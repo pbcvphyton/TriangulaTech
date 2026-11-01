@@ -1,0 +1,800 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-01",
+ "analises": [
+  {
+   "id": "73812d163d5d",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/01/trump-diz-que-flvio-bolsonaro-pode-ficar-nos-eua-pelo-tempo-que-quiser.ghtml",
+   "titulo": "Trump diz que Flávio Bolsonaro pode ficar nos EUA pelo tempo que quiser",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "trump-diz-que-flavio-bolsonaro-pode-ficar-nos-eu",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa"
+   },
+   "palavras": 484,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -2.78,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "O pai de Flávio, o ex-presidente de extrema-direita Jair Bolsonaro, está preso no Brasil",
+     "paragrafo": "P12",
+     "direcao": "esquerda",
+     "contribuicao": -2.78,
+     "explicacao": "Aplica o rótulo ideológico 'de extrema-direita' a Jair Bolsonaro, enquanto não atribui rótulo correspondente a Lula no mesmo parágrafo."
+    },
+    {
+     "id": "E2",
+     "criterio": "FONTES",
+     "citacao": "A embaixada brasileira em Washington não respondeu imediatamente ao pedido de comentário.",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A reportagem procurou ativamente a embaixada brasileira para obter o contraponto institucional sobre as declarações."
+    },
+    {
+     "id": "E3",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "Observadores externos descreveram a eleição como livre e justa.",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Contrapõe a fala infundada de Trump sobre fraude na eleição com a checagem consensual de observadores externos."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ce3c6ad900dc",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/01/agenda-de-politica-senado-retoma-analise-da-pec-da-seguranca-publica.ghtml",
+   "titulo": "Agenda de política: Senado retoma análise da PEC da segurança pública",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-agenda-votacao-da-pec-da-seguranca-public",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes",
+     "seguranca",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 813,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ac14228247cd",
+   "url": "https://valor.globo.com/politica/noticia/2026/10/31/ministros-de-lula-vao-ao-ms-apos-onda-de-violencia-pos-eleicao-189-casos-foram-identificados.ghtml",
+   "titulo": "Ministros de Lula vão ao MS após onda de violência pós-eleição; 189 casos foram identificados",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-investiga-189-casos-de-violencia-contra",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa"
+   },
+   "palavras": 311,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "As declarações aconteceram neste sábado (31) durante coletiva realizada em Dourados (MS).",
+     "paragrafo": "P5",
+     "direcao": "esquerda",
+     "contribuicao": -3.14,
+     "explicacao": "A reportagem é construída exclusivamente com base nas declarações dos três ministros de Estado, sem ouvir relatos diretos das comunidades ou autoridades locais."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "474fb061c068",
+   "url": "https://valor.globo.com/brasil/noticia/2026/10/31/acordo-mercosul-efta-comea-a-valer-entre-brasil-e-noruega-neste-domingo.ghtml",
+   "titulo": "Acordo Mercosul-EFTA começa a valer entre Brasil e Noruega neste domingo",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "acordo-de-livre-comercio-entre-mercosul-e-bloco",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 353,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8cb4f1f83336",
+   "url": "https://www.cnnbrasil.com.br/internacional/trump-diz-que-nao-tem-pressa-em-fechar-acordo-de-paz-com-o-ira/",
+   "titulo": "Trump diz que não tem pressa em fechar acordo de paz com o Irã",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "eua-e-ira-dialogam-via-mediadores-em-meio-a-amea",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular"
+   },
+   "palavras": 279,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "42b82ead955c",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/10/quase-meio-milhao-de-pessoas-protestam-na-franca-neste-sabado-segundo-organizadores.shtml",
+   "titulo": "Quase meio milhão de pessoas protestam na França neste sábado, segundo organizadores",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "onda-de-protestos-contra-o-custo-de-vida-mobiliz",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "costumes",
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa"
+   },
+   "palavras": 880,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "737bc3b8a3a6",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/01/ataques-russos-deixam-milhares-sem-energia-na-ucrnia-drones-danificam-instalaes-russas.ghtml",
+   "titulo": "Ataques russos deixam milhares sem energia na Ucrânia; drones danificam instalações russas",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataques-russos-cortam-energia-na-ucrania-enquant",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa"
+   },
+   "palavras": 530,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "No geral, o Ministério da Defesa da Rússia afirmou que suas forças abateram 235 drones ucranianos sobre regiões russas durante a noite. A Força Aérea da Ucrânia disse ter abatido 371 dos 433 drones de longo alcance lançados pela Rússia…",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Equilibra a divulgação de dados de perdas e abates fornecidos por ambos os lados do conflito."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6fd856de1519",
+   "url": "https://valor.globo.com/mundo/noticia/2026/10/31/crise-institucional-por-controle-do-supremo-se-aprofunda-na-polonia.ghtml",
+   "titulo": "Crise institucional por controle do Supremo se aprofunda na Polônia",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "disputa-pelo-controle-do-tribunal-constitucional",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa"
+   },
+   "palavras": 431,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.33,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "direita nacionalista, liderada pelo antigo partido governista, de extrema direita, Lei e Justiça (PiS)",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -3.33,
+     "explicacao": "Utiliza o rótulo 'extrema direita' para caracterizar o partido de oposição sem atribuir a qualificação a uma fonte específica."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6002e50e65e7",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/01/inflacao-emprego-e-pib-os-numeros-da-economia-de-trump-antes-das-eleicoes-de-meio-de-mandato-nos-eua.ghtml",
+   "titulo": "Inflação, emprego e PIB: os números da economia de Trump antes das eleições de meio de mandato nos EUA",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "persistencia-da-inflacao-pressiona-governo-trump",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 1156,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Trump costuma afirmar que nunca houve tantos empregos",
+     "paragrafo": "P17",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Usa o verbo 'afirmar' para introduzir a declaração de Trump, contrapondo-a logo em seguida com dados demográficos."
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "No último relatório antes das eleições, a inflação em setembro avançou para 3,7% em 12 meses.",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados oficiais com base, período e fonte clara."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6661744f480c",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/01/binance-retomara-saques-de-clientes-apos-ataque-hacker.ghtml",
+   "titulo": "Binance retomará saques de clientes após ataque hacker",
+   "veiculo": "Valor Econômico",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "binance-retoma-saques-de-clientes-em-fases-apos",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 649,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Bitcoin, que responde por cerca de 60% de todo o valor de mercado do setor",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Contextualiza a participação do Bitcoin no mercado com dados claros."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "94666a272a26",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/01/opep-mantm-inalteradas-as-metas-de-produo-de-petrleo-para-dezembro.ghtml",
+   "titulo": "Opep+ mantém inalteradas as metas de produção de petróleo para dezembro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "opep-mantem-inalteradas-as-metas-de-producao-de",
+   "data_publicacao": "2026-11-01",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 526,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Os preços do petróleo subiram mais de 2% na sexta-feira, com o Brent fechando a quase US$ 118 o barril",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Usa dados precisos de mercado para ilustrar o cenário de preços."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a8986da0fce6",
+   "url": "https://valor.globo.com/mundo/noticia/2026/10/31/os-avanos-da-cop-17-no-fundo-cli-que-se-abastece-de-natureza-e-cincia.ghtml",
+   "titulo": "Os avanços da COP 17 no Fundo Cáli, que se abastece de natureza e ciência",
+   "veiculo": "Valor Econômico",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop17-de-biodiversidade-aprova-plano-em-yerevan",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 78,
+    "rotulo": "Regular"
+   },
+   "palavras": 895,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Na verdade, foram pagos apenas US$ 10.588",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Contrasta a meta teórica com o valor efetivamente pago, fundamentando a crítica com dados."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "25c15f1d6644",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/10/incendio-de-grandes-proporcoes-atinge-area-de-protecao-ambiental-em-santarem-no-para.shtml",
+   "titulo": "Incêndio de grandes proporções atinge área de proteção ambiental em Santarém, no Pará",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "bombeiros-e-brigadistas-debelam-grande-incendio",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa"
+   },
+   "palavras": 619,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b6c7e6dab740",
+   "url": "https://c-level.folha.uol.com.br/ia/2026/10/openai-reduz-us-10-bi-da-meta-de-financiamento-em-meio-a-preocupacoes-com-setor-de-ia.shtml",
+   "titulo": "OpenAI reduz US$ 10 bi da meta de financiamento em meio a preocupações com setor de IA",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "openai-reduz-meta-de-captacao-para-ate-us-20-bil",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular"
+   },
+   "palavras": 513,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ffd7aa2d3658",
+   "url": "https://valor.globo.com/politica/noticia/2026/10/31/secretario-de-estado-americano-nega-ajuda-de-governo-dos-eua-na-fuga-de-flavio-bolsonaro.ghtml",
+   "titulo": "Secretário de Estado americano nega ajuda de governo dos EUA na fuga de Flávio Bolsonaro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "trump-diz-que-flavio-bolsonaro-pode-ficar-nos-eu",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa"
+   },
+   "palavras": 260,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a664c3500903",
+   "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/alcolumbre-marca-votacao-da-pec-da-seguranca-publica-para-terca-feira",
+   "titulo": "Alcolumbre marca votação da PEC da Segurança Pública para terça-feira",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-agenda-votacao-da-pec-da-seguranca-public",
+   "data_publicacao": "2026-10-31",
+   "analisado_em": "2026-11-01",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa"
+   },
+   "palavras": 523,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-01T15:45:42+00:00",
+   "provedor": "gemini → gemini_lite",
+   "modelo": "gemini-flash-latest + gemini-flash-lite-latest",
+   "candidatos": 40,
+   "textos_curtos": 3,
+   "falhas": 4,
+   "chamadas": 5,
+   "tokens": {
+    "entrada": 25041,
+    "saida": 14153
+   },
+   "analises": [
+    "73812d163d5d",
+    "ce3c6ad900dc",
+    "ac14228247cd",
+    "474fb061c068",
+    "8cb4f1f83336",
+    "42b82ead955c",
+    "737bc3b8a3a6",
+    "6fd856de1519",
+    "6002e50e65e7",
+    "6661744f480c",
+    "94666a272a26",
+    "a8986da0fce6",
+    "25c15f1d6644",
+    "b6c7e6dab740",
+    "ffd7aa2d3658",
+    "a664c3500903"
+   ]
+  }
+ ]
+}
