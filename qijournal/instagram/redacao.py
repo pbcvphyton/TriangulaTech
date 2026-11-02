@@ -50,7 +50,7 @@ def _lista_re(termos: Iterable[str]) -> re.Pattern:
 _PROIBIDAS_RE = _lista_re(PROIBIDAS)
 _VERBOS_PROIBIDOS_RE = _lista_re(VERBOS_PROIBIDOS)
 _CITADOS = {"framing", "framings"}  # texto do veículo, usado como está no JSON: o lint não julga
-_SEM_TEXTO = {"color", "id", "trend", "stance", "svg"}
+_SEM_TEXTO = {"color", "id", "trend", "stance", "svg", "capa_img"}  # capa_img: a imagem (data: URI) da miniatura
 
 
 def palavras_proibidas(texto: str) -> list[str]:

@@ -3,7 +3,8 @@
 1. Capa laranja chapada: "MESMO FATO, VÁRIAS VERSÕES."
 2. O funil da edição do D0, com a data: notícias → assuntos → coberturas comparadas → matérias.
 3. Pauta solitária: "x em cada 10 assuntos saem em uma fonte só", com a matriz de pontos do dia.
-4. A divisão: "Em x de cada 10 assuntos comparados, os veículos contaram sem divisão", com waffle.
+4. A divisão: "Em x de cada 10 assuntos comparados, os veículos contaram sem divisão", com waffle; a
+   base e o "dividir" são os do Placar (4+ veículos comparados, 2+ de cada lado: :func:`.estatistica.dividida`).
 5. Como fazemos e o que não fazemos.
 6. CTA: os 3 posts do dia.
 
@@ -33,9 +34,11 @@ SERIE_IA_DESDE = date(2026, 10, 14)  # 1ª edição com IA; antes disso o agrupa
 GANCHO_CAPA = "Mesmo fato, várias versões."
 SUB_CAPA = "O que aconteceu, quanto o mercado andou e como cada veículo contou."
 LINHA1 = "Mesmo fato, várias versões: como a Triangula lê a imprensa"
-REGRAS = ("Sem adjetivo, sempre com fonte.", "Sem foto de jornal.", "Sem ranking de veículos.")
+# "Sem adjetivo nosso": o adjetivo do veículo pode aparecer citado ("eleição decisiva"); o da casa, não (§4).
+REGRAS = ("Sem adjetivo nosso, sempre com fonte.", "Sem foto de jornal.", "Sem ranking de veículos.")
 ENQUADRAMENTO = "Enquadramento é escolha do que destacar, não erro."
 METODO_IA = "Classificação de ênfase feita por IA sobre os textos publicados."
+DIVIDIR = "Dividir = pelo menos 2 veículos de cada lado, o mesmo critério do Placar do dia."
 AGRUPAMENTO = "O agrupamento de assuntos é automático e tende a superestimar exclusivos."
 CTA = "Siga."
 CTA_LEGENDA = "Siga: todo dia, 3 posts."
@@ -64,8 +67,8 @@ class Historico:
     edicoes: int
     assuntos: int
     uma_fonte: int
-    coberturas: int
-    divididas: int  # pelo menos 1 veículo de cada lado (o "dividida" do selo de cobertura)
+    coberturas: int  # assuntos com 4+ veículos comparados (a base do Placar)
+    divididas: int  # dividiram pelo critério do Placar: 2+ veículos de cada lado (:func:`.estatistica.dividida`)
 
     @property
     def sem_divisao(self) -> int:
@@ -95,9 +98,9 @@ def historico(edition: Edition, history: Iterable[Edition]) -> Historico:
         if c is not None:
             h.assuntos += c.assuntos
             h.uma_fonte += c.uma_fonte
-        for cov, _ in E.coverages(e):
-            h.coberturas += 1
-            h.divididas += cov.count("a") >= 1 and cov.count("b") >= 1
+        p = E.placar(e, election=False)
+        h.coberturas += p.base
+        h.divididas += p.rachas
     return h
 
 
@@ -200,18 +203,18 @@ def _pauta_solitaria(edition: Edition, h: Historico) -> Slide:
 
 def _divisao(h: Historico) -> Slide:
     x = proporcao(h.sem_divisao, h.coberturas, "de")
-    titulo = f"Em {x} assuntos comparados, os veículos contaram sem divisão."
+    titulo = f"Em {x} assuntos comparados, os veículos contaram sem divisão."  # a base: 4+ veículos
     n = E.num(h.coberturas)
-    if h.coberturas > 100:  # um quadrado por cobertura não cabe: cada um vale 1% delas
+    if h.coberturas > 100:  # um quadrado por assunto não cabe: cada um vale 1% deles
         total, marcados = 100, round(100 * h.divididas / h.coberturas)
-        unidade, plural = f"1% das {n} coberturas comparadas", f"quadrados; cada um, 1% das {n} coberturas"
+        unidade, plural = f"1% dos {n} assuntos comparados", f"quadrados; cada um, 1% dos {n} assuntos"
     else:
         total, marcados = h.coberturas, h.divididas
-        unidade, plural = "cobertura comparada", "coberturas comparadas"
+        unidade, plural = "assunto comparado", "assuntos comparados"
     svg, descricao = G.waffle(
         total,
         marcados,
-        rotulos=("divididas", "sem divisão"),
+        rotulos=("dividiu" if marcados == 1 else "dividiram", "sem divisão"),  # as palavras do Placar
         unidade=unidade,
         unidade_plural=plural,
         por_linha=10,
@@ -220,9 +223,8 @@ def _divisao(h: Historico) -> Slide:
     )
     texto = "Nos outros, a gente mostra a diferença."
     pe = (
-        f"{h.periodo_frase}: {E.num(h.sem_divisao)} de {E.num(h.coberturas)} coberturas comparadas"
-        f"{_pct(h.sem_divisao, h.coberturas)} sem divisão, em {h.edicoes} edições. Dividida = pelo menos 1 veículo "
-        f"de cada lado. {METODO_IA}"
+        f"{h.periodo_frase}: {E.num(h.sem_divisao)} de {E.num(h.coberturas)} assuntos com 4 ou mais veículos "
+        f"comparados{_pct(h.sem_divisao, h.coberturas)} sem divisão, em {h.edicoes} edições. {DIVIDIR} {METODO_IA}"
     )
     ctx = {
         "selo": SELO,
@@ -281,8 +283,9 @@ def _legenda(edition: Edition, h: Historico) -> str:
         f" → {E.num(len(edition.stories))} matérias.",
         f"▸ Pauta solitária: {h.periodo}, {E.num(h.uma_fonte)} de {E.num(h.assuntos)} assuntos"
         f"{_pct(h.uma_fonte, h.assuntos)} saíram em uma fonte só, nas fontes que lemos.",
-        f"▸ A divisão: no mesmo período, {E.num(h.sem_divisao)} de {E.num(h.coberturas)} coberturas comparadas"
-        f"{_pct(h.sem_divisao, h.coberturas)} saíram sem divisão. Nas outras, o Raio-X mostra o que cada lado destacou.",
+        f"▸ A divisão: no mesmo período, {E.num(h.sem_divisao)} de {E.num(h.coberturas)} assuntos com 4 ou mais "
+        f"veículos comparados{_pct(h.sem_divisao, h.coberturas)} saíram sem divisão ({DIVIDIR[0].lower()}{DIVIDIR[1:-1]}). "
+        "Nas outras, o Raio-X mostra o que cada lado destacou.",
         "▸ " + " ".join(REGRAS),
         f"▸ Todo dia, 3 posts: {agenda}.",
         f"Como medimos: agrupamento automático das notícias por assunto; {METODO_IA[0].lower()}{METODO_IA[1:]} "

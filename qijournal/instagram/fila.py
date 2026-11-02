@@ -195,6 +195,11 @@ class Fila:
         uma lista por post: o ``entidades_recentes`` de :func:`.selecao.escolher_raiox`."""
         return [list(p.entidades) for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING)) if p.entidades]
 
+    def materias_raiox(self, day: date | str, dias: int = 1) -> list[str]:
+        """As matérias (ids) dos Raio-X dos ``dias`` anteriores a ``day``, publicados ou ainda na fila: a capa
+        do Em 1 minuto das 07:00 não reabre o assunto da noite anterior (:func:`.formatos.manha.selecionar`)."""
+        return [sid for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING)) if p.entidades for sid in p.story_ids[:1]]
+
     def due(self, now: datetime) -> list[Post]:
         """Publicações pendentes cujo horário chegou; marca como expiradas as que passaram do prazo."""
         ready: list[Post] = []

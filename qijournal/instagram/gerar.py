@@ -9,6 +9,7 @@ para o substituto e o motivo vai para o log. Na fila, a ordem é manhã, stories
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import logging
 import os
@@ -50,6 +51,8 @@ TENTATIVAS_NUMERO = 8  # substitutos do Número do dia antes de desistir
 
 # Lint de uma peça: devolve os problemas (lista vazia = aprovada).
 Aprovar = Callable[[conteudo.Peca], list[str]]
+# A imagem já renderizada do slide i (a partir de 0) de uma peça, como data: URI ("" se não houver).
+Imagem = Callable[[conteudo.Peca, int], str]
 
 
 def environment() -> Environment:
@@ -169,6 +172,14 @@ def _render_piece(
     return out
 
 
+def data_uri(path: Path) -> Markup:
+    """A imagem como ``data:`` URI (Markup: o polish e o escape não mexem nela); "" se o arquivo não existe."""
+    path = Path(path)
+    if not path.is_file():
+        return Markup("")
+    return Markup(f"data:image/jpeg;base64,{base64.b64encode(path.read_bytes()).decode('ascii')}")
+
+
 # ── A grade do dia ────────────────────────────────────────────────────────
 
 
@@ -199,6 +210,7 @@ def build_pieces(
     history: Sequence[Edition] | None = None,
     *,
     aprovar: Aprovar | None = None,
+    imagem: Imagem | None = None,
 ) -> list[conteudo.Peca]:
     """As publicações do dia, na ordem da fila: manhã, stories, número, noite.
 
@@ -213,6 +225,8 @@ def build_pieces(
     - ``history``: :func:`.estatistica.load_history` até o dia (a edição entra de todo jeito);
     - ``aprovar``: o lint de cada peça; o gerador renderiza e passa o que transbordou. Sem ele,
       só o lint do texto.
+    - ``imagem``: a imagem já renderizada de um slide de uma peça aprovada (``data:`` URI), para a
+      miniatura da capa do Em 1 minuto na tela 4 dos stories. Sem ela, o desenho genérico.
     """
     day = date.fromisoformat(edition.date)
     ig = config.instagram
@@ -289,9 +303,14 @@ def build_pieces(
 
     # 3. Manhã: Em 1 minuto ou, sem IA (ou reprovado), o Terminal.
     ontem = next((e for e in history if e.date == (day - timedelta(days=1)).isoformat()), None)
+    # a capa não estampa o que a noite do dia estampa (o Raio-X ou os destaques do Placar) nem reabre, sem
+    # número novo, o assunto do Raio-X da noite anterior, o post logo antes dela na grade
+    ids_ontem = set(fila.materias_raiox(day, 1))
+    noite_ontem = [s for s in (ontem.stories if ontem is not None else []) if s.id in ids_ontem]
     manha = MH.em_1_minuto(
         edition, brand, history, election=election, nomes=nomes, numero_serie=numero_serie(MH.SERIE, MH.SLOT),
         raiox_story_id=raiox_id, ontem=ontem, numero=numero, limiares=lim,
+        evitar_capa=noite.story_ids if noite is not None else (), noite_anterior=noite_ontem,
     )
     manha = aprovada(manha, "a manhã vira o Terminal")
     # Os três posts de feed nunca estampam a mesma matéria (a manhã cede).
@@ -311,10 +330,13 @@ def build_pieces(
     feed = [p for p in (manha, numero, noite) if p is not None]
     agenda = ST.agenda_das_pecas(feed, horarios(config, day))
     capa = None
+    capa_img = ""
     if manha is not None and manha.serie == MH.SERIE and manha.story_ids:
         capa = next((s for s in edition.stories if s.id == manha.story_ids[0]), None)
+        capa_img = (imagem(manha, 0) if imagem is not None else "") or ""
     stories = ST.stories_manha(
-        edition, brand, history, election=election, nomes=nomes, agenda=agenda, capa=capa, raiox_story_id=raiox_id
+        edition, brand, history, election=election, nomes=nomes, agenda=agenda, capa=capa, raiox_story_id=raiox_id,
+        capa_img=capa_img,
     )
     stories = aprovada(stories, "os stories não saem")
     return [p for p in (manha, stories, numero, noite) if p is not None]
@@ -397,7 +419,11 @@ def generate(
                 feitas[id(piece)] = feita
             return problemas
 
-        pieces = build_pieces(edition, config, brand, fila, history, aprovar=aprovar)
+        def imagem(piece: conteudo.Peca, i: int) -> str:
+            feita = feitas.get(id(piece))
+            return data_uri(Path(media_dir) / feita.images[i]) if feita is not None and i < len(feita.images) else ""
+
+        pieces = build_pieces(edition, config, brand, fila, history, aprovar=aprovar, imagem=imagem)
         for piece in pieces:
             w = janela(piece)
             if w is None:

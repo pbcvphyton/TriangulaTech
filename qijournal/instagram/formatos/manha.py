@@ -46,6 +46,7 @@ from ..conteudo import (
 from ..redacao import LEGENDA_MAX, LINHA1_MAX, palavras_proibidas, similaridade, verbos_proibidos
 from ..selecao import entidades, ordered_stories
 from . import mercado as M
+from . import noite as N  # _nomeia, _frases e _corta_na_virgula: o fato com sujeito, como no Raio-X
 
 SLOT = "manha"
 SERIE = "em1min"
@@ -55,6 +56,7 @@ FATOS = 5
 FATOS_MIN = 3  # com menos, o 07:00 vira o Terminal da manhã
 MANCHETE_MAX = 90
 FRASE_MAX = 230
+CORPO_MAX = 200  # a frase do corpo (reserva do fato) é cortada na vírgula antes disso
 JACCARD_CAPA = 0.6  # o slide 2 com texto parecido com a capa troca pela linha fina
 MESMO_ASSUNTO = 0.5  # dois itens com Jaccard ≥ 0,5 são o mesmo assunto
 MAIS_COBERTO_MIN = 5
@@ -157,7 +159,7 @@ MESES = ("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "a
 class Fato:
     texto: str  # a frase do slide, sem markdown, terminada em ponto
     story: Story | None  # a matéria (None: item do briefing sem casamento; sai sem selo)
-    origem: str  # "briefing" | "manchete" | "dek"
+    origem: str  # "briefing" | "manchete" | "dek" | "corpo"
     briefing: str = ""  # o item do briefing casado com a matéria
 
 
@@ -322,18 +324,22 @@ def _limpo(texto: str, titulos: list[str], limite: int = FRASE_MAX) -> tuple[str
     return curto, bool(curto) and n < 8 and n < 0.6 * total
 
 
-def _manchete_capa(edition: Edition, story: Story) -> str:
+def _manchete_capa(edition: Edition, story: Story, literais: set[str] = frozenset()) -> str:
     """A manchete da capa (§4 e §5.4): :func:`.estatistica.capa_sem_adj` (corte no último " e "
     ou "," com 5+ palavras; senão a linha fina), sem palavra proibida nem verbo que julga veículo
-    e com até 90 caracteres; "" se nada disso sobrar."""
+    e com até 90 caracteres; o título literal de um veículo (``literais``) troca pela linha fina;
+    "" se nada disso sobrar."""
     titulos = E.titulos_por_veiculo(E.topic_of(edition, story.id))
     texto = _frase(E.capa_sem_adj(edition, story))
+    if E.titulo_literal(texto, literais):
+        texto = _frase(story.dek)
     if _adj_sobrando(texto, titulos):  # a linha fina de reserva também tinha adjetivo
         texto = ""
     texto, _ = _sem_proibidas(texto) if texto else ("", False)
     if not texto or verbos_proibidos(texto):
         return ""
-    return _sem_ponto(_cabe(texto, MANCHETE_MAX))
+    texto = _sem_ponto(_cabe(texto, MANCHETE_MAX))
+    return "" if E.titulo_literal(texto, literais) else texto
 
 
 # ── Número em destaque ────────────────────────────────────────────────────
@@ -582,6 +588,14 @@ def _eleitoral(story: Story | None, textos: list[str], nomes: tuple[str, ...]) -
     return section != "mundo" and bool(_ELEICAO.search(" ".join([junto, story.headline, story.dek] if story else [junto])))
 
 
+def _eleicao_de_fora(story: Story | None, texto: str) -> bool:
+    """Eleição de qualquer país com todas as letras no texto do fato ou na manchete, fora o esporte
+    (:func:`.estatistica.eleicao_escrita`; "reeleição na Fifa" fica)."""
+    if story is not None and story.section == "esporte":
+        return False
+    return E.eleicao_escrita(texto, story.headline if story is not None else "")
+
+
 def eleitoral_capa(story: Story, textos: Iterable[str] = (), nomes: Iterable[str] = E.NOMES_ELEICAO) -> bool:
     """Na capa do período eleitoral vale a regra mais dura: política, :func:`_eleitoral` ou eleição
     de qualquer país na manchete ou nos ``textos`` ("Israel vai às urnas em eleição decisiva", 27/10).
@@ -597,27 +611,39 @@ def eleitoral_capa(story: Story, textos: Iterable[str] = (), nomes: Iterable[str
 
 
 def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "",
-           evitar_numero: Iterable[str] = ()) -> Fato | None:
+           evitar_numero: Iterable[str] = (), literais: set[str] = frozenset()) -> Fato | None:
     """O texto do fato: o item do briefing, a manchete ou a linha fina. Vale a primeira versão
     limpa sem corte pesado; entre o item e a manchete, a que tem número em destaque passa na
     frente (a linha fina não: costuma não dizer o sujeito, "Querosene… atinge 40% dos custos da
     empresa"); sem versão sem corte pesado, a primeira com corte. Com ``evitar`` (a manchete da
     capa), pula o que tiver Jaccard ≥ 0,6 com ela; ``evitar_numero`` são números que não contam
-    (o da capa, no slide 2)."""
+    (o da capa, no slide 2). O título literal de um veículo (``literais``) nunca vale: "Colisão
+    entre trens de alta velocidade mata ao menos 68 pessoas na Espanha" é o da Folha (29/10). Entre a
+    linha fina e a frase do corpo, vale a que nomeia o fato (:func:`.noite._nomeia`): em 29/10, "Pelo
+    menos 68 pessoas morreram… após a colisão entre dois trens…", e não "Desastre na província de Toledo…"."""
     titulos = _titulos(edition, story)
     candidatos = [("briefing", briefing)]
     if story is not None:
         candidatos += [("manchete", story.headline), ("dek", story.dek)]
+    if story is not None and not evitar:
+        # a frase do corpo que nomeia o fato, cortada na vírgula: a reserva da linha fina que não o nomeia
+        # (no slide 2 não: a capa já nomeia o fato, e o slide 2 acrescenta)
+        corpo = (N._corta_na_virgula(f, CORPO_MAX) for par in story.body[:1] for f in N._frases(par)[:2])
+        candidatos += [("corpo", f) for f in corpo if f and N._nomeia(f, story)][:1]
     evitar_numero = list(evitar_numero)
     limpos = []
     for i, (origem, bruto) in enumerate(candidatos):
         t, pesado = _limpo(bruto, titulos) if bruto else ("", False)
+        if t and E.titulo_literal(t, literais):
+            continue
         if t and not (evitar and similaridade(t, evitar) >= JACCARD_CAPA):
-            sem_numero = origem == "dek" or numero_fato(t, evitar_numero) is None
-            limpos.append((pesado, sem_numero, i, origem, t))
+            reserva = origem in ("dek", "corpo")
+            sem_numero = reserva or numero_fato(t, evitar_numero) is None
+            nao_nomeia = reserva and not evitar and story is not None and not N._nomeia(t, story)
+            limpos.append((pesado, sem_numero, nao_nomeia, i, origem, t))
     if not limpos:
         return None
-    _, _, _, origem, t = min(limpos)
+    *_, origem, t = min(limpos)
     return Fato(_ponto(t), story, origem, briefing)
 
 
@@ -645,20 +671,24 @@ def selecionar(
     fora: Iterable[str] = (),
     paineis: list[dict[str, Any]] | None = None,
     vespera: list[tuple[set[str], set[str]]] | None = None,
+    noite_anterior: Iterable[Story] = (),
 ) -> Selecao | None:
     """A capa e os 5 fatos do dia (§5.4).
 
     - Capa: a manchete (no período eleitoral, a 1ª que não é política nem eleição, de nenhum
-      país), fora de ``evitar_capa`` (as matérias do Raio-X e do Número: os três posts do dia
-      nunca têm a mesma peça principal). ``fora`` (a matéria do Número) não entra nem como fato.
+      país), fora de ``evitar_capa`` (as matérias do Raio-X ou do Placar e do Número: os três posts
+      do dia nunca têm a mesma peça principal) e sem repetir a noite anterior (``noite_anterior``, a
+      matéria do Raio-X da véspera; o post das 07:00 vem logo depois dele na grade): 2+ entidades em
+      comum e nenhum número novo, a regra da véspera ("Flávio Bolsonaro" em 28 e 29/10). Ela ainda pode
+      ser fato. ``fora`` (a matéria do Número) não entra nem como fato.
     - Fatos: o 1º é a matéria da capa; depois os itens do briefing e, para completar, as
       matérias, pela ordem de editoria (brasil > mercados > tecnologia > …); o item do briefing
       sem matéria (sem selo nem fontes) só depois delas; esporte e variedades só se faltar fato.
-    - Fora: assunto eleitoral no período eleitoral (e só 1 de política, sempre o último; a eleição de
-      outro país, que o filtro deixa passar em Mundo, conta como esse item de política); fato que
-      cita Ibovespa, dólar, Brent ou bitcoin com a variação do slide de mercado (``paineis``); fato
-      com 2+ entidades em comum com a véspera (``vespera``) e sem número novo; o mesmo assunto
-      duas vezes (2+ entidades em comum ou :func:`mesmo_assunto`).
+    - Fora: assunto eleitoral no período eleitoral, também a eleição de outro país ("Israel vai às
+      urnas", 27/10; fora o esporte), e só 1 de política, sempre o último; fato que cita Ibovespa,
+      dólar, Brent ou bitcoin com a variação do slide de mercado (``paineis``); fato com 2+
+      entidades em comum com a véspera (``vespera``) e sem número novo; o mesmo assunto duas vezes
+      (2+ entidades em comum ou :func:`mesmo_assunto`); título literal de veículo (vai o próximo texto).
 
     None se nenhuma matéria serve de capa.
     """
@@ -667,6 +697,8 @@ def selecionar(
     vespera = vespera or []
     fora = {x for x in fora if x}
     evitar = {x for x in evitar_capa if x} | fora
+    noite = [_marca(Fato(s.headline, s, "manchete")) for s in noite_anterior]
+    literais = E.titulos_literais(edition)
     por_story, orfaos = _briefing(edition)
     ordem = [s for s in ordered_stories(edition) if s.id not in fora]
 
@@ -685,13 +717,15 @@ def selecionar(
             if story.id in evitar or (passada == 0 and story.section in SO_SE_FALTAR and story.id != lead):
                 continue
             b = por_story.get(story.id, "")
+            if _repete_vespera(story, [b, story.headline, story.dek], noite):
+                continue
             if (election and eleitoral_capa(story, [b], nomes)) or bloqueado(story, [b]):
                 continue
-            m = _manchete_capa(edition, story)
+            m = _manchete_capa(edition, story, literais)
             if not m:
                 continue
             n = numero_capa(f"{story.headline} {story.dek}")
-            f = _texto(edition, story, b, evitar=m, evitar_numero=[n[1]] if n else ())
+            f = _texto(edition, story, b, evitar=m, evitar_numero=[n[1]] if n else (), literais=literais)
             if f is not None:
                 capa, manchete, primeiro = story, m, f
                 break
@@ -719,13 +753,13 @@ def selecionar(
             break
         if bloqueado(story, [b]):
             continue
-        f = _texto(edition, story, b)
+        f = _texto(edition, story, b, literais=literais)
         if f is None:
             continue
-        # no período eleitoral, a eleição de outro país também ocupa a vaga única de política
-        is_pol = election and (
-            (story is not None and story.section == "politica") or bool(_ELEICAO.search(f.texto) or _URNAS.search(f.texto))
-        )
+        # no período eleitoral, nem a eleição de outro país (o filtro base a deixa passar em Mundo)
+        if election and _eleicao_de_fora(story, f.texto):
+            continue
+        is_pol = election and story is not None and story.section == "politica"
         if is_pol and any(pol for _, pol in escolhidos):
             continue
         ents = _entidades(story, f.texto)
@@ -916,15 +950,32 @@ def linha_relogio(
 
 
 def _cobertura(edition: Edition, story: Story | None, raiox_story_id: str | None) -> dict[str, Any]:
-    """O selo de cobertura (:func:`.estatistica.selo_cobertura`), a contagem de veículos dele e a mini barra."""
+    """O selo de cobertura (:func:`.estatistica.selo_cobertura`), a contagem dele ("9 veículos", "4 fontes") e a
+    mini barra (:func:`.estatistica.lados`, só com 2+ comparados): a barra nunca soma mais que o selo."""
     if story is None:
-        return {"cobertura": "", "cob_k": 0, "cob_a": 0, "cob_n": 0, "cob_b": 0}
-    c = story.coverage
-    a, b = (c.count("a"), c.count("b")) if c else (0, 0)
-    n = len(c.outlets) - a - b if c else 0
+        return {"cobertura": "", "cob_k": 0, "cob_kt": "", "cob_a": 0, "cob_n": 0, "cob_b": 0}
+    a, n, b = E.lados(story.coverage)
+    if a + n + b < 2:
+        a = n = b = 0
     selo = E.selo_cobertura(edition, story, raiox_story_id)
-    m = re.match(r"(\d+) veículos?\b", selo)
-    return {"cobertura": selo, "cob_k": int(m.group(1)) if m else 0, "cob_a": a, "cob_n": n, "cob_b": b}
+    m = re.match(r"(\d+) (?:veículos?|fontes?)\b", selo)
+    return {
+        "cobertura": selo, "cob_k": int(m.group(1)) if m else 0, "cob_kt": m.group(0) if m else "",
+        "cob_a": a, "cob_n": n, "cob_b": b,
+    }
+
+
+def fontes_do_fato(edition: Edition, story: Story) -> list[str]:
+    """As fontes do fato: as da matéria e, se forem menos que as que o selo conta, as do assunto no index,
+    para a lista fechar com o selo (19/10: "2 veículos" com só "Valor Econômico")."""
+    nomes = source_names(story)
+    topic = E.topic_of(edition, story.id)
+    if topic is None:
+        return nomes
+    k = _cobertura(edition, story, None)["cob_k"]
+    if len(nomes) < k:
+        nomes = nomes + [x for x in E.topic_sources(topic) if x not in nomes]
+    return nomes
 
 
 def _slide_fato(
@@ -937,18 +988,20 @@ def _slide_fato(
     raiox_story_id: str | None,
     evitar_numero: Iterable[str] = (),
     relogio: tuple[list[dict[str, str]], int] = ([], 0),
+    cobertura_heroi: bool = True,
 ) -> Slide:
-    """Um fato: número (ou a cobertura, ou nada) + frase, com os tamanhos que enchem o miolo."""
+    """Um fato: número (ou a cobertura, ou nada) + frase, com os tamanhos que enchem o miolo.
+    ``cobertura_heroi=False`` no slide 2 quando a capa já estampa a cobertura (o slide 2 nunca repete a capa)."""
     story = f.story
     numero = numero_fato(f.texto, evitar_numero)
     qual, valor = numero if numero else ("", "")
-    nomes = source_names(story) if story else []
+    nomes = fontes_do_fato(edition, story) if story else []
     cob = _cobertura(edition, story, raiox_story_id)
     selo_pe = cob["cobertura"]
     heroi = "numero" if valor else ""
-    if not valor and cob["cob_k"] >= COBERTURA_MIN:  # a cobertura medida vira o número do slide
+    if not valor and cobertura_heroi and cob["cob_k"] >= COBERTURA_MIN:  # a cobertura medida vira o número do slide
         heroi, qual = "cobertura", NOTICIADO
-        valor = f"{cob['cob_k']} veículos"
+        valor = cob["cob_kt"]
         selo_pe = selo_pe.split(" · ", 1)[1] if " · " in selo_pe else ""
     batidas, mais = relogio
     section = section_info(edition, story.section) if story else None
@@ -1092,6 +1145,8 @@ def em_1_minuto(
     ontem: Edition | None = None,
     numero: Peca | None = None,
     limiares: LimiaresConfig | None = None,
+    evitar_capa: Iterable[str] = (),
+    noite_anterior: Iterable[Story] = (),
 ) -> Peca | None:
     """O carrossel das 07:00: capa, 5 fatos, Mercado em linha e fechamento (8 slides).
 
@@ -1100,6 +1155,14 @@ def em_1_minuto(
     - ``ontem``: a edição da véspera (None: procura em ``history``), para não repetir assunto sem número novo.
     - ``numero``: a :class:`~.conteudo.Peca` do Número do dia: a matéria dele não vira capa nem fato e,
       se o Número for o acumulado de um ativo (``acum:ibov``), esse ativo não vira o título do mercado.
+    - ``evitar_capa``: outras matérias que não viram capa (as que o Placar da noite estampa: 19/10).
+    - ``noite_anterior``: a matéria do Raio-X da noite anterior; a capa não reabre o assunto dele sem
+      número novo (pode ser fato).
+
+    Capa sem número na manchete e com 5+ veículos: a cobertura vira o número ("NOTICIADO POR / 13
+    VEÍCULOS") e o slide 2 não a repete. Na linha do mais coberto, a contagem vai em tinta (o laranja
+    é do dado da própria capa); quando o mais coberto é a própria capa, a linha não leva a contagem,
+    que fica para o slide 2.
 
     None sem IA, sem briefing nem matérias, ou com menos de 3 fatos (o 07:00 vira o Terminal):
     em 26/10, dia seguinte ao 2º turno, só o Bola de Ouro escapa do filtro eleitoral.
@@ -1110,7 +1173,7 @@ def em_1_minuto(
     lim = limiares or LimiaresConfig()
     day = edition_day(edition)
     ate = [h for h in history if h.date <= edition.date] or [edition]
-    evitar_capa = {raiox_story_id} | set(numero.story_ids if numero else [])
+    evitar_capa = {raiox_story_id, *evitar_capa} | set(numero.story_ids if numero else [])
     chave = numero.chave if numero else ""
     mercado = M.mercado_slide(
         edition, ate, tema="dark", min_pontos=lim.grafico_min_pontos,
@@ -1120,7 +1183,7 @@ def em_1_minuto(
     marcas = vespera(edition, history, ontem, election=election, nomes=nomes, min_pontos=lim.grafico_min_pontos)
     sel = selecionar(
         edition, election=election, nomes=nomes, evitar_capa=evitar_capa, fora=numero.story_ids if numero else (),
-        paineis=paineis, vespera=marcas,
+        paineis=paineis, vespera=marcas, noite_anterior=noite_anterior,
     )
     if sel is None or len(sel.fatos) < FATOS_MIN:
         return None
@@ -1129,6 +1192,10 @@ def em_1_minuto(
     total = len(sel.fatos)
     num_capa = numero_capa(f"{capa.headline} {capa.dek}")
     qual, valor = num_capa if num_capa else ("", "")
+    heroi = "numero" if valor else ""
+    cob_capa = _cobertura(edition, capa, raiox_story_id)
+    if not valor and cob_capa["cob_k"] >= COBERTURA_MIN:  # sem número na manchete, a cobertura medida da capa
+        heroi, qual, valor = "cobertura", NOTICIADO, cob_capa["cob_kt"]
     mc = _mais_coberto(edition, capa, election=election, nomes=nomes, paineis=paineis)
     faixa = _faixa(edition)
     chamada = f"{total} fatos + mercado" if mercado else f"{total} fatos"
@@ -1142,14 +1209,14 @@ def em_1_minuto(
         alt_capa.append(f"{faixa.replace(' · ', ', ')}.")
     if mc:
         alt_capa.append(
-            f"É o assunto mais coberto do dia: {mc['k']} veículos." if mc["proprio"]
-            else f"O mais coberto: {mc['nome']}, {mc['k']} veículos."
+            "É o assunto mais coberto do dia." if mc["proprio"] else f"O mais coberto: {mc['nome']}, {mc['k']} veículos."
         )
     slides = [
         Slide(
             "m1_capa",
             {
                 "selo": selo_capa,
+                "heroi": heroi,
                 "qual": qual,
                 "valor": valor,
                 "tam": tam,
@@ -1158,8 +1225,7 @@ def em_1_minuto(
                 "faixa": faixa,
                 "mais_coberto": mc,
                 "chamada": chamada,
-                # sem número na manchete, o laranja vai para a contagem do mais coberto
-                "destaque": valor or (f"{mc['k']} veículos" if mc else ""),
+                "destaque": valor,  # o laranja é só do dado da própria capa
                 "section": capa.section,
                 "nota": NOTA,
             },
@@ -1176,8 +1242,9 @@ def em_1_minuto(
             total,
             selo,
             raiox_story_id=raiox_story_id,
-            evitar_numero=[valor] if primeiro else (),
+            evitar_numero=[valor] if primeiro and heroi == "numero" else (),
             relogio=linha_relogio(edition, capa, lim) if primeiro else ([], 0),
+            cobertura_heroi=not (primeiro and heroi == "cobertura"),
         )
         selos.append(_cobertura(edition, f.story, raiox_story_id)["cobertura"])
         slides.append(slide)

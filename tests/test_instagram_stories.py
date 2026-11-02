@@ -272,3 +272,57 @@ def test_templates_renderizam_com_assinatura_em_todas_as_telas(handle):
             assert ("@triangula" in html) == bool(handle)
             assert handle or "<span>triangula</span>" in html
             assert "°C" not in html
+
+
+# ── Revisão da Onda 1: selo e barra, título literal, miniatura real ──────
+
+
+@real
+@pytest.mark.parametrize("dia", DIAS_IA)
+def test_manchete_selo_e_barra_fecham(dia):
+    """dados#9 / dados#18: o selo usa a definição do Placar e a barra nunca soma mais que ele."""
+    p = stories(dia)
+    t = tela(p, "st_manchete")
+    if t is None:
+        return
+    x = t.ctx
+    k = int(x["selo_cob"].split()[0])
+    soma = x["a"] + x["n"] + x["b"]
+    assert soma <= k and (soma == 0 or soma >= 2)
+    story = next(s for s in edicao(dia).stories if s.id == p.story_ids[0])
+    assert ("dividida" in x["selo_cob"]) == bool(story.coverage and E.dividida(story.coverage))
+    assert not E.titulo_literal(x["titulo"], E.titulos_literais(edicao(dia)))
+
+
+@real
+def test_27_10_manchete_sem_eleicao_de_outro_pais():
+    e = edicao("27")
+    israel = next(s for s in e.stories if s.id.startswith("israel-vai-as-urnas"))
+    assert ST.textos_manchete(e, israel, election=True, nomes=E.NOMES_ELEICAO) is None
+
+
+@real
+def test_chamada_com_a_capa_real_e_o_desenho_de_reserva():
+    """arte#18: a miniatura é a capa do Em 1 minuto já renderizada; sem ela, o desenho genérico."""
+    env = gerar.environment()
+    brand = gerar.brand_context(load_config(ROOT))
+    img = "data:image/jpeg;base64,/9j/4AAQSkZJRg=="
+    from markupsafe import Markup
+
+    p = stories("24", capa_img=Markup(img))
+    ctx = tela(p, "st_feed").ctx
+    assert ctx["capa_img"] == img
+    html = env.get_template("st_feed.html.j2").render(brand=brand, s=conteudo.polish(ctx), page=4, pages=4, kind="story", slot="stories")
+    assert f'<img src="{img}"' in html and 'class="strip real"' in html and 'class="card c1"' not in html
+    assert redacao.lint(p, election=True, veiculos=veiculos(edicao("24"))) == []  # a imagem não é texto
+    reserva = tela(stories("24"), "st_feed").ctx
+    assert reserva["capa_img"] == ""
+    html = env.get_template("st_feed.html.j2").render(brand=brand, s=conteudo.polish(reserva), page=4, pages=4, kind="story", slot="stories")
+    assert "<img" not in html and 'class="card c1"' in html
+
+
+def test_data_uri(tmp_path):
+    f = tmp_path / "capa.jpg"
+    f.write_bytes(b"\xff\xd8\xff\xe0JFIF")
+    assert str(gerar.data_uri(f)) == "data:image/jpeg;base64,/9j/4EpGSUY="
+    assert gerar.data_uri(tmp_path / "nao-existe.jpg") == ""

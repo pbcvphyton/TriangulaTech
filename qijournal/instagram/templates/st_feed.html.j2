@@ -1,5 +1,6 @@
-{# Stories da manhã · tela 4, chamada para o carrossel (§4.6): o gancho, a miniatura do Em 1 minuto 2.0 (capa
-   marinho com o número em laranja, um fato com o selo de cobertura e o mercado em linha: só forma, sem dado)
+{# Stories da manhã · tela 4, chamada para o carrossel (§5.5): o gancho, a miniatura do Em 1 minuto 2.0 (a capa
+   do dia já renderizada, inclinada, sobre dois cartões do carrossel; sem ela, o desenho genérico: capa
+   marinho com o número em laranja, um fato com o selo de cobertura e o mercado em linha, só forma, sem dado)
    e "Toque no perfil ↗". O story sai às 07:10 e o carrossel pode atrasar: o texto não diz que ele "já"
    está no ar, diz o que é e onde fica. A ação sai do story (vai ao perfil): ↗, não →. Marinho. #}
 {% extends "_base.html.j2" %}
@@ -23,6 +24,13 @@
 .card .mb i{display:block;height:100%}
 .card .ft{position:absolute;left:22px;bottom:26px;width:96px;height:12px;background:rgba(246,244,239,.45)}
 .card svg.mk{position:absolute;left:22px;top:66px}
+.strip.real{height:600px;margin-top:56px}
+.strip.real .card{background:#1B2745}
+.strip.real .card.r1{left:20px;top:22px;z-index:3;width:440px;height:550px;transform:rotate(-2.5deg);
+  box-shadow:0 0 0 3px rgba(246,244,239,.75),0 30px 64px rgba(0,0,0,.6)}
+.strip.real .card.r1 img{display:block;width:100%;height:100%;object-fit:cover}
+.strip.real .card.r2{left:380px;top:44px;z-index:2;width:400px;height:500px;transform:rotate(3deg);opacity:.92}
+.strip.real .card.r3{left:620px;top:70px;z-index:1;width:360px;height:450px;transform:rotate(7deg);opacity:.7}
 .dots{flex:none;display:flex;gap:12px;margin-top:20px}
 .dots i{display:block;width:14px;height:14px;border-radius:50%;background:rgba(246,244,239,.28)}
 .dots i:first-child{background:#F6F4EF}
@@ -35,6 +43,13 @@
 <div class="frame">
   <div class="kicker">{{ s.kicker }}</div>
   {{ m.hook(s.titulo, s.destaque, s.tam, 96) }}
+  {% if s.capa_img %}
+  <div class="strip real" aria-hidden="true">
+    <div class="card r1"><img src="{{ s.capa_img }}" alt=""></div>
+    <div class="card r2"></div>
+    <div class="card r3"></div>
+  </div>
+  {% else %}
   <div class="strip" aria-hidden="true">
     <div class="card c1"><div class="pl"></div><div class="q"></div><div class="nb"></div>
       <div class="ln" style="top:206px;--w:.92"></div><div class="ln" style="top:232px;--w:.84"></div><div class="ln" style="top:258px;--w:.9"></div><div class="ln" style="top:284px;--w:.5"></div>
@@ -52,6 +67,7 @@
       </svg>
       <div class="ft"></div></div>
   </div>
+  {% endif %}
   <div class="dots">{% for i in range(8) %}<i></i>{% endfor %}</div>
   <div class="go"><span class="t">{{ s.cta }}</span>{{ m.out_arrow(84, 7) }}</div>
 </div>

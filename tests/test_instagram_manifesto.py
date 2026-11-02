@@ -67,11 +67,19 @@ def test_proporcao_so_com_base_de_20_ou_mais():
 
 @real
 def test_historico_de_14_a_25_10_bate_com_a_spec():
-    """§4.7: "hoje dá 10.549 de 11.898, 88,7%" e "878 de 1.051 sem divisão, 83,5%"."""
+    """§5.6: "10.549 de 11.898, 88,7%"; a divisão com o critério do Placar (dados#9): 318 de 379 assuntos
+    com 4+ veículos comparados sem divisão (83,9%); antes, "dividida" era 1 veículo de cada lado (878 de 1.051)."""
     h = MF.historico(edicao("25"), historia("25"))
     assert (h.inicio, h.fim, h.edicoes) == (date(2026, 10, 14), date(2026, 10, 25), 12)
     assert (h.uma_fonte, h.assuntos) == (10549, 11898)
-    assert (h.sem_divisao, h.coberturas, h.divididas) == (878, 1051, 173)
+    assert (h.sem_divisao, h.coberturas, h.divididas) == (318, 379, 61)
+    # a mesma conta do Placar, dia a dia
+    base = rachas = 0
+    for e in historia("25"):
+        if e.mode == "ai" and "2026-10-14" <= e.date <= "2026-10-25":
+            p = E.placar(e, election=False)
+            base, rachas = base + p.base, rachas + p.rachas
+    assert (h.coberturas, h.divididas) == (base, rachas)
     assert h.periodo == "de 14/10 a 25/10" and h.periodo_frase == "De 14/10 a 25/10"
 
 
@@ -79,7 +87,7 @@ def test_historico_de_14_a_25_10_bate_com_a_spec():
 def test_historico_ignora_dia_sem_ia_e_inclui_a_edicao():
     h = MF.historico(edicao("26"), [e for e in historia("26") if e.date != "2026-10-26"])
     assert (h.inicio, h.fim, h.edicoes) == (date(2026, 10, 14), date(2026, 10, 26), 13)
-    assert (h.uma_fonte, h.assuntos, h.sem_divisao, h.coberturas) == (11417, 12850, 895, 1069)
+    assert (h.uma_fonte, h.assuntos, h.sem_divisao, h.coberturas) == (11417, 12850, 330, 391)
     # as edições sem IA (29/09 a 13/10) estão no histórico, mas não entram na conta
     assert any(e.mode != "ai" for e in historia("26"))
 
@@ -133,19 +141,25 @@ def test_divisao_com_waffle_de_100_e_a_definicao():
     s = manifesto("26").slides[3]
     assert s.ctx["titulo"] == "Em mais de 8 de cada 10 assuntos comparados, os veículos contaram sem divisão."
     assert s.ctx["texto"] == "Nos outros, a gente mostra a diferença."
-    assert s.ctx["pe"].startswith("De 14/10 a 26/10: 895 de 1.069 coberturas comparadas (83,7%) sem divisão")
-    assert "Dividida = pelo menos 1 veículo de cada lado" in s.ctx["pe"]
+    assert s.ctx["pe"].startswith(
+        "De 14/10 a 26/10: 330 de 391 assuntos com 4 ou mais veículos comparados (84,4%) sem divisão"
+    )
+    # a definição é a do Placar (dados#9), nunca "1 veículo de cada lado"
+    assert "Dividir = pelo menos 2 veículos de cada lado, o mesmo critério do Placar do dia." in s.ctx["pe"]
+    assert "1 veículo de cada lado" not in s.alt and "1 veículo de cada lado" not in manifesto("26").caption
     svg = str(s.ctx["grafico"])
-    # 100 quadrados, cada um 1% das 1.069: 16 divididas (174/1.069) em laranja
+    # 100 quadrados, cada um 1% dos 391: 16 dividiram (61/391) em laranja
     assert svg.count("fill='var(--g-hi)'") == 16
-    assert "Gráfico: grade de 100 quadrados, um por 1% das 1.069 coberturas comparadas; 16 divididas e 84 sem divisão." in s.alt
+    assert "Gráfico: grade de 100 quadrados, um por 1% dos 391 assuntos comparados; 16 dividiram e 84 sem divisão." in s.alt
 
 
 @real
 def test_como_fazemos_e_cta():
     p = manifesto("26")
     ctx = p.slides[4].ctx
-    assert ctx["regras"] == ["Sem adjetivo, sempre com fonte.", "Sem foto de jornal.", "Sem ranking de veículos."]
+    # dados#15: "sem adjetivo" seria desmentido pelos próprios posts, que citam o adjetivo do veículo
+    assert ctx["regras"] == ["Sem adjetivo nosso, sempre com fonte.", "Sem foto de jornal.", "Sem ranking de veículos."]
+    assert "Sem adjetivo nosso, sempre com fonte." in p.caption and "Sem adjetivo," not in p.caption
     assert ctx["frase"] == "Enquadramento é escolha do que destacar, não erro."
     cta = p.slides[5].ctx
     assert [(i["hora"], i["nome"]) for i in cta["agenda"]] == [("07h", "Em 1 minuto"), ("12h", "Número do dia"), ("18h30", "Raio-X")]

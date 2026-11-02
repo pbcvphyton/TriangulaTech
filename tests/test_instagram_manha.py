@@ -186,8 +186,9 @@ def test_27_10_capa_nao_e_a_eleicao_de_israel():
     assert c["mais_coberto"] is None  # o mais coberto do dia é a eleição de Israel: a linha sai
     for s in p.slides:
         assert not E.is_electoral(s.alt, s.ctx.get("section"), NOMES)
-    # a eleição de Israel fica, como fato de Mundo, na vaga única de política: por último
-    assert fatos(p)[-1].ctx["frase"].startswith("Israel vai às urnas")
+    # nada eleitoral até 27/10, nem a eleição de outro país (§2): Israel também sai dos fatos
+    assert israel.id not in p.story_ids
+    assert not any(E.eleicao_escrita(s.alt) for s in p.slides) and not E.eleicao_escrita(p.caption)
     assert "Ibovespa" not in " ".join(s.ctx["frase"] for s in fatos(p))  # o circuit breaker está no slide 7
 
 
@@ -223,8 +224,11 @@ def test_29_10_verbo_neutro_e_ressalva_ao_menos():
     alphabet = next(s.ctx for s in fatos(p) if "Alphabet" in s.ctx["frase"])
     assert alphabet["frase"].startswith("Ações da Alphabet caem até 10%")
     assert (alphabet["qual"], alphabet["valor"]) == ("ATÉ", "10%")
+    # o briefing e a manchete são o título literal da Folha (dados#10): vai a frase do corpo que nomeia o fato
     trens = next(s.ctx for s in fatos(p) if "trens" in s.ctx["frase"])
-    assert (trens["qual"], trens["valor"]) == ("AO MENOS", "68 pessoas")
+    assert trens["frase"].startswith("Pelo menos 68 pessoas morreram e mais de cem ficaram feridas")
+    assert "colisão entre dois trens de alta velocidade" in trens["frase"]
+    assert (trens["qual"], trens["valor"]) == ("PELO MENOS", "68 pessoas")
 
 
 # ── Sem IA e outras regras ──────────────────────────────────────────────
@@ -352,3 +356,171 @@ def test_render_sem_texto_cortado(dia, tmp_path):
             )
             res = r.render(html, tmp_path / f"{i:02d}.jpg", width=1080, height=1350)
             assert res.transbordos == [], (i, [str(t) for t in res.transbordos])
+
+
+# ── Revisão da Onda 1: dividida, selo, capa e slide 2, títulos literais ─────
+
+
+@pytest.mark.parametrize("dia", [d for d in DIAS_IA if d != 26])
+def test_dividida_so_pelo_criterio_do_placar_em_todo_o_perfil(dia):
+    """dados#9 / arte#20: uma definição só de "dividida", a do Placar (4+ comparados, 2+ de cada lado)."""
+    e = edicao(dia)
+    p = E.placar(e, election=eleicao(dia), nomes=NOMES)
+    assert p.rachas == sum(1 for c, _ in p.itens if E.dividida(c))
+    for s in e.stories:
+        if s.coverage is None:
+            continue
+        selo = E.selo_cobertura(e, s)
+        assert ("dividida" in selo) == E.dividida(s.coverage), (s.id, selo)
+        a, n, b = E.lados(s.coverage)
+        if not E.dividida(s.coverage) and a and b:
+            assert f"· {max(a, b)} × {min(a, b)}" in selo  # abaixo do critério, só a contagem
+
+
+def test_selos_de_21_10_19_10_e_29_10():
+    e = edicao(21)
+    deepseek = next(s for s in e.stories if "DeepSeek" in s.headline)
+    assert E.selo_cobertura(e, deepseek) == "6 veículos · 4 × 1"  # antes: "dividida 4 × 1"
+    emenda = materia(e, "promulgacao-da-emenda")
+    assert E.selo_cobertura(e, emenda) == "4 fontes · 2 × 1"  # a Secovi-SP está na comparação: "fontes" (§3)
+    assert E.selo_cobertura(e, materia(e, "spacex"), materia(e, "spacex").id) == "12 veículos · dividida 6 × 2 · Raio-X às 18h30"
+    e = edicao(19)
+    agro = materia(e, "pedidos-de-recuperacao")
+    assert E.selo_cobertura(e, agro) == "3 veículos · 2 × 1"  # o Placar de 19/10 é "0 de 13": nada dividiu
+    assert E.placar(e, election=True, nomes=NOMES).rachas == 0
+    e = edicao(29)
+    fed = materia(e, "fed-mantem")
+    assert E.selo_cobertura(e, fed) == "4 veículos · dividida 2 × 2"
+
+
+@pytest.mark.parametrize("dia", [d for d in DIAS_IA if d != 26])
+def test_barra_e_fontes_fecham_com_o_selo(dia):
+    """dados#18 / arte#12: a mini barra nunca soma mais que o selo e a lista de fontes nunca tem menos nomes."""
+    p = peca(dia)
+    for s in fatos(p):
+        x = s.ctx
+        if not x["cob_kt"]:
+            continue
+        soma = x["cob_a"] + x["cob_n"] + x["cob_b"]
+        assert soma <= x["cob_k"], (x["frase"], soma, x["cob_kt"])
+        assert soma == 0 or soma >= 2  # com uma fonte comparada, sem barra
+        nomes = s.alt.split("Fontes: ", 1)[1].rstrip(".").split(", ") if "Fontes: " in s.alt else []
+        assert len(nomes) >= x["cob_k"], (x["frase"], nomes, x["cob_kt"])
+
+
+def test_27_10_stj_e_19_10_escala_5x2():
+    e = edicao(27)
+    stj = materia(e, "stj-fixa-novos")
+    assert E.selo_cobertura(e, stj) == "2 fontes · sem divisão"  # Valor e STJ: antes "1 veículo" com 2 na barra
+    s = next(s.ctx for s in fatos(peca(27)) if s.ctx["frase"].startswith("STJ fixa"))
+    assert (s["cob_a"], s["cob_n"], s["cob_b"]) == (0, 2, 0) and s["cob_k"] == 2
+    escala = next(s for s in fatos(peca(19)) if s.ctx["frase"].startswith("Empresas correm"))
+    assert escala.ctx["cobertura"] == "2 veículos · sem divisão"
+    assert escala.ctx["fontes"] == "Valor Econômico, Estadão"  # antes só "Valor Econômico"
+
+
+@pytest.mark.parametrize("dia", [d for d in DIAS_IA if d != 26])
+def test_slide_2_nunca_repete_o_dado_da_capa(dia):
+    """arte#7 / dados#11 / arte#8: o laranja da capa é o dado dela; o slide 2 não repete esse dado; a contagem do
+    mais coberto vai em tinta e, quando ele é a própria capa, fica para o slide 2."""
+    p = peca(dia)
+    c, s2 = capa(p).ctx, fatos(p)[0].ctx
+    assert c["destaque"] == c["valor"]  # nunca a contagem do mais coberto de outra matéria
+    if c["valor"]:
+        assert s2["valor"] != c["valor"]
+    if c["heroi"] == "cobertura":
+        assert c["qual"] == MH.NOTICIADO and int(c["valor"].split()[0]) >= MH.COBERTURA_MIN
+        assert s2["heroi"] != "cobertura"
+    mc = c["mais_coberto"]
+    if mc and mc["proprio"]:
+        assert "veículos" not in capa(p).alt.split("É o assunto mais coberto do dia", 1)[1][:3]
+
+
+@functools.lru_cache(maxsize=None)
+def peca_22() -> Peca:
+    """22/10 como no gerador: o Raio-X da noite (STF/ISS) não vira capa."""
+    stf = materia(edicao(22), "stf-decide-que-iss")
+    return MH.em_1_minuto(edicao(22), {}, list(historico(22)), election=True, nomes=NOMES, numero_serie=31,
+                          raiox_story_id=stf.id)
+
+
+def test_capa_sem_numero_com_5_veiculos_estampa_a_cobertura():
+    p = peca_22()
+    c = capa(p).ctx
+    assert c["manchete"].startswith("Rússia aceita retomar negociações")
+    assert (c["heroi"], c["qual"], c["valor"]) == ("cobertura", MH.NOTICIADO, "9 veículos")
+    assert c["destaque"] == "9 veículos" and c["mais_coberto"]["k"] == 12  # o mais coberto é a Meta, em tinta
+    assert fatos(p)[0].ctx["heroi"] != "cobertura"
+    assert "Noticiado por 9 veículos." in capa(p).alt
+
+
+def test_capa_mais_coberta_entrega_a_contagem_no_slide_2():
+    p = peca(14)
+    c, s2 = capa(p).ctx, fatos(p)[0].ctx
+    assert c["valor"] == "3,7%" and c["mais_coberto"] == {"nome": "", "k": 11, "proprio": True}
+    assert "É o assunto mais coberto do dia." in capa(p).alt and "do dia: 11" not in capa(p).alt
+    assert (s2["heroi"], s2["valor"]) == ("cobertura", "11 veículos")
+
+
+def test_template_da_capa_sem_contagem_quando_proprio_e_em_tinta_quando_outro():
+    env = gerar.environment()
+    from qijournal.instagram import conteudo
+
+    def html(dia):
+        p = peca_22() if dia == 22 else peca(dia)
+        return env.get_template("m1_capa.html.j2").render(brand={"logo": "", "handle": "", "fonts_css": ""},
+                                                           s=conteudo.polish(p.slides[0].ctx), page=1, pages=8,
+                                                           kind="carousel", slot="manha")
+
+    h14 = html(14)
+    assert "É o assunto mais coberto do dia</div>" in h14 and "11 veículos" not in h14
+    h22 = html(22)
+    assert 'class="miolo cob"' in h22 and "O mais coberto · <b>12 veículos</b>" in h22 and "class=hl" not in h22
+
+
+@pytest.mark.parametrize("dia", [d for d in DIAS_IA if d != 26])
+def test_nenhum_titulo_literal_de_veiculo(dia):
+    """dados#10: nem a capa, nem os fatos, nem a legenda trazem o título literal de um veículo."""
+    e = edicao(dia)
+    literais = E.titulos_literais(e)
+    p = peca(dia)
+    assert not E.titulo_literal(capa(p).ctx["manchete"], literais)
+    for s in fatos(p):
+        assert not E.titulo_literal(s.ctx["frase"], literais), s.ctx["frase"]
+    for linha in p.caption.split("\n"):
+        if linha.startswith("▸ "):
+            assert not E.titulo_literal(linha[2:].rsplit(" (", 1)[0], literais), linha
+
+
+def test_16_10_credipaiva_sem_o_titulo_da_cnn():
+    e = edicao(16)
+    st = next(s for s in e.stories if "Credipaiva" in s.headline)
+    b = MH._briefing(e)[0].get(st.id, "")
+    literais = E.titulos_literais(e)
+    assert E.titulo_literal("Banco Central decreta liquidação extrajudicial da cooperativa Credipaiva", literais)
+    f = MH._texto(e, st, b, literais=literais)
+    assert f.texto != "Banco Central decreta liquidação extrajudicial da cooperativa Credipaiva."
+    assert not E.titulo_literal(f.texto, literais) and "Credipaiva" in f.texto
+    # sem a lista de literais, o texto antigo (o da CNN Brasil) voltaria
+    assert MH._texto(e, st, b).texto == "Banco Central decreta liquidação extrajudicial da cooperativa Credipaiva."
+
+
+def test_capa_nao_repete_a_noite():
+    """Pendência da integração (19/10) e §2: a capa não estampa o que a noite do mesmo dia estampa (o Placar
+    de 19/10 destaca os protestos na França) nem reabre, sem número novo, o Raio-X da noite anterior (o de
+    28/10 é a fuga de Flávio Bolsonaro; em 29/10 ele desembarca nos EUA). O assunto ainda pode ser fato."""
+    e19 = edicao(19)
+    franca = materia(e19, "protestos-violentos-na-franca")
+    assert capa(peca(19)).ctx["manchete"].startswith("Protestos violentos na França")  # sem a noite
+    p = MH.em_1_minuto(e19, {}, list(historico(19)), election=True, nomes=NOMES, numero_serie=31, evitar_capa=[franca.id])
+    assert p.story_ids[0] != franca.id and franca.id in p.story_ids
+    e28, e29 = edicao(28), edicao(29)
+    fuga = materia(e28, "flavio-bolsonaro-descumpre")
+    assert capa(peca(29)).ctx["manchete"].startswith("Flávio Bolsonaro desembarca")  # sem a noite anterior
+    p = MH.em_1_minuto(e29, {}, list(historico(29)), election=False, nomes=NOMES, numero_serie=31, noite_anterior=[fuga])
+    assert not p.story_ids[0].startswith("flavio-bolsonaro")
+    assert any(sid.startswith("flavio-bolsonaro-desembarca") for sid in p.story_ids[1:])
+    # com número novo, a continuação pode ser capa (a regra da véspera, §5.4)
+    marca = MH._marca(MH.Fato(fuga.headline, fuga, "manchete"))
+    assert MH._repete_vespera(materia(e29, "flavio-bolsonaro-desembarca"), [materia(e29, "flavio-bolsonaro-desembarca").headline], [marca])
+    assert not MH._repete_vespera(materia(e29, "flavio-bolsonaro-desembarca"), ["Flávio Bolsonaro paga R$ 2 milhões"], [marca])

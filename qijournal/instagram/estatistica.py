@@ -547,6 +547,20 @@ def is_racha(cov: Coverage) -> bool:
     return cov.has_debate and cov.count("a") >= RACHA_MIN_SIDE and cov.count("b") >= RACHA_MIN_SIDE
 
 
+def dividida(cov: Coverage) -> bool:
+    """A única definição de "dividida" do perfil (a do Placar, §5.2): 4+ veículos comparados e 2+ de
+    cada lado. Abaixo disso, nenhum texto diz "dividida" ou "dividiu"; o selo descreve só a contagem."""
+    return len(cov.outlets) >= PLACAR_MIN_OUTLETS and is_racha(cov)
+
+
+def lados(cov: Coverage | None) -> tuple[int, int, int]:
+    """(lado a, sem lado, lado b) da cobertura, contados como o Placar conta (a mini barra e o selo)."""
+    if cov is None:
+        return 0, 0, 0
+    a, b = cov.count("a"), cov.count("b")
+    return a, len(cov.outlets) - a - b, b
+
+
 @dataclass
 class Placar:
     rachas: int  # assuntos com 4+ veículos e pelo menos 2 de cada lado
@@ -578,7 +592,7 @@ def placar(edition: Edition, *, election: bool, nomes: Iterable[str] = NOMES_ELE
             continue
         if election and (is_political_coverage(cov, story, nomes) or eleicao_na_cobertura(cov, story)):
             continue
-        racha = is_racha(cov)
+        racha = dividida(cov)
         result.base += 1
         result.rachas += racha
         result.itens.append((cov, story))
@@ -591,7 +605,7 @@ def placar(edition: Edition, *, election: bool, nomes: Iterable[str] = NOMES_ELE
 def rachas_do_dia(edition: Edition, *, election: bool, nomes: Iterable[str] = NOMES_ELEICAO) -> list[tuple[Coverage, Story | None]]:
     """Os rachas da base do placar, do mais dividido (maior min(a, b), depois a + b) ao menos."""
     base = placar(edition, election=election, nomes=nomes).itens
-    rachas = [(c, s) for c, s in base if is_racha(c)]
+    rachas = [(c, s) for c, s in base if dividida(c)]
     return sorted(rachas, key=lambda cs: (-min(cs[0].count("a"), cs[0].count("b")), -(cs[0].count("a") + cs[0].count("b"))))
 
 
@@ -616,6 +630,23 @@ def topic_sources(topic: IndexTopic, *, veiculos: bool = False) -> list[str]:
 def topic_texts(topic: IndexTopic, *, veiculos: bool = True) -> int:
     """Quantos textos o assunto teve (dos veículos, sem órgãos públicos)."""
     return sum(1 for i in topic.items if i.source and not (veiculos and i.source in ORGAOS))
+
+
+def _norm_titulo(texto: str) -> str:
+    """O texto para comparar com título de veículo: sem markdown, acento, caixa nem pontuação."""
+    return re.sub(r"\s+", " ", re.sub(r"[^\w%$ ]", " ", _fold(_plain(texto)))).strip()
+
+
+def titulos_literais(edition: Edition) -> set[str]:
+    """Os títulos dos veículos no index do dia, normalizados (:func:`titulo_literal`)."""
+    return {_norm_titulo(i.title) for t in edition.index for i in t.items if i.title}
+
+
+def titulo_literal(texto: str, literais: set[str]) -> bool:
+    """O texto é o título de um veículo, ou traz um inteiro de 5+ palavras ("Crise em Paris: <título>")?
+    Manchete literal de veículo não vai para a arte nem para a legenda (§0.6)."""
+    n = _norm_titulo(texto)
+    return bool(n) and (n in literais or any(len(t.split()) >= 5 and t in n for t in literais))
 
 
 def topic_of(edition: Edition, story_id: str) -> IndexTopic | None:
@@ -1367,23 +1398,36 @@ def numero_do_dia(
 
 
 def selo_cobertura(edition: Edition, story: Story, raiox_story_id: str | None = None, *, hora_raiox: str = "18h30") -> str:
-    """``"12 veículos · dividida 6 × 2 · Raio-X às 18h30"``, ``"8 veículos · sem divisão"``.
+    """``"12 veículos · dividida 6 × 2 · Raio-X às 18h30"``, ``"3 veículos · 2 × 1"``, ``"8 veículos · sem divisão"``.
 
-    Conta os veículos do assunto no index (órgãos fora); sem assunto, os da matéria (e, se
-    só houver órgãos públicos entre as fontes, ``"2 fontes"``).
+    Conta os veículos do assunto no index (órgãos fora); se a cobertura comparada tem órgão público
+    (STJ, Agência Senado), conta as fontes do assunto e diz ``"fontes"`` (§3), para a mini barra
+    nunca somar mais que o selo (27/10: "1 veículo" com Valor e STJ na barra); sem assunto, as da
+    matéria. "Dividida" só pelo critério do Placar (:func:`dividida`, a única definição); abaixo
+    dele, com alguém dos dois lados, só a contagem ("2 × 1"); com lado de um só, "sem divisão";
+    com uma fonte comparada, nada.
     """
     topic = topic_of(edition, story.id)
+    c = story.coverage
+    orgao = c is not None and any(o.name in ORGAOS for o in c.outlets)
     if topic is not None:
-        k, unidade = len(topic_sources(topic, veiculos=True)), "veículo"
+        if orgao:
+            k, unidade = len(set(topic_sources(topic)) | {o.name for o in c.outlets}), "fonte"
+        else:
+            k, unidade = len(topic_sources(topic, veiculos=True)), "veículo"
     else:
         nomes = {s.name for s in story.sources if s.name}
         veiculos = nomes - ORGAOS
-        k, unidade = (len(veiculos), "veículo") if veiculos else (len(nomes), "fonte")
+        k, unidade = (len(veiculos), "veículo") if veiculos and not orgao else (len(nomes), "fonte")
     parts = [f"{k} {unidade}" if k == 1 else f"{k} {unidade}s"]
-    c = story.coverage
     if c is not None:
-        a, b = c.count("a"), c.count("b")
-        parts.append(f"dividida {max(a, b)} × {min(a, b)}" if a >= 1 and b >= 1 else "sem divisão")
+        a, n, b = lados(c)
+        if dividida(c):
+            parts.append(f"dividida {max(a, b)} × {min(a, b)}")
+        elif a >= 1 and b >= 1:
+            parts.append(f"{max(a, b)} × {min(a, b)}")
+        elif a + n + b >= 2:
+            parts.append("sem divisão")
     if raiox_story_id and story.id == raiox_story_id:
         parts.append(f"Raio-X às {hora_raiox}")
     return " · ".join(parts)

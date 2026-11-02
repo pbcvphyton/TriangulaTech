@@ -5,7 +5,7 @@
 2. Manchete: a do dia ou, no modo eleitoral, a primeira que não é política nem eleitoral;
    número em destaque, "por que importa", selo de cobertura e fontes.
 3. Mercado: valor, variação do dia com a hora da leitura e o acumulado desde o início da série.
-4. Chamada para o carrossel da manhã.
+4. Chamada para o carrossel da manhã, com a capa dele (já renderizada) de miniatura.
 
 Os stories não levam link nem figurinha (limite da API). Tudo sai da edição, do histórico e
 das contas de :mod:`..estatistica`; nada de IA.
@@ -138,16 +138,20 @@ def _texto_ok(texto: str, secao: str, *, election: bool, nomes: Iterable[str]) -
 
 def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: Iterable[str]) -> tuple[str, str] | None:
     """O título (a manchete depois do adjetivo da casa) e o "por que importa" da tela 2, ou None se a
-    matéria não serve: política ou eleitoral no modo eleitoral, palavra proibida no título, ou sem uma
-    segunda frase limpa (o "por que importa" ou, na falta, a linha fina; nunca igual ao título, sem
+    matéria não serve: política ou eleitoral no modo eleitoral (também a eleição de outro país na
+    manchete), palavra proibida ou título literal de veículo no título, ou sem uma segunda frase limpa (o "por que importa" ou, na falta, a linha fina; nunca igual ao título, sem
     adjetivo da casa e sem palavra proibida)."""
     nomes = tuple(nomes)
     if election and is_political(story, f"{story.headline} {story.dek}", nomes):
         return None
     if election and story.section != "mundo" and _ELEICAO.search(plain(f"{story.headline} {story.dek}")):
         return None
+    if election and story.section != "esporte" and E.eleicao_escrita(story.headline):  # nem a de outro país
+        return None
     titulo = E.capa_sem_adj(edition, story)
     if not _texto_ok(titulo, story.section, election=election, nomes=nomes):
+        return None
+    if E.titulo_literal(titulo, E.titulos_literais(edition)):  # manchete literal de veículo não vai para a arte
         return None
     for frase in (plain(story.why_it_matters), plain(story.dek)):
         # a frase não passa pelo corte do adjetivo da casa: com "recorde", "histórico"…, fica de fora
@@ -195,8 +199,9 @@ def _manchete(
     titulo, por_que = textos if textos else (E.capa_sem_adj(edition, story), "")
     numero = E.numero_destaque(titulo)
     qual, valor = numero if numero else ("", "")
-    c = story.coverage
-    a, n, b = (c.count("a"), sum(1 for o in c.outlets if o.stance not in ("a", "b")), c.count("b")) if c else (0, 0, 0)
+    a, n, b = E.lados(story.coverage)  # só com 2+ comparados, como o selo
+    if a + n + b < 2:
+        a = n = b = 0
     selo_cob = E.selo_cobertura(edition, story, raiox_story_id)
     fontes = sources_line(source_names(story))
     secao = section_info(edition, story.section)
@@ -327,11 +332,14 @@ def _mercado(edition: Edition, history: Sequence[Edition]) -> Slide | None:
 # ── Tela 4: chamada para o carrossel ──────────────────────────────────────
 
 
-def _chamada(edition: Edition, agenda: Sequence[tuple[str, str]]) -> Slide:
+def _chamada(edition: Edition, agenda: Sequence[tuple[str, str]], capa_img: str = "") -> Slide:
+    """A chamada para o carrossel. ``capa_img``: a capa do Em 1 minuto já renderizada (``data:`` URI), que
+    vira a miniatura; sem ela, o desenho genérico do carrossel."""
     day = edition_day(edition)
     hora = next((h for h, n in agenda if n == "Em 1 minuto"), "")
     titulo = "Os fatos da manhã e o mercado, no perfil"
     ctx = {
+        "capa_img": capa_img,
         "selo": f"Em 1 minuto · {kicker_date(day)}",
         "kicker": f"No feed às {hora}" if hora else "No feed",
         "titulo": titulo,
@@ -358,6 +366,7 @@ def stories_manha(
     agenda: Sequence[tuple[str, str]] = (),
     capa: Story | None = None,
     raiox_story_id: str | None = None,
+    capa_img: str = "",
 ) -> Peca | None:
     """A sequência de stories da manhã (até 4 telas); None com menos de 2.
 
@@ -366,6 +375,7 @@ def stories_manha(
       ("12h", "Número do dia"), ("18h30", "Raio-X")]`` (:func:`agenda_das_pecas`).
     - ``capa``: a matéria da capa do Em 1 minuto, para a tela 2 contar a mesma.
     - ``raiox_story_id``: a matéria do Raio-X da noite (o selo de cobertura ganha "Raio-X às 18h30").
+    - ``capa_img``: a capa do Em 1 minuto já renderizada (``data:`` URI), para a miniatura da tela 4.
 
     A chamada para o carrossel só sai com o Em 1 minuto na agenda (sem agenda, em dia com IA).
     """
@@ -379,7 +389,7 @@ def stories_manha(
         slides.append(mercado)
     tem_em1min = any(n == "Em 1 minuto" for _, n in agenda) if agenda else edition.mode == "ai"
     if tem_em1min and edition.mode == "ai":
-        slides.append(_chamada(edition, agenda))
+        slides.append(_chamada(edition, agenda, capa_img))
     if len(slides) < 2:
         return None
     return Peca(

@@ -603,3 +603,38 @@ def test_bola_de_ouro_conta_em_esporte_no_placar_de_27_10():
     s = e.stories[0]
     if s.coverage:
         assert E.secao_da_cobertura(e, s.coverage, s) == s.section
+
+
+def test_dividida_e_a_definicao_do_placar():
+    """dados#9: 4+ comparados e 2+ de cada lado; "1 de cada lado" ou 3 comparados não dividem."""
+    from qijournal.models import Coverage, CoverageOutlet
+
+    def cov(*stances: str) -> Coverage:
+        outs = [CoverageOutlet(f"V{i}", s) for i, s in enumerate(stances)]
+        return Coverage("t", "c", outs, side_a="x", side_b="y")
+
+    assert E.dividida(cov("a", "a", "b", "b"))
+    assert E.dividida(cov("a", "a", "a", "b", "b", "neutro"))
+    assert not E.dividida(cov("a", "a", "a", "a", "b"))  # 4 × 1
+    assert not E.dividida(cov("a", "b", "neutro"))  # 3 comparados
+    assert not E.dividida(Coverage("t", "c", [CoverageOutlet(f"V{i}", s) for i, s in enumerate("aabb")]))  # sem os lados
+    assert E.lados(cov("a", "a", "b", "neutro", "neutro")) == (2, 2, 1) and E.lados(None) == (0, 0, 0)
+
+
+@real
+def test_selo_de_cobertura_so_conta_e_fontes_com_orgao():
+    e = edicao("21")
+    deepseek = next(s for s in e.stories if "DeepSeek" in s.headline)
+    assert E.selo_cobertura(e, deepseek) == "6 veículos · 4 × 1"
+    assert E.selo_cobertura(e, materia("21", "promulgacao-da-emenda")) == "4 fontes · 2 × 1"  # Secovi-SP comparada
+
+
+@real
+def test_titulo_literal_de_veiculo():
+    e = edicao("29")
+    literais = E.titulos_literais(e)
+    titulo = "Colisão entre trens de alta velocidade mata ao menos 68 pessoas na Espanha"
+    assert E.titulo_literal(titulo, literais) and E.titulo_literal(titulo + ".", literais)
+    assert E.titulo_literal(f"Tragédia: {titulo}", literais)  # o título inteiro dentro do texto
+    assert not E.titulo_literal("Pelo menos 68 pessoas morreram após a colisão entre dois trens", literais)
+    assert not E.titulo_literal("", literais)
