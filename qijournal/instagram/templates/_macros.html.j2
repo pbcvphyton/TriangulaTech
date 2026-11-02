@@ -31,11 +31,20 @@
 <div class="selo-cob">{% if (a or 0) + (n or 0) + (b or 0) > 0 %}<span class="anb" aria-hidden="true">{% for k, c in [('a', a), ('n', n), ('b', b)] %}{% if c %}<i style="flex:{{ c }} 1 0;background:var(--g-{{ k }})"></i>{% endif %}{% endfor %}</span>{% endif %}<span class="txt">{{ texto }}</span></div>
 {%- endmacro %}
 
+{# Hora no texto em caixa alta: o "h" entre algarismos ("06h45") vai num <span class="hm"> que o CSS deixa
+   minúsculo; "LEITURA DAS 06H45" se leria como outra coisa. #}
+{% macro _hm(t) -%}
+{%- set ps = (t or '').split('h') -%}
+{%- for p in ps -%}{{ p }}{%- if not loop.last -%}{%- set nx = ps[loop.index] -%}
+{%- if p and nx and p[-1] in '0123456789' and nx[0] in '0123456789' -%}<span class="hm">h</span>{%- else -%}h{%- endif -%}
+{%- endif -%}{%- endfor -%}
+{%- endmacro %}
+
 {# Destaque em laranja: a 1ª ocorrência de trecho em texto (sem diferenciar maiúsculas) vira <em class="hl">. #}
 {% macro realce(texto, trecho=none) -%}
 {%- set t = texto or '' -%}
 {%- set i = t.lower().find(trecho.lower()) if trecho else -1 -%}
-{%- if i >= 0 -%}{{ t[:i] }}<em class="hl">{{ t[i:i + trecho|length] }}</em>{{ t[i + trecho|length:] }}{%- else -%}{{ t }}{%- endif -%}
+{%- if i >= 0 -%}{{ _hm(t[:i]) }}<em class="hl">{{ _hm(t[i:i + trecho|length]) }}</em>{{ _hm(t[i + trecho|length:]) }}{%- else -%}{{ _hm(t) }}{%- endif -%}
 {%- endmacro %}
 
 {# Gancho de capa: Archivo ExtraCondensed Black em caixa alta, entrelinha .92, uma expressão em laranja.

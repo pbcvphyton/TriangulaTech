@@ -89,7 +89,12 @@ VERBOS_LADO = (
 )
 # Verbos que invertem o sentido do que vem depois ("Afasta interferência..."): sem rótulo.
 VERBOS_INVERSOS = ("afasta", "minimiza", "nega", "rejeita", "descarta", "relativiza", "ignora")
-BLOQUEIO_ROTULO = re.compile(r"\b(?:heroic\w*|heróic\w*|corajos\w*|dúbi\w*|supost\w*)", re.I)
+# Adjetivo que julga ou exagera ("riscos astronômicos", 27/10) não vira rótulo da casa.
+BLOQUEIO_ROTULO = re.compile(
+    r"\b(?:heroic\w*|heróic\w*|corajos\w*|dúbi\w*|supost\w*|astronômic\w*|estrondos\w*|brutal\w*|absurd\w*|"
+    r"catastrófic\w*|escandalos\w*|alarmant\w*|assombros\w*)",
+    re.I,
+)
 ROTULO_MAX_PALAVRAS = 4
 
 _ARTIGOS = {"a", "o", "as", "os", "um", "uma", "uns", "umas"}
@@ -179,46 +184,65 @@ def lados(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO) -> Lados:
 # ── Gancho da capa do Raio-X ──────────────────────────────────────────────
 
 GANCHO_MAX = 90
+NBSP = "\u00a0"
+
+
+def inseparavel(texto: str) -> str:
+    """Espaço inseparável entre o número e a palavra seguinte e entre "só"/"de" e o número, para a quebra
+    de linha do gancho nunca deixar "MESMO FATO, 4 / VEÍCULOS" nem "SÓ / 2, COMPLEXIDADE" (só na arte)."""
+    texto = re.sub(r"\b(só|de) (?=\d)", lambda m: m.group(1) + NBSP, texto, flags=re.I)
+    return re.sub(r"(\d) (?=[^\W\d])", lambda m: m.group(1) + NBSP, texto)
 
 
 @dataclass
 class Gancho:
     formula: str  # "G2" | "G3" | "G0" | "compacto" | "sem_rotulo" (vai para Post.formula)
-    texto: str  # em caixa alta, até 90 caracteres
+    texto: str  # em caixa alta, até 90 caracteres, com espaço inseparável junto dos números (:func:`inseparavel`)
     destaque: str  # o trecho em laranja (caixa alta, substring de ``texto``), ou ""
     legenda: str  # a mesma frase em caixa normal: 1ª linha da legenda
     lados: Lados
 
 
-def gancho_raiox(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO) -> Gancho:
+def gancho_raiox(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO, *, fora: int = 0) -> Gancho:
     """O gancho da capa pelos moldes do §4.2, o primeiro que cabe em 90 caracteres.
 
     G2 (minoria, n ≥ 5 e min ≤ n/4), G3 (empate; "metade" só quando todos tomaram lado),
     G0 (os demais), compacto (o escolhido passou de 90) e sem rótulo (algum rótulo é None).
-    Em laranja vai só o rótulo da minoria (no G3, o do lado B).
+    Em laranja vai só o rótulo da minoria (no G3, o do lado B). ``fora``: veículos que publicaram o
+    assunto mas ficaram fora da análise; com eles, a contagem vira "11 veículos analisados" (o relógio do
+    mesmo carrossel conta 12).
     """
     ld = lados(cov, nomes)
     n, maj, mi = ld.total, ld.n_maioria, ld.n_minoria
+    veic = "veículos analisados" if fora else "veículos"
+
+    def pronto(formula: str, texto: str, destaque: str, legenda: str) -> Gancho:
+        return Gancho(formula, inseparavel(texto.upper()), destaque.upper(), legenda[0].upper() + legenda[1:], ld)
+
     if ld.rot_maioria is None or ld.rot_minoria is None:
-        texto = f"{n} veículos, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
-        return Gancho("sem_rotulo", texto.upper(), "", texto, ld)
+        texto = f"{n} {veic}, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
+        return pronto("sem_rotulo", texto, "", texto)
     rmaj, rmin = ld.rot_maioria, ld.rot_minoria
     if n >= 5 and mi <= n / 4:
-        formula, texto = "G2", f"{n} veículos, mesmo fato. {maj} destacaram {rmaj}. Só {mi}, {rmin}."
-        legenda = f"{n} veículos, mesmo fato: {maj} destacaram {rmaj}; só {mi}, {rmin}."
+        formula, texto = "G2", f"{n} {veic}, mesmo fato. {maj} destacaram {rmaj}. Só {mi}, {rmin}."
+        legenda = f"{n} {veic}, mesmo fato: {maj} destacaram {rmaj}; só {mi}, {rmin}."
     elif ld.empate and maj + mi == n:
-        formula, texto = "G3", f"Mesmo fato, {n} veículos: metade destacou {rmaj}; metade, {rmin}."
+        formula, texto = "G3", f"Mesmo fato, {n} {veic}: metade destacou {rmaj}; metade, {rmin}."
         legenda = texto
     else:
-        formula, texto = "G0", f"{n} veículos, mesmo fato: {maj} destacaram {rmaj}; {mi}, {rmin}."
+        formula, texto = "G0", f"{n} {veic}, mesmo fato: {maj} destacaram {rmaj}; {mi}, {rmin}."
         legenda = texto
+    if len(texto) > GANCHO_MAX:  # o compacto do G2 guarda o "só"
+        if formula == "G2":
+            texto = f"{maj} de {n} destacaram {rmaj}. Só {mi}, {rmin}."
+            legenda = f"{maj} de {n} destacaram {rmaj}; só {mi}, {rmin}."
+        else:
+            texto = legenda = f"{maj} de {n} destacaram {rmaj}; {mi}, {rmin}."
+        formula = "compacto"
     if len(texto) > GANCHO_MAX:
-        formula, texto = "compacto", f"{maj} de {n} destacaram {rmaj}; {mi}, {rmin}."
-        legenda = texto
-    if len(texto) > GANCHO_MAX:
-        texto = f"{n} veículos, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
-        return Gancho("sem_rotulo", texto.upper(), "", texto, ld)
-    return Gancho(formula, texto.upper(), rmin.upper(), legenda[0].upper() + legenda[1:], ld)
+        texto = f"{n} {veic}, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
+        return pronto("sem_rotulo", texto, "", texto)
+    return pronto(formula, texto, rmin, legenda)
 
 
 # ── Raio-X: elegibilidade, nota e escolha ─────────────────────────────────

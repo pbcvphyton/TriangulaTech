@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from qijournal.instagram.selecao import coverage_story, divergence_score, diverse_stories, ordered_stories
 from qijournal.models import Coverage, CoverageOutlet, Edition, Story
 
@@ -222,8 +224,37 @@ def test_repeticao_penaliza_a_ucrania_em_15_10_e_trump_fica_sem_alternativa_em_1
 def test_gancho_da_capa_pelos_moldes(day, prefixo, formula, texto, destaque):
     s = next(x for x in edicao(day).stories if x.id.startswith(prefixo))
     g = S.gancho_raiox(s.coverage)
-    assert (g.formula, g.texto, g.destaque) == (formula, texto, destaque)
+    assert (g.formula, g.texto.replace(S.NBSP, " "), g.destaque) == (formula, texto, destaque)
     assert len(g.texto) <= S.GANCHO_MAX and g.destaque in g.texto
+    assert not re.search(r"\d ", g.texto)  # o número preso à palavra seguinte (arte#13)
+
+
+@real
+def test_gancho_com_veiculos_fora_da_analise_diz_analisados():
+    """21/10: 12 publicaram, 11 analisados (dados#8). O G2 com "analisados" passa de 90: o compacto guarda o "só"."""
+    s = next(x for x in edicao(21).stories if x.id.startswith("spacex"))
+    g = S.gancho_raiox(s.coverage, fora=1)
+    assert g.formula == "compacto"
+    assert g.texto.replace(S.NBSP, " ") == "6 DE 11 DESTACARAM SINERGIA EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."
+    assert g.legenda == "6 de 11 destacaram sinergia em IA; só 2, complexidade de governança."
+    g0 = S.gancho_raiox(next(x for x in edicao(23).stories if x.id.startswith("bradesco")).coverage, fora=2)
+    assert g0.legenda.startswith("4 de 6 destacaram")
+
+
+def test_inseparavel_prende_numero_e_palavra():
+    assert S.inseparavel("MESMO FATO, 4 VEÍCULOS") == "MESMO FATO, 4\u00a0VEÍCULOS"
+    assert S.inseparavel("SÓ 2, COMPLEXIDADE") == "SÓ\u00a02, COMPLEXIDADE"
+    assert S.inseparavel("1 DE 17 ASSUNTOS") == "1\u00a0DE\u00a017\u00a0ASSUNTOS"
+    # e a medida da quebra respeita: "4 VEÍCULOS" não se separa
+    from qijournal.instagram import graficos as G
+
+    linhas = G.linhas_texto(S.inseparavel("MESMO FATO, 4 VEÍCULOS"), "hook", 150, 560)
+    assert all(not linha.endswith("4") for linha in linhas)
+
+
+def test_rotulo_hiperbolico_fica_de_fora():
+    assert S.rotulo_lado("Destaca os riscos astronômicos e os custos elevados") is None  # 27/10 (dados#6)
+    assert S.rotulo_lado("Destaca a queda brutal das vendas") is None
 
 
 def test_gancho_sem_rotulo_e_empate_com_neutros():
@@ -231,7 +262,7 @@ def test_gancho_sem_rotulo_e_empate_com_neutros():
     s.coverage.side_a, s.coverage.side_b = "Destaca a redenção histórica", "Destaca o custo"
     g = S.gancho_raiox(s.coverage)
     assert g.formula == "sem_rotulo" and g.destaque == ""
-    assert g.texto == "5 VEÍCULOS, MESMO FATO: 2 CONTARAM DE UM JEITO, 2 DE OUTRO."
+    assert g.texto.replace(S.NBSP, " ") == "5 VEÍCULOS, MESMO FATO: 2 CONTARAM DE UM JEITO, 2 DE OUTRO."
     s.coverage.side_a = "Destaca o alívio"
     g = S.gancho_raiox(s.coverage)
     assert g.formula == "G0"  # 2 × 2 com 1 neutro: "metade" seria falso

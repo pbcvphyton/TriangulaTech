@@ -1,6 +1,7 @@
 {# Relógio da notícia (Raio-X 2.0, slide 5, §4.2; Placar do dia, slide 3, §4.3): título-achado
-   "12 VEÍCULOS EM 16H43", o gráfico de graficos.relogio, a linha de virada (só fato) e o rodapé do horário.
-   ctx: selo, titulo, destaque, grafico, virada, rodape, nota; opcionais kicker e assunto (Placar) e contexto (as
+   "12 VEÍCULOS EM MAIS DE 16 HORAS", o gráfico de graficos.relogio, a linha de virada (só fato) e o rodapé do horário.
+   ctx: selo, titulo, destaque, grafico, virada, rodape, nota; opcionais titulo_px (88 quando o título quebra em 2
+   linhas), kicker e assunto (Placar) e contexto (as
    linhas de "A atenção", quando há poucos veículos e o espaço sobra). #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
@@ -20,7 +21,7 @@
 {{ m.serie_band(s.selo, true, 'raiox') }}
 <div class="frame">
   {% if s.get('kicker') %}<div class="kicker">{{ s.kicker }}</div>{% endif %}
-  {{ m.hook(s.titulo, s.destaque, 112, 80, none, 'relogio-titulo') }}
+  {{ m.hook(s.titulo, s.destaque, s.get('titulo_px', 112), 80, none, 'relogio-titulo') }}
   {% if s.get('assunto') %}<p class="assunto" data-fit="relogio-assunto" data-min="26">{{ m.tx(s.assunto) }}</p>{% endif %}
   {{ m.grafico(s.grafico) }}
   {% if s.virada %}<p class="virada" data-fit="virada" data-min="24">{{ m.tx(s.virada) }}</p>{% endif %}

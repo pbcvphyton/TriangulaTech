@@ -67,6 +67,15 @@ def slide(peca, template: str, i: int = 0):
     return [s for s in peca.slides if s.template == template][i]
 
 
+def sp(texto: str) -> str:
+    """O texto da arte com o espaço inseparável (U+00A0) como espaço comum."""
+    return texto.replace("\u00a0", " ")
+
+
+def setas(caption: str) -> list[str]:
+    return [linha for linha in caption.split("\n") if linha.startswith("▸")]
+
+
 def veiculos(e: Edition) -> list[str]:
     return sorted({o.name for s in e.stories if s.coverage for o in s.coverage.outlets})
 
@@ -85,9 +94,12 @@ def test_escolha_da_noite_de_14_a_25_10():
         assert all("tse-intima" not in sid for sid in peca.story_ids)
 
 
-def test_raiox_de_21_10_capa_g2():
+def test_raiox_de_21_10_capa_compacta_conta_so_os_analisados():
+    """12 veículos publicaram e 11 foram analisados (o WSJ ficou fora): o G2 "11 VEÍCULOS, MESMO FATO" diria
+    menos do que o relógio do mesmo carrossel (dados#8); com "analisados" passa de 90 e vira o compacto, que
+    guarda o "só 2"."""
     p = raiox(21)
-    assert (p.slot, p.kind, p.serie, p.numero_serie, p.formula) == ("noite", "carousel", "raiox", 14, "G2")
+    assert (p.slot, p.kind, p.serie, p.numero_serie, p.formula) == ("noite", "carousel", "raiox", 14, "compacto")
     assert p.story_ids == ["spacex-e-tesla-avaliam-fusao-historica-apos-salt"]
     assert p.entidades == S.entidades(edicao(21).story(p.story_ids[0]))
     assert [s.template for s in p.slides] == [
@@ -95,15 +107,17 @@ def test_raiox_de_21_10_capa_g2():
     ]
     capa = p.slides[0].ctx
     assert capa["selo"] == "RAIO-X Nº 014 · QUA 21 OUT · TECNOLOGIA"
-    assert capa["gancho"] == "11 VEÍCULOS, MESMO FATO. 6 DESTACARAM SINERGIA EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."
+    assert sp(capa["gancho"]) == "6 DE 11 DESTACARAM SINERGIA EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."
+    # a quebra de linha nunca separa o número da palavra nem o "só" do número (arte#13)
+    assert "6\u00a0DE\u00a011\u00a0DESTACARAM" in capa["gancho"] and "SÓ\u00a02," in capa["gancho"]
     assert capa["destaque"] == "COMPLEXIDADE DE GOVERNANÇA"
     assert 96 <= capa["gancho_px"] <= 150
-    # o assunto tem "histórica" (1 de 12 títulos): a capa usa a linha fina
-    assert capa["subtitulo"] == edicao(21).story(p.story_ids[0]).dek
+    # o assunto tem "histórica" (1 de 12 títulos): a capa usa a manchete só sem o adjetivo, que diz qual é o
+    # fato (a linha fina não cita SpaceX, Tesla nem Musk: dados#7)
+    assert capa["subtitulo"] == "SpaceX e Tesla avaliam fusão após salto nos resultados operacionais"
     assert p.slides[0].alt == (
-        "Raio-X da cobertura nº 14, 21 de outubro. 11 veículos, mesmo fato: 6 destacaram sinergia em IA; "
-        "só 2, complexidade de governança. Conselhos de administração criam comitês especiais para analisar "
-        "negócio de trilhões de dólares impulsionado por inteligência artificial. "
+        "Raio-X da cobertura nº 14, 21 de outubro. 6 de 11 destacaram sinergia em IA; "
+        "só 2, complexidade de governança. SpaceX e Tesla avaliam fusão após salto nos resultados operacionais. "
         "Gráfico: barra com 6 veículos na maioria, 3 sem lado e 2 na minoria."
     )
     assert "<svg" in capa["grafico"] and "graf-anb" in capa["grafico"]
@@ -116,8 +130,9 @@ def test_raiox_de_21_10_fato_nao_repete_a_capa():
     p = raiox(21)
     capa, fato = p.slides[0].ctx, p.slides[1].ctx
     assert fato["kicker"] == "O fato"
+    # a linha fina não tem número nem nome e não cabe junto: o slide 2 fica com a 1ª frase do corpo
     assert fato["texto"].startswith("Os conselhos de administração da SpaceX e da Tesla iniciaram conversas formais")
-    assert capa["subtitulo"] not in fato["texto"]  # a capa já usou a linha fina (T3)
+    assert capa["subtitulo"] not in fato["texto"]  # nunca repete a capa (T3)
     assert len(fato["texto"]) <= N.FATO_MAX and N._tem_dado(fato["texto"])
     assert fato["cobertura"] == "11 veículos · 6 × 2 · 3 sem lado"
     assert (fato["a"], fato["n"], fato["b"]) == (6, 3, 2)
@@ -144,7 +159,9 @@ def test_raiox_de_21_10_maioria_e_minoria_em_ordem_de_horario():
 
 def test_raiox_de_21_10_relogio_e_virada():
     s5 = raiox(21).slides[4]
-    assert s5.ctx["titulo"] == "12 VEÍCULOS EM 16H43" and s5.ctx["destaque"] == "16H43"
+    # a duração por extenso: "16H43" em caixa alta se lia como hora do dia (arte#14); o exato fica no gráfico
+    assert sp(s5.ctx["titulo"]) == "12 VEÍCULOS EM MAIS DE 16 HORAS" and sp(s5.ctx["destaque"]) == "16 HORAS"
+    assert ">16h43</tspan>" in s5.ctx["grafico"]
     assert s5.ctx["selo"] == "RAIO-X Nº 014 · RELÓGIO DA NOTÍCIA"
     assert s5.ctx["virada"] == (
         "Primeiro texto em inglês: The New York Times, 20/10 13h17. Primeiro em português: Valor Econômico, 20/10 18h17."
@@ -162,31 +179,38 @@ def test_raiox_de_21_10_significado_importa_e_placar():
     p = raiox(21)
     s6, s7, s8 = p.slides[5:8]
     assert "fora da análise: The Wall Street Journal" in s6.alt
-    assert "(lado" not in s6.ctx["conclusao"]
+    # "veículos internacionais mantiveram atenção às exigências de governança": NYT, Al Jazeera e CNBC estão
+    # na maioria; a frase da IA é desmentida pelo espectro e dá lugar ao molde com as contagens (dados#3)
+    assert s6.ctx["conclusao"] == (
+        "6 de 11 veículos destacaram sinergia em IA; 2, complexidade de governança; 3 não tomaram lado. "
+        "Entre os veículos em inglês, 3 destacaram sinergia em IA e 2, complexidade de governança; em português, "
+        "3 e nenhum."
+    )
     # "unindo gigantes de Musk": adjetivo da casa fora, cortado na vírgula
     assert s7.ctx["texto"] == "A transação remodelaria as indústrias automotiva, espacial e de inteligência artificial."
     # A spec simulou 4 de 26 sem o filtro por conteúdo; o referendo de Alberta (eleição de outro país) também sai.
-    assert s8.ctx["titulo"] == "3 DE 24 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"
-    assert s8.ctx["destaque"] == "3 DE 24" and "%" not in s8.ctx["titulo"]
+    assert sp(s8.ctx["titulo"]) == "3 DE 24 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"
+    assert sp(s8.ctx["destaque"]) == "3 DE 24" and "%" not in s8.ctx["titulo"]
     assert s8.ctx["cta"] == "Leu só uma versão? Mande para quem leu a outra."
     assert s8.ctx["serie"] == "Série completa no destaque Raio-X."
     assert "3 dividiram e 21 sem divisão; o contorno marca este Raio-X." in s8.alt
 
 
 def test_raiox_de_21_10_legenda_no_molde():
-    linhas = raiox(21).caption.split("\n")
-    assert linhas[0] == "11 veículos, mesmo fato: 6 destacaram sinergia em IA; só 2, complexidade de governança."
+    p = raiox(21)
+    linhas = p.caption.split("\n")
+    assert linhas[0] == "6 de 11 destacaram sinergia em IA; só 2, complexidade de governança."
     assert linhas[1] == ""
-    assert linhas[2] == (
-        "▸ O fato: Conselhos de administração criam comitês especiais para analisar negócio de trilhões de "
-        "dólares impulsionado por inteligência artificial."
-    )
+    # o fato com sujeito e o quê (dados#7)
+    assert linhas[2] == "▸ O fato: SpaceX e Tesla avaliam fusão após salto nos resultados operacionais"
     assert "▸ Sinergia em IA (6): The New York Times, Valor Econômico, g1, Al Jazeera, CNBC, InfoMoney" in linhas
-    assert "▸ Complexidade de governança (2): Financial Times, BBC News" in linhas
-    assert "▸ Sem tomar lado (3): TechCrunch, Folha de S.Paulo, MarketWatch" in linhas
+    # os sem lado vão na linha da minoria: 5 linhas "▸", nunca 6 (dados#16)
+    assert ("▸ Complexidade de governança (2): Financial Times, BBC News. Sem tomar lado (3): TechCrunch, "
+            "Folha de S.Paulo, MarketWatch") in linhas
+    assert len(setas(p.caption)) == 5
     assert (
-        "▸ Relógio: 12 veículos em 16h43, de The New York Times (20/10 13h17) a The Wall Street Journal "
-        "(21/10 06h01), horário informado por cada veículo."
+        "▸ Relógio: 12 veículos (11 analisados) em 16h43, de The New York Times (20/10 13h17) a The Wall Street "
+        "Journal (21/10 06h01), horário informado por cada veículo."
     ) in linhas
     assert "▸ Placar do dia: 3 de 24 assuntos com 4 ou mais veículos dividiram a cobertura." in linhas
     assert linhas[-4].startswith("Por que importa: A transação remodelaria")
@@ -209,8 +233,9 @@ def test_raiox_de_21_10_legenda_no_molde():
 def test_ganchos_reais_da_spec(day, formula, gancho, destaque):
     p = noites()[day]
     assert p.formula == formula
-    assert p.slides[0].ctx["gancho"] == gancho and p.slides[0].ctx["destaque"] == destaque
+    assert sp(p.slides[0].ctx["gancho"]) == gancho and p.slides[0].ctx["destaque"] == destaque
     assert len(gancho) <= S.GANCHO_MAX
+    assert not re.search(r"\d ", p.slides[0].ctx["gancho"])  # número sempre preso à palavra seguinte (arte#13)
 
 
 def test_empate_sem_maioria_nem_minoria():
@@ -227,7 +252,8 @@ def test_fato_pula_linha_fina_com_vicio_de_texto():
 
 
 def test_conclusao_sem_lado_a_e_lado_b_entre_parenteses():
-    concl = noites()[18].slides[5].ctx["conclusao"]
+    cov = edicao(18).story(noites()[18].story_ids[0]).coverage
+    concl = N._conclusao(cov)
     assert "lado" not in concl.lower() and concl.endswith("pressão eleitoral interna.")
 
 
@@ -264,7 +290,7 @@ def test_relogio_invalido_vira_a_atencao():
 
 def test_relogio_com_poucos_veiculos_ganha_as_linhas_da_atencao():
     s5 = noites()[20].slides[4]
-    assert s5.ctx["titulo"] == "4 VEÍCULOS EM 17H00"
+    assert sp(s5.ctx["titulo"]) == "4 VEÍCULOS EM 17 HORAS"
     assert s5.ctx["virada"] == "Os 2 primeiros a publicar destacaram contenção sanitária."
     assert s5.ctx["contexto"][0] == "7 textos de 4 veículos: o 29º assunto mais coberto entre os 1.071 do dia."
 
@@ -278,7 +304,7 @@ def test_sem_rotulo_de_lado():
         stories.append(s)
     p = N.raio_x(dataclasses.replace(e, stories=stories), {}, election=True, numero_serie=14)
     assert p.formula == "sem_rotulo"
-    assert p.slides[0].ctx["gancho"] == "11 VEÍCULOS, MESMO FATO: 6 CONTARAM DE UM JEITO, 2 DE OUTRO."
+    assert sp(p.slides[0].ctx["gancho"]) == "11 VEÍCULOS ANALISADOS, MESMO FATO: 6 CONTARAM DE UM JEITO, 2 DE OUTRO."
     assert p.slides[0].ctx["destaque"] == ""
     assert p.slides[3].ctx["titulo"] == "2 DE 11 · A MINORIA"
     assert "▸ Minoria (2): Financial Times, BBC News" in p.caption
@@ -306,7 +332,7 @@ def test_placar_de_19_10_dia_de_consenso():
     assert [s.template for s in p.slides] == ["placar_capa", "placar_lista", "rx_relogio", "placar_metodo"]
     capa = p.slides[0].ctx
     assert capa["selo"] == "RAIO-X Nº 006 · DIA DE CONSENSO"
-    assert capa["gancho"] == "0 DE 13 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"  # a spec simulou 0 de 16
+    assert sp(capa["gancho"]) == "0 DE 13 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"  # a spec simulou 0 de 16
     assert capa["subtitulo"] == "assuntos com 4 ou mais veículos comparados; dividir = pelo menos 2 veículos de cada lado."
     assert "grade de 13 quadrados" in p.slides[0].alt and "0 dividiram e 13 sem divisão" in p.slides[0].alt
     consenso = p.slides[1].ctx
@@ -328,7 +354,7 @@ def test_placar_com_rachas_fora_do_periodo_eleitoral():
     p = N.placar_do_dia(edicao(19), {}, election=False, numero_serie=15)
     assert p.formula == "placar"
     assert p.slides[0].ctx["selo"] == "RAIO-X Nº 015 · PLACAR DO DIA"
-    assert p.slides[0].ctx["gancho"] == "1 DE 21 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"
+    assert sp(p.slides[0].ctx["gancho"]) == "1 DE 21 ASSUNTOS DIVIDIU A COBERTURA HOJE"  # pelo numerador (arte#21)
     lista = p.slides[1].ctx
     assert lista["kicker"] == "1 de 21 assuntos" and len(lista["itens"]) == 1
     assert lista["itens"][0]["linha"] == "2 × 2 · cobrança da campanha × esclarecimentos operacionais"
@@ -404,3 +430,151 @@ def test_election_mode_do_gerador_cobre_os_dias_da_previa():
     cfg = load_config(ROOT)
     assert all(gerar.election_mode(cfg, date(2026, 10, d)) for d in (19, 20, 21, 23, 24, 26))
     assert not gerar.election_mode(cfg, date(2026, 10, 28))
+
+
+# ── Revisão da Onda 1: noite (Raio-X e Placar), com os JSONs reais ────────
+
+
+@functools.lru_cache(maxsize=None)
+def raiox_pos(day: int):
+    """O Raio-X de um dia depois da eleição (28 e 29/10), fora do período eleitoral."""
+    return N.raio_x(edicao(day), {}, election=False, numero_serie=15)
+
+
+def test_29_10_empate_com_sem_lado_nao_e_metade():
+    """5 × 5 com 1 sem lado (CNBC): nenhum dos lados é metade dos 11 (arte#2, dados#4)."""
+    p = raiox_pos(29)
+    assert p.story_ids[0].startswith("colisao-entre-trens")
+    assert [s.ctx["kicker"] for s in p.slides[2:4]] == ["Empate · um lado", "Empate · o outro lado"]
+    assert all("etade" not in s.alt for s in p.slides[2:4])
+    assert sp(p.slides[0].ctx["gancho"]) == "11 VEÍCULOS, MESMO FATO: 5 DESTACARAM APURAÇÃO DE FALHA HUMANA; 5, VÍTIMAS."
+
+
+def test_29_10_historico_de_e_substantivo():
+    """'luto e histórico de segurança na malha': substantivo, não adjetivo da casa (dados#5)."""
+    assert raiox_pos(29).slides[3].ctx["descricao"] == "Foco nas vítimas, luto e histórico de segurança na malha"
+    # tirar a palavra deixando "e de" (ou preposição no fim) apaga a descrição em vez de publicar texto quebrado
+    assert N._sem_adj("Foco nas vítimas, luto e gigante de segurança na malha", []) == ""
+    assert N._sem_adj("Destaca o custo gigante", []) == "Destaca o custo"
+    assert N._sem_adj("Destaca o salto e o bilionário de vendas", []) == ""  # sobraria "e o de vendas"
+
+
+def test_29_10_capa_e_legenda_dizem_qual_e_o_fato():
+    """A manchete e o assunto são o título da Folha e a linha fina não diz 'trens' nem '68' (dados#7)."""
+    p = raiox_pos(29)
+    sub = p.slides[0].ctx["subtitulo"]
+    assert "trens" in sub and "68" in sub and len(sub) <= N.SUBTITULO_MAX_CHARS
+    assert N._norm(sub) not in N._titulos_literais(edicao(29))
+    fato = p.slides[1].ctx["texto"]
+    assert not N._norm(fato).startswith(N._norm(sub)) and N._norm(sub) not in N._norm(fato)  # o slide 2 não repete
+    linha = next(x for x in setas(p.caption) if x.startswith("▸ O fato:"))
+    assert "trens" in linha and "68" in linha
+
+
+def test_29_10_conclusao_desmentida_pelo_espectro_vira_molde():
+    """'veículos espanhóis e agências priorizaram a admissão de erro': nenhum veículo espanhol, e a única agência
+    está no outro lado; 'a maior parte da imprensa internacional': 3 de 6 (dados#3)."""
+    s6 = raiox_pos(29).slides[5]
+    assert s6.ctx["conclusao"] == (
+        "5 de 11 veículos destacaram apuração de falha humana; 5, vítimas; 1 não tomou lado. Entre os veículos em "
+        "inglês, 2 destacaram apuração de falha humana e 3, vítimas; em português, 3 e 2."
+    )
+    assert s6.alt.startswith("O que isso significa: 5 de 11 veículos destacaram")
+
+
+def test_conclusao_so_com_frases_que_a_contagem_sustenta():
+    ld = S.Lados("a", "b", 6, 2, 3, 11, "sinergia em IA", "complexidade de governança")
+    empate = S.Lados("a", "b", 5, 5, 1, 11, "x", "y")
+    ok = N._frase_sustentada
+    assert not ok("A cobertura concentrou-se majoritariamente na SpaceX, enquanto veículos internacionais miraram a "
+                  "governança.", ld)
+    assert not ok("A mídia brasileira e agências focaram o aparato operacional.", ld)
+    assert not ok("Jornais generalistas e internacionais exploraram as dúvidas.", ld)
+    assert ok("A cobertura concentrou-se majoritariamente nos resultados da SpaceX.", ld)  # 6 de 11 é maioria
+    assert not ok("A maior parte dos veículos focou o drama humano.", empate)  # 5 × 5 não tem maior parte
+    assert ok("A maioria dos veículos (6 a 2) tratou o caso como prejuízo.", ld)
+    assert not ok("A maioria dos veículos (7 a 2) tratou o caso como prejuízo.", ld)
+    assert not ok("Quatro veículos enfatizaram a desaceleração.", ld)
+    assert ok("Houve divisão entre veículos que enfatizaram a surpresa e aqueles que frisaram os núcleos.", ld)
+    assert ok("A cobertura convergiu, com alguns veículos adicionando repercussões econômicas e políticas.", ld)
+
+
+def test_28_10_capa_conta_os_analisados_e_o_relogio_todos():
+    """15 veículos publicaram, 11 foram analisados: a capa não diz '11 veículos, mesmo fato' (dados#8)."""
+    p = raiox_pos(28)
+    assert sp(p.slides[0].ctx["gancho"]).startswith("11 VEÍCULOS ANALISADOS, MESMO FATO: 6 DESTACARAM FUGA ILÍCITA")
+    assert p.caption.startswith("11 veículos analisados, mesmo fato:")
+    rel = p.slides[4]
+    assert sp(rel.ctx["titulo"]) == "15 VEÍCULOS EM MAIS DE 18 HORAS"
+    assert "4 fora da análise" in rel.alt
+    assert any(x.startswith("▸ Relógio: 15 veículos (11 analisados) em 18h22") for x in setas(p.caption))
+    # a legenda do relógio nomeia o vazado (antes, cada linha levava o rótulo e alguns sumiam: arte#6)
+    assert ">fora da análise</text>" in rel.ctx["grafico"] and ">asilo político</text>" in rel.ctx["grafico"]
+
+
+def test_21_10_enquadramento_sem_erro_de_digitacao():
+    maioria = raiox(21).slides[2].ctx
+    assert maioria["veiculos"][1]["framing"].startswith("Detalhou a reversão do prejuízo")  # o JSON diz "Detralhou"
+
+
+def test_20_10_placar_concorda_pelo_numerador():
+    """'1 de 24 assuntos dividiu', como a legenda do waffle (arte#21)."""
+    p = noites()[20]
+    s8 = p.slides[-1]
+    assert sp(s8.ctx["titulo"]) == "1 DE 24 ASSUNTOS DIVIDIU A COBERTURA HOJE"
+    assert "1 dividiu e 23 sem divisão" in s8.alt
+    assert "▸ Placar do dia: 1 de 24 assuntos com 4 ou mais veículos dividiu a cobertura." in p.caption
+    assert ">1</text>" in s8.ctx["grafico"] and "var(--accent)" not in s8.ctx["grafico"]  # um laranja só (arte#17)
+
+
+@functools.lru_cache(maxsize=None)
+def placar_27():
+    return N.placar_do_dia(edicao(27), {}, election=True, numero_serie=13)
+
+
+def test_27_10_placar_empate_sem_maioria_nem_rotulo_hiperbolico():
+    """2 × 2 com 7 sem lado: nem 'maioria' nem 'riscos astronômicos' (arte#3, dados#6)."""
+    item = placar_27().slides[1].ctx["itens"][0]
+    assert item["linha"] == "2 × 2" and item["contagem"] == "2 × 2 · 7 sem lado"
+    assert "maioria" not in item["grafico"] and "astronômic" not in item["grafico"]
+    assert ">de um lado</text>" in item["grafico"] and ">do outro</text>" in item["grafico"]
+    assert placar_27().slides[1].alt.endswith("Gráfico: barra com 2 veículos de um lado, 7 sem lado e 2 do outro.")
+    assert S.rotulo_lado("Destaca os riscos astronômicos e os custos elevados") is None
+
+
+def test_27_10_placar_tem_4_slides_e_legenda_de_3_a_5_linhas():
+    """A eleição de Israel sai do 'mais coberto' e entra o seguinte do ranking, a Anthropic (dados#19a); a Bola
+    de Ouro conta em Esporte, não em Mercados (dados#19b); 'dividiu' (arte#21); 3 a 5 linhas (dados#16)."""
+    p = placar_27()
+    assert [s.template for s in p.slides] == ["placar_capa", "placar_lista", "rx_relogio", "placar_metodo"]
+    assert sp(p.slides[0].ctx["gancho"]) == "1 DE 17 ASSUNTOS DIVIDIU A COBERTURA HOJE"
+    coberto = p.slides[2].ctx
+    assert coberto["assunto"] == "O mesmo assunto foi o mais coberto do dia, entre 1.116."
+    assert "Israel" not in json.dumps([s.ctx for s in p.slides], ensure_ascii=False, default=str)
+    assert coberto["virada"].startswith("Primeiro horário: Folha de S.Paulo, 26/10 10h58. Último: InfoMoney, 27/10 05h00.")
+    linhas = setas(p.caption)
+    assert 3 <= len(linhas) <= 5
+    assert "▸ Por editoria: Mundo 0 de 7 · Esporte 0 de 5 · Tecnologia 1 de 4 · Brasil 0 de 1." in linhas
+    assert p.caption.startswith("Placar do dia: 1 de 17 assuntos com 4 ou mais veículos dividiu a cobertura hoje.")
+    assert redacao.lint(p, election=True, veiculos=veiculos(edicao(27))) == []
+
+
+def test_legendas_da_noite_com_3_a_5_linhas_de_14_a_29_10():
+    for day in range(14, 30):
+        e = edicao(day)
+        eleicao = day <= 27
+        p = N.raio_x(e, {}, election=eleicao, numero_serie=1) or N.placar_do_dia(e, {}, election=eleicao, numero_serie=1)
+        if p is None:
+            continue
+        assert 3 <= len(setas(p.caption)) <= 5, (day, setas(p.caption))
+        assert redacao.lint(p, election=eleicao, veiculos=veiculos(e)) == [], day
+
+
+def test_duracao_do_titulo_do_relogio():
+    from datetime import timedelta as td
+
+    assert N._duracao_titulo(td(minutes=45)) == ("45 minutos", "45 minutos")
+    assert N._duracao_titulo(td(minutes=95)) == ("95 minutos", "95 minutos")
+    assert N._duracao_titulo(td(hours=17)) == ("17 horas", "17 horas")
+    assert N._duracao_titulo(td(hours=18, minutes=22)) == ("mais de 18 horas", "18 horas")
+    assert N._duracao_titulo(td(hours=22, minutes=51)) == ("quase 23 horas", "23 horas")

@@ -1,5 +1,6 @@
 {# Raio-X 2.0, slide 8 (Placar do dia + método + CTA, §4.2): "4 DE 26 ASSUNTOS DIVIDIRAM A COBERTURA HOJE",
-   o waffle com o quadrado deste Raio-X em contorno, a definição, o método, o CTA único e a série.
+   o waffle com o quadrado deste Raio-X em contorno, a definição, o método, o CTA único no gancho condensado (o
+   mesmo peso do fecho do Número e do Em 1 minuto; sem seta: a → é só para arraste) e a série em mono.
    ctx: selo, kicker, titulo, destaque, grafico (waffle), definicao, metodo, cta, serie, nota. #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
@@ -10,9 +11,8 @@
 .grafico{flex:none;margin-top:34px}
 .def{flex:none;margin-top:28px;font-family:var(--serif);font-size:30px;line-height:1.32;color:var(--ink)}
 .met{flex:none;margin-top:12px;font-family:var(--mono);font-size:22px;line-height:1.4;color:var(--ink2)}
-.cta{flex:none;margin-top:auto;display:flex;align-items:center;gap:22px;padding:26px 0 0;border-top:3px solid var(--ink)}
-.cta b{flex:none;font-family:var(--label);font-weight:700;font-size:44px;line-height:1;color:var(--ink)}
-.cta span{text-wrap:balance;font-family:var(--label);font-weight:700;font-size:38px;line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
+.cta{flex:none;margin-top:auto;padding-top:24px;border-top:4px solid var(--ink)}
+.cta .hook{font-size:76px;max-height:2.1em}
 .serie{flex:none;margin-top:12px;font-family:var(--mono);font-size:22px;color:var(--ink2)}
 {% endblock %}
 {% block body %}
@@ -23,7 +23,7 @@
   {{ m.grafico(s.grafico) }}
   <p class="def" data-fit="placar-definicao" data-min="24">{{ s.definicao }}</p>
   <p class="met" data-fit="placar-metodo" data-min="18">{{ s.metodo }}</p>
-  <div class="cta"><b>→</b><span data-fit="cta" data-min="28">{{ s.cta }}</span></div>
+  <div class="cta"><h2 class="hook" data-fit="cta" data-min="56">{{ s.cta }}</h2></div>
   <p class="serie">{{ s.serie }}</p>
 </div>
 {{ m.assinatura(s.nota) }}

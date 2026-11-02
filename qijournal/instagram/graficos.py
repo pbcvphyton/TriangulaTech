@@ -18,6 +18,7 @@ Horários são convertidos para Brasília; datas ingênuas são tratadas como de
 from __future__ import annotations
 
 import math
+import re
 import unicodedata
 from datetime import date, datetime, timedelta
 from html import escape
@@ -76,6 +77,11 @@ def largura_texto(texto: str, fonte: str, tam: float) -> float:
     return total / 100 * tam
 
 
+def _palavras(texto: str) -> list[str]:
+    """As palavras de ``texto`` onde a linha pode quebrar: o espaço inseparável (U+00A0) não separa."""
+    return [p for p in re.split(r"[ \t\n\r]+", texto) if p]
+
+
 def _cabe(texto: str, fonte: str, tam: float, max_w: float) -> str:
     """``texto`` inteiro se couber em ``max_w``; senão, cortado com reticências."""
     if largura_texto(texto, fonte, tam) <= max_w:
@@ -87,7 +93,7 @@ def _cabe(texto: str, fonte: str, tam: float, max_w: float) -> str:
 
 def _quebra(texto: str, fonte: str, tam: float, max_w: float, max_linhas: int = 2) -> list[str]:
     """``texto`` em até ``max_linhas`` linhas de ``max_w``; a última leva reticências se sobrar."""
-    palavras = texto.split()
+    palavras = _palavras(texto)
     linhas: list[str] = []
     atual = ""
     for i, palavra in enumerate(palavras):
@@ -108,7 +114,7 @@ def linhas_texto(texto: str, fonte: str, tam: float, max_w: float, tracking: flo
     """Quebra gulosa de ``texto`` em linhas de até ``max_w`` px (``tracking`` em em, como o letter-spacing)."""
     linhas: list[str] = []
     atual = ""
-    for palavra in texto.split():
+    for palavra in _palavras(texto):
         tentativa = f"{atual} {palavra}".strip()
         w = largura_texto(tentativa, fonte, tam) + tracking * tam * len(tentativa)
         if atual and w > max_w:
@@ -237,6 +243,17 @@ def _lista(partes: Sequence[str]) -> str:
     if len(partes) <= 1:
         return "".join(partes)
     return ", ".join(partes[:-1]) + " e " + partes[-1]
+
+
+def _lista_cabe(prefixo: str, nomes: Sequence[str], fonte: str, tam: float, max_w: float) -> str:
+    """``prefixo`` + os nomes inteiros que couberem em ``max_w`` e "+k" pelo resto (nunca nome cortado):
+    "fora da análise: NeoFeed, The New York Times +2"."""
+    for i in range(len(nomes), 0, -1):
+        resto = len(nomes) - i
+        txt = prefixo + ", ".join(nomes[:i]) + (f" +{resto}" if resto else "")
+        if largura_texto(txt, fonte, tam) <= max_w:
+            return txt
+    return f"{prefixo}+{len(nomes)}" if nomes else prefixo.rstrip(": ")
 
 
 def _plural(n: int, singular: str, plural: str | None = None) -> str:
@@ -395,6 +412,56 @@ def _piso(dt: datetime, passo: int) -> datetime:
     return dt.replace(hour=dt.hour - dt.hour % passo, minute=0, second=0, microsecond=0)
 
 
+LEGENDA_TAM = 24  # legenda do relógio: Archivo 600 de 24 px
+LEGENDA_LINHA = 40  # altura de cada linha da legenda
+
+
+def _lado_relogio(stance: Mapping[str, str | None] | None, nome: str) -> str | None:
+    """"sem" (assunto sem cobertura comparada), "a", "b", "neutro" ou None (fora da análise)."""
+    if stance is None:
+        return "sem"
+    s = stance.get(nome)
+    return s if s in _COR_STANCE else None
+
+
+def legenda_relogio(
+    batidas: Iterable[Any],
+    stance: Mapping[str, str | None] | None,
+    rotulos: Mapping[str, str] | None = None,
+    *,
+    largura: float = LARGURA,
+) -> list[list[tuple[str | None, str, float]]]:
+    """As linhas da legenda do relógio: ``[[(lado, texto, largura do item), …], …]``, só com os grupos que
+    aparecem, na ordem a · sem lado · b · fora da análise. Sem ``stance``, nenhuma linha."""
+    if stance is None:
+        return []
+    rot = {"a": "lado A", "b": "lado B", "neutro": "sem lado", "fora": "fora da análise"} | dict(rotulos or {})
+    presentes = {_lado_relogio(stance, nome) for nome, _ in map(_batida, batidas)}
+    itens = [(k, rot["fora" if k is None else k]) for k in ("a", "neutro", "b", None) if k in presentes]
+    linhas: list[list[tuple[str | None, str, float]]] = [[]]
+    x = 0.0
+    for k, txt in itens:
+        w = 26 + largura_texto(txt, "label", LEGENDA_TAM)
+        if linhas[-1] and x + w > largura:
+            linhas.append([])
+            x = 0.0
+        linhas[-1].append((k, _cabe(txt, "label", LEGENDA_TAM, largura - 26), w))
+        x += w + 30
+    return [ln for ln in linhas if ln]
+
+
+def altura_legenda_relogio(
+    batidas: Iterable[Any],
+    stance: Mapping[str, str | None] | None,
+    rotulos: Mapping[str, str] | None = None,
+    *,
+    largura: float = LARGURA,
+) -> float:
+    """Quanto a legenda acrescenta à altura do relógio (para quem reparte o slide)."""
+    n = len(legenda_relogio(batidas, stance, rotulos, largura=largura))
+    return n * LEGENDA_LINHA + 14 if n else 0.0
+
+
 def relogio(
     batidas: Iterable[Any],
     stance: Mapping[str, str | None] | None = None,
@@ -411,29 +478,27 @@ def relogio(
     - ``batidas``: ``[(nome, datetime), …]`` (ou objetos com ``.source`` e ``.at``), em qualquer ordem.
     - ``stance``: ``{nome: "a" | "b" | "neutro" | None}``. Quem não está no dict (ou tem None) está
       fora da análise e vira ponto vazado. Sem ``stance`` (assunto sem cobertura comparada), todos
-      os pontos são cheios e não há rótulo de lado.
-    - ``ref_date``: o dia da edição; horários de outro dia levam a data ("20/10 13h17").
+      os pontos são cheios e não há legenda.
+    - ``ref_date``: o dia da edição (só para a frase do texto alternativo; o eixo diz o dia de cada hora).
     - ``rotulos``: ``{"a": "sinergia em IA", "b": "complexidade de governança"}`` (opcionais
-      ``"neutro"`` e ``"fora"``); vão depois do nome, em cada linha.
+      ``"neutro"`` e ``"fora"``); vão na legenda sob o eixo (● a ● sem lado ● b ○ fora da análise),
+      só com os grupos que aparecem.
 
-    Eixo de tempo no topo, com marcas a cada 3 h (ou o passo que couber) e "00h 21/10" na virada
-    do dia; o span (do primeiro ao último) fica marcado no eixo. Uma linha de ``linha`` px por
-    veículo, até ``max_linhas`` (as do meio viram uma linha "+k veículos"). No pé, a base
-    (``base``; padrão "12 veículos · horário informado por cada veículo, em Brasília"; "" tira).
+    Eixo de tempo no topo, com marcas a cada 3 h (ou o passo que couber); a data vai no eixo, uma vez:
+    na primeira marca ("09h 23/10") e em cada virada do dia ("00h 21/10"). O span (do primeiro ao último)
+    fica marcado no eixo. Uma linha de ``linha`` px por veículo, só com a hora (HHhMM) e o nome, até
+    ``max_linhas`` (as do meio viram uma linha "+k veículos"). No pé, a base (``base``; padrão "12 veículos ·
+    horário informado por cada veículo, em Brasília"; "" tira). Nenhum texto sai do quadro.
     """
     pts = sorted((_batida(b) for b in batidas), key=lambda p: p[1])
     if not pts:
         return _vazio("relogio", "nenhum horário informado", "Gráfico: linha do tempo sem horários informados.", largura)
-    ref = ref_date or pts[-1][1].date()
     if base is None:
         base = f"{len(pts)} {_plural(len(pts), 'veículo')} · horário informado por cada veículo, em Brasília"
     rot = {"a": "lado A", "b": "lado B", "neutro": "sem lado", "fora": "fora da análise"} | dict(rotulos or {})
 
     def lado(nome: str) -> str | None:
-        if stance is None:
-            return "sem"
-        s = stance.get(nome)
-        return s if s in _COR_STANCE else None
+        return _lado_relogio(stance, nome)
 
     # Descrição
     t0, t1 = pts[0][1], pts[-1][1]
@@ -485,35 +550,47 @@ def relogio(
         for t in (t0, t1):
             corpo.append(_linha(X(t), y_eixo - 10, X(t), y_eixo + 10, "var(--ink)", 3))
 
-    # marcas: primeiro as viradas de dia (sempre rotuladas), depois as demais se couberem
+    # marcas: primeiro as viradas de dia e a primeira marca (com a data), depois as demais se couberem
     marcas = []
     t = ini
     while t <= fim:
         marcas.append(t)
         t += timedelta(hours=passo)
-    nlinhas = min(n, max_linhas)
-    y_linhas = y_eixo + 52
-    altura = y_linhas + nlinhas * linha + 6
     ocupado: list[tuple[float, float]] = []
     viradas: list[float] = []  # x de cada meia-noite: fio tracejado que desce pelas linhas
-    rotulos_x: list[tuple[float, float, float]] = []  # (cy, x0, x1) de cada rótulo de linha
-    for virada in (True, False):
-        for t in marcas:
-            if (t.hour == 0) != virada:
-                continue
-            txt = f"00h {t:%d/%m}" if virada else f"{t:%H}h"
-            w = largura_texto(txt, "mono", 22)
-            x0 = min(max(X(t) - w / 2, 0), largura - w)
-            corpo.append(_linha(X(t), y_eixo, X(t), y_eixo + 8, "var(--rule3)", 2))
-            if virada:
-                viradas.append(X(t))
-            if any(not (x0 + w + 14 <= a or x0 >= b + 14) for a, b in ocupado):
-                continue
-            ocupado.append((x0, x0 + w))
-            corpo.append(_texto(x0, y_eixo + 32, txt, "mono6" if virada else "mono", 22,
-                                "var(--ink)" if virada else "var(--ink2)"))
+    datadas = [t for t in marcas if t.hour == 0] + ([ini] if ini.hour != 0 else [])
+    for t in datadas + [t for t in marcas if t not in datadas]:
+        datada = t in datadas
+        txt = f"{t:%H}h {t:%d/%m}" if datada else f"{t:%H}h"
+        w = largura_texto(txt, "mono", 22)
+        x0 = min(max(X(t) - w / 2, 0), largura - w)
+        corpo.append(_linha(X(t), y_eixo, X(t), y_eixo + 8, "var(--rule3)", 2))
+        if t.hour == 0:
+            viradas.append(X(t))
+        if any(not (x0 + w + 14 <= a or x0 >= b + 14) for a, b in ocupado):
+            continue
+        ocupado.append((x0, x0 + w))
+        corpo.append(_texto(x0, y_eixo + 32, txt, "mono6" if datada else "mono", 22,
+                            "var(--ink)" if datada else "var(--ink2)"))
+
+    # legenda dos grupos, sob o eixo
+    legenda = legenda_relogio(pts, stance, rot, largura=largura)
+    for j, itens in enumerate(legenda):
+        y = y_eixo + 86 + j * LEGENDA_LINHA
+        x = 0.0
+        for k, txt, w in itens:
+            if k is None:
+                corpo.append(_circulo(x + 9, y - 8, 7, "var(--bg)", " stroke='var(--ink2)' stroke-width='3'"))
+            else:
+                corpo.append(_circulo(x + 9, y - 8, 9, _COR_STANCE[k]))
+            corpo.append(_texto(x + 26, y, txt, "label", LEGENDA_TAM, "var(--ink)"))
+            x += w + 30
+    y_linhas = y_eixo + 52 + (len(legenda) * LEGENDA_LINHA + 14 if legenda else 0)
 
     # linhas por veículo; o excesso do meio vira "+k veículos"
+    nlinhas = min(n, max_linhas)
+    altura = y_linhas + nlinhas * linha + 6
+    rotulos_x: list[tuple[float, float, float]] = []  # (cy, x0, x1) de cada rótulo de linha
     if n > max_linhas:
         cab = max_linhas - 2
         mostradas = pts[:cab] + [None] + pts[-1:]
@@ -525,32 +602,39 @@ def relogio(
         if p is None:
             for nome, t in ocultas:
                 lo = lado(nome)
-                cor = "var(--ink2)" if lo == "sem" else _COR_STANCE.get(lo or "", "var(--ink3)")
-                corpo.append(_circulo(X(t), cy, 6, cor))
-            txt = f"+{len(ocultas)} {_plural(len(ocultas), 'veículo')} entre {_hora(ocultas[0][1], ref)} e {_hora(ocultas[-1][1], ref)}"
-            w = largura_texto(txt, "mono", 22)
-            xd = X(ocultas[-1][1]) + 18
-            x_txt, anc = (xd, "start") if xd + w <= largura else (X(ocultas[0][1]) - 18, "end")
-            rotulos_x.append((cy, x_txt if anc == "start" else x_txt - w, x_txt + w if anc == "start" else x_txt))
+                if lo is None:  # fora da análise: vazado, como na legenda
+                    corpo.append(_circulo(X(t), cy, 5, "var(--bg)", " stroke='var(--ink2)' stroke-width='2'"))
+                    continue
+                corpo.append(_circulo(X(t), cy, 6, "var(--ink2)" if lo == "sem" else _COR_STANCE[lo]))
+            k = len(ocultas)
+            xd, xe = X(ocultas[-1][1]) + 18, X(ocultas[0][1]) - 18
+            for txt in (f"+{k} {_plural(k, 'veículo')} entre {ocultas[0][1]:%Hh%M} e {ocultas[-1][1]:%Hh%M}",
+                        f"+{k} {_plural(k, 'veículo')}"):
+                w = largura_texto(txt, "mono", 22)
+                if xd + w <= largura or xe - w >= 0:
+                    break
+            if xd + w <= largura:
+                x_txt, anc = xd, "start"
+            elif xe - w >= 0:
+                x_txt, anc = xe, "end"
+            else:  # nem de um lado nem do outro: o lado mais largo, preso ao quadro
+                x_txt, anc = (min(xd, largura - w), "start") if largura - xd >= xe else (max(xe, w), "end")
+            x0 = x_txt if anc == "start" else x_txt - w
+            rotulos_x.append((cy, x0, x0 + w))
             corpo.append(_texto(x_txt, cy + 8, txt, "mono", 22, "var(--ink2)", anc, HALO))
             continue
         nome, t = p
         lo = lado(nome)
         x = X(t)
-        hora = _hora(t, ref)
-        tag = "" if lo == "sem" else rot["fora" if lo is None else lo]
+        hora = f"{t:%Hh%M}"
         w_h = largura_texto(hora, "mono", 24)
-        w_t = largura_texto(tag, "mono", 21) + 16 if tag else 0
         livre_d = largura - (x + 24)
         livre_e = x - 24
         lugar = max(livre_d, livre_e)
         nome_txt = nome
-        w_n = largura_texto(nome, "label", 28)
-        if w_h + 14 + w_n + w_t > lugar:
-            if w_t and w_h + 14 + w_n > lugar - w_t:
-                tag, w_t = "", 0
-            nome_txt = _cabe(nome, "label", 28, lugar - w_h - 14 - w_t)
-        w_tot = w_h + 14 + largura_texto(nome_txt, "label", 28) + w_t
+        if w_h + 14 + largura_texto(nome, "label", 28) > lugar:
+            nome_txt = _cabe(nome, "label", 28, lugar - w_h - 14)
+        w_tot = w_h + 14 + largura_texto(nome_txt, "label", 28)
         ax, anc = (x + 24, "start") if w_tot <= livre_d else (x - 24, "end")
         rotulos_x.append((cy, ax if anc == "start" else ax - w_tot, ax + w_tot if anc == "start" else ax))
         # haste desde o primeiro horário: para antes do rótulo quando ele fica à esquerda do ponto
@@ -563,12 +647,10 @@ def relogio(
             cor = "var(--ink)" if lo == "sem" else _COR_STANCE[lo]
             corpo.append(_circulo(x, cy, 12, cor, " stroke='var(--bg)' stroke-width='3'"))
         spans = _tspan(hora, "mono", 24, "var(--ink2)") + _tspan(nome_txt, "label", 28, "var(--ink)", 14)
-        if tag:
-            spans += _tspan(tag, "mono", 21, "var(--ink2)", 16)
         corpo.append(f"<text x='{_f(ax)}' y='{_f(cy + 9)}' text-anchor='{anc}' style='{HALO}'>{spans}</text>")
     # a meia-noite desce pelas linhas, interrompida onde passaria por um rótulo
     for xv in viradas:
-        trechos = [(y_eixo + 8, y_linhas)]
+        trechos = [(y_eixo + 8, y_eixo + 50)]
         for i in range(len(mostradas)):
             cy = y_linhas + i * linha + linha / 2
             coberto = any(abs(c - cy) < 1 and x0 - 10 <= xv <= x1 + 10 for c, x0, x1 in rotulos_x)
@@ -667,7 +749,7 @@ def espectro(
     if fora:
         y += 44
         corpo.append(_circulo(10, y + 4, 9, "var(--bg)", " stroke='var(--ink2)' stroke-width='3'"))
-        corpo.append(_texto(30, y + 12, _cabe(f"fora da análise: {', '.join(fora)}", "mono", 22, largura - 30),
+        corpo.append(_texto(30, y + 12, _lista_cabe("fora da análise: ", list(fora), "mono", 22, largura - 30),
                             "mono", 22, "var(--ink2)"))
     return _svg("espectro", largura, y + 24, corpo, descricao), descricao
 
@@ -689,7 +771,7 @@ def waffle(
     gap: float = 8,
     largura: float = LARGURA,
 ) -> tuple[Markup, str]:
-    """Um quadrado por item: os destacados em laranja, o resto em cinza (``--g-n`` a 40%).
+    """Um quadrado por item: os destacados em laranja, o resto em cinza (``--g-n`` a 40%); as contagens em tinta.
 
     - ``total``: quantos quadrados (a base).
     - ``destacados``: quantos (os primeiros) ou quais índices ficam em laranja.
@@ -740,7 +822,7 @@ def waffle(
     # contagens à direita: a dos destacados no alto, a do resto alinhada ao pé da grade
     xl = gw + 56
     wl = largura - xl
-    corpo.append(_texto(xl, 92, str(d), "hook", 128, "var(--accent)"))
+    corpo.append(_texto(xl, 92, str(d), "hook", 128, "var(--ink)"))  # o laranja fica no quadrado e no gancho (§4)
     corpo.append(_texto(xl, 134, _cabe(rotulos[0], "label", 32, wl), "label", 32, "var(--ink)"))
     cursor = 134
     if contorno_idx is not None and 0 <= contorno_idx < total:

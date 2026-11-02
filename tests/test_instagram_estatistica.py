@@ -576,3 +576,30 @@ def test_selo_de_cobertura_do_em_1_minuto():
     spacex = materia("21", "spacex")
     assert E.selo_cobertura(e, spacex, spacex.id) == "12 veículos · dividida 6 × 2 · Raio-X às 18h30"
     assert E.selo_cobertura(e, materia("21", "ifood-beneficios"), spacex.id) == "8 veículos · sem divisão"
+
+
+def test_historico_de_depois_de_artigo_ou_e_e_substantivo():
+    """'luto e histórico de segurança na malha' (29/10) não é adjetivo da casa; 'acordo histórico de paz' é."""
+    achados = lambda t: [m.group(0) for m in E.ADJ_CASA.finditer(t)]  # noqa: E731
+    assert achados("Foco nas vítimas, luto e histórico de segurança na malha") == []
+    assert achados("o histórico do clube na Libertadores") == []
+    assert achados("seu histórico de gols") == []
+    assert achados("acordo histórico de paz") == ["histórico"]
+    assert achados("um histórico acordo") == ["histórico"]
+    assert achados("alta histórica do Ibovespa") == ["histórica"]
+
+
+@real
+def test_bola_de_ouro_conta_em_esporte_no_placar_de_27_10():
+    """A cobertura comparada veio com section 'mercados' (no index também); 5 dos 9 veículos são esportivos no dia."""
+    e = edicao("27")
+    cov = next(c for c in e.compared if c.topic.startswith("Harry Kane"))
+    assert E.coverage_section(cov, None) == "mercados"
+    assert {"ge", "Gazeta Esportiva", "Placar", "Trivela", "UOL"} <= E.veiculos_esportivos(e)
+    assert "Folha de S.Paulo" not in E.veiculos_esportivos(e)
+    assert E.secao_da_cobertura(e, cov, None) == "esporte"
+    assert "mercados" not in E.placar(e, election=True).por_secao
+    # a de uma matéria nunca muda
+    s = e.stories[0]
+    if s.coverage:
+        assert E.secao_da_cobertura(e, s.coverage, s) == s.section

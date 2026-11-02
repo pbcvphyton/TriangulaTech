@@ -12,8 +12,9 @@ espectro e no fundo dos slides 3 e 4.
 
 from __future__ import annotations
 
+import math
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any, Iterable
 
 from qijournal.config import LimiaresConfig
@@ -58,12 +59,14 @@ SUB_PLACAR = "assuntos com 4 ou mais veículos comparados; dividir = pelo menos 
 
 FATO_MAX = 260  # slide 2: dek + 1ª frase do corpo, se couber
 SUBTITULO_MAX_PALAVRAS = 18
+SUBTITULO_MAX_CHARS = 200  # frase do corpo na capa: cortada na vírgula antes disso
 FRAMING_MAX = 160  # o §4.2 diz 120, mas 99 de 267 enquadramentos dos Raio-X elegíveis passam disso (máx. 158)
 LADO_FRAMINGS = 3  # veículos com enquadramento no slide do lado; o resto vai em "Também"
 RACHAS_MAX = 3  # linhas do slide 2 do Placar com rachas
 QUADRO = 1122  # altura útil do slide de feed no sistema 2 (1350 − faixa − assinatura)
 RELOGIO_RX = 630  # px para as linhas do relógio no Raio-X (12 linhas de 52 px no pior caso)
 RELOGIO_PLACAR = 540  # no Placar do dia, que tem kicker e assunto acima do gráfico
+RELOGIO_LINHA_MIN = 38  # px por veículo antes de juntar os do meio em "+k veículos"
 
 
 # ── Texto ─────────────────────────────────────────────────────────────────
@@ -119,15 +122,44 @@ def _sem_proibidas(texto: str, min_palavras: int = 4) -> str:
 def _sem_adj(texto: str, titulos: list[str]) -> str:
     """Texto corrido sem adjetivo da casa (§4.1): fica se estiver no título de metade dos veículos;
     senão, corta na última "," ou " e " antes dele se sobrar pelo menos 40% do texto; se não,
-    tira só a palavra ("risco fiscal bilionário da derrota" → "risco fiscal da derrota")."""
+    tira só a palavra ("risco fiscal bilionário da derrota" → "risco fiscal da derrota"). Se tirar a
+    palavra deixar uma emenda sem sentido ("luto e de segurança") ou preposição no fim, ``""``."""
     texto = plain(texto).strip()
     if not any(not E._adj_nos_titulos(E._raiz_adj(m.group(0)), titulos) for m in E.ADJ_CASA.finditer(texto)):
         return texto
     cut = E.sem_adj_casa(texto, titulos)
     if cut and len(cut) >= 0.4 * len(texto):
         return cut.rstrip(" ,;:") + "."
+    out = _sem_palavra_adj(texto, titulos)
+    return "" if _emenda_quebrada(texto, out) else out
+
+
+def _sem_palavra_adj(texto: str, titulos: list[str]) -> str:
+    """``texto`` sem a palavra do adjetivo da casa (a que não está no título de metade dos veículos)."""
     out = E.ADJ_CASA.sub(lambda m: m.group(0) if E._adj_nos_titulos(E._raiz_adj(m.group(0)), titulos) else "", texto)
     return re.sub(r"\s+([,.;:])", r"\1", re.sub(r"\s{2,}", " ", out)).strip()
+
+
+_EMENDA = re.compile(
+    r"\b(?:e|ou|o|a|os|as|um|uma)\s+(?:de|do|da|dos|das|em|no|na|nos|nas|com|para|por)\b|,\s+(?:de|do|da|dos|das)\b", re.I
+)
+
+
+def _emenda_quebrada(antes: str, depois: str) -> bool:
+    """Tirar a palavra deixou "e de"/"o da" que não havia, ou artigo/preposição no fim?"""
+    if len(_EMENDA.findall(depois)) > len(_EMENDA.findall(antes)):
+        return True
+    ultima = depois.rstrip(" .;:,").split()[-1:]
+    return bool(ultima) and ultima[0].lower() in E._PENDURADAS
+
+
+# Erros de digitação que já apareceram nos campos da IA ("Detralhou", framing do Valor em 21/10).
+ERROS_CONHECIDOS = {"Detralhou": "Detalhou", "detralhou": "detalhou"}
+_ERRO_RE = re.compile(r"\b(?:" + "|".join(ERROS_CONHECIDOS) + r")\b")
+
+
+def _corrige(texto: str) -> str:
+    return _ERRO_RE.sub(lambda m: ERROS_CONHECIDOS[m.group(0)], texto)
 
 
 def _eleicao(cov: Coverage, st: Story | None) -> bool:
@@ -156,13 +188,36 @@ def _hora_completa(at: datetime) -> str:
     return f"{at.astimezone(E.TZ):%d/%m %Hh%M}"
 
 
-def _lado_waffle(base: int) -> int:
-    """Quadrados maiores com base pequena (até 5 linhas de 7), 64 px acima disso."""
-    return 76 if base <= 35 else 64
+def _lado_waffle(base: int, altura: int = 368) -> int:
+    """Lado dos quadrados (7 por linha) para a grade caber em ``altura`` px: até 76 px com base pequena; 29
+    assuntos (5 linhas) já pedem 65 px no slide 8, que também leva o CTA no gancho condensado."""
+    linhas = max(math.ceil(base / 7), 1)
+    return max(36, min(76, altura // linhas - 8))
+
+
+def _dividiram(rachas: int) -> str:
+    """Concordância pelo numerador: "1 de 27 assuntos dividiu", "0 de 14 assuntos dividiram"."""
+    return "dividiu" if rachas == 1 else "dividiram"
 
 
 def _rotulos_waffle(rachas: int) -> tuple[str, str]:
-    return ("dividiu" if rachas == 1 else "dividiram", "sem divisão")
+    return (_dividiram(rachas), "sem divisão")
+
+
+def _duracao_titulo(span: timedelta) -> tuple[str, str]:
+    """A duração do relógio para o título em caixa alta, por extenso (o "18h22" viraria "18H22", que se lê
+    como hora do dia): "95 minutos" abaixo de 2 h, "17 horas" na hora cheia, "quase 17 horas" a partir de
+    45 minutos depois da hora, "mais de 18 horas" com menos (nunca afirma um intervalo que não houve).
+    O valor exato fica no gráfico e na legenda. Devolve (texto, trecho em laranja)."""
+    minutos = int(span.total_seconds() // 60)
+    if minutos < 120:
+        texto = f"{minutos} {'minuto' if minutos == 1 else 'minutos'}"
+        return texto, texto
+    horas, resto = divmod(minutos, 60)
+    if resto >= 45:
+        return f"quase {horas + 1} horas", f"{horas + 1} horas"
+    texto = f"{horas} horas"
+    return (f"mais de {texto}" if resto else texto), texto
 
 
 def _lista(nomes: list[str]) -> str:
@@ -176,9 +231,38 @@ def _titulos_literais(edition: Edition) -> set[str]:
 # ── Raio-X: peças ─────────────────────────────────────────────────────────
 
 
+def _chaves_do_fato(story: Story) -> set[str]:
+    """O que identifica o fato na manchete: os números, as palavras com maiúscula fora do começo e a
+    primeira palavra ("colisão", "68", "Espanha"; "SpaceX", "Tesla"), em minúsculas."""
+    palavras = re.findall(r"[\wÀ-ú]+", plain(story.headline))
+    chaves = {w for w in palavras if w[:1].isdigit()}
+    chaves |= {w for w in palavras[1:] if w[:1].isupper() and len(w) >= 3}
+    if palavras and len(palavras[0]) >= 4:
+        chaves.add(palavras[0])
+    return {c.lower() for c in chaves}
+
+
+def _nomeia(texto: str, story: Story) -> bool:
+    """O texto diz qual é o fato (dados#7): tem alguma das :func:`_chaves_do_fato` da manchete."""
+    palavras = {w.lower() for w in re.findall(r"[\wÀ-ú]+", plain(texto))}
+    return bool(palavras & _chaves_do_fato(story))
+
+
+def _corta_na_virgula(frase: str, maximo: int = SUBTITULO_MAX_CHARS) -> str:
+    """A frase inteira se couber em ``maximo``; senão, até a última vírgula antes disso (8+ palavras), com ponto."""
+    if len(frase) <= maximo:
+        return frase
+    cut = frase.rfind(", ", 0, maximo)
+    head = frase[:cut].rstrip(" ,;:") if cut > 0 else ""
+    return head + "." if len(head.split()) >= 8 else ""
+
+
 def _subtitulo(edition: Edition, story: Story, veiculos: list[str]) -> str:
-    """Subtítulo da capa (§4.2): o assunto da cobertura se passar no adjetivo da casa e tiver até 18
-    palavras; senão a linha fina. Nunca título literal de veículo, nome de veículo nem palavra proibida."""
+    """Subtítulo da capa (§4.2): diz qual é o fato, com o sujeito e o quê (:func:`_nomeia`). Na ordem: o assunto
+    da cobertura (sem adjetivo da casa, até 18 palavras); a manchete só sem o adjetivo da casa ("SpaceX e Tesla
+    avaliam fusão após salto nos resultados operacionais", 21/10); a linha fina; a frase do corpo que nomeia o
+    fato, cortada na vírgula (29/10: a manchete é o título da Folha e a linha fina não diz "trens" nem "68").
+    Sem nenhuma que nomeie, a linha fina. Nunca título literal de veículo, nome de veículo nem palavra proibida."""
     c = story.coverage
     titulos = E.titulos_por_veiculo(E.topic_of(edition, story.id))
     literais = _titulos_literais(edition)
@@ -186,19 +270,34 @@ def _subtitulo(edition: Edition, story: Story, veiculos: list[str]) -> str:
     topic = plain(c.topic) if c else ""
     if topic and E.sem_adj_casa(topic, titulos) == topic and len(topic.split()) <= SUBTITULO_MAX_PALAVRAS:
         candidatas.append(topic)
-    candidatas += [plain(story.dek), E.capa_sem_adj(edition, story)]
+    manchete = plain(story.headline)
+    sem_palavra = _sem_palavra_adj(manchete, titulos)
+    if sem_palavra != manchete and len(sem_palavra.split()) >= 5 and not _emenda_quebrada(manchete, sem_palavra):
+        candidatas.append(sem_palavra)
+    candidatas.append(plain(story.dek))
+    candidatas += [_corta_na_virgula(f) for p in story.body[:2] for f in _frases(p)[:2]]
+
+    def serve(texto: str) -> bool:
+        return bool(texto) and _limpo(texto) and _norm(texto) not in literais and not _cita_veiculo(texto, veiculos)
+
     for texto in candidatas:
-        if texto and _limpo(texto) and _norm(texto) not in literais and not _cita_veiculo(texto, veiculos):
+        if serve(texto) and _nomeia(texto, story):
+            return texto
+    for texto in [plain(story.dek), E.capa_sem_adj(edition, story)]:
+        if serve(texto):
             return texto
     return _sem_proibidas(story.dek) or _sem_proibidas(E.capa_sem_adj(edition, story))
 
 
 def _fato(story: Story, evitar: str, titulos: list[str]) -> str:
     """Slide 2 (§4.2): a linha fina e a 1ª frase do corpo, se o total couber em 260 caracteres; sem
-    número nem nome próprio, entra a frase seguinte. Se a capa já usou a linha fina (``evitar``), o
-    slide 2 sai só do corpo, para não repetir a capa (T3). Frases com palavra proibida ficam de fora."""
+    número nem nome próprio, entra a frase seguinte. O que a capa já usou (``evitar``: a linha fina ou
+    a frase do corpo, mesmo cortada) não volta, para não repetir a capa (T3). Frases com palavra
+    proibida ficam de fora."""
+    usado = _norm(evitar)
+
     def ok(f: str) -> bool:
-        return _limpo(f) and _sem_adj(f, titulos) == f
+        return _limpo(f) and _sem_adj(f, titulos) == f and not (usado and _norm(f).startswith(usado))
 
     dek = plain(story.dek)
     frases = [f for p in story.body for f in _frases(p) if ok(f)]
@@ -215,16 +314,114 @@ def _fato(story: Story, evitar: str, titulos: list[str]) -> str:
         base = frases[0] if frases else dek
         return truncate_sentence(base, FATO_MAX) if base else ""
     texto = " ".join(partes)
-    if not _tem_dado(texto):
+    if not _tem_dado(texto):  # sem número nem nome: entra a frase seguinte (sozinha, se as duas não couberem)
         prox = next((f for f in frases if f not in partes), None)
         if prox:
-            texto = f"{texto} {prox}"
+            junto = f"{texto} {prox}"
+            texto = prox if len(junto) > FATO_MAX and len(prox) <= FATO_MAX else junto
     return texto
 
 
 def _conclusao(c: Coverage) -> str:
     """A conclusão da cobertura sem "(lado A)"/"(lado B)": aqui os lados se chamam maioria e minoria."""
     return re.sub(r"\s+([,.;])", r"\1", _LADO_ENTRE_PARENTESES.sub("", plain(c.conclusion))).strip()
+
+
+# Afirmações da conclusão sobre grupos de veículos que a contagem não sustenta (dados#3). Não sabemos a
+# nacionalidade nem o tipo de cada veículo, então frase que atribui um lado a um grupo assim ("veículos
+# internacionais", "agências", "jornais generalistas") sai; proporção ("a maioria dos veículos") só fica se a
+# maioria tiver mais da metade dos analisados, e número junto de veículo só se for uma das contagens.
+_GRUPO_NOME = (r"(?:imprensa|m[íi]dias?|ve[íi]culos?|jornais|jornal|publica[çc](?:[õo]es|[ãa]o)|canais|canal|portais|portal|"
+               r"ag[êe]ncias?|coberturas?|reportagens|an[áa]lises|reda[çc][õo]es|emissoras|sites|revistas)")
+_GRUPO_QUAL = (r"(?:internacion|nacion|estrangeir|brasileir|espanh|american|europe|brit[âa]nic|anglo|ocident|ingl[eê]s|"
+               r"[áa]rabe|asi[áa]tic|latin|regiona|loca[li]|especializad|econ[ôo]mic|financeir|esportiv|generalist|"
+               r"investigativ|anal[íi]tic|t[ée]cnic|factua|oficia|estata|p[úu]blic|jur[íi]dic|pol[íi]tic|gera[li]|"
+               r"conservador|progressist|governist|alternativ|independent|de neg[óo]cios|de mercado|de economia|"
+               r"de tecnologia|de consumo|de servi[çc]o|de circula[çc][ãa]o|de grande alcance|com foco)")
+_GRUPO_RE = re.compile(rf"\b{_GRUPO_NOME}\s+{_GRUPO_QUAL}|\bag[êe]ncias\b", re.I)
+_PROPORCAO_RE = re.compile(
+    rf"\b(?:maioria|maior parte|grande parte|parte expressiva|minoria)\s+d[aeo]s?\s+(?:[\wÀ-ú]+\s+)?{_GRUPO_NOME}\b|"
+    r"\b(?:majoritariamente|predomin\w+|quase todos|unanim\w+)",
+    re.I,
+)
+_NUMEROS = {"um": 1, "uma": 1, "dois": 2, "duas": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, "sete": 7,
+            "oito": 8, "nove": 9, "dez": 10, "onze": 11, "doze": 12}
+_NUM = r"(\d+|" + "|".join(_NUMEROS) + r")"
+_NUM_GRUPO_RE = re.compile(rf"\b{_NUM}\s+(?:d[aeo]s\s+)?(?:[\wÀ-ú]+\s+)?{_GRUPO_NOME}\b|\boutr[oa]s\s+{_NUM}\b|"
+                           rf"\({_NUM}\s+a\s+{_NUM}\)", re.I)
+
+
+def _frase_sustentada(frase: str, ld: S.Lados) -> bool:
+    """A frase da conclusão não afirma nada sobre grupos de veículos que a contagem dos lados desminta."""
+    if _GRUPO_RE.search(frase):
+        return False
+    if _PROPORCAO_RE.search(frase) and (ld.empate or 2 * ld.n_maioria <= ld.total):
+        return False
+    contagens = {ld.n_maioria, ld.n_minoria, ld.neutros, ld.total}
+    for m in _NUM_GRUPO_RE.finditer(frase):
+        for g in (x for x in m.groups() if x):
+            if (int(g) if g.isdigit() else _NUMEROS[g.lower()]) not in contagens:
+                return False
+    return True
+
+
+def _conclusao_verificada(c: Coverage, ld: S.Lados, titulos: list[str]) -> str:
+    """A conclusão da IA (sem adjetivo da casa nem termo proibido) só com as frases que a contagem
+    sustenta (:func:`_frase_sustentada`); ``""`` se nenhuma sobrar."""
+    texto = _frases_limpas(_sem_adj(_conclusao(c), titulos))
+    return " ".join(f for f in _frases(texto) if _frase_sustentada(f, ld))
+
+
+def _destacaram(k: int) -> str:
+    return f"{k} destacou" if k == 1 else f"{k} destacaram"
+
+
+def _molde_conclusao(
+    maioria: list[CoverageOutlet],
+    neutros: list[CoverageOutlet],
+    minoria: list[CoverageOutlet],
+    rotulos: tuple[str | None, str | None],
+    idiomas: dict[str, str],
+    horas: dict[str, datetime] | None = None,
+    day: date | None = None,
+) -> str:
+    """A conclusão por molde, com os números do espectro: "5 de 11 veículos destacaram X; 5, Y; 1 não tomou
+    lado."; quando os horários dos dois lados não se cruzam, a janela de cada um (28/10: os 6 de "fuga ilícita"
+    das 09h13 às 15h32, os 5 de "asilo político" a partir das 15h37); e, com textos em inglês e em português
+    (2+ de cada com lado), a mesma conta por idioma."""
+    n = len(maioria) + len(neutros) + len(minoria)
+    rot_maj, rot_min = rotulos
+    if rot_maj and rot_min:
+        texto = f"{len(maioria)} de {n} veículos destacaram {rot_maj}; {len(minoria)}, {rot_min}"
+    else:
+        texto = f"{len(maioria)} de {n} veículos contaram de um jeito; {len(minoria)}, de outro"
+    if neutros:
+        texto += f"; {len(neutros)} não {'tomou' if len(neutros) == 1 else 'tomaram'} lado"
+    texto += "."
+    horas = horas or {}
+    if rot_maj and rot_min and all(len(g) >= 2 and all(o.name in horas for o in g) for g in (maioria, minoria)):
+        ja = sorted(horas[o.name] for o in maioria)
+        jb = sorted(horas[o.name] for o in minoria)
+        if ja[-1] < jb[0] or jb[-1] < ja[0]:  # as janelas não se cruzam
+            h = E.horas([ja[0], ja[-1], jb[0], jb[-1]], day)
+            texto += (f" Pelo horário informado, os {len(maioria)} de {rot_maj} publicaram entre {h[0]} e {h[1]}; "
+                      f"os {len(minoria)} de {rot_min}, entre {h[2]} e {h[3]}.")
+    conta = {lang: [sum(1 for o in grupo if idiomas.get(o.name) == lang) for grupo in (maioria, minoria)]
+             for lang in ("en", "pt")}
+    if rot_maj and rot_min and all(sum(v) >= 2 for v in conta.values()):
+        (en_a, en_b), (pt_a, pt_b) = conta["en"], conta["pt"]
+        texto += (f" Entre os veículos em inglês, {_destacaram(en_a)} {rot_maj} e {en_b}, {rot_min}; "
+                  f"em português, {pt_a or 'nenhum'} e {pt_b or 'nenhum'}.")
+    return texto
+
+
+def _idiomas(topic: IndexTopic | None) -> dict[str, str]:
+    """O idioma do primeiro texto de cada veículo no assunto (``index.items[].lang``)."""
+    out: dict[str, str] = {}
+    for item in topic.items if topic else []:
+        if item.source and item.lang and item.source not in out:
+            out[item.source] = item.lang
+    return out
 
 
 def _papel(ld: S.Lados) -> dict[str, str]:
@@ -240,12 +437,12 @@ def _ordem(outlets: list[CoverageOutlet], horas: dict[str, datetime]) -> list[Co
 
 def _linhas_relogio(n: int, disponivel: int = RELOGIO_RX) -> dict[str, int]:
     """Altura e número máximo de linhas do relógio (kwargs de :func:`.graficos.relogio`): com poucos
-    veículos as linhas abrem (até 100 px) e ocupam o slide; com muitos, encolhem até 44 px e, se nem
+    veículos as linhas abrem (até 100 px) e ocupam o slide; com muitos, encolhem até 38 px e, se nem
     assim couberem 12, as do meio viram "+k veículos"."""
     linhas = max(min(n, 12), 1)
-    if disponivel // linhas >= 44:
+    if disponivel // linhas >= RELOGIO_LINHA_MIN:
         return {"linha": min(100, disponivel // linhas), "max_linhas": 12}
-    return {"linha": 44, "max_linhas": max(6, disponivel // 44)}
+    return {"linha": RELOGIO_LINHA_MIN, "max_linhas": max(6, disponivel // RELOGIO_LINHA_MIN)}
 
 
 def _linhas_serif(texto: str, tam: float, largura: float = G.LARGURA, fator: float = 0.53) -> int:
@@ -330,7 +527,7 @@ def _lado_ctx(
     Se uma das horas for de outro dia, todas levam a data ("20/10 22h49" ao lado de "21/10 03h36")."""
     mostrados, resto = [], []
     for o in outlets:
-        framing = plain(o.framing)
+        framing = _corrige(plain(o.framing))
         if framing and len(mostrados) < LADO_FRAMINGS:
             mostrados.append({"name": o.name, "hora": "", "framing": truncate_sentence(framing, FRAMING_MAX)})
         else:
@@ -373,11 +570,13 @@ def raio_x(
     day = edition_day(edition)
     section = section_info(edition, story.section)
     ld = S.lados(c, nomes)
-    gancho = S.gancho_raiox(c, nomes)
     papel = _papel(ld)
     n_total = ld.total
     rot_maj, rot_min = ld.rot_maioria, ld.rot_minoria
-    nome_maj, nome_min = rot_maj or "maioria", rot_min or "minoria"
+    if ld.empate:  # no empate não há maioria nem minoria
+        nome_maj, nome_min = rot_maj or "de um lado", rot_min or "do outro lado"
+    else:
+        nome_maj, nome_min = rot_maj or "maioria", rot_min or "minoria"
     veiculos = [o.name for o in c.outlets]
     nota = f"análise por IA de {n_total} veículos"
 
@@ -390,6 +589,7 @@ def raio_x(
     fora = [v for v in (E.topic_sources(topic, veiculos=True) if topic else []) if v not in set(veiculos)]
     if rel:
         fora = sorted(fora, key=lambda v: horas.get(v, datetime.max.replace(tzinfo=E.TZ)))
+    gancho = S.gancho_raiox(c, nomes, fora=len(fora))
 
     selo_capa = _selo(numero_serie, kicker_date(day), SECAO_CURTA.get(story.section, section["title"]))
     selo = _selo(numero_serie)
@@ -446,16 +646,21 @@ def raio_x(
         )
     )
 
-    # 3 e 4. A maioria e a minoria
-    empate = ld.empate
+    # 3 e 4. A maioria e a minoria ("metade" só quando todos tomaram lado: 5 × 5 com 1 sem lado não é metade)
+    if ld.empate and not neutros:
+        kickers = ("Metade", "A outra metade")
+    elif ld.empate:
+        kickers = ("Empate · um lado", "Empate · o outro lado")
+    else:
+        kickers = ("A maioria", "A minoria")
     for chave, outlets, rotulo, nome, kicker in (
-        ("a", maioria, rot_maj, "maioria", "Metade" if empate else "A maioria"),
-        ("b", minoria, rot_min, "minoria", "A outra metade" if empate else "A minoria"),
+        ("a", maioria, rot_maj, nome_maj, kickers[0]),
+        ("b", minoria, rot_min, nome_min, kickers[1]),
     ):
         mostrados, resto = _lado_ctx(outlets, horas, day)
         lado_txt = _sem_adj(c.side_a if (ld.maioria if chave == "a" else ld.minoria) == "a" else c.side_b, titulos)
         contagem = f"{len(outlets)} de {n_total}"
-        titulo = _titulo_lado(contagem, rotulo or f"a {nome}")
+        titulo = _titulo_lado(contagem, rotulo or (nome if ld.empate else f"a {nome}"))
         extra = []
         if chave == "b" and neutros:
             extra = [f"Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}"]
@@ -487,15 +692,22 @@ def raio_x(
         assert rel is not None
         k = len(rel.batidas)
         dur = E.duracao(rel.span)
+        dur_titulo, dur_destaque = _duracao_titulo(rel.span)
+        titulo_rel = S.inseparavel(f"{k} veículos em {dur_titulo}".upper())
         vir = S.virada(edition, story, rel, nomes)
         contexto = _contexto_atencao(edition, story) if k <= 8 else []
         stance_papel = {o.name: papel.get(o.stance) for o in c.outlets}
+        rotulos_rel = {"a": nome_maj, "b": nome_min}
+        livre = RELOGIO_RX + _folga_virada(vir) - int(G.altura_legenda_relogio(rel.batidas, stance_papel, rotulos_rel))
+        livre -= _sobra_titulo(titulo_rel)
+        if contexto and (livre - _altura_contexto(contexto)) // k < RELOGIO_LINHA_MIN:
+            contexto = []  # as linhas de contexto só entram se nenhum veículo do relógio ficar escondido
         svg, d_rel = G.relogio(
             rel.batidas,
             stance_papel,
             day,
-            rotulos={"a": nome_maj, "b": nome_min},
-            **_linhas_relogio(len(rel.batidas), RELOGIO_RX + _folga_virada(vir) - _altura_contexto(contexto)),
+            rotulos=rotulos_rel,
+            **_linhas_relogio(k, livre - _altura_contexto(contexto)),
             base="",
         )
         slides.append(
@@ -503,8 +715,9 @@ def raio_x(
                 "rx_relogio",
                 {
                     "selo": f"{selo} · Relógio da notícia".upper(),
-                    "titulo": f"{k} veículos em {dur}".upper(),
-                    "destaque": dur.upper(),
+                    "titulo": titulo_rel,
+                    "titulo_px": _tam_titulo_relogio(titulo_rel),
+                    "destaque": S.inseparavel(dur_destaque.upper()),
                     "grafico": svg,
                     "virada": vir.texto if vir else "",
                     "contexto": contexto,
@@ -516,19 +729,22 @@ def raio_x(
                         + (f"{vir.texto} " if vir else "") + " ".join(contexto) + (" " if contexto else "") + RODAPE_RELOGIO),
             )
         )
+        analisados = f" ({sum(1 for b in rel.batidas if b.source in stance_papel)} analisados)" if fora else ""
         linha_relogio = (
-            f"▸ Relógio: {k} veículos em {dur}, de {rel.batidas[0].source} ({_hora_completa(rel.batidas[0].at)}) "
-            f"a {rel.batidas[-1].source} ({_hora_completa(rel.batidas[-1].at)}), horário informado por cada veículo."
+            f"▸ Relógio: {k} veículos{analisados} em {dur}, de {rel.batidas[0].source} "
+            f"({_hora_completa(rel.batidas[0].at)}) a {rel.batidas[-1].source} ({_hora_completa(rel.batidas[-1].at)}), "
+            "horário informado por cada veículo."
         )
     else:
         slides.append(_slide_atencao(edition, story, selo, nota, section))
         at = S.atencao(edition, story)
         linha_relogio = f"▸ A atenção: {at.veiculos} veículos, {at.textos} textos; {at.linhas[1]}." if at else ""
 
-    # 6. O que isso significa (sem as frases com termo proibido: o lint reprovaria o Raio-X inteiro)
-    conclusao = _frases_limpas(_sem_adj(_conclusao(c), titulos))
-    if not conclusao and rot_maj and rot_min:  # nenhuma frase limpa: a conta dos lados, por molde
-        conclusao = f"{len(maioria)} veículos destacaram {rot_maj}; {len(minoria)}, {rot_min}."
+    # 6. O que isso significa: a conclusão da IA só com as frases limpas (o lint reprovaria o Raio-X inteiro) e
+    # que a contagem sustenta; sem nenhuma, o molde com os números do espectro (e a conta por idioma)
+    conclusao = _conclusao_verificada(c, ld, titulos) or _molde_conclusao(
+        maioria, neutros, minoria, (rot_maj, rot_min), _idiomas(topic), horas, day
+    )
     svg, d_esp = G.espectro(
         [o.name for o in maioria],
         [o.name for o in neutros],
@@ -541,7 +757,7 @@ def raio_x(
         Slide(
             "rx_significado",
             {"selo": selo, "kicker": "O que isso significa", "conclusao": conclusao, "grafico": svg, "nota": nota,
-             "conclusao_px": _tam_serif(conclusao, QUADRO - 130 - _altura_svg(svg), 60, 34, 1.2, 0.54),
+             "conclusao_px": _tam_serif(conclusao, QUADRO - 130 - _altura_svg(svg), 76, 34, 1.2, 0.54),
              "section": section},
             alt=alt(f"O que isso significa: {conclusao} {d_esp}"),
         )
@@ -565,15 +781,15 @@ def raio_x(
     rachas = E.rachas_do_dia(edition, election=election, nomes=nomes)
     idx = next((i for i, (cov, _) in enumerate(rachas) if cov is c), None)
     svg, d_waf = G.waffle(p.base, p.rachas, idx, rotulos=_rotulos_waffle(p.rachas), lado=_lado_waffle(p.base))
-    titulo_placar = f"{p.texto_dia} assuntos dividiram a cobertura hoje"
+    titulo_placar = f"{p.texto_dia} assuntos {_dividiram(p.rachas)} a cobertura hoje"
     slides.append(
         Slide(
             "rx_placar",
             {
                 "selo": f"{selo} · Placar do dia".upper(),
                 "kicker": "",
-                "titulo": titulo_placar.upper(),
-                "destaque": p.texto_dia.upper(),
+                "titulo": S.inseparavel(titulo_placar.upper()),
+                "destaque": S.inseparavel(p.texto_dia.upper()),
                 "grafico": svg,
                 "definicao": DEFINICAO,
                 "metodo": METODO,
@@ -586,17 +802,18 @@ def raio_x(
         )
     )
 
-    # Legenda
-    fato_legenda = plain(story.dek) if _limpo(plain(story.dek)) else fato
+    # Legenda (3 a 5 linhas "▸": os sem lado vão na linha da minoria). O fato com sujeito e o quê: o
+    # subtítulo da capa ou o texto do slide 2, o primeiro que nomeia o fato (nunca título de veículo).
+    fato_legenda = next((t for t in (subtitulo, fato) if t and _nomeia(t, story)), fato or subtitulo)
     linhas = [
         f"▸ O fato: {fato_legenda}",
         f"▸ {nome_maj[0].upper() + nome_maj[1:]} ({len(maioria)}): {_lista([o.name for o in maioria])}",
-        f"▸ {nome_min[0].upper() + nome_min[1:]} ({len(minoria)}): {_lista([o.name for o in minoria])}",
+        f"▸ {nome_min[0].upper() + nome_min[1:]} ({len(minoria)}): {_lista([o.name for o in minoria])}"
+        + (f". Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}" if neutros else ""),
     ]
     opcionais = [
-        f"▸ Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}" if neutros else "",
         linha_relogio,
-        f"▸ Placar do dia: {p.texto_dia} assuntos com 4 ou mais veículos dividiram a cobertura.",
+        f"▸ Placar do dia: {p.texto_dia} assuntos com 4 ou mais veículos {_dividiram(p.rachas)} a cobertura.",
     ]
     fecho = [f"Por que importa: {why}" if why else "", METODO, CTA_RAIOX, hashtags("#jornalismo", [story.section], election=election)]
     caption = _legenda(gancho.legenda, linhas, opcionais, fecho)
@@ -613,6 +830,19 @@ def raio_x(
         entidades=S.entidades(story),
         formula=gancho.formula,
     )
+
+
+def _tam_titulo_relogio(titulo: str) -> int:
+    """112 px se o título couber numa linha; em 2 ("11 VEÍCULOS EM QUASE 23 HORAS"), 88 px, para as 12 linhas
+    do relógio continuarem cabendo."""
+    return 112 if len(G.linhas_texto(titulo.upper(), "hook", 112, G.LARGURA * 0.985, tracking=-0.01)) <= 1 else 88
+
+
+def _sobra_titulo(titulo: str) -> int:
+    """Quanto o título do relógio ocupa além de 1 linha de 112 px (o RELOGIO_RX conta com uma)."""
+    tam = _tam_titulo_relogio(titulo)
+    linhas = len(G.linhas_texto(titulo.upper(), "hook", tam, G.LARGURA * 0.985, tracking=-0.01))
+    return max(int(linhas * tam * 0.92 - 112 * 0.92), 0)
 
 
 def _folga_virada(vir: S.Virada | None) -> int:
@@ -669,17 +899,20 @@ def _slide_atencao(edition: Edition, story: Story, selo: str, nota: str, section
     )
 
 
+LINHAS_MIN, LINHAS_MAX = 3, 5  # linhas "▸" da legenda (§4)
+
+
 def _legenda(linha1: str, linhas: list[str], opcionais: list[str], fecho: list[str]) -> str:
-    """Legenda no molde do §4.1, até 1.300 caracteres: sem caber, saem as linhas "▸" opcionais
-    (de trás para a frente) e, por fim, o "Por que importa" é encurtado."""
-    opcionais = [o for o in opcionais if o]
+    """Legenda no molde do §4.1, até 1.300 caracteres e com 3 a 5 linhas "▸": as opcionais entram na ordem
+    até 5; sem caber, saem de trás para a frente (sem baixar de 3) e, por fim, o "Por que importa" é encurtado."""
+    opcionais = [o for o in opcionais if o][: max(LINHAS_MAX - len(linhas), 0)]
     fecho = [f for f in fecho if f]
 
     def montar() -> str:
         return finish_caption([linha1, "\n".join(linhas + opcionais), "\n".join(fecho)])
 
     caption = montar()
-    while len(caption) > R.LEGENDA_MAX and opcionais:
+    while len(caption) > R.LEGENDA_MAX and opcionais and len(linhas) + len(opcionais) > LINHAS_MIN:
         opcionais.pop()
         caption = montar()
     if len(caption) > R.LEGENDA_MAX and fecho and fecho[0].startswith("Por que importa"):
@@ -704,6 +937,22 @@ def _titulo_cobertura(edition: Edition, cov: Coverage, story: Story | None) -> s
     if not texto or _norm(texto) in literais:
         texto = _sem_proibidas(E.capa_sem_adj(edition, story)) if story else ""
     return "" if not texto or _norm(texto) in literais else texto
+
+
+def _titulos_cov(edition: Edition, cov: Coverage, story: Story | None) -> list[str]:
+    """Os títulos dos veículos do assunto da cobertura (da matéria ou, sem ela, do assunto do index de mesmo título)."""
+    topic = E.topic_of(edition, story.id) if story else next((t for t in edition.index if t.title == cov.topic), None)
+    return E.titulos_por_veiculo(topic)
+
+
+def _rotulos_barra(ld: S.Lados) -> dict[str, str]:
+    """Rótulos da barra de um racha: os dos lados quando os dois existem; senão "maioria"/"minoria", e no
+    empate (2 × 2 não tem maioria) "de um lado"/"do outro"."""
+    if ld.rot_maioria and ld.rot_minoria:
+        return {"a": ld.rot_maioria, "n": "sem lado", "b": ld.rot_minoria}
+    if ld.empate:
+        return {"a": "de um lado", "n": "sem lado", "b": "do outro"}
+    return {"a": "maioria", "n": "sem lado", "b": "minoria"}
 
 
 def _titulo_topico(edition: Edition, topic: IndexTopic) -> str:
@@ -743,20 +992,21 @@ def placar_do_dia(
     selo = _selo(numero_serie)
     nota = f"{kicker_date(day).lower()} · classificação por IA"
     story_ids: list[str] = []
+    assuntos_usados: set[str] = set()  # títulos das coberturas do slide 2 (o mais coberto pode ser uma delas)
     secoes: list[str] = []
     slides: list[Slide] = []
 
     # 1. Capa
-    titulo = f"{p.texto_dia} assuntos dividiram a cobertura hoje"
-    svg, d_waf = G.waffle(p.base, p.rachas, rotulos=_rotulos_waffle(p.rachas), lado=88 if p.base <= 21 else _lado_waffle(p.base))
+    titulo = f"{p.texto_dia} assuntos {_dividiram(p.rachas)} a cobertura hoje"
+    svg, d_waf = G.waffle(p.base, p.rachas, rotulos=_rotulos_waffle(p.rachas), lado=88 if p.base <= 21 else _lado_waffle(p.base, 480))
     slides.append(
         Slide(
             "placar_capa",
             {
                 "selo": _selo(numero_serie, variante),
-                "gancho": titulo.upper(),
-                "gancho_px": _tam_gancho(titulo),
-                "destaque": p.texto_dia.upper(),
+                "gancho": S.inseparavel(titulo.upper()),
+                "gancho_px": _tam_gancho(S.inseparavel(titulo)),
+                "destaque": S.inseparavel(p.texto_dia.upper()),
                 "subtitulo": SUB_PLACAR,
                 "grafico": svg,
                 "nota": nota,
@@ -790,10 +1040,9 @@ def placar_do_dia(
         n_neu = len(cov.outlets) - a - b
         sem_lado = a == 0 and b == 0
         svg, d_bar = G.barra_anb(a, n_neu, b, {"a": "de um lado", "n": "sem lado", "b": "do outro"}, base="", altura=140)
-        conclusao = _conclusao(cov)
-        conclusao = conclusao if _limpo(conclusao) else _sem_proibidas(conclusao)
+        conclusao = _conclusao_verificada(cov, S.lados(cov, nomes), _titulos_cov(edition, cov, st))
         cabeca = f"{len(cov.outlets)} veículos, nenhum lado" if sem_lado else f"{len(cov.outlets)} veículos, sem divisão"
-        section = section_info(edition, E.coverage_section(cov, st))
+        section = section_info(edition, E.secao_da_cobertura(edition, cov, st))
         slides.append(
             Slide(
                 "placar_lista",
@@ -816,6 +1065,8 @@ def placar_do_dia(
             )
         )
         linha2 = f"▸ Maior consenso: {assunto}, {cabeca}."
+        linha_consenso = ""
+        assuntos_usados.add(cov.topic)
         if st is not None:
             story_ids.append(st.id)
         secoes.append(section["id"])
@@ -825,18 +1076,19 @@ def placar_do_dia(
         for cov, st, assunto in pares:
             ld = S.lados(cov, nomes)
             rot = f" · {ld.rot_maioria} × {ld.rot_minoria}" if ld.rot_maioria and ld.rot_minoria else ""
-            rotulos = {"a": ld.rot_maioria or "maioria", "n": "sem lado", "b": ld.rot_minoria or "minoria"}
-            svg, d = G.barra_anb(ld.n_maioria, ld.neutros, ld.n_minoria, rotulos, base="", altura=112 if sozinho else 64)
-            conclusao = _sem_adj(_conclusao(cov), E.titulos_por_veiculo(E.topic_of(edition, st.id)) if st else [])
+            svg, d = G.barra_anb(ld.n_maioria, ld.neutros, ld.n_minoria, _rotulos_barra(ld), base="",
+                                 altura=112 if sozinho else 64)
+            conclusao = _conclusao_verificada(cov, ld, _titulos_cov(edition, cov, st)) if sozinho else ""
             itens.append({
                 "assunto": assunto,
                 "linha": f"{ld.n_maioria} × {ld.n_minoria}{rot}",
                 "contagem": f"{ld.n_maioria} × {ld.n_minoria}" + (f" · {ld.neutros} sem lado" if ld.neutros else ""),
                 "grafico": svg,
-                "texto": conclusao if sozinho and _limpo(conclusao) else "",
-                "section": E.coverage_section(cov, st),
+                "texto": conclusao,
+                "section": E.secao_da_cobertura(edition, cov, st),
             })
             descricoes.append(d)
+            assuntos_usados.add(cov.topic)
             if st is not None:
                 story_ids.append(st.id)
         secoes += [i["section"] for i in itens]
@@ -864,18 +1116,26 @@ def placar_do_dia(
                     for i, d in zip(itens, descricoes))),
             )
         )
-        linha2 = "▸ Dividiram: " + "; ".join(f"{i['assunto']} ({i['linha']})" for i in itens)
+        linha2 = f"▸ {_dividiram(len(itens)).capitalize()}: " + "; ".join(f"{i['assunto']} ({i['linha']})" for i in itens)
+        consenso_par = E.maior_consenso(edition, election=election, nomes=nomes)
+        linha_consenso = ""
+        if consenso_par is not None and not (election and _eleicao(*consenso_par)):
+            assunto_c = _titulo_cobertura(edition, *consenso_par)
+            if assunto_c:
+                linha_consenso = f"▸ Maior consenso: {assunto_c}, {len(consenso_par[0].outlets)} veículos, nenhum lado."
 
-    # 3. O mais coberto
+    # 3. O mais coberto (no período eleitoral, o seguinte do ranking quando o primeiro é eleição de outro país)
     conc = E.concentracao(edition, election=election, nomes=nomes)
     linha3 = ""
-    topo = conc.topo if conc is not None else None
-    st = next((s for s in edition.stories if s.id == topo.story_id), None) if topo is not None and topo.story_id else None
-    if election and topo is not None and E.eleicao_escrita(topo.title, st.headline if st else ""):
-        topo = None  # o mais coberto é uma eleição (de outro país): o slide sai
+    topo, st, k = None, None, 0
+    for cand, kc in E.assuntos_mais_cobertos(edition, election=election, nomes=nomes) if conc is not None else []:
+        st_c = next((s for s in edition.stories if s.id == cand.story_id), None) if cand.story_id else None
+        if kc > 0 and not (election and E.eleicao_escrita(cand.title, st_c.headline if st_c else "")):
+            topo, st, k = cand, st_c, kc
+            break
     if conc is not None and topo is not None:
-        k, t = conc.topo_veiculos, E.topic_texts(topo)
-        mesmo = st is not None and st.id in story_ids
+        t = E.topic_texts(topo)
+        mesmo = (st is not None and st.id in story_ids) or topo.title in assuntos_usados
         assunto = _titulo_topico(edition, topo)
         rel = E.relogio(edition, st) if st is not None else _relogio_do_assunto(topo)
         section = section_info(edition, topo.section)
@@ -887,20 +1147,23 @@ def placar_do_dia(
         if E.relogio_valido(rel, min_veiculos=lim.relogio_min_veiculos, min_span_min=lim.relogio_min_span_min):
             assert rel is not None
             stance = {o.name: o.stance for o in st.coverage.outlets} if st is not None and st.coverage else None
+            rot_rel = {"a": S.rotulo_lado(st.coverage.side_a, nomes) or "um lado",
+                       "b": S.rotulo_lado(st.coverage.side_b, nomes) or "outro lado"} if stance else {}
+            disponivel = RELOGIO_PLACAR - 42 * (_linhas_serif(texto_assunto, 32, fator=0.54) - 1)
             svg, d = G.relogio(
                 rel.batidas,
                 stance,
                 day,
-                rotulos={"a": "lado A", "b": "lado B"},
-                **_linhas_relogio(len(rel.batidas), RELOGIO_PLACAR - 42 * (_linhas_serif(texto_assunto, 32, fator=0.54) - 1)),
+                rotulos=rot_rel,
+                **_linhas_relogio(len(rel.batidas), disponivel - int(G.altura_legenda_relogio(rel.batidas, stance, rot_rel))),
                 base="",
             )
             dur = E.duracao(rel.span)
             vir = S.virada(edition, st, rel, nomes) if st is not None else None
             primeiro, ultimo = rel.batidas[0], rel.batidas[-1]
+            h0, h1 = E.horas([primeiro.at, ultimo.at], day)  # data nas duas pontas, se uma for de outro dia
             virada_txt = vir.texto if vir else (
-                f"Primeiro horário: {primeiro.source}, {E.hora(primeiro.at, day)}. "
-                f"Último: {ultimo.source}, {E.hora(ultimo.at, day)}. São {dur} entre os dois."
+                f"Primeiro horário: {primeiro.source}, {h0}. Último: {ultimo.source}, {h1}. São {dur} entre os dois."
             )
             slides.append(
                 Slide(
@@ -979,12 +1242,14 @@ def placar_do_dia(
         f"{SECAO_CURTA.get(sid, section_info(edition, sid)['title'])} {r} de {b}"
         for sid, (r, b) in sorted(p.por_secao.items(), key=lambda kv: (-kv[1][1], kv[0]))
     )
-    linha1 = (f"Dia de consenso: {p.texto_dia} assuntos com 4 ou mais veículos dividiram a cobertura hoje."
-              if consenso else f"Placar do dia: {p.texto_dia} assuntos com 4 ou mais veículos dividiram a cobertura hoje.")
+    linha1 = (f"{'Dia de consenso' if consenso else 'Placar do dia'}: {p.texto_dia} assuntos com 4 ou mais veículos "
+              f"{_dividiram(p.rachas)} a cobertura hoje.")
+    uma_fonte = (f"▸ Pauta solitária: {E.num(conc.uma_fonte)} dos {E.num(conc.assuntos)} assuntos do dia saíram em "
+                 "uma fonte só." if conc is not None and conc.assuntos else "")
     caption = _legenda(
         linha1,
         [linha2],
-        [linha3, f"▸ Por editoria: {por_secao}." if por_secao else ""],
+        [linha3, f"▸ Por editoria: {por_secao}." if por_secao else "", linha_consenso, uma_fonte],
         ["Dividir = pelo menos 2 veículos de cada lado. " + METODO, CTA_PLACAR,
          hashtags("#jornalismo", secoes, election=election)],
     )

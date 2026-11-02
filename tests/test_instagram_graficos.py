@@ -168,16 +168,86 @@ def test_relogio_spacex_21_10():
         "Gráfico: linha do tempo com 12 pontos, de 20/10 13h17 a 21/10 06h01; 6 do lado sinergia em IA, "
         "2 do lado complexidade de governança, 3 neutros, 1 fora da análise."
     )
-    assert conta(svg, "circle") == 12
-    assert svg.count("fill='var(--bg)' stroke='var(--ink2)'") == 1  # The Wall Street Journal, vazado
+    assert conta(svg, "circle") == 12 + 4  # + as 4 marcas da legenda
+    assert svg.count("fill='var(--bg)' stroke='var(--ink2)'") == 2  # The Wall Street Journal e a marca da legenda
     ts = textos(svg)
     assert "00h 21/10" in ts and "16h43 do primeiro ao último horário" in ts
-    linhas = [t for t in ts if "h" in t[:12] and any(n in t for n, _, _ in BATIDAS)]
-    assert linhas[0].startswith("20/10 13h17The New York Times")
-    assert linhas[-1].startswith("06h01The Wall Street Journal") and linhas[-1].endswith("fora da análise")
+    # a data vai no eixo, uma vez: na 1ª marca e na virada; as linhas só com HHhMM e o veículo
+    assert "12h 20/10" in ts
+    linhas = [t for t in ts if any(n in t for n, _, _ in BATIDAS)]
+    assert linhas[0] == "13h17The New York Times"
+    assert linhas[-1] == "06h01The Wall Street Journal"
+    assert not any("/10" in t for t in linhas)
+    # a legenda sob o eixo nomeia cada cor (nada de rótulo por linha nem nome cortado)
+    assert {"sinergia em IA", "sem lado", "complexidade de governança", "fora da análise"} <= set(ts)
+    assert not any("…" in t for t in ts)
     assert any(t.startswith("12 veículos · horário informado") for t in ts)
-    # marcas de 3 em 3 h
-    assert {"15h", "18h", "21h", "03h", "06h"} <= set(ts)
+    # marcas de 3 em 3 h (a das 15h cede lugar à 1ª marca, mais larga com a data)
+    assert {"18h", "21h", "03h", "06h"} <= set(ts)
+    # a altura da legenda que o formato desconta do slide
+    assert G.altura_legenda_relogio(batidas(), stance(), ROT) == G.LEGENDA_LINHA + 14
+    assert G.altura_legenda_relogio(batidas(), None) == 0
+
+
+def _caixas_svg(svg: str) -> list[tuple[float, float, str]]:
+    """(x0, x1, texto) de cada <text>, juntando os <tspan> (com o dx) pela tabela de larguras."""
+    out = []
+    for t in ET.fromstring(svg).iter(f"{NS}text"):
+        partes = [t] if not len(t) else list(t)
+        w = 0.0
+        for el in partes:
+            estilo = el.get("style", "") or t.get("style", "")
+            m = re.search(r"font-size:([\d.]+)px", estilo)
+            tam = float(m.group(1)) if m else 22
+            fonte = "mono" if "Plex Mono" in estilo else ("hook" if "62%" in estilo else "label")
+            w += float(el.get("dx", 0)) + G.largura_texto(el.text or "", fonte, tam)
+        x = float(t.get("x", 0))
+        anc = t.get("text-anchor", "start")
+        x0 = x if anc == "start" else (x - w if anc == "end" else x - w / 2)
+        out.append((x0, x0 + w, "".join(t.itertext())))
+    return out
+
+
+def dentro_do_quadro(svg: str) -> None:
+    largura = float(ET.fromstring(svg).get("width"))
+    for x0, x1, txt in _caixas_svg(svg):
+        assert x0 >= -1 and x1 <= largura + 1, f"texto fora do quadro [{x0:.0f}, {x1:.0f}] de {largura:.0f}: {txt!r}"
+
+
+def test_relogio_28_10_linha_do_meio_nao_sai_do_quadro():
+    """28/10: 15 veículos, os do meio entre 21h04 e 23h58 viravam "+4 veículos entre 27/10 21h04 e 27/10
+    23h58", cortado na borda esquerda (arte#0)."""
+    base = datetime(2026, 10, 27, 9, 13, tzinfo=G.TZ)
+    minutos = [0, 54, 134, 185, 219, 379, 384, 581, 646, 683, 711, 760, 790, 885, 1103]
+    bs = [(f"Veículo {i}", base + timedelta(minutes=m)) for i, m in enumerate(minutos)]
+    st = {n: ("a" if i < 6 else "b") for i, (n, _) in enumerate(bs[:-2])}
+    svg, _ = G.relogio(bs, st, date(2026, 10, 28), rotulos={"a": "fuga ilícita", "b": "asilo político"},
+                       linha=44, max_linhas=12)
+    valido(svg)
+    dentro_do_quadro(svg)
+    assert any(t.startswith("+4 veículos") for t in textos(svg))
+
+
+def test_graficos_de_texto_nunca_saem_do_quadro():
+    for svg, _ in (
+        G.relogio(batidas(), stance(), date(2026, 10, 21), rotulos=ROT),
+        G.relogio(batidas(), stance(), date(2026, 10, 21), rotulos=ROT, linha=44, max_linhas=6),
+        G.espectro(["The New York Times", "Valor Econômico"], ["CNBC"], ["Financial Times", "BBC News"],
+                   fora=["NeoFeed", "The New York Times", "Financial Times", "The Wall Street Journal", "Bloomberg Línea"]),
+        G.linha(ibov(), [date(2026, 9, 30)], prefixo="R$ "),
+        G.barras_variacao(btc(), 1.5375),
+    ):
+        dentro_do_quadro(svg)
+
+
+def test_espectro_fora_da_analise_com_nomes_inteiros():
+    fora = ["NeoFeed", "The New York Times", "Financial Times", "The Wall Street Journal", "Bloomberg Línea"]
+    svg, desc = G.espectro(["g1", "Estadão"], [], ["Folha de S.Paulo", "Valor Econômico"], fora=fora)
+    linha = next(t for t in textos(svg) if t.startswith("fora da análise:"))
+    assert "…" not in linha and re.search(r" \+\d$", linha)
+    mostrados = linha.removeprefix("fora da análise: ").rsplit(" +", 1)[0].split(", ")
+    assert set(mostrados) <= set(fora) and len(mostrados) + int(linha.rsplit("+", 1)[1]) == len(fora)
+    assert "fora da análise: " + ", ".join(fora) in desc  # o texto alternativo leva todos
 
 
 def test_relogio_muitas_linhas_e_virada_de_dois_dias():
@@ -254,6 +324,8 @@ def test_waffle_placar_4_de_26():
     assert conta(svg, "rect") == 26 + 2  # + contorno + a amostra do contorno no rótulo
     assert {"4", "22", "dividiram", "sem divisão", "este Raio-X"} <= set(textos(svg))
     assert "base: 26 assuntos com 4 ou mais veículos comparados" in textos(svg)
+    # o laranja fica no quadrado e no gancho; a contagem da legenda vai em tinta (um destaque por slide: arte#17)
+    assert "var(--accent)" not in svg
     assert desc == (
         "Gráfico: grade de 26 quadrados, um por assunto com 4 ou mais veículos comparados; "
         "4 dividiram e 22 sem divisão; o contorno marca este Raio-X."
@@ -657,3 +729,22 @@ def test_render_informa_quem_transbordou_no_minimo(tmp_path):
     assert "gancho" in nomes and "cabe" not in nomes
     t = next(t for t in res.transbordos if t.fit == "gancho")
     assert t.size == 140 and t.min == 140 and t.altura_px > 0 and t.texto.startswith("palavra")
+
+
+def test_hora_no_gancho_fica_com_h_minusculo(env):
+    """"LEITURA DAS 04H56" em caixa alta se lê como outra coisa (arte#14): o "h" entre algarismos vai num span
+    sem text-transform; o resto do gancho continua em caixa alta e escapado."""
+    html = macro(env, "hook", "Brent +1,95% na leitura das 06h45", "+1,95%", 96, 60)
+    assert 'das 06<span class="hm">h</span>45' in html and '<em class="hl">+1,95%</em>' in html
+    assert macro(env, "hook", "<b>ahh</b> 12h") == (
+        '<h1 class="hook" data-fit="gancho" data-min="96" style="font-size:128px">&lt;b&gt;ahh&lt;/b&gt; 12h</h1>'
+    )
+    assert ".hm{text-transform:none}" in (TEMPLATES / "_base.html.j2").read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("nome", ["rx_placar", "placar_metodo"])
+def test_cta_da_noite_no_gancho_condensado_sem_seta(nome):
+    """O CTA de envio/salvamento fecha como o Número e o Em 1 minuto: gancho condensado, sem a seta → (arte#9)."""
+    fonte = (TEMPLATES / f"{nome}.html.j2").read_text(encoding="utf-8")
+    assert '<div class="cta"><h2 class="hook" data-fit="cta"' in fonte
+    assert "<b>→</b>" not in fonte

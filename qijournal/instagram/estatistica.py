@@ -264,9 +264,15 @@ def is_political_coverage(cov: Coverage, story: Story | None, nomes: Iterable[st
 
 # ── Adjetivo da casa e número de capa ─────────────────────────────────────
 
+# "Histórico de/do/da" depois de artigo, possessivo, contração ou "e"/"," é substantivo ("luto e histórico de
+# segurança na malha", 29/10; "o histórico do clube"), não adjetivo: "acordo histórico de paz" continua adjetivo.
+_HISTORICO_SUBST = (
+    r"(?<!\bo\s)(?<!\bos\s)(?<!\bum\s)(?<!\bseu\s)(?<!\bsua\s)(?<!\bdo\s)(?<!\bno\s)(?<!\bao\s)"
+    r"(?<!\bpelo\s)(?<!\bnum\s)(?<!\bbom\s)(?<!\bmau\s)(?<!\be\s)(?<!,\s)"
+)
 ADJ_CASA = re.compile(
-    r"\b(?:gigantes?|históric[oa]s?|inédit[oa]s?|bilionári[oa]s?|polêmic[oa]s?|chocantes?|explosiv[oa]s?|"
-    r"dramátic[oa]s?|colossa(?:l|is)|recordes?)\b",
+    r"\b(?:gigantes?|históric[oa]s?(?!\s+d[aeo]s?\b)|" + _HISTORICO_SUBST + r"históric[oa]s?|inédit[oa]s?|"
+    r"bilionári[oa]s?|polêmic[oa]s?|chocantes?|explosiv[oa]s?|dramátic[oa]s?|colossa(?:l|is)|recordes?)\b",
     re.I,
 )
 _ADJ_RAIZES = ("gigante", "historic", "inedit", "bilionari", "polemic", "chocante", "explosiv", "dramatic", "colossa", "recorde")
@@ -510,6 +516,33 @@ def coverage_section(cov: Coverage, story: Story | None) -> str:
     return (story.section if story else cov.section) or ""
 
 
+VEICULO_ESPORTIVO_MIN = 0.8  # fração dos textos do dia em assuntos de esporte para o veículo contar como esportivo
+
+
+def veiculos_esportivos(edition: Edition) -> set[str]:
+    """Veículos que no dia só (ou quase só) publicaram esporte: 80%+ dos seus 5+ textos do index em assuntos
+    de esporte (ge, Gazeta Esportiva, Placar, Trivela...)."""
+    conta: dict[str, list[int]] = {}
+    for topic in edition.index:
+        for item in topic.items:
+            if item.source:
+                c = conta.setdefault(item.source, [0, 0])
+                c[0] += topic.section == "esporte"
+                c[1] += 1
+    return {s for s, (esp, tot) in conta.items() if tot >= 5 and esp >= VEICULO_ESPORTIVO_MIN * tot}
+
+
+def secao_da_cobertura(edition: Edition, cov: Coverage, story: Story | None) -> str:
+    """A editoria da cobertura (:func:`coverage_section`); a de um assunto comparado sem matéria vira esporte
+    quando metade ou mais dos veículos dele são esportivos no dia (:func:`veiculos_esportivos`): "Harry Kane e
+    Alexia Putellas vencem a Bola de Ouro" veio como mercados em 27/10."""
+    sec = coverage_section(cov, story)
+    if story is not None or sec == "esporte" or not cov.outlets:
+        return sec
+    esportivos = veiculos_esportivos(edition)
+    return "esporte" if 2 * sum(1 for o in cov.outlets if o.name in esportivos) >= len(cov.outlets) else sec
+
+
 def is_racha(cov: Coverage) -> bool:
     return cov.has_debate and cov.count("a") >= RACHA_MIN_SIDE and cov.count("b") >= RACHA_MIN_SIDE
 
@@ -549,7 +582,7 @@ def placar(edition: Edition, *, election: bool, nomes: Iterable[str] = NOMES_ELE
         result.base += 1
         result.rachas += racha
         result.itens.append((cov, story))
-        sec = coverage_section(cov, story)
+        sec = secao_da_cobertura(edition, cov, story)
         r, b = result.por_secao.get(sec, (0, 0))
         result.por_secao[sec] = (r + racha, b + 1)
     return result

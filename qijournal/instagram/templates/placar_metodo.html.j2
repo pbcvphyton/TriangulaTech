@@ -1,5 +1,6 @@
 {# Placar do dia, slide 4 (método + CTA, §4.3): o que conta como dividir, com dois exemplos em barra (2 × 2
-   dividiu; 3 × 1 não), a base, o limite da classificação e o CTA "Salve: o placar sai todo dia."
+   dividiu; 3 × 1 não), a base, o limite da classificação e o CTA "Salve: o placar sai todo dia." no gancho
+   condensado, como o fecho do Número.
    ctx: selo, kicker, titulo, destaque, exemplos [svg], itens [texto], cta, nota. #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
@@ -11,9 +12,8 @@
 .ex .grafico{flex:1 1 0;min-width:0}
 .itens{flex:0 1 auto;min-height:0;overflow:hidden;margin-top:40px;font-family:var(--serif);font-size:34px;line-height:1.32;color:var(--ink)}
 .itens p{padding:18px 0;border-top:2px solid var(--rule)}
-.cta{flex:none;margin-top:auto;display:flex;align-items:center;gap:22px;padding:26px 0 0;border-top:3px solid var(--ink)}
-.cta b{flex:none;font-family:var(--label);font-weight:700;font-size:44px;line-height:1;color:var(--ink)}
-.cta span{text-wrap:balance;font-family:var(--label);font-weight:700;font-size:40px;line-height:1.15;letter-spacing:-.01em;color:var(--ink)}
+.cta{flex:none;margin-top:auto;padding-top:24px;border-top:4px solid var(--ink)}
+.cta .hook{font-size:84px;max-height:2.1em}
 {% endblock %}
 {% block body %}
 {{ m.serie_band(s.selo, true, 'raiox') }}
@@ -22,7 +22,7 @@
   {{ m.hook(s.titulo, s.destaque, 112, 76, none, 'metodo-titulo') }}
   <div class="ex">{% for svg in s.exemplos %}{{ m.grafico(svg) }}{% endfor %}</div>
   <div class="itens" data-fit="metodo-itens" data-min="24">{% for t in s.itens %}<p>{{ m.tx(t) }}</p>{% endfor %}</div>
-  <div class="cta"><b>→</b><span data-fit="cta" data-min="28">{{ s.cta }}</span></div>
+  <div class="cta"><h2 class="hook" data-fit="cta" data-min="60">{{ s.cta }}</h2></div>
 </div>
 {{ m.assinatura(s.nota) }}
 {% endblock %}
