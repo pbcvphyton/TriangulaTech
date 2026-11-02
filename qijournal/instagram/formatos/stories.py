@@ -129,10 +129,12 @@ def _bom_dia(edition: Edition, agenda: Sequence[tuple[str, str]]) -> Slide:
 
 def _texto_ok(texto: str, secao: str, *, election: bool, nomes: Iterable[str]) -> bool:
     """Texto que pode ir para a tela: sem palavra proibida do lint e, no modo eleitoral, sem
-    léxico eleitoral."""
+    léxico eleitoral nem eleição de outro país ("às vésperas das eleições de meio de mandato nos EUA", 22/10)."""
     if not texto or palavras_proibidas(texto) or verbos_proibidos(texto):
         return False
     if election and (E.is_electoral(texto, secao, nomes) or (secao != "mundo" and _ELEICAO.search(texto))):
+        return False
+    if election and secao != "esporte" and E.eleicao_escrita(texto):  # nem a eleição de outro país (§2)
         return False
     return True
 

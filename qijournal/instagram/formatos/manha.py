@@ -1,11 +1,14 @@
 """Em 1 minuto 2.0 (07:00, §5.4): carrossel de 8 em marinho.
 
-1. Capa: o número da manchete em laranja (com o qualificador), a manchete sem adjetivo
-   da casa e sem linha fina, a faixa de dados do dia e o assunto mais coberto.
+1. Capa: o número da manchete em laranja (com o qualificador; sem ele, a cobertura da capa com
+   5+ veículos), a manchete sem adjetivo da casa e sem linha fina, a faixa de dados do dia e o
+   assunto mais coberto (contagem em tinta). Nunca a matéria que a noite estampa nem, sem número
+   novo, o assunto do Raio-X da noite anterior.
 2–6. Os 5 fatos: número em destaque, a frase em serif, o selo de cobertura e as fontes.
    Fato sem número leva a cobertura no lugar dele ("NOTICIADO POR / 12 VEÍCULOS", com 5+
    veículos); sem os dois, a frase sozinha ocupa o quadro. O 1º é a matéria da capa, nunca com o texto da
-   capa (Jaccard ≥ 0,6 → linha fina), e ganha a linha do relógio quando ele vale.
+   capa (Jaccard ≥ 0,6 → linha fina) nem com o dado dela, e ganha a linha do relógio quando ele vale.
+   Nenhum texto é o título literal de um veículo.
 7. Mercado em linha (:mod:`.mercado`), no tema marinho.
 8. Fechamento: a pauta solitária do dia, a matriz de pontos e o único CTA.
 
@@ -588,12 +591,12 @@ def _eleitoral(story: Story | None, textos: list[str], nomes: tuple[str, ...]) -
     return section != "mundo" and bool(_ELEICAO.search(" ".join([junto, story.headline, story.dek] if story else [junto])))
 
 
-def _eleicao_de_fora(story: Story | None, texto: str) -> bool:
-    """Eleição de qualquer país com todas as letras no texto do fato ou na manchete, fora o esporte
+def _eleicao_de_fora(story: Story | None, texto: str, *, manchete: bool = True) -> bool:
+    """Eleição de qualquer país com todas as letras no texto do fato (ou na manchete), fora o esporte
     (:func:`.estatistica.eleicao_escrita`; "reeleição na Fifa" fica)."""
     if story is not None and story.section == "esporte":
         return False
-    return E.eleicao_escrita(texto, story.headline if story is not None else "")
+    return E.eleicao_escrita(texto, story.headline if story is not None and manchete else "")
 
 
 def eleitoral_capa(story: Story, textos: Iterable[str] = (), nomes: Iterable[str] = E.NOMES_ELEICAO) -> bool:
@@ -611,7 +614,7 @@ def eleitoral_capa(story: Story, textos: Iterable[str] = (), nomes: Iterable[str
 
 
 def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "",
-           evitar_numero: Iterable[str] = (), literais: set[str] = frozenset()) -> Fato | None:
+           evitar_numero: Iterable[str] = (), literais: set[str] = frozenset(), sem_eleicao: bool = False) -> Fato | None:
     """O texto do fato: o item do briefing, a manchete ou a linha fina. Vale a primeira versão
     limpa sem corte pesado; entre o item e a manchete, a que tem número em destaque passa na
     frente (a linha fina não: costuma não dizer o sujeito, "Querosene… atinge 40% dos custos da
@@ -620,7 +623,9 @@ def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "
     (o da capa, no slide 2). O título literal de um veículo (``literais``) nunca vale: "Colisão
     entre trens de alta velocidade mata ao menos 68 pessoas na Espanha" é o da Folha (29/10). Entre a
     linha fina e a frase do corpo, vale a que nomeia o fato (:func:`.noite._nomeia`): em 29/10, "Pelo
-    menos 68 pessoas morreram… após a colisão entre dois trens…", e não "Desastre na província de Toledo…"."""
+    menos 68 pessoas morreram… após a colisão entre dois trens…", e não "Desastre na província de Toledo…".
+    ``sem_eleicao`` (período eleitoral): pula o texto que cita eleição de qualquer país ("a poucas semanas das
+    eleições de meio de mandato", na linha fina de 18/10)."""
     titulos = _titulos(edition, story)
     candidatos = [("briefing", briefing)]
     if story is not None:
@@ -634,7 +639,7 @@ def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "
     limpos = []
     for i, (origem, bruto) in enumerate(candidatos):
         t, pesado = _limpo(bruto, titulos) if bruto else ("", False)
-        if t and E.titulo_literal(t, literais):
+        if t and (E.titulo_literal(t, literais) or (sem_eleicao and _eleicao_de_fora(story, t, manchete=False))):
             continue
         if t and not (evitar and similaridade(t, evitar) >= JACCARD_CAPA):
             reserva = origem in ("dek", "corpo")
@@ -725,7 +730,8 @@ def selecionar(
             if not m:
                 continue
             n = numero_capa(f"{story.headline} {story.dek}")
-            f = _texto(edition, story, b, evitar=m, evitar_numero=[n[1]] if n else (), literais=literais)
+            f = _texto(edition, story, b, evitar=m, evitar_numero=[n[1]] if n else (), literais=literais,
+                       sem_eleicao=election)
             if f is not None:
                 capa, manchete, primeiro = story, m, f
                 break
@@ -753,7 +759,7 @@ def selecionar(
             break
         if bloqueado(story, [b]):
             continue
-        f = _texto(edition, story, b, literais=literais)
+        f = _texto(edition, story, b, literais=literais, sem_eleicao=election)
         if f is None:
             continue
         # no período eleitoral, nem a eleição de outro país (o filtro base a deixa passar em Mundo)

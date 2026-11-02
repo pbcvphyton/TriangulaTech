@@ -76,7 +76,9 @@ Ordem de seleção do dia (`gerar.build_pieces`), com a `Fila`:
 3. **Manhã:** `em_1_minuto(raiox_story_id=…)` ou `terminal()`.
 4. **Stories:** `stories_manha(agenda=…)` com o que de fato foi gerado.
 
-Os três posts do dia nunca têm o mesmo assunto como peça principal. A ordem na
+Os três posts do dia nunca têm o mesmo assunto como peça principal (para a capa do
+Em 1 minuto, os destaques do Placar contam como peça principal da noite, e o Raio-X
+da noite anterior também conta, salvo número novo: §5.4). A ordem na
 fila fica: manhã, stories, número, noite. Quando a noite cai para o Mercado em
 linha, ele é montado depois do Número e não repete o ativo dele no título; o
 Terminal também evita os ativos dos outros dois. O título do Terminal só vai para uma variação
@@ -253,25 +255,48 @@ tudo.". A fonte vai uma vez por slide: na assinatura (slides 1 e 2) ou na ficha
 **Seleção dos 5 fatos:** preferência por editoria brasil > mercados >
 tecnologia > imobiliário > mundo > jurídico > natureza > política (pós-eleição)
 > esporte > variedades (esporte e variedades só se faltar fato). Fora:
-`is_electoral` no modo eleitoral; mais de 1 item de política no modo eleitoral
-(e esse vai por último); itens que repetem a variação de Ibovespa, dólar, Brent
-ou bitcoin já mostrada no slide de mercado; itens com 2+ entidades em comum com
-a capa ou os fatos da véspera **e** sem número novo; duplicatas (o mesmo
-assunto em dois itens do briefing). O 1º fato é a story da capa.
+`is_electoral` no modo eleitoral, e também a eleição de outro país com todas as
+letras (`estatistica.eleicao_escrita`, fora o esporte: "Israel vai às urnas",
+27/10); mais de 1 item de política no modo eleitoral (e esse vai por último);
+itens que repetem a variação de Ibovespa, dólar, Brent ou bitcoin já mostrada
+no slide de mercado; itens com 2+ entidades em comum com a capa ou os fatos da
+véspera **e** sem número novo; duplicatas (o mesmo assunto em dois itens do
+briefing). O 1º fato é a story da capa. Texto do fato: o item do briefing, a
+manchete ou a linha fina, nunca o título literal de um veículo
+(`estatistica.titulo_literal`, que vale também para a capa: "Colisão entre trens
+de alta velocidade mata ao menos 68 pessoas na Espanha" é o da Folha, 29/10);
+quando a linha fina não nomeia o fato, a frase do corpo que o nomeia, cortada na
+vírgula ("Pelo menos 68 pessoas morreram… após a colisão entre dois trens…").
+
+**Capa e a noite (§2):** a capa não estampa o que a noite do mesmo dia estampa
+(a matéria do Raio-X, ou as do Placar: em 19/10 os protestos na França, maior
+consenso e mais coberto do Placar, saem da capa) nem reabre o assunto do Raio-X
+da noite anterior, o post logo antes dela na grade, com a regra da véspera (2+
+entidades em comum e nenhum número novo: em 29/10, "Flávio Bolsonaro desembarca
+nos EUA" depois do Raio-X de 28/10 sobre a fuga). O assunto ainda pode ser fato
+e aparecer na linha do mais coberto.
 
 | # | Slide | Conteúdo |
 |---|---|---|
-| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`numero_destaque`, com o qualificador); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO: {topo}, {k} veículos" só com k ≥ 5 |
-| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes. **No slide 2**, se o item tiver Jaccard ≥ 0,6 com a manchete da capa, usa-se `story.dek`; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
+| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`numero_destaque`, com o qualificador); sem número e com 5+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
+| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, se o item tiver Jaccard ≥ 0,6 com a manchete da capa, usa-se `story.dek`; o número da capa não volta, nem a cobertura quando ela é o número da capa; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
 | 7 | Mercado em linha | `mercado.mercado_slide(tema="dark")` |
 | 8 | Fechamento | uma estatística (pauta solitária: "1.039 de 1.159 assuntos de hoje (90%) saíram em uma fonte só") + matriz de pontos pequena + 1 CTA "Mande no grupo de quem precisa começar o dia informado." |
 
 **Decisão de arte (dono, 11/2026):** os fatos usam tamanhos maiores que os da
-tabela, para encher o slide: número do fato até 260 px e frase até 68 px (fato sem
-número com 5+ veículos usa a cobertura como número).
+tabela, para encher o slide (fato sem número com 5+ veículos usa a cobertura como
+número). Tamanhos adotados (`manha.tamanhos_fato` e `tamanhos_capa`, o maior par que
+cabe): número do fato de 260 a 180 px e frase de 68 a 44 px (sem número, a frase
+sozinha de 96 a 60 px, em até 6 linhas); na capa, número de 280 a 160 px e manchete
+de 80 a 64 px (96 a 72 sem número).
 
-Selo de cobertura: "{k} veículos" (do index, sem órgãos) + "· dividida {maj} ×
-{min}" ou "· sem divisão" + "· Raio-X às 18h30" quando a story é a da noite.
+Selo de cobertura (`estatistica.selo_cobertura`): "{k} veículos" (do index, sem
+órgãos; quando a cobertura comparada tem órgão público, "{k} fontes", §3) + a
+divisão + "· Raio-X às 18h30" quando a story é a da noite. **"Dividida" tem uma
+definição só no perfil, a do Placar** (`estatistica.dividida`: 4+ comparados e 2+
+de cada lado): "· dividida 6 × 2"; abaixo do critério, com alguém dos dois lados,
+só a contagem ("· 2 × 1", "· 4 × 1"); com um lado só, "· sem divisão"; com uma
+fonte comparada, nada. A mini barra conta o mesmo e nunca soma mais que o selo.
 
 Legenda: "{capa} · e mais 4 fatos da {dia}" (≤ 110 caracteres), "▸ {fato}
 ({selo})", mercado em uma linha com o acumulado, "Resumo por IA a partir de {N}
@@ -280,15 +305,22 @@ notícias de {M} fontes.", CTA, hashtags.
 ### 5.5 Stories da manhã (07:10, 4 telas) — `formatos/stories.py`
 
 Bom dia + "Hoje lemos N notícias de M fontes" + agenda do que foi gerado (sem
-clima); manchete (com o filtro eleitoral); mercado com a coluna do acumulado e a
-hora da leitura; chamada para o carrossel. Assinatura em todas.
+clima); manchete (a da capa do Em 1 minuto, com o verbo neutro: "caem até 10%";
+com o filtro eleitoral, também a eleição de outro país, e nunca o título literal
+de um veículo; selo e mini barra como no Em 1 minuto); mercado com a coluna do
+acumulado e a hora da leitura; chamada para o carrossel com a capa do Em 1 minuto
+já renderizada de miniatura (sem ela, o desenho genérico). Assinatura em todas.
 
 ### 5.6 Manifesto (Comece aqui 2.0) — `formatos/manifesto.py`
 
 Capa laranja "MESMO FATO, VÁRIAS VERSÕES."; o funil da edição com a data;
-pauta solitária e divisão no histórico com IA desde 14/10, com período e n;
-"como fazemos e o que não fazemos"; "Todo dia, 3 posts" + Siga. "x em cada 10"
-arredondado para baixo.
+pauta solitária e divisão no histórico com IA desde 14/10, com período e n (a
+divisão com a base e o critério do Placar: de 14/10 a 26/10, 330 de 391 assuntos
+com 4 ou mais veículos comparados sem divisão; "Dividir = pelo menos 2 veículos de
+cada lado, o mesmo critério do Placar do dia"); "como fazemos e o que não fazemos"
+("Sem adjetivo nosso, sempre com fonte.": o adjetivo do veículo pode aparecer
+citado, o da casa não); "Todo dia, 3 posts" + Siga. "x em cada 10" arredondado
+para baixo.
 
 ### 5.7 Mercado em linha — `formatos/mercado.py`
 

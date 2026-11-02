@@ -326,3 +326,14 @@ def test_data_uri(tmp_path):
     f.write_bytes(b"\xff\xd8\xff\xe0JFIF")
     assert str(gerar.data_uri(f)) == "data:image/jpeg;base64,/9j/4EpGSUY="
     assert gerar.data_uri(tmp_path / "nao-existe.jpg") == ""
+
+
+@real
+def test_22_10_por_que_importa_sem_eleicao_de_outro_pais():
+    """No período eleitoral, nem a eleição de outro país no texto da tela 2 (§2)."""
+    e = edicao("22")
+    russia = next(s for s in e.stories if s.id.startswith("russia-aceita"))
+    assert "eleições de meio de mandato" in russia.why_it_matters
+    titulo, frase = ST.textos_manchete(e, russia, election=True, nomes=E.NOMES_ELEICAO)
+    assert not E.eleicao_escrita(titulo, frase) and frase == russia.dek
+    assert ST.textos_manchete(e, russia, election=False, nomes=E.NOMES_ELEICAO)[1] == russia.why_it_matters

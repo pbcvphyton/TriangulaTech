@@ -340,7 +340,7 @@ def test_tamanhos_enchem_o_quadro_sem_palavra_solta():
 
 
 @pytest.mark.skipif(not os.environ.get("QIJ_CHROMIUM"), reason="sem Chromium (QIJ_CHROMIUM)")
-@pytest.mark.parametrize("dia", [21, 24, 27, 29])
+@pytest.mark.parametrize("dia", [14, 15, 19, 21, 24, 27, 29])
 def test_render_sem_texto_cortado(dia, tmp_path):
     from qijournal.instagram import conteudo
     from qijournal.instagram.render import Renderer
@@ -524,3 +524,36 @@ def test_capa_nao_repete_a_noite():
     marca = MH._marca(MH.Fato(fuga.headline, fuga, "manchete"))
     assert MH._repete_vespera(materia(e29, "flavio-bolsonaro-desembarca"), [materia(e29, "flavio-bolsonaro-desembarca").headline], [marca])
     assert not MH._repete_vespera(materia(e29, "flavio-bolsonaro-desembarca"), ["Flávio Bolsonaro paga R$ 2 milhões"], [marca])
+
+
+def test_gerador_capa_sem_a_noite_do_dia_nem_a_da_vespera():
+    """No gerador (build_pieces, com a fila avançando): em 19/10 a capa não é a França do Placar; em 29/10 não
+    reabre a fuga de Flávio Bolsonaro, o Raio-X de 28/10. A tela 2 dos stories conta a mesma capa."""
+    from datetime import datetime, time
+    from zoneinfo import ZoneInfo
+
+    from qijournal.instagram.fila import PUBLISHED, Fila
+
+    config = load_config(ROOT)
+    tz = ZoneInfo("America/Sao_Paulo")
+    fila = Fila()
+    pecas = {}
+    for dia in (18, 19, 28, 29):
+        e = edicao(dia)
+        ps = gerar.build_pieces(e, config, {}, fila, list(historico(dia)))
+        dia_d = date.fromisoformat(e.date)
+        inicio, fim = datetime.combine(dia_d, time(7), tz), datetime.combine(dia_d, time(23), tz)
+        posts = [gerar._post(p, e, gerar.post_id(e.date, p.slot), inicio, fim, []) for p in ps]
+        fila.replace_day(e.date, posts)
+        for p in posts:
+            atual = fila.get(p.id)
+            atual.status, atual.published_at = PUBLISHED, atual.due
+            fila.registrar_publicacao(atual)
+        pecas[dia] = {p.slot: p for p in ps}
+    noite19, manha19 = pecas[19]["noite"], pecas[19]["manha"]
+    assert noite19.title == "Placar do dia" and noite19.story_ids
+    assert manha19.story_ids[0] not in noite19.story_ids
+    assert pecas[28]["noite"].story_ids[0].startswith("flavio-bolsonaro-descumpre")
+    manha29 = pecas[29]["manha"]
+    assert manha29.title == "Em 1 minuto" and not manha29.story_ids[0].startswith("flavio-bolsonaro")
+    assert pecas[29]["stories"].story_ids == manha29.story_ids[:1]

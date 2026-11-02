@@ -316,7 +316,7 @@ def test_chaves_do_numero_e_entidades_do_raiox_para_o_gerador():
 
     def raiox(day, ents, status=PUBLISHED, serie="raiox"):
         return post(f"{day}-noite", due=f"{day}T18:30:00-03:00", expires=f"{day}T22:30:00-03:00", serie=serie,
-                    entidades=ents, status=status)
+                    entidades=ents, status=status, story_ids=[f"materia-{day}"] if ents else ["placar"])
 
     fila = Fila()
     assert fila.chaves_numero("2026-10-22") is None  # sem histórico: vale a regra antiga
@@ -334,6 +334,9 @@ def test_chaves_do_numero_e_entidades_do_raiox_para_o_gerador():
     ]
     assert fila.chaves_numero("2026-10-22") == {"acum:ibov", "0,3%"}
     assert fila.entidades_raiox("2026-10-22") == [["Trump", "Rússia"], ["SpaceX", "Tesla"]]
+    # a matéria do Raio-X da noite anterior (para a capa do Em 1 minuto não reabrir o assunto); o Placar não conta
+    assert fila.materias_raiox("2026-10-22") == ["materia-2026-10-21"]
+    assert fila.materias_raiox("2026-10-21") == []
 
 
 def test_refazer_o_dia_tira_o_que_nao_veio_na_geracao_nova():
