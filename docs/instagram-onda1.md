@@ -79,11 +79,19 @@ Ordem de seleção do dia (`gerar.build_pieces`), com a `Fila`:
 Os três posts do dia nunca têm o mesmo assunto como peça principal. A ordem na
 fila fica: manhã, stories, número, noite. Quando a noite cai para o Mercado em
 linha, ele é montado depois do Número e não repete o ativo dele no título; o
-Terminal também evita os ativos dos outros dois.
+Terminal também evita os ativos dos outros dois. O título do Terminal só vai para uma variação
+fora do comum (pelo menos 1% e 2 vezes a variação típica do ativo, leitura do dia); sem ela, sai
+neutro ("13 INDICADORES ANTES DA ABERTURA", ou "EM DIA SEM PREGÃO"), e a linha do achado vai
+marcada na tabela. CTA do Terminal: "Salve para comparar com a próxima leitura.".
 
 **Período eleitoral** (`election_until`, hoje 2026-10-27): política e assunto
 eleitoral fora do Raio-X, do Placar, do Número e da capa (também a eleição de
-outro país no título, `estatistica.eleicao_escrita`: "Israel vai às urnas", 27/10);
+outro país no título, `estatistica.eleicao_escrita`: "Israel vai às urnas", 27/10;
+no Placar ela sai da própria base, `estatistica.eleicao_na_cobertura`, para capa,
+waffle, "por editoria" e lista contarem a mesma coisa; "reeleição na Fifa" fica). O
+Número de mercado, o título do Terminal e o do Mercado em linha pulam o ativo que
+estiver no título de matéria eleitoral do dia (`estatistica.mercado_eleitoral`:
+"Ibovespa desaba 13,88%… após eleição", 27/10);
 no Em 1 minuto, no máximo um item de política (sempre o último). Duas regras são **permanentes**:
 o destaque em laranja e o gancho nunca levam nome de partido ou de político, e
 nenhum veículo é rotulado com campo político.
@@ -101,9 +109,14 @@ nenhum veículo é rotulado com campo político.
   número vivo do dia; nos fixados, número arredondado para baixo e com data.
   "Fontes" quando a contagem inclui órgãos públicos; "veículos" só sem eles.
 - **Cotações:** "fech. DD/MM" só quando é fechamento de pregão; senão "leitura
-  das HHhMM"; sem variação quando a leitura é velha. Série com uma leitura por
-  dia; acumulado sempre ponta a ponta, com as duas datas; pregão faltante
-  tracejado; juro real ex-post = (1 + Selic) / (1 + IPCA 12m) − 1.
+  das HHhMM"; sem variação quando a leitura é velha (`estatistica.leitura_velha`:
+  a mesma cotação da edição anterior, ou ativo sem pregão lido em outro dia). Série
+  com uma leitura por dia; acumulado sempre ponta a ponta, com as duas datas (e as
+  comparações na mesma janela: "No mesmo período, de 28/09 a 20/10: Brent +11,7%
+  (desde 29/09)"); fechamento e leitura do meio do pregão nunca se comparam sem o
+  selo de cada um; pregão faltante tracejado; juro real ex-post = (1 + Selic) /
+  (1 + IPCA 12m) − 1. Horários de dias diferentes levam a data nas duas pontas
+  ("28/10 10h51 a 29/10 04h47").
 - **Numeração de série:** `Fila.series` guarda o último número **publicado**
   de cada série; o post usa `series[serie] + 1`, mantém o número ao ser refeito
   e reaproveita o de um post expirado. O Placar do dia pertence à série do
@@ -180,11 +193,18 @@ esporte, política/eleição no modo eleitoral, `exclude` e `usados`); 3 o assun
 mais coberto com 12+ veículos; 4 mercado com z ≥ 2; 5 acumulado da série;
 6 juro real ex-post; 7 o maior acumulado, mesmo repetido.
 
+Nos passos 1 e 4 a leitura velha não vale, e o fechamento de outro dia vai no
+pretérito, com a data ("Ibovespa caiu 13,88% em 26/10").
+
 Slides: capa laranja chapada (texto marinho #0F1730), qualificador, o número em
-Archivo condensada 300–360 px, tese ≤ 14 palavras e a prova em mono; slide 2
-com o gráfico do tipo (checklist, matriz de pontos, barras de variação, linha da
-série ou barras do juro real); slide 3 método + "Mande para quem acha que leu
-tudo.".
+Archivo condensada 300–360 px, tese ≤ 14 palavras e a prova em mono (quando a
+manchete cai só pelo adjetivo da casa e a linha fina não diz de quem é o número,
+o sujeito vai na frente: "Embraer: volume total de encomendas avança 14% em doze
+meses"); slide 2 com o gráfico do tipo (checklist, matriz de pontos, barras de
+variação, com as leituras do meio do pregão vazadas, linha da série ou barras do
+juro real) e nunca a tese da capa; slide 3 método + "Mande para quem acha que leu
+tudo.". A fonte vai uma vez por slide: na assinatura (slides 1 e 2) ou na ficha
+(slide 3); o pé do slide 2 leva a base e o método.
 
 ### 5.4 Em 1 minuto 2.0 (07:00, 8 slides, marinho) — `formatos/manha.py`
 
@@ -203,6 +223,10 @@ assunto em dois itens do briefing). O 1º fato é a story da capa.
 | 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes. **No slide 2**, se o item tiver Jaccard ≥ 0,6 com a manchete da capa, usa-se `story.dek`; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
 | 7 | Mercado em linha | `mercado.mercado_slide(tema="dark")` |
 | 8 | Fechamento | uma estatística (pauta solitária: "1.039 de 1.159 assuntos de hoje (90%) saíram em uma fonte só") + matriz de pontos pequena + 1 CTA "Mande no grupo de quem precisa começar o dia informado." |
+
+**Decisão de arte (dono, 11/2026):** os fatos usam tamanhos maiores que os da
+tabela, para encher o slide: número do fato até 260 px e frase até 68 px (fato sem
+número com 5+ veículos usa a cobertura como número).
 
 Selo de cobertura: "{k} veículos" (do index, sem órgãos) + "· dividida {maj} ×
 {min}" ou "· sem divisão" + "· Raio-X às 18h30" quando a story é a da noite.
@@ -226,11 +250,13 @@ arredondado para baixo.
 
 ### 5.7 Mercado em linha — `formatos/mercado.py`
 
-Título-achado com o maior |acumulado|; 4 gráficos pequenos 2×2 (Ibovespa,
+Título-achado com o maior |acumulado| e, embaixo, a ponta final ("até o
+fechamento de 23/10", "até a leitura das 06h45"); 4 gráficos pequenos 2×2 (Ibovespa,
 Dólar, Brent, Bitcoin) com a série desde 29/09, ponto de hoje em laranja,
 extremo anotado e pregão faltante tracejado; faixa Selic · IPCA 12m · juro
-real; rodapé com fonte e leitura. Como substituto da noite: tema papel, sem
-número de série.
+real; rodapé com o método (a fonte fica na assinatura). Como substituto da noite:
+tema papel, sem número de série, e o título só vai para ativo lido no dia (às
+18h30, o fechamento de sexta não é título da segunda-feira).
 
 ## 6. Sistema visual
 

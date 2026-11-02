@@ -505,6 +505,64 @@ def test_numero_do_dia_usa_as_chaves_publicadas_e_nunca_fica_vazio():
 
 
 @real
+def test_numero_de_27_10_nao_e_a_queda_eleitoral_do_ibovespa():
+    # "Ibovespa desaba 13,88%… após eleição" e "Dólar sobe mais de 8%": no período eleitoral, os passos 1
+    # e 4 pulam o ativo de matéria eleitoral do dia, como o Em 1 minuto das 07h fez (dados#1).
+    e, h = edicao("27"), historia("27")
+    assert E.mercado_eleitoral(e, "ibov") and E.mercado_eleitoral(e, "usd")
+    assert not E.mercado_eleitoral(e, "brent") and not E.mercado_eleitoral(e, "btc")
+    n = E.numero_do_dia(e, h, election=True)
+    assert not n.chave.startswith(("ibov:", "usd:")) and n.passo > 1
+    # Fora do período eleitoral, a mesma queda é o passo 1, no pretérito e com a data do fechamento (dados#17).
+    fora = E.numero_do_dia(e, h, election=False)
+    assert (fora.chave, fora.passo, fora.tese) == ("ibov:−13,88%", 1, "Ibovespa caiu 13,88% em 26/10")
+    assert fora.selo == "Yahoo Finance · fech. 26/10"
+    # "Bolsa Família" não é a bolsa.
+    assert not E._ATIVO_NO_TITULO["ibov"].search("Bolsa Família tem novo reajuste")
+
+
+@real
+def test_leitura_velha_nao_vira_o_numero_de_mercado():
+    # 25/10 (domingo): o dólar da edição é a leitura de sábado 06h58, a mesma da edição de 24/10 (dados#14).
+    e24, e25 = edicao("24"), edicao("25")
+    usd = E.ponto_da_cotacao(next(q for q in e25.quotes if q.id == "usd"))
+    assert E.leitura_velha("usd", usd, date(2026, 10, 25), e24)
+    assert E.leitura_velha("usd", usd, date(2026, 10, 25))  # dólar de outro dia, mesmo sem a edição anterior
+    past = [x for x in historia("25") if x.date < e25.date]
+    assert E._mercado(e25, past, E.Z_MEDIO, 4) is None  # antes: "Dólar cai 1,11%", z = 2,6
+    # O fechamento de ontem do pregão vale: é a última leitura do Ibovespa, e não a da edição anterior.
+    ibov = E.ponto_da_cotacao(next(q for q in edicao("27").quotes if q.id == "ibov"))
+    assert not E.leitura_velha("ibov", ibov, date(2026, 10, 27), edicao("26"))
+    # Ibovespa de segunda com o fechamento de sexta, igual ao da edição de domingo: velha.
+    ibov26 = E.ponto_da_cotacao(next(q for q in edicao("26").quotes if q.id == "ibov"))
+    assert E.leitura_velha("ibov", ibov26, date(2026, 10, 26), e25)
+
+
+def test_horas_com_a_data_nas_duas_pontas():
+    ref = date(2026, 10, 29)
+    ontem = datetime(2026, 10, 28, 13, 51, tzinfo=timezone.utc)  # 10h51 em Brasília
+    hoje = datetime(2026, 10, 29, 7, 47, tzinfo=timezone.utc)  # 04h47
+    assert E.horas([ontem, hoje], ref) == ["28/10 10h51", "29/10 04h47"]  # nunca "28/10 10h51 a 04h47"
+    assert E.horas([hoje, hoje], ref) == ["04h47", "04h47"]
+
+
+@real
+def test_tese_com_o_sujeito_quando_o_adjetivo_derruba_a_manchete():
+    # 24/10: "Carteira de pedidos da Embraer bate recorde histórico…" ("histórico" em 0 de 5 títulos) caía
+    # na linha fina, que não diz de quem é o número (arte#5).
+    e = edicao("24")
+    embraer = materia("24", "carteira-de-pedidos-da-embraer")
+    assert E.sujeito(embraer, E.titulos_por_veiculo(E.topic_of(e, embraer.id))) == "Embraer"
+    assert E.tese_da_materia(e, embraer) == "Embraer: volume total de encomendas avança 14% em doze meses"
+    # Manchete que fica (sem adjetivo, ou cortada na junção) não ganha sujeito.
+    caju = materia("21", "ifood-beneficios")
+    assert ":" not in E.tese_da_materia(edicao("21"), caju)
+    # Político nunca vira sujeito.
+    lula = materia("27", "lula-vence")
+    assert E.sujeito(lula, E.titulos_por_veiculo(E.topic_of(edicao("27"), lula.id))) == ""
+
+
+@real
 def test_numero_do_dia_sem_ia_so_mercado():
     e = edicao("10")
     assert e.mode != "ai"

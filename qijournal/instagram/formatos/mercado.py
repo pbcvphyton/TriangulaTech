@@ -207,11 +207,17 @@ def mercado_em_linha(
     *,
     min_pontos: int = E.ACUMULADO_MIN_PONTOS,
     evitar: Iterable[str] = (),
+    election: bool = False,
+    nomes: Iterable[str] = E.NOMES_ELEICAO,
 ) -> Peca | None:
     """Substituto da noite (18:30): imagem única em papel, sem número de série.
 
     ``evitar``: ativos que não viram título (o do Número do dia, para os posts do dia não repetirem o assunto).
+    No período eleitoral, o ativo de matéria eleitoral do dia também não (:func:`.estatistica.mercado_eleitoral`).
     """
+    evitar = set(evitar)
+    if election:
+        evitar |= {qid for qid in ATIVOS if E.mercado_eleitoral(edition, qid, nomes)}
     slide = mercado_slide(edition, history, tema="paper", min_pontos=min_pontos, evitar=evitar, so_do_dia=True)
     if slide is None:
         return None

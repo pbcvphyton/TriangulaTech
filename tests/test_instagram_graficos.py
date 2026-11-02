@@ -426,7 +426,43 @@ def test_barras_variacao_sem_escala_e_limite_de_30():
     assert conta(um, "rect") == 1 and "em 21/10; hoje, 0,00%" in desc
 
 
+def test_barras_variacao_dia_fora_do_comum_junta_os_rotulos_dos_limiares():
+    # 27/10: Ibovespa −13,88% com variação típica de 1,06% (z = 13,2): os tracejados de 2× e 3× ficam a
+    # ~12 px um do outro, e "+3×" caía em cima de "+2×" (arte#1). Um rótulo só por sinal.
+    serie = [(date(2026, 9, 28) + timedelta(days=i), c) for i, c in enumerate([0.3, -0.5, 1.2, 8.25, -0.6, 0.2, -13.88])]
+    svg, desc = G.barras_variacao(serie, 1.06, altura=520)
+    valido(svg)
+    sem_sobreposicao(svg)
+    ts = textos(svg)
+    assert "+2–3×" in ts and "−2–3×" in ts and "+3×" not in ts and "+2×" not in ts
+    assert svg.count("stroke-dasharray='8 8'") == 4  # as 4 linhas continuam
+    # Escala normal: os 4 rótulos separados, sem encostar.
+    svg, _ = G.barras_variacao(btc(), 1.5375)
+    sem_sobreposicao(svg)
+
+
+def test_barras_variacao_marca_as_leituras_do_meio_do_pregao():
+    # Ibovespa: 05/10 só tem a leitura das 13h51 (+8,25%); não se compara com um fechamento sem aviso.
+    serie = [(date(2026, 10, 1) + timedelta(days=i), c) for i, c in enumerate([0.3, -0.5, 1.2, 8.25, -0.6, -13.88])]
+    svg, desc = G.barras_variacao(serie, 1.06, parciais=[date(2026, 10, 4), date(2026, 10, 2)], rotulo_hoje="fech. 06/10")
+    valido(svg)
+    sem_sobreposicao(svg)
+    assert svg.count("fill='none'") == 2  # vazadas
+    assert "vazadas: 2 leituras do meio do pregão, sem o fechamento" in textos(svg)
+    assert desc.endswith("; vazadas: 2 leituras do meio do pregão, sem o fechamento.")
+    assert "fech. 06/10: −13,88%" in textos(svg)
+
+
 # ── checklist ────────────────────────────────────────────────────────────
+
+
+def test_checklist_com_uma_hora_de_outro_dia_poe_a_data_em_todas():
+    # 29/10: "Estadão 28/10 19h15" e, embaixo, "CNN Brasil 04h47" parecia voltar no tempo (dados#12).
+    horas = {"Estadão": datetime(2026, 10, 28, 22, 15, tzinfo=UTC), "CNN Brasil": datetime(2026, 10, 29, 7, 47, tzinfo=UTC)}
+    svg, _ = G.checklist(["Estadão", "CNN Brasil"], [], horas, ref_date=date(2026, 10, 29))
+    assert {"28/10 19h15", "29/10 04h47"} <= set(textos(svg)) and "04h47" not in textos(svg)
+    so_hoje = {"CNN Brasil": datetime(2026, 10, 29, 7, 47, tzinfo=UTC)}
+    assert "04h47" in textos(G.checklist(["CNN Brasil"], [], so_hoje, ref_date=date(2026, 10, 29))[0])
 
 
 def test_checklist_numero_triangulado():
@@ -439,7 +475,7 @@ def test_checklist_numero_triangulado():
     assert conta(svg, "path") == 5  # ✓ desenhado, não glifo
     ts = textos(svg)
     assert "5 de 6 veículos com o número no título" in ts
-    assert "21/10 17h00" in ts and "05h59" in ts
+    assert "21/10 17h00" in ts and "22/10 05h59" in ts and "05h59" not in ts  # data em todas (dados#12)
     assert desc.startswith("Gráfico: lista de 6 veículos; 5 de 6 com o número no título (Valor Econômico, 21/10 17h00;")
     assert desc.endswith("; sem o número: g1; títulos não reproduzidos.")
 

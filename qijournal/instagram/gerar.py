@@ -281,7 +281,9 @@ def build_pieces(
     if noite is None:  # o Mercado em linha, sem o ativo do Número no título
         evitar = {_ativo(numero.chave)} - {""} if numero is not None else set()
         noite = aprovada(
-            ME.mercado_em_linha(edition, brand, history, min_pontos=lim.grafico_min_pontos, evitar=evitar),
+            ME.mercado_em_linha(
+                edition, brand, history, min_pontos=lim.grafico_min_pontos, evitar=evitar, election=election, nomes=nomes
+            ),
             "a noite fica sem post",
         )
 
@@ -300,7 +302,9 @@ def build_pieces(
     if manha is None:  # o Terminal, sem o ativo do Número nem o do título do Mercado em linha
         ocupados = {_ativo(numero.chave) if numero is not None else ""}
         ocupados |= {str(s.ctx.get("ativo") or "") for s in (noite.slides if noite is not None else []) if s.template == "mercado_linha"}
-        terminal = conteudo.terminal(edition, brand, evitar=ocupados - {""}, history=history)
+        terminal = conteudo.terminal(
+            edition, brand, evitar=ocupados - {""}, history=history, election=election, nomes=nomes
+        )
         manha = aprovada(terminal, "a manhã fica sem post")
 
     # 4. Stories, com a agenda do que de fato foi gerado.

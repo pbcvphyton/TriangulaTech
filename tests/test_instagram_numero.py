@@ -280,6 +280,38 @@ def test_slide_2_nao_repete_a_tese_quando_ela_saiu_da_linha_fina():
 
 
 @real
+def test_triangulado_de_29_10_com_a_data_nas_duas_pontas_e_sem_repetir_a_capa():
+    p = peca("29")
+    prova, metodo = p.slides[1].ctx, p.slides[2].ctx
+    # "Títulos de 28/10 10h51 a 04h47" parecia andar para trás (dados#12).
+    assert "Títulos de 28/10 10h51 a 29/10 04h47, no horário informado por cada veículo." in prova["contexto"]
+    assert dict((f["k"], f["v"]) for f in metodo["ficha"])["Período"] == "28/10 10h51 a 29/10 04h47"
+    assert "▸ Títulos de 28/10 10h51 a 29/10 04h47" in p.caption
+    assert "29/10 04h47" in str(prova["grafico"])  # na lista de verificação também (CNN Brasil)
+    # A linha fina longa é cortada na vírgula; o slide 2 nunca repete a tese da capa ("O número: …").
+    tese = p.slides[0].ctx["tese"]
+    assert prova["contexto"][0] == "Tribunal de Contas valida alíquota de referência acima do esperado pelo mercado."
+    assert all(tese not in c for c in prova["contexto"])
+
+
+@real
+def test_mercado_fora_do_comum_sela_fechamento_e_leitura_parcial():
+    # 27/10 fora do período eleitoral: −13,88% no fechamento de 26/10 contra o +8,25% de 05/10, que é a
+    # leitura das 13h51 (o pregão de 05/10 não tem fechamento na série) (dados#17).
+    e, h = edicao("27"), historia("27")
+    n = E.numero_do_dia(e, h, election=False)
+    p = N.peca_numero(e, n, h, election=False, numero_serie=6)
+    capa, prova, metodo = (s.ctx for s in p.slides)
+    assert capa["tese"] == "Ibovespa caiu 13,88% em 26/10"
+    assert prova["contexto"][1] == "Maior variação anterior no período: +8,25% na leitura de 05/10, 13h51."
+    assert "▸ Maior variação anterior no período: +8,25% na leitura de 05/10, 13h51." in p.caption
+    svg = str(prova["grafico"])
+    assert "fech. 26/10: −13,88%" in svg and "vazadas: 4 leituras do meio do pregão" in svg
+    assert dict((f["k"], f["v"]) for f in metodo["ficha"])["Base"] == "18 leituras diárias; 4 do meio do pregão"
+    assert "+2–3×" in svg  # z = 13,2: um rótulo só por sinal (arte#1)
+
+
+@real
 def test_metodo_da_concentracao_com_ponto_de_milhar():
     e = edicao("21")
     conc = E._concentracao_numero(e, election=True, exclude={e.lead})

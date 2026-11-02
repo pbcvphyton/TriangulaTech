@@ -9,7 +9,9 @@
 {% block style %}
 .hook{flex:0 1 auto;min-height:0;margin-top:30px}
 .st{flex:none;margin-top:10px;font-family:var(--mono);font-weight:500;font-size:24px;line-height:1.25;color:var(--ink2);white-space:nowrap}
-.grid4{flex:none;display:grid;grid-template-columns:440px 440px;column-gap:56px;row-gap:36px;margin-top:40px}
+.grid4{flex:none;display:grid;grid-template-columns:440px 440px;column-gap:56px;row-gap:36px;margin-top:40px;margin-bottom:14px}
+/* com a ponta final embaixo do título, a grade sobe para a faixa de juros não encostar nos gráficos */
+.st + .grid4{margin-top:22px;row-gap:24px}
 .pn{min-width:0;display:flex;flex-direction:column}
 .pn .hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .pn .nm{font-family:var(--label);font-stretch:100%;font-weight:600;font-size:30px;color:var(--ink);white-space:nowrap}

@@ -975,10 +975,16 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
     return [n for _, n in out]
 
 
-# Como o ativo aparece no título de uma matéria (filtro eleitoral do Número de mercado).
+# Como o ativo aparece no título de uma matéria (filtro eleitoral do Número de mercado e do Terminal).
+# IFIX anda com a bolsa (B3) e euro e yuan com o dólar (o que se move é o real).
+_BOLSA = r"\b(?:ibovespa|b3)\b|\bbolsas?\b(?!\s+fam[íi]lia)"
+_CAMBIO = r"\bd[óo]lar(?:es)?\b|\bc[âa]mbio\b"
 _ATIVO_NO_TITULO = {
-    "ibov": re.compile(r"\b(?:ibovespa|b3)\b|\bbolsas?\b(?!\s+fam[íi]lia)", re.I),
-    "usd": re.compile(r"\bd[óo]lar(?:es)?\b|\bc[âa]mbio\b", re.I),
+    "ibov": re.compile(_BOLSA, re.I),
+    "ifix": re.compile(_BOLSA + r"|\bifix\b|\bfundos? imobili[áa]rios?\b", re.I),
+    "usd": re.compile(_CAMBIO, re.I),
+    "eur": re.compile(_CAMBIO + r"|\beuro\b", re.I),
+    "cny": re.compile(_CAMBIO + r"|\byuan\b", re.I),
     "brent": re.compile(r"\b(?:brent|petr[óo]leo)\b", re.I),
     "btc": re.compile(r"\b(?:bitcoin|criptomoedas?|cripto)\b", re.I),
     "spx": re.compile(r"\bS&P\b|\b(?:wall street|nasdaq|dow jones)\b", re.I),

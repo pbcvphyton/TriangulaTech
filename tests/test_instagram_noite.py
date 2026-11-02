@@ -136,6 +136,8 @@ def test_raiox_de_21_10_maioria_e_minoria_em_ordem_de_horario():
     assert all(len(v["framing"]) <= N.FRAMING_MAX and not v["framing"].endswith("…") for v in maioria["veiculos"])
     assert (minoria["lado"], minoria["titulo"]) == ("b", "2 DE 11: COMPLEXIDADE DE GOVERNANÇA")  # quebra: dois pontos
     assert [v["name"] for v in minoria["veiculos"]] == ["Financial Times", "BBC News"]
+    # Uma hora com data na lista: todas com data ("BBC News 03h36" ao lado de "20/10 22h49", dados#12).
+    assert [v["hora"] for v in minoria["veiculos"]] == ["20/10 22h49", "21/10 03h36"]
     assert minoria["neutros"] == "Sem tomar lado (3): TechCrunch, Folha de S.Paulo, MarketWatch"
     assert "Lado A" not in json.dumps([maioria, minoria], ensure_ascii=False)
 

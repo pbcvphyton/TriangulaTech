@@ -317,14 +317,18 @@ def _achado_terminal(
     edition: Edition,
     evitar: Iterable[str] = (),
     history: Sequence[Edition] = (),
+    *,
+    election: bool = False,
+    nomes: Iterable[str] = estatistica.NOMES_ELEICAO,
 ) -> tuple[str, str, str]:
     """O título do Terminal, o trecho em laranja e o ativo do achado (a linha marcada na tabela).
 
     Achado = a maior variação entre as leituras que valem, fora dos ativos em ``evitar``, com pelo
     menos 1% e, se o ativo tem série para a escala robusta, 2 vezes a variação típica dele (o yuan
     +0,62% de 26/10 não é achado; "Brent +1,95% na leitura das 06h45" pode ser). Leitura velha
-    (:func:`.estatistica.leitura_velha`) não vale. Sem achado, o título é neutro: "13 indicadores
-    antes da abertura" (ou "em dia sem pregão"), com o número em laranja."""
+    (:func:`.estatistica.leitura_velha`) não vale e, no período eleitoral, nem o ativo de matéria
+    eleitoral do dia (:func:`.estatistica.mercado_eleitoral`). Sem achado, o título é neutro:
+    "13 indicadores antes da abertura" (ou "em dia sem pregão"), com o número em laranja."""
     day = edition_day(edition)
     evitar = set(evitar)
     antes = [e for e in history if e.date < edition.date]
@@ -337,6 +341,8 @@ def _achado_terminal(
         if ponto is None or not item["change"] or not item["ref"] or item["id"] in evitar:
             continue
         if abs(q.change_pct) < TERMINAL_VAR_MIN or estatistica.leitura_velha(q.id, ponto, day, anterior):
+            continue
+        if election and estatistica.mercado_eleitoral(edition, q.id, nomes):
             continue
         serie = [x for x in estatistica.serie(antes, q.id) if x.as_of < ponto.as_of]
         escala = estatistica.escala_robusta(serie)
@@ -358,13 +364,15 @@ def terminal(
     *,
     evitar: Iterable[str] = (),
     history: Sequence[Edition] = (),
+    election: bool = False,
+    nomes: Iterable[str] = estatistica.NOMES_ELEICAO,
 ) -> Peca | None:
     """Imagem única com os indicadores (07:00 dos dias sem IA, ou quando o Em 1 minuto não sai).
 
     ``evitar``: ativos que já são o assunto de outro post do dia (o do Número, o do título do
     Mercado em linha) e por isso não viram o título daqui. ``history`` (com ou sem a edição do dia):
     a escala de cada ativo e a edição anterior, para o título só ir para uma variação fora do comum
-    (:func:`_achado_terminal`).
+    (:func:`_achado_terminal`). ``election``/``nomes``: o filtro eleitoral do título.
     """
     from .formatos.mercado import faixa_juros  # o mercado importa daqui
 
@@ -372,7 +380,7 @@ def terminal(
     if len(quotes) < 4:
         return None
     day = edition_day(edition)
-    titulo, destaque, achado = _achado_terminal(quotes, edition, evitar, history)
+    titulo, destaque, achado = _achado_terminal(quotes, edition, evitar, history, election=election, nomes=nomes)
     for q in quotes:
         q["achado"] = q["id"] == achado
     juros = faixa_juros(edition)

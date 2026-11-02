@@ -113,6 +113,35 @@ def test_terminal_no_sistema_novo(edition):
     assert redacao.lint(peca, election=True) == []
 
 
+@real
+def test_terminal_so_titula_variacao_fora_do_comum():
+    # 26/10 (sem IA às 07h): o maior |var| fora dos ativos ocupados era o yuan +0,62% ou o Brent −1,77%,
+    # nenhum perto de 2 vezes a variação típica: título neutro, sem linha marcada (arte#15, dados#20).
+    h = E.load_history(DATA, date(2026, 10, 26), 90)
+    peca = conteudo.terminal(h[-1], {}, history=h)
+    ctx = peca.slides[0].ctx
+    assert (ctx["titulo"], ctx["destaque"]) == ("13 indicadores antes da abertura", "13 indicadores")
+    assert not any(q["achado"] for q in ctx["quotes"])
+    assert ctx["cta"] == "Salve para comparar com a próxima leitura." == peca.caption.split("\n")[-2]
+    assert redacao.lint(peca, election=True) == []
+    # Domingo: sem pregão.
+    h = E.load_history(DATA, date(2026, 10, 25), 90)
+    assert conteudo.terminal(h[-1], {}, history=h).slides[0].ctx["titulo"] == "13 indicadores em dia sem pregão"
+    # Com achado, a linha dele vai marcada.
+    h = E.load_history(DATA, date(2026, 10, 29), 90)
+    ctx = conteudo.terminal(h[-1], {}, history=h).slides[0].ctx
+    assert ctx["titulo"] == "Ibovespa −2,68% no fechamento de 28/10"
+    assert [q["id"] for q in ctx["quotes"] if q["achado"]] == ["ibov"]
+
+
+@real
+def test_terminal_no_periodo_eleitoral_nao_titula_a_queda_da_eleicao():
+    h = E.load_history(DATA, date(2026, 10, 27), 90)
+    assert conteudo.terminal(h[-1], {}, history=h).slides[0].ctx["titulo"].startswith("Ibovespa −13,88%")
+    eleicao = conteudo.terminal(h[-1], {}, history=h, election=True).slides[0].ctx
+    assert eleicao["titulo"] == "13 indicadores antes da abertura"  # nem o IFIX −5,68%, que anda com a bolsa
+
+
 def test_janela_do_slot_por_dia_da_semana():
     slot = InstagramSlot(weekdays="07:00", weekends=None, expires="13:00")
     due, expires = slot_window(slot, date(2026, 10, 20), TZ)

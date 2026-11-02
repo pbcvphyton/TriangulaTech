@@ -1188,7 +1188,8 @@ def checklist(
     - ``veiculos``: os veículos do assunto, na ordem em que aparecem.
     - ``confirmados``: os que puseram o número no título.
     - ``horas``: ``{nome: datetime}`` (ou lista na ordem de ``veiculos``) com o horário de cada um.
-    - ``ref_date``: dia da edição (outro dia leva a data na frente da hora).
+    - ``ref_date``: dia da edição (outro dia leva a data na frente da hora; se uma hora da lista
+      for de outro dia, todas levam a data: "28/10 19h15" e "29/10 04h47", nunca "04h47" solto).
 
     Nenhum título de veículo aparece: só o nome, a marca e a hora.
     """
@@ -1218,6 +1219,8 @@ def checklist(
     descricao += "; títulos não reproduzidos."
 
     mostrados = nomes if n <= max_linhas else nomes[: max_linhas - 1]
+    datas = ref_date is not None and any(_local(h).date() != ref_date for nm in mostrados if (h := hora_de.get(nm)))
+    ref_hora = None if datas else ref_date  # _hora sem ref põe a data na frente
     corpo: list[str] = []
     for i, nm in enumerate(mostrados):
         y = i * linha
@@ -1228,7 +1231,7 @@ def checklist(
         else:
             corpo.append(_linha(8, cy, 36, cy, "var(--ink3)", 4, " stroke-linecap='round'"))
         h = hora_de.get(nm)
-        hora = _hora(h, ref_date) if h else ""
+        hora = _hora(h, ref_hora) if h else ""
         w_h = largura_texto(hora, "mono", 26) if hora else 0
         corpo.append(_texto(64, cy + 12, _cabe(nm, "label", 34, largura - 64 - w_h - 24), "label", 34,
                             "var(--ink)" if nm in ok else "var(--ink2)"))
