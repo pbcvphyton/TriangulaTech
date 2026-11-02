@@ -748,3 +748,12 @@ def test_cta_da_noite_no_gancho_condensado_sem_seta(nome):
     fonte = (TEMPLATES / f"{nome}.html.j2").read_text(encoding="utf-8")
     assert '<div class="cta"><h2 class="hook" data-fit="cta"' in fonte
     assert "<b>→</b>" not in fonte
+
+
+def test_espectro_coluna_estreita_nao_corta_nome():
+    """18/10: 3 colunas, "The New York Times" na de 2 veículos saía "The New York T…"."""
+    svg, _ = G.espectro(["Folha de S.Paulo", "Estadão", "CNBC", "The Wall Street Journal"], ["g1", "BBC News"],
+                        ["Valor Econômico", "The New York Times"], rotulos=("alívio a Moscou", "pausa por custos"))
+    ts = textos(svg)
+    assert "The New York Times" in ts and "The Wall Street Journal" in ts and not any("…" in t for t in ts)
+    dentro_do_quadro(svg)

@@ -578,3 +578,22 @@ def test_duracao_do_titulo_do_relogio():
     assert N._duracao_titulo(td(hours=17)) == ("17 horas", "17 horas")
     assert N._duracao_titulo(td(hours=18, minutes=22)) == ("mais de 18 horas", "18 horas")
     assert N._duracao_titulo(td(hours=22, minutes=51)) == ("quase 23 horas", "23 horas")
+
+
+def test_relogio_nunca_esconde_veiculo_ate_12():
+    """As linhas de contexto saem antes de um veículo virar "+k" (15/10: 8 veículos, antes 2 sumiam)."""
+    for day in (*range(14, 26), 28, 29):
+        p = N.raio_x(edicao(day), {}, election=day <= 27, numero_serie=1)
+        if p is None or p.slides[4].template != "rx_relogio":
+            continue
+        k = int(sp(p.slides[4].ctx["titulo"]).split()[0])
+        assert (">+" in p.slides[4].ctx["grafico"]) == (k > 12), day
+    assert noites()[15].slides[4].ctx["contexto"] == []
+
+
+def test_28_10_molde_com_a_janela_de_cada_lado():
+    """Os 6 de 'fuga ilícita' publicaram de manhã; os 5 de 'asilo político', a partir das 15h37: o molde diz."""
+    concl = raiox_pos(28).slides[5].ctx["conclusao"]
+    assert concl.startswith("6 de 11 veículos destacaram fuga ilícita; 5, asilo político. Pelo horário informado, os 6 "
+                            "de fuga ilícita publicaram entre 27/10 09h13 e 27/10 15h32; os 5 de asilo político, entre "
+                            "27/10 15h37 e ")

@@ -686,7 +686,7 @@ def espectro(
     - ``fora``: veículos que publicaram mas ficaram fora da análise (linha no pé, ponto vazado).
 
     Cada grupo é uma coluna: a fileira de pontos, a contagem grande, o rótulo e os nomes
-    (até ``max_nomes``; o resto vira "+k"). Sem percentual.
+    (até ``max_nomes``; o resto vira "+k"), inteiros (a coluna estreita desce o corpo até 22 px). Sem percentual.
     """
     lado_minoria = "b" if lado_maioria == "a" else "a"
     grupos = [("maj", list(maioria), _COR_LADO[lado_maioria], rotulos[0])]
@@ -734,8 +734,10 @@ def espectro(
         for j, txt in enumerate(linhas_rot):
             corpo.append(_texto(x, 168 + 36 * j, txt, "label", 30, "var(--ink)"))
         visiveis = nomes if k <= max_nomes else nomes[: max_nomes - 1]
+        # um corpo por coluna, o maior em que todos os nomes cabem inteiros ("The New York Times" numa coluna estreita)
+        tam = next((t for t in (28, 26, 24, 22) if all(largura_texto(nm, "label", t) <= w for nm in visiveis)), 22)
         for j, nome in enumerate(visiveis):
-            corpo.append(_texto(x, y_nomes + 14 + j * passo_nome, _cabe(nome, "label", 28, w), "label", 28, "var(--ink2)"))
+            corpo.append(_texto(x, y_nomes + 14 + j * passo_nome, _cabe(nome, "label", tam, w), "label", tam, "var(--ink2)"))
         linhas = len(visiveis)
         if k > len(visiveis):
             corpo.append(_texto(x, y_nomes + 14 + linhas * passo_nome, f"+{k - len(visiveis)}", "mono6", 24, "var(--ink2)"))

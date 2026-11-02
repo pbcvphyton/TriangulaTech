@@ -60,6 +60,7 @@ SUB_PLACAR = "assuntos com 4 ou mais veículos comparados; dividir = pelo menos 
 FATO_MAX = 260  # slide 2: dek + 1ª frase do corpo, se couber
 SUBTITULO_MAX_PALAVRAS = 18
 SUBTITULO_MAX_CHARS = 200  # frase do corpo na capa: cortada na vírgula antes disso
+MOLDE_MAX = 260  # conclusão por molde: a conta por idioma só entra se o total couber
 FRAMING_MAX = 160  # o §4.2 diz 120, mas 99 de 267 enquadramentos dos Raio-X elegíveis passam disso (máx. 158)
 LADO_FRAMINGS = 3  # veículos com enquadramento no slide do lado; o resto vai em "Também"
 RACHAS_MAX = 3  # linhas do slide 2 do Placar com rachas
@@ -388,7 +389,7 @@ def _molde_conclusao(
     """A conclusão por molde, com os números do espectro: "5 de 11 veículos destacaram X; 5, Y; 1 não tomou
     lado."; quando os horários dos dois lados não se cruzam, a janela de cada um (28/10: os 6 de "fuga ilícita"
     das 09h13 às 15h32, os 5 de "asilo político" a partir das 15h37); e, com textos em inglês e em português
-    (2+ de cada com lado), a mesma conta por idioma."""
+    (2+ de cada com lado), a mesma conta por idioma, se o total couber em 260 caracteres."""
     n = len(maioria) + len(neutros) + len(minoria)
     rot_maj, rot_min = rotulos
     if rot_maj and rot_min:
@@ -410,8 +411,10 @@ def _molde_conclusao(
              for lang in ("en", "pt")}
     if rot_maj and rot_min and all(sum(v) >= 2 for v in conta.values()):
         (en_a, en_b), (pt_a, pt_b) = conta["en"], conta["pt"]
-        texto += (f" Entre os veículos em inglês, {_destacaram(en_a)} {rot_maj} e {en_b}, {rot_min}; "
+        idioma = (f" Entre os veículos em inglês, {_destacaram(en_a)} {rot_maj} e {en_b}, {rot_min}; "
                   f"em português, {pt_a or 'nenhum'} e {pt_b or 'nenhum'}.")
+        if len(texto + idioma) <= MOLDE_MAX:  # a janela de horário, se houver, tem a vez
+            texto += idioma
     return texto
 
 
