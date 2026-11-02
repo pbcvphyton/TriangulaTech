@@ -21,7 +21,7 @@ ATIVOS = ["ibov", "usd", "brent", "btc"]
 JANELA_DIAS = 60  # a linha mostra no máximo 60 dias de série
 PAINEL_LARGURA, PAINEL_ALTURA = 440, 250  # o gráfico de cada painel (o painel inteiro tem ~440 × 380)
 CTA = "Salve para comparar com a próxima leitura."
-RODAPE = "Yahoo Finance e BCB · uma leitura por dia · fech. = fechamento do pregão"
+RODAPE = "Uma leitura por dia · fech. = fechamento do pregão"  # a fonte fica só na assinatura
 
 # Unidade de cada ativo no texto ("R$ 5,01", "208.296 pontos") e o nome no meio da frase.
 PREFIXO = {"usd": "R$ ", "eur": "R$ ", "cny": "R$ ", "brent": "US$ ", "btc": "US$ ", "gold": "US$ "}
@@ -86,15 +86,18 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
         "desde": "",
         "grafico": "",
         "leituras": len(pontos),
-        "ate": "",  # "leitura das 06h00" quando o acumulado não termina num fechamento
+        "ate": "",  # a ponta final do acumulado: "até o fechamento de 23/10", "até a leitura das 06h45"
+        "do_dia": hoje is not None and hoje.day == day,  # a última leitura é do dia da edição
     }
     descricao = ""
     acc = E.acumulado(pontos)
     if acc is not None:  # ponta a ponta com as duas datas: vale mesmo com série curta
         desde = f"{acc.first.day:%d/%m}"
         painel.update(pct=acc.pct, desde=desde, acumulado=f"{E.sinal(acc.pct)} desde {desde}")
-        if not E.is_close(qid, acc.last.as_of):  # termina numa leitura do meio do pregão: o título diz a hora
-            painel["ate"] = E.selo_leitura(qid, acc.last, day) or f"leitura de {acc.last.day:%d/%m}"
+        if E.is_close(qid, acc.last.as_of):
+            painel["ate"] = f"até o fechamento de {acc.last.day:%d/%m}"
+        else:  # termina numa leitura do meio do pregão (ou de ativo sem pregão): a hora
+            painel["ate"] = "até a " + (E.selo_leitura(qid, acc.last, day) or f"leitura de {acc.last.day:%d/%m}")
     if acc is not None and len(pontos) >= min_pontos:
         svg, descricao = G.linha(
             [(p.day, p.value) for p in pontos],
@@ -112,15 +115,15 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
 
 def _achado(paineis: list[dict[str, Any]], day: str, evitar: Iterable[str] = ()) -> tuple[str, str, str, str]:
     """O título-achado, o trecho em laranja, o selo do título e o ativo dele: o maior |acumulado| ("Ibovespa +13,8%
-    desde 28/09"), fora dos ativos em ``evitar`` se houver outro, com "até a leitura das 06h00" quando
-    o acumulado termina no meio do pregão; sem série (uma leitura só), a maior variação da leitura
-    ("Dólar −4,42% na leitura das 14h06", que já diz a hora)."""
+    desde 28/09"), fora dos ativos em ``evitar`` se houver outro, com a ponta final no selo (§3: ponta a ponta,
+    com as duas datas): "até o fechamento de 20/10", "até a leitura das 06h00"; sem série (uma leitura só),
+    a maior variação da leitura ("Dólar −4,42% na leitura das 14h06", que já diz a hora)."""
     evitar = set(evitar)
     com_serie = [p for p in paineis if p["pct"] is not None]
     com_serie = [p for p in com_serie if p["id"] not in evitar] or com_serie
     if com_serie:
         p = max(com_serie, key=lambda p: abs(p["pct"]))
-        return f"{p['nome']} {p['acumulado']}", E.sinal(p["pct"]), f"até a {p['ate']}" if p["ate"] else "", p["id"]
+        return f"{p['nome']} {p['acumulado']}", E.sinal(p["pct"]), p["ate"], p["id"]
     com_var = [p for p in paineis if p["variacao"] is not None]
     if com_var:
         p = max(com_var, key=lambda p: abs(p["variacao"]))
@@ -152,6 +155,7 @@ def mercado_slide(
     tema: str = "dark",
     min_pontos: int = E.ACUMULADO_MIN_PONTOS,
     evitar: Iterable[str] = (),
+    so_do_dia: bool = False,
 ) -> Slide | None:
     """O slide do Mercado em linha: título-achado, 4 gráficos pequenos em 2×2, faixa de juros e rodapé.
 
@@ -159,6 +163,8 @@ def mercado_slide(
     ``history`` precisa incluir a edição do dia. Com menos de ``min_pontos`` leituras
     (``limiares.grafico_min_pontos``), o painel mostra só o valor. None sem nenhuma cotação dos 4 ativos.
     ``evitar``: ativos que não viram título (ex.: ``{"ibov"}`` quando o Número do dia já é o acumulado dele).
+    ``so_do_dia``: o título só vai para ativo com leitura do dia da edição, se houver (a noite sai às 18h30:
+    o fechamento de sexta não é o título da segunda-feira).
 
     O ``ctx`` traz ``selo`` ("MERCADO EM LINHA · QUA 21 OUT"), ``contador`` (False) e ``cor``
     ("em1min" ou "mercado"): o Em 1 minuto troca o selo pelo da série e liga o contador.
@@ -168,6 +174,9 @@ def mercado_slide(
     if not feitos:
         return None
     paineis = [p for p, _ in feitos]
+    evitar = set(evitar)
+    if so_do_dia:
+        evitar |= {p["id"] for p in paineis if not p["do_dia"]}
     titulo, destaque, selo_titulo, ativo = _achado(paineis, short_date(day), evitar)
     faixa = faixa_juros(edition)
     ctx = {
@@ -203,7 +212,7 @@ def mercado_em_linha(
 
     ``evitar``: ativos que não viram título (o do Número do dia, para os posts do dia não repetirem o assunto).
     """
-    slide = mercado_slide(edition, history, tema="paper", min_pontos=min_pontos, evitar=evitar)
+    slide = mercado_slide(edition, history, tema="paper", min_pontos=min_pontos, evitar=evitar, so_do_dia=True)
     if slide is None:
         return None
     day = edition_day(edition)

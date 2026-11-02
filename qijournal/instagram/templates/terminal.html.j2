@@ -1,8 +1,9 @@
 {# Terminal da manhã (07:00 nos dias sem IA, ou quando o Em 1 minuto não sai): imagem única em marinho.
-   Título-achado com a maior variação entre as leituras que valem (laranja só no número); a tabela com
-   indicador, último valor, variação com seta e de quando é a leitura ("fech. 19/10" só no fechamento do
-   pregão, "leitura das 06h00", "set/26"); o CTA e a assinatura.
-   ctx: selo, titulo, destaque, quotes [{label, value, change, trend, ref}], cta, nota. #}
+   Título-achado com a maior variação fora do comum (laranja só no número), ou o título neutro ("13 indicadores
+   antes da abertura"); a tabela com indicador, último valor, variação com seta e de quando é a leitura
+   ("fech. 19/10" só no fechamento do pregão, "leitura das 06h00", "set/26"), com a linha do achado marcada
+   por um fio laranja de 6 px à esquerda; o CTA (de salvamento) e a assinatura.
+   ctx: selo, titulo, destaque, quotes [{label, value, change, trend, ref, achado}], cta, nota. #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
 {% set nq = s.quotes|length %}
@@ -15,6 +16,7 @@ th{font-family:var(--mono);font-weight:500;font-size:22px;letter-spacing:.06em;t
 th.r,td.r{text-align:right}
 td{border-bottom:2px solid var(--rule);height:{{ rowh }}px;vertical-align:middle;white-space:nowrap}
 td.l{font-family:var(--label);font-stretch:100%;font-weight:600;font-size:{{ 32 if rowh >= 60 else 28 }}px;color:var(--ink)}
+tr.achado td.l{box-shadow:inset 6px 0 0 var(--accent);padding-left:20px}
 td.v{font-family:var(--mono);font-weight:600;font-size:{{ 32 if rowh >= 60 else 28 }}px;color:var(--ink)}
 td.c{width:180px}
 td.f{width:250px;font-family:var(--mono);font-size:21px;color:var(--ink2);padding-left:24px}
@@ -29,13 +31,12 @@ td.f{width:250px;font-family:var(--mono);font-size:21px;color:var(--ink2);paddin
   <table>
     <tr><th>Indicador</th><th class="r">Último</th><th class="r">Var.</th><th style="padding-left:24px">Leitura</th></tr>
     {% for q in s.quotes %}
-    <tr><td class="l">{{ q.label }}</td><td class="v r">{{ q.value }}</td>
+    <tr{% if q.achado %} class="achado"{% endif %}><td class="l">{{ q.label }}</td><td class="v r">{{ q.value }}</td>
       <td class="c r">{% if q.change %}{{ m.change(q, 28) }}{% else %}<span class="nada">—</span>{% endif %}</td>
       <td class="f">{{ q.ref or 'vigente' }}</td></tr>
     {% endfor %}
   </table>
-  {# post de imagem única: o link sai do post, então ↗ (a → fica só para "arraste") #}
-  <div class="cta">{{ s.cta }}{{ m.out_arrow(28, 4.4) }}</div>
+  <div class="cta">{{ s.cta }}</div>
 </div>
 {{ m.assinatura(s.nota) }}
 {% endblock %}

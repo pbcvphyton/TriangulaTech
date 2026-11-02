@@ -132,6 +132,11 @@ def _cabe(*candidatas: str, limite: int = LINHA1_MAX) -> str:
     return ultima[: limite - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
 
 
+def _junta(cabeca: str, tese: str) -> str:
+    """``"cabeça: tese"``; se a tese já tem dois-pontos ("Embraer: volume…"), ``"cabeça. Tese"``."""
+    return f"{cabeca}. {tese}" if ": " in tese else f"{cabeca}: {tese}"
+
+
 def _limpo(texto: str) -> bool:
     return bool(texto) and not palavras_proibidas(texto)
 
@@ -480,13 +485,14 @@ def _linha1(n: E.Numero, history: list[Edition]) -> str:
     if n.tipo == "triangulado":
         k, total = p["confirmados"], p["total"]
         return _cabe(
-            f"{n.valor} no título de {k} de {total} veículos: {n.tese}",
-            f"{n.tese}: no título de {k} de {total} veículos",
+            _junta(f"{n.valor} no título de {k} de {total} veículos", n.tese),
+            f"{n.tese} ({n.valor} no título de {k} de {total} veículos)" if ": " in n.tese
+            else f"{n.tese}: no título de {k} de {total} veículos",
             f"{n.valor} no título de {k} de {total} veículos que publicaram o assunto.",
         )
     if n.tipo == "concentracao":
         onde = f"o mais coberto entre {E.num(p['assuntos'])} do dia" if p["rank"] == 1 else f"o {p['rank']}º entre {E.num(p['assuntos'])} do dia"
-        return _cabe(f"{p['veiculos']} veículos no mesmo assunto: {n.tese}", f"{p['veiculos']} veículos no mesmo assunto, {onde}.")
+        return _cabe(_junta(f"{p['veiculos']} veículos no mesmo assunto", n.tese), f"{p['veiculos']} veículos no mesmo assunto, {onde}.")
     valor = f"{n.qualificador.capitalize()} {n.valor}" if n.qualificador else n.valor
     return _cabe(
         f"{valor}: o juro real ex-post com a Selic a {E.num(p['selic'], 2)}% e o IPCA de 12 meses a {E.num(p['ipca'], 2)}%.",

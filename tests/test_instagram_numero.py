@@ -93,7 +93,10 @@ def test_slide_2_traz_o_grafico_do_tipo_e_nao_repete_a_capa(dia, raiox, tipo):
     assert prova["titulo"] != capa["tese"] and capa["tese"] not in prova["titulo"]
     assert prova["destaque"] and prova["destaque"].lower() in prova["titulo"].lower()
     assert "Gráfico: " in p.slides[1].alt
-    assert prova["pe"].startswith("Fonte: ")
+    # A fonte fica só na assinatura (e no alt); o pé leva a base e o método (§6, uma vez só por slide).
+    assert not prova["pe"].lower().startswith("fonte") and prova["nota"].startswith("fonte: ")
+    assert p.slides[1].alt.endswith(f"Fonte: {p.slides[2].ctx['ficha'][0]['v']}.")
+    assert p.slides[2].ctx["nota"] == "" and p.slides[2].ctx["ficha"][0]["k"] == "Fonte"
     assert prova["selo"] == "NÚMERO DO DIA Nº 003"
 
 
@@ -128,7 +131,7 @@ def test_slide_2_do_mercado_e_da_concentracao():
     btc = peca("15").slides[1].ctx
     assert btc["titulo"] == "2,6 vezes a variação típica do bitcoin" and btc["destaque"] == "2,6 vezes"
     assert btc["contexto"][0] == "Variação típica do bitcoin: 0,90% por dia, nas 16 leituras anteriores (desde 29/09)."
-    assert btc["pe"] == "Fonte: Yahoo Finance · uma leitura por dia · hoje: leitura das 06h55"
+    assert btc["pe"] == "Uma leitura por dia · hoje: leitura das 06h55"
     conc = peca("18").slides[1].ctx
     assert conc["titulo"] == "1º entre 663 assuntos; 589 saíram em uma fonte só" and conc["destaque"] == "1º"
     assert "graf-matriz" in str(conc["grafico"])
@@ -142,7 +145,7 @@ def test_legenda_e_alt_do_acumulado_seguem_o_molde_da_spec():
         "\n"
         "▸ De 182.991 pontos (fech. 28/09) a 208.296 (fech. 20/10), em 14 leituras.\n"
         "▸ Máxima da série: 209.067 pontos, fech. 09/10.\n"
-        "▸ No mesmo período: Brent +10,1%, dólar −4,1%.\n"
+        "▸ No mesmo período, de 28/09 a 20/10: Brent +11,7% (desde 29/09), dólar −3,3%.\n"
         "Como medimos: uma leitura por dia (Yahoo Finance), variação ponta a ponta; não é soma de variações diárias.\n"
         "Mande para quem acha que leu tudo.\n"
         "#triangula #dados #mercadofinanceiro"
@@ -268,8 +271,10 @@ def test_frase_da_serie_so_quando_o_primeiro_ponto_e_o_comeco_dos_dados():
 def test_slide_2_nao_repete_a_tese_quando_ela_saiu_da_linha_fina():
     p = peca("24", "ipca-15")
     tese = p.slides[0].ctx["tese"]
-    assert tese == "Volume total de encomendas avança 14% em doze meses"  # a linha fina cortada (§4.4)
-    assert all(tese not in c for c in p.slides[1].ctx["contexto"])
+    # A manchete caiu pelo "histórico" (em 0 de 5 títulos) e a linha fina não diz de quem é o número:
+    # o sujeito da manchete vai na frente (arte#5).
+    assert tese == "Embraer: volume total de encomendas avança 14% em doze meses"
+    assert all("volume total" not in c.lower() for c in p.slides[1].ctx["contexto"])
     assert p.slides[1].ctx["contexto"][0] == "Puxado por forte demanda no segmento de defesa e na aviação executiva."
     assert "▸ O fato: Volume total de encomendas avança 14% em doze meses, puxado" in p.caption  # a legenda estende
 

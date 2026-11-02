@@ -177,7 +177,7 @@ def test_escolha_do_raiox_de_14_a_25_10():
         assert all("tse-intima" not in s.id for _, s in S.candidatos_raiox(e, election=True))
         if esperado is None:
             assert noite.tipo == "placar" and noite.story is None
-            assert noite.placar.texto_dia == "0 de 14"  # a spec simulou "0 de 16" sem o filtro por conteúdo
+            assert noite.placar.texto_dia == "0 de 13"  # a spec simulou "0 de 16" sem o filtro por conteúdo nem a eleição de Israel
             recentes.append([])
             continue
         prefixo, a, b, n = esperado

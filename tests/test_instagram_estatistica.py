@@ -331,17 +331,34 @@ def test_filtro_eleitoral_familias_e_excecoes():
 def test_placar_real_tira_o_eleitoral_e_vai_sem_porcentagem():
     p21 = E.placar(edicao("21"), election=True)
     p19 = E.placar(edicao("19"), election=True)
-    # A spec simulou 4 de 26 e 0 de 16 sem o filtro por conteúdo; com ele saem
-    # "Nunes Marques diz que TSE..." (21/10) e duas coberturas com Lula e Flávio Bolsonaro (19/10).
-    assert (p21.rachas, p21.base) == (4, 25) and p21.texto_dia == "4 de 25"
-    assert (p19.rachas, p19.base) == (0, 14) and p19.texto_dia == "0 de 14"
-    assert "%" not in p21.texto_dia and p21.texto == "4 de 25 (16%)"
+    # A spec simulou 4 de 26 e 0 de 16 sem o filtro por conteúdo; com ele saem "Nunes Marques diz que
+    # TSE..." (21/10) e duas coberturas com Lula e Flávio Bolsonaro (19/10). Eleição de outro país no
+    # título também sai (§2): o referendo de Alberta (21/10, um racha) e Trump × Netanyahu (19/10).
+    assert (p21.rachas, p21.base) == (3, 24) and p21.texto_dia == "3 de 24"
+    assert (p19.rachas, p19.base) == (0, 13) and p19.texto_dia == "0 de 13"
+    assert "%" not in p21.texto_dia and p21.texto == "3 de 24 (12%)"
     assert len(p21.itens) == p21.base
+    assert not any("Alberta" in c.topic for c, _ in p21.itens)
     consenso, _story = E.maior_consenso(edicao("19"), election=True)
     assert consenso.topic.startswith("Protestos") and len(consenso.outlets) == 8
     assert consenso.count("a") == consenso.count("b") == 0
     rachas = E.rachas_do_dia(edicao("21"), election=True)
-    assert len(rachas) == 4 and all(E.is_racha(c) for c, _ in rachas)
+    assert len(rachas) == 3 and all(E.is_racha(c) for c, _ in rachas)
+
+
+@real
+def test_placar_no_periodo_eleitoral_sem_eleicao_de_outro_pais():
+    # 27/10: "Israel vai às urnas" (racha) e "Trump oferece recompensa por fraude eleitoral" saem da base;
+    # capa, waffle, "por editoria" e a lista dos rachas contam a mesma coisa: 1 de 17 (só a Anthropic).
+    p27 = E.placar(edicao("27"), election=True)
+    assert p27.texto_dia == "1 de 17" and p27.por_secao["mundo"] == (0, 7)
+    assert not any(E.eleicao_escrita(c.topic, s.headline if s else "") for c, s in p27.itens)
+    rachas = E.rachas_do_dia(edicao("27"), election=True)
+    assert [c.topic[:9] for c, _ in rachas] == ["Anthropic"]
+    # Fora do período eleitoral, a eleição de Israel conta; e "reeleição na Fifa" (esporte) nunca sai.
+    assert E.placar(edicao("27"), election=False).base > p27.base
+    p24 = E.placar(edicao("24"), election=True)
+    assert any("Fifa" in c.topic for c, _ in p24.itens) and not any("Canadá" in c.topic for c, _ in p24.itens)
 
 
 @real
@@ -465,7 +482,12 @@ def test_numero_do_dia_prova_por_tipo():
     assert (p["primeiro"]["valor_fmt"], p["ultimo"]["valor_fmt"], p["leituras"]) == ("182.991", "208.296", 14)
     assert (p["max"]["valor_fmt"], p["max"]["dia"]) == ("209.067", "09/10")
     assert [f["dia"] for f in p["faltantes"]] == ["30/09", "13/10"]
-    assert {o["qid"]: o["pct_fmt"] for o in p["outros"]}["brent"] == "+10,1%"
+    # Os outros ativos na mesma janela do Ibovespa (28/09 a 20/10), e não na série inteira de cada um
+    # (o Brent ia de 29/09 a 21/10 06h45: +10,1%); a ponta que não bate fica escrita.
+    outros = {o["qid"]: o for o in p["outros"]}
+    assert (outros["brent"]["pct_fmt"], outros["brent"]["de"], outros["brent"]["ate"]) == ("+11,7%", "29/09", "20/10")
+    assert not outros["brent"]["mesmas_pontas"]
+    assert (outros["usd"]["pct_fmt"], outros["usd"]["mesmas_pontas"]) == ("−3,3%", True)
 
 
 @real

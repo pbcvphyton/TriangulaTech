@@ -67,13 +67,16 @@ def test_slide_de_21_10_titulo_paineis_e_faixa():
     assert p["btc"]["valor"] == "US$ 83.366"
     assert all(str(x["grafico"]).startswith("<svg class='graf graf-linha'") for x in c["paineis"])
     assert c["faixa"] == "Selic 13,75% · IPCA 12m 4,58% (set) · juro real ex-post 8,77%"
-    assert c["pe"].startswith("Yahoo Finance e BCB · uma leitura por dia")
+    assert c["pe"] == "Uma leitura por dia · fech. = fechamento do pregão"  # a fonte só na assinatura
+    assert c["nota"] == "fonte: Yahoo Finance e BCB"
+    # Acumulado ponta a ponta, com as duas datas (§3): a ponta final vai embaixo do título.
+    assert c["selo_titulo"] == "até o fechamento de 20/10"
 
 
 @real
 def test_alt_tem_os_valores_e_a_frase_de_cada_grafico():
     alt = M.mercado_slide(edicao("21"), historia("21")).alt
-    assert alt.startswith("Mercado em linha, 21/10: Ibovespa +13,8% desde 28/09. ")
+    assert alt.startswith("Mercado em linha, 21/10: Ibovespa +13,8% desde 28/09, até o fechamento de 20/10. ")
     assert "Ibovespa 208.296 (fech. 20/10, +1,57% no dia, +13,8% desde 28/09)" in alt
     assert "Gráficos: Ibovespa: linha com 14 leituras" in alt and "2 pregões sem leitura, tracejado" in alt
     assert len(alt) <= redacao.ALT_MAX
@@ -92,11 +95,26 @@ def test_substituto_da_noite_em_papel_sem_numero(dia):
     assert (p.slot, p.kind, p.serie, p.numero_serie, p.chave) == ("noite", "image", "mercado", 0, "")
     assert len(p.slides) == 1 and p.slides[0].ctx["tema"] == "t-paper" and p.slides[0].ctx["cor"] == "mercado"
     linhas = p.caption.split("\n")
-    assert linhas[0] == f"Mercado em linha · {dia}/10: {p.slides[0].ctx['titulo']}" and linhas[1] == ""
+    ctx = p.slides[0].ctx
+    assert linhas[0] == f"Mercado em linha · {dia}/10: {ctx['titulo']} ({ctx['selo_titulo']})" and linhas[1] == ""
     assert len(linhas[0]) <= redacao.LINHA1_MAX and len(p.caption) <= redacao.LEGENDA_MAX
     assert 3 <= sum(1 for x in linhas if x.startswith("▸ ")) <= 5
     assert linhas[-2] == M.CTA and linhas[-1] == "#triangula #dados #mercadofinanceiro #economia"
     assert redacao.lint(p, election=True) == []
+
+
+@real
+def test_noite_de_26_10_nao_titula_com_o_fechamento_de_sexta():
+    # 18h30 de segunda: o Ibovespa da edição é o fechamento de sexta (23/10); o título vai para um ativo
+    # lido no dia, sempre com a ponta final (dados#2, arte#11).
+    p = M.mercado_em_linha(edicao("26"), {}, historia("26"))
+    c = p.slides[0].ctx
+    assert c["ativo"] != "ibov" and not c["titulo"].startswith("Ibovespa")
+    assert c["selo_titulo"].startswith("até a leitura das ")
+    assert p.caption.split("\n")[0].endswith(f"({c['selo_titulo']})")
+    # O slide 7 do Em 1 minuto (07h00) continua com o maior acumulado, com a data do fechamento.
+    manha = M.mercado_slide(edicao("26"), historia("26")).ctx
+    assert (manha["ativo"], manha["selo_titulo"]) == ("ibov", "até o fechamento de 23/10")
 
 
 @real

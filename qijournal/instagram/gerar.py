@@ -300,7 +300,8 @@ def build_pieces(
     if manha is None:  # o Terminal, sem o ativo do Número nem o do título do Mercado em linha
         ocupados = {_ativo(numero.chave) if numero is not None else ""}
         ocupados |= {str(s.ctx.get("ativo") or "") for s in (noite.slides if noite is not None else []) if s.template == "mercado_linha"}
-        manha = aprovada(conteudo.terminal(edition, brand, evitar=ocupados - {""}), "a manhã fica sem post")
+        terminal = conteudo.terminal(edition, brand, evitar=ocupados - {""}, history=history)
+        manha = aprovada(terminal, "a manhã fica sem post")
 
     # 4. Stories, com a agenda do que de fato foi gerado.
     feed = [p for p in (manha, numero, noite) if p is not None]

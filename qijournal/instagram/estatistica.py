@@ -444,17 +444,18 @@ def sujeito(story: Story, titulos: Sequence[str] = ()) -> str:
 
 def _com_sujeito(dek: str, story: Story, titulos: Sequence[str], limite: int) -> str:
     """A linha fina com o sujeito da manchete na frente, quando ela não o diz
-    ("Embraer: volume total de encomendas avança 14% em doze meses"); "" se não precisa."""
+    ("Embraer: volume total de encomendas avança 14% em doze meses"); "" se não precisa ou se,
+    com o sujeito, a frase só caberia em ``limite`` palavras cortada no meio (sem "," nem " e ")."""
     quem = sujeito(story, titulos)
     if not quem or _fold(quem) in _fold(dek):
         return ""
-    corpo = _corta_palavras(dek, limite - len(quem.split()))
-    primeira = corpo.split(" ", 1)[0]
+    primeira = dek.split(" ", 1)[0]
     # "Volume" só abre a frase e vai em minúscula; nome próprio (maiúsculo no meio de algum título) fica.
     meio = re.compile(r"\S\s+" + re.escape(primeira) + r"\b")
     if primeira[1:2].islower() and not any(meio.search(_plain(t)) for t in [*titulos, story.headline, dek]):
-        corpo = corpo[:1].lower() + corpo[1:]
-    return f"{quem}: {corpo}"
+        dek = dek[:1].lower() + dek[1:]
+    frase = f"{quem}: {dek}".rstrip(".")
+    return frase if len(frase.split()) <= limite else _corta_na_juncao(frase, limite)
 
 
 def numero_destaque(texto: str) -> tuple[str, str] | None:

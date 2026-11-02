@@ -12,7 +12,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, Iterable
+from typing import Any, Iterable, Sequence
 
 from markupsafe import Markup
 
@@ -308,27 +308,63 @@ def alt(value: str) -> str:
 
 
 TERMINAL_MERCADO = ["usd", "ibov", "brent", "btc"]  # as linhas "▸" da legenda (os juros vão numa linha só)
-TERMINAL_CTA = "Edição de hoje no link da bio."
+TERMINAL_CTA = "Salve para comparar com a próxima leitura."
+TERMINAL_VAR_MIN = 1.0  # % : abaixo disso, nenhuma variação vira título
 
 
-def _achado_terminal(quotes: list[dict[str, Any]], day: date, evitar: Iterable[str] = ()) -> tuple[str, str]:
-    """O título do Terminal e o trecho em laranja: a maior variação entre as leituras que valem
-    ("Brent +1,95% na leitura das 06h45"), fora dos ativos em ``evitar`` se houver outro; sem
-    nenhuma, "Mercado em 20/10"."""
-    com_var = [q for q in quotes if q["change"] and q["ref"] and q["id"] not in ("selic", "ipca12m")]
-    com_var = [q for q in com_var if q["id"] not in set(evitar)] or com_var
-    if not com_var:
-        return f"Mercado em {short_date(day)}", ""
-    q = max(com_var, key=lambda q: abs(float(q["change"].replace("−", "-").replace(",", ".").rstrip("%"))))
+def _achado_terminal(
+    quotes: list[dict[str, Any]],
+    edition: Edition,
+    evitar: Iterable[str] = (),
+    history: Sequence[Edition] = (),
+) -> tuple[str, str, str]:
+    """O título do Terminal, o trecho em laranja e o ativo do achado (a linha marcada na tabela).
+
+    Achado = a maior variação entre as leituras que valem, fora dos ativos em ``evitar``, com pelo
+    menos 1% e, se o ativo tem série para a escala robusta, 2 vezes a variação típica dele (o yuan
+    +0,62% de 26/10 não é achado; "Brent +1,95% na leitura das 06h45" pode ser). Leitura velha
+    (:func:`.estatistica.leitura_velha`) não vale. Sem achado, o título é neutro: "13 indicadores
+    antes da abertura" (ou "em dia sem pregão"), com o número em laranja."""
+    day = edition_day(edition)
+    evitar = set(evitar)
+    antes = [e for e in history if e.date < edition.date]
+    anterior = max(antes, key=lambda e: e.date, default=None)
+    by_id = {q.id: q for q in edition.quotes}
+    candidatos = []
+    for item in quotes:
+        q = by_id.get(item["id"])
+        ponto = estatistica.ponto_da_cotacao(q) if q is not None and q.change_pct is not None else None
+        if ponto is None or not item["change"] or not item["ref"] or item["id"] in evitar:
+            continue
+        if abs(q.change_pct) < TERMINAL_VAR_MIN or estatistica.leitura_velha(q.id, ponto, day, anterior):
+            continue
+        serie = [x for x in estatistica.serie(antes, q.id) if x.as_of < ponto.as_of]
+        escala = estatistica.escala_robusta(serie)
+        if escala and abs(q.change_pct) / escala < estatistica.Z_MEDIO:
+            continue
+        candidatos.append((abs(q.change_pct), item))
+    if not candidatos:
+        pregao = day.weekday() < 5 and day not in estatistica.FERIADOS["ibov"]
+        n = f"{len(quotes)} indicadores"
+        return f"{n} {'antes da abertura' if pregao else 'em dia sem pregão'}", n, ""
+    _, q = max(candidatos, key=lambda c: c[0])
     onde = q["ref"].replace("fech.", "no fechamento de", 1) if q["ref"].startswith("fech.") else f"na {q['ref']}"
-    return f"{q['label']} {q['change']} {onde}", q["change"]
+    return f"{q['label']} {q['change']} {onde}", q["change"], q["id"]
 
 
-def terminal(edition: Edition, brand: dict[str, Any], *, evitar: Iterable[str] = ()) -> Peca | None:
+def terminal(
+    edition: Edition,
+    brand: dict[str, Any],
+    *,
+    evitar: Iterable[str] = (),
+    history: Sequence[Edition] = (),
+) -> Peca | None:
     """Imagem única com os indicadores (07:00 dos dias sem IA, ou quando o Em 1 minuto não sai).
 
     ``evitar``: ativos que já são o assunto de outro post do dia (o do Número, o do título do
-    Mercado em linha) e por isso não viram o título daqui.
+    Mercado em linha) e por isso não viram o título daqui. ``history`` (com ou sem a edição do dia):
+    a escala de cada ativo e a edição anterior, para o título só ir para uma variação fora do comum
+    (:func:`_achado_terminal`).
     """
     from .formatos.mercado import faixa_juros  # o mercado importa daqui
 
@@ -336,7 +372,9 @@ def terminal(edition: Edition, brand: dict[str, Any], *, evitar: Iterable[str] =
     if len(quotes) < 4:
         return None
     day = edition_day(edition)
-    titulo, destaque = _achado_terminal(quotes, day, evitar)
+    titulo, destaque, achado = _achado_terminal(quotes, edition, evitar, history)
+    for q in quotes:
+        q["achado"] = q["id"] == achado
     juros = faixa_juros(edition)
     linhas = [
         f"▸ {q['label']}: {q['value']}" + (f" ({', '.join(x for x in (q['change'], q['ref']) if x)})" if q["change"] or q["ref"] else "") + "."

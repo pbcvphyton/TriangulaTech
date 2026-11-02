@@ -163,11 +163,12 @@ def test_raiox_de_21_10_significado_importa_e_placar():
     assert "(lado" not in s6.ctx["conclusao"]
     # "unindo gigantes de Musk": adjetivo da casa fora, cortado na vírgula
     assert s7.ctx["texto"] == "A transação remodelaria as indústrias automotiva, espacial e de inteligência artificial."
-    assert s8.ctx["titulo"] == "4 DE 25 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"  # a spec simulou 4 de 26 sem o filtro por conteúdo
-    assert s8.ctx["destaque"] == "4 DE 25" and "%" not in s8.ctx["titulo"]
+    # A spec simulou 4 de 26 sem o filtro por conteúdo; o referendo de Alberta (eleição de outro país) também sai.
+    assert s8.ctx["titulo"] == "3 DE 24 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"
+    assert s8.ctx["destaque"] == "3 DE 24" and "%" not in s8.ctx["titulo"]
     assert s8.ctx["cta"] == "Leu só uma versão? Mande para quem leu a outra."
     assert s8.ctx["serie"] == "Série completa no destaque Raio-X."
-    assert "4 dividiram e 21 sem divisão; o contorno marca este Raio-X." in s8.alt
+    assert "3 dividiram e 21 sem divisão; o contorno marca este Raio-X." in s8.alt
 
 
 def test_raiox_de_21_10_legenda_no_molde():
@@ -185,7 +186,7 @@ def test_raiox_de_21_10_legenda_no_molde():
         "▸ Relógio: 12 veículos em 16h43, de The New York Times (20/10 13h17) a The Wall Street Journal "
         "(21/10 06h01), horário informado por cada veículo."
     ) in linhas
-    assert "▸ Placar do dia: 4 de 25 assuntos com 4 ou mais veículos dividiram a cobertura." in linhas
+    assert "▸ Placar do dia: 3 de 24 assuntos com 4 ou mais veículos dividiram a cobertura." in linhas
     assert linhas[-4].startswith("Por que importa: A transação remodelaria")
     assert linhas[-3] == N.METODO
     assert linhas[-2] == N.CTA_RAIOX
@@ -303,9 +304,9 @@ def test_placar_de_19_10_dia_de_consenso():
     assert [s.template for s in p.slides] == ["placar_capa", "placar_lista", "rx_relogio", "placar_metodo"]
     capa = p.slides[0].ctx
     assert capa["selo"] == "RAIO-X Nº 006 · DIA DE CONSENSO"
-    assert capa["gancho"] == "0 DE 14 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"  # a spec simulou 0 de 16
+    assert capa["gancho"] == "0 DE 13 ASSUNTOS DIVIDIRAM A COBERTURA HOJE"  # a spec simulou 0 de 16
     assert capa["subtitulo"] == "assuntos com 4 ou mais veículos comparados; dividir = pelo menos 2 veículos de cada lado."
-    assert "grade de 14 quadrados" in p.slides[0].alt and "0 dividiram e 14 sem divisão" in p.slides[0].alt
+    assert "grade de 13 quadrados" in p.slides[0].alt and "0 dividiram e 13 sem divisão" in p.slides[0].alt
     consenso = p.slides[1].ctx
     assert consenso["titulo"] == "8 VEÍCULOS, NENHUM LADO"
     assert consenso["assunto"].startswith("Protestos violentos na França")
@@ -315,9 +316,9 @@ def test_placar_de_19_10_dia_de_consenso():
     assert coberto["assunto"] == "O mesmo assunto foi o mais coberto do dia, entre 680."
     assert p.slides[3].ctx["cta"] == "Salve: o placar sai todo dia."
     linhas = p.caption.split("\n")
-    assert linhas[0] == "Dia de consenso: 0 de 14 assuntos com 4 ou mais veículos dividiram a cobertura hoje."
+    assert linhas[0] == "Dia de consenso: 0 de 13 assuntos com 4 ou mais veículos dividiram a cobertura hoje."
     assert any(linha.startswith("▸ O mais coberto: o mesmo assunto, 13 veículos e 29 textos") for linha in linhas)
-    assert "▸ Por editoria: Mundo 0 de 10 · Esporte 0 de 3 · Tecnologia 0 de 1." in linhas
+    assert "▸ Por editoria: Mundo 0 de 9 · Esporte 0 de 3 · Tecnologia 0 de 1." in linhas  # sem Trump × Netanyahu
     assert linhas[-2:] == ["Salve: o placar sai todo dia.", "#triangula #jornalismo #geopolitica"]
 
 
