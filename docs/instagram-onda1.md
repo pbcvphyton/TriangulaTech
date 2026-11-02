@@ -139,18 +139,26 @@ nenhum veículo é rotulado com campo político.
   chocante, explosivo, dramático, colossal, recorde): num texto de capa só fica
   se aparecer no título de pelo menos metade dos veículos do assunto; senão a
   manchete é cortada no último " e " ou "," antes dele (sobrando 5+ palavras),
-  ou usa-se o dek.
+  ou usa-se o dek. "Histórico de/do/da" depois de artigo, possessivo ou "e" é
+  substantivo ("luto e histórico de segurança na malha"). Se tirar a palavra
+  deixar emenda sem sentido ("luto e de segurança"), o texto é omitido.
 - **Verbos para veículo:** destacou, enfatizou, priorizou, focou, registrou,
   citou, publicou às. Proibidos: omitiu, ignorou, escondeu, distorceu, errou,
   enviesou, furou, atrasou, admitiu.
 - **Horário** sempre em BRT, "horário informado pelo veículo"; nunca "primeiro
   a noticiar" nem "furo".
 - **Laranja:** um destaque por slide, número ou substantivo; nunca adjetivo,
-  veículo, partido ou político.
+  veículo, partido ou político. No waffle, o laranja fica no quadrado do racha
+  e no gancho; as contagens da legenda vão em tinta.
+- **Concordância pelo numerador:** "1 de 24 assuntos dividiu", "0 de 14
+  assuntos dividiram".
+- **Gancho em caixa alta:** o número fica preso à palavra seguinte e "só"/"de"
+  ao número (espaço inseparável: nunca "MESMO FATO, 4 / VEÍCULOS"); hora no
+  gancho sai com "h" minúsculo ("LEITURA DAS 06h52"); duração vai por extenso.
 - **Legenda:** linha 1 (≤ 110 caracteres, única no dia, com o número e o
-  contraste); linha em branco; 3–5 linhas "▸"; uma linha de método; 1 CTA (o
-  mesmo do último slide); 3–4 hashtags; até 1.300 caracteres; sem emoji em
-  tragédia.
+  contraste); linha em branco; 3–5 linhas "▸" (as opcionais saem de trás para a
+  frente, nunca abaixo de 3); uma linha de método; 1 CTA (o mesmo do último
+  slide); 3–4 hashtags; até 1.300 caracteres; sem emoji em tragédia.
 - **Alt text:** todo slide, com o texto integral; quando há gráfico, a frase
   gerada pela mesma função que desenha o gráfico.
 
@@ -167,22 +175,56 @@ Raio-X dos 3 dias anteriores).
 
 Gancho por molde (≤ 90 caracteres, só o rótulo da minoria em laranja): G2
 minoria ("11 VEÍCULOS, MESMO FATO. 6 DESTACARAM SINERGIA EM IA. SÓ 2,
-COMPLEXIDADE DE GOVERNANÇA."), G3 empate, G0 padrão, compacto, sem rótulo.
-Maioria e minoria pela contagem; nunca "Lado A" como título.
+COMPLEXIDADE DE GOVERNANÇA."), G3 empate ("metade" só quando todos tomaram
+lado), G0 padrão, compacto (o do G2 guarda o "só": "6 DE 11 DESTACARAM SINERGIA
+EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."), sem rótulo. Maioria e minoria pela
+contagem; nunca "Lado A" como título. Quando o assunto teve veículos fora da
+análise, a contagem vira "11 VEÍCULOS ANALISADOS" (o relógio do mesmo carrossel
+conta os 12 que publicaram); passando de 90, cai no compacto.
 
-Slides: 1 capa-tensão com barra A | N | B; 2 o fato (nunca repete o gancho);
-3 a maioria; 4 a minoria + sem lado; 5 Relógio da notícia (válido com 4+
-veículos com horário e span ≥ 30 min; senão "A atenção"); 6 o que isso
-significa (conclusão + espectro, sem percentual); 7 por que importa (some sem
+Slides: 1 capa-tensão com barra A | N | B e o subtítulo que diz qual é o fato,
+com sujeito e o quê (o assunto ou a manchete só sem o adjetivo da casa; a linha
+fina só se nomear o fato; senão a frase do corpo que o nomeia, cortada na
+vírgula; nunca título literal de veículo: 29/10, "Pelo menos 68 pessoas
+morreram… colisão entre dois trens…"); 2 o fato (nunca repete a capa nem o
+gancho); 3 a maioria; 4 a minoria + sem lado (no empate, os chapéus são
+"Metade"/"A outra metade" só sem neutros; com neutros, "Empate · um lado"/
+"Empate · o outro lado"); 5 Relógio da notícia (válido com 4+ veículos com
+horário e span ≥ 30 min; senão "A atenção"); título com a duração por extenso
+("15 VEÍCULOS EM MAIS DE 18 HORAS", "QUASE 23 HORAS"; o exato fica sobre o eixo);
+a data vai no eixo, uma vez (na 1ª marca e em cada virada), as linhas só com
+HHhMM e o veículo, e uma legenda sob o eixo nomeia cada cor (● maioria ● sem
+lado ● minoria ○ fora da análise); nenhum veículo escondido em "+k" com 12 ou
+menos (as linhas de contexto saem antes); 6 o que isso significa (conclusão +
+espectro, sem percentual): a conclusão da IA só com as frases que a contagem
+sustenta (sai a que atribui um lado a um grupo de veículos que não medimos,
+"veículos internacionais", "agências", "jornais generalistas"; a de proporção
+quando a maioria não passa da metade; a de número que não é uma das contagens);
+sem nenhuma, o molde com os números do espectro, a janela de horário de cada
+lado quando elas não se cruzam e a conta por idioma ("Entre os veículos em
+inglês, 2 destacaram X e 3, Y; em português, 3 e 2."); a lista "fora da
+análise" com nomes inteiros e "+k"; 7 por que importa (some sem
 `why_it_matters`); 8 Placar do dia + método + CTA "Leu só uma versão? Mande
-para quem leu a outra.".
+para quem leu a outra." no gancho condensado (como o fecho do Número), sem seta.
+
+Legenda: "▸ O fato" com sujeito e o quê (o subtítulo da capa ou o slide 2, o
+que nomear o fato); os sem lado vão na linha da minoria; relógio com "(11
+analisados)" quando houve veículo fora da análise; até 5 linhas "▸".
 
 ### 5.2 Placar do dia (variante da noite, 4 slides)
 
 Quando nenhuma story é elegível e a base do placar ≥ 10: capa "X DE Y ASSUNTOS
-DIVIDIRAM A COBERTURA HOJE" (selo "DIA DE CONSENSO" com 0), o maior consenso
-(ou os rachas), o mais coberto com o relógio, método + "Salve: o placar sai
-todo dia.".
+DIVIDIRAM A COBERTURA HOJE" ("1 DE 17 ASSUNTOS DIVIDIU…"; selo "DIA DE
+CONSENSO" com 0), o maior consenso (ou os rachas: no empate a barra diz "de um
+lado"/"do outro", nunca "maioria"; rótulo hiperbólico, "riscos astronômicos",
+não vira rótulo), o mais coberto com o relógio (no período eleitoral, quando o
+primeiro do ranking é eleição de outro país, o seguinte; se for o mesmo assunto
+do slide 2, "O mesmo assunto foi o mais coberto do dia"), método + "Salve: o
+placar sai todo dia." no gancho condensado. "Por editoria": assunto comparado
+sem matéria cuja metade dos veículos é esportiva no dia conta em Esporte (a Bola
+de Ouro veio como mercados em 27/10). Legenda com 3 a 5 linhas "▸" (dividiram ou
+maior consenso, o mais coberto, por editoria, o maior consenso, a pauta
+solitária).
 
 ### 5.3 Número do dia (12:00, 3 slides, laranja) — `formatos/numero.py`
 
@@ -272,7 +314,9 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   Nada essencial a menos de 72 px das laterais.
 - **Gráficos** (`graficos.py`, funções puras que devolvem `(svg, descricao)`):
   barra A/N/B, relógio, espectro, waffle, matriz de pontos, linha, barras de
-  variação, checklist.
+  variação, checklist. Nenhum texto sai do quadro do SVG (o guarda do render não
+  mede texto de SVG; os testes medem); nome de veículo não é cortado com
+  reticências: lista longa vira "nomes inteiros +k".
 
 ## 7. Perfil
 
