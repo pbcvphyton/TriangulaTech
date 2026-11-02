@@ -1047,12 +1047,16 @@ def barras_variacao(
     casas: int = 2,
     max_barras: int = 30,
     rotulo_hoje: str = "hoje",
+    parciais: Iterable[date] = (),
 ) -> tuple[Markup, str]:
     """Barras das variações diárias (%), a última (hoje) em laranja.
 
     - ``changes``: ``[(data ou datetime, variação em %), …]``; ficam as ``max_barras`` mais recentes.
     - ``escala``: a variação típica (escala robusta, em %); desenha tracejados em ±2 e ±3 vezes ela
-      e a anotação "2,6 vezes a variação típica". Sem escala, só as barras.
+      e a anotação "2,6 vezes a variação típica". Sem escala, só as barras. Quando os tracejados de
+      2× e 3× ficam a menos de 28 px um do outro (dia muito fora do comum), um rótulo só por sinal ("+2–3×").
+    - ``parciais``: dias cuja leitura é do meio do pregão, e não o fechamento: barra vazada e uma
+      linha na base dizendo quantas são (não se compara fechamento com leitura parcial sem aviso).
     """
     pts = sorted(((_dia(d), float(c)) for d, c in changes), key=lambda p: p[0])[-max_barras:]
     n = len(pts)
@@ -1060,6 +1064,8 @@ def barras_variacao(
         return _vazio("barras", "sem leituras", "Gráfico: barras sem leituras.", largura)
     d0, dn = pts[0][0], pts[-1][0]
     hoje = pts[-1][1]
+    parciais = {_dia(d) for d in parciais}
+    k_parciais = sum(1 for d, _ in pts[:-1] if d in parciais)
     z = abs(hoje) / escala if escala else None
     vez = "vez" if z is not None and z < 2 else "vezes"  # "1,6 vez", "2,6 vezes"
     descricao = f"Gráfico: barras com {n} {_plural(n, 'variação diária', 'variações diárias')}"
@@ -1068,9 +1074,14 @@ def barras_variacao(
     if z is not None:
         descricao += (f", {_num(z, 1)} {vez} a variação típica de {_num(escala, 2)}%; "
                       "linhas tracejadas em 2 e 3 vezes essa variação")
+    nota_parciais = ""
+    if k_parciais:
+        nota_parciais = (f"vazadas: {k_parciais} {_plural(k_parciais, 'leitura')} do meio do pregão, "
+                         "sem o fechamento")
+        descricao += f"; {nota_parciais}"
     descricao += "."
 
-    topo, pe, dir_ = 96, 86, (82 if escala else 0)
+    topo, pe, dir_ = 96, 86 + (30 if nota_parciais else 0), (82 if escala else 0)
     plot_w = largura - dir_
     plot_h = altura - topo - pe
     m = max(max(abs(c) for _, c in pts), 3 * escala if escala else 0, 0.01) * 1.08
@@ -1081,12 +1092,17 @@ def barras_variacao(
 
     corpo: list[str] = []
     if escala:
-        for k in (2, 3):
-            for s in (1, -1):
+        juntos = abs(Y(2 * escala) - Y(3 * escala)) < 28  # os rótulos de 22 px se encostariam
+        for s in (1, -1):
+            sinal_ = "+" if s > 0 else MENOS
+            for k in (2, 3):
                 y = Y(s * k * escala)
                 corpo.append(_linha(0, y, plot_w, y, "var(--ink3)", 2, " stroke-dasharray='8 8'"))
-                rot = f"{'+' if s > 0 else MENOS}{k}×"
-                corpo.append(_texto(largura, y + 8, rot, "mono", 22, "var(--ink2)", "end"))
+                if not juntos:
+                    corpo.append(_texto(largura, y + 8, f"{sinal_}{k}×", "mono", 22, "var(--ink2)", "end"))
+            if juntos:
+                y = (Y(s * 2 * escala) + Y(s * 3 * escala)) / 2
+                corpo.append(_texto(largura, y + 8, f"{sinal_}2–3×", "mono", 22, "var(--ink2)", "end"))
     passo = plot_w / n
     bw = min(24.0, passo * 0.62)
     for i, (d, c) in enumerate(pts):
@@ -1094,6 +1110,9 @@ def barras_variacao(
         y, h = min(Y(c), y0), max(abs(Y(c) - y0), 2)
         if i == n - 1:
             corpo.append(_rect(x, y, bw, h, "var(--g-hi)", rx=3))
+        elif d in parciais:  # leitura do meio do pregão: só o contorno
+            corpo.append(_rect(x + 1, y + 1, bw - 2, max(h - 2, 1), "none", rx=3,
+                               extra=" stroke='var(--g-n)' stroke-width='2'"))
         else:
             corpo.append(_rect(x, y, bw, h, "var(--g-n)", rx=3, extra=" fill-opacity='0.55'"))
     corpo.append(_linha(0, y0, plot_w, y0, "var(--rule3)", 2))
@@ -1110,7 +1129,10 @@ def barras_variacao(
     base = f"{n} {_plural(n, 'leitura diária', 'leituras diárias')}"
     if escala:
         base += f" · variação típica {_num(escala, 2)}% (escala robusta)"
-    corpo.append(_texto(0, altura - 8, _cabe(base, "mono", 22, largura), "mono", 22, "var(--ink2)"))
+    y_base = altura - 8 - (30 if nota_parciais else 0)
+    corpo.append(_texto(0, y_base, _cabe(base, "mono", 22, largura), "mono", 22, "var(--ink2)"))
+    if nota_parciais:
+        corpo.append(_texto(0, altura - 8, _cabe(nota_parciais, "mono", 22, largura), "mono", 22, "var(--ink2)"))
     return _svg("barras", largura, altura, corpo, descricao), descricao
 
 

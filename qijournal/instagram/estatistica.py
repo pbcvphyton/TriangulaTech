@@ -113,6 +113,13 @@ def hora(dt: datetime, ref: date | None = None) -> str:
     return label if ref is None or local.date() == ref else f"{local:%d/%m} {label}"
 
 
+def horas(ats: Sequence[datetime], ref: date | None = None) -> list[str]:
+    """:func:`hora` de cada horário de uma lista, com a data em todos se algum não for do dia ``ref``:
+    "28/10 10h51" e "29/10 04h47", nunca "28/10 10h51" ao lado de "04h47"."""
+    com_data = ref is not None and any(dt.astimezone(TZ).date() != ref for dt in ats)
+    return [f"{dt.astimezone(TZ):%d/%m} {hora(dt)}" if com_data else hora(dt) for dt in ats]
+
+
 def duracao(delta: timedelta) -> str:
     """``timedelta(hours=16, minutes=44)`` → ``"16h44"``; menos de 1 h → ``"38 min"``."""
     minutes = int(delta.total_seconds() // 60)
@@ -243,6 +250,12 @@ def eleicao_escrita(*textos: str | None) -> bool:
     return any(_ELEICAO_ESCRITA.search(t) for t in textos if t)
 
 
+def eleicao_na_cobertura(cov: Coverage, story: Story | None) -> bool:
+    """A cobertura tem eleição no assunto ou na manchete (:func:`eleicao_escrita`), de qualquer país.
+    Esporte fica de fora: "reeleição na Fifa" (24/10) não é eleição."""
+    return coverage_section(cov, story) != "esporte" and eleicao_escrita(cov.topic, story.headline if story else "")
+
+
 def is_political_coverage(cov: Coverage, story: Story | None, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
     section = coverage_section(cov, story)
     head = " ".join([cov.topic, cov.side_a, cov.side_b, story.headline if story else "", story.dek if story else ""])
@@ -353,7 +366,8 @@ def _limpo(texto: str) -> bool:
 def tese_da_materia(edition: Edition, story: Story, limite: int = TESE_MAX_PALAVRAS) -> str:
     """Tese de capa a partir da matéria (§4.4): a manchete sem adjetivo da casa; com mais de
     ``limite`` palavras, cortada no último " e " ou ","; senão o assunto da cobertura; se
-    ainda passar, a linha fina cortada na última vírgula antes da palavra ``limite``.
+    ainda passar, a linha fina cortada na última vírgula antes da palavra ``limite`` (com o
+    sujeito da manchete na frente, se foi o adjetivo que a derrubou e a linha fina não o diz).
     Candidata com palavra proibida do lint ("em meio a"...) passa a vez para a seguinte."""
     titulos = titulos_por_veiculo(topic_of(edition, story.id))
     topic = story.coverage.topic if story.coverage and story.coverage.topic else ""
@@ -364,8 +378,83 @@ def tese_da_materia(edition: Edition, story: Story, limite: int = TESE_MAX_PALAV
         if cut:
             candidatas.append(cut)
     dek = sem_adj_casa(story.dek, titulos) or _plain(story.dek)
+    # A manchete caiu só pelo adjetivo da casa: a linha fina vira a tese, com o sujeito na frente
+    # se ela não o disser ("Embraer: volume total de encomendas…", 24/10).
+    if dek and ADJ_CASA.search(_plain(story.headline)) and not sem_adj_casa(story.headline, titulos):
+        com_sujeito = _com_sujeito(dek, story, titulos, limite)
+        if com_sujeito:
+            candidatas.append(com_sujeito)
     candidatas.append(_corta_palavras(dek or _plain(story.headline), limite))
     return next((c for c in candidatas if _limpo(c)), candidatas[-1])
+
+
+_ENTIDADE = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕ][\wÀ-ú]{3,}")
+_LIGA_NOME = {"de", "da", "do", "dos", "das"}  # "Bola de Ouro" é um nome só
+_SUJEITOS_FORA = {"brasil", "governo"}
+
+
+def sujeito(story: Story, titulos: Sequence[str] = ()) -> str:
+    """De quem é a manchete: o nome próprio dela ("Embraer", "Bola de Ouro") que está, com a mesma
+    grafia, no título de pelo menos metade dos veículos; dois nomes ligados por "e" vão juntos
+    ("Nvidia e Meta"). A palavra que abre a frase só é nome se estiver no título de metade dos
+    veículos. Político, partido, Brasil e Governo nunca; "" se não houver."""
+    if not titulos:
+        return ""
+    words = [w.strip(",.;:()“”\"'") for w in _plain(story.headline).split()]
+
+    def vezes(n: str) -> int:
+        pattern = re.compile(r"(?<![\wÀ-ú])" + re.escape(n) + r"(?![\wÀ-ú])")
+        return sum(1 for t in titulos if pattern.search(_plain(t)))
+
+    def eh_nome(i: int) -> bool:
+        return bool(_ENTIDADE.fullmatch(words[i])) and (i > 0 or 2 * vezes(words[i]) >= len(titulos))
+
+    nomes: list[tuple[int, int]] = []  # (início, fim) de cada nome na manchete
+    i = 0
+    while i < len(words):
+        if not eh_nome(i):
+            i += 1
+            continue
+        j = i
+        while True:
+            if j + 1 < len(words) and eh_nome(j + 1):
+                j += 1
+            elif j + 2 < len(words) and words[j + 1].lower() in _LIGA_NOME and eh_nome(j + 2):
+                j += 2
+            else:
+                break
+        nomes.append((i, j))
+        i = j + 1
+
+    def vale(n: str) -> bool:
+        return (
+            _fold(n) not in _SUJEITOS_FORA and not cita_nome(n, NOMES_ELEICAO, ignora_caixa=True)
+            and not cita_partido(n) and 2 * vezes(n) >= len(titulos)
+        )
+
+    validos = [(a, b) for a, b in nomes if vale(" ".join(words[a : b + 1]))]
+    if not validos:
+        return ""
+    for (a1, b1), (a2, b2) in zip(validos, validos[1:]):
+        if a2 == b1 + 2 and words[b1 + 1].lower() == "e":
+            return f"{' '.join(words[a1 : b1 + 1])} e {' '.join(words[a2 : b2 + 1])}"
+    a, b = max(validos, key=lambda ab: (vezes(" ".join(words[ab[0] : ab[1] + 1])), ab[0] > 0))
+    return " ".join(words[a : b + 1])
+
+
+def _com_sujeito(dek: str, story: Story, titulos: Sequence[str], limite: int) -> str:
+    """A linha fina com o sujeito da manchete na frente, quando ela não o diz
+    ("Embraer: volume total de encomendas avança 14% em doze meses"); "" se não precisa."""
+    quem = sujeito(story, titulos)
+    if not quem or _fold(quem) in _fold(dek):
+        return ""
+    corpo = _corta_palavras(dek, limite - len(quem.split()))
+    primeira = corpo.split(" ", 1)[0]
+    # "Volume" só abre a frase e vai em minúscula; nome próprio (maiúsculo no meio de algum título) fica.
+    meio = re.compile(r"\S\s+" + re.escape(primeira) + r"\b")
+    if primeira[1:2].islower() and not any(meio.search(_plain(t)) for t in [*titulos, story.headline, dek]):
+        corpo = corpo[:1].lower() + corpo[1:]
+    return f"{quem}: {corpo}"
 
 
 def numero_destaque(texto: str) -> tuple[str, str] | None:
@@ -442,13 +531,18 @@ class Placar:
 
 
 def placar(edition: Edition, *, election: bool, nomes: Iterable[str] = NOMES_ELEICAO) -> Placar:
-    """Quantos dos assuntos comparados com 4+ veículos dividiram a imprensa (política fora no período eleitoral)."""
+    """Quantos dos assuntos comparados com 4+ veículos dividiram a imprensa.
+
+    No período eleitoral, política, assunto eleitoral e eleição de outro país no título
+    (:func:`eleicao_na_cobertura`: "Israel vai às urnas", 27/10) ficam fora da base: capa,
+    waffle, "por editoria" e a lista dos rachas contam a mesma coisa.
+    """
     nomes = tuple(nomes)
     result = Placar(0, 0)
     for cov, story in coverages(edition):
         if len(cov.outlets) < PLACAR_MIN_OUTLETS:
             continue
-        if election and is_political_coverage(cov, story, nomes):
+        if election and (is_political_coverage(cov, story, nomes) or eleicao_na_cobertura(cov, story)):
             continue
         racha = is_racha(cov)
         result.base += 1
@@ -661,6 +755,17 @@ def stale_reading(p: Ponto) -> bool:
     return local.hour < 7 and not p.change_pct
 
 
+def leitura_velha(qid: str, p: Ponto, day: date, anterior: Edition | None = None) -> bool:
+    """A variação da leitura não é notícia no dia ``day`` (§3: "sem variação quando a leitura é velha"):
+    começo do dia sem variação (:func:`stale_reading`), a mesma cotação da edição ``anterior`` (o dólar
+    de sábado 06h58 repetido no domingo, 25/10) ou, fora dos pregões com fechamento, leitura de outro dia."""
+    if stale_reading(p):
+        return True
+    if anterior is not None and any(q.id == qid and _parse_dt(q.as_of) == p.as_of for q in anterior.quotes):
+        return True
+    return qid not in FECHAMENTO_IDS and p.day < day
+
+
 def selo_leitura(qid: str, ponto: Ponto, ref: date | None = None) -> str:
     """De quando é a cotação: ``"fech. 20/10"`` (só fechamento de pregão), senão
     ``"leitura das 06h55"`` (``"leitura de 23/10, 17h06"`` se não é do dia ``ref``);
@@ -808,8 +913,11 @@ def _prova_triangulado(edition: Edition, topic: IndexTopic, core: str, valor: st
         row["confirmado"] = row["confirmado"] or _title_has(core, item.title or "")
         at = _parse_dt(item.published)
         if at is not None and (row["at"] is None or at < row["at"]):
-            row["at"], row["hora"] = at, hora(at, day)
+            row["at"] = at
     ordered = sorted(rows.values(), key=lambda r: (r["at"] is None, r["at"] or datetime.min.replace(tzinfo=TZ)))
+    com_hora = [r for r in ordered if r["at"] is not None]
+    for r, h in zip(com_hora, horas([r["at"] for r in com_hora], day)):  # data em todos se algum for de outro dia
+        r["hora"] = h
     confirmados = sum(1 for r in ordered if r["confirmado"])
     return {
         "veiculos": ordered,
@@ -866,17 +974,57 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
     return [n for _, n in out]
 
 
-def _mercado(edition: Edition, history: list[Edition], z_min: float, passo: int) -> Numero | None:
+# Como o ativo aparece no título de uma matéria (filtro eleitoral do Número de mercado).
+_ATIVO_NO_TITULO = {
+    "ibov": re.compile(r"\b(?:ibovespa|b3)\b|\bbolsas?\b(?!\s+fam[íi]lia)", re.I),
+    "usd": re.compile(r"\bd[óo]lar(?:es)?\b|\bc[âa]mbio\b", re.I),
+    "brent": re.compile(r"\b(?:brent|petr[óo]leo)\b", re.I),
+    "btc": re.compile(r"\b(?:bitcoin|criptomoedas?|cripto)\b", re.I),
+    "spx": re.compile(r"\bS&P\b|\b(?:wall street|nasdaq|dow jones)\b", re.I),
+    "gold": re.compile(r"\bouro\b", re.I),
+}
+
+
+def mercado_eleitoral(edition: Edition, qid: str, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
+    """Alguma matéria do dia com o ativo no título é eleitoral (:func:`story_is_electoral`, ou eleição
+    com todas as letras na manchete)? "Ibovespa desaba 13,88%… após eleição" (27/10): no período
+    eleitoral, a variação do dia é o assunto da eleição e não vira o Número."""
+    pattern = _ATIVO_NO_TITULO.get(qid)
+    if pattern is None:
+        return False
+    nomes = tuple(nomes)
+    return any(
+        pattern.search(_plain(s.headline)) and (story_is_electoral(s, nomes) or eleicao_escrita(s.headline))
+        for s in edition.stories
+    )
+
+
+def _mercado(
+    edition: Edition,
+    history: list[Edition],
+    z_min: float,
+    passo: int,
+    *,
+    election: bool = False,
+    nomes: Iterable[str] = NOMES_ELEICAO,
+) -> Numero | None:
+    """Passos 1 e 4: a variação do dia ``z_min`` vezes a típica do ativo. Leitura velha não vale
+    (:func:`leitura_velha` contra a edição anterior do ``history``); no período eleitoral, nem o ativo
+    de matéria eleitoral do dia (:func:`mercado_eleitoral`). Fechamento de outro dia vai no pretérito,
+    com a data ("Ibovespa caiu 13,88% em 26/10")."""
     best: tuple[float, Numero] | None = None
     labels = {q.id: q.label for q in edition.quotes}
     day = date.fromisoformat(edition.date)
+    anterior = max((e for e in history if e.date < edition.date), key=lambda e: e.date, default=None)
     for qid in MERCADO_Z_IDS:
         q = next((q for q in edition.quotes if q.id == qid), None)
         at = _parse_dt(q.as_of) if q else None
         if q is None or at is None or q.change_pct is None:
             continue
         p = Ponto(at, q.value, q.change_pct)
-        if stale_reading(p):
+        if leitura_velha(qid, p, day, anterior):
+            continue
+        if election and mercado_eleitoral(edition, qid, nomes):
             continue
         series = [x for x in serie(history, qid) if x.as_of < at]
         scale = escala_robusta(series)
@@ -886,16 +1034,20 @@ def _mercado(edition: Edition, history: list[Edition], z_min: float, passo: int)
         if z < z_min:
             continue
         label = labels.get(qid, qid)
-        verb = "sobe" if q.change_pct > 0 else "cai"
+        pct = f"{abs(q.change_pct):.2f}%".replace(".", ",")
+        if p.day < day:  # o fechamento de ontem: o fato já aconteceu
+            tese = f"{label} {'subiu' if q.change_pct > 0 else 'caiu'} {pct} em {p.day:%d/%m}"
+        else:
+            tese = f"{label} {'sobe' if q.change_pct > 0 else 'cai'} {pct}"
         when = selo_leitura(qid, p, day)
         sign = "+" if q.change_pct > 0 else "−"
-        valor = f"{sign}{abs(q.change_pct):.2f}%".replace(".", ",")
+        valor = f"{sign}{pct}"
         recent = [x for x in series if x.change_pct is not None and not stale_reading(x)][-29:]
         variacoes = [{**_ponto_json(qid, x, day), "hoje": False} for x in recent]
         variacoes.append({**_ponto_json(qid, p, day), "hoje": True})
         numero = Numero(
             valor=valor,
-            tese=f"{label} {verb} {abs(q.change_pct):.2f}%".replace(".", ","),
+            tese=tese,
             selo=f"{q.source or 'Yahoo Finance'} · {when}",
             tipo="mercado",
             metodo=f"Variação do dia {num(z, 1)} vezes a típica do ativo "
@@ -983,6 +1135,32 @@ def _concentracao_numero(
     return None
 
 
+def _outros_no_periodo(
+    found: list[tuple[str, list[Ponto], Acumulado]], qid: str, acc: Acumulado, labels: dict[str, str]
+) -> list[dict[str, Any]]:
+    """Os outros ativos na mesma janela do acumulado principal (§3: ponta a ponta, com as duas datas):
+    as leituras de cada um entre o primeiro e o último dia dele. ``mesmas_pontas`` diz se os dias de ida
+    e volta batem; senão, o texto escreve as datas do outro ("Brent +9,8% (29/09 a 20/10)")."""
+    ini, fim = acc.first.day, acc.last.day
+    out = []
+    for o, pts, _ in found:
+        if o == qid:
+            continue
+        a = acumulado([p for p in pts if ini <= p.day <= fim])
+        if a is None:
+            continue
+        out.append({
+            "qid": o,
+            "ativo": labels.get(o, o),
+            "pct": a.pct,
+            "pct_fmt": sinal(a.pct),
+            "de": f"{a.first.day:%d/%m}",
+            "ate": f"{a.last.day:%d/%m}",
+            "mesmas_pontas": a.first.day == ini and a.last.day == fim,
+        })
+    return out
+
+
 def _acumulados(edition: Edition, history: list[Edition], min_pontos: int) -> list[Numero]:
     """Acumulado ponta a ponta de cada ativo com série suficiente, do maior |%| ao menor."""
     labels = {q.id: q.label for q in edition.quotes}
@@ -1022,11 +1200,7 @@ def _acumulados(edition: Edition, history: list[Edition], min_pontos: int) -> li
                     "min": _ponto_json(qid, acc.low),
                     "pct": acc.pct,
                     "leituras": len(pontos),
-                    "outros": [
-                        {"qid": o, "ativo": labels.get(o, o), "pct": a.pct, "pct_fmt": sinal(a.pct)}
-                        for o, _, a in found
-                        if o != qid
-                    ],
+                    "outros": _outros_no_periodo(found, qid, acc, labels),
                 },
             )
         )
@@ -1089,7 +1263,8 @@ def numero_do_dia(
 ) -> Numero | None:
     """O Número do dia, pelo primeiro passo que tiver candidato (§4.4):
 
-    1. mercado fora do comum (variação ≥ 3 desvios robustos do próprio ativo);
+    1. mercado fora do comum (variação ≥ 3 desvios robustos do próprio ativo; leitura velha não
+       vale e, no período eleitoral, nem o ativo de matéria eleitoral do dia, como no passo 4);
     2. número triangulado (no título de 3+ veículos), fora de ``exclude`` e de ``usados``;
     3. o assunto mais coberto fora de ``exclude``, se tiver 12+ veículos;
     4. mercado com variação ≥ 2 desvios robustos;
@@ -1116,7 +1291,7 @@ def numero_do_dia(
     def vale(n: Numero | None, passo: int) -> bool:
         return n is not None and passo > apos and n.chave not in fora
 
-    forte = _mercado(edition, past, Z_FORTE, 1) if apos < 1 else None
+    forte = _mercado(edition, past, Z_FORTE, 1, election=election, nomes=nomes) if apos < 1 else None
     if vale(forte, 1):
         return forte
     if edition.mode == "ai":
@@ -1129,7 +1304,7 @@ def numero_do_dia(
             conc = _concentracao_numero(edition, election=election, nomes=nomes, exclude=excluded, usados=ja | fora)
             if conc:
                 return conc
-    medio = _mercado(edition, past, Z_MEDIO, 4) if apos < 4 else None
+    medio = _mercado(edition, past, Z_MEDIO, 4, election=election, nomes=nomes) if apos < 4 else None
     if vale(medio, 4):
         return medio
     acumulados = [n for n in _acumulados(edition, upto, min_pontos) if n.chave not in fora]

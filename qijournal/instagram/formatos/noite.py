@@ -131,8 +131,9 @@ def _sem_adj(texto: str, titulos: list[str]) -> str:
 
 
 def _eleicao(cov: Coverage, st: Story | None) -> bool:
-    """A cobertura é de uma eleição com todas as letras (:func:`.estatistica.eleicao_escrita`), de qualquer país."""
-    return E.eleicao_escrita(cov.topic, st.headline if st else "")
+    """A cobertura é de uma eleição com todas as letras, de qualquer país (a mesma regra da base do
+    placar: :func:`.estatistica.eleicao_na_cobertura`)."""
+    return E.eleicao_na_cobertura(cov, st)
 
 
 def _cita_veiculo(texto: str, nomes: Iterable[str]) -> bool:
@@ -325,17 +326,18 @@ def _lado_ctx(
     horas: dict[str, datetime],
     day: date,
 ) -> tuple[list[dict[str, str]], list[str]]:
-    """Até 3 veículos com enquadramento ("Veículo · framing", com a hora) e os demais só pelo nome."""
+    """Até 3 veículos com enquadramento ("Veículo · framing", com a hora) e os demais só pelo nome.
+    Se uma das horas for de outro dia, todas levam a data ("20/10 22h49" ao lado de "21/10 03h36")."""
     mostrados, resto = [], []
     for o in outlets:
         framing = plain(o.framing)
         if framing and len(mostrados) < LADO_FRAMINGS:
-            at = horas.get(o.name)
-            mostrados.append(
-                {"name": o.name, "hora": E.hora(at, day) if at else "", "framing": truncate_sentence(framing, FRAMING_MAX)}
-            )
+            mostrados.append({"name": o.name, "hora": "", "framing": truncate_sentence(framing, FRAMING_MAX)})
         else:
             resto.append(o.name)
+    com_hora = [m for m in mostrados if horas.get(m["name"])]
+    for m, h in zip(com_hora, E.horas([horas[m["name"]] for m in com_hora], day)):
+        m["hora"] = h
     return mostrados, resto
 
 

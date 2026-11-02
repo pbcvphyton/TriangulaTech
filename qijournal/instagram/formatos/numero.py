@@ -137,10 +137,12 @@ def _limpo(texto: str) -> bool:
 
 
 def _horas(veiculos: list[dict[str, Any]], day: date) -> tuple[str, str]:
+    """O primeiro e o último horário; se um deles tiver data, os dois têm ("28/10 10h51" a "29/10 04h47")."""
     ats = [v["at"] for v in veiculos if v.get("at")]
     if not ats:
         return "", ""
-    return E.hora(min(ats), day), E.hora(max(ats), day)
+    ini, fim = E.horas([min(ats), max(ats)], day)
+    return ini, fim
 
 
 def _lista(nomes: list[str]) -> str:
@@ -161,15 +163,20 @@ def _materia(edition: Edition, n: E.Numero) -> Story | None:
 
 def _fato(n: E.Numero, edition: Edition, limite: int = 170) -> str:
     """De que é o número, para o slide 2 se sustentar sozinho: a linha fina da matéria (sem palavra
-    proibida do lint e com até ``limite`` caracteres); senão, a tese. Se a tese da capa saiu da linha
-    fina, só o resto dela ("Puxado por forte demanda…"), ou "": o slide 2 não repete a capa."""
+    proibida do lint; com mais de ``limite`` caracteres, até a última vírgula antes dele). Se a tese
+    da capa saiu da linha fina, só o resto dela ("Puxado por forte demanda…"), ou "": o slide 2
+    nunca repete a capa."""
     story = _materia(edition, n)
     dek = " ".join(plain(story.dek).split()) if story is not None else ""
     tese = " ".join(n.tese.rstrip(".").split())
-    if dek and E._fold(tese) in E._fold(dek):
-        resto = dek[len(tese):].lstrip(" ,;:—-") if dek.startswith(tese) else ""
+    nucleo = tese.split(": ", 1)[-1]  # "Embraer: volume total…": a parte que veio da linha fina
+    if dek and E._fold(nucleo) in E._fold(dek):
+        resto = dek[len(nucleo):].lstrip(" ,;:—-") if E._fold(dek).startswith(E._fold(nucleo)) else ""
         return resto[:1].upper() + resto[1:] if len(resto.split()) >= 4 and _limpo(resto) else ""
-    return dek if _limpo(dek) and len(dek) <= limite else f"O número: {n.tese}."
+    if len(dek) > limite:
+        corte = max(dek.rfind(", ", 0, limite), dek.rfind("; ", 0, limite))
+        dek = dek[:corte].rstrip() + "." if corte > 0 and len(dek[:corte].split()) >= 5 else ""
+    return dek if _limpo(dek) else ""
 
 
 def _data_iso(value: str) -> str:
@@ -256,7 +263,7 @@ def _prova_triangulado(n: E.Numero, edition: Edition, day: date) -> dict[str, An
         "minimo": linhas_max * CHECKLIST_LINHA_MIN + 64,
         "teto": linhas_max * 72 + 64,
         "contexto": [c for c in (_fato(n, edition), horario) if c],
-        "pe": f"Fonte: títulos do índice de {short_date(day)} · nenhum título reproduzido",
+        "pe": f"Base: {p['total']} veículos que publicaram o assunto · nenhum título reproduzido",
         "fonte": f"títulos do índice da edição de {short_date(day)}",
         "periodo": f"{ini} a {fim}" if ini else short_date(day),
         "base": f"{p['total']} veículos que publicaram o assunto",
@@ -282,19 +289,39 @@ def _prova_concentracao(n: E.Numero, edition: Edition, day: date) -> dict[str, A
         "minimo": 420,
         "teto": 760,
         "contexto": [f"Em laranja: {n.tese.rstrip('.')}."],
-        "pe": f"Fonte: índice da edição de {short_date(day)} · agrupamento automático",
+        "pe": f"Base: {E.num(p['assuntos'])} assuntos da edição de {short_date(day)} · agrupamento automático",
         "fonte": f"índice da edição de {short_date(day)}",
         "periodo": f"a coleta da edição de {short_date(day)}",
         "base": f"{E.num(p['assuntos'])} assuntos, {E.num(artigos)} notícias",
     }
 
 
+def _quando_var(qid: str, v: dict[str, Any], day: date) -> str:
+    """De quando é uma variação da série, com o selo da leitura: "no fechamento de 26/10" ou
+    "na leitura de 05/10, 13h51" (não se compara fechamento com leitura do meio do pregão sem dizer)."""
+    selo = _quando(qid, v, day)
+    if selo.startswith("fech. "):
+        return f"no fechamento de {selo[6:]}"
+    return f"na {selo}" if selo.startswith("leitura") else f"em {selo}"
+
+
+def _parciais(qid: str, var: list[dict[str, Any]]) -> list[date]:
+    """Os dias da série de um pregão (Ibovespa, S&P 500) cuja leitura é do meio do pregão, e não o fechamento."""
+    if qid not in E.FECHAMENTO_IDS:
+        return []
+    return [v["data"] for v in var if not E.is_close(qid, v["as_of"])]
+
+
 def _prova_mercado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]:
     p = n.prova
+    qid = p["qid"]
     var = p["variacoes"]
     hoje = var[-1]
-    rotulo = "hoje" if hoje["data"] == day else f"leitura de {hoje['dia']}"
-    ativo = nome_corrido(p["qid"], p["ativo"])
+    if hoje["data"] == day:
+        rotulo = "hoje"
+    else:
+        rotulo = f"fech. {hoje['dia']}" if E.is_close(qid, hoje["as_of"]) else f"leitura de {hoje['dia']}"
+    ativo = nome_corrido(qid, p["ativo"])
     z = f"{E.num(p['z'], 1)} {_vezes(p['z'])}"
     anteriores = [v for v in var[:-1] if v["pct"] is not None]
     contexto = []
@@ -303,11 +330,14 @@ def _prova_mercado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]:
         contexto = [
             f"Variação típica do {ativo}: {E.num(p['escala'], 2)}% por dia, nas {len(anteriores)} leituras "
             f"anteriores (desde {anteriores[0]['dia']}).",
-            f"Maior variação anterior no período: {E.sinal(maior['pct'], 2)} em {maior['dia']}.",
+            f"Maior variação anterior no período: {E.sinal(maior['pct'], 2)} {_quando_var(qid, maior, day)}.",
         ]
+    parciais = _parciais(qid, var)
+    k_parciais = sum(1 for d in parciais if d != hoje["data"])
 
     def desenha(altura: int) -> tuple[Markup, str]:
-        return G.barras_variacao([(v["data"], v["pct"]) for v in var], p["escala"], altura=altura, rotulo_hoje=rotulo)
+        return G.barras_variacao([(v["data"], v["pct"]) for v in var], p["escala"], altura=altura, rotulo_hoje=rotulo,
+                                 parciais=parciais)
 
     return {
         "titulo": f"{z} a variação típica do {ativo}",
@@ -316,10 +346,10 @@ def _prova_mercado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]:
         "minimo": 400,
         "teto": GRAFICO_MAX,
         "contexto": contexto,
-        "pe": f"Fonte: {p['fonte']} · uma leitura por dia · " + (f"hoje: {p['leitura']}" if hoje["data"] == day else p["leitura"]),
+        "pe": "Uma leitura por dia · " + (f"hoje: {p['leitura']}" if hoje["data"] == day else p["leitura"]),
         "fonte": p["fonte"],
         "periodo": f"{var[0]['dia']} a {hoje['dia']}",
-        "base": f"{len(var)} leituras diárias",
+        "base": f"{len(var)} leituras diárias" + (f"; {k_parciais} do meio do pregão" if k_parciais else ""),
     }
 
 
@@ -335,10 +365,23 @@ def _extremo(p: dict[str, Any], day: date) -> str:
 
 
 def _outros(p: dict[str, Any]) -> str:
-    """Os 2 outros ativos do Mercado em linha com maior |acumulado|: "Brent +10,1%, dólar −4,1%"."""
+    """Os 2 outros ativos do Mercado em linha com maior |acumulado| na mesma janela, com as duas datas
+    (§3): "No mesmo período, de 28/09 a 20/10: Brent +9,8% (desde 29/09), dólar −4,0%."; "" sem outros."""
     outros = [o for o in p.get("outros", []) if o["qid"] in ("ibov", "usd", "brent", "btc")]
     outros.sort(key=lambda o: -abs(o["pct"]))
-    return ", ".join(f"{nome_corrido(o['qid'], o['ativo'])} {o['pct_fmt']}" for o in outros[:2])
+    ini, fim = p["primeiro"]["dia"], p["ultimo"]["dia"]
+    partes = []
+    for o in outros[:2]:
+        if o.get("mesmas_pontas", True):
+            pontas = ""
+        elif o["ate"] == fim:
+            pontas = f" (desde {o['de']})"
+        elif o["de"] == ini:
+            pontas = f" (até {o['ate']})"
+        else:
+            pontas = f" ({o['de']} a {o['ate']})"
+        partes.append(f"{nome_corrido(o['qid'], o['ativo'])} {o['pct_fmt']}{pontas}")
+    return f"No mesmo período, de {ini} a {fim}: {', '.join(partes)}." if partes else ""
 
 
 def _prova_acumulado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]:
@@ -346,10 +389,7 @@ def _prova_acumulado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]
     qid = p["qid"]
     primeiro, ultimo = p["primeiro"], p["ultimo"]
     de, ate = valor_fmt(qid, primeiro["valor"], unidade=False), valor_fmt(qid, ultimo["valor"], unidade=False)
-    contexto = [_extremo(p, day)]
-    outros = _outros(p)
-    if outros:
-        contexto.append(f"No mesmo período: {outros}.")
+    contexto = [_extremo(p, day), _outros(p)]
 
     def desenha(altura: int) -> tuple[Markup, str]:
         return G.linha(
@@ -367,7 +407,7 @@ def _prova_acumulado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]
         "minimo": 400,
         "teto": GRAFICO_MAX,
         "contexto": [c for c in contexto if c],
-        "pe": "Fonte: Yahoo Finance · uma leitura por dia · variação ponta a ponta",
+        "pe": "Uma leitura por dia · variação ponta a ponta",
         "fonte": "Yahoo Finance",
         "periodo": f"{_quando(qid, primeiro, day)} a {_quando(qid, ultimo, day)}",
         "base": f"{p['leituras']} leituras" + (f"; {len(p['faltantes'])} pregões sem leitura" if p["faltantes"] else ""),
@@ -387,7 +427,7 @@ def _prova_juro(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]:
             f"Selic de {selic_dia}; IPCA acumulado em 12 meses até {p['ipca_ref']}.",
             "O juro real não é a diferença simples entre as duas taxas: a conta divide uma pela outra.",
         ],
-        "pe": f"Fonte: {p['fonte']} · Selic de {selic_dia} · IPCA 12m até {p['ipca_ref']}",
+        "pe": f"Selic de {selic_dia} · IPCA 12m até {p['ipca_ref']}",
         "fonte": p["fonte"],
         "periodo": f"Selic de {selic_dia}; IPCA de 12 meses até {p['ipca_ref']}",
         "base": "as duas taxas oficiais do dia",
@@ -464,10 +504,8 @@ def _bullets(n: E.Numero, edition: Edition, day: date) -> list[str]:
             f"De {valor_fmt(qid, ini['valor'])} ({_quando(qid, ini, day)}) a {valor_fmt(qid, fim['valor'], unidade=False)} "
             f"({_quando(qid, fim, day)}), em {p['leituras']} leituras.",
             _extremo(p, day),
+            _outros(p),
         ]
-        outros = _outros(p)
-        if outros:
-            linhas.append(f"No mesmo período: {outros}.")
         return [x for x in linhas if x]
     if n.tipo == "mercado":
         qid = p["qid"]
@@ -479,7 +517,7 @@ def _bullets(n: E.Numero, edition: Edition, day: date) -> list[str]:
             linhas += [
                 f"Variação típica do {nome_corrido(qid, p['ativo'])}: {E.num(p['escala'], 2)}% por dia "
                 f"(escala robusta de {len(anteriores)} leituras desde {anteriores[0]['dia']}).",
-                f"Maior variação anterior no período: {E.sinal(maior['pct'], 2)} em {maior['dia']}.",
+                f"Maior variação anterior no período: {E.sinal(maior['pct'], 2)} {_quando_var(qid, maior, day)}.",
             ]
         return linhas
     if n.tipo == "triangulado":
@@ -584,7 +622,8 @@ def peca_numero(edition: Edition, n: E.Numero, history: list[Edition], *, electi
     slide2 = Slide(
         "numero_prova",
         {"selo": selo_serie(numero_serie), "kicker": "A prova", "tam": tam, "grafico": svg, "nota": nota, "section": section, **prova},
-        alt=f"{serie_nome}: {valor_falado}. {_frase_curta(n)}. {descricao} " + " ".join(prova["contexto"]) + f" {prova['pe']}.",
+        alt=f"{serie_nome}: {valor_falado}. {_frase_curta(n)}. {descricao} " + " ".join(prova["contexto"])
+        + f" {prova['pe']}. Fonte: {ficha['fonte']}.",
     )
 
     metodo = _milhar(n.metodo) if n.tipo == "concentracao" else n.metodo
@@ -604,7 +643,7 @@ def peca_numero(edition: Edition, n: E.Numero, history: list[Edition], *, electi
             "cadeia": [{"n": i, "texto": t, "atual": i == n.passo} for i, t in enumerate(PASSOS, 1)],
             "passo": n.passo,
             "cta": CTA,
-            "nota": nota,
+            "nota": "",  # a fonte já está na ficha (uma vez só por slide)
             "section": section,
         },
         alt=f"Como medimos: {metodo} "
