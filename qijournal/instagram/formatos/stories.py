@@ -37,6 +37,7 @@ from ..conteudo import (
 )
 from ..redacao import palavras_proibidas, verbos_proibidos
 from ..selecao import ordered_stories
+from .manha import neutro
 from .mercado import faixa_juros
 
 SLOT = "stories"
@@ -148,7 +149,7 @@ def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: It
         return None
     if election and story.section != "esporte" and E.eleicao_escrita(story.headline):  # nem a de outro país
         return None
-    titulo = E.capa_sem_adj(edition, story)
+    titulo = neutro(E.capa_sem_adj(edition, story))  # "desabam até 10%" → "caem até 10%", como na capa da manhã
     if not _texto_ok(titulo, story.section, election=election, nomes=nomes):
         return None
     if E.titulo_literal(titulo, E.titulos_literais(edition)):  # manchete literal de veículo não vai para a arte
@@ -196,7 +197,7 @@ def _manchete(
 ) -> Slide:
     day = edition_day(edition)
     textos = textos_manchete(edition, story, election=election, nomes=nomes)
-    titulo, por_que = textos if textos else (E.capa_sem_adj(edition, story), "")
+    titulo, por_que = textos if textos else (neutro(E.capa_sem_adj(edition, story)), "")
     numero = E.numero_destaque(titulo)
     qual, valor = numero if numero else ("", "")
     a, n, b = E.lados(story.coverage)  # só com 2+ comparados, como o selo
