@@ -623,3 +623,15 @@ def test_papeis_dos_lados():
     assert lados(2, 2, 7).papeis == ("de um lado", "do outro lado")
     assert N._rotulos_barra(lados(6, 4, 4)) == {"a": "lado maior", "n": "sem lado", "b": "lado menor"}
     assert N._rotulos_barra(lados(5, 1, 0)) == {"a": "maioria", "n": "sem lado", "b": "minoria"}
+
+
+def test_02_11_conclusao_majoritaria_sem_maioria_vira_molde():
+    """4 de 9 não é maioria: "A cobertura majoritária enfatizou…" sai (como "a maioria dos veículos"), e entra o
+    molde com as contagens (prévia final)."""
+    e = edicao(2, 11)
+    s = next(s for s in e.stories if s.id.startswith("eleicoes-de-meio-de-mandato"))
+    p = N.raio_x(e, {}, election=False, numero_serie=19, story=s)
+    concl = p.slides[5].ctx["conclusao"]
+    assert "majorit" not in concl.lower()
+    assert concl.startswith("4 de 9 veículos destacaram favoritismo democrata; 3, ofensiva de campanha; 2 não tomaram lado.")
+    assert [x.ctx["kicker"] for x in p.slides[2:4]] == ["O lado maior", "O lado menor"]

@@ -343,7 +343,7 @@ _GRUPO_QUAL = (r"(?:internacion|nacion|estrangeir|brasileir|espanh|american|euro
 _GRUPO_RE = re.compile(rf"\b{_GRUPO_NOME}\s+{_GRUPO_QUAL}|\bag[êe]ncias\b", re.I)
 _PROPORCAO_RE = re.compile(
     rf"\b(?:maioria|maior parte|grande parte|parte expressiva|minoria)\s+d[aeo]s?\s+(?:[\wÀ-ú]+\s+)?{_GRUPO_NOME}\b|"
-    r"\b(?:majoritariamente|predomin\w+|quase todos|unanim\w+)",
+    r"\b(?:majorit[aá]ri\w+|predomin\w+|quase todos|unanim\w+)",  # "a cobertura majoritária", 4 de 9 (02/11)
     re.I,
 )
 _NUMEROS = {"um": 1, "uma": 1, "dois": 2, "duas": 2, "três": 3, "quatro": 4, "cinco": 5, "seis": 6, "sete": 7,

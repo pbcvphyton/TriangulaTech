@@ -216,7 +216,7 @@ menos (as linhas de contexto saem antes); 6 o que isso significa (conclusão +
 espectro, sem percentual): a conclusão da IA só com as frases que a contagem
 sustenta (sai a que atribui um lado a um grupo de veículos que não medimos,
 "veículos internacionais", "agências", "jornais generalistas"; a de proporção
-quando a maioria não passa da metade; a de número que não é uma das contagens);
+quando a maioria não passa da metade, "a cobertura majoritária" com 4 de 9 também, 02/11; a de número que não é uma das contagens);
 sem nenhuma, o molde com os números do espectro, a janela de horário de cada
 lado quando elas não se cruzam e a conta por idioma ("Entre os veículos em
 inglês, 2 destacaram X e 3, Y; em português, 3 e 2."); a lista "fora da
