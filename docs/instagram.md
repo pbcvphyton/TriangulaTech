@@ -164,7 +164,11 @@ python -m qijournal instagram gerar --dir . --media-dir /tmp/instagram --date 20
 - **Link**: https://pbcvphyton.github.io/qi-journal/ (sempre a edição de hoje)
 - **Foto do perfil**: `assets/instagram/avatar.png`
 - **Destaques** (capas em `assets/instagram/destaques/`): Comece aqui · Raio-X · Método
-- **Fixado**: o Manifesto (sai uma vez, no primeiro dia com a conta conectada); "Como ler um Raio-X" e "Nossos números" chegam na Onda 2
+- **Fixado**: o Manifesto (sai uma vez, no primeiro dia com a conta conectada); "Como ler um Raio-X" e "Nossos números" chegam na Onda 2.
+  Não fixe o Manifesto sozinho: o post fixado ocupa a 1ª casa da grade e empurra cada dia para duas linhas (cada dia
+  é uma linha de 3). Fixe os 3 de uma vez quando a Onda 2 trouxer os outros dois; até lá, ou o Manifesto fica sem
+  fixar (sozinho na última linha, e a grade de cima continua alinhada), ou se fixam 3 juntos (o Manifesto e os 2
+  últimos posts de feed de um dia), para manter o múltiplo de 3
 - **Moderação**, ligada uma vez no app:
   - "Ocultar comentários ofensivos" e "Palavras ocultas";
   - resposta automática de DM: "Conta automática, não lemos mensagens. A edição de hoje está no link da bio."

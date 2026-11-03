@@ -162,3 +162,15 @@ def test_em_meio_com_crase_e_contracao_e_texto_pendurado():
     assert not R.pendurado("a pressão sobre os governos.") and not R.pendurado("a") and not R.pendurado("lado a")
     problemas = R.lint(peca(Slide("rx_importa", {"texto": "A pressão sobre os governos em meio"})), election=False)
     assert any("cortado no meio" in p for p in problemas)
+
+
+def test_vicios_de_ia_com_a_familia_do_verbo_e_o_plural():
+    """dados (rodada 2): "reacendeu alertas" (15/10), "acende sinal amarelo" (23/10) e "cenários" passavam."""
+    from qijournal.instagram import redacao as R
+
+    assert R.palavras_proibidas("…e reacendeu alertas do FMI sobre choques de oferta") == ["reacendeu alertas"]
+    assert R.palavras_proibidas("…mas acende sinal amarelo para avanço na inadimplência") == ["acende sinal amarelo"]
+    assert R.palavras_proibidas("acendeu alerta") == ["acendeu alerta"]
+    assert R.palavras_proibidas("três cenários para os juros") == ["cenários"]
+    assert R.palavras_proibidas("O alerta da Defesa Civil") == []  # "alerta" sozinho fica
+    assert R.palavras_proibidas("A empresa acendeu a fornalha") == []

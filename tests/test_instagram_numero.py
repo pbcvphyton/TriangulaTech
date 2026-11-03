@@ -388,3 +388,27 @@ def test_acumulado_abaixo_de_1_por_cento_nao_e_o_numero_do_dia():
     e, h = edicao("27"), historia("27")
     n = E.numero_do_dia(e, h, election=True, exclude={e.lead}, usados={"acum:brent", "acum:usd", "acum:gold", "acum:btc"})
     assert n.chave == "juroreal" and n.passo == 6
+
+
+@real
+def test_20_10_legenda_diz_de_quem_e_o_numero():
+    """dados (rodada 2): a tese não cabe nos 110 caracteres e a linha fina não diz "Ri Happy": a linha 1 leva o
+    sujeito (o "Ri" curto vai junto do nome)."""
+    p = peca("20")
+    linhas = p.caption.split("\n")
+    assert linhas[0] == "R$ 827 mi: Ri Happy, no título de 3 de 6 veículos que publicaram o assunto."
+    assert "▸ O fato: Maior rede especializada em brinquedos do país protocola plano" in p.caption
+
+
+@real
+def test_31_10_quase_18_nao_confirma_o_mais_de_18():
+    """dados (rodada 2): o título da Suno ("deixa quase 18% pelo caminho") tem a ressalva oposta à da capa
+    ("MAIS DE 18%"): não conta no checklist; fica 4 de 8, acima do mínimo de 3."""
+    assert not E._confirma("18%", "Ibovespa fecha outubro no vermelho e deixa quase 18% pelo caminho", "mais de")
+    assert E._confirma("18%", "Ibovespa cai mais de 18% na semana", "mais de")
+    assert E._confirma("18%", "Ibovespa cai 18% na semana", "mais de")  # sem ressalva, confirma
+    assert not E._confirma("10%", "Ações caem mais de 10%", "até")
+    e = edicao("31")
+    n = next(x for x in E.triangulados(e, election=False) if x.chave == "18%")
+    assert n.qualificador == "MAIS DE" and n.selo == "no título de 4 de 8 veículos"
+    assert {v["nome"]: v["confirmado"] for v in n.prova["veiculos"]}["Suno Notícias"] is False

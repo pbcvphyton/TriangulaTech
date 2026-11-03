@@ -4,7 +4,9 @@
    Painel, para ler a 375 px (todo texto com dado tem 22 px ou mais; o gráfico é a foto, arte#10): três linhas de
    texto, "Ibovespa · fech. 23/10" (o selo da leitura à direita do nome), "205.083 ↑ +0,47%" (valor em Plex Mono
    40 px e a variação do dia) e "+12,1% desde 28/09"; embaixo, a linha da série compacta (um rótulo só e o eixo).
-   O rodapé leva o método e, com pregão faltante em algum gráfico, a legenda do tracejado.
+   O rodapé leva o método e, com pregão faltante em algum gráfico, a legenda do tracejado. Na noite (papel), o CTA
+   de salvamento vai na arte, acima do rodapé (s.cta), e o rodapé diz "Leitura antiga sem variação" quando a variação do dia
+   saiu pela hora do post.
    Painel com menos leituras que o mínimo mostra só o valor. #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
@@ -33,12 +35,18 @@
 .curta .pn .nm{font-size:36px}
 .curta .pn .ac{font-size:26px}
 .faixa{flex:none;margin-top:auto;padding-top:20px;border-top:2px solid var(--rule3);font-family:var(--mono);font-weight:600;font-size:25px;line-height:1.3;color:var(--ink)}
+/* com o CTA na arte (a noite), o título e a grade sobem para caber a linha a mais */
+.com-cta .hook{margin-top:14px}
+.com-cta .st + .grid4{row-gap:14px}
+.com-cta .faixa{padding-top:16px}
+.cta{flex:none;margin-top:12px;font-family:var(--mono);font-weight:600;font-size:24px;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink);white-space:nowrap}
 .pe{flex:none;margin-top:12px;font-family:var(--mono);font-size:22px;line-height:1.35;color:var(--ink2);white-space:nowrap}
 .pe svg{display:inline-block;vertical-align:middle;margin:0 .3em 0 .1em}
 {% endblock %}
 {% block body %}
 {{ m.serie_band(s.selo, s.contador or none, s.cor) }}
-<div class="frame{{ '' if s.graficos else ' curta' }}">
+<div class="frame{{ '' if s.graficos else ' curta' }}{{ ' com-cta' if s.cta }}">
   {{ m.hook(s.titulo, s.destaque or none, s.tam, 60) }}
   {% if s.selo_titulo %}<div class="st">{{ s.selo_titulo }}</div>{% endif %}
   <div class="grid4">
@@ -52,6 +60,7 @@
   {% endfor %}
   </div>
   {% if s.faixa %}<div class="faixa" data-fit="faixa" data-min="22">{{ s.faixa }}</div>{% endif %}
+  {% if s.cta %}<div class="cta">{{ s.cta }}</div>{% endif %}
   <div class="pe" data-fit="rodape" data-min="20">{{ s.pe }}{% if s.tracejado %} · <svg width="40" height="8" viewBox="0 0 40 8" aria-hidden="true"><path d="M4 4H36" stroke="var(--ink2)" stroke-width="4" stroke-dasharray="3 9" stroke-linecap="round"/></svg>pregão sem leitura{% endif %}</div>
 </div>
 {{ m.assinatura(s.nota) }}

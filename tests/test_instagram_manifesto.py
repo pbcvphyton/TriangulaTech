@@ -127,8 +127,10 @@ def test_funil_com_os_numeros_da_edicao_e_a_data():
 def test_pauta_solitaria_com_periodo_e_n_no_rodape():
     s = manifesto("26").slides[2]
     assert s.ctx["kicker"] == "Pauta solitária"
-    assert s.ctx["titulo"] == "Mais de 8 em cada 10 assuntos saem em uma fonte só"
-    assert s.ctx["destaque"] == "8 em cada 10" and s.ctx["destaque"] in s.ctx["titulo"]
+    nb = "\u00a0"  # "mais de 8 em cada 10" não quebra de linha (arte, rodada 2: "8 EM CADA / 10")
+    assert s.ctx["titulo"] == f"Mais de{nb}8{nb}em{nb}cada{nb}10 assuntos saem em uma fonte só"
+    assert s.ctx["destaque"] == f"8{nb}em{nb}cada{nb}10" and s.ctx["destaque"] in s.ctx["titulo"]
+    assert "Mais de 8 em cada 10 assuntos saem em uma fonte só" in s.alt
     assert s.ctx["pe"].startswith("De 14/10 a 26/10: 11.417 de 12.850 assuntos (88,8%) em uma fonte só, em 13 edições com IA")
     assert "superestimar exclusivos" in s.ctx["pe"]
     # a matriz do dia: um ponto por assunto de 26/10 (952), e a frase do gráfico vai no alt
@@ -139,10 +141,12 @@ def test_pauta_solitaria_com_periodo_e_n_no_rodape():
 @real
 def test_divisao_com_waffle_de_100_e_a_definicao():
     s = manifesto("26").slides[3]
-    assert s.ctx["titulo"] == "Em mais de 8 de cada 10 assuntos comparados, os veículos contaram sem divisão."
-    assert s.ctx["texto"] == "Nos outros, a gente mostra a diferença."
+    # arte (rodada 2): o gancho conta o racha, e o laranja dele é o dos quadrados (61 de 391, 15,6%: menos de 2)
+    nb = "\u00a0"
+    assert s.ctx["titulo"] == f"Menos de{nb}2{nb}em{nb}cada{nb}10 assuntos comparados dividiram a cobertura."
+    assert s.ctx["texto"] == "Neles, a gente mostra a diferença."
     assert s.ctx["pe"].startswith(
-        "De 14/10 a 26/10: 330 de 391 assuntos com 4 ou mais veículos comparados (84,4%) sem divisão"
+        "De 14/10 a 26/10: 61 de 391 assuntos com 4 ou mais veículos comparados (15,6%) dividiram a cobertura"
     )
     # a definição é a do Placar (dados#9), nunca "1 veículo de cada lado"
     assert "Dividir = pelo menos 2 veículos de cada lado, o mesmo critério do Placar do dia." in s.ctx["pe"]
@@ -153,7 +157,9 @@ def test_divisao_com_waffle_de_100_e_a_definicao():
     # cada quadrado é 1%: as contagens vão com "%" ("16 dividiram" se lia como 16 assuntos), e o laranja vai no gancho
     assert "Gráfico: grade de 100 quadrados, um por 1% dos 391 assuntos comparados; 16% dividiram e 84% sem divisão." in s.alt
     assert ">16%</text>" in svg and ">84%</text>" in svg
-    assert s.ctx["destaque"] == "8 de cada 10" and s.ctx["destaque"] in s.ctx["titulo"] and not s.ctx.get("texto_destaque")
+    assert s.ctx["destaque"] == f"2{nb}em{nb}cada{nb}10" and s.ctx["destaque"] in s.ctx["titulo"] and not s.ctx.get("texto_destaque")
+    assert MF.menos_de_cada_10(61, 391) == "menos de 2" and MF.menos_de_cada_10(20, 100) == "2"
+    assert MF.menos_de_cada_10(0, 100) == "0" and MF.menos_de_cada_10(5, 100) == "menos de 1"
 
 
 @real

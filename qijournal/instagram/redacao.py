@@ -39,9 +39,17 @@ SENSACIONALISMO = (
     *FAMILIAS,
     "polêmica", "escândalo", "você não vai acreditar", "tudo o que você precisa saber", "a verdade sobre", "segredo",
 )
+# "acende alerta" com a família do verbo e os sinônimos do alerta ("reacendeu alertas", 15/10; "acende sinal
+# amarelo", 23/10)
+_ACENDE = ("acende", "acendem", "acendeu", "acenderam", "acender", "acendendo", "acenderá", "acenderia")
+_ALERTA = ("alerta", "alertas", "o alerta", "os alertas", "um alerta", "novo alerta", "um novo alerta", "sinal amarelo",
+           "o sinal amarelo", "um sinal amarelo", "sinal de alerta", "sinais de alerta", "sinal vermelho",
+           "luz amarela", "a luz amarela", "luz vermelha", "a luz vermelha")
+ACENDE_ALERTA = tuple(f"{pre}{v} {a}" for pre in ("", "re") for v in _ACENDE for a in _ALERTA)
 VICIOS_IA = (
-    "cenário", "em meio a", "em meio à", "em meio às", "em meio ao", "em meio aos", "desdobramentos", "vale destacar", "vale lembrar", "nesse sentido",
-    "ponto de inflexão", "divisor de águas", "sem precedentes", "acende alerta",
+    "cenário", "cenários", "em meio a", "em meio à", "em meio às", "em meio ao", "em meio aos", "desdobramentos",
+    "vale destacar", "vale lembrar", "nesse sentido", "ponto de inflexão", "divisor de águas", "sem precedentes",
+    *ACENDE_ALERTA,
 )
 PROIBIDAS = SENSACIONALISMO + VICIOS_IA
 

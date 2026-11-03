@@ -475,8 +475,17 @@ def _serie_comeca(history: list[Edition], n: E.Numero, janela: int = 90) -> bool
     return (datas[-1] - datas[0]).days < janela - 1 and abs((n.prova["primeiro"]["data"] - datas[0]).days) <= 1
 
 
-def _linha1(n: E.Numero, history: list[Edition]) -> str:
-    """1ª linha da legenda: o número e o contraste, em até 110 caracteres."""
+def _quem(n: E.Numero, edition: Edition | None) -> str:
+    """De quem é o número (:func:`.estatistica.sujeito` da matéria: "Ri Happy"), ou ""."""
+    story = _materia(edition, n) if edition is not None else None
+    if story is None:
+        return ""
+    return E.sujeito(story, E.titulos_por_veiculo(E.topic_of(edition, story.id)))
+
+
+def _linha1(n: E.Numero, history: list[Edition], edition: Edition | None = None) -> str:
+    """1ª linha da legenda: o número e o contraste, em até 110 caracteres. Quando a tese não cabe, a linha
+    ainda diz de quem é o número ("R$ 827 mi: Ri Happy, no título de 3 de 6 veículos", 20/10)."""
     p = n.prova
     if n.tipo == "acumulado":
         if _serie_comeca(history, n):  # "−3,5%: Ouro acumula queda de 29/09 (início da série da Triangula) a 27/10."
@@ -497,10 +506,16 @@ def _linha1(n: E.Numero, history: list[Edition]) -> str:
         )
     if n.tipo == "triangulado":
         k, total = p["confirmados"], p["total"]
+        quem = _quem(n, edition)
+        com_quem = [] if not quem else [
+            f"{n.valor}: {quem}, no título de {k} de {total} veículos que publicaram o assunto.",
+            f"{n.valor}: {quem}, no título de {k} de {total} veículos.",
+        ]
         return _cabe(
             _junta(f"{n.valor} no título de {k} de {total} veículos", n.tese),
             f"{n.tese} ({n.valor} no título de {k} de {total} veículos)" if ": " in n.tese
             else f"{n.tese}: no título de {k} de {total} veículos",
+            *com_quem,
             f"{n.valor} no título de {k} de {total} veículos que publicaram o assunto.",
         )
     if n.tipo == "concentracao":
@@ -679,7 +694,7 @@ def peca_numero(edition: Edition, n: E.Numero, history: list[Edition], *, electi
         kind="carousel",
         title="Número do dia",
         slides=[capa, slide2, slide3],
-        caption=finish_caption([_linha1(n, history), "\n".join(corpo)]),
+        caption=finish_caption([_linha1(n, history, edition), "\n".join(corpo)]),
         story_ids=[n.story_id] if n.story_id else [],
         serie=SERIE,
         numero_serie=numero_serie,

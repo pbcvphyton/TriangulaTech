@@ -3,19 +3,22 @@
 1. Capa laranja chapada: "MESMO FATO, VÁRIAS VERSÕES."
 2. O funil da edição do D0, com a data: notícias → assuntos → coberturas comparadas → matérias.
 3. Pauta solitária: "x em cada 10 assuntos saem em uma fonte só", com a matriz de pontos do dia.
-4. A divisão: "Em x de cada 10 assuntos comparados, os veículos contaram sem divisão", com waffle; a
-   base e o "dividir" são os do Placar (4+ veículos comparados, 2+ de cada lado: :func:`.estatistica.dividida`).
+4. A divisão: "Menos de 2 em cada 10 assuntos comparados dividiram a cobertura", com waffle: o laranja do gancho e
+   o dos quadrados são a mesma coisa, o racha, como no Placar; a base e o "dividir" são os do Placar (4+ veículos
+   comparados, 2+ de cada lado: :func:`.estatistica.dividida`).
 5. Como fazemos e o que não fazemos.
 6. CTA: os 3 posts do dia.
 
 As contas dos slides 3 e 4 vêm do histórico com IA, de 14/10 (quando o agrupamento passou a
 cruzar idiomas, §9) até a data da edição, com período e n no rodapé. "x em cada 10" é sempre
-arredondado para baixo: o post fica fixado, e um número com data nunca fica falso.
+arredondado para baixo e o "menos de x em cada 10" do racha, para cima: o post fica fixado, e um número com
+data nunca fica falso. "N em cada 10" não quebra de linha (espaço inseparável, só na arte).
 """
 
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Iterable, Sequence
@@ -27,6 +30,7 @@ from .. import graficos as G
 from ..conteudo import Peca, Slide, alt, edition_day, finish_caption, short_date
 from .stories import DESCRICAO_AGENDA
 
+NBSP = "\u00a0"
 SLOT = "lancamento"
 TITULO = "Manifesto"
 SELO = "Comece aqui"
@@ -116,6 +120,22 @@ def em_cada_10(x: int, y: int) -> str:
     return str(k) if math.isclose(dez, k, abs_tol=1e-9) else f"mais de {k}"
 
 
+def menos_de_cada_10(x: int, y: int) -> str:
+    """O complemento honesto de :func:`em_cada_10`, arredondado para cima: ``18,0%`` → ``"menos de 2"``;
+    ``20%`` → ``"2"``; ``0`` → ``"0"``."""
+    if y <= 0 or x <= 0:
+        return "0"
+    dez = 10 * x / y
+    k = math.ceil(dez - 1e-9)
+    return str(k) if math.isclose(dez, k, abs_tol=1e-9) else f"menos de {k}"
+
+
+def junto(texto: str) -> str:
+    """"mais de 8 em cada 10" sem quebra de linha (U+00A0): a arte nunca deixa "8 EM CADA / 10" (slide 3)."""
+    texto = re.sub(r"\b((?:mais|menos) de) (?=\d)", lambda m: m.group(1) + NBSP, texto, flags=re.I)
+    return re.sub(r"(\d+) (em|de) (cada) (10)\b", lambda m: NBSP.join(m.groups()), texto, flags=re.I)
+
+
 def proporcao(x: int, y: int, cada: str = "em") -> str:
     """``"Mais de 8 em cada 10"`` (``cada="de"``: ``"mais de 8 de cada 10"``); com base abaixo de
     :data:`.estatistica.PCT_MIN`, a contagem crua (``"5 de 12"``): proporção só com base ≥ 20."""
@@ -189,9 +209,9 @@ def _pauta_solitaria(edition: Edition, h: Historico) -> Slide:
     ctx = {
         "selo": SELO,
         "kicker": "Pauta solitária",
-        "titulo": titulo,
-        "destaque": x.removeprefix("mais de ").removeprefix("menos de "),
-        "tam": G.tamanho_gancho(titulo, max_linhas=3, tam_max=120, tam_min=88),
+        "titulo": junto(titulo),
+        "destaque": junto(x.removeprefix("mais de ").removeprefix("menos de ")),
+        "tam": G.tamanho_gancho(junto(titulo), max_linhas=3, tam_max=120, tam_min=88),
         "grafico": svg,
         "texto": texto,
         "pe": pe,
@@ -202,8 +222,17 @@ def _pauta_solitaria(edition: Edition, h: Historico) -> Slide:
 
 
 def _divisao(h: Historico) -> Slide:
-    x = proporcao(h.sem_divisao, h.coberturas, "de")
-    titulo = f"Em {x} assuntos comparados, os veículos contaram sem divisão."  # a base: 4+ veículos
+    """O slide 4: o gancho conta os que dividiram, como o Placar ("Menos de 2 em cada 10 assuntos comparados
+    dividiram a cobertura"), e o laranja do gancho é o dos quadrados do waffle (arte, rodada 2: "8 de cada 10" sem
+    divisão em laranja ao lado de quadrados laranja que eram os 18% que dividiram)."""
+    if h.coberturas >= E.PCT_MIN:
+        k = menos_de_cada_10(h.divididas, h.coberturas)
+        x = f"{k} em cada 10"
+        verbo = "dividiu" if k == "1" else "dividiram"
+    else:  # proporção só com base ≥ 20: a contagem crua, com a concordância pelo numerador
+        x = f"{E.num(h.divididas)} de {E.num(h.coberturas)}"
+        verbo = "dividiu" if h.divididas == 1 else "dividiram"
+    titulo = f"{x[:1].upper()}{x[1:]} assuntos comparados {verbo} a cobertura."  # a base: 4+ veículos
     n = E.num(h.coberturas)
     if h.coberturas > 100:  # um quadrado por assunto não cabe: cada um vale 1% deles, e as contagens vão com "%"
         total, marcados = 100, round(100 * h.divididas / h.coberturas)
@@ -224,17 +253,19 @@ def _divisao(h: Historico) -> Slide:
         gap=6,
         sufixo=sufixo,
     )
-    texto = "Nos outros, a gente mostra a diferença."
+    texto = "Neles, a gente mostra a diferença."
     pe = (
-        f"{h.periodo_frase}: {E.num(h.sem_divisao)} de {E.num(h.coberturas)} assuntos com 4 ou mais veículos "
-        f"comparados{_pct(h.sem_divisao, h.coberturas)} sem divisão, em {h.edicoes} edições. {DIVIDIR} {METODO_IA}"
+        f"{h.periodo_frase}: {E.num(h.divididas)} de {E.num(h.coberturas)} assuntos com 4 ou mais veículos "
+        f"comparados{_pct(h.divididas, h.coberturas)} {'dividiu' if h.divididas == 1 else 'dividiram'} a cobertura, "
+        f"em {h.edicoes} edições. {DIVIDIR} {METODO_IA}"
     )
     ctx = {
         "selo": SELO,
         "kicker": "A divisão",
-        "titulo": titulo,
-        "destaque": x.removeprefix("mais de ").removeprefix("menos de "),  # o laranja no gancho, como no slide 3
-        "tam": G.tamanho_gancho(titulo, max_linhas=3, tam_max=104, tam_min=80),
+        "titulo": junto(titulo),
+        # o laranja no gancho é o dos quadrados: o racha
+        "destaque": junto(x.removeprefix("menos de ")),
+        "tam": G.tamanho_gancho(junto(titulo), max_linhas=3, tam_max=104, tam_min=80),
         "grafico": svg,
         "texto": texto,
         "pe": pe,
@@ -285,9 +316,9 @@ def _legenda(edition: Edition, h: Historico) -> str:
         f" → {E.num(len(edition.stories))} matérias.",
         f"▸ Pauta solitária: {h.periodo}, {E.num(h.uma_fonte)} de {E.num(h.assuntos)} assuntos"
         f"{_pct(h.uma_fonte, h.assuntos)} saíram em uma fonte só, nas fontes que lemos.",
-        f"▸ A divisão: no mesmo período, {E.num(h.sem_divisao)} de {E.num(h.coberturas)} assuntos com 4 ou mais "
-        f"veículos comparados{_pct(h.sem_divisao, h.coberturas)} saíram sem divisão ({DIVIDIR[0].lower()}{DIVIDIR[1:-1]}). "
-        "Nas outras, o Raio-X mostra o que cada lado destacou.",
+        f"▸ A divisão: no mesmo período, {E.num(h.divididas)} de {E.num(h.coberturas)} assuntos com 4 ou mais "
+        f"veículos comparados{_pct(h.divididas, h.coberturas)} dividiram a cobertura ({DIVIDIR[0].lower()}{DIVIDIR[1:-1]}); "
+        f"{E.num(h.sem_divisao)} saíram sem divisão. Nos que dividiram, o Raio-X mostra o que cada lado destacou.",
         "▸ " + " ".join(REGRAS),
         f"▸ Todo dia, 3 posts: {agenda}.",
         f"Como medimos: agrupamento automático das notícias por assunto; {METODO_IA[0].lower()}{METODO_IA[1:]} "

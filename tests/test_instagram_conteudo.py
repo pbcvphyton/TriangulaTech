@@ -443,9 +443,27 @@ def test_dias_reais_com_a_fila_avancando():
 def test_sem_ia_o_terminal_nao_repete_o_titulo_do_mercado_em_linha(raw):
     raw = deepcopy(raw)
     raw["mode"] = "heuristic"
+    for q in raw["quotes"]:  # leituras da tarde: às 18h30, a das 06h45 já não leva a variação do dia
+        if q["id"] in ("usd", "eur", "cny", "brent", "gold", "btc"):
+            q["as_of"] = "2026-10-20T18:00:00+00:00"
     e = Edition.from_dict(raw)
     pecas = {p.slot: p for p in build_pieces(e, config(), {}, Fila(), [e])}
     ativo_noite = pecas["noite"].slides[0].ctx["ativo"]
     assert ativo_noite == "brent"
     assert not pecas["manha"].slides[0].ctx["titulo"].startswith("Brent")
     assert conteudo.terminal(e, {}).slides[0].ctx["titulo"].startswith("Brent")  # sem evitar, seria o mesmo
+
+
+def test_terminal_leitura_a_24_px_sem_o_rotulo_repetido_e_cta_no_alt(edition):
+    """arte (rodada 2): a coluna LEITURA tinha 21 px ("leitura das 06h58"); o cabeçalho já diz LEITURA, a célula
+    leva só a hora, a 24 px. O texto alternativo fecha com o CTA da arte (dados, rodada 2)."""
+    p = conteudo.terminal(edition, {})
+    s = p.slides[0]
+    html = gerar.environment().get_template("terminal.html.j2").render(
+        brand={"logo": "", "handle": "", "fonts_css": ""}, s=conteudo.polish(s.ctx), page=1, pages=1, kind="image",
+        slot="manha",
+    )
+    assert "font-size:24px;color:var(--ink2);padding-left:24px" in html
+    assert '<td class="f">06h45</td>' in html and '<td class="f">leitura das' not in html
+    assert '<td class="f">fech. 19/10</td>' in html
+    assert s.alt.endswith(conteudo.TERMINAL_CTA) and "leitura das 06h45" in s.alt

@@ -1,7 +1,7 @@
 {# Terminal da manhã (07:00 nos dias sem IA, ou quando o Em 1 minuto não sai): imagem única em marinho.
    Título-achado com a maior variação fora do comum (laranja só no número), ou o título neutro ("13 indicadores
    antes da abertura"); a tabela com indicador, último valor, variação com seta e de quando é a leitura
-   ("fech. 19/10" só no fechamento do pregão, "leitura das 06h00", "set/26"), com a linha do achado marcada
+   ("fech. 19/10" só no fechamento do pregão, "06h00" sob o cabeçalho LEITURA, "set/26", a 24 px), com a linha do achado marcada
    por um fio laranja de 6 px à esquerda; o CTA (de salvamento) e a assinatura.
    ctx: selo, titulo, destaque, quotes [{label, value, change, trend, ref, achado}], cta, nota. #}
 {% extends "_base.html.j2" %}
@@ -19,7 +19,7 @@ td.l{font-family:var(--label);font-stretch:100%;font-weight:600;font-size:{{ 32 
 tr.achado td.l{box-shadow:inset 6px 0 0 var(--accent);padding-left:20px}
 td.v{font-family:var(--mono);font-weight:600;font-size:{{ 32 if rowh >= 60 else 28 }}px;color:var(--ink)}
 td.c{width:180px}
-td.f{width:250px;font-family:var(--mono);font-size:21px;color:var(--ink2);padding-left:24px}
+td.f{width:250px;font-family:var(--mono);font-size:24px;color:var(--ink2);padding-left:24px}
 .nada{font-family:var(--mono);font-size:26px;color:var(--ink3)}
 .cta{flex:none;margin-top:auto;display:flex;align-items:center;gap:14px;height:76px;border-top:2px solid var(--rule3);
   font-family:var(--mono);font-weight:600;font-size:26px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink)}
@@ -33,7 +33,7 @@ td.f{width:250px;font-family:var(--mono);font-size:21px;color:var(--ink2);paddin
     {% for q in s.quotes %}
     <tr{% if q.achado %} class="achado"{% endif %}><td class="l">{{ q.label }}</td><td class="v r">{{ q.value }}</td>
       <td class="c r">{% if q.change %}{{ m.change(q, 28) }}{% else %}<span class="nada">—</span>{% endif %}</td>
-      <td class="f">{{ q.ref or 'vigente' }}</td></tr>
+      <td class="f">{{ (q.ref or 'vigente')|replace('leitura das ', '')|replace('leitura de ', '') }}</td></tr>
     {% endfor %}
   </table>
   <div class="cta">{{ s.cta }}</div>

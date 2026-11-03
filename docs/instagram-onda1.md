@@ -101,7 +101,9 @@ no Em 1 minuto, no máximo um item de política (sempre o último). Duas regras 
 o destaque em laranja e o gancho nunca levam nome de partido ou de político, e
 nenhum veículo é rotulado com campo político (`estatistica.cita_politico`, no rótulo de lado e no lint:
 também chefes de Estado de fora e partidos de outros países, na forma adjetiva: "desafio de Zelenski",
-16/10; "favoritismo democrata", 02/11; "trabalhista" fica, aqui é o direito do trabalho).
+16/10; "favoritismo democrata", 02/11; "trabalhista" fica, aqui é o direito do trabalho). A regra vale para
+tudo que fica no lugar do rótulo: a descrição do lado nos slides 3 e 4 do Raio-X com político ou partido
+("Destaca desafio de Zelenski e atrito com Washington") sai da arte e do texto alternativo.
 
 ## 3. Pré-requisitos (já na base)
 
@@ -135,8 +137,9 @@ também chefes de Estado de fora e partidos de outros países, na forma adjetiva
   escândalo…, com a família inteira do verbo: "despencarem", "disparada",
   "desabar", "explodindo"; ficam de fora, por lista fechada, "disparo",
   "disparidade", "desabafo", "desabamento", "derretimento" e "explosão"; vícios de
-  IA: cenário, "em meio a", desdobramentos, "vale destacar", "sem precedentes",
-  "acende alerta"…), léxico eleitoral no modo eleitoral, limites de caracteres,
+  IA: cenário e cenários, "em meio a", desdobramentos, "vale destacar", "sem precedentes",
+  "acende alerta" com a família do verbo e os sinônimos do alerta: "reacendeu alertas", 15/10; "acende sinal
+  amarelo", 23/10; o texto do fato é cortado antes deles), léxico eleitoral no modo eleitoral, limites de caracteres,
   overflow do render e a 1ª linha da legenda repetida (similaridade > 0,6 com a de
   um post **do mesmo formato** dos últimos 14 dias). A repetição só vale onde a
   linha vem do fato do dia: Em 1 minuto e Raio-X (em 14/10 a 02/11, a maior foi
@@ -171,8 +174,9 @@ também chefes de Estado de fora e partidos de outros países, na forma adjetiva
   e no gancho; as contagens da legenda vão em tinta.
 - **Concordância pelo numerador:** "1 de 24 assuntos dividiu", "0 de 14
   assuntos dividiram".
-- **Gancho em caixa alta:** o número fica preso à palavra seguinte e "só"/"de"
-  ao número (espaço inseparável: nunca "MESMO FATO, 4 / VEÍCULOS"); hora no
+- **Gancho em caixa alta:** o número fica preso à palavra seguinte, "só"/"de"
+  ao número e a contagem com vírgula à 1ª palavra do rótulo (espaço inseparável: nunca "MESMO FATO, 4 /
+  VEÍCULOS" nem "IMPACTO MILITAR; 4, / MANOBRA POLÍTICA"); hora no
   gancho sai com "h" minúsculo ("LEITURA DAS 06h52"); duração vai por extenso.
 - **Legenda:** linha 1 (≤ 110 caracteres, única no dia, com o número e o
   contraste); linha em branco; 3–5 linhas "▸" (as opcionais saem de trás para a
@@ -212,6 +216,9 @@ mais da metade dos analisados** (`selecao.Lados.papeis`): 6 × 4 com 4 sem lado,
 da capa e do Placar, na legenda do relógio, no espectro e na legenda; 4 de 8 (18/10)
 também.
 
+Os títulos dos slides 3 e 4 usam o mesmo separador: se um não cabe numa linha com o "·", os dois vão com ":"
+("5 DE 11: APURAÇÃO DE FALHA HUMANA" e "5 DE 11: VÍTIMAS", 29/10).
+
 Slides: 1 capa-tensão com barra A | N | B e o subtítulo que diz qual é o fato,
 com sujeito e o quê (o assunto ou a manchete só sem o adjetivo da casa; a linha
 fina só se nomear o fato; senão a frase do corpo que o nomeia, cortada na
@@ -233,7 +240,8 @@ quando a maioria não passa da metade, "a cobertura majoritária" com 4 de 9 tam
 sem nenhuma, o molde com os números do espectro, a janela de horário de cada
 lado quando elas não se cruzam (tudo num dia só, a data vai uma vez: "em 27/10, os 6 de fuga ilícita
 publicaram entre 09h13 e 15h32…") e a conta por idioma ("Entre os veículos em
-inglês, 2 destacaram X e 3, Y; em português, 3 e 2."); a lista "fora da
+inglês, 2 destacaram X e 3, Y; em português, 3 e 2."; o zero por extenso: "nenhum destacou X e 2, Y", "3 e
+nenhum"); a lista "fora da
 análise" com nomes inteiros e "+k"; 7 por que importa (some sem
 `why_it_matters`; com termo proibido, o corte vai ao começo dele, "em meio à inflação" sai inteiro, ou
 à fronteira de oração anterior, e fecha com ponto; nunca "…sobre os governos em meio", 01/11); 8 Placar do dia + método + CTA "Leu só uma versão? Mande
@@ -265,7 +273,9 @@ Escolha (`estatistica.numero_do_dia`), primeira regra com candidato:
 triangulado (o mesmo número, com unidade, no título de 3+ veículos; fora
 esporte, política/eleição no modo eleitoral, `exclude` e `usados`; na lista de verificação, a hora do
 veículo confirmado é a do 1º título dele com o número, e o período vai do 1º ao último desses: em 31/10,
-Valor às 17h34, e não às 05h00 de outro título); 3 o assunto
+Valor às 17h34, e não às 05h00 de outro título; o título com a ressalva oposta à da tese não confirma: "quase
+18%" da Suno sob o "MAIS DE 18%" da capa, 31/10, que fica 4 de 8; quando a tese não cabe na linha 1 da legenda,
+a linha diz de quem é o número: "R$ 827 mi: Ri Happy, no título de 3 de 6 veículos…", 20/10); 3 o assunto
 mais coberto com 12+ veículos; 4 mercado com z ≥ 2; 5 o maior acumulado ainda não publicado na semana, de 1% ou
 mais ("S&P 500 acumula −0,1%" não é achado) e, no período eleitoral, sem o que carrega o movimento eleitoral do dia
 (o Ibovespa de 27/10)
@@ -325,12 +335,16 @@ Bolsonaro desembarca nos EUA" depois do Raio-X de 28/10 sobre a fuga). Com núme
 novo, a continuação pode ser capa, e o número em destaque é o novo (01/11: a Binance
 volta depois do Placar de 31/10, que destacou o roubo de US$ 6,3 bi; a capa estampa
 "90%", o que a corretora cobriu). O assunto ainda pode ser fato e aparecer na linha
-do mais coberto.
+do mais coberto. A capa do Em 1 minuto da véspera (`Fila.capas_manha`) não volta como capa nem com número novo
+(`manha.mesma_capa`: 2+ entidades em comum, `mesmo_assunto` ou um nome próprio nas duas manchetes; "Ações da
+Alphabet caem até 10%…", 29/10, e "Alphabet perde US$ 500 bilhões…", 30/10): a matéria pode ser fato, nunca capa
+dois dias seguidos. O número que o Número da véspera estampou não volta como destaque de fato do mesmo assunto
+(o "11,3%" do TCU, Número de 29/10, no slide 3 de 30/10, que estampa os "30%").
 
 | # | Slide | Conteúdo |
 |---|---|---|
-| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`manha.numero_da_capa`: o da manchete que sai na capa ou, sem ele, o da manchete original e da linha fina, com o qualificador); sem número e com 3+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10; "4 VEÍCULOS", 24/10: a coluna marinho do grid não fica sem laranja; só com 2 veículos e sem número a capa sai sem destaque, 18 e 25/10 e 02/11); os nomes próprios de até 20 caracteres não quebram de linha ("André Lara Resende", 02/11); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
-| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, o texto nunca repete a capa (`manha.repete_capa`: Jaccard ≥ 0,6 com a manchete ou 60% das palavras de assunto dela, pelas 5 primeiras letras, dentro do texto; 31/10, "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…"; 02/11, "O Ministério da Fazenda descartou fixar teto…" sob "Fazenda descarta teto…"): vai o próximo (o item do briefing, a manchete, a linha fina e, por último, uma das 2 primeiras frases do corpo, para a capa não cair por falta de texto); o texto sem dado novo em relação à capa (`manha.dado_novo`: nenhum número nem nome próprio que ela não tenha; 28/10, "O mercado financeiro arrefeceu o estresse…") só vale se nenhum outro servir; nenhum número que a capa mostra volta como destaque (o em laranja e os da manchete), nem a cobertura quando ela é o número da capa; sem número nem cobertura e com o relógio válido, a duração vira o número, sempre nova ("DO PRIMEIRO AO ÚLTIMO VEÍCULO, MAIS DE / 25 HORAS", 22/10); a contagem vale com qualquer substantivo no plural fora de tempo, "vezes" e "votos" ("448 requerimentos", 19/10); o número que a véspera estampou sobre a mesma entidade não volta como destaque de fato ("US$ 6,3 BI" da Binance, 30 e 31/10); quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
+| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`manha.numero_da_capa`: o da manchete que sai na capa ou, sem ele, o da manchete original e da linha fina, com o qualificador); sem número e com 3+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10; "4 VEÍCULOS", 24/10: a coluna marinho do grid não fica sem laranja; só com 2 veículos e sem número a capa sai sem destaque, 18 e 25/10 e 02/11); os nomes próprios de até 20 caracteres não quebram de linha ("André Lara Resende", 02/11); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa) e o nome pela manchete da matéria sem o adjetivo da casa ("SpaceX e Tesla avaliam fusão após salto…", nunca o rótulo "SpaceX e Tesla"); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2; quando ele é um dos fatos, a linha só aponta o slide ("O MAIS COBERTO DO DIA ESTÁ NO SLIDE 5 · 15 VEÍCULOS", 31/10), e o texto fica no fato; o de mercado, só o nome do ativo e onde está a cotação ("Petróleo Brent · cotação no slide 7", 23/10) |
+| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, o texto nunca repete a capa (`manha.repete_capa`: Jaccard ≥ 0,6 com a manchete ou 60% das palavras de assunto dela, pelas 5 primeiras letras, dentro do texto; 31/10, "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…"; 02/11, "O Ministério da Fazenda descartou fixar teto…" sob "Fazenda descarta teto…"): vai o próximo (o item do briefing, a manchete, a linha fina e, por último, uma das 2 primeiras frases do corpo, para a capa não cair por falta de texto); o texto sem dado novo em relação à capa (`manha.dado_novo`: nenhum número nem nome próprio que ela não tenha; o dia do mês entre parênteses, o ano e a data não são número novo, "nesta segunda-feira (26)", 27/10; nome próprio é entidade da matéria, e não "Justiça", 15/10, nem o veículo citado no corpo; 28/10, "O mercado financeiro arrefeceu o estresse…") só vale se nenhum outro servir; sem nenhum com dado novo, vai o "por que importa" (`why_it_matters`: o que o fato muda, e não a capa de novo; 16 e 27/10); nenhum número que a capa mostra volta como destaque (o em laranja e os da manchete), nem a cobertura quando ela é o número da capa; sem número nem cobertura e com o relógio válido, a duração vira o número, sempre nova ("DO PRIMEIRO AO ÚLTIMO VEÍCULO, MAIS DE / 25 HORAS", 22/10), só quando o texto traz dado novo e com 3 horas ou mais (abaixo disso, "101 MINUTOS" em 15/10, é o ritmo comum de uma notícia; em 14/10 a 02/11, 3 dias: 22, 24 e 28/10); a contagem vale com qualquer substantivo no plural fora de tempo, "vezes" e "votos" ("448 requerimentos", 19/10); o número que a véspera estampou sobre a mesma entidade não volta como destaque de fato ("US$ 6,3 BI" da Binance, 30 e 31/10); quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
 | 7 | Mercado em linha | `mercado.mercado_slide(tema="dark")` |
 | 8 | Fechamento | uma estatística (pauta solitária: "1.039 de 1.159 assuntos de hoje (90%) saíram em uma fonte só") + matriz de pontos pequena + 1 CTA "Mande no grupo de quem precisa começar o dia informado." |
 
@@ -360,7 +374,8 @@ clima); manchete (a da capa do Em 1 minuto, letra por letra, `manha.manchete_cap
 verbo neutro, "caem até 10%", e o corte antes da palavra proibida, "TCU define alíquota de 11,3%
 para a CBS" sem o "e acende alerta…", 30/10; com o filtro eleitoral, também a eleição de outro país,
 e nunca o título literal de um veículo; a 2ª frase nunca repete o título; selo, mini
-barra e fontes como no Em 1 minuto, a lista fechando com a contagem); mercado com a coluna do
+barra e fontes como no Em 1 minuto, a lista fechando com a contagem; o destaque é o da capa, a cobertura também:
+"NOTICIADO POR / 8 VEÍCULOS", 18/10); mercado com a coluna do
 acumulado e a hora da leitura; chamada para o carrossel com a capa do Em 1 minuto
 já renderizada de miniatura (sem ela, o desenho genérico). Assinatura em todas.
 
@@ -373,7 +388,11 @@ com 4 ou mais veículos comparados sem divisão; "Dividir = pelo menos 2 veícul
 cada lado, o mesmo critério do Placar do dia"); "como fazemos e o que não fazemos"
 ("Sem adjetivo nosso, sempre com fonte.": o adjetivo do veículo pode aparecer
 citado, o da casa não); "Todo dia, 3 posts" + Siga. "x em cada 10" arredondado
-para baixo, com o laranja no gancho ("8 DE CADA 10"), um destaque só por slide.
+para baixo, com o laranja no gancho ("8 EM CADA 10"), um destaque só por slide e o mesmo "em cada" nos dois
+slides, sem quebra de linha dentro ("MAIS DE 8 EM CADA 10" com espaço inseparável). Na divisão (slide 4), o gancho
+conta o racha, como o Placar, e o laranja dele é o dos quadrados do waffle: "MENOS DE 2 EM CADA 10 ASSUNTOS
+COMPARADOS DIVIDIRAM A COBERTURA" (o "menos de" arredondado para cima, a mesma regra honesta), e não "8 de cada
+10… sem divisão" em laranja ao lado de quadrados laranja que eram os que dividiram.
 
 ### 5.7 Mercado em linha — `formatos/mercado.py`
 
@@ -390,7 +409,11 @@ linha ocupa ~190 px. Nenhum texto com dado abaixo de 22 px (o rodapé encolhe at
 tracejado se explica uma vez, no rodapé ("Uma leitura por dia · fech. = fechamento · ┄ pregão
 sem leitura"). Como substituto da noite:
 tema papel, sem número de série, e o título só vai para ativo lido no dia (às
-18h30, o fechamento de sexta não é título da segunda-feira).
+18h30, o fechamento de sexta não é título da segunda-feira); a leitura feita mais de 6 h antes do post sai sem a
+variação do dia, na arte, na legenda e no texto alternativo (26/10: o dólar das 04h30 com +0,56%, num dia que fechou
+em cerca de +7,7%), e o rodapé diz "Leitura antiga sem variação"; o CTA ("Salve para comparar com a próxima
+leitura.") vai na arte, na legenda e no fim do texto alternativo. Renovar as cotações antes das 18h30 é decisão do
+dono no workflow.
 
 ## 6. Sistema visual
 
@@ -406,7 +429,8 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   luminância; A e B se separam pelo matiz. As marcas cinzas sem lado nenhum (o resto do
   waffle, as faixas da matriz, as barras dos outros dias, o IPCA) usam `--g-cinza`, ≥ 3:1
   sobre o fundo. Nenhum texto com dado abaixo de 22 px (rótulos em mono, chip, horas dos slides de lado, a lista
-  "Por que este número"); rodapé e nota de método até 20 px, com o texto encurtado em vez de encolher (a tela 3
+  "Por que este número", a coluna LEITURA do Terminal, a 24 px e só com "06h58" ou "fech. 08/10", porque o
+  cabeçalho já diz LEITURA); rodapé e nota de método até 20 px, com o texto encurtado em vez de encolher (a tela 3
   dos stories: "Horário de Brasília · fech. = fechamento · acumulado desde a 1ª leitura").
 - **Moldura:** sai a régua dupla, o logotipo nos slides internos, o "01 FATO"
   gigante e os tracinhos de progresso. Fica uma faixa de série de 8 px com o selo
@@ -430,7 +454,9 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   dezenas de veículos: o fato, o mercado e como cada um contou. Por IA, com
   fontes ↓".
 - Destaques: Comece aqui, Raio-X, Método. Fixados: Manifesto (D0), Como ler
-  um Raio-X e Nossos números (Onda 2).
+  um Raio-X e Nossos números (Onda 2). O manifesto não se fixa sozinho: o fixado ocupa a 1ª casa da grade e
+  parte cada dia em duas linhas. Até a Onda 2, ou ele fica sem fixar, ou se fixam 3 de uma vez (o manifesto e os 2
+  últimos posts de feed de um dia), para manter o múltiplo de 3.
 
 ## 8. Limites honestos
 

@@ -124,8 +124,18 @@ def test_noite_de_26_10_nao_titula_com_o_fechamento_de_sexta():
 @real
 def test_legenda_do_substituto_em_21_10():
     p = M.mercado_em_linha(edicao("21"), {}, historia("21"))
-    assert "▸ Ibovespa: 208.296 pontos (fech. 20/10, +1,57% no dia, +13,8% desde 28/09)." in p.caption
-    assert "▸ Dólar: R$ 5,01 (leitura das 06h00, −0,35% no dia, −4,1% desde 28/09)." in p.caption
+    # às 18h30, o fechamento da véspera e a leitura das 06h00 não levam a variação do dia (dados#2, rodada 2)
+    assert "▸ Ibovespa: 208.296 pontos (fech. 20/10, +13,8% desde 28/09)." in p.caption
+    assert "▸ Dólar: R$ 5,01 (leitura das 06h00, −4,1% desde 28/09)." in p.caption
+    assert "Leitura de mais de 6 h sai sem a variação do dia." in p.caption
+    s = p.slides[0]
+    assert s.ctx["pe"] == M.RODAPE_ANTIGA and s.ctx["cta"] == M.CTA and s.alt.endswith(M.CTA)
+    assert all(x["change"] == "" for x in s.ctx["paineis"]) and "no dia" not in s.alt
+    # com a leitura recente (hora do post às 09h), a variação volta
+    cedo = M.mercado_em_linha(edicao("21"), {}, historia("21"), hora_post=datetime(2026, 10, 21, 9, 0, tzinfo=E.TZ))
+    assert "▸ Dólar: R$ 5,01 (leitura das 06h00, −0,35% no dia, −4,1% desde 28/09)." in cedo.caption
+    # o slide 7 do Em 1 minuto (07:00) fica como era
+    assert M.mercado_slide(edicao("21"), historia("21")).ctx["pe"] == M.RODAPE
     assert "▸ Selic 13,75% · IPCA 12m 4,58% (set) · juro real ex-post 8,77%." in p.caption
 
 

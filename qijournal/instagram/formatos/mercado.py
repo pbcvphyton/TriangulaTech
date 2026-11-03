@@ -9,7 +9,7 @@ histórico; nada de IA.
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 from typing import Any, Iterable
 
 from qijournal.models import Edition, Quote
@@ -25,6 +25,9 @@ PAINEL_LARGURA, PAINEL_ALTURA = 440, 270  # o gráfico de cada painel (o painel 
 CTA = "Salve para comparar com a próxima leitura."
 # A fonte fica só na assinatura; com pregão faltante em algum gráfico, o template junta a legenda do tracejado.
 RODAPE = "Uma leitura por dia · fech. = fechamento"
+RODAPE_ANTIGA = "Leitura antiga sem variação · fech. = fechamento"  # a noite com leitura de mais de 6 h
+HORA_NOITE = time(18, 30)  # o substituto da noite sai às 18h30
+VALIDADE_LEITURA = timedelta(hours=6)  # às 18h30, a leitura das 04h30 não é "o dia" (26/10: dólar +0,56% às 04h30)
 
 # Unidade de cada ativo no texto ("R$ 5,01", "208.296 pontos") e o nome no meio da frase.
 PREFIXO = {"usd": "R$ ", "eur": "R$ ", "cny": "R$ ", "brent": "US$ ", "btc": "US$ ", "gold": "US$ "}
@@ -65,8 +68,11 @@ def faixa_juros(edition: Edition) -> str:
     return " · ".join(partes)
 
 
-def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int) -> tuple[dict[str, Any], str] | None:
-    """O painel de um ativo e a frase do gráfico para o texto alternativo ("" sem gráfico)."""
+def _painel(
+    edition: Edition, history: list[Edition], qid: str, min_pontos: int, hora_post: datetime | None = None
+) -> tuple[dict[str, Any], str] | None:
+    """O painel de um ativo e a frase do gráfico para o texto alternativo ("" sem gráfico). Com ``hora_post``
+    (a noite), a leitura feita mais de 6 h antes do post também perde a variação do dia."""
     q = next((x for x in edition.quotes if x.id == qid), None)
     if q is None:
         return None
@@ -77,7 +83,9 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
     # Leitura sem variação (o dólar às 09h00 com 0,00%) ou velha (a da véspera, a de domingo sem sessão,
     # :func:`.estatistica.leitura_velha`) não mostra variação nem seta; o valor e o selo ficam.
     velha = hoje is not None and E.leitura_velha(qid, hoje, day, E.edicao_anterior(history, edition))
-    mostra_var = bool(selo) and q.change_pct is not None and not velha
+    # a noite sai às 18h30: a variação de uma leitura da madrugada não é a do dia (o dólar fechou +7,7% em 26/10)
+    antiga = hoje is not None and hora_post is not None and hoje.as_of < hora_post - VALIDADE_LEITURA
+    mostra_var = bool(selo) and q.change_pct is not None and not velha and not antiga
     painel: dict[str, Any] = {
         "id": qid,
         "nome": q.label,
@@ -94,6 +102,7 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
         "faltantes": 0,  # pregões sem leitura no gráfico (tracejado)
         "ate": "",  # a ponta final do acumulado: "até o fechamento de 23/10", "até a leitura das 06h45"
         "do_dia": hoje is not None and hoje.day == day,  # a última leitura é do dia da edição
+        "antiga": bool(antiga and q.change_pct is not None and not velha),  # a variação saiu pela hora do post
     }
     descricao = ""
     acc = E.acumulado(pontos)
@@ -139,9 +148,13 @@ def _achado(paineis: list[dict[str, Any]], day: str, evitar: Iterable[str] = ())
     return f"Mercado em {day}", "", "", ""
 
 
-def _alt(titulo: str, day: str, paineis: list[dict[str, Any]], faixa: str, graficos: list[str], selo_titulo: str = "") -> str:
+def _alt(
+    titulo: str, day: str, paineis: list[dict[str, Any]], faixa: str, graficos: list[str], selo_titulo: str = "",
+    fim: str = "",
+) -> str:
     """Texto alternativo com os valores, a faixa e a frase de cada gráfico; se passar de 1.000
-    caracteres, cada gráfico fica só com a primeira frase ("linha com 14 leituras, de … a …")."""
+    caracteres, cada gráfico fica só com a primeira frase ("linha com 14 leituras, de … a …"). ``fim``: o
+    rodapé e o CTA da arte, que fecham o texto."""
     frases = []
     for p in paineis:
         partes = [x for x in (p["selo"], f"{p['change']} no dia" if p["change"] else "", p["acumulado"]) if x]
@@ -149,11 +162,12 @@ def _alt(titulo: str, day: str, paineis: list[dict[str, Any]], faixa: str, grafi
     base = f"Mercado em linha, {day}: {titulo}" + (f", {selo_titulo}" if selo_titulo else "") + ". " + "; ".join(frases) + "."
     if faixa:
         base += f" {faixa[0].upper()}{faixa[1:]}."
+    fim = f" {fim}" if fim else ""
     for desc in (graficos, [g.split(";")[0].rstrip(".") + "." for g in graficos], []):
-        alt = base + (" Gráficos: " + " ".join(desc) if desc else "")
+        alt = base + (" Gráficos: " + " ".join(desc) if desc else "") + fim
         if len(alt) <= ALT_LIMIT:
             return alt
-    return base
+    return base + fim
 
 
 def mercado_slide(
@@ -164,6 +178,8 @@ def mercado_slide(
     min_pontos: int = E.ACUMULADO_MIN_PONTOS,
     evitar: Iterable[str] = (),
     so_do_dia: bool = False,
+    hora_post: datetime | None = None,
+    cta: str = "",
 ) -> Slide | None:
     """O slide do Mercado em linha: título-achado, 4 gráficos pequenos em 2×2, faixa de juros e rodapé.
 
@@ -172,13 +188,14 @@ def mercado_slide(
     (``limiares.grafico_min_pontos``), o painel mostra só o valor. None sem nenhuma cotação dos 4 ativos.
     ``evitar``: ativos que não viram título (ex.: ``{"ibov"}`` quando o Número do dia já é o acumulado dele).
     ``so_do_dia``: o título só vai para ativo com leitura do dia da edição, se houver (a noite sai às 18h30:
-    o fechamento de sexta não é o título da segunda-feira).
+    o fechamento de sexta não é o título da segunda-feira). ``hora_post``: a leitura de mais de 6 h antes dele
+    sai sem a variação do dia, e o rodapé diz por quê (:data:`RODAPE_ANTIGA`). ``cta``: a chamada na arte (a noite).
 
     O ``ctx`` traz ``selo`` ("MERCADO EM LINHA · QUA 21 OUT"), ``contador`` (False) e ``cor``
     ("em1min" ou "mercado"): o Em 1 minuto troca o selo pelo da série e liga o contador.
     """
     day = edition_day(edition)
-    feitos = [x for x in (_painel(edition, history, qid, min_pontos) for qid in ATIVOS) if x]
+    feitos = [x for x in (_painel(edition, history, qid, min_pontos, hora_post) for qid in ATIVOS) if x]
     if not feitos:
         return None
     paineis = [p for p, _ in feitos]
@@ -200,12 +217,14 @@ def mercado_slide(
         "paineis": paineis,
         "graficos": any(p["grafico"] for p in paineis),
         "faixa": faixa,
-        "pe": RODAPE,
+        "pe": RODAPE_ANTIGA if any(p["antiga"] for p in paineis) else RODAPE,
+        "cta": cta,
         "tracejado": any(p["grafico"] and p["faltantes"] for p in paineis),  # legenda "┄ pregão sem leitura"
         "nota": "fonte: Yahoo Finance e BCB",
         "section": "mercados",
     }
-    alt = _alt(titulo, short_date(day), paineis, faixa, [d for _, d in feitos if d], selo_titulo)
+    fim = " ".join(x for x in ((f"{ctx['pe']}." if ctx["pe"] == RODAPE_ANTIGA else ""), cta) if x)
+    alt = _alt(titulo, short_date(day), paineis, faixa, [d for _, d in feitos if d], selo_titulo, fim)
     return Slide("mercado_linha", ctx, alt=alt)
 
 
@@ -218,19 +237,26 @@ def mercado_em_linha(
     evitar: Iterable[str] = (),
     election: bool = False,
     nomes: Iterable[str] = E.NOMES_ELEICAO,
+    hora_post: datetime | None = None,
 ) -> Peca | None:
-    """Substituto da noite (18:30): imagem única em papel, sem número de série.
+    """Substituto da noite (18:30): imagem única em papel, sem número de série, com o CTA na arte.
 
     ``evitar``: ativos que não viram título (o do Número do dia, para os posts do dia não repetirem o assunto).
     No período eleitoral, o ativo de matéria eleitoral do dia também não (:func:`.estatistica.mercado_eleitoral`).
+    ``hora_post`` (padrão: 18h30 do dia): a leitura de mais de 6 h antes dele sai sem a variação do dia, na arte,
+    na legenda e no texto alternativo (26/10: o dólar das 04h30 com +0,56%, num dia que fechou em +7,7%).
     """
     evitar = set(evitar)
     if election:
         evitar |= {qid for qid in ATIVOS if E.mercado_eleitoral(edition, qid, nomes)}
-    slide = mercado_slide(edition, history, tema="paper", min_pontos=min_pontos, evitar=evitar, so_do_dia=True)
+    day = edition_day(edition)
+    hora_post = hora_post or datetime.combine(day, HORA_NOITE, E.TZ)
+    slide = mercado_slide(
+        edition, history, tema="paper", min_pontos=min_pontos, evitar=evitar, so_do_dia=True, hora_post=hora_post,
+        cta=CTA,
+    )
     if slide is None:
         return None
-    day = edition_day(edition)
     ctx = slide.ctx
     linhas = []
     for p in ctx["paineis"]:
@@ -241,7 +267,8 @@ def mercado_em_linha(
         linhas.append(f"▸ {ctx['faixa']}.")
     corpo = linhas + [
         "Como medimos: uma leitura por dia (Yahoo Finance e Banco Central), variação ponta a ponta; "
-        "não é soma de variações diárias.",
+        "não é soma de variações diárias." + (" Leitura de mais de 6 h sai sem a variação do dia."
+                                               if ctx["pe"] == RODAPE_ANTIGA else ""),
         CTA,
         hashtags("#dados", ["mercados", "brasil"], election=False),
     ]

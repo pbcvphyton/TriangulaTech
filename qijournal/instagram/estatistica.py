@@ -537,6 +537,9 @@ def tese_com_numero(edition: Edition, story: Story, core: str, tese: str, limite
 _ENTIDADE = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕ][\wÀ-ú]{3,}")
 _LIGA_NOME = {"de", "da", "do", "dos", "das"}  # "Bola de Ouro" é um nome só
 _SUJEITOS_FORA = {"brasil", "governo"}
+_CURTO = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕ][\wÀ-ú]{1,2}")
+_CURTOS_FORA = {"em", "na", "no", "da", "do", "de", "os", "as", "um", "ao", "aos", "por", "com", "sem", "uma", "seu",
+                "sua", "eua", "ue", "onu"}
 
 
 def sujeito(story: Story, titulos: Sequence[str] = ()) -> str:
@@ -555,13 +558,21 @@ def sujeito(story: Story, titulos: Sequence[str] = ()) -> str:
     def eh_nome(i: int) -> bool:
         return bool(_ENTIDADE.fullmatch(words[i])) and (i > 0 or 2 * vezes(words[i]) >= len(titulos))
 
+    def curto(i: int) -> bool:
+        """A parte curta de um nome ("Ri Happy", 20/10): maiúscula de 2–3 letras colada num nome, com os dois
+        juntos no título de metade dos veículos (nunca "Em", "Na"…)."""
+        return (
+            i + 1 < len(words) and bool(_CURTO.fullmatch(words[i])) and words[i].lower() not in _CURTOS_FORA
+            and eh_nome(i + 1) and 2 * vezes(f"{words[i]} {words[i + 1]}") >= len(titulos)
+        )
+
     nomes: list[tuple[int, int]] = []  # (início, fim) de cada nome na manchete
     i = 0
     while i < len(words):
-        if not eh_nome(i):
+        if not eh_nome(i) and not curto(i):
             i += 1
             continue
-        j = i
+        j = i if eh_nome(i) else i + 1
         while True:
             if j + 1 < len(words) and eh_nome(j + 1):
                 j += 1
@@ -1104,6 +1115,28 @@ def _title_has(core: str, title: str) -> bool:
     return re.search(r"(?<![\d,.])" + re.escape(core) + r"(?![\d])", t) is not None
 
 
+_ACIMA, _ABAIXO = {"mais de"}, {"quase", "até"}  # ressalvas de sentido oposto: "mais de 18%" e "quase 18%"
+
+
+def _qual_no_titulo(core: str, title: str) -> str:
+    """A ressalva que o título põe antes do número (``"quase"``), ou ""."""
+    t = _plain(title or "")
+    for m in _NUMERO.finditer(t):
+        if _core(m.group(0).strip()) == core:
+            q = _QUALIFICADOR.search(t[: m.start()])
+            return q.group(1).lower() if q else ""
+    return ""
+
+
+def _confirma(core: str, title: str, qual: str = "") -> bool:
+    """O título traz o número da tese, sem ressalva de sentido oposto ao da tese (31/10: "quase 18%" na Suno não
+    confirma o "MAIS DE 18%" da capa)."""
+    if not _title_has(core, title or ""):
+        return False
+    q, dele = qual.lower(), _qual_no_titulo(core, title)
+    return not ((q in _ACIMA and dele in _ABAIXO) or (q in _ABAIXO and dele in _ACIMA))
+
+
 def _display_number(raw: str) -> str:
     """``"R$ 1 bilhão"`` → ``"R$ 1 bi"`` (cabe na capa); o resto como veio."""
     s = re.sub(r"\s+", " ", raw.strip())
@@ -1125,17 +1158,18 @@ def _ponto_json(qid: str, p: Ponto, ref: date | None = None) -> dict[str, Any]:
     }
 
 
-def _prova_triangulado(edition: Edition, topic: IndexTopic, core: str, valor: str) -> dict[str, Any]:
+def _prova_triangulado(edition: Edition, topic: IndexTopic, core: str, valor: str, qual: str = "") -> dict[str, Any]:
     """A lista de verificação: cada veículo, se pôs o número no título e a hora. A hora do confirmado é a do
     1º título dele **com** o número (31/10: o Valor pôs "18%" às 17h34, não às 05h00, que é a de outro título
-    do assunto); a do não confirmado, a do 1º título dele no assunto."""
+    do assunto); a do não confirmado, a do 1º título dele no assunto. O título com a ressalva oposta à da tese
+    (``qual``) não confirma (:func:`_confirma`)."""
     day = date.fromisoformat(edition.date)
     rows: dict[str, dict[str, Any]] = {}
     for item in topic.items:
         if not item.source or item.source in ORGAOS:
             continue
         row = rows.setdefault(item.source, {"nome": item.source, "confirmado": False, "at": None, "hora": ""})
-        tem = _title_has(core, item.title or "")
+        tem = _confirma(core, item.title or "", qual)
         at = _parse_dt(item.published)
         if tem and not row["confirmado"]:  # o 1º título com o número troca a hora de um título sem ele
             row["confirmado"], row["at"] = True, at
@@ -1177,13 +1211,14 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
             core = _core(raw)
             if any(n.story_id == story.id and n.chave == core for _, n in out):
                 continue
-            confirm = {i.source for i in topic.items if i.source in sources and _title_has(core, i.title)}
+            q = _QUALIFICADOR.search(text[: m.start()])
+            qual = q.group(1) if q else ""
+            confirm = {i.source for i in topic.items if i.source in sources and _confirma(core, i.title, qual)}
             if len(confirm) < TRIANGULADO_MIN:
                 continue
             tese = tese_com_numero(edition, story, core, tese_da_materia(edition, story))
             if not _title_has(core, tese) or titulo_literal(tese, literais):
                 continue  # a capa diria um número sem dizer de quê, ou com o título de um veículo
-            q = _QUALIFICADOR.search(text[: m.start()])
             valor = _display_number(raw)
             numero = Numero(
                 valor=valor,
@@ -1196,7 +1231,7 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
                 chave=core,
                 qualificador=q.group(1).upper() if q else "",
                 passo=2,
-                prova=_prova_triangulado(edition, topic, core, valor),
+                prova=_prova_triangulado(edition, topic, core, valor, qual),
             )
             # Primeiro o número que a maioria dos veículos do assunto pôs no título.
             key = (2 * len(confirm) >= len(sources), story.section in SECOES_ECONOMIA, len(confirm), story.importance)

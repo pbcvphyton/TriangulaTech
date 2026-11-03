@@ -422,7 +422,8 @@ def terminal(
                     "nota": "fonte: Yahoo Finance e BCB",
                     "section": "mercados",
                 },
-                alt=f"Terminal da manhã, {short_date(day)}: {titulo}. " + quote_sentence(quotes, [q["id"] for q in quotes]) + ".",
+                alt=f"Terminal da manhã, {short_date(day)}: {titulo}. " + quote_sentence(quotes, [q["id"] for q in quotes])
+                + f". {TERMINAL_CTA}",  # o CTA da arte também (§4: o texto integral)
             )
         ],
         caption=caption,
