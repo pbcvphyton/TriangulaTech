@@ -2,7 +2,9 @@
 
 Quatro gráficos pequenos (Ibovespa, Dólar, Brent, Bitcoin) com a série de até 60
 dias, a faixa Selic · IPCA 12m · juro real e o título-achado com o maior acumulado.
-Tudo sai de ``edition.quotes`` e do histórico; nada de IA.
+Cada painel se lê a 375 px: três linhas de texto e a linha compacta, que faz o papel
+da foto (``graficos.linha(compacto=True)``). Tudo sai de ``edition.quotes`` e do
+histórico; nada de IA.
 """
 
 from __future__ import annotations

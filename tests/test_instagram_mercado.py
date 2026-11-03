@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import functools
 import json
+import os
 import re
 import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta, timezone
@@ -204,3 +205,31 @@ def test_template_renderiza_nos_dois_temas(tema, classe):
     assert html.count("graf graf-linha") == 4 and "triangula" in html
     s.ctx.update(selo="EM 1 MINUTO Nº 031", contador=True)  # como slide 7 do Em 1 minuto
     assert '<span class="cnt">07/08</span>' in _render(s, "carousel")
+
+
+def _luminancia(rgb: tuple[int, ...]) -> float:
+    c = [v / 255 for v in rgb[:3]]
+    c = [v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4 for v in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+@real
+@pytest.mark.skipif(not os.environ.get("QIJ_CHROMIUM"), reason="sem Chromium (QIJ_CHROMIUM)")
+@pytest.mark.parametrize("dia", ["20", "26", "27"])
+def test_render_sem_corte_e_com_a_faixa_visivel(dia, tmp_path):
+    """O slide 7 do Em 1 minuto e a noite em papel cabem sem texto cortado, e a faixa de série (y = 3) passa de
+    3:1 contra o fundo logo abaixo (y = 20): era #1B2745 sobre #0F1730 e papel sobre papel (arte#4)."""
+    from PIL import Image
+
+    from qijournal.instagram.render import Renderer
+
+    manha = M.mercado_slide(edicao(dia), historia(dia))
+    manha.ctx.update(selo="EM 1 MINUTO Nº 031", contador=True)
+    noite = M.mercado_em_linha(edicao(dia), {}, historia(dia)).slides[0]
+    with Renderer() as r:
+        for nome, s in (("manha", manha), ("noite", noite)):
+            res = r.render(_render(s, "carousel"), tmp_path / f"{nome}.jpg", width=1080, height=1350)
+            assert res.transbordos == [], (nome, [str(t) for t in res.transbordos])
+            im = Image.open(res.path).convert("RGB")
+            a, b = sorted((_luminancia(im.getpixel((540, 3))), _luminancia(im.getpixel((540, 20)))), reverse=True)
+            assert (a + 0.05) / (b + 0.05) >= 3.0, nome

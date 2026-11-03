@@ -337,7 +337,14 @@ Título-achado com o maior |acumulado| e, embaixo, a ponta final ("até o
 fechamento de 23/10", "até a leitura das 06h45"); 4 gráficos pequenos 2×2 (Ibovespa,
 Dólar, Brent, Bitcoin) com a série desde 29/09, ponto de hoje em laranja,
 extremo anotado e pregão faltante tracejado; faixa Selic · IPCA 12m · juro
-real; rodapé com o método (a fonte fica na assinatura). Como substituto da noite:
+real; rodapé com o método (a fonte fica na assinatura). Legível a 375 px, o gráfico é
+a foto: cada painel tem três linhas de texto ("Ibovespa · fech. 23/10", o valor com a
+variação do dia, "+12,1% desde 28/09") e a linha compacta (`graficos.linha(compacto=True)`)
+com um rótulo só, o extremo do meio da série ("máx. 209.067 · 09/10"; sem ele, o valor da
+1ª leitura), e o eixo "28/09 · 17 leituras · 23/10"; o valor de hoje fica no painel, e a
+linha ocupa ~190 px. Nenhum texto com dado abaixo de 22 px (o rodapé encolhe até 20). O
+tracejado se explica uma vez, no rodapé ("Uma leitura por dia · fech. = fechamento · ┄ pregão
+sem leitura"). Como substituto da noite:
 tema papel, sem número de série, e o título só vai para ativo lido no dia (às
 18h30, o fechamento de sexta não é título da segunda-feira).
 
@@ -348,10 +355,20 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   selos). A Noto Sans sai dos templates do Instagram.
 - **Cor:** marinho #1B2745/#0F1730, laranja #FF5A1F, papel #F6F4EF; lados A
   ardósia, B petróleo, neutro cinza. Tema `.t-orange` (texto marinho). O laranja
-  nos demais formatos só marca o dado.
+  nos demais formatos só marca o dado. O sem lado (`--g-n`) é o cinza recessivo e não
+  se confunde com o lado A na mini barra nem nos pontos do relógio: ≥ 3:1 contra A e
+  ≥ 2:1 contra o fundo e contra B (papel: #A3AAB5, mais claro que A e B; marinho:
+  #424C61, mais escuro). Três marcas e o fundo não passam todos de 3:1 entre si só pela
+  luminância; A e B se separam pelo matiz. As marcas cinzas sem lado nenhum (o resto do
+  waffle, as faixas da matriz, as barras dos outros dias, o IPCA) usam `--g-cinza`, ≥ 3:1
+  sobre o fundo.
 - **Moldura:** sai a régua dupla, o logotipo nos slides internos, o "01 FATO"
   gigante e os tracinhos de progresso. Fica uma faixa de série de 8 px com o selo
-  em pílula e o contador ("03/08"), e um rodapé de uma linha com a assinatura.
+  em pílula e o contador ("03/08"), e um rodapé de uma linha com a assinatura. A
+  faixa vai na tinta do tema, a cor da pílula (marinho no papel, creme no marinho,
+  branco nos lados do Raio-X): na cor da série ela sumia no próprio fundo (papel sobre
+  papel, marinho sobre marinho). Só o Número (e o manifesto) leva a faixa em laranja
+  (`--g-hi`: #E04A12 no papel, marinho na capa laranja). Toda faixa passa de 3:1.
   Nada essencial a menos de 72 px das laterais.
 - **Gráficos** (`graficos.py`, funções puras que devolvem `(svg, descricao)`):
   barra A/N/B, relógio, espectro, waffle, matriz de pontos, linha, barras de

@@ -1011,10 +1011,15 @@ def linha(
     lo, hi = pts[i_min][1], pts[i_max][1]
     if hi == lo:
         lo, hi = lo - abs(lo) * 0.01 - 1, hi + abs(hi) * 0.01 + 1
-    # a base no pé: numa linha; se não couber (o compacto, com pregão faltante), em duas, sem cortar
-    base = []
-    if compacto:  # o eixo: as duas datas nas pontas e a base no meio
-        base_h = td + 18
+    base = []  # a base no pé (a versão grande): numa linha; se não couber, em duas, sem cortar
+    if compacto:
+        # no pé, o eixo (as duas datas nas pontas e a base no meio); margem só do lado do único rótulo e, do
+        # outro, a do ponto de hoje
+        base_h = rotulo_h = td + 18
+        cima = "max" in anotacoes or ("primeiro" in anotacoes and v0 > vn)
+        baixo = "min" in anotacoes or ("primeiro" in anotacoes and v0 <= vn)
+        topo = rotulo_h + 4 if cima else 14
+        pe = base_h + (rotulo_h + 4 if baixo else 14)
     else:
         if n > 1:
             base = [f"{n} leituras, de {_ddmm(d0)} a {_ddmm(dn)}"]
@@ -1023,13 +1028,6 @@ def linha(
                 junta = f"{base[0]} · {falta}"
                 base = [junta] if largura_texto(junta, "mono", td) <= largura else [base[0], falta]
         base_h = (td + 22) + (td + 6) * (len(base) - 1)
-    if compacto:  # margem só do lado do único rótulo; do outro, a do ponto de hoje
-        rotulo_h = td + 18
-        cima = "max" in anotacoes or ("primeiro" in anotacoes and v0 > vn)
-        baixo = "min" in anotacoes or ("primeiro" in anotacoes and v0 <= vn)
-        topo = rotulo_h + 4 if cima else 14
-        pe = base_h + (rotulo_h + 4 if baixo else 14)
-    else:
         # margens: rótulo de duas linhas no alto; embaixo, também quando uma ponta está no terço de baixo
         rotulo_h = tv + td + 6 + 18
         topo = rotulo_h + 4
