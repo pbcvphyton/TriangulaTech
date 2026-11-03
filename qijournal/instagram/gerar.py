@@ -277,7 +277,7 @@ def build_pieces(
         if peca is None:
             return None
         problemas = aprovar(peca)
-        rotulo = f"{peca.title} ({peca.chave})" if peca.chave else peca.title
+        rotulo = f"{peca.title} ({peca.chave})" if peca.chave and peca.serie == NU.SERIE else peca.title
         if problemas:
             log.warning("Instagram: %s reprovado no lint (%s); %s", rotulo, "; ".join(problemas[:6]), depois)
             caiu(peca.slot, rotulo, ["lint: " + p for p in problemas], depois)
@@ -309,6 +309,15 @@ def build_pieces(
     # 2. Número do dia: o próximo passo da cadeia substitui o reprovado.
     exclude = {edition.lead, *(noite.story_ids if noite is not None else [])}
     usados = fila.chaves_numero(day, lim.numero_repeticao_dias)
+    ontem = next((e for e in history if e.date == (day - timedelta(days=1)).isoformat()), None)
+    if usados is not None:
+        # nem o acumulado que o slide de mercado da véspera estampou no título (o Brent +13,4% de 31/10), nem o do
+        # ativo de que o Número da véspera tratou (o Ibovespa dos "18%" de 31/10 não volta como acumulado em 01/11)
+        usados |= {f"acum:{a}" for a in fila.ativos_mercado(day)}
+        ids_numero = set(fila.materias_numero(day, 1))
+        for s in (ontem.stories if ontem is not None else []):
+            if s.id in ids_numero:
+                usados |= {f"acum:{a}" for a in E.ativos_no_titulo(s.headline)}
     numero: conteudo.Peca | None = None
     rejeitadas: set[str] = set()
     apos = 0
@@ -340,10 +349,9 @@ def build_pieces(
         )
 
     # 3. Manhã: Em 1 minuto ou, sem IA (ou reprovado), o Terminal.
-    ontem = next((e for e in history if e.date == (day - timedelta(days=1)).isoformat()), None)
     # a capa não estampa o que a noite do dia estampa (o Raio-X ou os destaques do Placar) nem reabre, sem
     # número novo, o assunto do Raio-X ou do Placar da noite anterior, o post logo antes dela na grade
-    ids_ontem = set(fila.materias_raiox(day, 1))
+    ids_ontem = set(fila.materias_raiox(day, 1)) | set(fila.materias_numero(day, 1))  # e o Número da véspera
     noite_ontem = [s for s in (ontem.stories if ontem is not None else []) if s.id in ids_ontem]
     manha = MH.em_1_minuto(
         edition, brand, history, election=election, nomes=nomes, numero_serie=numero_serie(MH.SERIE, MH.SLOT),

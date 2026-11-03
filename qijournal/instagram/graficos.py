@@ -687,7 +687,9 @@ def espectro(
     - ``fora``: veículos que publicaram mas ficaram fora da análise (linha no pé, ponto vazado).
 
     Cada grupo é uma coluna: a fileira de pontos, a contagem grande, o rótulo e os nomes
-    (até ``max_nomes``; o resto vira "+k"), inteiros (a coluna estreita desce o corpo até 22 px). Sem percentual.
+    (até ``max_nomes``; o resto vira "+k"), inteiros: a coluna tem pelo menos a largura do nome mais longo dela a
+    22 px, a figura usa um corpo só (de 28 a 22 px) e, se ainda assim não couber, o nome quebra em 2 linhas.
+    Sem percentual.
     """
     lado_minoria = "b" if lado_maioria == "a" else "a"
     grupos = [("maj", list(maioria), _COR_LADO[lado_maioria], rotulos[0])]
@@ -711,11 +713,24 @@ def espectro(
     minimo = 236
     livre = largura - gap * (len(grupos) - 1)
     pesos = [max(len(nomes), 1) for _, nomes, _, _ in grupos]
+    visiveis_de = [nomes if len(nomes) <= max_nomes else nomes[: max_nomes - 1] for _, nomes, _, _ in grupos]
+    # cada coluna com pelo menos o nome mais longo dela a 22 px ("South China Morning Post", 30/10), e o resto da
+    # largura pelo número de veículos; se nem assim couber, o nome quebra em 2 linhas (nunca reticências)
+    piso = [max([minimo] + [largura_texto(nm, "label", 22) + 2 for nm in vis]) for vis in visiveis_de]
+    if sum(piso) > livre:
+        piso = [minimo] * len(grupos)
     larguras = [livre * p / sum(pesos) for p in pesos]
-    falta = sum(minimo - w for w in larguras if w < minimo)
-    if falta:
-        sobra = sum(w - minimo for w in larguras if w > minimo)
-        larguras = [minimo if w <= minimo else w - falta * (w - minimo) / sobra for w in larguras]
+    for _ in range(len(grupos)):
+        baixas = [i for i, w in enumerate(larguras) if w < piso[i] - 0.01]
+        if not baixas:
+            break
+        fixas = {i for i, w in enumerate(larguras) if w <= piso[i] + 0.01} | set(baixas)
+        resto = livre - sum(piso[i] for i in fixas)
+        peso_resto = sum(pesos[i] for i in range(len(grupos)) if i not in fixas)
+        larguras = [piso[i] if i in fixas else resto * pesos[i] / peso_resto for i in range(len(grupos))]
+    # um corpo só na figura: o maior em que todos os nomes cabem inteiros na sua coluna
+    tam = next((t for t in (28, 26, 24, 22)
+                if all(largura_texto(nm, "label", t) <= w for vis, w in zip(visiveis_de, larguras) for nm in vis)), 22)
 
     corpo: list[str] = []
     x = 0.0
@@ -735,11 +750,12 @@ def espectro(
         for j, txt in enumerate(linhas_rot):
             corpo.append(_texto(x, 168 + 36 * j, txt, "label", 30, "var(--ink)"))
         visiveis = nomes if k <= max_nomes else nomes[: max_nomes - 1]
-        # um corpo por coluna, o maior em que todos os nomes cabem inteiros ("The New York Times" numa coluna estreita)
-        tam = next((t for t in (28, 26, 24, 22) if all(largura_texto(nm, "label", t) <= w for nm in visiveis)), 22)
-        for j, nome in enumerate(visiveis):
-            corpo.append(_texto(x, y_nomes + 14 + j * passo_nome, _cabe(nome, "label", tam, w), "label", tam, "var(--ink2)"))
-        linhas = len(visiveis)
+        linhas = 0
+        for nome in visiveis:
+            partes = [nome] if largura_texto(nome, "label", tam) <= w else _quebra(nome, "label", tam, w)
+            for parte_nome in partes:
+                corpo.append(_texto(x, y_nomes + 14 + linhas * passo_nome, parte_nome, "label", tam, "var(--ink2)"))
+                linhas += 1
         if k > len(visiveis):
             corpo.append(_texto(x, y_nomes + 14 + linhas * passo_nome, f"+{k - len(visiveis)}", "mono6", 24, "var(--ink2)"))
             linhas += 1
@@ -773,6 +789,7 @@ def waffle(
     lado: float = 64,
     gap: float = 8,
     largura: float = LARGURA,
+    sufixo: str = "",
 ) -> tuple[Markup, str]:
     """Um quadrado por item: os destacados em laranja, o resto em cinza (``--g-cinza`` a 40%); as contagens em tinta.
 
@@ -782,6 +799,8 @@ def waffle(
     - ``rotulos``: o que os destacados e o resto são ("dividiram", "sem divisão").
     - ``unidade``: o que cada quadrado é, no singular; ``unidade_plural`` se o plural não for
       só acrescentar "s" na primeira palavra.
+    - ``sufixo``: vai junto das duas contagens grandes ("%" quando cada quadrado vale 1% da base: "18%" e
+      "82%", e não "18 dividiram", que se lê como 18 assuntos).
 
     Quadrados de 64 px, 7 por linha (com mais de 70, a grade alarga até 10 linhas). À direita,
     as duas contagens em número grande; embaixo, a base.
@@ -791,7 +810,8 @@ def waffle(
     marcados = set(range(destacados)) if isinstance(destacados, int) else set(destacados)
     marcados = {i for i in marcados if 0 <= i < total}
     d = len(marcados)
-    descricao = f"Gráfico: grade de {total} {_plural(total, 'quadrado')}, um por {unidade}; {d} {rotulos[0]} e {total - d} {rotulos[1]}"
+    descricao = (f"Gráfico: grade de {total} {_plural(total, 'quadrado')}, um por {unidade}; {d}{sufixo} {rotulos[0]} e "
+                 f"{total - d}{sufixo} {rotulos[1]}")
     if contorno_idx is not None and 0 <= contorno_idx < total:
         descricao += f"; o contorno marca {contorno_rotulo}"
     descricao += "."
@@ -825,7 +845,7 @@ def waffle(
     # contagens à direita: a dos destacados no alto, a do resto alinhada ao pé da grade
     xl = gw + 56
     wl = largura - xl
-    corpo.append(_texto(xl, 92, str(d), "hook", 128, "var(--ink)"))  # o laranja fica no quadrado e no gancho (§4)
+    corpo.append(_texto(xl, 92, f"{d}{sufixo}", "hook", 128, "var(--ink)"))  # o laranja fica no quadrado e no gancho (§4)
     corpo.append(_texto(xl, 134, _cabe(rotulos[0], "label", 32, wl), "label", 32, "var(--ink)"))
     cursor = 134
     if contorno_idx is not None and 0 <= contorno_idx < total:
@@ -833,7 +853,7 @@ def waffle(
         corpo.append(_texto(xl + 42, cursor + 47, _cabe(contorno_rotulo, "mono", 22, wl - 42), "mono", 22, "var(--ink2)"))
         cursor += 60
     y_rot2 = max(gh - 4, cursor + 44 + 134)
-    corpo.append(_texto(xl, y_rot2 - 42, str(total - d), "hook", 128, "var(--ink)"))
+    corpo.append(_texto(xl, y_rot2 - 42, f"{total - d}{sufixo}", "hook", 128, "var(--ink)"))
     corpo.append(_texto(xl, y_rot2, _cabe(rotulos[1], "label", 32, wl), "label", 32, "var(--ink)"))
     y_base = max(gh, y_rot2) + 50
     corpo.append(_texto(0, y_base, _cabe(f"base: {total} {plural if total != 1 else unidade}", "mono", 24, largura),

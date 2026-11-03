@@ -72,7 +72,7 @@ def veiculos(e: Edition) -> list[str]:
 def test_21_10_capa_sem_gigante_com_cerca_de():
     p = peca(21)
     c = capa(p).ctx
-    assert c["manchete"] == "iFood Benefícios compra a Caju por cerca de R$ 1 bi"
+    assert c["manchete"] == "iFood\u00a0Benefícios compra a Caju por cerca de R$ 1 bi"  # o nome não quebra
     assert "gigante" not in c["manchete"].lower()
     assert (c["qual"], c["valor"]) == ("CERCA DE", "R$ 1 bi")
     assert c["selo"] == "EM 1 MINUTO Nº 031 · QUA 21 OUT"
@@ -440,7 +440,7 @@ def test_slide_2_nunca_repete_o_dado_da_capa(dia):
     if MH.numero_capa(c["manchete"]) and c["heroi"] == "numero":
         assert c["valor"] in MH._todos_numeros(c["manchete"]), (c["manchete"], c["valor"])
     if c["heroi"] == "cobertura":
-        assert c["qual"] == MH.NOTICIADO and int(c["valor"].split()[0]) >= MH.COBERTURA_MIN
+        assert c["qual"] == MH.NOTICIADO and int(c["valor"].split()[0]) >= MH.COBERTURA_CAPA_MIN
         assert s2["heroi"] != "cobertura"
     mc = c["mais_coberto"]
     if mc and mc["proprio"]:
@@ -674,3 +674,107 @@ def test_nome_do_mais_coberto_para_antes_do_lugar():
     assert capa(peca(30)).ctx["mais_coberto"]["nome"] == "Binance suspende saques após roubo de US$ 6,3 bilhões"
     assert capa(peca(31)).ctx["mais_coberto"]["nome"] == "Hackers norte-coreanos roubam US$ 6,3 bilhões da Binance"
     assert capa(peca(21)).ctx["mais_coberto"]["nome"] == "SpaceX e Tesla"  # os nomes que abrem o título continuam
+
+
+# ── Ajuste final, rodada 1 ────────────────────────────────────────────────
+
+
+@functools.lru_cache(maxsize=None)
+def _grade(dias: tuple = (*range(14, 32), "2026-11-01", "2026-11-02")) -> dict:
+    """As peças de cada dia pelo gerador, com UMA fila que avança dia a dia (marca como publicado)."""
+    from datetime import datetime, time
+    from zoneinfo import ZoneInfo
+
+    from qijournal.instagram.fila import PUBLISHED, Fila
+
+    config = load_config(ROOT)
+    tz = ZoneInfo("America/Sao_Paulo")
+    fila = Fila()
+    pecas = {}
+    for dia in dias:
+        e = edicao(dia)
+        ps = gerar.build_pieces(e, config, {}, fila, list(historico(dia)))
+        dia_d = date.fromisoformat(e.date)
+        inicio, fim = datetime.combine(dia_d, time(7), tz), datetime.combine(dia_d, time(23), tz)
+        posts = [gerar._post(p, e, gerar.post_id(e.date, p.slot), inicio, fim, []) for p in ps]
+        fila.replace_day(e.date, posts)
+        for p in posts:
+            atual = fila.get(p.id)
+            atual.status, atual.published_at = PUBLISHED, atual.due
+            fila.registrar_publicacao(atual)
+        pecas[dia] = {p.slot: p for p in ps}
+    return pecas
+
+
+def manha(dia):
+    """O Em 1 minuto do dia como o gerador o monta (sem a noite do dia, o Número e a noite anterior)."""
+    return _grade()[dia]["manha"]
+
+
+@pytest.mark.parametrize("dia, valor", [(15, "4 veículos"), (16, "4 veículos"), (24, "4 veículos"), (31, "3 veículos")])
+def test_capa_sem_numero_com_3_veiculos_ou_mais_estampa_a_cobertura(dia, valor):
+    """arte#8: sem número na manchete, a capa das 07:00 não fica só serif no marinho com 3+ veículos."""
+    c = capa(manha(dia)).ctx
+    assert (c["heroi"], c["qual"], c["valor"], c["destaque"]) == ("cobertura", "NOTICIADO POR", valor, valor)
+
+
+@pytest.mark.parametrize("dia", [15, 16, 22, 23, 24, 28])
+def test_slide_2_sem_numero_estampa_a_duracao_do_relogio(dia):
+    """O slide 2 sem número nem cobertura (a da capa não volta) leva a duração do relógio, sempre nova."""
+    s2 = fatos(manha(dia))[0].ctx
+    assert s2["heroi"] == "relogio" and s2["qual"].startswith("DO PRIMEIRO AO ÚLTIMO VEÍCULO") and s2["relogio"]
+    assert s2["valor"].endswith(("horas", "minutos")) and s2["destaque"] == s2["valor"]
+    assert s2["valor"] != capa(manha(dia)).ctx["valor"]
+
+
+def test_22_10_duracao_por_extenso_com_a_ressalva():
+    s2 = fatos(manha(22))[0]
+    assert (s2.ctx["qual"], s2.ctx["valor"]) == ("DO PRIMEIRO AO ÚLTIMO VEÍCULO, MAIS DE", "25 horas")
+    assert "Do primeiro ao último veículo, mais de 25 horas." in s2.alt
+
+
+def test_19_10_contagem_fora_da_lista_vira_o_numero_do_slide_2():
+    texto = "Levantamento da Serasa Experian registra 448 requerimentos e aponta queda"
+    assert MH.numero_fato(texto, minimo_px=100) == ("", "448 requerimentos")
+    assert MH.numero_fato(texto) == ("", "448")  # não cabe numa linha a 180 px: o substantivo fica na frase
+    assert MH.numero_fato("O prazo é de 20 anos e 48 horas para 3 vezes mais, com 6 votos") is None  # tempo, "vezes", "votos"
+    assert fatos(manha(19))[0].ctx["valor"] == "448"
+
+
+def test_28_10_slide_2_traz_dado_novo_e_nao_a_capa_dita_de_outro_jeito():
+    capa28 = capa(manha(28)).ctx["manchete"]
+    assert not MH.dado_novo("O mercado financeiro arrefeceu o estresse pós-eleitoral com queda dos juros futuros e do "
+                            "dólar, auxiliado por recompras de títulos do Tesouro.", capa28)
+    s2 = fatos(manha(28))[0].ctx["frase"]
+    assert s2.startswith("Juros futuros e dólar registram queda") and MH.dado_novo(s2, capa28)
+
+
+def test_numero_sem_unidade_em_evitar_pula_o_mesmo_numero_com_unidade():
+    texto = "Hackers norte-coreanos roubam US$ 6,3 bilhões da Binance e 40% dos fundos"
+    assert MH.numero_fato(texto, ["6,3"]) == ("", "40%")
+    assert MH.numero_fato(texto, ["US$ 6,3 bi"]) == ("", "40%")
+
+
+def test_nome_proprio_nao_quebra_na_capa():
+    """02/11: a quebra equilibrada partia "André / Lara Resende"; só na arte (a legenda fica com espaço comum)."""
+    p = manha("2026-11-02")
+    c = capa(p).ctx
+    assert "André Lara Resende" in c["manchete"] and "André Lara Resende" in p.slides[0].alt
+    assert MH.nomes_juntos("A Binance começou a liberar") == "A Binance começou a liberar"  # artigo não junta
+    juntos = MH.nomes_juntos("ao lado de Luiz Inácio Lula da Silva hoje").split(" ")
+    assert all(len(w) <= MH.NOME_JUNTO_MAX for w in juntos) and "Luiz" in juntos  # o nome longo só em parte
+
+
+def test_grade_de_29_10_a_01_11_sem_o_mesmo_numero_em_posts_seguidos():
+    """arte/dados: o "11,3%" do TCU (Número de 29/10) não volta como capa em 30/10; o "US$ 6,3 BI" da Binance não
+    é destaque de fato em 30 e 31/10; o Brent do slide de mercado de 31/10 não vira o Número de 01/11, nem o
+    Ibovespa do Número de 31/10 ("18%")."""
+    g = _grade()
+    assert g[29]["numero"].chave == "11,3%"
+    capa30 = g[30]["manha"]
+    assert not capa30.story_ids[0].startswith("tcu-") and capa30.slides[0].ctx["valor"] != "11,3%"
+    herois31 = [s.ctx["valor"] for s in g[31]["manha"].slides if s.template == "m1_fato"]
+    herois30 = [s.ctx["valor"] for s in g[30]["manha"].slides if s.template == "m1_fato"]
+    assert "US$ 6,3 bi" in herois30 and "US$ 6,3 bi" not in herois31
+    assert g[31]["manha"].chave == "mercado:brent"
+    assert g["2026-11-01"]["numero"].chave not in ("acum:brent", "acum:ibov")

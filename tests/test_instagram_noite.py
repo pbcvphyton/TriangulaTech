@@ -29,7 +29,7 @@ ESCOLHAS = {  # §4.9, item 3 (prefixo do id da matéria)
     15: "papa-leao-xiv",
     16: "ucrania-retoma-ataques",
     17: "deficit-fiscal-dos-estados",
-    18: "trump-suspende-sancoes",
+    18: "",  # sem noite aqui: Trump fala de eleição de outro país fora do título, e a base do Placar é menor que 10
     19: None,  # Placar do dia
     20: "governo-declara-emergencia",
     21: "spacex-e-tesla",
@@ -86,6 +86,9 @@ def veiculos(e: Edition) -> list[str]:
 def test_escolha_da_noite_de_14_a_25_10():
     for day, prefixo in ESCOLHAS.items():
         peca = noites()[day]
+        if prefixo == "":
+            assert peca is None, day
+            continue
         if prefixo is None:
             assert peca.title == "Placar do dia" and peca.formula == "consenso", day
             continue
@@ -252,7 +255,7 @@ def test_fato_pula_linha_fina_com_vicio_de_texto():
 
 
 def test_conclusao_sem_lado_a_e_lado_b_entre_parenteses():
-    cov = edicao(18).story(noites()[18].story_ids[0]).coverage
+    cov = next(s for s in edicao(18).stories if s.id.startswith("trump-suspende")).coverage
     concl = N._conclusao(cov)
     assert "lado" not in concl.lower() and concl.endswith("pressão eleitoral interna.")
 
@@ -387,6 +390,8 @@ def test_26_10_no_periodo_eleitoral_nada_eleitoral_entra():
 
 def test_lint_e_limites_em_todas_as_noites():
     for day, p in noites().items():
+        if p is None:
+            continue
         e = edicao(day)
         assert redacao.lint(p, election=True, veiculos=veiculos(e)) == [], day
         primeira = p.caption.split("\n", 1)[0]
@@ -547,15 +552,15 @@ def test_27_10_placar_tem_4_slides_e_legenda_de_3_a_5_linhas():
     de Ouro conta em Esporte, não em Mercados (dados#19b); 'dividiu' (arte#21); 3 a 5 linhas (dados#16)."""
     p = placar_27()
     assert [s.template for s in p.slides] == ["placar_capa", "placar_lista", "rx_relogio", "placar_metodo"]
-    assert sp(p.slides[0].ctx["gancho"]) == "1 DE 17 ASSUNTOS DIVIDIU A COBERTURA HOJE"
+    assert sp(p.slides[0].ctx["gancho"]) == "1 DE 16 ASSUNTOS DIVIDIU A COBERTURA HOJE"  # sem a campanha de Trump
     coberto = p.slides[2].ctx
     assert coberto["assunto"] == "O mesmo assunto foi o mais coberto do dia, entre 1.116."
     assert "Israel" not in json.dumps([s.ctx for s in p.slides], ensure_ascii=False, default=str)
     assert coberto["virada"].startswith("Primeiro horário: Folha de S.Paulo, 26/10 10h58. Último: InfoMoney, 27/10 05h00.")
     linhas = setas(p.caption)
     assert 3 <= len(linhas) <= 5
-    assert "▸ Por editoria: Mundo 0 de 7 · Esporte 0 de 5 · Tecnologia 1 de 4 · Brasil 0 de 1." in linhas
-    assert p.caption.startswith("Placar do dia: 1 de 17 assuntos com 4 ou mais veículos dividiu a cobertura hoje.")
+    assert "▸ Por editoria: Mundo 0 de 6 · Esporte 0 de 5 · Tecnologia 1 de 4 · Brasil 0 de 1." in linhas
+    assert p.caption.startswith("Placar do dia: 1 de 16 assuntos com 4 ou mais veículos dividiu a cobertura hoje.")
     assert redacao.lint(p, election=True, veiculos=veiculos(edicao(27))) == []
 
 
@@ -610,7 +615,9 @@ def test_maioria_so_com_mais_da_metade_dos_analisados():
         assert "maioria" not in s.alt and "minoria" not in s.alt, (s.template, s.alt)
         assert "maioria" not in str(s.ctx.get("grafico", "")), s.template
     assert "▸ Tamanho do roubo (6): " in p.caption and "aioria" not in p.caption
-    assert [s.ctx["kicker"] for s in noites()[18].slides[2:4]] == ["O lado maior", "O lado menor"]
+    trump = next(s for s in edicao(18).stories if s.id.startswith("trump-suspende"))
+    p18 = N.raio_x(edicao(18), {}, election=False, numero_serie=5, story=trump)
+    assert [s.ctx["kicker"] for s in p18.slides[2:4]] == ["O lado maior", "O lado menor"]
     assert [s.ctx["kicker"] for s in noites()[21].slides[2:4]] == ["A maioria", "A minoria"]
 
 
@@ -685,3 +692,13 @@ def test_politico_e_partido_de_fora_nunca_no_gancho_nem_nos_rotulos(dia, mes, pr
     assert linhas and not any(E.cita_politico(l.split(":")[0]) for l in linhas), linhas
     assert "emocrat" not in p.caption.split("\n")[0] and "ZELENSKI" not in capa["gancho"]
     assert not redacao.lint(p, election=mes == 10)
+
+
+def test_18_10_no_periodo_eleitoral_sem_eleicao_de_fora_nem_fora_do_titulo():
+    """"a poucas semanas das eleições de meio de mandato" (linha fina) e "risco eleitoral" (lado A): o Raio-X de
+    18/10 sai; e o slide 2 de qualquer Raio-X no período eleitoral não leva frase com eleição."""
+    e = edicao(18)
+    trump = next(s for s in e.stories if s.id.startswith("trump-suspende"))
+    assert not S.raiox_elegivel(trump, election=True)
+    assert "eleiç" not in N._fato(trump, "", [], sem_eleicao=True)
+    assert "eleições de meio de mandato" in N._fato(trump, "", [])

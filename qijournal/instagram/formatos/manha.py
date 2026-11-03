@@ -67,9 +67,12 @@ CONTIDA_CAPA = 0.6  # …ou com 60% das palavras de assunto da manchete da capa 
 MESMO_ASSUNTO = 0.5  # dois itens com Jaccard ≥ 0,5 são o mesmo assunto
 MAIS_COBERTO_MIN = 5
 COBERTURA_MIN = 5  # fato sem número: a cobertura vira o número com 5+ veículos (a faixa "com 5+" da matriz)
+COBERTURA_CAPA_MIN = 3  # na capa, com 3+: a coluna marinho do grid não fica sem o laranja (15, 24 e 31/10)
 VESPERA_CADEIA = 3  # dias recalculados para saber o que a véspera publicou
 NOTA = "resumo por IA a partir das fontes citadas"
 NOTICIADO = "NOTICIADO POR"
+DO_PRIMEIRO = "DO PRIMEIRO AO ÚLTIMO VEÍCULO"  # o relógio como número do slide 2 ("…, MAIS DE / 20 HORAS")
+NOME_JUNTO_MAX = 20  # nome próprio de até 20 caracteres não quebra de linha ("André Lara Resende", 02/11)
 
 # Medidas do quadro (px), para escolher os tamanhos que enchem o slide sem transbordar.
 QUADRO = 1122  # altura útil (1350 − 116 da faixa − 112 da assinatura)
@@ -126,6 +129,14 @@ _CONTAGEM = re.compile(
     r"(?<![\w.,/-])(\d{1,3}(?:\.\d{3})+|\d+(?:,\d+)?)(\s(?:mil|milhão|milhões))?\s(" + _CONTAVEIS + r")\b"
     r"|(?<![\w.,/-])(\d+(?:,\d+)?)()\s?°C"  # temperatura: "2,8°C"
 )
+# Sem nenhuma da lista, qualquer número seguido de substantivo no plural ("448 requerimentos", 19/10), menos
+# tempo ("20 anos", "48 horas"), "vezes", "pontos" e as palavras que não contam coisa ("5 mais", "3 outros").
+_NAO_CONTAVEIS = {
+    "anos", "meses", "semanas", "dias", "horas", "minutos", "segundos", "décadas", "séculos", "trimestres",
+    "semestres", "bimestres", "vezes", "pontos", "mais", "menos", "apenas", "outros", "outras", "todos", "todas",
+    "ambos", "ambas", "depois", "antes", "atrás", "votos",  # "6 votos" no laranja soaria eleitoral
+}
+_CONTAGEM_LIVRE = re.compile(r"(?<![\w.,/-])(\d{1,3}(?:\.\d{3})+|\d+)(\s(?:mil|milhão|milhões))?\s([a-zà-ú]{4,}s)\b")
 
 # Verbo de sensacionalismo antes de um número vira o verbo neutro ("desabam até 10%" → "caem até 10%").
 _NEUTRO = {
@@ -394,24 +405,27 @@ def numero_fato(
     Primeiro o número com unidade, como :func:`.estatistica.numero_destaque` ("R$ 1 bi", "0,32%");
     sem ele (e com ``contagem``), a contagem de gente ou coisa ("68 pessoas", "2.400 presos") ou a
     temperatura ("2,8°C").
-    Pula os números de ``evitar`` (o slide 2 não repete o da capa). O qualificador inclui "ao
+    Pula os números de ``evitar`` (o slide 2 não repete o da capa; um número sem unidade, "6,3", pula
+    também "US$ 6,3 bi": o da véspera, 31/10). O qualificador inclui "ao
     menos" e "pelo menos": a ressalva nunca se perde. A contagem que não cabe numa linha com
     ``minimo_px`` perde o substantivo ("1,8 mil"), que está na frase logo abaixo.
     """
     t = plain(texto)
     fora = {E._core(x) for x in evitar if x}
     fora_digitos = {_digitos(x) for x in evitar if x}
+    nus = {x for x in evitar if x and _NUMEROS.fullmatch(x)}  # número sem unidade ("6,3"): vale com qualquer uma
     for m in E._NUMERO.finditer(t):
         raw = m.group(0).strip()
         if E._ANO.fullmatch(raw):
             continue
         valor = E._display_number(raw)
-        if E._core(valor) in fora:
+        if E._core(valor) in fora or (nus & set(_NUMEROS.findall(valor))):
             continue
         return _qualificador(t, m.start()), _extenso(valor)
     if not contagem:
         return None
-    for m in _CONTAGEM.finditer(t):
+    livres = [m for m in _CONTAGEM_LIVRE.finditer(t) if m.group(3).lower() not in _NAO_CONTAVEIS]
+    for m in [*_CONTAGEM.finditer(t), *livres]:
         if E._ANO.fullmatch(m.group(1) or "") or _digitos(m.group(0)) in fora_digitos:
             continue
         valor = m.group(0)
@@ -605,6 +619,22 @@ def repete_capa(texto: str, manchete: str) -> bool:
     return bool(pm) and len(pm & {w[:5] for w in _palavras(texto)}) >= CONTIDA_CAPA * len(pm)
 
 
+def dado_novo(texto: str, manchete: str) -> bool:
+    """O texto traz algo que a capa não diz: um número ou um nome próprio (maiúscula fora do começo de frase)
+    que não está nela. 28/10: "O mercado financeiro arrefeceu o estresse… do Tesouro" sob "Mercados
+    financeiros devolvem parte do estresse com ajuda do Tesouro…" não traz; a linha fina, com os juros, o
+    dólar e "Luiz Inácio Lula da Silva", traz."""
+    if _numeros(texto) - _numeros(manchete):
+        return True
+    na_capa = {w[:5] for w in _palavras(manchete)}
+    words = plain(texto).split()
+    for antes, w in zip(words, words[1:]):
+        core = w.strip(".,;:!?()“”\"'‘’")
+        if core[:1].isupper() and not antes.endswith((".", "!", "?", ":")) and E._fold(core)[:5] not in na_capa:
+            return True
+    return False
+
+
 def _marca(f: Fato) -> tuple[set[str], set[str]]:
     """(entidades, números) de um fato publicado, para a regra da véspera."""
     s = f.story
@@ -701,7 +731,8 @@ def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "
     menos 68 pessoas morreram… após a colisão entre dois trens…", e não "Desastre na província de Toledo…";
     no slide 2, a frase do corpo é a última reserva, para a capa não cair por falta de um texto que não a repita.
     ``sem_eleicao`` (período eleitoral): pula o texto que cita eleição de qualquer país ("a poucas semanas das
-    eleições de meio de mandato", na linha fina de 18/10)."""
+    eleições de meio de mandato", na linha fina de 18/10). No slide 2, o texto sem dado novo em relação à capa
+    (:func:`dado_novo`) só vale se nenhum outro servir: a capa dita de outro jeito não é o slide 2 (28/10)."""
     titulos = _titulos(edition, story)
     candidatos = [("briefing", briefing)]
     if story is not None:
@@ -725,7 +756,8 @@ def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "
             reserva = origem in ("dek", "corpo")
             sem_numero = reserva or numero_fato(t, evitar_numero) is None
             nao_nomeia = reserva and not evitar and story is not None and not N._nomeia(t, story)
-            limpos.append((pesado, sem_numero, nao_nomeia, i, origem, t))
+            velho = bool(evitar) and not dado_novo(t, evitar)  # no slide 2, o que não traz dado novo passa a vez
+            limpos.append((pesado, velho, sem_numero, nao_nomeia, i, origem, t))
     if not limpos:
         return None
     *_, origem, t = min(limpos)
@@ -813,6 +845,8 @@ def selecionar(
             if not m:
                 continue
             n = numero_da_capa(story, m, velhos)
+            if velhos and (n is None or not _numeros(n[1]) & _numeros(m)):
+                continue  # reabre o assunto e o número novo não está na manchete que sai (30/10: "30%" do corte)
             # o slide 2 não repete nenhum número que a capa mostra (o em destaque e os da manchete)
             f = _texto(edition, story, b, evitar=m, evitar_numero=[*(n[1:] if n else ()), *_todos_numeros(m)],
                        literais=literais, sem_eleicao=election)
@@ -941,6 +975,24 @@ def _corrida(words: list[str], proprios: set[str]) -> list[str]:
     while run and run[-1].lower() in _LIGA:
         run.pop()
     return run
+
+
+def nomes_juntos(texto: str) -> str:
+    """Espaço inseparável dentro dos nomes próprios de várias palavras de até 20 caracteres ("André Lara
+    Resende", 02/11), para a quebra equilibrada da arte não partir o nome; só na arte (o ctx)."""
+    words = plain(texto).split(" ")
+    proprios = _proprios([texto])
+    out, i = [], 0
+    while i < len(words):
+        run = _corrida(words[i:], proprios)
+        bruto = words[i:i + len(run)]
+        if len(run) >= 2 and len(" ".join(bruto)) <= NOME_JUNTO_MAX and bruto[-1].rstrip(",;:") == run[-1]:
+            out.append("\u00a0".join(bruto))
+            i += len(run)
+        else:
+            out.append(words[i])
+            i += 1
+    return " ".join(out)
 
 
 def _varios_nomes(run: list[str]) -> bool:
@@ -1083,9 +1135,12 @@ def _slide_fato(
     evitar_numero: Iterable[str] = (),
     relogio: tuple[list[dict[str, str]], int] = ([], 0),
     cobertura_heroi: bool = True,
+    duracao: timedelta | None = None,
 ) -> Slide:
-    """Um fato: número (ou a cobertura, ou nada) + frase, com os tamanhos que enchem o miolo.
-    ``cobertura_heroi=False`` no slide 2 quando a capa já estampa a cobertura (o slide 2 nunca repete a capa)."""
+    """Um fato: número (ou a cobertura, ou a duração do relógio, ou nada) + frase, com os tamanhos que enchem o
+    miolo. ``cobertura_heroi=False`` no slide 2 quando a capa já estampa a cobertura (o slide 2 nunca repete a
+    capa). ``duracao`` (só no slide 2, com o relógio válido): sem número nem cobertura, ela vira o número, que é
+    sempre novo em relação à capa ("DO PRIMEIRO AO ÚLTIMO VEÍCULO, MAIS DE / 20 HORAS")."""
     story = f.story
     numero = numero_fato(f.texto, evitar_numero)
     qual, valor = numero if numero else ("", "")
@@ -1097,6 +1152,10 @@ def _slide_fato(
         heroi, qual = "cobertura", NOTICIADO
         valor = cob["cob_kt"]
         selo_pe = selo_pe.split(" · ", 1)[1] if " · " in selo_pe else ""
+    elif not valor and duracao is not None:  # o relógio medido: a duração por extenso, a ressalva no qualificador
+        texto, valor = E.duracao_extenso(duracao)
+        ressalva = texto[: -len(valor)].strip().upper()
+        heroi, qual = "relogio", DO_PRIMEIRO + (f", {ressalva}" if ressalva else "")
     batidas, mais = relogio
     section = section_info(edition, story.section) if story else None
     fontes = sources_line(nomes)
@@ -1110,7 +1169,7 @@ def _slide_fato(
         "qual": qual,
         "valor": valor,
         "tam": tam,
-        "frase": f.texto,
+        "frase": nomes_juntos(f.texto),
         "tam_frase": tam_frase,
         "solo": not valor,
         **cob,
@@ -1123,6 +1182,8 @@ def _slide_fato(
         "nota": NOTA,
     }
     partes = [f"Fato {i} de {total}: {f.texto}"]
+    if heroi == "relogio":
+        partes.append(f"{qual.capitalize()} {valor}.")
     if cob["cobertura"]:
         partes.append(f"{cob['cobertura'][:1].upper()}{cob['cobertura'][1:]}.")
     if batidas:
@@ -1288,7 +1349,7 @@ def em_1_minuto(
     qual, valor = sel.numero if sel.numero else ("", "")
     heroi = "numero" if valor else ""
     cob_capa = _cobertura(edition, capa, raiox_story_id)
-    if not valor and cob_capa["cob_k"] >= COBERTURA_MIN:  # sem número na manchete, a cobertura medida da capa
+    if not valor and cob_capa["cob_k"] >= COBERTURA_CAPA_MIN:  # sem número na manchete, a cobertura medida da capa
         heroi, qual, valor = "cobertura", NOTICIADO, cob_capa["cob_kt"]
     mc = _mais_coberto(edition, capa, election=election, nomes=nomes, paineis=paineis)
     faixa = _faixa(edition)
@@ -1314,7 +1375,7 @@ def em_1_minuto(
                 "qual": qual,
                 "valor": valor,
                 "tam": tam,
-                "manchete": sel.manchete,
+                "manchete": nomes_juntos(sel.manchete),
                 "tam_manchete": tam_manchete,
                 "faixa": faixa,
                 "mais_coberto": mc,
@@ -1327,8 +1388,14 @@ def em_1_minuto(
         )
     ]
     selos = []
+    rel_capa = E.relogio(edition, capa)
+    rel_valido = E.relogio_valido(rel_capa, min_veiculos=lim.relogio_min_veiculos, min_span_min=lim.relogio_min_span_min)
     for i, f in enumerate(sel.fatos, 1):
         primeiro = i == 1
+        # o número que a véspera já estampou sobre a mesma entidade não volta como destaque ("US$ 6,3 BI" da
+        # Binance, 30 e 31/10): basta 1 entidade em comum, porque aqui só troca o número, não tira o fato
+        ents = _entidades(f.story, f.texto)
+        velhos = [x for e, n in marcas if ents & e for x in sorted(n)]
         slide = _slide_fato(
             edition,
             f,
@@ -1336,9 +1403,10 @@ def em_1_minuto(
             total,
             selo,
             raiox_story_id=raiox_story_id,
-            evitar_numero=[valor, *_todos_numeros(sel.manchete)] if primeiro and heroi == "numero" else (),
+            evitar_numero=[*([valor, *_todos_numeros(sel.manchete)] if primeiro and heroi == "numero" else ()), *velhos],
             relogio=linha_relogio(edition, capa, lim) if primeiro else ([], 0),
             cobertura_heroi=not (primeiro and heroi == "cobertura"),
+            duracao=rel_capa.span if primeiro and rel_valido and rel_capa is not None else None,
         )
         selos.append(_cobertura(edition, f.story, raiox_story_id)["cobertura"])
         slides.append(slide)
@@ -1350,6 +1418,7 @@ def em_1_minuto(
     if fechamento is not None:
         slides.append(fechamento)
     story_ids = [f.story.id for f in sel.fatos if f.story is not None]
+    ativo = str(mercado.ctx.get("ativo") or "") if mercado is not None else ""
     return Peca(
         slot=SLOT,
         kind="carousel",
@@ -1359,4 +1428,5 @@ def em_1_minuto(
         story_ids=list(dict.fromkeys(story_ids)),
         serie=SERIE,
         numero_serie=numero_serie,
+        chave=f"mercado:{ativo}" if ativo else "",  # o Número do dia seguinte não repete o acumulado do título
     )

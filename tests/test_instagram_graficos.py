@@ -818,3 +818,20 @@ def test_espectro_coluna_estreita_nao_corta_nome():
     ts = textos(svg)
     assert "The New York Times" in ts and "The Wall Street Journal" in ts and not any("…" in t for t in ts)
     dentro_do_quadro(svg)
+
+
+def test_espectro_de_30_10_sem_reticencias_e_com_um_corpo_so():
+    """arte#6: "South China Morning Post" numa coluna de 4 nomes saía "South China Morning…"; e a figura
+    misturava 28 px (1ª coluna) com 22 px (as outras)."""
+    maj = ["Exame", "g1", "CNN Brasil", "InfoMoney", "Money Times", "The New York Times"]
+    neu = ["TechCrunch", "The Wall Street Journal", "Poder360", "CNBC"]
+    mino = ["Valor Econômico", "Folha de S.Paulo", "South China Morning Post", "MarketWatch"]
+    svg, _ = G.espectro(maj, neu, mino, rotulos=("tamanho do roubo", "contenção do dano"))
+    valido(svg)
+    ts = textos(svg)
+    assert set(maj + neu + mino) <= set(ts) and not any("…" in t for t in ts)
+    nomes = [t for t in ET.fromstring(svg).iter(f"{NS}text") if "".join(t.itertext()) in set(maj + neu + mino)]
+    assert len({t.get("style") for t in nomes}) == 1  # um corpo só para os nomes
+    largura = float(ET.fromstring(svg).get("viewBox").split()[2])
+    for x0, _, x1, _, txt in caixas_texto(svg):
+        assert x0 >= -1 and x1 <= largura + 1, txt

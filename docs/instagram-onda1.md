@@ -44,7 +44,9 @@ capa do Número). O gráfico é a foto. Pouca moldura. Assinatura "▲ @handle" 
 **Pensamento.** Tese com tensão, mas medida (contagem contra contagem, tempo
 contra tempo, expectativa contra dado). Autoridade por métricas próprias com
 nome: Placar do dia, Relógio da notícia, Número triangulado, Pauta solitária.
-Âncora de tempo só contra a nossa série ("desde 29/09"), nunca "recorde". O
+Âncora de tempo só contra a nossa série ("desde 29/09"), nunca "recorde" no que a casa escreve
+(tese do Número, título de mercado, moldes); o texto do fato, que vem do briefing ou da manchete, segue a
+regra do adjetivo da casa do §4 ("recorde" só fica se estiver no título de metade dos veículos). O
 enquadramento dos outros (`outlets[].framing`) é a matéria-prima. Rigor
 visível: número sempre com base ("4 de 25"), percentual só com base ≥ 20,
 universo nomeado, verbos de observação. Ausência medida também é notícia
@@ -184,7 +186,11 @@ também chefes de Estado de fora e partidos de outros países, na forma adjetiva
 ### 5.1 Raio-X 2.0 (18:30, 8 slides, papel) — `formatos/noite.py`
 
 Elegível: story com `coverage`, 4+ veículos, a ≥ 2 e b ≥ 2, 4+ framings, lados
-escritos, fora de política/eleição no modo eleitoral. Nota =
+escritos, fora de política/eleição no modo eleitoral (também a eleição de outro país, a campanha, o comício
+e o meio de mandato no título, nos lados ou na linha fina, `estatistica.eleicao_no_texto`: em 18/10, "risco
+eleitoral" num lado e "a poucas semanas das eleições de meio de mandato" na linha fina tiram o Raio-X; o slide
+2 pula a frase do corpo que fala de eleição). No Placar, a mesma regra vale para o assunto e os lados (27/10:
+"Envolvimento… com a campanha de Trump" sai da base, 1 de 16). Nota =
 2×importance + 4×min(a,b) + 0,5×(a+b) + 2×peso_seção − 8×repetição (peso: 3
 brasil/mercados, 2 tecnologia/imobiliário, 1 jurídico/natureza, 0
 mundo/política, −2 esporte/variedades; repetição = 2+ entidades em comum com o
@@ -303,7 +309,11 @@ literal) e não diz de quem é o fato, o sujeito vai na frente, como na tese do 
 (`manha.texto_capa`: "Binance: corretora informou ter coberto 90% dos valores levados",
 01/11, e não "Corretora informou…"); a tela 2 dos stories usa o mesmo texto.
 
-**Capa e a noite (§2):** a capa não estampa o que a noite do mesmo dia estampa
+**Capa e a noite (§2):** a matéria do Número da véspera conta como noite anterior (o "11,3%" do TCU, Número de
+29/10, não volta como capa em 30/10), e a capa que reabre um assunto só sai se o número novo estiver na
+manchete que ela mostra (o "30%" do trecho cortado não serve). O Número não repete como acumulado o ativo do
+título do slide de mercado da véspera (`Post.chave` "mercado:brent") nem o ativo de que o Número da véspera
+tratou (o Ibovespa dos "18%" de 31/10). A capa não estampa o que a noite do mesmo dia estampa
 (a matéria do Raio-X, ou as do Placar: em 19/10 os protestos na França, maior
 consenso e mais coberto do Placar, saem da capa) nem reabre o assunto da noite
 anterior (a matéria do Raio-X ou as que o Placar destaca; `Fila.materias_raiox`),
@@ -317,8 +327,8 @@ do mais coberto.
 
 | # | Slide | Conteúdo |
 |---|---|---|
-| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`manha.numero_da_capa`: o da manchete que sai na capa ou, sem ele, o da manchete original e da linha fina, com o qualificador); sem número e com 5+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
-| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, o texto nunca repete a capa (`manha.repete_capa`: Jaccard ≥ 0,6 com a manchete ou 60% das palavras de assunto dela, pelas 5 primeiras letras, dentro do texto; 31/10, "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…"; 02/11, "O Ministério da Fazenda descartou fixar teto…" sob "Fazenda descarta teto…"): vai o próximo (o item do briefing, a manchete, a linha fina e, por último, uma das 2 primeiras frases do corpo, para a capa não cair por falta de texto); nenhum número que a capa mostra volta como destaque (o em laranja e os da manchete), nem a cobertura quando ela é o número da capa; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
+| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`manha.numero_da_capa`: o da manchete que sai na capa ou, sem ele, o da manchete original e da linha fina, com o qualificador); sem número e com 3+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10; "4 VEÍCULOS", 24/10: a coluna marinho do grid não fica sem laranja; só com 2 veículos e sem número a capa sai sem destaque, 18 e 25/10 e 02/11); os nomes próprios de até 20 caracteres não quebram de linha ("André Lara Resende", 02/11); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
+| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, o texto nunca repete a capa (`manha.repete_capa`: Jaccard ≥ 0,6 com a manchete ou 60% das palavras de assunto dela, pelas 5 primeiras letras, dentro do texto; 31/10, "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…"; 02/11, "O Ministério da Fazenda descartou fixar teto…" sob "Fazenda descarta teto…"): vai o próximo (o item do briefing, a manchete, a linha fina e, por último, uma das 2 primeiras frases do corpo, para a capa não cair por falta de texto); o texto sem dado novo em relação à capa (`manha.dado_novo`: nenhum número nem nome próprio que ela não tenha; 28/10, "O mercado financeiro arrefeceu o estresse…") só vale se nenhum outro servir; nenhum número que a capa mostra volta como destaque (o em laranja e os da manchete), nem a cobertura quando ela é o número da capa; sem número nem cobertura e com o relógio válido, a duração vira o número, sempre nova ("DO PRIMEIRO AO ÚLTIMO VEÍCULO, MAIS DE / 25 HORAS", 22/10); a contagem vale com qualquer substantivo no plural fora de tempo, "vezes" e "votos" ("448 requerimentos", 19/10); o número que a véspera estampou sobre a mesma entidade não volta como destaque de fato ("US$ 6,3 BI" da Binance, 30 e 31/10); quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
 | 7 | Mercado em linha | `mercado.mercado_slide(tema="dark")` |
 | 8 | Fechamento | uma estatística (pauta solitária: "1.039 de 1.159 assuntos de hoje (90%) saíram em uma fonte só") + matriz de pontos pequena + 1 CTA "Mande no grupo de quem precisa começar o dia informado." |
 
@@ -361,7 +371,7 @@ com 4 ou mais veículos comparados sem divisão; "Dividir = pelo menos 2 veícul
 cada lado, o mesmo critério do Placar do dia"); "como fazemos e o que não fazemos"
 ("Sem adjetivo nosso, sempre com fonte.": o adjetivo do veículo pode aparecer
 citado, o da casa não); "Todo dia, 3 posts" + Siga. "x em cada 10" arredondado
-para baixo.
+para baixo, com o laranja no gancho ("8 DE CADA 10"), um destaque só por slide.
 
 ### 5.7 Mercado em linha — `formatos/mercado.py`
 
@@ -393,7 +403,9 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   #424C61, mais escuro). Três marcas e o fundo não passam todos de 3:1 entre si só pela
   luminância; A e B se separam pelo matiz. As marcas cinzas sem lado nenhum (o resto do
   waffle, as faixas da matriz, as barras dos outros dias, o IPCA) usam `--g-cinza`, ≥ 3:1
-  sobre o fundo.
+  sobre o fundo. Nenhum texto com dado abaixo de 22 px (rótulos em mono, chip, horas dos slides de lado, a lista
+  "Por que este número"); rodapé e nota de método até 20 px, com o texto encurtado em vez de encolher (a tela 3
+  dos stories: "Horário de Brasília · fech. = fechamento · acumulado desde a 1ª leitura").
 - **Moldura:** sai a régua dupla, o logotipo nos slides internos, o "01 FATO"
   gigante e os tracinhos de progresso. Fica uma faixa de série de 8 px com o selo
   em pílula e o contador ("03/08"), e um rodapé de uma linha com a assinatura. A
@@ -406,7 +418,9 @@ tema papel, sem número de série, e o título só vai para ativo lido no dia (�
   barra A/N/B, relógio, espectro, waffle, matriz de pontos, linha, barras de
   variação, checklist. Nenhum texto sai do quadro do SVG (o guarda do render não
   mede texto de SVG; os testes medem); nome de veículo não é cortado com
-  reticências: lista longa vira "nomes inteiros +k".
+  reticências: lista longa vira "nomes inteiros +k"; no espectro, cada coluna tem pelo menos a largura do nome
+  mais longo dela a 22 px e a figura usa um corpo só ("South China Morning Post", 30/10). No waffle de 100
+  quadrados do manifesto, cada quadrado é 1% e as contagens vão com "%" ("18%", não "18 dividiram").
 
 ## 7. Perfil
 

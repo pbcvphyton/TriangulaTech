@@ -297,7 +297,8 @@ def raiox_elegivel(
 ) -> bool:
     """Matéria com cobertura dividida: 4+ veículos, 2+ de cada lado, 4+ enquadramentos, os
     dois lados descritos; no período eleitoral, nada político nem eleitoral (nem eleição de outro país
-    no título: :func:`.estatistica.eleicao_escrita`)."""
+    no título, nos lados ou na linha fina: :func:`.estatistica.eleicao_no_texto`; 18/10, "risco eleitoral"
+    e "a poucas semanas das eleições de meio de mandato")."""
     lim = limiares or LimiaresConfig()
     c = story.coverage
     if c is None or not c.side_a.strip() or not c.side_b.strip():
@@ -309,7 +310,8 @@ def raiox_elegivel(
     if sum(1 for o in c.outlets if o.framing.strip()) < lim.raiox_min_framings:
         return False
     if election and (
-        E.is_political_coverage(c, story, nomes) or E.story_is_electoral(story, nomes) or E.eleicao_escrita(story.headline, c.topic)
+        E.is_political_coverage(c, story, nomes) or E.story_is_electoral(story, nomes)
+        or E.eleicao_no_texto(story.headline, c.topic, c.side_a, c.side_b, story.dek)
     ):
         return False
     return True

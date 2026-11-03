@@ -56,7 +56,7 @@ class Post:
     serie: str = ""  # "em1min" | "numero" | "raiox" (o Placar do dia também) | "placar" | "semana" | "mercado"
     numero_serie: int = 0  # "RAIO-X Nº 015"; 0 = sem número (Mercado em linha, stories)
     story_ids: list[str] = field(default_factory=list)  # matérias usadas
-    chave: str = ""  # do Número do dia: não repete em 7 dias
+    chave: str = ""  # do Número do dia: não repete em 7 dias; no Em 1 minuto, o ativo do slide de mercado
     entidades: list[str] = field(default_factory=list)  # do Raio-X: penaliza a repetição em 3 dias
     formula: str = ""  # molde do gancho ("G2", "G3", "G0", "compacto", "sem_rotulo")
     redacao: dict[str, Any] = field(default_factory=dict)  # Onda 2: {modo, formula, falhas, tentativas}
@@ -230,6 +230,19 @@ class Fila:
             sid for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING))
             for sid in (p.story_ids[:1] if p.entidades else p.story_ids)
         ]
+
+    def materias_numero(self, day: date | str, dias: int = 1) -> list[str]:
+        """As matérias (ids) do Número dos ``dias`` anteriores a ``day``, publicado ou na fila: a capa do Em 1
+        minuto não estampa de novo, sem número novo, o que o Número da véspera estampou (o "11,3%" do TCU em
+        29 e 30/10)."""
+        return [sid for p in self._recentes("numero", day, dias, (PUBLISHED, PENDING)) for sid in p.story_ids[:1]]
+
+    def ativos_mercado(self, day: date | str, dias: int = 1) -> set[str]:
+        """Os ativos do título do slide de mercado do Em 1 minuto dos ``dias`` anteriores (``chave``
+        "mercado:brent"): o acumulado que ele estampou não vira o Número do dia seguinte (o Brent +13,4% em 31/10
+        e 01/11)."""
+        return {p.chave.removeprefix("mercado:") for p in self._recentes("em1min", day, dias, (PUBLISHED, PENDING))
+                if p.chave.startswith("mercado:")}
 
     def primeiras_linhas(self, titulo: str, day: date | str, dias: int = LINHA1_REPETICAO_DIAS) -> list[str]:
         """1ªs linhas das legendas publicadas com esse ``titulo`` (o formato: "Em 1 minuto") nos ``dias``

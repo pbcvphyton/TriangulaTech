@@ -128,6 +128,22 @@ def duracao(delta: timedelta) -> str:
     return f"{minutes // 60}h{minutes % 60:02d}"
 
 
+def duracao_extenso(span: timedelta) -> tuple[str, str]:
+    """A duração por extenso, para texto em caixa alta (o "18h22" viraria "18H22", que se lê como hora do
+    dia): "95 minutos" abaixo de 2 h, "17 horas" na hora cheia, "quase 17 horas" a partir de 45 minutos depois
+    da hora, "mais de 18 horas" com menos (nunca afirma um intervalo que não houve). Devolve (texto, o
+    número com a unidade, sem a ressalva)."""
+    minutos = int(span.total_seconds() // 60)
+    if minutos < 120:
+        texto = f"{minutos} {'minuto' if minutos == 1 else 'minutos'}"
+        return texto, texto
+    horas, resto = divmod(minutos, 60)
+    if resto >= 45:
+        return f"quase {horas + 1} horas", f"{horas + 1} horas"
+    texto = f"{horas} horas"
+    return (f"mais de {texto}" if resto else texto), texto
+
+
 def _parse_dt(value: str | None) -> datetime | None:
     if not value:
         return None
@@ -277,10 +293,28 @@ def eleicao_escrita(*textos: str | None) -> bool:
     return any(_ELEICAO_ESCRITA.search(t) for t in textos if t)
 
 
+# Além da palavra: a campanha de um político, o comício e as eleições de meio de mandato ditas sem "eleição"
+# ("Envolvimento… com a campanha de Trump", 27/10; "risco eleitoral" já é :data:`_ELEICAO_ESCRITA`).
+_CAMPANHA = re.compile(
+    r"\bcomícios?\b|\bmeio de mandato\b|\bmidterms?\b|\bcampanha (?:de|do|da) (?:"
+    + "|".join(re.escape(n) for n in POLITICOS) + r"|reeleição)\b",
+    re.I,
+)
+
+
+def eleicao_no_texto(*textos: str | None) -> bool:
+    """:func:`eleicao_escrita` ou a campanha, o comício e o meio de mandato (:data:`_CAMPANHA`), de qualquer
+    país: o que fica fora do Raio-X e do Placar no período eleitoral mesmo fora do título (18/10: "risco
+    eleitoral" num lado e "a poucas semanas das eleições de meio de mandato" na linha fina)."""
+    return eleicao_escrita(*textos) or any(_CAMPANHA.search(_plain(t)) for t in textos if t)
+
+
 def eleicao_na_cobertura(cov: Coverage, story: Story | None) -> bool:
-    """A cobertura tem eleição no assunto ou na manchete (:func:`eleicao_escrita`), de qualquer país.
-    Esporte fica de fora: "reeleição na Fifa" (24/10) não é eleição."""
-    return coverage_section(cov, story) != "esporte" and eleicao_escrita(cov.topic, story.headline if story else "")
+    """A cobertura tem eleição no assunto, na manchete ou num dos lados (:func:`eleicao_no_texto`), de qualquer
+    país. Esporte fica de fora: "reeleição na Fifa" (24/10) não é eleição."""
+    return coverage_section(cov, story) != "esporte" and eleicao_no_texto(
+        cov.topic, story.headline if story else "", cov.side_a, cov.side_b
+    )
 
 
 def is_political_coverage(cov: Coverage, story: Story | None, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
@@ -1187,6 +1221,11 @@ _ATIVO_NO_TITULO = {
 }
 
 
+def ativos_no_titulo(titulo: str) -> set[str]:
+    """Os ativos que o título nomeia ("Ibovespa acumula queda…" → {"ibov"})."""
+    return {qid for qid, pattern in _ATIVO_NO_TITULO.items() if pattern.search(_plain(titulo))}
+
+
 def mercado_eleitoral(edition: Edition, qid: str, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
     """Alguma matéria do dia com o ativo no título é eleitoral (:func:`story_is_electoral`, ou eleição
     com todas as letras na manchete)? "Ibovespa desaba 13,88%… após eleição" (27/10): no período
@@ -1199,6 +1238,17 @@ def mercado_eleitoral(edition: Edition, qid: str, nomes: Iterable[str] = NOMES_E
         pattern.search(_plain(s.headline)) and (story_is_electoral(s, nomes) or eleicao_escrita(s.headline))
         for s in edition.stories
     )
+
+
+def _movimento_eleitoral(edition: Edition, history: list[Edition], qid: str, nomes: Iterable[str]) -> bool:
+    """O ativo está no título de matéria eleitoral do dia (:func:`mercado_eleitoral`) e a variação do dia é
+    de 2 vezes a típica ou mais: o acumulado dele carrega a eleição (27/10: Ibovespa −13,88%)."""
+    q = next((q for q in edition.quotes if q.id == qid), None)
+    if q is None or q.change_pct is None or not mercado_eleitoral(edition, qid, nomes):
+        return False
+    at = _parse_dt(q.as_of)
+    scale = escala_robusta([x for x in serie(history, qid) if at is None or x.as_of < at])
+    return bool(scale) and abs(q.change_pct) / scale >= Z_MEDIO
 
 
 def _mercado(
@@ -1478,7 +1528,8 @@ def numero_do_dia(
     2. número triangulado (no título de 3+ veículos), fora de ``exclude`` e de ``usados``;
     3. o assunto mais coberto fora de ``exclude``, se tiver 12+ veículos;
     4. mercado com variação ≥ 2 desvios robustos;
-    5. o maior acumulado da série (10+ leituras), com chave ``acum:<ativo>`` fora de ``usados``;
+    5. o maior acumulado da série (10+ leituras), com chave ``acum:<ativo>`` fora de ``usados`` (no período
+       eleitoral, fora o que carrega o movimento eleitoral do dia, :func:`_movimento_eleitoral`);
     6. o juro real ex-post (chave ``juroreal``) fora de ``usados``;
     7. o maior acumulado, mesmo repetido: o 12:00 nunca fica vazio.
 
@@ -1518,7 +1569,12 @@ def numero_do_dia(
     if vale(medio, 4):
         return medio
     acumulados = [n for n in _acumulados(edition, upto, min_pontos) if n.chave not in fora]
-    novo = next((n for n in acumulados if n.chave not in ja), None)
+    # no período eleitoral, o acumulado que carrega o movimento eleitoral do dia (ativo de matéria eleitoral que
+    # se moveu 2 vezes a típica: o Ibovespa de 27/10, depois do 2º turno) também passa a vez e só volta no passo 7
+    eleitorais = {n.chave for n in acumulados
+                  if election and _movimento_eleitoral(edition, past, n.prova["qid"], nomes)}
+    acumulados = sorted(acumulados, key=lambda n: n.chave in eleitorais)
+    novo = next((n for n in acumulados if n.chave not in ja and n.chave not in eleitorais), None)
     if vale(novo, 5):
         return novo
     real = _juro_real_numero(edition)

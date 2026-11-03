@@ -205,12 +205,14 @@ def _divisao(h: Historico) -> Slide:
     x = proporcao(h.sem_divisao, h.coberturas, "de")
     titulo = f"Em {x} assuntos comparados, os veículos contaram sem divisão."  # a base: 4+ veículos
     n = E.num(h.coberturas)
-    if h.coberturas > 100:  # um quadrado por assunto não cabe: cada um vale 1% deles
+    if h.coberturas > 100:  # um quadrado por assunto não cabe: cada um vale 1% deles, e as contagens vão com "%"
         total, marcados = 100, round(100 * h.divididas / h.coberturas)
         unidade, plural = f"1% dos {n} assuntos comparados", f"quadrados; cada um, 1% dos {n} assuntos"
+        sufixo = "%"
     else:
         total, marcados = h.coberturas, h.divididas
         unidade, plural = "assunto comparado", "assuntos comparados"
+        sufixo = ""
     svg, descricao = G.waffle(
         total,
         marcados,
@@ -220,6 +222,7 @@ def _divisao(h: Historico) -> Slide:
         por_linha=10,
         lado=44,
         gap=6,
+        sufixo=sufixo,
     )
     texto = "Nos outros, a gente mostra a diferença."
     pe = (
@@ -230,11 +233,10 @@ def _divisao(h: Historico) -> Slide:
         "selo": SELO,
         "kicker": "A divisão",
         "titulo": titulo,
-        "destaque": "",
+        "destaque": x.removeprefix("mais de ").removeprefix("menos de "),  # o laranja no gancho, como no slide 3
         "tam": G.tamanho_gancho(titulo, max_linhas=3, tam_max=104, tam_min=80),
         "grafico": svg,
         "texto": texto,
-        "texto_destaque": "diferença",
         "pe": pe,
         "nota": "",
         "section": None,

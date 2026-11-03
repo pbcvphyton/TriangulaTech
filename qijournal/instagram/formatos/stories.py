@@ -46,7 +46,7 @@ SECOES_FIM = {"esporte", "variedades"}  # só viram a tela da manchete se faltar
 NUM_MAX, NUM_MIN = 240, 180  # px do número em destaque da manchete (o data-fit ainda encolhe até 140)
 NOTA_MANCHETE = "resumo por IA das fontes citadas"
 NOTA_MERCADO = "fonte: Yahoo Finance e BCB"
-RODAPE_MERCADO = "Horário de Brasília · fech. = fechamento do pregão · acumulado ponta a ponta desde a 1ª leitura da série"
+RODAPE_MERCADO = "Horário de Brasília · fech. = fechamento · acumulado desde a 1ª leitura"  # cabe a 20 px, sem encolher
 
 # O nome curto de cada formato na agenda e o que ele traz (texto fixo, sempre verdadeiro).
 NOME_AGENDA = {"Raio-X da cobertura": "Raio-X"}

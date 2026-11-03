@@ -150,7 +150,10 @@ def test_divisao_com_waffle_de_100_e_a_definicao():
     svg = str(s.ctx["grafico"])
     # 100 quadrados, cada um 1% dos 391: 16 dividiram (61/391) em laranja
     assert svg.count("fill='var(--g-hi)'") == 16
-    assert "Gráfico: grade de 100 quadrados, um por 1% dos 391 assuntos comparados; 16 dividiram e 84 sem divisão." in s.alt
+    # cada quadrado é 1%: as contagens vão com "%" ("16 dividiram" se lia como 16 assuntos), e o laranja vai no gancho
+    assert "Gráfico: grade de 100 quadrados, um por 1% dos 391 assuntos comparados; 16% dividiram e 84% sem divisão." in s.alt
+    assert ">16%</text>" in svg and ">84%</text>" in svg
+    assert s.ctx["destaque"] == "8 de cada 10" and s.ctx["destaque"] in s.ctx["titulo"] and not s.ctx.get("texto_destaque")
 
 
 @real

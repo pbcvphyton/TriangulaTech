@@ -349,10 +349,13 @@ def test_placar_real_tira_o_eleitoral_e_vai_sem_porcentagem():
 
 @real
 def test_placar_no_periodo_eleitoral_sem_eleicao_de_outro_pais():
-    # 27/10: "Israel vai às urnas" (racha) e "Trump oferece recompensa por fraude eleitoral" saem da base;
-    # capa, waffle, "por editoria" e a lista dos rachas contam a mesma coisa: 1 de 17 (só a Anthropic).
+    # 27/10: "Israel vai às urnas" (racha), "Trump oferece recompensa por fraude eleitoral" e "Envolvimento… com a
+    # campanha de Trump" saem da base; capa, waffle, "por editoria" e a lista dos rachas contam a mesma coisa:
+    # 1 de 16 (só a Anthropic).
     p27 = E.placar(edicao("27"), election=True)
-    assert p27.texto_dia == "1 de 17" and p27.por_secao["mundo"] == (0, 7)
+    assert p27.texto_dia == "1 de 16" and p27.por_secao["mundo"] == (0, 6)
+    assert E.eleicao_no_texto("Envolvimento de líderes corporativos e políticos com a campanha de Trump")
+    assert not E.eleicao_no_texto("Campanha de vacinação contra a gripe")
     assert not any(E.eleicao_escrita(c.topic, s.headline if s else "") for c, s in p27.itens)
     rachas = E.rachas_do_dia(edicao("27"), election=True)
     assert [c.topic[:9] for c, _ in rachas] == ["Anthropic"]

@@ -222,19 +222,9 @@ def _rotulos_waffle(rachas: int) -> tuple[str, str]:
 
 
 def _duracao_titulo(span: timedelta) -> tuple[str, str]:
-    """A duração do relógio para o título em caixa alta, por extenso (o "18h22" viraria "18H22", que se lê
-    como hora do dia): "95 minutos" abaixo de 2 h, "17 horas" na hora cheia, "quase 17 horas" a partir de
-    45 minutos depois da hora, "mais de 18 horas" com menos (nunca afirma um intervalo que não houve).
-    O valor exato fica no gráfico e na legenda. Devolve (texto, trecho em laranja)."""
-    minutos = int(span.total_seconds() // 60)
-    if minutos < 120:
-        texto = f"{minutos} {'minuto' if minutos == 1 else 'minutos'}"
-        return texto, texto
-    horas, resto = divmod(minutos, 60)
-    if resto >= 45:
-        return f"quase {horas + 1} horas", f"{horas + 1} horas"
-    texto = f"{horas} horas"
-    return (f"mais de {texto}" if resto else texto), texto
+    """A duração do relógio para o título, por extenso (:func:`.estatistica.duracao_extenso`); o valor exato
+    fica no gráfico e na legenda. Devolve (texto, trecho em laranja)."""
+    return E.duracao_extenso(span)
 
 
 def _lista(nomes: list[str]) -> str:
@@ -306,15 +296,17 @@ def _subtitulo(edition: Edition, story: Story, veiculos: list[str]) -> str:
     return _sem_proibidas(story.dek) or _sem_proibidas(E.capa_sem_adj(edition, story))
 
 
-def _fato(story: Story, evitar: str, titulos: list[str]) -> str:
+def _fato(story: Story, evitar: str, titulos: list[str], sem_eleicao: bool = False) -> str:
     """Slide 2 (§4.2): a linha fina e a 1ª frase do corpo, se o total couber em 260 caracteres; sem
     número nem nome próprio, entra a frase seguinte. O que a capa já usou (``evitar``: a linha fina ou
     a frase do corpo, mesmo cortada) não volta, para não repetir a capa (T3). Frases com palavra
-    proibida ficam de fora."""
+    proibida ficam de fora e, com ``sem_eleicao`` (período eleitoral), as que falam de eleição de qualquer
+    país (:func:`.estatistica.eleicao_no_texto`)."""
     usado = _norm(evitar)
 
     def ok(f: str) -> bool:
-        return _limpo(f) and _sem_adj(f, titulos) == f and not (usado and _norm(f).startswith(usado))
+        return (_limpo(f) and _sem_adj(f, titulos) == f and not (usado and _norm(f).startswith(usado))
+                and not (sem_eleicao and E.eleicao_no_texto(f)))
 
     dek = plain(story.dek)
     frases = [f for p in story.body for f in _frases(p) if ok(f)]
@@ -648,7 +640,7 @@ def raio_x(
 
     # 2. O fato
     titulos = E.titulos_por_veiculo(topic)
-    fato = _fato(story, subtitulo, titulos)
+    fato = _fato(story, subtitulo, titulos, sem_eleicao=election)
     fontes = source_names(story)
     slides.append(
         Slide(

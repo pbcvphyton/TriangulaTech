@@ -168,7 +168,7 @@ ESCOLHAS = {
     15: ("papa-leao-xiv", 5, 3, None),
     16: ("ucrania-retoma-ataques", 8, 2, None),
     17: ("deficit-fiscal-dos-estados", 2, 4, None),
-    18: ("trump-suspende-sancoes", 2, 4, None),
+    18: "mercado",  # Trump saiu: "risco eleitoral" num lado e "eleições de meio de mandato" na linha fina
     19: None,  # Placar do dia
     20: ("governo-declara-emergencia", 2, 2, 4),
     21: ("spacex-e-tesla", 6, 2, 11),
@@ -187,6 +187,10 @@ def test_escolha_do_raiox_de_14_a_25_10():
         e = edicao(day)
         noite = S.escolher_noite(e, election=True, entidades_recentes=recentes[-3:])
         assert all("tse-intima" not in s.id for _, s in S.candidatos_raiox(e, election=True))
+        if esperado == "mercado":  # sem Raio-X e com a base do Placar abaixo de 10: o Mercado em linha
+            assert noite.tipo != "raiox" and noite.story is None, day
+            recentes.append([])
+            continue
         if esperado is None:
             assert noite.tipo == "placar" and noite.story is None
             assert noite.placar.texto_dia == "0 de 13"  # a spec simulou "0 de 16" sem o filtro por conteúdo nem a eleição de Israel
@@ -201,11 +205,11 @@ def test_escolha_do_raiox_de_14_a_25_10():
         assert s.section != "esporte"
         geopolitica += s.section == "mundo"
         recentes.append(S.entidades(s))
-    assert geopolitica == 4
+    assert geopolitica == 3
 
 
 @real
-def test_repeticao_penaliza_a_ucrania_em_15_10_e_trump_fica_sem_alternativa_em_18_10():
+def test_repeticao_penaliza_a_ucrania_em_15_10_e_18_10_fica_sem_raiox():
     e14 = edicao(14)
     recentes = [S.entidades(S.escolher_raiox(e14, election=True))]
     ranking = S.candidatos_raiox(edicao(15), election=True, entidades_recentes=recentes)
@@ -214,7 +218,10 @@ def test_repeticao_penaliza_a_ucrania_em_15_10_e_trump_fica_sem_alternativa_em_1
     e16, e17 = edicao(16), edicao(17)
     recentes = [S.entidades(S.escolher_raiox(e, election=True)) for e in (edicao(15), e16, e17)]
     ranking = S.candidatos_raiox(edicao(18), election=True, entidades_recentes=recentes)
-    assert len(ranking) == 1 and S.repete(ranking[0][1], recentes)
+    # o único candidato era o Trump, que fala de eleição de outro país fora do título (§2): sai no período eleitoral
+    assert ranking == []
+    trump = next(s for s in edicao(18).stories if s.id.startswith("trump-suspende"))
+    assert S.raiox_elegivel(trump, election=False) and not S.raiox_elegivel(trump, election=True)
 
 
 @real
