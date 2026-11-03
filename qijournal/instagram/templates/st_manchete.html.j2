@@ -1,6 +1,7 @@
 {# Stories da manhã · tela 2, a manchete (§4.6): a editoria, o número em destaque (qualificador pequeno acima,
    "CERCA DE / R$ 1 BI"), a manchete depois do adjetivo da casa em Noto Serif 800, o "por que importa", o selo
-   de cobertura (mini barra A | sem lado | B + "8 veículos · sem divisão") e as fontes. Marinho. #}
+   de cobertura (mini barra A | sem lado | B + "8 veículos · sem divisão") e as fontes. Marinho. O destaque é o da
+   capa do Em 1 minuto, a cobertura também ("NOTICIADO POR / 8 VEÍCULOS", qualificador em mono, como na capa). #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
 {% block theme %}t-dark v2{% endblock %}
@@ -9,6 +10,8 @@
 .sec{flex:none;margin-top:20px;font-family:var(--mono);font-weight:600;font-size:26px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
 .numbox{flex:none;margin-top:26px}
 .numbox .qual{margin-bottom:.06em}
+.cob .numbox .qual{font-family:var(--mono);font-stretch:100%;font-weight:600;font-size:26px!important;letter-spacing:.08em;
+  color:var(--ink2);margin-bottom:.5em}
 .head{flex:0 1 auto;min-height:0;margin-top:{{ 30 if s.numero else 34 }}px;font-family:var(--serif);font-weight:800;font-size:{{ s.tam_titulo }}px;
   line-height:1.06;letter-spacing:-.014em;color:var(--ink);text-wrap:balance;overflow:hidden}
 .why{flex:0 1 auto;min-height:0;margin-top:52px;padding-top:26px;border-top:2px solid var(--rule2);overflow:hidden;font-size:40px}
@@ -21,7 +24,7 @@
 {% endblock %}
 {% block body %}
 {{ m.serie_band(s.selo, none, 'em1min') }}
-<div class="frame">
+<div class="frame{{ ' cob' if s.heroi == 'cobertura' }}">
   <div class="sec">{{ s.secao }}</div>
   {% if s.numero %}{{ m.num_hero(s.numero, s.qual or none, s.tam_num, 140, hl=true) }}{% endif %}
   <h1 class="head" data-fit="story-manchete" data-min="56">{{ m.tx(s.titulo) }}</h1>

@@ -77,7 +77,10 @@ def test_21_10_capa_sem_gigante_com_cerca_de():
     assert (c["qual"], c["valor"]) == ("CERCA DE", "R$ 1 bi")
     assert c["selo"] == "EM 1 MINUTO Nº 031 · QUA 21 OUT"
     assert c["faixa"] == "1.640 notícias · 46 fontes · 1.159 assuntos"
-    assert c["mais_coberto"] == {"nome": "SpaceX e Tesla", "k": 12, "proprio": False}
+    # o mais coberto (SpaceX e Tesla) é o fato do slide 4: a capa só aponta o slide, com a contagem
+    assert c["mais_coberto"] == {"nome": "", "k": 12, "proprio": False, "slide": 4,
+                                 "story_id": "spacex-e-tesla-avaliam-fusao-historica-apos-salt"}
+    assert "O mais coberto do dia, com 12 veículos, está no slide 4." in capa(p).alt
     assert "dek" not in c and "linha_fina" not in c  # sem linha fina na capa
 
 
@@ -468,7 +471,8 @@ def test_capa_sem_numero_com_5_veiculos_estampa_a_cobertura():
 def test_capa_mais_coberta_entrega_a_contagem_no_slide_2():
     p = peca(14)
     c, s2 = capa(p).ctx, fatos(p)[0].ctx
-    assert c["valor"] == "3,7%" and c["mais_coberto"] == {"nome": "", "k": 11, "proprio": True}
+    assert c["valor"] == "3,7%" and (c["mais_coberto"]["nome"], c["mais_coberto"]["k"], c["mais_coberto"]["proprio"]) == (
+        "", 11, True)
     assert "É o assunto mais coberto do dia." in capa(p).alt and "do dia: 11" not in capa(p).alt
     assert (s2["heroi"], s2["valor"]) == ("cobertura", "11 veículos")
 
@@ -486,7 +490,10 @@ def test_template_da_capa_sem_contagem_quando_proprio_e_em_tinta_quando_outro():
     h14 = html(14)
     assert "É o assunto mais coberto do dia</div>" in h14 and "11 veículos" not in h14
     h22 = html(22)
-    assert 'class="miolo cob"' in h22 and "O mais coberto · <b>12 veículos</b>" in h22 and "class=hl" not in h22
+    assert 'class="miolo cob"' in h22 and "class=hl" not in h22
+    assert "O mais coberto do dia está no slide 4 · <b>12 veículos</b>" in h22  # a Meta é o fato do slide 4
+    h24 = html(24)  # a França não é fato: a linha leva o nome
+    assert "O mais coberto · <b>12 veículos</b>" in h24 and "conter nova onda de protestos" in h24
 
 
 @pytest.mark.parametrize("dia", [d for d in DIAS_IA if d != 26])
@@ -671,9 +678,14 @@ def test_gerador_capa_de_01_11_depois_do_placar_de_31_10():
 def test_nome_do_mais_coberto_para_antes_do_lugar():
     """30 e 31/10: o título passa de 90 caracteres sem junção; o nome para antes de " no maior ataque…", em vez de
     cair na tese ("Corretora congela ativos…", sem dizer quem) ou na linha fina."""
-    assert capa(peca(30)).ctx["mais_coberto"]["nome"] == "Binance suspende saques após roubo de US$ 6,3 bilhões"
-    assert capa(peca(31)).ctx["mais_coberto"]["nome"] == "Hackers norte-coreanos roubam US$ 6,3 bilhões da Binance"
-    assert capa(peca(21)).ctx["mais_coberto"]["nome"] == "SpaceX e Tesla"  # os nomes que abrem o título continuam
+    def nome(dia):
+        e = edicao(dia)
+        return MH.nome_do_assunto(e, E.concentracao(e, election=eleicao(dia), nomes=NOMES).topo)
+
+    assert nome(30) == "Binance suspende saques após roubo de US$ 6,3 bilhões"
+    assert nome(31) == "Hackers norte-coreanos roubam US$ 6,3 bilhões da Binance"
+    # arte (rodada 2): a manchete sem o adjetivo da casa, e não o rótulo sem verbo ("SpaceX e Tesla")
+    assert nome(21) == "SpaceX e Tesla avaliam fusão após salto nos resultados operacionais"
 
 
 # ── Ajuste final, rodada 1 ────────────────────────────────────────────────
@@ -718,9 +730,10 @@ def test_capa_sem_numero_com_3_veiculos_ou_mais_estampa_a_cobertura(dia, valor):
     assert (c["heroi"], c["qual"], c["valor"], c["destaque"]) == ("cobertura", "NOTICIADO POR", valor, valor)
 
 
-@pytest.mark.parametrize("dia", [15, 16, 22, 23, 24, 28])
+@pytest.mark.parametrize("dia", [22, 24, 28])
 def test_slide_2_sem_numero_estampa_a_duracao_do_relogio(dia):
-    """O slide 2 sem número nem cobertura (a da capa não volta) leva a duração do relógio, sempre nova."""
+    """O slide 2 sem número nem cobertura (a da capa não volta) leva a duração do relógio, sempre nova, quando o
+    texto traz dado novo e a duração passa de 3 horas."""
     s2 = fatos(manha(dia))[0].ctx
     assert s2["heroi"] == "relogio" and s2["qual"].startswith("DO PRIMEIRO AO ÚLTIMO VEÍCULO") and s2["relogio"]
     assert s2["valor"].endswith(("horas", "minutos")) and s2["destaque"] == s2["valor"]
@@ -778,3 +791,96 @@ def test_grade_de_29_10_a_01_11_sem_o_mesmo_numero_em_posts_seguidos():
     assert "US$ 6,3 bi" in herois30 and "US$ 6,3 bi" not in herois31
     assert g[31]["manha"].chave == "mercado:brent"
     assert g["2026-11-01"]["numero"].chave not in ("acum:brent", "acum:ibov")
+
+
+# ── Ajuste final, rodada 2 ────────────────────────────────────────────────
+
+
+def test_dado_novo_sem_o_dia_do_mes_nem_substantivo_com_maiuscula():
+    """codigo#2: "(26)" de "nesta segunda-feira (26)" não é número novo; "Justiça" não é nome próprio da matéria."""
+    e27, e15 = edicao(27), edicao(15)
+    itau = materia(e27, "itau-unibanco-anuncia")
+    capa27 = "Itaú Unibanco anuncia a aquisição total da startup NeoSpace por R$ 2,925 bilhões"
+    s27 = "O Itaú Unibanco assinou um acordo nesta segunda-feira (26) para adquirir a totalidade das ações da NeoSpace."
+    assert MH._numeros_de_dado(s27) == set() and not MH.dado_novo(s27, capa27, itau)
+    stf = materia(e15, "stf-decide-que-bancos")
+    capa15 = "STF decide que bancos não devem pagar expurgos inflacionários em depósitos judiciais"
+    s15 = ("STF formou maioria para livrar bancos do pagamento de expurgos inflacionários de planos econômicos em "
+           "recursos sob custódia da Justiça.")
+    assert MH.dado_novo(s15, capa15) and not MH.dado_novo(s15, capa15, stf)  # sem a matéria, a regra antiga
+    assert MH.dado_novo("Por 7 votos a 2, corte veda incidência de índices dos planos Bresser, Verão e Collor.", capa15, stf)
+    assert not MH.dado_novo("Prazo vale desde 2022 e até 15/10.", capa15, stf)  # ano e data não são dado
+
+
+@pytest.mark.parametrize("dia, comeco", [
+    (15, "Por 7 votos a 2, corte veda"),
+    (16, "O ceticismo financeiro sobre o retorno da infraestrutura de IA"),  # o por que importa
+    (27, "A transação consolida a corrida dos grandes conglomerados"),
+])
+def test_slide_2_nao_e_a_capa_dita_de_outro_jeito(dia, comeco):
+    """codigo#2 (15, 16 e 27/10): sem texto com dado novo, o slide 2 vai para o "por que importa"; a duração só
+    vira o número com dado novo e 3 horas ou mais (o "101 MINUTOS" de 15/10 sai)."""
+    p = manha(dia)
+    s2 = fatos(p)[0].ctx
+    assert s2["frase"].startswith(comeco), s2["frase"]
+    assert s2["heroi"] != "relogio"
+    assert not MH.repete_capa(s2["frase"], capa(p).ctx["manchete"])
+
+
+def test_duracao_do_relogio_como_numero_no_maximo_em_3_dias():
+    """arte (rodada 2): a duração era o número do slide 2 em 6 de 19 dias; agora só com dado novo e 3+ horas."""
+    g = _grade()
+    dias = [d for d, ps in g.items() if ps["manha"].serie == MH.SERIE and fatos(ps["manha"])[0].ctx["heroi"] == "relogio"]
+    assert dias == [22, 24, 28]
+
+
+def test_capa_da_vespera_nao_volta_como_capa():
+    """arte (rodada 2): a Alphabet foi capa em 29/10; em 30/10, com número novo (US$ 500 bi), ela fica como fato."""
+    g = _grade()
+    assert g[29]["manha"].story_ids[0].startswith("acoes-da-alphabet")
+    assert not g[30]["manha"].story_ids[0].startswith("alphabet-")
+    assert any(sid.startswith("alphabet-perde") for sid in g[30]["manha"].story_ids[1:])
+    e29, e30 = edicao(29), edicao(30)
+    assert MH.mesma_capa(materia(e29, "acoes-da-alphabet"), materia(e30, "alphabet-perde"))
+    assert not MH.mesma_capa(materia(e29, "acoes-da-alphabet"), materia(e30, "petrobras-confirma"))
+    for dia in [*range(15, 26), *range(28, 32), "2026-11-01", "2026-11-02"]:  # a grade inteira
+        ontem = g[dia - 1 if isinstance(dia, int) and dia > 14 else 31 if dia == "2026-11-01" else "2026-11-01"]
+        if ontem.get("manha") is None or ontem["manha"].serie != MH.SERIE or g[dia]["manha"].serie != MH.SERIE:
+            continue
+        e, e_ontem = edicao(dia), edicao(dia - 1 if isinstance(dia, int) else 31 if dia == "2026-11-01" else "2026-11-01")
+        a = next(s for s in e_ontem.stories if s.id == ontem["manha"].story_ids[0])
+        b = next(s for s in e.stories if s.id == g[dia]["manha"].story_ids[0])
+        assert not MH.mesma_capa(a, b), (dia, a.headline, b.headline)
+
+
+def test_30_10_numero_da_vespera_nao_volta_como_destaque_de_fato():
+    """arte (rodada 2): o "11,3%" do Número de 29/10 (TCU/CBS) não é o número do fato de 30/10."""
+    g = _grade()
+    tcu = [s for s in fatos(g[30]["manha"]) if "TCU" in s.ctx["frase"]]
+    assert tcu and all(s.ctx["valor"] != "11,3%" for s in tcu)
+
+
+@pytest.mark.parametrize("dia, slide", [(21, 4), (29, 6), (31, 5), ("2026-11-02", 4)])
+def test_mais_coberto_que_e_fato_so_aponta_o_slide(dia, slide):
+    """arte (rodada 2): o mais coberto que também é fato não se diz duas vezes; a capa aponta o slide."""
+    p = manha(dia)
+    mc = capa(p).ctx["mais_coberto"]
+    assert mc["slide"] == slide and mc["nome"] == ""
+    fato = p.slides[slide - 1]
+    assert fato.template == "m1_fato" and str(mc["k"]) in fato.ctx["cobertura"] + fato.ctx["valor"]
+
+
+def test_23_10_mais_coberto_de_mercado_aponta_a_cotacao():
+    mc = capa(manha(23)).ctx["mais_coberto"]
+    assert mc["nome"] == "Petróleo Brent · cotação no slide 7" and not mc.get("slide")
+
+
+@pytest.mark.parametrize("dia", [18, 24, 30, 27])
+def test_tela_2_dos_stories_com_o_destaque_da_capa(dia):
+    """arte (rodada 2): a tela 2 reproduz a capa letra por letra e também o destaque dela, a cobertura também
+    ("NOTICIADO POR / 8 VEÍCULOS", 18/10), e não só o número da manchete."""
+    g = _grade()[dia]
+    c = capa(g["manha"]).ctx
+    tela2 = next(s for s in g["stories"].slides if s.template == "st_manchete").ctx
+    assert (tela2["heroi"], tela2["qual"], tela2["numero"]) == (c["heroi"], c["qual"], c["valor"])
+    assert tela2["numero"], dia

@@ -200,12 +200,17 @@ def _manchete(
     election: bool,
     nomes: tuple[str, ...],
     raiox_story_id: str | None,
+    heroi: tuple[str, str, str] | None = None,
 ) -> Slide:
+    """A tela 2. ``heroi`` (o da capa do Em 1 minuto): o mesmo destaque da capa, a cobertura também."""
     day = edition_day(edition)
     textos = textos_manchete(edition, story, election=election, nomes=nomes)
     titulo, por_que = textos if textos else (manchete_capa(edition, story, E.titulos_literais(edition)), "")
-    numero = E.numero_destaque(titulo)
-    qual, valor = numero if numero else ("", "")
+    if heroi is not None:
+        tipo, qual, valor = heroi
+    else:
+        numero = E.numero_destaque(titulo)
+        tipo, (qual, valor) = ("numero" if numero else ""), (numero if numero else ("", ""))
     a, n, b = E.lados(story.coverage)  # só com 2+ comparados, como o selo
     if a + n + b < 2:
         a = n = b = 0
@@ -218,6 +223,7 @@ def _manchete(
         "selo": f"{rotulo} · {kicker_date(day)}",
         "secao": secao["title"],
         "section": secao,
+        "heroi": tipo if valor else "",
         "qual": qual,
         "numero": valor,
         "destaque": valor,
@@ -377,6 +383,7 @@ def stories_manha(
     capa: Story | None = None,
     raiox_story_id: str | None = None,
     capa_img: str = "",
+    capa_heroi: tuple[str, str, str] | None = None,
 ) -> Peca | None:
     """A sequência de stories da manhã (até 4 telas); None com menos de 2.
 
@@ -387,6 +394,8 @@ def stories_manha(
     - ``capa``: a matéria da capa do Em 1 minuto, para a tela 2 contar a mesma.
     - ``raiox_story_id``: a matéria do Raio-X da noite (o selo de cobertura ganha "Raio-X às 18h30").
     - ``capa_img``: a capa do Em 1 minuto já renderizada (``data:`` URI), para a miniatura da tela 4.
+    - ``capa_heroi``: ``(heroi, qual, valor)`` da capa do Em 1 minuto; a tela 2 da mesma matéria estampa o mesmo
+      destaque ("NOTICIADO POR / 8 VEÍCULOS", 18/10), e não só o número da manchete.
 
     A chamada para o carrossel só sai com o Em 1 minuto na agenda; sem agenda (``None``), em dia com IA.
     Agenda vazia é dia sem nenhum post de feed: sem chamada para um carrossel que não existe (26/10 sem
@@ -398,7 +407,10 @@ def stories_manha(
     slides = [_bom_dia(edition, agenda)]
     story = escolher_manchete(edition, election=election, nomes=nomes, capa=capa)
     if story is not None:
-        slides.append(_manchete(edition, story, election=election, nomes=nomes, raiox_story_id=raiox_story_id))
+        heroi = capa_heroi if capa is not None and story.id == capa.id else None
+        slides.append(
+            _manchete(edition, story, election=election, nomes=nomes, raiox_story_id=raiox_story_id, heroi=heroi)
+        )
     mercado = _mercado(edition, history)
     if mercado is not None:
         slides.append(mercado)

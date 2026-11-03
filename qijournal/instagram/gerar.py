@@ -351,12 +351,19 @@ def build_pieces(
     # 3. Manhã: Em 1 minuto ou, sem IA (ou reprovado), o Terminal.
     # a capa não estampa o que a noite do dia estampa (o Raio-X ou os destaques do Placar) nem reabre, sem
     # número novo, o assunto do Raio-X ou do Placar da noite anterior, o post logo antes dela na grade
-    ids_ontem = set(fila.materias_raiox(day, 1)) | set(fila.materias_numero(day, 1))  # e o Número da véspera
-    noite_ontem = [s for s in (ontem.stories if ontem is not None else []) if s.id in ids_ontem]
+    # (e o Número da véspera); a capa da véspera não volta como capa, e o número do Número da véspera não volta
+    # como destaque de fato
+    ids_numero_ontem = set(fila.materias_numero(day, 1))
+    ids_ontem = set(fila.materias_raiox(day, 1)) | ids_numero_ontem
+    ids_capa_ontem = set(fila.capas_manha(day, 1))
+    stories_ontem = ontem.stories if ontem is not None else []
     manha = MH.em_1_minuto(
         edition, brand, history, election=election, nomes=nomes, numero_serie=numero_serie(MH.SERIE, MH.SLOT),
         raiox_story_id=raiox_id, ontem=ontem, numero=numero, limiares=lim,
-        evitar_capa=noite.story_ids if noite is not None else (), noite_anterior=noite_ontem,
+        evitar_capa=noite.story_ids if noite is not None else (),
+        noite_anterior=[s for s in stories_ontem if s.id in ids_ontem],
+        capa_anterior=[s for s in stories_ontem if s.id in ids_capa_ontem],
+        numero_anterior=[s for s in stories_ontem if s.id in ids_numero_ontem],
     )
     manha = aprovada(manha, "a manhã vira o Terminal")
     # Os três posts de feed nunca estampam a mesma matéria (a manhã cede).
@@ -378,12 +385,15 @@ def build_pieces(
     agenda = ST.agenda_das_pecas(feed, horarios(config, day))
     capa = None
     capa_img = ""
+    capa_heroi = None
     if manha is not None and manha.serie == MH.SERIE and manha.story_ids:
         capa = next((s for s in edition.stories if s.id == manha.story_ids[0]), None)
         capa_img = (imagem(manha, 0) if imagem is not None else "") or ""
+        c = manha.slides[0].ctx
+        capa_heroi = (str(c.get("heroi") or ""), str(c.get("qual") or ""), str(c.get("valor") or ""))
     stories = ST.stories_manha(
         edition, brand, history, election=election, nomes=nomes, agenda=agenda, capa=capa, raiox_story_id=raiox_id,
-        capa_img=capa_img,
+        capa_img=capa_img, capa_heroi=capa_heroi,
     )
     stories = aprovada(stories, "os stories não saem")
     return [p for p in (manha, stories, numero, noite) if p is not None]

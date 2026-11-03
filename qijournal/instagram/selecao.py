@@ -205,9 +205,11 @@ NBSP = "\u00a0"
 
 
 def inseparavel(texto: str) -> str:
-    """Espaço inseparável entre o número e a palavra seguinte e entre "só"/"de" e o número, para a quebra
-    de linha do gancho nunca deixar "MESMO FATO, 4 / VEÍCULOS" nem "SÓ / 2, COMPLEXIDADE" (só na arte)."""
+    """Espaço inseparável entre o número e a palavra seguinte, entre "só"/"de" e o número e entre a contagem com
+    vírgula e a 1ª palavra do rótulo, para a quebra de linha do gancho nunca deixar "MESMO FATO, 4 / VEÍCULOS",
+    "SÓ / 2, COMPLEXIDADE" nem "IMPACTO MILITAR; 4, / MANOBRA POLÍTICA" (14/10; só na arte)."""
     texto = re.sub(r"\b(só|de) (?=\d)", lambda m: m.group(1) + NBSP, texto, flags=re.I)
+    texto = re.sub(r"(\d,) (?=[^\W\d])", lambda m: m.group(1) + NBSP, texto)
     return re.sub(r"(\d) (?=[^\W\d])", lambda m: m.group(1) + NBSP, texto)
 
 

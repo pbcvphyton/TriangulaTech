@@ -3,8 +3,9 @@
    80 px; até 96 sem número; manha.tamanhos_capa) e, no pé, o mais coberto do dia e a faixa de dados em Plex
    Mono. Sem número na manchete e com 5+ veículos, a cobertura da capa vira o número ("NOTICIADO POR / 13
    VEÍCULOS", qualificador em mono, como no fato). O laranja é só do dado da capa: a contagem do mais coberto
-   vai em tinta e, quando ele é a própria capa, a linha sai sem a contagem (ela fica para o slide 2). Sem
-   linha fina: ela vai para o slide 2. #}
+   vai em tinta e, quando ele é a própria capa, a linha sai sem a contagem (ela fica para o slide 2); quando ele é
+   um dos fatos, a linha só aponta o slide, com a contagem (o texto fica no fato). Sem linha fina: ela vai para
+   o slide 2. #}
 {% extends "_base.html.j2" %}
 {% import "_macros.html.j2" as m with context %}
 {% block theme %}t-dark v2{% endblock %}
@@ -43,6 +44,8 @@
     <div class="mc">
       {% if s.mais_coberto.proprio %}
       <div class="k">É o assunto mais coberto do dia</div>
+      {% elif s.mais_coberto.get('slide') %}
+      <div class="k">O mais coberto do dia está no slide {{ s.mais_coberto.slide }} · <b>{{ s.mais_coberto.k }} veículos</b></div>
       {% else %}
       <div class="k">O mais coberto · <b>{{ s.mais_coberto.k }} veículos</b></div>
       <div class="nome" data-fit="capa-mais-coberto" data-min="26">{{ m.tx(s.mais_coberto.nome) }}</div>

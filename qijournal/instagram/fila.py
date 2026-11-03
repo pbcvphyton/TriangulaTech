@@ -237,6 +237,11 @@ class Fila:
         29 e 30/10)."""
         return [sid for p in self._recentes("numero", day, dias, (PUBLISHED, PENDING)) for sid in p.story_ids[:1]]
 
+    def capas_manha(self, day: date | str, dias: int = 1) -> list[str]:
+        """As matérias (ids) da capa do Em 1 minuto dos ``dias`` anteriores, publicado ou na fila: a capa não
+        volta no dia seguinte, nem com número novo (a Alphabet em 29 e 30/10)."""
+        return [p.story_ids[0] for p in self._recentes("em1min", day, dias, (PUBLISHED, PENDING)) if p.story_ids]
+
     def ativos_mercado(self, day: date | str, dias: int = 1) -> set[str]:
         """Os ativos do título do slide de mercado do Em 1 minuto dos ``dias`` anteriores (``chave``
         "mercado:brent"): o acumulado que ele estampou não vira o Número do dia seguinte (o Brent +13,4% em 31/10

@@ -260,7 +260,7 @@ def test_gancho_com_veiculos_fora_da_analise_diz_analisados():
 
 def test_inseparavel_prende_numero_e_palavra():
     assert S.inseparavel("MESMO FATO, 4 VEÍCULOS") == "MESMO FATO, 4\u00a0VEÍCULOS"
-    assert S.inseparavel("SÓ 2, COMPLEXIDADE") == "SÓ\u00a02, COMPLEXIDADE"
+    assert S.inseparavel("SÓ 2, COMPLEXIDADE") == "SÓ\u00a02,\u00a0COMPLEXIDADE"
     assert S.inseparavel("1 DE 17 ASSUNTOS") == "1\u00a0DE\u00a017\u00a0ASSUNTOS"
     # e a medida da quebra respeita: "4 VEÍCULOS" não se separa
     from qijournal.instagram import graficos as G

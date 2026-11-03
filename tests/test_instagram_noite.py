@@ -146,7 +146,7 @@ def test_raiox_de_21_10_fato_nao_repete_a_capa():
 def test_raiox_de_21_10_maioria_e_minoria_em_ordem_de_horario():
     p = raiox(21)
     maioria, minoria = (s.ctx for s in p.slides[2:4])
-    assert (maioria["lado"], maioria["kicker"], maioria["titulo"]) == ("a", "A maioria", "6 DE 11 · SINERGIA EM IA")
+    assert (maioria["lado"], maioria["kicker"], maioria["titulo"]) == ("a", "A maioria", "6 DE 11: SINERGIA EM IA")  # o par usa o mesmo separador
     assert maioria["destaque"] == "6 DE 11"
     assert [v["name"] for v in maioria["veiculos"]] == ["The New York Times", "Valor Econômico", "g1"]
     assert maioria["veiculos"][0]["hora"] == "20/10 13h17"
@@ -702,3 +702,49 @@ def test_18_10_no_periodo_eleitoral_sem_eleicao_de_fora_nem_fora_do_titulo():
     assert not S.raiox_elegivel(trump, election=True)
     assert "eleiç" not in N._fato(trump, "", [], sem_eleicao=True)
     assert "eleições de meio de mandato" in N._fato(trump, "", [])
+
+
+# ── Ajuste final, rodada 2 ────────────────────────────────────────────────
+
+
+def test_contagem_com_virgula_presa_ao_rotulo_no_gancho():
+    """arte#13 (resto): no "; 4, RÓTULO" a contagem não fica sozinha no fim da linha (14, 15, 28 e 30/10)."""
+    g = S.inseparavel("6 DESTACARAM IMPACTO MILITAR; 4, MANOBRA POLÍTICA.")
+    assert "4, MANOBRA POLÍTICA" in g and "6 DESTACARAM" in g
+    assert S.inseparavel("SÓ 2, COMPLEXIDADE") == "SÓ 2, COMPLEXIDADE"
+    assert S.inseparavel("ALTA DE 4,5%") == "ALTA DE 4,5%"  # decimal não muda
+    for dia in (14, 15, 28, 30):
+        capa = (noites()[dia] if dia in noites() else raiox_pos(dia)).slides[0].ctx
+        m = re.search(r"; (\d+),(.)", capa["gancho"])
+        assert m and m.group(2) == " ", (dia, capa["gancho"])
+
+
+@pytest.mark.parametrize("dia, mes", [(29, 10), (1, 11)])
+def test_titulos_dos_lados_com_o_mesmo_separador(dia, mes):
+    """arte (rodada 2): "5 DE 11: APURAÇÃO DE FALHA HUMANA" e "5 DE 11 · VÍTIMAS" no mesmo par: o separador é um só."""
+    p = N.raio_x(edicao(dia, mes), {}, election=False, numero_serie=15)
+    t3, t4 = (x.ctx["titulo"] for x in p.slides[2:4])
+    seps = {":" if ":" in t else "·" for t in (t3, t4)}
+    assert len(seps) == 1, (t3, t4)
+    assert ":" in t3 and ":" in t4  # um dos dois não cabe numa linha com o "·"
+
+
+@pytest.mark.parametrize("dia, mes, prefixo", [(16, 10, "ucrania-retoma"), (2, 11, "eleicoes-de-meio-de-mandato")])
+def test_descricao_do_lado_sem_politico_nem_partido(dia, mes, prefixo):
+    """arte (rodada 2): a regra do rótulo vale para a descrição do lado ("Destaca desafio de Zelenski…",
+    "Foco no favoritismo democrata…"): ela sai da arte e do texto alternativo."""
+    e = edicao(dia, mes)
+    s = next(s for s in e.stories if s.id.startswith(prefixo))
+    p = N.raio_x(e, {}, election=mes == 10, numero_serie=3, story=s)
+    for x in p.slides[2:4]:
+        assert not E.cita_politico(x.ctx["descricao"]), x.ctx["descricao"]
+    assert "Zelenski e atrito" not in p.slides[2].alt and "favoritismo democrata" not in p.slides[2].alt
+
+
+def test_molde_por_idioma_com_zero_por_extenso():
+    """dados (rodada 2): "0 destacaram" vira "nenhum destacou"; o zero do fim, "nenhum" (01/11 e 21/10)."""
+    assert N._destacaram(0) == "nenhum destacou" and N._destacaram(1) == "1 destacou"
+    p = N.raio_x(edicao(1, 11), {}, election=False, numero_serie=18)
+    concl = p.slides[5].ctx["conclusao"]
+    assert "0 destacaram" not in concl and " 0 " not in concl
+    assert "Entre os veículos em inglês, nenhum destacou reivindicações sociais e 2, saques" in concl, concl

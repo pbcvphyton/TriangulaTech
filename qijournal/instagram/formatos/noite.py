@@ -382,6 +382,9 @@ def _conclusao_verificada(c: Coverage, ld: S.Lados, titulos: list[str]) -> str:
 
 
 def _destacaram(k: int) -> str:
+    """"1 destacou", "3 destacaram"; o zero por extenso, "nenhum destacou" (nunca "0 destacaram", 01/11)."""
+    if k == 0:
+        return "nenhum destacou"
     return f"{k} destacou" if k == 1 else f"{k} destacaram"
 
 
@@ -426,7 +429,7 @@ def _molde_conclusao(
              for lang in ("en", "pt")}
     if rot_maj and rot_min and all(sum(v) >= 2 for v in conta.values()):
         (en_a, en_b), (pt_a, pt_b) = conta["en"], conta["pt"]
-        idioma = (f" Entre os veículos em inglês, {_destacaram(en_a)} {rot_maj} e {en_b}, {rot_min}; "
+        idioma = (f" Entre os veículos em inglês, {_destacaram(en_a)} {rot_maj} e {en_b or 'nenhum'}, {rot_min}; "
                   f"em português, {pt_a or 'nenhum'} e {pt_b or 'nenhum'}.")
         if len(texto + idioma) <= MOLDE_MAX:  # a janela de horário, se houver, tem a vez
             texto += idioma
@@ -527,13 +530,23 @@ def _tam_gancho(texto: str) -> int:
     return G.tamanho_gancho(texto, max_linhas=5, tam_min=100)
 
 
-def _titulo_lado(contagem: str, rotulo: str) -> str:
+def _titulo_lado(contagem: str, rotulo: str, sep: str | None = None) -> str:
     """``"6 de 11 · sinergia em IA"`` numa linha; se não couber, ``"4 de 6: restabelecimento"`` (os dois
-    pontos fecham bem a 1ª linha; o "·" ficaria sozinho no fim dela)."""
-    titulo = f"{contagem} · {rotulo}"
-    if len(G.linhas_texto(titulo.upper(), "hook", 96, G.LARGURA * 0.985, tracking=-0.01)) <= 1:
-        return titulo
-    return f"{contagem}: {rotulo}"
+    pontos fecham bem a 1ª linha; o "·" ficaria sozinho no fim dela). ``sep`` já decidido para o par
+    (:func:`_separador_lados`)."""
+    if sep is None:
+        sep = _separador_lados([(contagem, rotulo)])
+    return f"{contagem}{sep}{rotulo}"
+
+
+def _separador_lados(pares: list[tuple[str, str]]) -> str:
+    """O separador dos títulos dos slides 3 e 4, decidido para o par: se um deles não cabe numa linha com o "·",
+    os dois usam ":" (29/10: "5 DE 11: APURAÇÃO DE FALHA HUMANA" e "5 DE 11: VÍTIMAS", e não "5 DE 11 · VÍTIMAS")."""
+    for contagem, rotulo in pares:
+        if rotulo and len(G.linhas_texto(f"{contagem} · {rotulo}".upper(), "hook", 96, G.LARGURA * 0.985,
+                                         tracking=-0.01)) > 1:
+            return ": "
+    return " · "
 
 
 def _lado_ctx(
@@ -673,14 +686,19 @@ def raio_x(
         kickers = ("A maioria", "A minoria")
     else:
         kickers = ("O lado maior", "O lado menor")
+    sep = _separador_lados([(f"{len(maioria)} de {n_total}", rot_maj or ""), (f"{len(minoria)} de {n_total}", rot_min or "")])
     for chave, outlets, rotulo, nome, kicker in (
         ("a", maioria, rot_maj, nome_maj, kickers[0]),
         ("b", minoria, rot_min, nome_min, kickers[1]),
     ):
         mostrados, resto = _lado_ctx(outlets, horas, day)
         lado_txt = _sem_adj(c.side_a if (ld.maioria if chave == "a" else ld.minoria) == "a" else c.side_b, titulos)
+        # a regra do rótulo vale para o que fica no lugar dele: a descrição do lado com político ou partido
+        # ("Destaca desafio de Zelenski…", 16/10; "Foco no favoritismo democrata…", 02/11) sai (§2)
+        if lado_txt and E.cita_politico(lado_txt, nomes):
+            lado_txt = ""
         contagem = f"{len(outlets)} de {n_total}"
-        titulo = _titulo_lado(contagem, rotulo) if rotulo else contagem  # o papel já está no chapéu
+        titulo = _titulo_lado(contagem, rotulo, sep) if rotulo else contagem  # o papel já está no chapéu
         extra = []
         if chave == "b" and neutros:
             extra = [f"Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}"]
