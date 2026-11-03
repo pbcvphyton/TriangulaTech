@@ -42,7 +42,7 @@ PASSOS = (
     "O mesmo número no título de 3 ou mais veículos",
     "Assunto com 12 ou mais veículos",
     "Mercado: 2 vezes a variação típica",
-    "Maior acumulado da série",
+    "Maior acumulado ainda não publicado na semana",
     "Juro real ex-post",
     "Maior acumulado, mesmo repetido",
 )
@@ -89,10 +89,17 @@ def _nome_serie(numero_serie: int) -> str:
     return f"Número do dia nº {numero_serie}" if numero_serie else "Número do dia"
 
 
-def _quando(qid: str, d: dict[str, Any], day: date) -> str:
+def _quando(qid: str, d: dict[str, Any], day: date, *, com_data: bool = False) -> str:
     """De quando é a leitura, com a data sempre que não é do dia: ``"fech. 28/09"``,
     ``"leitura de 28/09, 23h34"``, ``"leitura das 04h30"``."""
-    return E.selo_leitura(qid, E.Ponto(d["as_of"], d["valor"], d.get("pct")), day) or d["dia"]
+    return E.selo_leitura(qid, E.Ponto(d["as_of"], d["valor"], d.get("pct")), day, com_data=com_data) or d["dia"]
+
+
+def _pontas(qid: str, ini: dict[str, Any], fim: dict[str, Any], day: date) -> tuple[str, str]:
+    """As duas pontas de um acumulado, com a data nas duas quando são de dias diferentes (§3):
+    "leitura de 29/09, 02h31" e "leitura de 27/10, 06h45", nunca "… a leitura das 06h45"."""
+    com_data = ini["data"] != fim["data"]
+    return _quando(qid, ini, day, com_data=com_data), _quando(qid, fim, day, com_data=com_data)
 
 
 def tamanho_numero(valor: str, *, largura: float = LARGURA) -> int:
@@ -117,7 +124,8 @@ def _prova_capa(n: E.Numero, day: date) -> str:
     """A prova em mono da capa (o ``Numero.selo``, com as datas e a base quando faltam)."""
     p = n.prova
     if n.tipo == "acumulado":
-        return f"{_quando(p['qid'], p['primeiro'], day)} → {_quando(p['qid'], p['ultimo'], day)} · {p['leituras']} leituras"
+        ida, volta = _pontas(p["qid"], p["primeiro"], p["ultimo"], day)
+        return f"{ida} → {volta} · {p['leituras']} leituras"
     if n.tipo == "mercado":
         return f"{p['leitura']} · {E.num(p['z'], 1)} {_vezes(p['z'])} a variação típica"
     return n.selo
@@ -256,9 +264,9 @@ def _prova_triangulado(n: E.Numero, edition: Edition, day: date) -> dict[str, An
         linha = min(72.0, (altura - 64) / max(linhas, 1))
         return G.checklist(nomes, sim, horas, ref_date=day, linha=linha, max_linhas=cabem)
 
-    ini, fim = _horas(veiculos, day)
+    ini, fim = _horas([v for v in veiculos if v["confirmado"]], day)  # o período é o dos títulos com o número
     horario = (
-        f"Títulos de {ini} a {fim}, no horário informado por cada veículo."
+        f"Títulos com o número de {ini} a {fim}, no horário informado por cada veículo."
         if ini and ini != fim else "Horário informado por cada veículo, em Brasília."
     )
     return {
@@ -414,7 +422,7 @@ def _prova_acumulado(n: E.Numero, edition: Edition, day: date) -> dict[str, Any]
         "contexto": [c for c in contexto if c],
         "pe": "Uma leitura por dia · variação ponta a ponta",
         "fonte": "Yahoo Finance",
-        "periodo": f"{_quando(qid, primeiro, day)} a {_quando(qid, ultimo, day)}",
+        "periodo": " a ".join(_pontas(qid, primeiro, ultimo, day)),
         "base": f"{p['leituras']} leituras" + (f"; {len(p['faltantes'])} pregões sem leitura" if p["faltantes"] else ""),
     }
 
@@ -455,7 +463,7 @@ def _frase_curta(n: E.Numero) -> str:
     """A tese sem repetir o número que já abre a frase (alt e legenda do acumulado)."""
     if n.tipo == "acumulado":
         p = n.prova
-        return f"{p['ativo']} acumula {'alta' if p['pct'] > 0 else 'queda'} desde {p['primeiro']['dia']}"
+        return f"{p['ativo']} acumula {'alta' if p['pct'] > 0 else 'queda'} de {p['primeiro']['dia']} a {p['ultimo']['dia']}"
     return n.tese
 
 
@@ -471,8 +479,13 @@ def _linha1(n: E.Numero, history: list[Edition]) -> str:
     """1ª linha da legenda: o número e o contraste, em até 110 caracteres."""
     p = n.prova
     if n.tipo == "acumulado":
-        fim = ", quando a série da Triangula começa." if _serie_comeca(history, n) else "."
-        return _cabe(f"{n.valor}: {_frase_curta(n)}{fim}", f"{n.valor}: {_frase_curta(n)}.")
+        if _serie_comeca(history, n):  # "−3,5%: Ouro acumula queda de 29/09 (início da série da Triangula) a 27/10."
+            ativo, rumo = p["ativo"], "alta" if p["pct"] > 0 else "queda"
+            comeca = (f"{n.valor}: {ativo} acumula {rumo} de {p['primeiro']['dia']} (início da série da Triangula) "
+                      f"a {p['ultimo']['dia']}.")
+        else:
+            comeca = ""
+        return _cabe(comeca, f"{n.valor}: {_frase_curta(n)}.")
     if n.tipo == "mercado":
         ativo = nome_corrido(p["qid"], p["ativo"])
         z = f"{E.num(p['z'], 1)} {_vezes(p['z'])}"
@@ -506,9 +519,10 @@ def _bullets(n: E.Numero, edition: Edition, day: date) -> list[str]:
     if n.tipo == "acumulado":
         qid = p["qid"]
         ini, fim = p["primeiro"], p["ultimo"]
+        ida, volta = _pontas(qid, ini, fim, day)
         linhas = [
-            f"De {valor_fmt(qid, ini['valor'])} ({_quando(qid, ini, day)}) a {valor_fmt(qid, fim['valor'], unidade=False)} "
-            f"({_quando(qid, fim, day)}), em {p['leituras']} leituras.",
+            f"De {valor_fmt(qid, ini['valor'])} ({ida}) a {valor_fmt(qid, fim['valor'], unidade=False)} "
+            f"({volta}), em {p['leituras']} leituras.",
             _extremo(p, day),
             _outros(p),
         ]
@@ -536,9 +550,9 @@ def _bullets(n: E.Numero, edition: Edition, day: date) -> list[str]:
         dek = plain(story.dek) if story is not None else ""
         if _limpo(dek) and len(dek) <= 240:
             linhas.append(f"O fato: {dek}")
-        ini, fim = _horas(p["veiculos"], day)
+        ini, fim = _horas([v for v in p["veiculos"] if v["confirmado"]], day)
         linhas.append(
-            f"Títulos de {ini} a {fim}, no horário informado por cada veículo, em Brasília."
+            f"Títulos com o número de {ini} a {fim}, no horário informado por cada veículo, em Brasília."
             if ini and ini != fim else "Horário informado por cada veículo, em Brasília."
         )
         if len(linhas) < 3:

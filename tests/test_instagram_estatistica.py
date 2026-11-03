@@ -221,7 +221,7 @@ def test_mercado_fora_do_comum_vira_o_numero_com_a_hora_da_leitura():
     assert n.selo.endswith("leitura das 14h06")  # o dólar não tem fechamento: diz a hora
     # Com menos de 15 leituras não há escala confiável: nada de "fora do comum"; sai o acumulado.
     n = E.numero_do_dia(hoje, history[:10] + [hoje], election=True)
-    assert n.tipo == "acumulado" and n.passo == 5 and n.tese == "Dólar acumula −4,3% desde 29/09"
+    assert n.tipo == "acumulado" and n.passo == 5 and n.tese == "Dólar acumula −4,3% de 29/09 a 15/10"
 
 
 def test_serie_uma_leitura_por_dia_e_acumulado_ponta_a_ponta():
@@ -451,7 +451,7 @@ def test_numero_de_destaque_com_qualificador():
         ("15", None, 4, "mercado", "", "−2,36%", "Bitcoin cai 2,36%", "Yahoo Finance · leitura das 06h55"),
         ("16", None, 2, "triangulado", "", "0,3%", "IBC-Br sobe 0,3% em agosto com recuo do agro", "no título de 5 de 5 veículos"),
         ("18", None, 3, "concentracao", "", "12 veículos", None, "o assunto mais coberto entre 663 do dia"),
-        ("21", "spacex", 5, "acumulado", "", "+13,8%", "Ibovespa acumula +13,8% desde 28/09", "fech. 28/09 → fech. 20/10"),
+        ("21", "spacex", 5, "acumulado", "", "+13,8%", "Ibovespa acumula +13,8% de 28/09 a 20/10", "fech. 28/09 → fech. 20/10"),
         ("22", None, 2, "triangulado", "ATÉ", "R$ 90 bi", None, "no título de 5 de 6 veículos"),
         ("24", "ipca-15", 2, "triangulado", "", "US$ 35,7 bi", None, "no título de 5 de 5 veículos"),
     ],

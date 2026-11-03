@@ -936,16 +936,17 @@ def leitura_velha(qid: str, p: Ponto, day: date, anterior: Edition | None = None
     return qid not in FECHAMENTO_IDS and p.day < day
 
 
-def selo_leitura(qid: str, ponto: Ponto, ref: date | None = None) -> str:
+def selo_leitura(qid: str, ponto: Ponto, ref: date | None = None, *, com_data: bool = False) -> str:
     """De quando é a cotação: ``"fech. 20/10"`` (só fechamento de pregão), senão
-    ``"leitura das 06h55"`` (``"leitura de 23/10, 17h06"`` se não é do dia ``ref``);
-    ``""`` quando a leitura não serve de dado (:func:`stale_reading`: sem variação)."""
+    ``"leitura das 06h55"`` (``"leitura de 23/10, 17h06"`` se não é do dia ``ref`` ou com ``com_data``,
+    para as duas pontas de um acumulado levarem a data, §3); ``""`` quando a leitura não serve de
+    dado (:func:`stale_reading`: sem variação)."""
     if stale_reading(ponto):
         return ""
     local = ponto.as_of.astimezone(TZ)
     if is_close(qid, ponto.as_of):
         return f"fech. {local:%d/%m}"
-    if ref is not None and local.date() != ref:
+    if com_data or (ref is not None and local.date() != ref):
         return f"leitura de {local:%d/%m}, {local:%Hh%M}"
     return f"leitura das {local:%Hh%M}"
 
@@ -1074,15 +1075,20 @@ def _ponto_json(qid: str, p: Ponto, ref: date | None = None) -> dict[str, Any]:
 
 
 def _prova_triangulado(edition: Edition, topic: IndexTopic, core: str, valor: str) -> dict[str, Any]:
+    """A lista de verificação: cada veículo, se pôs o número no título e a hora. A hora do confirmado é a do
+    1º título dele **com** o número (31/10: o Valor pôs "18%" às 17h34, não às 05h00, que é a de outro título
+    do assunto); a do não confirmado, a do 1º título dele no assunto."""
     day = date.fromisoformat(edition.date)
     rows: dict[str, dict[str, Any]] = {}
     for item in topic.items:
         if not item.source or item.source in ORGAOS:
             continue
         row = rows.setdefault(item.source, {"nome": item.source, "confirmado": False, "at": None, "hora": ""})
-        row["confirmado"] = row["confirmado"] or _title_has(core, item.title or "")
+        tem = _title_has(core, item.title or "")
         at = _parse_dt(item.published)
-        if at is not None and (row["at"] is None or at < row["at"]):
+        if tem and not row["confirmado"]:  # o 1º título com o número troca a hora de um título sem ele
+            row["confirmado"], row["at"] = True, at
+        elif at is not None and tem == row["confirmado"] and (row["at"] is None or at < row["at"]):
             row["at"] = at
     ordered = sorted(rows.values(), key=lambda r: (r["at"] is None, r["at"] or datetime.min.replace(tzinfo=TZ)))
     com_hora = [r for r in ordered if r["at"] is not None]
@@ -1361,12 +1367,14 @@ def _acumulados(edition: Edition, history: list[Edition], min_pontos: int) -> li
     for qid, pontos, acc in sorted(found, key=lambda f: -abs(f[2].pct)):
         label = labels.get(qid, qid)
         valor = sinal(acc.pct)
-        desde = f"{acc.first.day:%d/%m}"
-        ida, volta = selo_leitura(qid, acc.first) or f"{acc.first.day:%d/%m}", selo_leitura(qid, acc.last) or f"{acc.last.day:%d/%m}"
+        desde, ate = f"{acc.first.day:%d/%m}", f"{acc.last.day:%d/%m}"
+        # ponta a ponta, com as duas datas (§3): "leitura de 29/09, 02h31 → leitura de 27/10, 06h45"
+        ida = selo_leitura(qid, acc.first, com_data=True) or desde
+        volta = selo_leitura(qid, acc.last, com_data=True) or ate
         out.append(
             Numero(
                 valor=valor,
-                tese=f"{label} acumula {valor} desde {desde}",
+                tese=f"{label} acumula {valor} de {desde} a {ate}",
                 selo=f"{ida} → {volta}",
                 tipo="acumulado",
                 metodo=f"Uma leitura por dia ({len(pontos)} leituras, Yahoo Finance), variação ponta a ponta "

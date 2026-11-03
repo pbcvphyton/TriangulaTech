@@ -53,7 +53,7 @@ CASOS = [
     ("15", None, "mercado", "", "−2,36%", "Bitcoin cai 2,36%", "leitura das 06h55 · 2,6 vezes a variação típica"),
     ("16", None, "triangulado", "", "0,3%", "IBC-Br sobe 0,3% em agosto com recuo do agro", "no título de 5 de 5 veículos"),
     ("18", None, "concentracao", "", "12", None, "o assunto mais coberto entre 663 do dia"),
-    ("21", "spacex", "acumulado", "", "+13,8%", "Ibovespa acumula +13,8% desde 28/09", "fech. 28/09 → fech. 20/10 · 14 leituras"),
+    ("21", "spacex", "acumulado", "", "+13,8%", "Ibovespa acumula +13,8% de 28/09 a 20/10", "fech. 28/09 → fech. 20/10 · 14 leituras"),
     ("22", None, "triangulado", "ATÉ", "R$ 90 bi", None, "no título de 5 de 6 veículos"),
     ("24", "ipca-15", "triangulado", "", "US$ 35,7 bi", None, "no título de 5 de 5 veículos"),
 ]
@@ -141,7 +141,7 @@ def test_slide_2_do_mercado_e_da_concentracao():
 def test_legenda_e_alt_do_acumulado_seguem_o_molde_da_spec():
     p = peca("21", "spacex")
     assert p.caption == (
-        "+13,8%: Ibovespa acumula alta desde 28/09, quando a série da Triangula começa.\n"
+        "+13,8%: Ibovespa acumula alta de 28/09 (início da série da Triangula) a 20/10.\n"
         "\n"
         "▸ De 182.991 pontos (fech. 28/09) a 208.296 (fech. 20/10), em 14 leituras.\n"
         "▸ Máxima da série: 209.067 pontos, fech. 09/10.\n"
@@ -151,10 +151,10 @@ def test_legenda_e_alt_do_acumulado_seguem_o_molde_da_spec():
         "#triangula #dados #mercadofinanceiro"
     )
     assert p.slides[1].alt.startswith(
-        "Número do dia nº 3: +13,8%. Ibovespa acumula alta desde 28/09. Gráfico: linha com 14 leituras, "
+        "Número do dia nº 3: +13,8%. Ibovespa acumula alta de 28/09 a 20/10. Gráfico: linha com 14 leituras, "
         "de 182.991 (28/09) a 208.296 (20/10); máxima de 209.067 em 09/10"
     )
-    assert p.slides[0].alt == "Número do dia nº 3: +13,8%. Ibovespa acumula +13,8% desde 28/09. fech. 28/09 → fech. 20/10 · 14 leituras."
+    assert p.slides[0].alt == "Número do dia nº 3: +13,8%. Ibovespa acumula +13,8% de 28/09 a 20/10. fech. 28/09 → fech. 20/10 · 14 leituras."
     assert p.slides[1].ctx["titulo"] == "De 182.991 a 208.296 pontos em 14 leituras"
 
 
@@ -197,9 +197,13 @@ def test_slide_3_metodo_ficha_ordem_de_escolha_e_cta():
 def test_acumulado_fora_do_fechamento_escreve_as_datas_das_leituras():
     p = peca("26", usados={"acum:ibov", "acum:brent"})
     capa = p.slides[0].ctx
-    assert capa["valor"] == "−4,4%" and capa["tese"] == "Dólar acumula −4,4% desde 28/09"
-    assert capa["prova"] == "leitura de 28/09, 23h34 → leitura das 04h30 · 24 leituras"
-    assert p.caption.startswith("−4,4%: Dólar acumula queda desde 28/09")
+    assert capa["valor"] == "−4,4%" and capa["tese"] == "Dólar acumula −4,4% de 28/09 a 26/10"
+    # as duas pontas com a data (§3; dados#12 no acumulado): nunca "… → leitura das 04h30"
+    assert capa["prova"] == "leitura de 28/09, 23h34 → leitura de 26/10, 04h30 · 24 leituras"
+    assert p.caption.startswith("−4,4%: Dólar acumula queda de 28/09 (início da série da Triangula) a 26/10.")
+    assert "(leitura de 28/09, 23h34) a R$ " in p.caption and "(leitura de 26/10, 04h30)" in p.caption
+    assert dict((f["k"], f["v"]) for f in p.slides[2].ctx["ficha"])["Período"] == (
+        "leitura de 28/09, 23h34 a leitura de 26/10, 04h30")
 
 
 @real
@@ -285,10 +289,11 @@ def test_slide_2_nao_repete_a_tese_quando_ela_saiu_da_linha_fina():
 def test_triangulado_de_29_10_com_a_data_nas_duas_pontas_e_sem_repetir_a_capa():
     p = peca("29")
     prova, metodo = p.slides[1].ctx, p.slides[2].ctx
-    # "Títulos de 28/10 10h51 a 04h47" parecia andar para trás (dados#12).
-    assert "Títulos de 28/10 10h51 a 29/10 04h47, no horário informado por cada veículo." in prova["contexto"]
-    assert dict((f["k"], f["v"]) for f in metodo["ficha"])["Período"] == "28/10 10h51 a 29/10 04h47"
-    assert "▸ Títulos de 28/10 10h51 a 29/10 04h47" in p.caption
+    # "Títulos de 28/10 10h51 a 04h47" parecia andar para trás (dados#12); o período é o dos títulos com o número
+    # (a CNN Brasil, às 04h47 de 29/10, não pôs 11,3% no título)
+    assert "Títulos com o número de 28/10 10h51 a 28/10 15h46, no horário informado por cada veículo." in prova["contexto"]
+    assert dict((f["k"], f["v"]) for f in metodo["ficha"])["Período"] == "28/10 10h51 a 28/10 15h46"
+    assert "▸ Títulos com o número de 28/10 10h51 a 28/10 15h46" in p.caption
     assert "29/10 04h47" in str(prova["grafico"])  # na lista de verificação também (CNN Brasil)
     # A linha fina longa é cortada na vírgula; o slide 2 nunca repete a tese da capa ("O número: …").
     tese = p.slides[0].ctx["tese"]
@@ -330,3 +335,48 @@ def test_sem_cotacoes_nao_ha_numero():
         }
     )
     assert N.numero_do_dia(e, {}, [e], election=True) is None
+
+
+# ── Ajuste final, rodada 1 ────────────────────────────────────────────────
+
+
+def _triangulado(iso: str, valor: str):
+    e = Edition.from_dict(json.loads((DATA / f"{iso}.json").read_text(encoding="utf-8")))
+    return e, next(n for n in E.triangulados(e, election=False) if n.valor == valor)
+
+
+@real
+def test_triangulado_com_a_hora_do_titulo_que_tem_o_numero():
+    """30 e 31/10: a hora do confirmado era a do 1º título dele no assunto, mesmo sem o número (o Valor
+    teria posto "18%" às 05h00 de sexta, antes do pregão); agora é a do 1º título com o número."""
+    _, n = _triangulado("2026-10-30", "82,9%")
+    horas = {v["nome"]: v["hora"] for v in n.prova["veiculos"] if v["confirmado"]}
+    assert horas == {"g1": "29/10 14h11", "Folha de S.Paulo": "29/10 14h23", "Agência Brasil": "29/10 16h49",
+                     "Valor Econômico": "30/10 05h00"}
+    _, n = _triangulado("2026-10-31", "18%")
+    horas = {v["nome"]: v["hora"] for v in n.prova["veiculos"] if v["confirmado"]}
+    assert horas["Valor Econômico"] == "30/10 17h34" and horas["g1"] == "31/10 04h00"
+    nao = {v["nome"]: v["hora"] for v in n.prova["veiculos"] if not v["confirmado"]}
+    assert nao["InfoMoney"] == "31/10 02h03"  # sem o número, fica o 1º título dele
+
+
+@real
+def test_31_10_periodo_e_o_dos_titulos_com_o_numero():
+    day = date(2026, 10, 31)
+    e = Edition.from_dict(json.loads((DATA / "2026-10-31.json").read_text(encoding="utf-8")))
+    p = N.numero_do_dia(e, {}, E.load_history(DATA, day, 90), election=False, numero_serie=18)
+    assert p.chave == "18%"
+    ficha = dict((f["k"], f["v"]) for f in p.slides[2].ctx["ficha"])
+    assert ficha["Período"] == "30/10 17h34 a 31/10 04h05"
+    assert "▸ Com o número no título: Valor Econômico (30/10 17h34)," in p.caption
+
+
+@real
+def test_passo_5_nao_diz_maior_da_serie_quando_o_slide_2_mostra_maior():
+    """27/10: o ouro (−3,5%) não é o maior acumulado da série (Brent +11,0% no slide 2), é o maior ainda não
+    publicado na semana."""
+    p = peca("27", usados={"acum:ibov", "acum:brent", "acum:btc", "acum:usd"})
+    assert p.chave == "acum:gold"
+    cadeia = " ".join(str(x) for x in p.slides[2].ctx.values())
+    assert "Maior acumulado da série" not in cadeia and "Maior acumulado ainda não publicado na semana" in cadeia
+    assert "maior acumulado da série" not in p.slides[2].alt
