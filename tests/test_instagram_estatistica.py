@@ -153,7 +153,7 @@ def test_numero_triangulado_normaliza_bilhao_e_nao_confunde_com_outro_numero():
                 [
                     ("Brazil Journal", "iFood paga R$ 1 bilhão pela Caju", None),
                     ("Estadão", "iFood compra Caju por cerca de R$ 1 bi", None),
-                    ("Folha de S.Paulo", "iFood compra a Caju por R$ 1 bi", None),
+                    ("Folha de S.Paulo", "Caju é comprada pelo iFood por R$ 1 bi", None),  # não a manchete literal
                     ("g1", "iFood compra Caju por R$ 11 bi", None),  # outro número: não confirma
                 ],
                 story_id="caju",
