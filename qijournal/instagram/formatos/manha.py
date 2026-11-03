@@ -314,7 +314,7 @@ def _sem_proibidas(texto: str) -> tuple[str, bool]:
             return texto, cortou
         pos = texto.lower().find(achadas[0])
         cortou = True
-        if achadas[0] == "em meio a" and len(texto[:pos].split()) >= 5:
+        if achadas[0].startswith("em meio a") and len(texto[:pos].split()) >= 5:
             texto = texto[:pos].rstrip(" ,;:")
             continue
         texto = _corte(texto, pos)

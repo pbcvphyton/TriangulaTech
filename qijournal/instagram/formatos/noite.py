@@ -109,16 +109,31 @@ def _norm(texto: str) -> str:
     return re.sub(r"\s+", " ", E._fold(plain(texto))).strip(" .")
 
 
-def _sem_proibidas(texto: str, min_palavras: int = 4) -> str:
-    """O texto cortado antes do primeiro termo proibido ("…de Ormuz em meio a atritos" → "…de Ormuz"),
-    se sobrarem ``min_palavras``; ``""`` se não der."""
+_FRONTEIRA = re.compile(r"[,;]\s|\s(?:e|enquanto|mas|após)\s")
+
+
+def _sem_proibidas(texto: str, min_palavras: int = 4, ponto: bool = False) -> str:
+    """O texto cortado no começo do primeiro termo proibido. "Em meio a…" abre um adjunto, que sai
+    inteiro ("…sobre os governos em meio à inflação" → "…sobre os governos"); nos outros termos o corte
+    recua até a última fronteira de oração antes dele (", ", " e ", " enquanto "), para não sobrar frase
+    pela metade ("A decisão abre um novo cenário…" → ""). ``""`` se sobrarem menos de ``min_palavras``
+    ou se o texto acabar em artigo ou preposição; com ``ponto``, o corte fecha com ponto."""
     texto = plain(texto).strip()
     if _limpo(texto):
         return texto
-    ms = [m.start() for m in re.finditer(r"\S+", texto) if not _limpo(texto[: m.end()])]
-    head = texto[: ms[0]].rstrip(" ,;:—–-") if ms else ""
-    head = re.sub(r"\s+(?:e|de|da|do|em|com|para|por|que|a|o)$", "", head)
-    return head if len(head.split()) >= min_palavras and _limpo(head) else ""
+    achados = [m for m in (R._PROIBIDAS_RE.search(texto), R._VERBOS_PROIBIDOS_RE.search(texto),
+                           _EM_MEIO.search(texto)) if m]
+    m = min(achados, key=lambda m: m.start())
+    if m.group(0).lower().startswith("em meio"):
+        head = texto[: m.start()]
+    else:
+        fronteiras = list(_FRONTEIRA.finditer(texto[: m.start()]))
+        head = texto[: fronteiras[-1].start()] if fronteiras else ""
+    head = head.rstrip(" ,;:—–-")
+    palavras = head.split()
+    if len(palavras) < min_palavras or palavras[-1].lower() in E._PENDURADAS | {"meio"} or not _limpo(head):
+        return ""
+    return head + "." if ponto and not head.endswith((".", "!", "?")) else head
 
 
 def _sem_adj(texto: str, titulos: list[str]) -> str:
@@ -770,7 +785,7 @@ def raio_x(
 
     # 7. Por que importa (some sem o campo)
     why = _sem_adj(story.why_it_matters or "", titulos) if story.why_it_matters else ""
-    why = why if _limpo(why) else _sem_proibidas(why)
+    why = why if _limpo(why) else _sem_proibidas(why, 5, ponto=True)
     if why:
         slides.append(
             Slide(

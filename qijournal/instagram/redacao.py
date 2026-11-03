@@ -40,7 +40,7 @@ SENSACIONALISMO = (
     "polêmica", "escândalo", "você não vai acreditar", "tudo o que você precisa saber", "a verdade sobre", "segredo",
 )
 VICIOS_IA = (
-    "cenário", "em meio a", "desdobramentos", "vale destacar", "vale lembrar", "nesse sentido",
+    "cenário", "em meio a", "em meio à", "em meio às", "em meio ao", "em meio aos", "desdobramentos", "vale destacar", "vale lembrar", "nesse sentido",
     "ponto de inflexão", "divisor de águas", "sem precedentes", "acende alerta",
 )
 PROIBIDAS = SENSACIONALISMO + VICIOS_IA
@@ -73,6 +73,18 @@ def palavras_proibidas(texto: str) -> list[str]:
 def verbos_proibidos(texto: str) -> list[str]:
     """Verbos que julgam o veículo ("omitiu", "errou"...) e "furo"/"primeiro a noticiar"."""
     return [re.sub(r"\s+", " ", m.group(0).lower()) for m in _VERBOS_PROIBIDOS_RE.finditer(texto or "")]
+
+
+_FIM_PENDURADO = re.compile(
+    r"(?<![\wÀ-ú])(?:" + "|".join(sorted(E._PENDURADAS | {"meio"}, key=len, reverse=True)) + r")\s*$"
+)
+
+
+def pendurado(texto: str) -> bool:
+    """A frase (3+ palavras) acaba em artigo, preposição ou "meio" ("…sobre os governos em meio"): foi
+    cortada no meio. Rótulo de uma palavra (o ``lado`` "a") não conta."""
+    texto = E._plain(texto or "").rstrip()
+    return len(texto.split()) >= 3 and bool(_FIM_PENDURADO.search(texto))
 
 
 def similaridade(a: str, b: str) -> float:
@@ -177,6 +189,9 @@ def lint(
         texto = " · ".join(textos)
         alt = _sem_citados(slide.alt or "", citados)
         palavras(onde, texto)
+        for t in textos:
+            if pendurado(t):
+                problemas.append(f"{onde}: texto cortado no meio (“…{E._plain(t)[-40:]}”)")
         palavras(f"{onde} (alt)", alt)
         secao = _secao(slide.ctx)
         if election:

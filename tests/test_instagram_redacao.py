@@ -151,3 +151,14 @@ def test_ganchos_e_teses_reais_de_14_a_25_10_passam_no_lint():
                             alt=f"Número do dia: {n.valor}. {n.tese}."))
         p = Peca(slot="noite", kind="carousel", title="dia", slides=slides, caption=(g.legenda if story else n.tese) + "\n\nx")
         assert R.lint(p, election=True) == [], day
+
+
+def test_em_meio_com_crase_e_contracao_e_texto_pendurado():
+    """"em meio à/às/ao/aos" também é vício; frase que acaba em artigo, preposição ou "meio" foi cortada no meio."""
+    assert R.palavras_proibidas("cai em meio à inflação, em meio às dúvidas e em meio ao caos") == [
+        "em meio à", "em meio às", "em meio ao",
+    ]
+    assert R.pendurado("a pressão sobre os governos em meio") and R.pendurado("O custo sobe para o")
+    assert not R.pendurado("a pressão sobre os governos.") and not R.pendurado("a") and not R.pendurado("lado a")
+    problemas = R.lint(peca(Slide("rx_importa", {"texto": "A pressão sobre os governos em meio"})), election=False)
+    assert any("cortado no meio" in p for p in problemas)

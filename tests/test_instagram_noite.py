@@ -635,3 +635,25 @@ def test_02_11_conclusao_majoritaria_sem_maioria_vira_molde():
     assert "majorit" not in concl.lower()
     assert concl.startswith("4 de 9 veículos destacaram favoritismo democrata; 3, ofensiva de campanha; 2 não tomaram lado.")
     assert [x.ctx["kicker"] for x in p.slides[2:4]] == ["O lado maior", "O lado menor"]
+
+
+# ── Ajuste final, rodada 1 ────────────────────────────────────────────────
+
+
+def test_sem_proibidas_corta_no_comeco_do_termo_e_nunca_deixa_frase_pendurada():
+    """Bloqueante do 01/11: o corte caía na palavra que completa o termo e sobrava "…sobre os governos em meio"."""
+    assert N._sem_proibidas("O aumento eleva o custo do crédito em meio a juros altos") == "O aumento eleva o custo do crédito"
+    assert N._sem_proibidas("A pressão sobre os governos cresce em meio à inflação.", 5, ponto=True) == (
+        "A pressão sobre os governos cresce.")
+    assert N._sem_proibidas("A decisão abre um novo cenário para o setor bancário") == ""  # sem fronteira de oração
+    assert N._sem_proibidas("O banco cortou tarifas e vale destacar que o lucro subiu", 5) == ""  # sobram 4 palavras
+    assert N._sem_proibidas("O banco cortou as tarifas do cartão, e vale destacar o lucro") == "O banco cortou as tarifas do cartão"
+
+
+def test_01_11_por_que_importa_termina_em_frase_inteira():
+    e = edicao(1, 11)
+    p = N.raio_x(e, {}, election=False, numero_serie=18)
+    importa = next(s for s in p.slides if s.template == "rx_importa")
+    assert importa.ctx["texto"].endswith("a pressão sobre os governos.")
+    assert "em meio" not in importa.ctx["texto"] and "em meio" not in p.caption
+    assert not redacao.lint(p, election=False)
