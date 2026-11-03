@@ -571,6 +571,11 @@ def test_gerador_capa_sem_a_noite_do_dia_nem_a_da_vespera():
 
 
 def test_repete_capa_jaccard_ou_a_capa_contida():
+    capa02 = "Fazenda descarta teto para juros após proposta de André Lara Resende agitar mercado"
+    assert MH.repete_capa("O Ministério da Fazenda descartou fixar teto para a Selic após a tese de André Lara Resende "
+                          "gerar turbulência no mercado financeiro.", capa02)  # a capa dita de novo
+    assert not MH.repete_capa("Ministro Dario Durigan nega debate sobre limitação da Selic e desmente reunião de Lula "
+                              "com economista; PT apoia críticas ao Banco Central.", capa02)
     capa31 = "COP17 de Biodiversidade é encerrada na Armênia com críticas e definição de nova sede"
     assert MH.repete_capa(
         "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais e definição do Equador como "
@@ -597,7 +602,10 @@ def test_18_10_slide_2_cai_para_a_frase_do_corpo():
     p = peca(18)
     assert capa(p).ctx["manchete"].startswith("Trump suspende sanções")
     s2 = fatos(p)[0].ctx
-    assert s2["frase"].startswith("O presidente dos Estados Unidos, Donald Trump, assinou um decreto executivo")
+    # a 1ª frase do corpo ("Donald Trump assinou um decreto… suspendendo… sanções e tarifas… contra a Rússia") ainda
+    # é a capa dita de novo; vai a 2ª, com o número novo
+    assert s2["frase"].startswith("A legislação sancionada no mês passado previa a cobrança de tarifas de até 100%")
+    assert (s2["qual"], s2["valor"]) == ("ATÉ", "100%")
     assert not MH.repete_capa(s2["frase"], capa(p).ctx["manchete"])
 
 
@@ -658,3 +666,11 @@ def test_gerador_capa_de_01_11_depois_do_placar_de_31_10():
     manha = pecas["2026-11-01"]["manha"]
     assert manha.story_ids[0].startswith("binance-retoma") and manha.slides[0].ctx["valor"] == "90%"
     assert pecas["2026-11-01"]["stories"].story_ids == manha.story_ids[:1]
+
+
+def test_nome_do_mais_coberto_para_antes_do_lugar():
+    """30 e 31/10: o título passa de 90 caracteres sem junção; o nome para antes de " no maior ataque…", em vez de
+    cair na tese ("Corretora congela ativos…", sem dizer quem) ou na linha fina."""
+    assert capa(peca(30)).ctx["mais_coberto"]["nome"] == "Binance suspende saques após roubo de US$ 6,3 bilhões"
+    assert capa(peca(31)).ctx["mais_coberto"]["nome"] == "Hackers norte-coreanos roubam US$ 6,3 bilhões da Binance"
+    assert capa(peca(21)).ctx["mais_coberto"]["nome"] == "SpaceX e Tesla"  # os nomes que abrem o título continuam

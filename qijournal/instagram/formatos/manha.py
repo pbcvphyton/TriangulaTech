@@ -63,7 +63,7 @@ MANCHETE_MAX = 90
 FRASE_MAX = 230
 CORPO_MAX = 200  # a frase do corpo (reserva do fato) é cortada na vírgula antes disso
 JACCARD_CAPA = 0.6  # o slide 2 com texto parecido com a capa troca pela linha fina
-CONTIDA_CAPA = 0.8  # …ou com 80% das palavras de assunto da manchete da capa (a capa dentro dele)
+CONTIDA_CAPA = 0.6  # …ou com 60% das palavras de assunto da manchete da capa (a capa dentro dele, dita de novo)
 MESMO_ASSUNTO = 0.5  # dois itens com Jaccard ≥ 0,5 são o mesmo assunto
 MAIS_COBERTO_MIN = 5
 COBERTURA_MIN = 5  # fato sem número: a cobertura vira o número com 5+ veículos (a faixa "com 5+" da matriz)
@@ -150,6 +150,8 @@ _ANTES_NAO = {
 _PENDURADAS = E._PENDURADAS | {"que", "se"}
 # Onde uma frase pode ser cortada sem perder o sentido: primeiro as junções de oração, depois as preposições.
 _JUNCOES = ((", ", "; ", " e ", " após ", " enquanto ", " mas ", " em meio a "), (" com ", " para ", " em "))
+# O nome do mais coberto ainda pode parar antes de um lugar ("… bilhões no maior ataque…").
+_JUNCOES_NOME = (*_JUNCOES, (" no ", " na ", " nos ", " nas "))
 _LIGA = {"e", "de", "da", "do", "das", "dos"}
 # Palavras que não dizem o assunto (para comparar dois itens do mesmo dia).
 _VAZIAS = set(
@@ -588,13 +590,16 @@ def mesmo_assunto(a: str, b: str) -> bool:
 
 
 def repete_capa(texto: str, manchete: str) -> bool:
-    """O texto repete a manchete da capa: Jaccard ≥ 0,6, ou 80% das palavras de assunto dela estão nele
-    (31/10: "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…" sob a capa
-    "COP17 de Biodiversidade é encerrada na Armênia com críticas e definição de nova sede")."""
+    """O texto repete a manchete da capa: Jaccard ≥ 0,6, ou 60% das palavras de assunto dela estão nele,
+    comparadas pelas 5 primeiras letras ("descarta" e "descartou"). 31/10: "COP17 de Biodiversidade é
+    encerrada na Armênia com críticas às metas globais…" sob a capa "COP17 de Biodiversidade é encerrada
+    na Armênia com críticas e definição de nova sede"; 02/11: "O Ministério da Fazenda descartou fixar teto
+    para a Selic após a tese de André Lara Resende…" sob "Fazenda descarta teto para juros após proposta
+    de André Lara Resende agitar mercado"."""
     if similaridade(texto, manchete) >= JACCARD_CAPA:
         return True
-    pm = set(_palavras(manchete))
-    return bool(pm) and len(pm & set(_palavras(texto))) >= CONTIDA_CAPA * len(pm)
+    pm = {w[:5] for w in _palavras(manchete)}
+    return bool(pm) and len(pm & {w[:5] for w in _palavras(texto)}) >= CONTIDA_CAPA * len(pm)
 
 
 def _marca(f: Fato) -> tuple[set[str], set[str]]:
@@ -700,8 +705,8 @@ def _texto(edition: Edition, story: Story | None, briefing: str, evitar: str = "
         candidatos += [("manchete", story.headline), ("dek", story.dek)]
     if story is not None:
         # a frase do corpo, cortada na vírgula: a reserva da linha fina. Fora do slide 2, a que nomeia o fato;
-        # no slide 2 (a capa já o nomeia), as duas primeiras, se não repetirem a capa (18/10, sem a noite: "Donald
-        # Trump assinou um decreto executivo…", quando o item do briefing é a própria capa)
+        # no slide 2 (a capa já o nomeia), as duas primeiras, se não repetirem a capa (18/10, sem a noite: "A
+        # legislação… previa a cobrança de tarifas de até 100%…", quando o item do briefing é a própria capa)
         corpo = [N._corta_na_virgula(f, CORPO_MAX) for par in story.body[:1] for f in N._frases(par)[:2]]
         if evitar:
             candidatos += [("corpo", f) for f in corpo if f]
@@ -942,8 +947,9 @@ def _varios_nomes(run: list[str]) -> bool:
 
 def nome_do_assunto(edition: Edition, topic: IndexTopic) -> str:
     """Como o assunto aparece na capa: os nomes que abrem o título, se forem 2 ou mais
-    ("SpaceX e Tesla"); senão o título da matéria sem adjetivo da casa e com até 90 caracteres
-    (nunca o título literal de um veículo); senão a tese do assunto."""
+    ("SpaceX e Tesla"); senão o título da matéria sem adjetivo da casa e com até 90 caracteres,
+    cortado numa junção ou antes de " no "/" na " ("Hackers norte-coreanos roubam US$ 6,3 bilhões da
+    Binance", 31/10; nunca o título literal de um veículo); senão a tese do assunto."""
     story = next((s for s in edition.stories if s.id == topic.story_id), None) if topic.story_id else None
     titulo = _frase(story.headline if story else topic.title)
     literais = {_frase(i.title) for i in topic.items}
@@ -954,6 +960,9 @@ def nome_do_assunto(edition: Edition, topic: IndexTopic) -> str:
         return " ".join(abre)
     if story is not None and titulo not in literais:
         limpo, _ = _limpo(titulo, E.titulos_por_veiculo(topic), limite=MANCHETE_MAX)
+        if not limpo:  # longo e sem junção antes dos 90: o nome pode parar antes de " no "/" na "
+            inteiro, _ = _limpo(titulo, E.titulos_por_veiculo(topic), limite=10**3)
+            limpo = _corte(inteiro, MANCHETE_MAX + 1, juncoes=_JUNCOES_NOME) if inteiro else ""
         if limpo:
             return _sem_ponto(limpo)
     tese = E._titulo_assunto(edition, topic)
