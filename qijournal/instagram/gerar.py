@@ -304,7 +304,7 @@ def build_pieces(
     # 3. Manhã: Em 1 minuto ou, sem IA (ou reprovado), o Terminal.
     ontem = next((e for e in history if e.date == (day - timedelta(days=1)).isoformat()), None)
     # a capa não estampa o que a noite do dia estampa (o Raio-X ou os destaques do Placar) nem reabre, sem
-    # número novo, o assunto do Raio-X da noite anterior, o post logo antes dela na grade
+    # número novo, o assunto do Raio-X ou do Placar da noite anterior, o post logo antes dela na grade
     ids_ontem = set(fila.materias_raiox(day, 1))
     noite_ontem = [s for s in (ontem.stories if ontem is not None else []) if s.id in ids_ontem]
     manha = MH.em_1_minuto(

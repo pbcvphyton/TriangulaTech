@@ -78,7 +78,7 @@ Ordem de seleção do dia (`gerar.build_pieces`), com a `Fila`:
 
 Os três posts do dia nunca têm o mesmo assunto como peça principal (para a capa do
 Em 1 minuto, os destaques do Placar contam como peça principal da noite, e o Raio-X
-da noite anterior também conta, salvo número novo: §5.4). A ordem na
+ou os destaques do Placar da noite anterior também contam, salvo número novo: §5.4). A ordem na
 fila fica: manhã, stories, número, noite. Quando a noite cai para o Mercado em
 linha, ele é montado depois do Número e não repete o ativo dele no título; o
 Terminal também evita os ativos dos outros dois. O título do Terminal só vai para uma variação
@@ -266,20 +266,28 @@ manchete ou a linha fina, nunca o título literal de um veículo
 (`estatistica.titulo_literal`, que vale também para a capa: "Colisão entre trens
 de alta velocidade mata ao menos 68 pessoas na Espanha" é o da Folha, 29/10);
 quando a linha fina não nomeia o fato, a frase do corpo que o nomeia, cortada na
-vírgula ("Pelo menos 68 pessoas morreram… após a colisão entre dois trens…").
+vírgula ("Pelo menos 68 pessoas morreram… após a colisão entre dois trens…"). Quando a
+linha fina entra no lugar da manchete (adjetivo da casa sem corte possível ou título
+literal) e não diz de quem é o fato, o sujeito vai na frente, como na tese do Número
+(`manha.texto_capa`: "Binance: corretora informou ter coberto 90% dos valores levados",
+01/11, e não "Corretora informou…"); a tela 2 dos stories usa o mesmo texto.
 
 **Capa e a noite (§2):** a capa não estampa o que a noite do mesmo dia estampa
 (a matéria do Raio-X, ou as do Placar: em 19/10 os protestos na França, maior
-consenso e mais coberto do Placar, saem da capa) nem reabre o assunto do Raio-X
-da noite anterior, o post logo antes dela na grade, com a regra da véspera (2+
-entidades em comum e nenhum número novo: em 29/10, "Flávio Bolsonaro desembarca
-nos EUA" depois do Raio-X de 28/10 sobre a fuga). O assunto ainda pode ser fato
-e aparecer na linha do mais coberto.
+consenso e mais coberto do Placar, saem da capa) nem reabre o assunto da noite
+anterior (a matéria do Raio-X ou as que o Placar destaca; `Fila.materias_raiox`),
+o post logo antes dela na grade: mesmo assunto (2+ entidades em comum ou
+`manha.mesmo_assunto` com a manchete) e nenhum número novo (em 29/10, "Flávio
+Bolsonaro desembarca nos EUA" depois do Raio-X de 28/10 sobre a fuga). Com número
+novo, a continuação pode ser capa, e o número em destaque é o novo (01/11: a Binance
+volta depois do Placar de 31/10, que destacou o roubo de US$ 6,3 bi; a capa estampa
+"90%", o que a corretora cobriu). O assunto ainda pode ser fato e aparecer na linha
+do mais coberto.
 
 | # | Slide | Conteúdo |
 |---|---|---|
-| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`numero_destaque`, com o qualificador); sem número e com 5+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
-| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, se o item tiver Jaccard ≥ 0,6 com a manchete da capa, usa-se `story.dek`; o número da capa não volta, nem a cobertura quando ela é o número da capa; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
+| 1 | Capa | Selo "EM 1 MINUTO Nº 031 · QUA 21 OUT"; número em destaque em laranja (`manha.numero_da_capa`: o da manchete que sai na capa ou, sem ele, o da manchete original e da linha fina, com o qualificador); sem número e com 5+ veículos, a cobertura da própria capa ("NOTICIADO POR / 9 VEÍCULOS", 22/10); a manchete sem adjetivo da casa (Noto Serif 800, 64–80 px, até 90 caracteres); **sem dek** (vai para o slide 2); faixa "1.640 notícias · 46 fontes · 1.159 assuntos"; "O MAIS COBERTO · {k} VEÍCULOS / {topo}" só com k ≥ 5, com a contagem em tinta (o laranja é só do dado da capa); quando o mais coberto é a própria capa, só "É O ASSUNTO MAIS COBERTO DO DIA", e a contagem fica para o slide 2 |
+| 2–6 | Fatos | número em destaque (180–220 px; sem número, a frase sobe para 60 px); frase em Noto Serif 52 px; `selo_cobertura` com mini barra A/N/B; chip vazado da editoria; fontes (as da matéria e, se forem menos que o selo conta, as do assunto no index). **No slide 2**, o texto nunca repete a capa (`manha.repete_capa`: Jaccard ≥ 0,6 com a manchete ou 80% das palavras de assunto dela dentro do texto; 31/10, "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais…"): vai o próximo (o item do briefing, a manchete, a linha fina e, por último, uma das 2 primeiras frases do corpo, para a capa não cair por falta de texto); nenhum número que a capa mostra volta como destaque (o em laranja e os da manchete), nem a cobertura quando ela é o número da capa; quando o relógio é válido, linha extra com as 3 primeiras batidas ("Folha 15h57 · g1 16h00 · NeoFeed 16h35 +5"). Fato sem casamento com story sai sem selo |
 | 7 | Mercado em linha | `mercado.mercado_slide(tema="dark")` |
 | 8 | Fechamento | uma estatística (pauta solitária: "1.039 de 1.159 assuntos de hoje (90%) saíram em uma fonte só") + matriz de pontos pequena + 1 CTA "Mande no grupo de quem precisa começar o dia informado." |
 
@@ -305,9 +313,10 @@ notícias de {M} fontes.", CTA, hashtags.
 ### 5.5 Stories da manhã (07:10, 4 telas) — `formatos/stories.py`
 
 Bom dia + "Hoje lemos N notícias de M fontes" + agenda do que foi gerado (sem
-clima); manchete (a da capa do Em 1 minuto, com o verbo neutro: "caem até 10%";
-com o filtro eleitoral, também a eleição de outro país, e nunca o título literal
-de um veículo; selo e mini barra como no Em 1 minuto); mercado com a coluna do
+clima); manchete (a da capa do Em 1 minuto, com o mesmo texto, `manha.texto_capa`, e
+o verbo neutro: "caem até 10%"; com o filtro eleitoral, também a eleição de outro país,
+e nunca o título literal de um veículo; a 2ª frase nunca repete o título; selo, mini
+barra e fontes como no Em 1 minuto, a lista fechando com a contagem); mercado com a coluna do
 acumulado e a hora da leitura; chamada para o carrossel com a capa do Em 1 minuto
 já renderizada de miniatura (sem ela, o desenho genérico). Assinatura em todas.
 

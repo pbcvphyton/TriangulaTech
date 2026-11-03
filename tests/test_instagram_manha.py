@@ -23,25 +23,30 @@ real = pytest.mark.skipif(not (DATA / "2026-10-29.json").is_file(), reason="sem 
 pytestmark = real
 
 NOMES = ("Lula", "Flávio Bolsonaro", "Bolsonaro")
-DIAS_IA = range(14, 30)
-ELEICAO_ATE = 27  # election_until = 2026-10-27
+DIAS_IA = [*range(14, 32), "2026-11-01", "2026-11-02"]  # inteiro: outubro
+ELEICAO_ATE = date(2026, 10, 27)  # election_until
+
+
+def _data(day: int | str) -> date:
+    """O dia do teste: inteiro é outubro (19 → 19/10); senão AAAA-MM-DD."""
+    return date(2026, 10, day) if isinstance(day, int) else date.fromisoformat(day)
 
 
 @functools.lru_cache(maxsize=None)
-def historico(day: int) -> tuple[Edition, ...]:
-    return tuple(E.load_history(DATA, date(2026, 10, day)))
+def historico(day: int | str) -> tuple[Edition, ...]:
+    return tuple(E.load_history(DATA, _data(day)))
 
 
-def edicao(day: int) -> Edition:
-    return next(e for e in historico(day) if e.date == f"2026-10-{day:02d}")
+def edicao(day: int | str) -> Edition:
+    return next(e for e in historico(day) if e.date == _data(day).isoformat())
 
 
-def eleicao(day: int) -> bool:
-    return day <= ELEICAO_ATE
+def eleicao(day: int | str) -> bool:
+    return _data(day) <= ELEICAO_ATE
 
 
 @functools.lru_cache(maxsize=None)
-def peca(day: int, numero_serie: int = 31) -> Peca | None:
+def peca(day: int | str, numero_serie: int = 31) -> Peca | None:
     return MH.em_1_minuto(edicao(day), {}, list(historico(day)), election=eleicao(day), nomes=NOMES, numero_serie=numero_serie)
 
 
@@ -340,7 +345,7 @@ def test_tamanhos_enchem_o_quadro_sem_palavra_solta():
 
 
 @pytest.mark.skipif(not os.environ.get("QIJ_CHROMIUM"), reason="sem Chromium (QIJ_CHROMIUM)")
-@pytest.mark.parametrize("dia", [14, 15, 19, 21, 24, 27, 29])
+@pytest.mark.parametrize("dia", [14, 15, 19, 21, 24, 27, 29, 31, "2026-11-01"])
 def test_render_sem_texto_cortado(dia, tmp_path):
     from qijournal.instagram import conteudo
     from qijournal.instagram.render import Renderer
@@ -428,6 +433,12 @@ def test_slide_2_nunca_repete_o_dado_da_capa(dia):
     assert c["destaque"] == c["valor"]  # nunca a contagem do mais coberto de outra matéria
     if c["valor"]:
         assert s2["valor"] != c["valor"]
+    # nem um número da manchete da capa, nem o texto dela (31/10: a COP17 de novo, com 2 palavras a mais)
+    assert not (s2["valor"] and s2["valor"] in MH._todos_numeros(c["manchete"])), (c["manchete"], s2["valor"])
+    assert not MH.repete_capa(s2["frase"], c["manchete"]), (c["manchete"], s2["frase"])
+    # o número da capa é o da manchete que sai nela, quando ela tem um
+    if MH.numero_capa(c["manchete"]) and c["heroi"] == "numero":
+        assert c["valor"] in MH._todos_numeros(c["manchete"]), (c["manchete"], c["valor"])
     if c["heroi"] == "cobertura":
         assert c["qual"] == MH.NOTICIADO and int(c["valor"].split()[0]) >= MH.COBERTURA_MIN
         assert s2["heroi"] != "cobertura"
@@ -557,3 +568,93 @@ def test_gerador_capa_sem_a_noite_do_dia_nem_a_da_vespera():
     manha29 = pecas[29]["manha"]
     assert manha29.title == "Em 1 minuto" and not manha29.story_ids[0].startswith("flavio-bolsonaro")
     assert pecas[29]["stories"].story_ids == manha29.story_ids[:1]
+
+
+def test_repete_capa_jaccard_ou_a_capa_contida():
+    capa31 = "COP17 de Biodiversidade é encerrada na Armênia com críticas e definição de nova sede"
+    assert MH.repete_capa(
+        "COP17 de Biodiversidade é encerrada na Armênia com críticas às metas globais e definição do Equador como "
+        "sede da COP18.", capa31)  # Jaccard 0,55, mas a capa inteira está dentro
+    assert not MH.repete_capa(
+        "Conferência da ONU sobre biodiversidade termina em Yerevan com avaliação negativa sobre metas globais, e "
+        "Equador é escolhido para sediar a COP18.", capa31)
+    capa30 = "TCU define alíquota de 11,3% para a CBS"
+    assert MH.repete_capa("O TCU estimou em 11,3% a alíquota da CBS, elevando o alerta entre empresas e tributaristas.", capa30)
+
+
+def test_31_10_e_20_10_slide_2_com_outro_texto():
+    s2 = fatos(peca(31))[0].ctx
+    assert capa(peca(31)).ctx["manchete"].startswith("COP17 de Biodiversidade é encerrada")
+    assert s2["frase"].startswith("Conferência da ONU sobre biodiversidade termina em Yerevan")
+    s2 = fatos(peca(20))[0].ctx
+    assert capa(peca(20)).ctx["valor"] == "R$ 42,5 bi" and s2["valor"] != "R$ 42,5 bi"
+    assert not s2["frase"].startswith("A Justiça do Rio encerrou")  # a capa de novo
+
+
+def test_18_10_slide_2_cai_para_a_frase_do_corpo():
+    """Sem a noite (no gerador, o Trump de 18/10 é o Raio-X): o item do briefing é a própria capa e a linha fina
+    cita a eleição dos EUA; o slide 2 usa a frase do corpo em vez de a capa cair."""
+    p = peca(18)
+    assert capa(p).ctx["manchete"].startswith("Trump suspende sanções")
+    s2 = fatos(p)[0].ctx
+    assert s2["frase"].startswith("O presidente dos Estados Unidos, Donald Trump, assinou um decreto executivo")
+    assert not MH.repete_capa(s2["frase"], capa(p).ctx["manchete"])
+
+
+def test_01_11_capa_com_sujeito_e_o_numero_novo():
+    """A manchete cai pelo "recorde" e a linha fina não diz de quem é o fato: o sujeito vai na frente. O número
+    da capa é o da manchete que sai nela (90%), não os US$ 6,3 bi do Placar de 31/10; o slide 2 não repete."""
+    e = edicao("2026-11-01")
+    binance = materia(e, "binance-retoma")
+    assert MH.texto_capa(e, binance).startswith("Binance: corretora informou ter coberto 90%")
+    p = peca("2026-11-01")
+    c, s2 = capa(p).ctx, fatos(p)[0].ctx
+    assert p.story_ids[0] == binance.id
+    assert c["manchete"] == "Binance: corretora informou ter coberto 90% dos valores levados"
+    assert (c["heroi"], c["valor"]) == ("numero", "90%")
+    assert s2["valor"] != "90%" and "90%" not in s2["frase"]
+    assert p.caption.startswith("Binance: corretora informou")
+    # a noite anterior (o Placar de 31/10 destaca o roubo de US$ 6,3 bi): o mesmo assunto, com número novo
+    hackers = materia(edicao(31), "hackers-norte-coreanos")
+    noite = [(*MH._marca(MH.Fato(hackers.headline, hackers, "manchete")), hackers.headline)]
+    b = MH._briefing(e)[0].get(binance.id, "")
+    repete, velhos = MH._da_noite(binance, [b, binance.headline, binance.dek], noite)
+    assert not repete and velhos == {"6,3"}
+    assert MH.numero_da_capa(binance, binance.headline) == ("", "US$ 6,3 bi")
+    assert MH.numero_da_capa(binance, binance.headline, velhos) == ("", "90%")
+    p = MH.em_1_minuto(e, {}, list(historico("2026-11-01")), election=False, nomes=NOMES, numero_serie=31,
+                       noite_anterior=[hackers])
+    assert p.story_ids[0] == binance.id and capa(p).ctx["valor"] == "90%"
+    # sem número novo, a continuação não é capa
+    assert MH._da_noite(binance, [binance.headline], noite) == (True, set())
+
+
+def test_gerador_capa_de_01_11_depois_do_placar_de_31_10():
+    """No gerador, com a fila avançando: o Placar de 31/10 destaca a Binance e conta como noite anterior."""
+    from datetime import datetime, time
+    from zoneinfo import ZoneInfo
+
+    from qijournal.instagram.fila import PUBLISHED, Fila
+
+    config = load_config(ROOT)
+    tz = ZoneInfo("America/Sao_Paulo")
+    fila = Fila()
+    pecas = {}
+    for dia in (30, 31, "2026-11-01"):
+        e = edicao(dia)
+        ps = gerar.build_pieces(e, config, {}, fila, list(historico(dia)))
+        dia_d = date.fromisoformat(e.date)
+        inicio, fim = datetime.combine(dia_d, time(7), tz), datetime.combine(dia_d, time(23), tz)
+        posts = [gerar._post(p, e, gerar.post_id(e.date, p.slot), inicio, fim, []) for p in ps]
+        fila.replace_day(e.date, posts)
+        for p in posts:
+            atual = fila.get(p.id)
+            atual.status, atual.published_at = PUBLISHED, atual.due
+            fila.registrar_publicacao(atual)
+        pecas[dia] = {p.slot: p for p in ps}
+    noite31 = pecas[31]["noite"]
+    assert noite31.title == "Placar do dia" and any(s.startswith("hackers-norte-coreanos") for s in noite31.story_ids)
+    assert set(fila.materias_raiox("2026-11-01")) == set(noite31.story_ids)
+    manha = pecas["2026-11-01"]["manha"]
+    assert manha.story_ids[0].startswith("binance-retoma") and manha.slides[0].ctx["valor"] == "90%"
+    assert pecas["2026-11-01"]["stories"].story_ids == manha.story_ids[:1]

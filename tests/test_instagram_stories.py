@@ -19,21 +19,26 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 real = pytest.mark.skipif(not (DATA / "2026-10-26.json").is_file(), reason="sem os JSONs reais em data/")
 AGENDA = [("07h", "Em 1 minuto"), ("12h", "Número do dia"), ("18h30", "Raio-X")]
-DIAS_IA = [f"{d:02d}" for d in range(14, 27)]
+DIAS_IA = [*(f"{d:02d}" for d in range(14, 32)), "2026-11-01", "2026-11-02"]
+
+
+def _data(day: str) -> date:
+    """O dia do teste: "19" é 19/10; senão AAAA-MM-DD."""
+    return date(2026, 10, int(day)) if len(day) == 2 else date.fromisoformat(day)
 
 
 @functools.lru_cache(maxsize=None)
 def edicao(day: str) -> Edition:
-    return Edition.from_dict(json.loads((DATA / f"2026-10-{day}.json").read_text(encoding="utf-8")))
+    return Edition.from_dict(json.loads((DATA / f"{_data(day).isoformat()}.json").read_text(encoding="utf-8")))
 
 
 @functools.lru_cache(maxsize=None)
 def historia(day: str) -> list[Edition]:
-    return E.load_history(DATA, date(2026, 10, int(day)), 90)
+    return E.load_history(DATA, _data(day), 90)
 
 
 def eleicao(day: str) -> bool:
-    return date(2026, 10, int(day)) <= date(2026, 10, 27)
+    return _data(day) <= date(2026, 10, 27)
 
 
 def stories(day: str, *, election: bool | None = None, agenda=AGENDA, **kw) -> Peca | None:
@@ -292,6 +297,20 @@ def test_manchete_selo_e_barra_fecham(dia):
     story = next(s for s in edicao(dia).stories if s.id == p.story_ids[0])
     assert ("dividida" in x["selo_cob"]) == bool(story.coverage and E.dividida(story.coverage))
     assert not E.titulo_literal(x["titulo"], E.titulos_literais(edicao(dia)))
+    # arte#12: a lista de fontes fecha com a contagem do selo (as do assunto completam as da matéria)
+    nomes = t.alt.split("Fontes: ", 1)[1].rstrip(".").split(", ") if "Fontes: " in t.alt else []
+    assert len(nomes) >= k, (x["selo_cob"], nomes)
+    assert not (x["por_que"] and ST.repete_capa(x["por_que"], x["titulo"]))  # a 2ª frase não repete o título
+
+
+@real
+def test_01_11_manchete_com_o_sujeito_como_na_capa():
+    """A manchete cai pelo "recorde": a linha fina entra com o sujeito na frente, como na capa do Em 1 minuto."""
+    e = edicao("2026-11-01")
+    binance = next(s for s in e.stories if s.id.startswith("binance-retoma"))
+    x = tela(stories("2026-11-01", capa=binance), "st_manchete").ctx
+    assert x["titulo"].startswith("Binance: corretora informou ter coberto 90% dos valores levados")
+    assert x["numero"] == "90%"
 
 
 @real

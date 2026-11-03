@@ -196,9 +196,14 @@ class Fila:
         return [list(p.entidades) for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING)) if p.entidades]
 
     def materias_raiox(self, day: date | str, dias: int = 1) -> list[str]:
-        """As matérias (ids) dos Raio-X dos ``dias`` anteriores a ``day``, publicados ou ainda na fila: a capa
-        do Em 1 minuto das 07:00 não reabre o assunto da noite anterior (:func:`.formatos.manha.selecionar`)."""
-        return [sid for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING)) if p.entidades for sid in p.story_ids[:1]]
+        """As matérias (ids) da noite dos ``dias`` anteriores a ``day``, publicadas ou ainda na fila: a do
+        Raio-X ou as que o Placar destaca (o maior consenso ou os rachas e o mais coberto). A capa do Em 1
+        minuto das 07:00 não reabre o assunto da noite anterior (:func:`.formatos.manha.selecionar`): em
+        01/11, a Binance do Placar de 31/10."""
+        return [
+            sid for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING))
+            for sid in (p.story_ids[:1] if p.entidades else p.story_ids)
+        ]
 
     def due(self, now: datetime) -> list[Post]:
         """Publicações pendentes cujo horário chegou; marca como expiradas as que passaram do prazo."""

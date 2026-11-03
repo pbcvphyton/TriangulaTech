@@ -31,13 +31,12 @@ from ..conteudo import (
     plain,
     section_info,
     short_date,
-    source_names,
     sources_line,
     trend,
 )
 from ..redacao import palavras_proibidas, verbos_proibidos
 from ..selecao import ordered_stories
-from .manha import neutro
+from .manha import fontes_do_fato, neutro, repete_capa, texto_capa
 from .mercado import faixa_juros
 
 SLOT = "stories"
@@ -142,8 +141,9 @@ def _texto_ok(texto: str, secao: str, *, election: bool, nomes: Iterable[str]) -
 def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: Iterable[str]) -> tuple[str, str] | None:
     """O título (a manchete depois do adjetivo da casa) e o "por que importa" da tela 2, ou None se a
     matéria não serve: política ou eleitoral no modo eleitoral (também a eleição de outro país na
-    manchete), palavra proibida ou título literal de veículo no título, ou sem uma segunda frase limpa (o "por que importa" ou, na falta, a linha fina; nunca igual ao título, sem
-    adjetivo da casa e sem palavra proibida)."""
+    manchete), palavra proibida ou título literal de veículo no título, ou sem uma segunda frase limpa (o
+    "por que importa" ou, na falta, a linha fina; nunca repetindo o título, :func:`.manha.repete_capa`, sem
+    adjetivo da casa e sem palavra proibida). O título é o da capa da manhã (:func:`.manha.texto_capa`)."""
     nomes = tuple(nomes)
     if election and is_political(story, f"{story.headline} {story.dek}", nomes):
         return None
@@ -151,14 +151,16 @@ def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: It
         return None
     if election and story.section != "esporte" and E.eleicao_escrita(story.headline):  # nem a de outro país
         return None
-    titulo = neutro(E.capa_sem_adj(edition, story))  # "desabam até 10%" → "caem até 10%", como na capa da manhã
+    # o texto da capa da manhã ("desabam até 10%" → "caem até 10%"; linha fina com o sujeito na frente)
+    literais = E.titulos_literais(edition)
+    titulo = neutro(texto_capa(edition, story, literais))
     if not _texto_ok(titulo, story.section, election=election, nomes=nomes):
         return None
-    if E.titulo_literal(titulo, E.titulos_literais(edition)):  # manchete literal de veículo não vai para a arte
+    if E.titulo_literal(titulo, literais):  # manchete literal de veículo não vai para a arte
         return None
     for frase in (plain(story.why_it_matters), plain(story.dek)):
         # a frase não passa pelo corte do adjetivo da casa: com "recorde", "histórico"…, fica de fora
-        if frase and E._fold(frase) != E._fold(titulo) and not E.ADJ_CASA.search(frase) and _texto_ok(
+        if frase and not repete_capa(frase, titulo) and not E.ADJ_CASA.search(frase) and _texto_ok(
             frase, story.section, election=election, nomes=nomes
         ):
             return titulo, frase
@@ -199,14 +201,15 @@ def _manchete(
 ) -> Slide:
     day = edition_day(edition)
     textos = textos_manchete(edition, story, election=election, nomes=nomes)
-    titulo, por_que = textos if textos else (neutro(E.capa_sem_adj(edition, story)), "")
+    titulo, por_que = textos if textos else (neutro(texto_capa(edition, story, E.titulos_literais(edition))), "")
     numero = E.numero_destaque(titulo)
     qual, valor = numero if numero else ("", "")
     a, n, b = E.lados(story.coverage)  # só com 2+ comparados, como o selo
     if a + n + b < 2:
         a = n = b = 0
     selo_cob = E.selo_cobertura(edition, story, raiox_story_id)
-    fontes = sources_line(source_names(story))
+    nomes_fontes = fontes_do_fato(edition, story)  # fecha com a contagem do selo, como no Em 1 minuto
+    fontes = sources_line(nomes_fontes)
     secao = section_info(edition, story.section)
     rotulo = "Manchete" if story.id == edition.lead else "Destaque"
     ctx = {
@@ -234,7 +237,7 @@ def _manchete(
         f"{titulo}.",
         f"{ctx['rotulo_por_que']}: {por_que}" if por_que else "",
         f"{selo_cob}." if selo_cob else "",
-        f"Fontes: {', '.join(source_names(story))}." if fontes else "",
+        f"Fontes: {', '.join(nomes_fontes)}." if fontes else "",
     ]
     return Slide("st_manchete", ctx, alt=alt(" ".join(p for p in partes if p)))
 
