@@ -272,7 +272,9 @@ def _linha_mercado(edition: Edition, history: Sequence[Edition], qid: str) -> di
     day = edition_day(edition)
     hoje = E.ponto_da_cotacao(q)
     selo = E.selo_leitura(qid, hoje, day) if hoje is not None else ""
-    mostra = bool(selo) and q.change_pct is not None  # leitura sem variação (o dólar às 09h00) não mostra variação
+    # leitura sem variação (o dólar às 09h00) ou velha (:func:`.estatistica.leitura_velha`) não mostra variação
+    velha = hoje is not None and E.leitura_velha(qid, hoje, day, E.edicao_anterior(history, edition))
+    mostra = bool(selo) and q.change_pct is not None and not velha
     # uma leitura por dia, terminando na de hoje; leitura que não serve de dado não vira ponta
     pontos = [p for p in E.serie([*history, edition], qid) if not E.stale_reading(p)]
     acc = E.acumulado(pontos)

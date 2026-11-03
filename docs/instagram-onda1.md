@@ -115,7 +115,9 @@ também chefes de Estado de fora e partidos de outros países, na forma adjetiva
   "Fontes" quando a contagem inclui órgãos públicos; "veículos" só sem eles.
 - **Cotações:** "fech. DD/MM" só quando é fechamento de pregão; senão "leitura
   das HHhMM"; sem variação quando a leitura é velha (`estatistica.leitura_velha`:
-  a mesma cotação da edição anterior, ou ativo sem pregão lido em outro dia). Série
+  a mesma cotação da edição anterior, ou ativo sem pregão lido em outro dia ou no sábado e no domingo, fora o
+  bitcoin: o dólar de domingo, 01/11, trazia o +1,00% da sexta), no Número, no título e na tabela do Terminal,
+  no slide de mercado do Em 1 minuto, no Mercado em linha e na tela 3 dos stories (o valor e o selo ficam). Série
   com uma leitura por dia; acumulado sempre ponta a ponta, com as duas datas (e as
   comparações na mesma janela: "No mesmo período, de 28/09 a 20/10: Brent +11,7%
   (desde 29/09)"); fechamento e leitura do meio do pregão nunca se comparam sem o

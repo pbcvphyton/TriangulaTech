@@ -930,15 +930,26 @@ def stale_reading(p: Ponto) -> bool:
     return local.hour < 7 and not p.change_pct
 
 
+SEMPRE_ABERTO = {"btc"}  # negociado todo dia: no fim de semana, a variação é do próprio dia
+
+
 def leitura_velha(qid: str, p: Ponto, day: date, anterior: Edition | None = None) -> bool:
     """A variação da leitura não é notícia no dia ``day`` (§3: "sem variação quando a leitura é velha"):
     começo do dia sem variação (:func:`stale_reading`), a mesma cotação da edição ``anterior`` (o dólar
-    de sábado 06h58 repetido no domingo, 25/10) ou, fora dos pregões com fechamento, leitura de outro dia."""
+    de sábado 06h58 repetido no domingo, 25/10) ou, fora dos pregões com fechamento, leitura de outro dia
+    ou de sábado e domingo, sem sessão (o dólar de domingo, 01/11, traz o +1,00% da sexta)."""
     if stale_reading(p):
         return True
     if anterior is not None and any(q.id == qid and _parse_dt(q.as_of) == p.as_of for q in anterior.quotes):
         return True
-    return qid not in FECHAMENTO_IDS and p.day < day
+    if qid in FECHAMENTO_IDS:  # o fechamento de outro dia vai com a data ("fech. 30/10"), como dado
+        return False
+    return p.day < day or (qid not in SEMPRE_ABERTO and p.as_of.astimezone(TZ).weekday() >= 5)
+
+
+def edicao_anterior(history: Iterable[Edition], edition: Edition) -> Edition | None:
+    """A edição mais recente antes de ``edition`` no histórico (a de referência de :func:`leitura_velha`)."""
+    return max((e for e in history if e.date < edition.date), key=lambda e: e.date, default=None)
 
 
 def selo_leitura(qid: str, ponto: Ponto, ref: date | None = None, *, com_data: bool = False) -> str:

@@ -74,8 +74,10 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
     hoje = E.ponto_da_cotacao(q)
     pontos = [p for p in E.serie(history, qid) if p.day >= day - timedelta(days=JANELA_DIAS)]
     selo = E.selo_leitura(qid, hoje, day) if hoje is not None else ""
-    # Leitura sem variação (o dólar às 09h00 com 0,00%) não mostra variação nem seta.
-    mostra_var = bool(selo) and q.change_pct is not None
+    # Leitura sem variação (o dólar às 09h00 com 0,00%) ou velha (a da véspera, a de domingo sem sessão,
+    # :func:`.estatistica.leitura_velha`) não mostra variação nem seta; o valor e o selo ficam.
+    velha = hoje is not None and E.leitura_velha(qid, hoje, day, E.edicao_anterior(history, edition))
+    mostra_var = bool(selo) and q.change_pct is not None and not velha
     painel: dict[str, Any] = {
         "id": qid,
         "nome": q.label,

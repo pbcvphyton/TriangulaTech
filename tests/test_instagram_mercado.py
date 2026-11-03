@@ -247,3 +247,40 @@ def test_mercado_em_linha_evitar_e_o_ativo_no_ctx():
     # com todos os ativos evitados, o título fica no maior |acumulado| (o Mercado nunca fica sem título)
     todos = M.mercado_em_linha(edicao("21"), {}, historia("21"), evitar=set(M.ATIVOS)).slides[0].ctx
     assert todos["titulo"] and todos["ativo"] in M.ATIVOS
+
+
+# ── Ajuste final, rodada 1: leitura velha sem variação ────────────────────
+
+
+@real
+@pytest.mark.parametrize("iso, qid, selo", [
+    ("2026-10-18", "usd", "leitura de 17/10, 06h58"),  # domingo: a leitura de sábado cedo
+    ("2026-10-25", "usd", "leitura de 24/10, 06h58"),  # a mesma cotação da edição de 24/10
+    ("2026-10-31", "usd", "leitura de 30/10, 19h08"),
+    ("2026-10-31", "brent", "leitura de 30/10, 17h59"),
+    ("2026-11-01", "usd", "leitura das 11h23"),  # domingo, sem sessão: o +1,00% é o da sexta
+])
+def test_leitura_velha_sem_variacao_no_mercado_do_em_1_minuto_nos_stories_e_no_terminal(iso, qid, selo):
+    from qijournal.instagram.formatos import stories as ST
+
+    day = date.fromisoformat(iso)
+    e = Edition.from_dict(json.loads((DATA / f"{iso}.json").read_text(encoding="utf-8")))
+    hist = E.load_history(DATA, day, 90)
+    painel = next(p for p in M.mercado_slide(e, hist).ctx["paineis"] if p["id"] == qid)
+    assert painel["selo"] == selo and painel["change"] == "" and painel["trend"] == "" and painel["valor"]
+    linha = ST._linha_mercado(e, hist, qid)
+    assert linha["change"] == "" and linha["trend"] == ""
+    item = next(q for q in conteudo.quote_items(e, [qid], E.edicao_anterior(hist, e)))
+    assert item["change"] == "" and item["ref"] == selo
+
+
+@real
+def test_bitcoin_no_fim_de_semana_e_ibovespa_de_sexta_no_sabado_continuam_com_variacao():
+    def paineis(iso: str) -> dict:
+        e = Edition.from_dict(json.loads((DATA / f"{iso}.json").read_text(encoding="utf-8")))
+        return {p["id"]: p for p in M.mercado_slide(e, E.load_history(DATA, date.fromisoformat(iso), 90)).ctx["paineis"]}
+
+    sab, dom = paineis("2026-10-31"), paineis("2026-11-01")
+    assert sab["ibov"]["change"] and sab["ibov"]["selo"] == "fech. 30/10"  # o fechamento de sexta, com a data
+    assert dom["ibov"]["change"] == "" and dom["ibov"]["selo"] == "fech. 30/10"  # no domingo, a mesma de sábado
+    assert dom["btc"]["change"]  # negociado todo dia

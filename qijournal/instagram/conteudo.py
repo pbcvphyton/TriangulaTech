@@ -215,9 +215,10 @@ def match_story(edition: Edition, item: str) -> Story | None:
     return best if best_score >= 3 else None
 
 
-def quote_items(edition: Edition, ids: Iterable[str]) -> list[dict[str, Any]]:
+def quote_items(edition: Edition, ids: Iterable[str], anterior: Edition | None = None) -> list[dict[str, Any]]:
     """Cotações para os slides: valor, variação com sinal e seta e de quando é a leitura ("fech. 19/10"
-    só no fechamento de pregão, "leitura das 06h00", "set/26"); leitura velha sai sem variação."""
+    só no fechamento de pregão, "leitura das 06h00", "set/26"); leitura velha sai sem variação
+    (:func:`.estatistica.leitura_velha`, contra a edição ``anterior``)."""
     by_id = {q.id: q for q in edition.quotes}
     day = edition_day(edition)
     items = []
@@ -229,8 +230,8 @@ def quote_items(edition: Edition, ids: Iterable[str]) -> list[dict[str, Any]]:
         if q.kind in ("fx", "index", "commodity", "crypto"):
             ponto = estatistica.ponto_da_cotacao(q)
             ref = estatistica.selo_leitura(q.id, ponto, day) if ponto is not None else ""
-            if ponto is not None and not ref:  # leitura do começo do dia sem variação: não é dado
-                change = None
+            if ponto is not None and (not ref or estatistica.leitura_velha(q.id, ponto, day, anterior)):
+                change = None  # leitura do começo do dia sem variação, ou velha: não é dado
         elif q.kind == "inflation" and q.as_of:
             year, _, month = q.as_of.partition("-")
             if month.isdigit():
@@ -377,7 +378,7 @@ def terminal(
     """
     from .formatos.mercado import faixa_juros  # o mercado importa daqui
 
-    quotes = quote_items(edition, [q.id for q in edition.quotes])
+    quotes = quote_items(edition, [q.id for q in edition.quotes], estatistica.edicao_anterior(history, edition))
     if len(quotes) < 4:
         return None
     day = edition_day(edition)
