@@ -352,11 +352,11 @@ def texto_capa(edition: Edition, story: Story, literais: set[str] = frozenset())
     return texto
 
 
-def _manchete_capa(edition: Edition, story: Story, literais: set[str] = frozenset()) -> str:
+def manchete_capa(edition: Edition, story: Story, literais: set[str] = frozenset()) -> str:
     """A manchete da capa (§4 e §5.4): :func:`texto_capa` (corte no último " e " ou "," com 5+
     palavras; senão a linha fina, com o sujeito na frente), sem palavra proibida nem verbo que julga
     veículo e com até 90 caracteres; o título literal de um veículo (``literais``) troca pela linha
-    fina; "" se nada disso sobrar."""
+    fina; "" se nada disso sobrar. A tela 2 dos stories usa o mesmo texto."""
     titulos = E.titulos_por_veiculo(E.topic_of(edition, story.id))
     texto = texto_capa(edition, story, literais)
     if _adj_sobrando(texto, titulos):  # a linha fina de reserva também tinha adjetivo
@@ -809,7 +809,7 @@ def selecionar(
                 continue
             if (election and eleitoral_capa(story, [b], nomes)) or bloqueado(story, [b]):
                 continue
-            m = _manchete_capa(edition, story, literais)
+            m = manchete_capa(edition, story, literais)
             if not m:
                 continue
             n = numero_da_capa(story, m, velhos)

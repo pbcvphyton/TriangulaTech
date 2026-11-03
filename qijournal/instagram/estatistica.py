@@ -394,6 +394,84 @@ def tese_da_materia(edition: Edition, story: Story, limite: int = TESE_MAX_PALAV
     return next((c for c in candidatas if _limpo(c)), candidatas[-1])
 
 
+# A tese do número triangulado diz de que é o número (§5.3): sem ele, "MAIS DE 18%" ficava sobre "A reeleição…
+# desencadeou uma onda de estresse" (31/10) e "82,9%" sobre "Setor público tem déficit de R$ 5,5 bilhões" (30/10).
+_ADJ_SOLTOS = ("historic", "inedit", "bilionari", "polemic", "dramatic", "explosiv", "chocante", "colossa")
+_ANTES_DO_ADJ = _PENDURADAS | {"e", "ou", "é", "são", "foi", "foram", "será", "era", "está", "fica", "ficou", "após", "sobre"}
+_CORTE_PREPOSICAO = re.compile(r"\s(?:em|com|por|após|no|na|nos|nas|para|sob|entre)\s")
+
+
+# "bate recorde de US$ 35,7 bilhões" → "chega a US$ 35,7 bilhões" (24/10): o valor fica, o "recorde" (âncora que
+# não é a nossa série, §1) sai com o verbo de observação no mesmo tempo e número.
+_RECORDE_DE = re.compile(
+    r"\b(bate|batem|bateu|atinge|atingem|atingiu|alcança|alcançam|alcançou|registra|registram|registrou)\s+"
+    r"(?:(?:um|o)\s+)?(?:novo\s+)?recordes?(?:\s+históric[oa]s?)?\s+(?:de\s+)?(?=(?:R\$|US\$|€)?\s?\d)",
+    re.I,
+)
+_SEM_RECORDE = {"bate": "chega a", "batem": "chegam a", "bateu": "chegou a"}
+
+
+def _sem_recorde(texto: str) -> str:
+    return _RECORDE_DE.sub(lambda m: _SEM_RECORDE.get(m.group(1).lower(), m.group(1)) + " ", texto)
+
+
+def _sem_adj_solto(texto: str, titulos: Sequence[str]) -> str:
+    """O texto sem o adjetivo da casa que vem sozinho depois do substantivo ("queda histórica de" → "queda de");
+    "" se sobrar um que não sai sozinho ("recorde", "gigante") e não está no título de metade dos veículos."""
+    while True:
+        bad = next((m for m in ADJ_CASA.finditer(texto) if not _adj_nos_titulos(_raiz_adj(m.group(0)), titulos)), None)
+        if bad is None:
+            return texto
+        antes = texto[: bad.start()].split()
+        if _raiz_adj(bad.group(0)) not in _ADJ_SOLTOS or not antes or antes[-1].lower() in _ANTES_DO_ADJ:
+            return ""
+        texto = re.sub(r"\s+([,;:.])", r"\1", f"{texto[: bad.start()].rstrip()} {texto[bad.end():].lstrip()}").strip()
+
+
+def _ate_o_limite(texto: str, limite: int) -> str:
+    """Até ``limite`` palavras: na última "," ou " e " antes da palavra ``limite + 1`` ou, sem elas, na última
+    preposição ("… ao ano em votação com…" → "… ao ano"), se sobrarem 5+ palavras; "" se não der."""
+    if len(texto.split()) <= limite:
+        return texto
+    corte = _corta_na_juncao(texto, limite)
+    if corte:
+        return corte
+    head = " ".join(texto.split()[: limite + 1])
+    cortes = [m.start() for m in _CORTE_PREPOSICAO.finditer(head)]
+    return head[: cortes[-1]].strip() if cortes and len(head[: cortes[-1]].split()) >= 5 else ""
+
+
+def tese_com_numero(edition: Edition, story: Story, core: str, tese: str, limite: int = TESE_MAX_PALAVRAS) -> str:
+    """A ``tese`` do número triangulado ``core`` se ela o traz; senão, a manchete que o traz: sem o adjetivo
+    solto, cortada antes da palavra proibida ("… em 7,2% em meio a tensões" → "… em 7,2%", 02/11), só a oração
+    do número quando ele está depois de " e " ("Dívida bruta fica em 82,9% do PIB", 30/10) e até ``limite``
+    palavras. Nunca título literal de veículo; sem candidata, fica a ``tese``."""
+    if _title_has(core, tese):
+        return tese
+    from .redacao import palavras_proibidas  # redacao importa este módulo
+
+    titulos = titulos_por_veiculo(topic_of(edition, story.id))
+    literais = titulos_literais(edition)
+    base = _sem_adj_solto(_sem_recorde(_plain(story.headline)), titulos)
+    achadas = palavras_proibidas(base)
+    if achadas:
+        cabeca = base[: base.lower().find(achadas[0])].rstrip(" ,;:")
+        if achadas[0].split()[0] in _PENDURADAS:  # "em meio a…": a locução abre o trecho, que sai inteiro
+            base = cabeca
+        else:  # o verbo ("e dólar dispara"): sai a oração dele, da última junção em diante
+            corte = max(cabeca.rfind(" e "), cabeca.rfind(", "))
+            base = cabeca[:corte].strip() if corte > 0 else ""
+    candidatas = [base] + [o.strip() for o in re.split(r",\s+|\s+e\s+", base) if o.strip() != base]
+    for c in candidatas:
+        c = _ate_o_limite(c, limite) if c else ""
+        if not c or len(c.split()) < 5 or not _title_has(core, c) or not _limpo(c) or ADJ_CASA.search(c):
+            continue  # nem "recorde" que os veículos usaram: a âncora é a nossa série (§1)
+        c = c[0].upper() + c[1:]
+        if not titulo_literal(c, literais):
+            return c
+    return tese
+
+
 _ENTIDADE = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕ][\wÀ-ú]{3,}")
 _LIGA_NOME = {"de", "da", "do", "dos", "das"}  # "Bola de Ouro" é um nome só
 _SUJEITOS_FORA = {"brasil", "governo"}
@@ -999,6 +1077,7 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
     """
     nomes = tuple(nomes)
     out: list[tuple[tuple, Numero]] = []
+    literais = titulos_literais(edition)
     for story in edition.stories:
         text = f"{_plain(story.headline)} {_plain(story.dek)}"
         if story.section == "esporte":
@@ -1017,11 +1096,14 @@ def triangulados(edition: Edition, *, election: bool, nomes: Iterable[str] = NOM
             confirm = {i.source for i in topic.items if i.source in sources and _title_has(core, i.title)}
             if len(confirm) < TRIANGULADO_MIN:
                 continue
+            tese = tese_com_numero(edition, story, core, tese_da_materia(edition, story))
+            if not _title_has(core, tese) or titulo_literal(tese, literais):
+                continue  # a capa diria um número sem dizer de quê, ou com o título de um veículo
             q = _QUALIFICADOR.search(text[: m.start()])
             valor = _display_number(raw)
             numero = Numero(
                 valor=valor,
-                tese=tese_da_materia(edition, story),
+                tese=tese,
                 selo=f"no título de {len(confirm)} de {len(sources)} veículos",
                 tipo="triangulado",
                 metodo=f"O mesmo número no título de {len(confirm)} veículos diferentes que publicaram o assunto.",

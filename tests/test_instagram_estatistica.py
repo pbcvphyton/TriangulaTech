@@ -125,12 +125,13 @@ def test_numero_triangulado_exige_tres_veiculos_e_prefere_o_da_maioria():
         index=[
             _topic(
                 "IBC-Br",
-                [(s, "IBC-Br sobe 0,3% em agosto", None) for s in ("Valor Econômico", "g1", "Folha de S.Paulo")],
+                # títulos dos veículos diferentes da manchete: título literal nunca é a tese (prévia final)
+                [(s, f"IBC-Br sobe 0,3% em agosto ({s})", None) for s in ("Valor Econômico", "g1", "Folha de S.Paulo")],
                 story_id="ibc",
             ),
             _topic(
                 "MEI",
-                [(f"V{i}", "Teto de R$ 140 mil" if i < 3 else "Câmara aprova MEI", None) for i in range(10)],
+                [(f"V{i}", "Teto do MEI fica em R$ 140 mil" if i < 3 else "Câmara aprova MEI", None) for i in range(10)],
                 story_id="mei",
             ),
         ],
@@ -184,7 +185,7 @@ def test_numero_do_dia_nao_repete_o_da_semana_e_cai_para_o_assunto_mais_coberto(
             d,
             stories=[_story("apple", "Apple vale US$ 5 trilhões", section="tecnologia")],
             index=[
-                _topic("Apple", [(f"V{i}", "Apple vale US$ 5 trilhões", None) for i in range(4)], story_id="apple"),
+                _topic("Apple", [(f"V{i}", "Apple chega a US$ 5 trilhões em valor", None) for i in range(4)], story_id="apple"),
                 _topic("Protestos", [(f"W{i}", f"Protestos tomam as ruas ({i})", None) for i in range(13)], section="mundo"),
             ],
         )
@@ -676,3 +677,30 @@ def test_numero_do_dia_apos_e_rejeitadas_na_cadeia():
     # passo 7 sem o acumulado rejeitado: o seguinte em |variação|
     n = E.numero_do_dia(e, h, election=False, apos=6, rejeitadas={"acum:brent", "juroreal"})
     assert n.passo == 7 and n.chave.startswith("acum:") and n.chave != "acum:brent"
+
+
+def test_tese_do_triangulado_diz_de_que_e_o_numero():
+    """Prévia final: a tese do número triangulado traz o número (antes, "82,9%" sobre "Setor público tem déficit de
+    R$ 5,5 bilhões", 30/10; "MAIS DE 18%" sobre "A reeleição… desencadeou uma onda de estresse", 31/10)."""
+    esperado = {
+        date(2026, 10, 30): ("82,9%", "Dívida bruta fica em 82,9% do PIB"),
+        date(2026, 10, 31): ("18%", "Ibovespa acumula queda de mais de 18% na semana pós-eleição"),  # sem "histórica" e "dispara"
+        date(2026, 11, 2): ("7,2%", "Petrobras eleva querosene de aviação em 7,2%"),  # sem "em meio a…"
+        date(2026, 10, 29): ("3,75%", "Fed mantém juros na faixa de 3,75% a 4% ao ano em votação"),  # até 14 palavras
+    }
+    for dia, (chave, tese) in esperado.items():
+        e = E.load_history(DATA, dia, 1)[-1]
+        n = next(n for n in E.triangulados(e, election=False) if n.chave == chave)
+        assert n.tese == tese, dia
+        assert len(n.tese.split()) <= E.TESE_MAX_PALAVRAS
+    # "recorde" fica de fora mesmo quando os veículos o usam: "bate recorde histórico de" vira "chega a" (24/10)
+    e = E.load_history(DATA, date(2026, 10, 24), 1)[-1]
+    n = next(n for n in E.triangulados(e, election=True) if n.chave == "35,7bi")
+    assert n.tese == "Carteira de pedidos da Embraer chega a US$ 35,7 bilhões no 3º trimestre"
+    assert E._sem_adj_solto("Ibovespa acumula queda histórica de 18%", []) == "Ibovespa acumula queda de 18%"
+    assert E._sem_adj_solto("Embraer bate recorde de US$ 35,7 bi", []) == ""
+    assert E._sem_recorde("Exportações atingem novo recorde de 30 milhões") == "Exportações atingem 30 milhões"
+    assert E._sem_recorde("Bolsa bate recorde e dólar cai") == "Bolsa bate recorde e dólar cai"  # sem número, fica
+    # o título literal de um veículo nunca é a tese: sem outra com o número, o triangulado sai da lista (01/11)
+    e = E.load_history(DATA, date(2026, 11, 1), 1)[-1]
+    assert "340mi" not in [n.chave for n in E.triangulados(e, election=False)]

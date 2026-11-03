@@ -271,12 +271,14 @@ def test_frase_da_serie_so_quando_o_primeiro_ponto_e_o_comeco_dos_dados():
 def test_slide_2_nao_repete_a_tese_quando_ela_saiu_da_linha_fina():
     p = peca("24", "ipca-15")
     tese = p.slides[0].ctx["tese"]
-    # A manchete caiu pelo "histórico" (em 0 de 5 títulos) e a linha fina não diz de quem é o número:
-    # o sujeito da manchete vai na frente (arte#5).
-    assert tese == "Embraer: volume total de encomendas avança 14% em doze meses"
-    assert all("volume total" not in c.lower() for c in p.slides[1].ctx["contexto"])
-    assert p.slides[1].ctx["contexto"][0] == "Puxado por forte demanda no segmento de defesa e na aviação executiva."
+    # A manchete caiu pelo "histórico" (em 0 de 5 títulos), e a linha fina ("Embraer: volume total de encomendas
+    # avança 14%…", arte#5) não diz o número da capa: vai a manchete com o número, sem o "recorde histórico"
+    # ("bate recorde de" → "chega a"; prévia final).
+    assert tese == "Carteira de pedidos da Embraer chega a US$ 35,7 bilhões no 3º trimestre"
+    assert all("carteira de pedidos" not in c.lower() for c in p.slides[1].ctx["contexto"])
+    assert p.slides[1].ctx["contexto"][0].startswith("Volume total de encomendas avança 14% em doze meses, puxado")
     assert "▸ O fato: Volume total de encomendas avança 14% em doze meses, puxado" in p.caption  # a legenda estende
+    assert "recorde" not in p.caption.lower() and "recorde" not in tese.lower()
 
 
 @real

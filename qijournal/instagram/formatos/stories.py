@@ -36,7 +36,7 @@ from ..conteudo import (
 )
 from ..redacao import palavras_proibidas, verbos_proibidos
 from ..selecao import ordered_stories
-from .manha import fontes_do_fato, neutro, repete_capa, texto_capa
+from .manha import fontes_do_fato, manchete_capa, repete_capa
 from .mercado import faixa_juros
 
 SLOT = "stories"
@@ -143,7 +143,9 @@ def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: It
     matéria não serve: política ou eleitoral no modo eleitoral (também a eleição de outro país na
     manchete), palavra proibida ou título literal de veículo no título, ou sem uma segunda frase limpa (o
     "por que importa" ou, na falta, a linha fina; nunca repetindo o título, :func:`.manha.repete_capa`, sem
-    adjetivo da casa e sem palavra proibida). O título é o da capa da manhã (:func:`.manha.texto_capa`)."""
+    adjetivo da casa e sem palavra proibida). O título é o da capa da manhã, letra por letra
+    (:func:`.manha.manchete_capa`: o verbo neutro e o corte antes da palavra proibida; 30/10, "TCU define
+    alíquota de 11,3% para a CBS", sem o "e acende alerta…" da manchete)."""
     nomes = tuple(nomes)
     if election and is_political(story, f"{story.headline} {story.dek}", nomes):
         return None
@@ -153,8 +155,8 @@ def textos_manchete(edition: Edition, story: Story, *, election: bool, nomes: It
         return None
     # o texto da capa da manhã ("desabam até 10%" → "caem até 10%"; linha fina com o sujeito na frente)
     literais = E.titulos_literais(edition)
-    titulo = neutro(texto_capa(edition, story, literais))
-    if not _texto_ok(titulo, story.section, election=election, nomes=nomes):
+    titulo = manchete_capa(edition, story, literais)
+    if not titulo or not _texto_ok(titulo, story.section, election=election, nomes=nomes):
         return None
     if E.titulo_literal(titulo, literais):  # manchete literal de veículo não vai para a arte
         return None
@@ -201,7 +203,7 @@ def _manchete(
 ) -> Slide:
     day = edition_day(edition)
     textos = textos_manchete(edition, story, election=election, nomes=nomes)
-    titulo, por_que = textos if textos else (neutro(texto_capa(edition, story, E.titulos_literais(edition))), "")
+    titulo, por_que = textos if textos else (manchete_capa(edition, story, E.titulos_literais(edition)), "")
     numero = E.numero_destaque(titulo)
     qual, valor = numero if numero else ("", "")
     a, n, b = E.lados(story.coverage)  # só com 2+ comparados, como o selo

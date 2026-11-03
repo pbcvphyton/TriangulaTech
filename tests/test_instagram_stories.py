@@ -365,3 +365,17 @@ def test_agenda_vazia_nao_chama_para_o_em_1_minuto():
     vazia = stories("26", agenda=[])
     assert vazia is not None and tela(vazia, "st_feed") is None
     assert tela(stories("21", agenda=None), "st_feed") is not None
+
+
+@real
+def test_tela_2_com_a_capa_letra_por_letra_mesmo_com_palavra_proibida_na_manchete():
+    """30/10: a manchete do TCU tem "acende alerta" (vício de IA); a capa do Em 1 minuto corta antes dele, e a
+    tela 2 fica com a mesma capa (antes caía para a Binance, a matéria do Raio-X da noite)."""
+    from qijournal.instagram.formatos import manha as MH
+
+    e = edicao("30")
+    tcu = next(s for s in e.stories if s.headline.startswith("TCU define alíquota"))
+    p = stories("30", capa=tcu)
+    assert p.story_ids == [tcu.id]
+    titulo = tela(p, "st_manchete").ctx["titulo"]
+    assert titulo == MH.manchete_capa(e, tcu, E.titulos_literais(e)) == "TCU define alíquota de 11,3% para a CBS"

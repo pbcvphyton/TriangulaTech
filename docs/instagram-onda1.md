@@ -259,7 +259,10 @@ Slides: capa laranja chapada (texto marinho #0F1730), qualificador, o número em
 Archivo condensada 300–360 px, tese ≤ 14 palavras e a prova em mono (quando a
 manchete cai só pelo adjetivo da casa e a linha fina não diz de quem é o número,
 o sujeito vai na frente: "Embraer: volume total de encomendas avança 14% em doze
-meses"); slide 2 com o gráfico do tipo (checklist, matriz de pontos, barras de
+meses"; a tese do triangulado diz de que é o número, `estatistica.tese_com_numero`: sem ele
+na tese, vai a manchete que o traz, sem o adjetivo solto, cortada antes da palavra proibida, só
+a oração do número e até 14 palavras, nunca com "recorde": "Ibovespa acumula queda de mais de
+18% na semana pós-eleição", 31/10, e não "A reeleição… desencadeou uma onda de estresse"); slide 2 com o gráfico do tipo (checklist, matriz de pontos, barras de
 variação, com as leituras do meio do pregão vazadas, linha da série ou barras do
 juro real) e nunca a tese da capa; slide 3 método + "Mande para quem acha que leu
 tudo.". A fonte vai uma vez por slide: na assinatura (slides 1 e 2) ou na ficha
@@ -328,8 +331,9 @@ notícias de {M} fontes.", CTA, hashtags.
 ### 5.5 Stories da manhã (07:10, 4 telas) — `formatos/stories.py`
 
 Bom dia + "Hoje lemos N notícias de M fontes" + agenda do que foi gerado (sem
-clima); manchete (a da capa do Em 1 minuto, com o mesmo texto, `manha.texto_capa`, e
-o verbo neutro: "caem até 10%"; com o filtro eleitoral, também a eleição de outro país,
+clima); manchete (a da capa do Em 1 minuto, letra por letra, `manha.manchete_capa`: o
+verbo neutro, "caem até 10%", e o corte antes da palavra proibida, "TCU define alíquota de 11,3%
+para a CBS" sem o "e acende alerta…", 30/10; com o filtro eleitoral, também a eleição de outro país,
 e nunca o título literal de um veículo; a 2ª frase nunca repete o título; selo, mini
 barra e fontes como no Em 1 minuto, a lista fechando com a contagem); mercado com a coluna do
 acumulado e a hora da leitura; chamada para o carrossel com a capa do Em 1 minuto
