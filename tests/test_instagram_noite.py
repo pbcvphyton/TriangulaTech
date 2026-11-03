@@ -305,8 +305,8 @@ def test_sem_rotulo_de_lado():
     p = N.raio_x(dataclasses.replace(e, stories=stories), {}, election=True, numero_serie=14)
     assert p.formula == "sem_rotulo"
     assert sp(p.slides[0].ctx["gancho"]) == "11 VEÍCULOS ANALISADOS, MESMO FATO: 6 CONTARAM DE UM JEITO, 2 DE OUTRO."
-    assert p.slides[0].ctx["destaque"] == ""
-    assert p.slides[3].ctx["titulo"] == "2 DE 11 · A MINORIA"
+    assert sp(p.slides[0].ctx["destaque"]) == "11 VEÍCULOS"  # o laranja vai na contagem
+    assert p.slides[3].ctx["titulo"] == "2 DE 11"  # o papel já está no chapéu ("A minoria")
     assert "▸ Minoria (2): Financial Times, BBC News" in p.caption
 
 
@@ -594,9 +594,8 @@ def test_relogio_nunca_esconde_veiculo_ate_12():
 def test_28_10_molde_com_a_janela_de_cada_lado():
     """Os 6 de 'fuga ilícita' publicaram de manhã; os 5 de 'asilo político', a partir das 15h37: o molde diz."""
     concl = raiox_pos(28).slides[5].ctx["conclusao"]
-    assert concl.startswith("6 de 11 veículos destacaram fuga ilícita; 5, asilo político. Pelo horário informado, os 6 "
-                            "de fuga ilícita publicaram entre 27/10 09h13 e 27/10 15h32; os 5 de asilo político, entre "
-                            "27/10 15h37 e ")
+    assert concl == ("6 de 11 veículos destacaram fuga ilícita; 5, asilo político. Pelo horário informado, em 27/10, os 6 "
+                     "de fuga ilícita publicaram entre 09h13 e 15h32; os 5 de asilo político, entre 15h37 e 23h29.")
 
 
 def test_maioria_so_com_mais_da_metade_dos_analisados():
@@ -605,12 +604,12 @@ def test_maioria_so_com_mais_da_metade_dos_analisados():
     p = raiox_pos(30)
     assert p.story_ids[0].startswith("binance")
     assert [s.ctx["kicker"] for s in p.slides[2:4]] == ["O lado maior", "O lado menor"]
-    assert sp(p.slides[2].ctx["titulo"]) == "6 DE 14 · O LADO MAIOR"
+    assert sp(p.slides[2].ctx["titulo"]) == "6 DE 14: TAMANHO DO ROUBO"  # "recorde" sai e o rótulo fica
     assert p.slides[0].alt.endswith("Gráfico: barra com 6 veículos no lado maior, 4 sem lado e 4 no lado menor.")
     for s in p.slides:
         assert "maioria" not in s.alt and "minoria" not in s.alt, (s.template, s.alt)
         assert "maioria" not in str(s.ctx.get("grafico", "")), s.template
-    assert "▸ Lado maior (6): " in p.caption and "aioria" not in p.caption
+    assert "▸ Tamanho do roubo (6): " in p.caption and "aioria" not in p.caption
     assert [s.ctx["kicker"] for s in noites()[18].slides[2:4]] == ["O lado maior", "O lado menor"]
     assert [s.ctx["kicker"] for s in noites()[21].slides[2:4]] == ["A maioria", "A minoria"]
 
@@ -633,7 +632,7 @@ def test_02_11_conclusao_majoritaria_sem_maioria_vira_molde():
     p = N.raio_x(e, {}, election=False, numero_serie=19, story=s)
     concl = p.slides[5].ctx["conclusao"]
     assert "majorit" not in concl.lower()
-    assert concl.startswith("4 de 9 veículos destacaram favoritismo democrata; 3, ofensiva de campanha; 2 não tomaram lado.")
+    assert concl.startswith("4 de 9 veículos contaram de um jeito; 3, de outro; 2 não tomaram lado.")  # sem "democrata"
     assert [x.ctx["kicker"] for x in p.slides[2:4]] == ["O lado maior", "O lado menor"]
 
 
@@ -657,3 +656,32 @@ def test_01_11_por_que_importa_termina_em_frase_inteira():
     assert importa.ctx["texto"].endswith("a pressão sobre os governos.")
     assert "em meio" not in importa.ctx["texto"] and "em meio" not in p.caption
     assert not redacao.lint(p, election=False)
+
+
+def test_30_10_rotulo_sem_recorde_e_capa_com_laranja():
+    """O lado B era "tamanho recorde do roubo": sem o adjetivo da casa, o rótulo fica, e a capa tem laranja."""
+    p = raiox_pos(30)
+    capa = p.slides[0].ctx
+    assert p.formula == "G0" and capa["destaque"] == "CONTENÇÃO DO DANO" and capa["destaque"] in capa["gancho"]
+    assert sp(capa["gancho"]) == "14 VEÍCULOS ANALISADOS, MESMO FATO: 6 DESTACARAM TAMANHO DO ROUBO; 4, CONTENÇÃO DO DANO."
+    assert p.slides[5].ctx["conclusao"].startswith("6 de 14 veículos destacaram tamanho do roubo; 4, contenção do dano;")
+
+
+@pytest.mark.parametrize("dia, mes, prefixo", [(16, 10, "ucrania-retoma"), (2, 11, "eleicoes-de-meio-de-mandato")])
+def test_politico_e_partido_de_fora_nunca_no_gancho_nem_nos_rotulos(dia, mes, prefixo):
+    """§2, regra permanente: "DESAFIO DE ZELENSKI" (16/10) e "FAVORITISMO DEMOCRATA" (02/11) não vão para o gancho,
+    os títulos dos lados, o relógio, o espectro nem a legenda; a capa leva o molde sem rótulo, com o laranja na
+    contagem."""
+    e = edicao(dia, mes)
+    s = next(s for s in e.stories if s.id.startswith(prefixo))
+    p = N.raio_x(e, {}, election=mes == 10, numero_serie=3, story=s)
+    capa = p.slides[0].ctx
+    assert p.formula == "sem_rotulo" and capa["destaque"] and capa["destaque"] in capa["gancho"]
+    for x in p.slides:
+        for chave in ("gancho", "titulo", "destaque"):
+            assert not E.cita_politico(str(x.ctx.get(chave, ""))), (x.template, chave)
+        assert "emocrata" not in str(x.ctx.get("grafico", "")) and "Zelenski" not in str(x.ctx.get("grafico", ""))
+    linhas = [l for l in p.caption.split("\n") if l.startswith("▸ ") and "(" in l.split(":")[0]]
+    assert linhas and not any(E.cita_politico(l.split(":")[0]) for l in linhas), linhas
+    assert "emocrat" not in p.caption.split("\n")[0] and "ZELENSKI" not in capa["gancho"]
+    assert not redacao.lint(p, election=mes == 10)

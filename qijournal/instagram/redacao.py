@@ -200,7 +200,7 @@ def lint(
                     problemas.append(f"{nome}: termo eleitoral no período eleitoral")
         for chave in ("destaque", "gancho"):
             for valor in _lista(slide.ctx.get(chave)):
-                if E.cita_nome(valor, nomes, ignora_caixa=True) or E.cita_partido(valor):
+                if E.cita_politico(valor, nomes):
                     problemas.append(f"{onde}: {chave} com nome de político ou partido (“{valor}”)")
                 if chave == "destaque" and E.ADJ_CASA.search(valor):
                     problemas.append(f"{onde}: destaque com adjetivo da casa (“{valor}”)")

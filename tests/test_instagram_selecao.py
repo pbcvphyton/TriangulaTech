@@ -100,10 +100,18 @@ def test_rotulo_corta_em_quatro_palavras_e_recusa_o_que_nao_serve():
     assert S.rotulo_lado("Foco na estratégia de pressão política do governo") == "estratégia"  # recua até a preposição
     assert S.rotulo_lado("Concentra-se nos riscos fiscais") == "riscos fiscais"
     assert S.rotulo_lado("Alega que limites de sinal foram manobra deliberada") == "limites de sinal"
-    assert S.rotulo_lado("Destaca a redenção histórica do goleiro") is None  # adjetivo da casa
+    assert S.rotulo_lado("Destaca a redenção histórica do goleiro") == "redenção do goleiro"  # sai o adjetivo da casa
+    assert S.rotulo_lado("Enfatiza tamanho recorde do roubo e fragilidade do setor") == "tamanho do roubo"  # 30/10
+    assert S.rotulo_lado("Foco no histórico e nos impactos da fumaça em Manaus") is None  # sobraria "e nos impactos"
     assert S.rotulo_lado("Destaca a atuação heroica do time") is None  # lista de bloqueio
     assert S.rotulo_lado("Enfatiza a recuperação de Lula") is None  # político
     assert S.rotulo_lado("Destaca a manobra do PT") is None  # partido
+    # §2, regra permanente: político e partido de fora também (16/10 e 02/11)
+    assert S.rotulo_lado("Destaca desafio de Zelenski e atrito com Washington") is None
+    assert S.rotulo_lado("Foco no favoritismo democrata e no desgaste de Trump") is None
+    assert S.rotulo_lado("Foco na resposta republicana") is None
+    assert S.rotulo_lado("Destaca conquista trabalhista e prazos para vigência do 5x2") == "conquista trabalhista"
+    assert S.rotulo_lado("Destaca o voto de Flávio Dino") == "voto de Flávio Dino"  # ministro do STF
     assert S.rotulo_lado("Afasta interferência do governo dos EUA") is None  # o verbo inverte o sentido
     assert S.rotulo_lado("") is None
 
@@ -119,7 +127,9 @@ def test_rotulo_sai_em_pelo_menos_95_por_cento_dos_lados_reais():
                 total += 1
                 com_rotulo += S.rotulo_lado(side) is not None
     assert total == 346
-    assert com_rotulo / total >= 0.95  # 329 de 346 (a spec simulou 337: aqui verbo que inverte o sentido fica sem rótulo)
+    # 328 de 346 (a spec simulou 337: aqui verbo que inverte o sentido fica sem rótulo, e o lado com político de
+    # fora, "desafio de Zelenski", "vitória de Carney", também, pela regra permanente do §2)
+    assert com_rotulo == 328 and com_rotulo / total >= 0.94
 
 
 def test_entidades_e_repeticao():
@@ -259,10 +269,11 @@ def test_rotulo_hiperbolico_fica_de_fora():
 
 def test_gancho_sem_rotulo_e_empate_com_neutros():
     s = story("s", stances=["a", "a", "b", "b", "neutro"])
-    s.coverage.side_a, s.coverage.side_b = "Destaca a redenção histórica", "Destaca o custo"
+    s.coverage.side_a, s.coverage.side_b = "Destaca a vitória de Trump", "Destaca o custo"
     g = S.gancho_raiox(s.coverage)
-    assert g.formula == "sem_rotulo" and g.destaque == ""
+    assert g.formula == "sem_rotulo" and g.destaque.replace(S.NBSP, " ") == "5 VEÍCULOS"  # a capa nunca sem laranja
     assert g.texto.replace(S.NBSP, " ") == "5 VEÍCULOS, MESMO FATO: 2 CONTARAM DE UM JEITO, 2 DE OUTRO."
+    assert g.destaque in g.texto
     s.coverage.side_a = "Destaca o alívio"
     g = S.gancho_raiox(s.coverage)
     assert g.formula == "G0"  # 2 × 2 com 1 neutro: "metade" seria falso

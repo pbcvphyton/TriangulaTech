@@ -97,7 +97,9 @@ estiver no título de matéria eleitoral do dia (`estatistica.mercado_eleitoral`
 "Ibovespa desaba 13,88%… após eleição", 27/10);
 no Em 1 minuto, no máximo um item de política (sempre o último). Duas regras são **permanentes**:
 o destaque em laranja e o gancho nunca levam nome de partido ou de político, e
-nenhum veículo é rotulado com campo político.
+nenhum veículo é rotulado com campo político (`estatistica.cita_politico`, no rótulo de lado e no lint:
+também chefes de Estado de fora e partidos de outros países, na forma adjetiva: "desafio de Zelenski",
+16/10; "favoritismo democrata", 02/11; "trabalhista" fica, aqui é o direito do trabalho).
 
 ## 3. Pré-requisitos (já na base)
 
@@ -190,7 +192,10 @@ Gancho por molde (≤ 90 caracteres, só o rótulo da minoria em laranja): G2
 minoria ("11 VEÍCULOS, MESMO FATO. 6 DESTACARAM SINERGIA EM IA. SÓ 2,
 COMPLEXIDADE DE GOVERNANÇA."), G3 empate ("metade" só quando todos tomaram
 lado), G0 padrão, compacto (o do G2 guarda o "só": "6 DE 11 DESTACARAM SINERGIA
-EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."), sem rótulo. Maioria e minoria pela
+EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."), sem rótulo (com o laranja na contagem, "14 VEÍCULOS": a capa nunca sai
+sem destaque). O rótulo vale só com os dois lados; com um barrado, a arte toda usa os papéis, e o título do
+slide do lado fica só com a contagem ("8 DE 10"; o papel já está no chapéu). Com adjetivo da casa, a palavra
+sai e o rótulo é refeito ("tamanho recorde do roubo" → "tamanho do roubo", 30/10). Maioria e minoria pela
 contagem; nunca "Lado A" como título. Quando o assunto teve veículos fora da
 análise, a contagem vira "11 VEÍCULOS ANALISADOS" (o relógio do mesmo carrossel
 conta os 12 que publicaram); passando de 90, cai no compacto. **"Maioria" só com
@@ -218,10 +223,12 @@ sustenta (sai a que atribui um lado a um grupo de veículos que não medimos,
 "veículos internacionais", "agências", "jornais generalistas"; a de proporção
 quando a maioria não passa da metade, "a cobertura majoritária" com 4 de 9 também, 02/11; a de número que não é uma das contagens);
 sem nenhuma, o molde com os números do espectro, a janela de horário de cada
-lado quando elas não se cruzam e a conta por idioma ("Entre os veículos em
+lado quando elas não se cruzam (tudo num dia só, a data vai uma vez: "em 27/10, os 6 de fuga ilícita
+publicaram entre 09h13 e 15h32…") e a conta por idioma ("Entre os veículos em
 inglês, 2 destacaram X e 3, Y; em português, 3 e 2."); a lista "fora da
 análise" com nomes inteiros e "+k"; 7 por que importa (some sem
-`why_it_matters`); 8 Placar do dia + método + CTA "Leu só uma versão? Mande
+`why_it_matters`; com termo proibido, o corte vai ao começo dele, "em meio à inflação" sai inteiro, ou
+à fronteira de oração anterior, e fecha com ponto; nunca "…sobre os governos em meio", 01/11); 8 Placar do dia + método + CTA "Leu só uma versão? Mande
 para quem leu a outra." no gancho condensado (como o fecho do Número), sem seta.
 
 Legenda: "▸ O fato" com sujeito e o quê (o subtítulo da capa ou o slide 2, o

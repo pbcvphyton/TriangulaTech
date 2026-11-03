@@ -420,9 +420,16 @@ def _molde_conclusao(
         ja = sorted(horas[o.name] for o in maioria)
         jb = sorted(horas[o.name] for o in minoria)
         if ja[-1] < jb[0] or jb[-1] < ja[0]:  # as janelas não se cruzam
-            h = E.horas([ja[0], ja[-1], jb[0], jb[-1]], day)
-            texto += (f" Pelo horário informado, os {len(maioria)} de {rot_maj} publicaram entre {h[0]} e {h[1]}; "
-                      f"os {len(minoria)} de {rot_min}, entre {h[2]} e {h[3]}.")
+            pontas = [ja[0], ja[-1], jb[0], jb[-1]]
+            datas = {dt.astimezone(E.TZ).date() for dt in pontas}
+            quando = ","
+            if len(datas) == 1:  # tudo num dia só: a data vai uma vez ("em 27/10, …"), não nas 4 pontas
+                d = datas.pop()
+                h, quando = [E.hora(dt) for dt in pontas], (f", em {d:%d/%m}," if day and d != day else ",")
+            else:
+                h = E.horas(pontas, day)
+            texto += (f" Pelo horário informado{quando} os {len(maioria)} de {rot_maj} publicaram entre {h[0]} e "
+                      f"{h[1]}; os {len(minoria)} de {rot_min}, entre {h[2]} e {h[3]}.")
     conta = {lang: [sum(1 for o in grupo if idiomas.get(o.name) == lang) for grupo in (maioria, minoria)]
              for lang in ("en", "pt")}
     if rot_maj and rot_min and all(sum(v) >= 2 for v in conta.values()):
@@ -591,7 +598,8 @@ def raio_x(
     ld = S.lados(c, nomes)
     papel = _papel(ld)
     n_total = ld.total
-    rot_maj, rot_min = ld.rot_maioria, ld.rot_minoria
+    # rótulo só com os dois: com um barrado ("desafio de Zelenski", 16/10), a arte toda usa os papéis
+    rot_maj, rot_min = (ld.rot_maioria, ld.rot_minoria) if ld.rot_maioria and ld.rot_minoria else (None, None)
     papel_maj, papel_min = ld.papeis  # "maioria" só com mais da metade; no empate, "de um lado"
     nome_maj, nome_min = rot_maj or papel_maj, rot_min or papel_min
     veiculos = [o.name for o in c.outlets]
@@ -680,7 +688,7 @@ def raio_x(
         mostrados, resto = _lado_ctx(outlets, horas, day)
         lado_txt = _sem_adj(c.side_a if (ld.maioria if chave == "a" else ld.minoria) == "a" else c.side_b, titulos)
         contagem = f"{len(outlets)} de {n_total}"
-        titulo = _titulo_lado(contagem, rotulo or (nome if ld.empate else f"{'a' if ld.tem_maioria else 'o'} {nome}"))
+        titulo = _titulo_lado(contagem, rotulo) if rotulo else contagem  # o papel já está no chapéu
         extra = []
         if chave == "b" and neutros:
             extra = [f"Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}"]

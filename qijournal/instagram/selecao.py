@@ -119,9 +119,11 @@ def rotulo_lado(side: str, nomes: Iterable[str] = E.NOMES_ELEICAO) -> str | None
     verbo inicial e os artigos e preposições que vêm depois, corta no primeiro ",", ";",
     " e " ou " — ", fica com até 4 palavras (recuando até antes da última preposição se o
     corte quebrou a frase) e tira o que ficou pendurado no fim. ``None`` se sobrar vazio,
-    se o verbo inverte o sentido ("afasta", "nega"...) ou se o rótulo tem adjetivo da
-    casa, palavra da lista de bloqueio, partido ou político. Depois de "que" ("Alega que
-    limites de sinal foram..."), fica o sujeito da oração.
+    se o verbo inverte o sentido ("afasta", "nega"...) ou se o rótulo tem palavra da lista de
+    bloqueio, partido ou político (:func:`.estatistica.cita_politico`: "favoritismo democrata",
+    "desafio de Zelenski"). Com adjetivo da casa, ele sai e o rótulo é refeito ("Enfatiza tamanho
+    recorde do roubo…" → "tamanho do roubo"). Depois de "que" ("Alega que limites de sinal
+    foram..."), fica o sujeito da oração.
     """
     text = E._plain(side).strip().rstrip(".")
     if not text or _INVERSO_RE.match(text):
@@ -148,10 +150,12 @@ def rotulo_lado(side: str, nomes: Iterable[str] = E.NOMES_ELEICAO) -> str | None
     while words and words[-1].lower() in _ARTIGOS | _PREPOSICOES:
         words.pop()
     label = " ".join(words).strip(" .;:,")
-    if not label:
+    if not label or BLOQUEIO_ROTULO.search(label) or E.cita_politico(label, nomes):
         return None
-    if E.ADJ_CASA.search(label) or BLOQUEIO_ROTULO.search(label) or E.cita_partido(label) or E.cita_nome(label, nomes):
-        return None
+    if E.ADJ_CASA.search(label):  # "tamanho recorde do roubo" (30/10): sai a palavra, e o rótulo é refeito
+        sem_adj = re.sub(r"\s{2,}", " ", E.ADJ_CASA.sub("", E._plain(side))).strip()
+        novo = rotulo_lado(sem_adj, nomes) if sem_adj != E._plain(side).strip() else None
+        return novo if novo and novo.split()[0].lower() not in {"e", "ou"} else None  # "no histórico e nos…"
     return label
 
 
@@ -221,7 +225,7 @@ def gancho_raiox(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO, *, fora:
 
     G2 (minoria, n ≥ 5 e min ≤ n/4), G3 (empate; "metade" só quando todos tomaram lado),
     G0 (os demais), compacto (o escolhido passou de 90) e sem rótulo (algum rótulo é None).
-    Em laranja vai só o rótulo da minoria (no G3, o do lado B). ``fora``: veículos que publicaram o
+    Em laranja vai só o rótulo da minoria (no G3, o do lado B); sem rótulo, a contagem ("14 VEÍCULOS"). ``fora``: veículos que publicaram o
     assunto mas ficaram fora da análise; com eles, a contagem vira "11 veículos analisados" (o relógio do
     mesmo carrossel conta 12).
     """
@@ -230,11 +234,12 @@ def gancho_raiox(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO, *, fora:
     veic = "veículos analisados" if fora else "veículos"
 
     def pronto(formula: str, texto: str, destaque: str, legenda: str) -> Gancho:
-        return Gancho(formula, inseparavel(texto.upper()), destaque.upper(), legenda[0].upper() + legenda[1:], ld)
+        legenda = legenda[0].upper() + legenda[1:]
+        return Gancho(formula, inseparavel(texto.upper()), inseparavel(destaque.upper()), legenda, ld)
 
-    if ld.rot_maioria is None or ld.rot_minoria is None:
+    if ld.rot_maioria is None or ld.rot_minoria is None:  # o laranja vai na contagem: a capa nunca sai sem ele
         texto = f"{n} {veic}, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
-        return pronto("sem_rotulo", texto, "", texto)
+        return pronto("sem_rotulo", texto, f"{n} veículos", texto)
     rmaj, rmin = ld.rot_maioria, ld.rot_minoria
     if n >= 5 and mi <= n / 4:
         formula, texto = "G2", f"{n} {veic}, mesmo fato. {maj} destacaram {rmaj}. Só {mi}, {rmin}."
@@ -254,7 +259,7 @@ def gancho_raiox(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO, *, fora:
         formula = "compacto"
     if len(texto) > GANCHO_MAX:
         texto = f"{n} {veic}, mesmo fato: {maj} contaram de um jeito, {mi} de outro."
-        return pronto("sem_rotulo", texto, "", texto)
+        return pronto("sem_rotulo", texto, f"{n} veículos", texto)
     return pronto(formula, texto, rmin, legenda)
 
 

@@ -198,6 +198,33 @@ def cita_partido(text: str) -> bool:
     return bool(_PARTIDO_SOLTO.search(text or ""))
 
 
+# Regra permanente do destaque, do gancho e do rótulo de lado (§2), além de :data:`NOMES_ELEICAO` e das
+# siglas: chefes de Estado e de governo que aparecem nos dados ("desafio de Zelenski", 16/10) e os partidos
+# de outros países, também na forma adjetiva ("favoritismo democrata", 02/11; "Republicanos" com maiúscula
+# é o partido daqui e já está em :data:`PARTIDOS`). "Trabalhista" fica de fora: aqui é quase sempre o direito
+# do trabalho ("conquista trabalhista", a escala 5x2).
+POLITICOS = (
+    "Trump", "Biden", "Kamala Harris", "Vance", "Zelensky", "Zelenski", "Putin", "Netanyahu", "Milei", "Macron",
+    "Carney", "Xi Jinping", "Starmer", "Merz", "Meloni", "Maduro", "Petro", "Orbán", "Erdogan", "Erdoğan", "Modi",
+    "Sheinbaum", "Lula", "Bolsonaro", "Alckmin", "Haddad", "Tarcísio",
+)
+_POLITICO_RE = re.compile(r"\b(?:" + "|".join(re.escape(n) for n in POLITICOS) + r"|Flávio(?! Dino))\b", re.I)
+_PARTIDO_FORA = re.compile(
+    r"\b(?:democratas?|republican[oa]s?|conservador(?:a|es|as)?|tory|tories|labour|maga|"
+    r"peronistas?|kirchneristas?|chavistas?|bolsonaristas?|petistas?|lulistas?)\b",
+    re.I,
+)
+
+
+def cita_politico(text: str, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
+    """Nome de político (os de ``nomes`` e :data:`POLITICOS`, em qualquer caixa) ou partido, daqui ou de
+    fora (:func:`cita_partido` e as formas adjetivas: "democrata", "republicano"): o que nunca vai para
+    o laranja, o gancho nem o rótulo de um lado (§2)."""
+    text = text or ""
+    return (cita_nome(text, nomes, ignora_caixa=True) or cita_partido(text) or bool(_POLITICO_RE.search(text))
+            or bool(_PARTIDO_FORA.search(text)))
+
+
 def is_electoral(text: str, section: str | None, nomes: Iterable[str] = NOMES_ELEICAO) -> bool:
     """O texto é eleitoral? Três famílias de regra (§4.0.1):
 
