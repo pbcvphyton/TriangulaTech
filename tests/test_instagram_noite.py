@@ -161,7 +161,7 @@ def test_raiox_de_21_10_relogio_e_virada():
     s5 = raiox(21).slides[4]
     # a duração por extenso: "16H43" em caixa alta se lia como hora do dia (arte#14); o exato fica no gráfico
     assert sp(s5.ctx["titulo"]) == "12 VEÍCULOS EM MAIS DE 16 HORAS" and sp(s5.ctx["destaque"]) == "16 HORAS"
-    assert ">16h43</tspan>" in s5.ctx["grafico"]
+    assert ">16h44</tspan>" in s5.ctx["grafico"]  # 13h17 a 06h01: as pontas no minuto
     assert s5.ctx["selo"] == "RAIO-X Nº 014 · RELÓGIO DA NOTÍCIA"
     assert s5.ctx["virada"] == (
         "Primeiro texto em inglês: The New York Times, 20/10 13h17. Primeiro em português: Valor Econômico, 20/10 18h17."
@@ -209,7 +209,7 @@ def test_raiox_de_21_10_legenda_no_molde():
             "Folha de S.Paulo, MarketWatch") in linhas
     assert len(setas(p.caption)) == 5
     assert (
-        "▸ Relógio: 12 veículos (11 analisados) em 16h43, de The New York Times (20/10 13h17) a The Wall Street "
+        "▸ Relógio: 12 veículos (11 analisados) em 16h44, de The New York Times (20/10 13h17) a The Wall Street "
         "Journal (21/10 06h01), horário informado por cada veículo."
     ) in linhas
     assert "▸ Placar do dia: 3 de 24 assuntos com 4 ou mais veículos dividiram a cobertura." in linhas
@@ -507,7 +507,7 @@ def test_28_10_capa_conta_os_analisados_e_o_relogio_todos():
     rel = p.slides[4]
     assert sp(rel.ctx["titulo"]) == "15 VEÍCULOS EM MAIS DE 18 HORAS"
     assert "4 fora da análise" in rel.alt
-    assert any(x.startswith("▸ Relógio: 15 veículos (11 analisados) em 18h22") for x in setas(p.caption))
+    assert any(x.startswith("▸ Relógio: 15 veículos (11 analisados) em 18h23") for x in setas(p.caption))  # 09h13 a 03h36
     # a legenda do relógio nomeia o vazado (antes, cada linha levava o rótulo e alguns sumiam: arte#6)
     assert ">fora da análise</text>" in rel.ctx["grafico"] and ">asilo político</text>" in rel.ctx["grafico"]
 

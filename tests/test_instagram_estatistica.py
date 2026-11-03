@@ -379,7 +379,7 @@ def test_relogio_real_da_spacex_em_21_10():
     assert first.source == "The New York Times" and E.hora(first.at, date(2026, 10, 21)) == "20/10 13h17"
     assert first.lang == "en"
     assert last.source == "The Wall Street Journal" and E.hora(last.at) == "06h01" and last.stance is None
-    assert E.duracao(r.span) == "16h43" and E.relogio_valido(r)
+    assert E.duracao(r.span) == "16h44" and E.relogio_valido(r)  # 13h17 a 06h01, no minuto como na arte
     assert not E.relogio_valido(E.Relogio(r.batidas[:3]))  # menos de 4 veículos
     assert not E.relogio_valido(E.Relogio([r.batidas[0], E.Batida("X", r.batidas[0].at + timedelta(minutes=10))] * 2))
 

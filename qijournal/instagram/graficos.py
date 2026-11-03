@@ -521,8 +521,9 @@ def relogio(
         descricao += "; " + ", ".join(partes)
     descricao += "."
 
-    # Eixo: domínio arredondado ao passo, para o span aparecer marcado dentro dele.
-    span = t1 - t0
+    # Eixo: domínio arredondado ao passo, para o span aparecer marcado dentro dele. O span vem das pontas no
+    # minuto, como as horas impressas ("13h17 a 06h01" é 16h44, nunca os 16h43 dos segundos).
+    span = t1.replace(second=0, microsecond=0) - t0.replace(second=0, microsecond=0)
     passo = next((p for p in _PASSOS_H if (span + timedelta(hours=2 * p)) / timedelta(hours=p) <= 9), 24)
     ini = _piso(t0, passo)
     fim = _piso(t1, passo) + timedelta(hours=passo)

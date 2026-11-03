@@ -851,7 +851,12 @@ class Relogio:
 
     @property
     def span(self) -> timedelta:
-        return self.batidas[-1].at - self.batidas[0].at if self.batidas else timedelta(0)
+        """Do primeiro ao último, entre as pontas no minuto (como saem na arte): "13h17 a 06h01" dá 16h44,
+        e não os 16h43 que os segundos dariam (21/10)."""
+        if not self.batidas:
+            return timedelta(0)
+        ini, fim = (b.at.replace(second=0, microsecond=0) for b in (self.batidas[0], self.batidas[-1]))
+        return fim - ini
 
 
 def relogio(edition: Edition, story: Story, *, veiculos: bool = True) -> Relogio | None:

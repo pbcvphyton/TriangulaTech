@@ -171,7 +171,7 @@ def test_relogio_spacex_21_10():
     assert conta(svg, "circle") == 12 + 4  # + as 4 marcas da legenda
     assert svg.count("fill='var(--bg)' stroke='var(--ink2)'") == 2  # The Wall Street Journal e a marca da legenda
     ts = textos(svg)
-    assert "00h 21/10" in ts and "16h43 do primeiro ao último horário" in ts
+    assert "00h 21/10" in ts and "16h44 do primeiro ao último horário" in ts  # as pontas no minuto: 13h17 a 06h01
     # a data vai no eixo, uma vez: na 1ª marca e na virada; as linhas só com HHhMM e o veículo
     assert "12h 20/10" in ts
     linhas = [t for t in ts if any(n in t for n, _, _ in BATIDAS)]
