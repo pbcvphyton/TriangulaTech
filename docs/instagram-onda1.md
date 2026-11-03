@@ -266,7 +266,9 @@ triangulado (o mesmo número, com unidade, no título de 3+ veículos; fora
 esporte, política/eleição no modo eleitoral, `exclude` e `usados`; na lista de verificação, a hora do
 veículo confirmado é a do 1º título dele com o número, e o período vai do 1º ao último desses: em 31/10,
 Valor às 17h34, e não às 05h00 de outro título); 3 o assunto
-mais coberto com 12+ veículos; 4 mercado com z ≥ 2; 5 o maior acumulado ainda não publicado na semana
+mais coberto com 12+ veículos; 4 mercado com z ≥ 2; 5 o maior acumulado ainda não publicado na semana, de 1% ou
+mais ("S&P 500 acumula −0,1%" não é achado) e, no período eleitoral, sem o que carrega o movimento eleitoral do dia
+(o Ibovespa de 27/10)
 (no slide 3, com esse nome: o slide 2 mostra os maiores que saíram nos 7 dias); 6 juro real ex-post;
 7 o maior acumulado, mesmo repetido. O acumulado leva as duas datas na tese, na prova, no período e na
 legenda ("Ouro acumula −3,5% de 29/09 a 27/10"; "leitura de 29/09, 02h31 → leitura de 27/10, 06h45").

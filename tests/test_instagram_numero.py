@@ -380,3 +380,11 @@ def test_passo_5_nao_diz_maior_da_serie_quando_o_slide_2_mostra_maior():
     cadeia = " ".join(str(x) for x in p.slides[2].ctx.values())
     assert "Maior acumulado da série" not in cadeia and "Maior acumulado ainda não publicado na semana" in cadeia
     assert "maior acumulado da série" not in p.slides[2].alt
+
+
+@real
+def test_acumulado_abaixo_de_1_por_cento_nao_e_o_numero_do_dia():
+    """27/10: com os outros acumulados usados na semana, sobrava o S&P 500 −0,1%; vai o juro real (passo 6)."""
+    e, h = edicao("27"), historia("27")
+    n = E.numero_do_dia(e, h, election=True, exclude={e.lead}, usados={"acum:brent", "acum:usd", "acum:gold", "acum:btc"})
+    assert n.chave == "juroreal" and n.passo == 6

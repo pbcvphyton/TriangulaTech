@@ -28,6 +28,7 @@ RACHA_MIN_SIDE = 2  # racha: pelo menos 2 veículos de cada lado
 TRIANGULADO_MIN = 3  # o mesmo número no título de 3+ veículos
 CONCENTRACAO_MIN = 12  # assunto com 12+ veículos (P75 dos máximos diários de 29/09 a 21/10)
 Z_FORTE, Z_MEDIO = 3.0, 2.0  # movimento de mercado fora do comum (escala robusta)
+ACUMULADO_MIN_PCT = 1.0  # passo 5: abaixo de 1% ponta a ponta, o acumulado não é achado (vai o juro real)
 SERIE_MIN_PONTOS = 15  # para estimar a escala robusta de um ativo
 ACUMULADO_MIN_PONTOS = 10  # leituras para o acumulado virar Número (= limiares.grafico_min_pontos)
 REPETICAO_DIAS = 7  # o mesmo número não volta antes disso
@@ -1528,8 +1529,8 @@ def numero_do_dia(
     2. número triangulado (no título de 3+ veículos), fora de ``exclude`` e de ``usados``;
     3. o assunto mais coberto fora de ``exclude``, se tiver 12+ veículos;
     4. mercado com variação ≥ 2 desvios robustos;
-    5. o maior acumulado da série (10+ leituras), com chave ``acum:<ativo>`` fora de ``usados`` (no período
-       eleitoral, fora o que carrega o movimento eleitoral do dia, :func:`_movimento_eleitoral`);
+    5. o maior acumulado da série (10+ leituras), com chave ``acum:<ativo>`` fora de ``usados``, de 1% ou mais
+       (no período eleitoral, fora o que carrega o movimento eleitoral do dia, :func:`_movimento_eleitoral`);
     6. o juro real ex-post (chave ``juroreal``) fora de ``usados``;
     7. o maior acumulado, mesmo repetido: o 12:00 nunca fica vazio.
 
@@ -1574,7 +1575,8 @@ def numero_do_dia(
     eleitorais = {n.chave for n in acumulados
                   if election and _movimento_eleitoral(edition, past, n.prova["qid"], nomes)}
     acumulados = sorted(acumulados, key=lambda n: n.chave in eleitorais)
-    novo = next((n for n in acumulados if n.chave not in ja and n.chave not in eleitorais), None)
+    novo = next((n for n in acumulados if n.chave not in ja and n.chave not in eleitorais
+                 and abs(n.prova["pct"]) >= ACUMULADO_MIN_PCT), None)  # "S&P 500 acumula −0,1%" não é número do dia
     if vale(novo, 5):
         return novo
     real = _juro_real_numero(edition)
