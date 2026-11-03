@@ -11,17 +11,22 @@
    · IBM Plex Mono: horas, selos, dados e rodapés; nunca nome de veículo longo.
    Cor: laranja só no dado (o número, o ponto de hoje, o quadrado do racha, a expressão do gancho), nunca
    em adjetivo, nome de veículo, partido ou político. Texto em laranja usa var(--accent), ajustado a cada
-   tema para passar de 4,5:1; as marcas dos gráficos usam --g-a/--g-b/--g-n/--g-hi (≥ 3:1 sobre o fundo).
+   tema para passar de 4,5:1; as marcas dos gráficos usam --g-a/--g-b/--g-hi/--g-cinza (≥ 3:1 sobre o fundo).
+   O sem lado (--g-n) é o cinza recessivo: ≥ 3:1 contra o lado A e ≥ 2:1 contra o fundo e o lado B (no
+   papel, mais claro que A e B; no marinho, mais escuro); três marcas e o fundo não passam todos de 3:1
+   entre si só pela luminância, e A e B já se separam pelo matiz. --g-cinza é o cinza das marcas sem lado
+   nenhum (o resto do waffle, as faixas da matriz, as barras dos outros dias, o IPCA).
    Temas: .t-dark (marinho: Em 1 minuto) · .t-paper (papel: Raio-X, Placar, provas) · .t-orange (laranja
    chapado: capa do Número e do manifesto; todo texto em marinho #0F1730, 5,7:1; branco daria 3,1:1) ·
    .t-side-a/.t-side-b (os lados do Raio-X: ardósia #394A7A e petróleo #0B6470, não partidários).
-   Moldura: faixa de 8 px na cor da série com o selo em pílula e o contador "03/08" (macro serie_band) e
+   Moldura: faixa de 8 px no topo (na tinta do tema, como a pílula; laranja só no Número, var(--g-hi))
+   com o selo em pílula e o contador "03/08" (macro serie_band) e
    um rodapé de uma linha, "▲ @handle" + nota curta (macro assinatura). Nada essencial a menos de 72 px
    das laterais (o grid do perfil corta 34 px de cada lado).
    Todo template põe "v2" na classe do body ({% raw %}{% block theme %}t-paper v2{% endblock %}{% endraw %}): a fonte
    padrão vira var(--label) e o .frame abre espaço para a faixa e a assinatura. Três famílias só (§6).
-   Lado A ardósia #394A7A · neutro cinza #4B5563 · lado B petróleo #0F7C8C (fundo e texto pequeno do lado
-   B em #0B6470). No Raio-X a editoria nunca entra em cor. */
+   Lado A ardósia #394A7A · neutro cinza-claro #A3AAB5 · lado B petróleo #0F7C8C (fundo e texto pequeno do
+   lado B em #0B6470). No Raio-X a editoria nunca entra em cor. */
 :root{
   --navy:#1B2745; --deep:#0F1730; --orange:#FF5A1F; --paper:#F6F4EF;
   --up-dark:#7FC8FF; --down-dark:#FF5C9A; --up-light:#2E6BD6; --down-light:#C90055;
@@ -36,18 +41,18 @@ body{position:relative;font-family:var(--label);-webkit-font-smoothing:antialias
 /* temas: --ink texto principal · --ink2 secundário · --ink3 metadados (todos ≥ 4,5:1 sobre --bg) */
 .t-dark{--bg:#0F1730;--ink:#F6F4EF;--ink2:#B4BED6;--ink3:#8E9AB8;--rule:rgba(246,244,239,.16);--rule2:rgba(246,244,239,.32);--rule3:rgba(246,244,239,.62);
   --up:var(--up-dark);--down:var(--down-dark);
-  --accent:#FF5A1F;--tri:#FF5A1F;--g-a:#8C9BD0;--g-b:#3FB3C4;--g-n:#9AA3B2;--g-hi:#FF5A1F;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#0F1730}
+  --accent:#FF5A1F;--tri:#FF5A1F;--g-a:#8C9BD0;--g-b:#3FB3C4;--g-n:#424C61;--g-cinza:#9AA3B2;--g-hi:#FF5A1F;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#F6F4EF}
 .t-paper{--bg:#F6F4EF;--ink:#1B2745;--ink2:#4B5563;--ink3:#5A6474;--rule:rgba(27,39,69,.16);--rule2:rgba(27,39,69,.34);--rule3:rgba(27,39,69,.82);
   --up:var(--up-light);--down:var(--down-light);
-  --accent:#C2410C;--tri:#FF5A1F;--g-a:#394A7A;--g-b:#0F7C8C;--g-n:#4B5563;--g-hi:#E04A12;--g-a-ink:#FFFFFF;--g-b-ink:#FFFFFF;--g-n-ink:#FFFFFF}
+  --accent:#C2410C;--tri:#FF5A1F;--g-a:#394A7A;--g-b:#0F7C8C;--g-n:#A3AAB5;--g-cinza:#4B5563;--g-hi:#E04A12;--g-a-ink:#FFFFFF;--g-b-ink:#FFFFFF;--g-n-ink:#1B2745}
 /* laranja chapado: a hierarquia vem do peso e do tamanho, não da opacidade (todo texto em marinho, 5,7:1) */
 .t-orange{--bg:#FF5A1F;--ink:#0F1730;--ink2:#0F1730;--ink3:#0F1730;--rule:rgba(15,23,48,.22);--rule2:rgba(15,23,48,.4);--rule3:rgba(15,23,48,.8);
   --up:#0F1730;--down:#0F1730;
-  --accent:#0F1730;--tri:#0F1730;--g-a:#0F1730;--g-b:#0F1730;--g-n:#0F1730;--g-hi:#0F1730;--g-a-ink:#FF5A1F;--g-b-ink:#FF5A1F;--g-n-ink:#FF5A1F}
+  --accent:#0F1730;--tri:#0F1730;--g-a:#0F1730;--g-b:#0F1730;--g-n:#0F1730;--g-cinza:#0F1730;--g-hi:#0F1730;--g-a-ink:#FF5A1F;--g-b-ink:#FF5A1F;--g-n-ink:#FF5A1F}
 .t-side-a{--bg:#394A7A;--ink:#FFFFFF;--ink2:rgba(255,255,255,.94);--ink3:rgba(255,255,255,.86);--rule:rgba(255,255,255,.24);--rule2:rgba(255,255,255,.48);--rule3:rgba(255,255,255,.7);
-  --accent:#FFD3C2;--tri:#FF5A1F;--g-a:#FFFFFF;--g-b:#FFFFFF;--g-n:#C9CFDD;--g-hi:#FFB59A;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#0F1730}
+  --accent:#FFD3C2;--tri:#FF5A1F;--g-a:#FFFFFF;--g-b:#FFFFFF;--g-n:#C9CFDD;--g-cinza:#C9CFDD;--g-hi:#FFB59A;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#0F1730}
 .t-side-b{--bg:#0B6470;--ink:#FFFFFF;--ink2:#FFFFFF;--ink3:rgba(255,255,255,.92);--rule:rgba(255,255,255,.26);--rule2:rgba(255,255,255,.5);--rule3:rgba(255,255,255,.72);
-  --accent:#FFD3C2;--tri:#FF5A1F;--g-a:#FFFFFF;--g-b:#FFFFFF;--g-n:#C4DADD;--g-hi:#FFB59A;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#0F1730}
+  --accent:#FFD3C2;--tri:#FF5A1F;--g-a:#FFFFFF;--g-b:#FFFFFF;--g-n:#C4DADD;--g-cinza:#C4DADD;--g-hi:#FFB59A;--g-a-ink:#0F1730;--g-b-ink:#0F1730;--g-n-ink:#0F1730}
 
 /* o quadro corta o que passar dele: nada invade a zona da interface (story: 250 px no topo, 340 px na base).
    Antes de cortar, o script do fim da página encolhe os textos ajustáveis; se nem assim couber,
@@ -94,9 +99,10 @@ p,.txt{text-wrap:pretty}
 .num-hero.hl{color:var(--accent)}
 .qual{display:block;font-family:var(--hook);font-stretch:62%;font-weight:900;font-size:64px;line-height:1;letter-spacing:.02em;
   text-transform:uppercase;color:var(--ink)}
-/* faixa da série: 8 px na cor da série + selo em pílula + contador */
+/* faixa da série: 8 px na tinta do tema (laranja no Número) + selo em pílula + contador */
 .sb{position:absolute;left:0;right:0;top:0;z-index:3}
-.sb-band{height:8px}
+.sb-band{height:8px;background:var(--ink)}
+.sb-band.sb-hi{background:var(--g-hi)}
 .sb-row{display:flex;align-items:center;justify-content:space-between;gap:24px;height:44px;margin:32px var(--mx) 0}
 .story .sb-row{margin-top:250px}
 .pill{display:block;min-width:0;max-width:100%;height:44px;line-height:44px;padding:0 20px!important;border-radius:22px;background:var(--ink);color:var(--bg);

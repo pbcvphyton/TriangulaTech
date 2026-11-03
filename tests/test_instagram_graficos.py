@@ -320,7 +320,7 @@ def test_waffle_placar_4_de_26():
     svg, desc = G.waffle(26, 4, 0)
     valido(svg)
     assert svg.count("fill='var(--g-hi)'") == 4
-    assert svg.count("fill='var(--g-n)'") == 22
+    assert svg.count("fill='var(--g-cinza)'") == 22
     assert conta(svg, "rect") == 26 + 2  # + contorno + a amostra do contorno no rótulo
     assert {"4", "22", "dividiram", "sem divisão", "este Raio-X"} <= set(textos(svg))
     assert "base: 26 assuntos com 4 ou mais veículos comparados" in textos(svg)
@@ -429,18 +429,38 @@ def test_linha_compacta_e_bordas():
     assert "de 1 (19/10) a 2 (20/10)" in G.linha(dts)[1]
 
 
-def test_linha_compacta_com_pregao_faltante_quebra_a_base_sem_cortar():
-    # No Mercado em linha (440 px), "14 leituras, de 28/09 a 20/10 · 2 pregões…" saía cortada.
+def _tamanhos(svg: str) -> list[float]:
+    return [float(x) for x in re.findall(r"font-size:([\d.]+)px", svg)]
+
+
+def test_linha_compacta_legivel_a_375_px():
+    """No Mercado em linha, o compacto tinha valor em 20 px e data em 17 px (5,9 px no celular), três rótulos de
+    duas linhas e a base em duas linhas: o texto dominava os ~110 px da linha (arte#10). Agora: um rótulo só
+    (o extremo do meio), o eixo com as duas datas e a base, tudo com 22 px ou mais, e a linha ocupa o quadro."""
     faltantes = [date(2026, 10, 10), date(2026, 10, 13)]
-    svg, _ = G.linha(ibov(), faltantes, largura=440, altura=250, compacto=True)
+    svg, desc = G.linha(ibov(), faltantes, largura=440, altura=270, compacto=True)
     valido(svg)
-    ts = textos(svg)
-    assert ts[-2:] == ["14 leituras, de 28/09 a 20/10", "2 pregões sem leitura (tracejado)"]
-    assert not any(t.endswith("…") for t in ts)
+    dentro_do_quadro(svg)
     sem_sobreposicao(svg)
-    # cabendo numa linha (a versão grande), fica numa só
+    assert textos(svg) == ["máx. 209.067 · 09/10", "28/09", "20/10", "14 leituras"]
+    assert min(_tamanhos(svg)) >= 22
+    assert "stroke-dasharray='3 9'" in svg and svg.count("fill='var(--g-hi)'") == 1  # o tracejado e o ponto de hoje
+    ys = [float(y) for y in re.findall(r"<circle cx='[\d.]+' cy='([\d.]+)'", svg)]
+    assert max(ys) - min(ys) >= 170  # a linha tinha ~110 px de altura
+    assert "2 pregões sem leitura, tracejado" in desc  # o texto alternativo continua com tudo
+    # extremo na ponta (série que só sobe): o rótulo é o valor da 1ª leitura, embaixo dela
+    sobe = [(date(2026, 10, 1) + timedelta(days=k), 100.0 + k) for k in range(10)]
+    svg, _ = G.linha(sobe, [], largura=440, altura=270, prefixo="US$ ", casas=2, compacto=True)
+    dentro_do_quadro(svg)
+    sem_sobreposicao(svg)
+    assert textos(svg) == ["US$ 100,00", "01/10", "10/10", "10 leituras"] and min(_tamanhos(svg)) >= 22
+
+
+def test_linha_grande_com_pregao_faltante_na_base_sem_cortar():
+    faltantes = [date(2026, 10, 10), date(2026, 10, 13)]
     svg, _ = G.linha(ibov(), faltantes, altura=560)
     assert textos(svg)[-1] == "14 leituras, de 28/09 a 20/10 · 2 pregões sem leitura (tracejado)"
+    assert not any(t.endswith("…") for t in textos(svg))
 
 
 # ── barras_juros ─────────────────────────────────────────────────────────
@@ -607,10 +627,46 @@ def test_assinatura_sem_handle_e_com_handle(env):
 
 def test_serie_band_selo_e_contador(env):
     capa = macro(env, "serie_band", "Raio-X Nº 014 · TER 21 OUT", None, "raiox")
-    assert "Raio-X Nº 014 · TER 21 OUT" in capa and "cnt" not in capa and "#F6F4EF" in capa
+    assert "Raio-X Nº 014 · TER 21 OUT" in capa and "cnt" not in capa
+    assert 'class="sb-band"' in capa and "style=" not in capa.split('class="sb-row"')[0]  # a cor vem do tema
     interno = macro(env, "serie_band", "Número do dia Nº 003", True, "numero")
-    assert ">03/08<" in interno and "#FF5A1F" in interno
-    assert ">05/08<" in macro(env, "serie_band", "Em 1 minuto Nº 031", "05/08", "#123456")
+    assert ">03/08<" in interno and 'class="sb-band sb-hi"' in interno
+    assert ">05/08<" in macro(env, "serie_band", "Em 1 minuto Nº 031", "05/08", "em1min")
+
+
+# temas e séries das faixas que dependem do contexto (mercado.py e o lado do Raio-X)
+_FAIXAS_DINAMICAS = {"mercado_linha": [("t-paper", "mercado"), ("t-dark", "em1min")],
+                     "rx_lado": [("t-side-a", "raiox"), ("t-side-b", "raiox")]}
+
+
+def test_faixa_de_serie_aparece_em_todo_template_e_tema(env):
+    """A faixa de 8 px tinha a cor da série, que é a do próprio fundo: papel sobre papel no Raio-X, no Placar e
+    no Mercado (1:1), #1B2745 sobre #0F1730 no Em 1 minuto (1,2:1), laranja sobre laranja na capa do Número e
+    uma risca creme só nos lados do Raio-X (arte#4). Agora ela passa de 3:1 em todo template, em todo tema."""
+    css = (TEMPLATES / "_base.html.j2").read_text(encoding="utf-8")
+    regra = dict(re.findall(r"\.(sb-band(?:\.sb-hi)?)\{[^}]*background:var\(--([\w-]+)\)", css))
+    assert regra == {"sb-band": "ink", "sb-band.sb-hi": "g-hi"}
+    vistos = 0
+    for p in sorted(TEMPLATES.glob("[!_]*.html.j2")):
+        nome = p.name.removesuffix(".html.j2")
+        fonte = p.read_text(encoding="utf-8")
+        chamada = re.search(r"m\.serie_band\(([^)]*)\)", fonte)
+        assert chamada, nome
+        if nome in _FAIXAS_DINAMICAS:
+            casos = _FAIXAS_DINAMICAS[nome]
+        else:
+            tema = re.search(r"\{% block theme %\}(t-[\w-]+) v2\{% endblock %\}", fonte).group(1)
+            casos = [(tema, re.search(r"'(\w+)'\s*$", chamada.group(1)).group(1))]
+        for tema, serie in casos:
+            html = macro(env, "serie_band", "SELO", None, serie)
+            classe = re.search(r'class="(sb-band[^"]*)"', html).group(1).replace(" ", ".")
+            t = _tema(css, tema)
+            cor = t[regra[classe]]
+            assert _contraste(cor, t["bg"]) >= 3.0, (nome, tema, serie, cor, t["bg"])
+            vistos += 1
+    assert vistos >= 30
+    # o laranja da faixa fica só com o Número (e o manifesto, que usa a série dele)
+    assert "sb-hi" not in macro(env, "serie_band", "S", None, "em1min") + macro(env, "serie_band", "S", None, "raiox")
 
 
 def test_selo_cobertura_realce_e_numero(env):
@@ -667,10 +723,15 @@ def test_temas_passam_de_4_5_em_todo_texto():
         t = _tema(css, classe)
         for token in ("ink", "ink2", "ink3", "accent"):
             assert _contraste(t[token], t["bg"]) >= 4.5, (classe, token)
-        for token in ("g-a", "g-b", "g-n", "g-hi"):  # marcas de gráfico: 3:1
+        for token in ("g-a", "g-b", "g-cinza", "g-hi"):  # marcas de gráfico: 3:1
             assert _contraste(t[token], t["bg"]) >= 3.0, (classe, token)
         for lado in ("a", "b", "n"):  # contagem dentro do segmento
             assert _contraste(t[f"g-{lado}-ink"], t[f"g-{lado}"]) >= 4.5, (classe, lado)
+    for classe in ("t-dark", "t-paper"):  # onde há barra A/N/B e relógio (arte#19)
+        t = _tema(css, classe)
+        # o sem lado é o cinza recessivo: não se confunde com o lado A (eram 1,07:1 e 1,14:1) e ainda aparece
+        assert _contraste(t["g-a"], t["g-n"]) >= 3.0, classe
+        assert _contraste(t["g-b"], t["g-n"]) >= 2.0 and _contraste(t["g-n"], t["bg"]) >= 2.0, classe
     assert "font-stretch:62%" in css and "--label:'Archivo'" in css
     assert re.search(r"\.hook\{[^}]*line-height:\.92[^}]*letter-spacing:-\.01em[^}]*text-transform:uppercase", css)
     assert re.search(r"\.num-hero\{[^}]*tabular-nums", css)

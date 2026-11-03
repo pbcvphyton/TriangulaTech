@@ -773,7 +773,7 @@ def waffle(
     gap: float = 8,
     largura: float = LARGURA,
 ) -> tuple[Markup, str]:
-    """Um quadrado por item: os destacados em laranja, o resto em cinza (``--g-n`` a 40%); as contagens em tinta.
+    """Um quadrado por item: os destacados em laranja, o resto em cinza (``--g-cinza`` a 40%); as contagens em tinta.
 
     - ``total``: quantos quadrados (a base).
     - ``destacados``: quantos (os primeiros) ou quais índices ficam em laranja.
@@ -812,7 +812,7 @@ def waffle(
         if i in marcados:
             corpo.append(_rect(x, y, lado, lado, "var(--g-hi)", rx=lado * 0.08))
         else:
-            corpo.append(_rect(x, y, lado, lado, "var(--g-n)", rx=lado * 0.08, extra=" fill-opacity='0.4'"))
+            corpo.append(_rect(x, y, lado, lado, "var(--g-cinza)", rx=lado * 0.08, extra=" fill-opacity='0.4'"))
     if contorno_idx is not None and 0 <= contorno_idx < total:
         x = (contorno_idx % por_linha) * (lado + gap)
         y = (contorno_idx // por_linha) * (lado + gap)
@@ -844,8 +844,8 @@ def waffle(
 
 _FAIXAS = (  # (rótulo com {1}/{n} = unidade no singular/plural, condição, cor, opacidade)
     ("com 5 ou mais {n}", lambda k: k >= 5, "var(--ink)", 1.0),
-    ("com 2 a 4 {n}", lambda k: 2 <= k <= 4, "var(--g-n)", 0.62),
-    ("com 1 {1}", lambda k: k <= 1, "var(--g-n)", 0.26),
+    ("com 2 a 4 {n}", lambda k: 2 <= k <= 4, "var(--g-cinza)", 0.62),
+    ("com 1 {1}", lambda k: k <= 1, "var(--g-cinza)", 0.26),
 )
 
 
@@ -966,9 +966,13 @@ def linha(
     - ``pontos``: ``[(data ou datetime, valor), …]``, uma leitura por dia.
     - ``faltantes``: dias úteis sem leitura; o trecho que passa por eles sai tracejado.
     - ``anotacoes``: quais rótulos desenhar, entre ``"primeiro"``, ``"ultimo"``, ``"max"`` e
-      ``"min"``. Padrão: os quatro (no ``compacto``, primeiro, último e um extremo).
+      ``"min"``. Padrão: os quatro (no ``compacto``, só um extremo do meio da série).
     - ``casas``, ``prefixo``, ``sufixo``: formato dos valores ("US$ " + 83.366).
-    - ``compacto``: versão de 440 × 330 do Mercado em linha (passe ``largura``/``altura``).
+    - ``compacto``: o painel do Mercado em linha (~440 × 270; passe ``largura``/``altura``). Lido a
+      375 px no celular, todo texto tem 22 px ou mais e a linha ocupa o quadro (o gráfico é a foto): um
+      rótulo só, o extremo ("máx. 209.067 · 09/10"; sem extremo no meio, o valor da 1ª leitura), e no
+      pé o eixo com as duas datas e a base ("28/09 · 17 leituras · 23/10"). O valor de hoje já está no
+      painel, em cima; o ponto de hoje fica em laranja. O tracejado se explica no rodapé do slide.
 
     Primeiro e último levam valor e data; máxima e mínima, "máx. 209.067 · 09/10" (quando
     coincidem com uma ponta, a ponta ganha "· máx."). A base vai no pé.
@@ -996,31 +1000,41 @@ def linha(
             descricao += f"; {len(buracos)} {_plural(len(buracos), 'pregão', 'pregões')} sem leitura, tracejado"
         descricao += "."
 
+    meio = [i for i in (i_max, i_min) if i not in (0, n - 1) and n >= 3]  # extremos fora das pontas
     if anotacoes is None:
-        if compacto:
-            extremo = "max" if i_max not in (0, n - 1) or i_min in (0, n - 1) else "min"
-            anotacoes = {"primeiro", "ultimo", extremo}
+        if compacto:  # um rótulo só: o extremo do meio (a máxima, se houver); sem ele, a 1ª leitura
+            anotacoes = {"max" if i_max in meio else "min"} if meio else {"primeiro"}
         else:
             anotacoes = {"primeiro", "ultimo", "max", "min"}
     anotacoes = set(anotacoes)
-    tv, td = (20, 17) if compacto else (30, 22)  # tamanho do valor e da data
+    tv, td = (24, 22) if compacto else (30, 22)  # tamanho do valor e da data (piso de 22 px)
     lo, hi = pts[i_min][1], pts[i_max][1]
     if hi == lo:
         lo, hi = lo - abs(lo) * 0.01 - 1, hi + abs(hi) * 0.01 + 1
     # a base no pé: numa linha; se não couber (o compacto, com pregão faltante), em duas, sem cortar
     base = []
-    if n > 1:
-        base = [f"{n} leituras, de {_ddmm(d0)} a {_ddmm(dn)}"]
-        if buracos:
-            falta = f"{len(buracos)} {_plural(len(buracos), 'pregão', 'pregões')} sem leitura (tracejado)"
-            junta = f"{base[0]} · {falta}"
-            base = [junta] if largura_texto(junta, "mono", td) <= largura else [base[0], falta]
-    base_h = (td + 22) + (td + 6) * (len(base) - 1)
-    # margens: rótulo de duas linhas no alto; embaixo, também quando uma ponta está no terço de baixo
-    rotulo_h = tv + td + 6 + 18
-    topo = rotulo_h + 4
-    ponta_baixa = min(v0, vn) <= lo + (hi - lo) * 0.3
-    pe = base_h + (rotulo_h + 4 if ponta_baixa else td + 26)
+    if compacto:  # o eixo: as duas datas nas pontas e a base no meio
+        base_h = td + 18
+    else:
+        if n > 1:
+            base = [f"{n} leituras, de {_ddmm(d0)} a {_ddmm(dn)}"]
+            if buracos:
+                falta = f"{len(buracos)} {_plural(len(buracos), 'pregão', 'pregões')} sem leitura (tracejado)"
+                junta = f"{base[0]} · {falta}"
+                base = [junta] if largura_texto(junta, "mono", td) <= largura else [base[0], falta]
+        base_h = (td + 22) + (td + 6) * (len(base) - 1)
+    if compacto:  # margem só do lado do único rótulo; do outro, a do ponto de hoje
+        rotulo_h = td + 18
+        cima = "max" in anotacoes or ("primeiro" in anotacoes and v0 > vn)
+        baixo = "min" in anotacoes or ("primeiro" in anotacoes and v0 <= vn)
+        topo = rotulo_h + 4 if cima else 14
+        pe = base_h + (rotulo_h + 4 if baixo else 14)
+    else:
+        # margens: rótulo de duas linhas no alto; embaixo, também quando uma ponta está no terço de baixo
+        rotulo_h = tv + td + 6 + 18
+        topo = rotulo_h + 4
+        ponta_baixa = min(v0, vn) <= lo + (hi - lo) * 0.3
+        pe = base_h + (rotulo_h + 4 if ponta_baixa else td + 26)
     pad = 14
     plot_h = altura - topo - pe
     dias = max((dn - d0).days, 1)
@@ -1038,7 +1052,7 @@ def linha(
     for (da, va), (db, vb) in zip(pts, pts[1:]):
         seg = f"M{_f(X(da))} {_f(Y(va))}L{_f(X(db))} {_f(Y(vb))}"
         (tracejado if any(da < f < db for f in buracos) else cheio).append(seg)
-    esp = 3 if compacto else 4
+    esp = 4
     if cheio:
         corpo.append(f"<path d='{''.join(cheio)}' fill='none' stroke='var(--ink)' stroke-width='{esp}' "
                      "stroke-linecap='round' stroke-linejoin='round'/>")
@@ -1046,8 +1060,8 @@ def linha(
         corpo.append(f"<path d='{''.join(tracejado)}' fill='none' stroke='var(--ink2)' stroke-width='{esp}' "
                      "stroke-dasharray='3 9' stroke-linecap='round'/>")
     for d, v in pts[:-1]:
-        corpo.append(_circulo(X(d), Y(v), 3.5 if compacto else 5, "var(--ink)"))
-    corpo.append(_circulo(X(dn), Y(vn), 8 if compacto else 11, "var(--g-hi)", " stroke='var(--bg)' stroke-width='3'"))
+        corpo.append(_circulo(X(d), Y(v), 4 if compacto else 5, "var(--ink)"))
+    corpo.append(_circulo(X(dn), Y(vn), 10 if compacto else 11, "var(--g-hi)", " stroke='var(--bg)' stroke-width='3'"))
 
     # Rótulos: cada um tenta suas posições em ordem e fica na que não cruza a linha nem outro rótulo.
     tracado = [(X(d), Y(v)) for d, v in pts]
@@ -1105,17 +1119,33 @@ def linha(
         lado = [("end", "acima"), ("end", "abaixo"), ("end", "lado")] if n > 1 else [("middle", "acima"), ("middle", "abaixo")]
         rotular(n - 1, ponta(n - 1), lado, False)
     if "primeiro" in anotacoes and n > 1:
-        rotular(0, ponta(0), [("start", "acima"), ("start", "abaixo"), ("start", "lado")], False)
+        if compacto:  # a data já está no eixo: só o valor, do lado em que sobrou margem
+            ordem = [("start", "acima"), ("start", "abaixo")] if v0 > vn else [("start", "abaixo"), ("start", "acima")]
+            rotular(0, [(fmt(v0), "mono6", tv, "var(--ink)")], ordem + [("start", "lado")], False)
+        else:
+            rotular(0, ponta(0), [("start", "acima"), ("start", "abaixo"), ("start", "lado")], False)
     for chave, i, prefixo_txt, ordem in (("max", i_max, "máx.", ("acima", "abaixo")), ("min", i_min, "mín.", ("abaixo", "acima"))):
         if chave not in anotacoes or i in (0, n - 1) or n < 3:
             continue
         d, v = pts[i]
         txt = f"{prefixo_txt} {fmt(v)} · {_ddmm(d)}"
-        rotular(i, [(txt, "mono", td, "var(--ink2)")], [("middle", o) for o in ordem], True)
+        # no compacto é o único rótulo: não some por encostar na linha (o halo separa)
+        rotular(i, [(txt, "mono", td, "var(--ink2)")], [("middle", o) for o in ordem], not compacto)
 
     for k, texto in enumerate(base):
         y = altura - 8 - (td + 6) * (len(base) - 1 - k)
         corpo.append(_texto(0, y, _cabe(texto, "mono", td, largura), "mono", td, "var(--ink2)"))
+    if compacto:
+        y = altura - 6
+        if n > 1:
+            corpo.append(_texto(0, y, _ddmm(d0), "mono", td, "var(--ink2)"))
+            corpo.append(_texto(largura, y, _ddmm(dn), "mono", td, "var(--ink2)", "end"))
+            meio_txt = f"{n} leituras"
+            livre = largura - 2 * (largura_texto("00/00", "mono", td) + 16)
+            if largura_texto(meio_txt, "mono", td) <= livre:
+                corpo.append(_texto(largura / 2, y, meio_txt, "mono", td, "var(--ink2)", "middle"))
+        else:
+            corpo.append(_texto(largura / 2, y, _ddmm(d0), "mono", td, "var(--ink2)", "middle"))
     return _svg("linha", largura, altura, corpo, descricao), descricao
 
 
@@ -1196,9 +1226,9 @@ def barras_variacao(
             corpo.append(_rect(x, y, bw, h, "var(--g-hi)", rx=3))
         elif d in parciais:  # leitura do meio do pregão: só o contorno
             corpo.append(_rect(x + 1, y + 1, bw - 2, max(h - 2, 1), "none", rx=3,
-                               extra=" stroke='var(--g-n)' stroke-width='2'"))
+                               extra=" stroke='var(--g-cinza)' stroke-width='2'"))
         else:
-            corpo.append(_rect(x, y, bw, h, "var(--g-n)", rx=3, extra=" fill-opacity='0.55'"))
+            corpo.append(_rect(x, y, bw, h, "var(--g-cinza)", rx=3, extra=" fill-opacity='0.55'"))
     corpo.append(_linha(0, y0, plot_w, y0, "var(--rule3)", 2))
     # anotação de hoje, no alto, alinhada à barra
     xh = min(passo * (n - 1) + (passo + bw) / 2, plot_w)
@@ -1231,7 +1261,7 @@ def barras_juros(selic: float, ipca: float, real: float, formula: str, *, largur
     """
     linhas = (
         ("Selic", selic, "var(--ink)", "var(--ink)"),
-        ("IPCA de 12 meses", ipca, "var(--g-n)", "var(--ink)"),
+        ("IPCA de 12 meses", ipca, "var(--g-cinza)", "var(--ink)"),
         ("Juro real ex-post", real, "var(--g-hi)", "var(--accent)"),
     )
     topo = max(selic, ipca, real, 0.01)

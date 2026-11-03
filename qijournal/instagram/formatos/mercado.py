@@ -19,9 +19,10 @@ from ..conteudo import ALT_LIMIT, MESES_CURTOS, Peca, Slide, edition_day, finish
 
 ATIVOS = ["ibov", "usd", "brent", "btc"]
 JANELA_DIAS = 60  # a linha mostra no máximo 60 dias de série
-PAINEL_LARGURA, PAINEL_ALTURA = 440, 250  # o gráfico de cada painel (o painel inteiro tem ~440 × 380)
+PAINEL_LARGURA, PAINEL_ALTURA = 440, 270  # o gráfico de cada painel (o painel inteiro tem ~440 × 390)
 CTA = "Salve para comparar com a próxima leitura."
-RODAPE = "Uma leitura por dia · fech. = fechamento do pregão"  # a fonte fica só na assinatura
+# A fonte fica só na assinatura; com pregão faltante em algum gráfico, o template junta a legenda do tracejado.
+RODAPE = "Uma leitura por dia · fech. = fechamento"
 
 # Unidade de cada ativo no texto ("R$ 5,01", "208.296 pontos") e o nome no meio da frase.
 PREFIXO = {"usd": "R$ ", "eur": "R$ ", "cny": "R$ ", "brent": "US$ ", "btc": "US$ ", "gold": "US$ "}
@@ -86,6 +87,7 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
         "desde": "",
         "grafico": "",
         "leituras": len(pontos),
+        "faltantes": 0,  # pregões sem leitura no gráfico (tracejado)
         "ate": "",  # a ponta final do acumulado: "até o fechamento de 23/10", "até a leitura das 06h45"
         "do_dia": hoje is not None and hoje.day == day,  # a última leitura é do dia da edição
     }
@@ -99,9 +101,11 @@ def _painel(edition: Edition, history: list[Edition], qid: str, min_pontos: int)
         else:  # termina numa leitura do meio do pregão (ou de ativo sem pregão): a hora
             painel["ate"] = "até a " + (E.selo_leitura(qid, acc.last, day) or f"leitura de {acc.last.day:%d/%m}")
     if acc is not None and len(pontos) >= min_pontos:
+        faltantes = E.pregoes_faltantes(pontos, qid)
+        painel["faltantes"] = len(faltantes)
         svg, descricao = G.linha(
             [(p.day, p.value) for p in pontos],
-            E.pregoes_faltantes(pontos, qid),
+            faltantes,
             largura=PAINEL_LARGURA,
             altura=PAINEL_ALTURA,
             casas=E.CASAS.get(qid, 2),
@@ -193,6 +197,7 @@ def mercado_slide(
         "graficos": any(p["grafico"] for p in paineis),
         "faixa": faixa,
         "pe": RODAPE,
+        "tracejado": any(p["grafico"] and p["faltantes"] for p in paineis),  # legenda "┄ pregão sem leitura"
         "nota": "fonte: Yahoo Finance e BCB",
         "section": "mercados",
     }

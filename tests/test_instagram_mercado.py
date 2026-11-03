@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import functools
 import json
+import re
+import xml.etree.ElementTree as ET
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -67,7 +69,8 @@ def test_slide_de_21_10_titulo_paineis_e_faixa():
     assert p["btc"]["valor"] == "US$ 83.366"
     assert all(str(x["grafico"]).startswith("<svg class='graf graf-linha'") for x in c["paineis"])
     assert c["faixa"] == "Selic 13,75% · IPCA 12m 4,58% (set) · juro real ex-post 8,77%"
-    assert c["pe"] == "Uma leitura por dia · fech. = fechamento do pregão"  # a fonte só na assinatura
+    assert c["pe"] == "Uma leitura por dia · fech. = fechamento"  # a fonte só na assinatura
+    assert c["tracejado"] and p["ibov"]["faltantes"] == 2 and p["usd"]["faltantes"] == 0
     assert c["nota"] == "fonte: Yahoo Finance e BCB"
     # Acumulado ponta a ponta, com as duas datas (§3): a ponta final vai embaixo do título.
     assert c["selo_titulo"] == "até o fechamento de 20/10"
@@ -167,6 +170,29 @@ def test_unidades_no_texto():
     assert M.valor_fmt("ibov", 208295.98, unidade=False) == "208.296"
     assert M.valor_fmt("usd", 5.0093) == "R$ 5,01" and M.valor_fmt("btc", 83365.79) == "US$ 83.366"
     assert M.nome_corrido("usd", "Dólar") == "dólar" and M.nome_corrido("brent", "Brent") == "Brent"
+
+
+@real
+def test_painel_legivel_no_celular():
+    """A 375 px, os 4 painéis tinham 5 linhas de texto (o selo e as datas do gráfico em 17 a 20 px) e o gráfico,
+    ~110 px de linha (arte#10). Agora: três linhas ("Ibovespa · fech. 20/10", o valor com a variação, o
+    acumulado), a linha compacta com um rótulo só e o eixo, e nenhum texto com dado abaixo de 22 px."""
+    s = M.mercado_slide(edicao("21"), historia("21"), tema="paper")
+    html = _render(s)
+    fonte = (ROOT / "qijournal" / "instagram" / "templates" / "mercado_linha.html.j2").read_text(encoding="utf-8")
+    css = fonte.split("{% block style %}")[1].split("{% endblock %}")[0]
+    assert min(int(x) for x in re.findall(r"font-size:(\d+)px", css)) >= 22
+    assert 'data-min="20"' in html.split('class="pe"')[1].split(">")[0]  # o rodapé encolhe no máximo até 20
+    assert html.count('<div class="hd"><span class="nm">') == 4 and '<span class="sl">fech. 20/10</span>' in html
+    assert '<div class="vr"><span class="v">208.296</span>' in html
+    for p in s.ctx["paineis"]:
+        svg = str(p["grafico"])
+        assert ET.fromstring(svg).get("viewBox") == f"0 0 {M.PAINEL_LARGURA} {M.PAINEL_ALTURA}"
+        assert min(float(x) for x in re.findall(r"font-size:([\d.]+)px", svg)) >= 22
+        textos = ["".join(t.itertext()) for t in ET.fromstring(svg).iter("{http://www.w3.org/2000/svg}text")]
+        assert len(textos) <= 4 and textos[-1].endswith(" leituras"), textos  # 1 rótulo + o eixo
+    # o tracejado (Ibovespa com 2 pregões sem leitura) se explica no rodapé, uma vez
+    assert html.count("pregão sem leitura") == 1 and "stroke-dasharray=\"3 9\"" in html
 
 
 @real
