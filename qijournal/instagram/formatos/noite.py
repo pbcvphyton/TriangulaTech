@@ -5,9 +5,10 @@ campos da edição, das contas de :mod:`..estatistica` e da escolha de :mod:`..s
 nenhuma IA nova. Os gráficos vêm de :mod:`..graficos`, com a frase do texto alternativo
 gerada pela mesma função que desenha.
 
-Cores por papel, não por lado: a maioria fica sempre à esquerda em ardósia e a minoria
-à direita em petróleo (no empate, o lado A é a "maioria"), na barra, no relógio, no
-espectro e no fundo dos slides 3 e 4.
+Cores por papel, não por lado: o lado maior fica sempre à esquerda em ardósia e o menor
+à direita em petróleo (no empate, o lado A é o "maior"), na barra, no relógio, no
+espectro e no fundo dos slides 3 e 4. "Maioria" só quando o lado maior passa da metade
+dos analisados (:attr:`.selecao.Lados.papeis`).
 """
 
 from __future__ import annotations
@@ -576,10 +577,8 @@ def raio_x(
     papel = _papel(ld)
     n_total = ld.total
     rot_maj, rot_min = ld.rot_maioria, ld.rot_minoria
-    if ld.empate:  # no empate não há maioria nem minoria
-        nome_maj, nome_min = rot_maj or "de um lado", rot_min or "do outro lado"
-    else:
-        nome_maj, nome_min = rot_maj or "maioria", rot_min or "minoria"
+    papel_maj, papel_min = ld.papeis  # "maioria" só com mais da metade; no empate, "de um lado"
+    nome_maj, nome_min = rot_maj or papel_maj, rot_min or papel_min
     veiculos = [o.name for o in c.outlets]
     nota = f"análise por IA de {n_total} veículos"
 
@@ -601,7 +600,7 @@ def raio_x(
     # 1. Capa-tensão
     subtitulo = _subtitulo(edition, story, veiculos)
     if not ld.empate:
-        rot_barra = {"a": "maioria", "n": "sem lado", "b": "minoria"}
+        rot_barra = {"a": papel_maj, "n": "sem lado", "b": papel_min}
     else:  # no empate não há maioria: a barra leva os rótulos dos lados
         rot_barra = {"a": rot_maj, "n": "sem lado", "b": rot_min} if rot_maj and rot_min else None
     barra, d_barra = G.barra_anb(len(maioria), len(neutros), len(minoria), rot_barra, altura=140)
@@ -649,13 +648,16 @@ def raio_x(
         )
     )
 
-    # 3 e 4. A maioria e a minoria ("metade" só quando todos tomaram lado: 5 × 5 com 1 sem lado não é metade)
+    # 3 e 4. A maioria e a minoria ("metade" só quando todos tomaram lado: 5 × 5 com 1 sem lado não é metade;
+    # "maioria" só com mais da metade dos analisados: 6 de 14 com 4 sem lado é "o lado maior")
     if ld.empate and not neutros:
         kickers = ("Metade", "A outra metade")
     elif ld.empate:
         kickers = ("Empate · um lado", "Empate · o outro lado")
-    else:
+    elif ld.tem_maioria:
         kickers = ("A maioria", "A minoria")
+    else:
+        kickers = ("O lado maior", "O lado menor")
     for chave, outlets, rotulo, nome, kicker in (
         ("a", maioria, rot_maj, nome_maj, kickers[0]),
         ("b", minoria, rot_min, nome_min, kickers[1]),
@@ -663,7 +665,7 @@ def raio_x(
         mostrados, resto = _lado_ctx(outlets, horas, day)
         lado_txt = _sem_adj(c.side_a if (ld.maioria if chave == "a" else ld.minoria) == "a" else c.side_b, titulos)
         contagem = f"{len(outlets)} de {n_total}"
-        titulo = _titulo_lado(contagem, rotulo or (nome if ld.empate else f"a {nome}"))
+        titulo = _titulo_lado(contagem, rotulo or (nome if ld.empate else f"{'a' if ld.tem_maioria else 'o'} {nome}"))
         extra = []
         if chave == "b" and neutros:
             extra = [f"Sem tomar lado ({len(neutros)}): {_lista([o.name for o in neutros])}"]
@@ -682,7 +684,7 @@ def raio_x(
         }
         ctx["lista_px"] = _tam_lista(ctx["titulo"], ctx["descricao"], mostrados, [ctx["tambem"], ctx["neutros"]])
         texto_alt = (
-            f"{kicker}, {contagem} veículos: {rotulo or nome}."
+            f"{kicker}, {contagem} veículos" + (f": {rotulo}." if rotulo else ".")
             + (f" {ctx['descricao'].rstrip('.')}." if ctx["descricao"] else "")
             + "".join(f" {v['name']}" + (f", {v['hora']}" if v["hora"] else "") + f": {v['framing']}" for v in mostrados)
             + (f" Também: {_lista(resto)}." if resto else "")
@@ -949,13 +951,15 @@ def _titulos_cov(edition: Edition, cov: Coverage, story: Story | None) -> list[s
 
 
 def _rotulos_barra(ld: S.Lados) -> dict[str, str]:
-    """Rótulos da barra de um racha: os dos lados quando os dois existem; senão "maioria"/"minoria", e no
-    empate (2 × 2 não tem maioria) "de um lado"/"do outro"."""
+    """Rótulos da barra de um racha: os dos lados quando os dois existem; senão os papéis
+    (:attr:`.selecao.Lados.papeis`: "maioria"/"minoria" só com mais da metade, senão "lado maior"/"lado menor"),
+    e no empate (2 × 2 não tem maioria) "de um lado"/"do outro"."""
     if ld.rot_maioria and ld.rot_minoria:
         return {"a": ld.rot_maioria, "n": "sem lado", "b": ld.rot_minoria}
     if ld.empate:
         return {"a": "de um lado", "n": "sem lado", "b": "do outro"}
-    return {"a": "maioria", "n": "sem lado", "b": "minoria"}
+    maj, mi = ld.papeis
+    return {"a": maj, "n": "sem lado", "b": mi}
 
 
 def _titulo_topico(edition: Edition, topic: IndexTopic) -> str:

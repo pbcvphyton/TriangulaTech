@@ -177,11 +177,11 @@ class FakeRenderer:
         return RenderResult(path=Path(out))
 
 
-def gera(edition, root, tmp_path, *, now=None, fila=None, renderer=None, launch=True):
+def gera(edition, root, tmp_path, *, now=None, fila=None, renderer=None, launch=True, avisos=None):
     renderer = renderer or FakeRenderer()
     now = now or datetime(2026, 10, 20, 8, 0, tzinfo=timezone.utc)  # 05h00 em Brasília
     posts = generate(edition, config(), root=root, media_dir=tmp_path / "midia", now=now,
-                     renderer_factory=lambda: renderer, fila=fila, launch=launch)
+                     renderer_factory=lambda: renderer, fila=fila, launch=launch, avisos=avisos)
     return posts, renderer
 
 
@@ -276,6 +276,54 @@ def test_manha_reprovada_vira_terminal(edition):
     agenda = [i["nome"] for i in por_slot["stories"].slides[0].ctx["agenda"]]
     assert agenda[0] == "Terminal da manhã"
     assert not any(s.template == "st_feed" for s in por_slot["stories"].slides)  # sem Em 1 minuto, sem chamada
+
+
+def test_linha_1_repetida_reprova_so_os_formatos_do_fato(edition):
+    """Pendência da integração: o ``recentes`` do lint vale para o Em 1 minuto e o Raio-X (a 1ª linha vem do
+    fato do dia), contra o mesmo formato nos últimos 14 dias; o Número e os moldes ficam de fora."""
+    primeiro = {p.slot: p for p in build_pieces(edition, config(), {}, Fila(), [edition])}
+    ontem = "2026-10-19"
+
+    def publicado(peca, dia=ontem):
+        return Post(id=f"{dia}-{peca.slot}", date=dia, kind=peca.kind, due=f"{dia}T07:00:00-03:00",
+                    expires=f"{dia}T23:00:00-03:00", images=["x.jpg"], caption=peca.caption, title=peca.title,
+                    status=PUBLISHED)
+
+    fila = Fila(posts=[publicado(primeiro["manha"]), publicado(primeiro["numero"]), publicado(primeiro["noite"])])
+    assert fila.primeiras_linhas("Em 1 minuto", DIA) == [primeiro["manha"].caption.split("\n", 1)[0]]
+    avisos: list[str] = []
+    de_novo = {p.slot: p for p in build_pieces(edition, config(), {}, fila, [edition], avisos=avisos)}
+    assert de_novo["manha"].title == "Terminal da manhã" and de_novo["noite"].title == "Mercado em linha"
+    assert "repete uma dos últimos dias" in de_novo["manha"].redacao["de"][0]["falhas"][0]
+    assert de_novo["numero"].title == "Número do dia" and de_novo["numero"].redacao == {"modo": "molde"}
+    # 15 dias atrás já não conta
+    velho = Fila(posts=[publicado(primeiro["manha"], "2026-10-05")])
+    assert {p.slot: p for p in build_pieces(edition, config(), {}, velho, [edition])}["manha"].title == "Em 1 minuto"
+
+
+def test_motivo_da_reprovacao_chega_ao_post_e_aos_avisos(edition, root, tmp_path):
+    """codigo#5: o substituto leva em ``redacao`` o que caiu e por quê (vai para Post.redacao na fila), e
+    ``avisos`` recebe uma linha por peça reprovada (o alerta do dono, com ``gerar --alert-out``)."""
+    def aprovar(peca):
+        return ["slide 1: palavra proibida “x”"] if peca.title == "Em 1 minuto" else []
+
+    avisos: list[str] = []
+    pecas = {p.slot: p for p in build_pieces(edition, config(), {}, Fila(), [edition], aprovar=aprovar, avisos=avisos)}
+    assert pecas["manha"].redacao == {
+        "modo": "substituto", "de": [{"peca": "Em 1 minuto", "falhas": ["lint: slide 1: palavra proibida “x”"]}],
+    }
+    assert pecas["noite"].redacao == {"modo": "molde"} and pecas["numero"].redacao == {"modo": "molde"}
+    assert avisos == [f"{DIA}: Em 1 minuto reprovado (lint: slide 1: palavra proibida “x”); a manhã vira o Terminal."]
+    # no gerador, o transbordo do render reprova e o Post do substituto guarda o motivo
+    renderer = FakeRenderer({".noite-01.jpg": 1})
+    avisos = []
+    posts, _ = gera(edition, root, tmp_path, renderer=renderer, launch=False, avisos=avisos)
+    noite = next(p for p in posts if p.id == f"{DIA}-noite")
+    assert noite.title == "Mercado em linha" and noite.redacao["modo"] == "substituto"
+    assert noite.redacao["de"][0]["peca"] == "Raio-X da cobertura" and "transbordou" in noite.redacao["de"][0]["falhas"][0]
+    assert len(avisos) == 1 and avisos[0].startswith(f"{DIA}: Raio-X da cobertura reprovado (lint: ")
+    assert avisos[0].endswith("; a noite vira o Mercado em linha.")
+    assert next(p for p in posts if p.id == f"{DIA}-manha").redacao == {"modo": "molde"}
 
 
 @real

@@ -356,3 +356,12 @@ def test_22_10_por_que_importa_sem_eleicao_de_outro_pais():
     titulo, frase = ST.textos_manchete(e, russia, election=True, nomes=E.NOMES_ELEICAO)
     assert not E.eleicao_escrita(titulo, frase) and frase == russia.dek
     assert ST.textos_manchete(e, russia, election=False, nomes=E.NOMES_ELEICAO)[1] == russia.why_it_matters
+
+
+@real
+def test_agenda_vazia_nao_chama_para_o_em_1_minuto():
+    """codigo#6: dia sem nenhum post de feed (agenda vazia) não chama para um carrossel que não existe; sem
+    agenda (chamada direta), o dia com IA ainda chama."""
+    vazia = stories("26", agenda=[])
+    assert vazia is not None and tela(vazia, "st_feed") is None
+    assert tela(stories("21", agenda=None), "st_feed") is not None

@@ -369,7 +369,7 @@ def stories_manha(
     *,
     election: bool,
     nomes: Iterable[str] = E.NOMES_ELEICAO,
-    agenda: Sequence[tuple[str, str]] = (),
+    agenda: Sequence[tuple[str, str]] | None = None,
     capa: Story | None = None,
     raiox_story_id: str | None = None,
     capa_img: str = "",
@@ -378,14 +378,19 @@ def stories_manha(
 
     - ``history``: :func:`.estatistica.load_history` com o dia (para o acumulado do mercado).
     - ``agenda``: [(hora, formato)] só do que foi gerado, ex. ``[("07h", "Em 1 minuto"),
-      ("12h", "Número do dia"), ("18h30", "Raio-X")]`` (:func:`agenda_das_pecas`).
+      ("12h", "Número do dia"), ("18h30", "Raio-X")]`` (:func:`agenda_das_pecas`); ``None`` numa chamada
+      direta, sem a grade do dia.
     - ``capa``: a matéria da capa do Em 1 minuto, para a tela 2 contar a mesma.
     - ``raiox_story_id``: a matéria do Raio-X da noite (o selo de cobertura ganha "Raio-X às 18h30").
     - ``capa_img``: a capa do Em 1 minuto já renderizada (``data:`` URI), para a miniatura da tela 4.
 
-    A chamada para o carrossel só sai com o Em 1 minuto na agenda (sem agenda, em dia com IA).
+    A chamada para o carrossel só sai com o Em 1 minuto na agenda; sem agenda (``None``), em dia com IA.
+    Agenda vazia é dia sem nenhum post de feed: sem chamada para um carrossel que não existe (26/10 sem
+    cotações).
     """
     nomes = tuple(nomes)
+    agenda_dada = agenda is not None
+    agenda = list(agenda or ())
     slides = [_bom_dia(edition, agenda)]
     story = escolher_manchete(edition, election=election, nomes=nomes, capa=capa)
     if story is not None:
@@ -393,7 +398,7 @@ def stories_manha(
     mercado = _mercado(edition, history)
     if mercado is not None:
         slides.append(mercado)
-    tem_em1min = any(n == "Em 1 minuto" for _, n in agenda) if agenda else edition.mode == "ai"
+    tem_em1min = any(n == "Em 1 minuto" for _, n in agenda) if agenda_dada else edition.mode == "ai"
     if tem_em1min and edition.mode == "ai":
         slides.append(_chamada(edition, agenda, capa_img))
     if len(slides) < 2:

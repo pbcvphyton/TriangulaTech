@@ -17,6 +17,8 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from qijournal.config import SLOT_APELIDOS
+
 log = logging.getLogger(__name__)
 
 FILA_FILE = "fila.json"
@@ -29,6 +31,7 @@ SERIES = ("em1min", "numero", "raiox", "placar", "semana", "mercado")
 SEM_NUMERO = {"mercado"}  # o Mercado em linha não leva número de série
 NUMERO_REPETICAO_DIAS = 7  # chaves do Número publicadas nesse período não voltam
 RAIOX_REPETICAO_DIAS = 3  # entidades dos Raio-X desse período penalizam a repetição
+LINHA1_REPETICAO_DIAS = 14  # 1ª linha da legenda parecida com uma desse período reprova (redacao.lint)
 
 
 @dataclass
@@ -69,9 +72,15 @@ class Post:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Post":
-        """Lê um registro do ``fila.json``; campos que ainda não existiam ficam no padrão."""
+        """Lê um registro do ``fila.json``; campos que ainda não existiam ficam no padrão. O id com o
+        nome antigo do slot (``"2026-11-02-raiox"``, :data:`~qijournal.config.SLOT_APELIDOS`) vira o
+        atual (``"-noite"``): refazer o dia depois do deploy não pode pôr uma segunda noite na fila."""
         known = set(cls.__dataclass_fields__)
-        return cls(**{k: v for k, v in data.items() if k in known and not (v is None and k in _COLECOES)})
+        post = cls(**{k: v for k, v in data.items() if k in known and not (v is None and k in _COLECOES)})
+        for antigo, novo in SLOT_APELIDOS.items():
+            if post.date and post.id == f"{post.date}-{antigo}":
+                post.id = f"{post.date}-{novo}"
+        return post
 
     def due_at(self) -> datetime:
         return datetime.fromisoformat(self.due)
@@ -81,6 +90,23 @@ class Post:
 
 
 _COLECOES = {"alt_texts", "story_ids", "entidades", "redacao", "metricas"}  # null no JSON = padrão
+
+
+def _avanco(p: Post) -> int:
+    """O quanto o post andou: publicado > com container (talvez no ar) > o resto."""
+    return 2 if p.status == PUBLISHED else 1 if p.container_id else 0
+
+
+def _sem_duplicados(posts: list[Post]) -> list[Post]:
+    """Um post por id (a migração de ``-raiox`` para ``-noite`` pode juntar dois): fica o que mais andou."""
+    melhor: dict[str, Post] = {}
+    for p in posts:
+        atual = melhor.get(p.id)
+        if atual is None or _avanco(p) > _avanco(atual):
+            if atual is not None:
+                log.info("Instagram: %s duplicado na fila; fica o que já andou (%s)", p.id, p.status)
+            melhor[p.id] = p
+    return [p for p in posts if melhor[p.id] is p]
 
 
 @dataclass
@@ -96,7 +122,7 @@ class Fila:
         if not path.is_file():
             return cls(path=path)
         data = json.loads(path.read_text(encoding="utf-8"))
-        posts = [Post.from_dict(p) for p in data.get("posts") or [] if isinstance(p, dict)]
+        posts = _sem_duplicados([Post.from_dict(p) for p in data.get("posts") or [] if isinstance(p, dict)])
         series = {str(k): int(v) for k, v in (data.get("series") or {}).items() if isinstance(v, int)}
         return cls(posts=posts, token=dict(data.get("token") or {}), path=path, series=series)
 
@@ -203,6 +229,17 @@ class Fila:
         return [
             sid for p in self._recentes("raiox", day, dias, (PUBLISHED, PENDING))
             for sid in (p.story_ids[:1] if p.entidades else p.story_ids)
+        ]
+
+    def primeiras_linhas(self, titulo: str, day: date | str, dias: int = LINHA1_REPETICAO_DIAS) -> list[str]:
+        """1ªs linhas das legendas publicadas com esse ``titulo`` (o formato: "Em 1 minuto") nos ``dias``
+        anteriores a ``day``: o ``recentes`` de :func:`.redacao.lint`."""
+        day = date.fromisoformat(day) if isinstance(day, str) else day
+        start = (day - timedelta(days=dias)).isoformat()
+        return [
+            p.caption.strip().split("\n", 1)[0].strip()
+            for p in self.posts
+            if p.title == titulo and p.status == PUBLISHED and p.caption and start <= p.date < day.isoformat()
         ]
 
     def due(self, now: datetime) -> list[Post]:

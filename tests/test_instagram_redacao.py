@@ -26,8 +26,23 @@ def test_palavras_e_verbos_proibidos():
     assert R.palavras_proibidas("Dólar dispara e Bolsa despenca em meio a cenário de incerteza") == [
         "dispara", "despenca", "em meio a", "cenário",
     ]
-    # Palavra parecida não conta: desabamento, disparada, tiros disparados.
-    assert R.palavras_proibidas("Desabamento em SP; disparada do ouro; tiros disparados") == []
+    # Palavra parecida não conta: desabamento, tiros disparados, disparo, disparidade, desabafo, derretimento.
+    assert R.palavras_proibidas("Desabamento em SP; tiros disparados; disparo; disparidade; desabafo") == []
+    assert R.palavras_proibidas("derretimento das geleiras; explosão em fábrica") == []
+
+
+def test_palavras_proibidas_pegam_a_familia_inteira():
+    """codigo#1: a família do verbo, não só a 3ª pessoa (30/10, Raio-X: "cotações do setor despencarem";
+    14/10, Em 1 minuto: "após disparada no combustível")."""
+    assert R.palavras_proibidas("vê cotações do setor despencarem após invasão") == ["despencarem"]
+    assert R.palavras_proibidas("licença após disparada no combustível") == ["disparada"]
+    assert R.palavras_proibidas("ações vão desabar; preço explodindo") == ["desabar", "explodindo"]
+    assert R.palavras_proibidas("o ouro derreteria? derretendo; dispararem; despenquem") == [
+        "derreteria", "derretendo", "dispararem", "despenquem",
+    ]
+    assert R.palavras_proibidas("Bolsa despencando, dólar disparando, ações explodirão") == [
+        "despencando", "disparando", "explodirão",
+    ]
     assert R.verbos_proibidos("O jornal omitiu o dado e foi o primeiro a noticiar o furo") == ["omitiu", "primeiro a noticiar", "furo"]
     assert R.verbos_proibidos("Folha destacou o custo; g1 publicou às 16h00") == []
     assert "destacou" in R.VERBOS_VEICULO and "ignorou" in R.VERBOS_PROIBIDOS

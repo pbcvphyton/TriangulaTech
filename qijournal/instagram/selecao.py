@@ -172,6 +172,19 @@ class Lados:
     def empate(self) -> bool:
         return self.n_maioria == self.n_minoria
 
+    @property
+    def tem_maioria(self) -> bool:
+        """O lado maior passa da metade dos analisados: 6 de 11 é maioria, 6 de 14 (com 4 sem lado) não é."""
+        return 2 * self.n_maioria > self.total
+
+    @property
+    def papeis(self) -> tuple[str, str]:
+        """Os nomes dos dois lados quando falta rótulo: "maioria"/"minoria" só com :attr:`tem_maioria`;
+        no empate, "de um lado"/"do outro lado"; nos demais, "lado maior"/"lado menor"."""
+        if self.empate:
+            return "de um lado", "do outro lado"
+        return ("maioria", "minoria") if self.tem_maioria else ("lado maior", "lado menor")
+
 
 def lados(cov: Coverage, nomes: Iterable[str] = E.NOMES_ELEICAO) -> Lados:
     a, b = cov.count("a"), cov.count("b")

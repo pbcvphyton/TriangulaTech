@@ -597,3 +597,29 @@ def test_28_10_molde_com_a_janela_de_cada_lado():
     assert concl.startswith("6 de 11 veículos destacaram fuga ilícita; 5, asilo político. Pelo horário informado, os 6 "
                             "de fuga ilícita publicaram entre 27/10 09h13 e 27/10 15h32; os 5 de asilo político, entre "
                             "27/10 15h37 e ")
+
+
+def test_maioria_so_com_mais_da_metade_dos_analisados():
+    """codigo#3: 6 × 4 com 4 sem lado (30/10, de 14): o lado maior não é "maioria" na capa, nos slides 3 e 4,
+    no relógio, no espectro nem na legenda; 4 de 8 (18/10) também não; 6 de 11 (21/10) é."""
+    p = raiox_pos(30)
+    assert p.story_ids[0].startswith("binance")
+    assert [s.ctx["kicker"] for s in p.slides[2:4]] == ["O lado maior", "O lado menor"]
+    assert sp(p.slides[2].ctx["titulo"]) == "6 DE 14 · O LADO MAIOR"
+    assert p.slides[0].alt.endswith("Gráfico: barra com 6 veículos no lado maior, 4 sem lado e 4 no lado menor.")
+    for s in p.slides:
+        assert "maioria" not in s.alt and "minoria" not in s.alt, (s.template, s.alt)
+        assert "maioria" not in str(s.ctx.get("grafico", "")), s.template
+    assert "▸ Lado maior (6): " in p.caption and "aioria" not in p.caption
+    assert [s.ctx["kicker"] for s in noites()[18].slides[2:4]] == ["O lado maior", "O lado menor"]
+    assert [s.ctx["kicker"] for s in noites()[21].slides[2:4]] == ["A maioria", "A minoria"]
+
+
+def test_papeis_dos_lados():
+    lados = lambda a, b, n: S.Lados("a", "b", a, b, n, a + b + n, None, None)  # noqa: E731
+    assert lados(6, 4, 4).papeis == ("lado maior", "lado menor") and not lados(6, 4, 4).tem_maioria
+    assert lados(6, 2, 3).papeis == ("maioria", "minoria") and lados(6, 2, 3).tem_maioria
+    assert lados(4, 2, 2).papeis == ("lado maior", "lado menor")  # 4 de 8 é metade, não maioria
+    assert lados(2, 2, 7).papeis == ("de um lado", "do outro lado")
+    assert N._rotulos_barra(lados(6, 4, 4)) == {"a": "lado maior", "n": "sem lado", "b": "lado menor"}
+    assert N._rotulos_barra(lados(5, 1, 0)) == {"a": "maioria", "n": "sem lado", "b": "minoria"}

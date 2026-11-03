@@ -72,7 +72,8 @@ Ordem de seleção do dia (`gerar.build_pieces`), com a `Fila`:
 1. **Noite:** `raio_x()`, ou `placar_do_dia()`, ou `mercado_em_linha()`
    (a mais escassa vem primeiro).
 2. **Número:** `numero_do_dia(exclude={lead, story do Raio-X}, usados=chaves
-   publicadas nos últimos 7 dias)`.
+   publicadas nos últimos 7 dias)`; os passos de mercado (1 e 4) também pulam a chave usada e
+   vão para o ativo seguinte.
 3. **Manhã:** `em_1_minuto(raiox_story_id=…)` ou `terminal()`.
 4. **Stories:** `stories_manha(agenda=…)` com o que de fato foi gerado.
 
@@ -125,10 +126,20 @@ nenhum veículo é rotulado com campo político.
   Raio-X. O Mercado em linha não tem número.
 - **Lint** (`redacao.lint`): palavras proibidas (sensacionalismo: urgente,
   bomba, chocante, despenca, dispara, derrete, desaba, explode, polêmica,
-  escândalo…; vícios de IA: cenário, "em meio a", desdobramentos, "vale
-  destacar", "sem precedentes", "acende alerta"…), léxico eleitoral no modo
-  eleitoral, limites de caracteres e overflow do render. Peça reprovada cai para
-  o substituto e o motivo vai para o log.
+  escândalo…, com a família inteira do verbo: "despencarem", "disparada",
+  "desabar", "explodindo"; ficam de fora, por lista fechada, "disparo",
+  "disparidade", "desabafo", "desabamento", "derretimento" e "explosão"; vícios de
+  IA: cenário, "em meio a", desdobramentos, "vale destacar", "sem precedentes",
+  "acende alerta"…), léxico eleitoral no modo eleitoral, limites de caracteres,
+  overflow do render e a 1ª linha da legenda repetida (similaridade > 0,6 com a de
+  um post **do mesmo formato** dos últimos 14 dias). A repetição só vale onde a
+  linha vem do fato do dia: Em 1 minuto e Raio-X (em 14/10 a 02/11, a maior foi
+  0,38 e 0,46). Fica fora, por desenho, nos moldes: o Número (a chave já não volta
+  em 7 dias; a linha do acumulado chega a 0,71), o Placar (0,88), o Mercado em
+  linha e o Terminal. Peça reprovada cai para o substituto, e o motivo vai para o
+  log, para o `Post.redacao` do substituto (`{"modo": "substituto", "de": [{"peca",
+  "falhas"}]}`; sem troca, `{"modo": "molde"}`), para o resumo da execução e, com
+  `instagram gerar --alert-out`, para o alerta do dono (a issue, por e-mail).
 
 ## 4. Regras comuns
 
@@ -182,7 +193,11 @@ lado), G0 padrão, compacto (o do G2 guarda o "só": "6 DE 11 DESTACARAM SINERGI
 EM IA. SÓ 2, COMPLEXIDADE DE GOVERNANÇA."), sem rótulo. Maioria e minoria pela
 contagem; nunca "Lado A" como título. Quando o assunto teve veículos fora da
 análise, a contagem vira "11 VEÍCULOS ANALISADOS" (o relógio do mesmo carrossel
-conta os 12 que publicaram); passando de 90, cai no compacto.
+conta os 12 que publicaram); passando de 90, cai no compacto. **"Maioria" só com
+mais da metade dos analisados** (`selecao.Lados.papeis`): 6 × 4 com 4 sem lado, de
+14 (30/10), é "o lado maior" e "o lado menor" no chapéu dos slides 3 e 4, na barra
+da capa e do Placar, na legenda do relógio, no espectro e na legenda; 4 de 8 (18/10)
+também.
 
 Slides: 1 capa-tensão com barra A | N | B e o subtítulo que diz qual é o fato,
 com sujeito e o quê (o assunto ou a manchete só sem o adjetivo da casa; a linha

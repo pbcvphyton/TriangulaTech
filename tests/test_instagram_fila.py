@@ -357,3 +357,29 @@ def test_refazer_o_dia_tira_o_que_nao_veio_na_geracao_nova():
     assert {"2026-10-20-numero", "2026-10-20-stories-4", "lancamento-comece-aqui", "2026-10-19-noite"} <= ids
     assert sorted(changed) == ["2026-10-20-manha", "2026-10-20-mercado"]
     assert fila.get("2026-10-20-manha").caption == "v2"
+
+
+def test_fila_antiga_com_raiox_publicado_nao_ganha_segunda_noite(tmp_path):
+    """codigo#4: a fila.json da main tem a noite como "<data>-raiox". Ao ler, ela vira "-noite" (o apelido do
+    slot): refazer o dia depois das 18:30 não põe uma segunda noite na fila, e um par duplicado fica com a que
+    já saiu."""
+    import json
+
+    def antigo(pid, **kw):
+        d = pid[:10]
+        return {"id": pid, "date": d, "kind": "carousel", "due": f"{d}T18:30:00-03:00",
+                "expires": f"{d}T22:30:00-03:00", "images": ["a.jpg"], "caption": "x", **kw}
+
+    (tmp_path / "fila.json").write_text(json.dumps({"posts": [
+        antigo("2026-11-02-raiox", status="published", media_id="m1"),
+        antigo("2026-11-01-raiox", status="pending", container_id="c9"),
+        antigo("2026-11-01-noite", status="pending"),
+    ]}), encoding="utf-8")
+    fila = Fila.load(tmp_path)
+    assert sorted(p.id for p in fila.posts) == ["2026-11-01-noite", "2026-11-02-noite"]
+    assert fila.get("2026-11-01-noite").container_id == "c9"  # o par duplicado fica com o que tem container
+    novo = post("2026-11-02-noite", due="2026-11-02T18:30:00-03:00", expires="2026-11-02T22:30:00-03:00",
+                serie="raiox", numero_serie=1)
+    fila.replace_day("2026-11-02", [novo])
+    noites = [p for p in fila.posts if p.date == "2026-11-02"]
+    assert [(p.id, p.status, p.media_id) for p in noites] == [("2026-11-02-noite", PUBLISHED, "m1")]

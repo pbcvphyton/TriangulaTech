@@ -1078,11 +1078,14 @@ def _mercado(
     *,
     election: bool = False,
     nomes: Iterable[str] = NOMES_ELEICAO,
+    evitar: Iterable[str] = (),
 ) -> Numero | None:
     """Passos 1 e 4: a variação do dia ``z_min`` vezes a típica do ativo. Leitura velha não vale
     (:func:`leitura_velha` contra a edição anterior do ``history``); no período eleitoral, nem o ativo
-    de matéria eleitoral do dia (:func:`mercado_eleitoral`). Fechamento de outro dia vai no pretérito,
+    de matéria eleitoral do dia (:func:`mercado_eleitoral`); nem a chave em ``evitar`` (publicada nos
+    últimos 7 dias ou rejeitada), e aí vale o próximo ativo. Fechamento de outro dia vai no pretérito,
     com a data ("Ibovespa caiu 13,88% em 26/10")."""
+    evitar = set(evitar)
     best: tuple[float, Numero] | None = None
     labels = {q.id: q.label for q in edition.quotes}
     day = date.fromisoformat(edition.date)
@@ -1113,6 +1116,8 @@ def _mercado(
         when = selo_leitura(qid, p, day)
         sign = "+" if q.change_pct > 0 else "−"
         valor = f"{sign}{pct}"
+        if f"{qid}:{valor}" in evitar:
+            continue
         recent = [x for x in series if x.change_pct is not None and not stale_reading(x)][-29:]
         variacoes = [{**_ponto_json(qid, x, day), "hoje": False} for x in recent]
         variacoes.append({**_ponto_json(qid, p, day), "hoje": True})
@@ -1335,7 +1340,8 @@ def numero_do_dia(
     """O Número do dia, pelo primeiro passo que tiver candidato (§4.4):
 
     1. mercado fora do comum (variação ≥ 3 desvios robustos do próprio ativo; leitura velha não
-       vale e, no período eleitoral, nem o ativo de matéria eleitoral do dia, como no passo 4);
+       vale, nem chave de ``usados`` e, no período eleitoral, nem o ativo de matéria eleitoral do
+       dia, como no passo 4);
     2. número triangulado (no título de 3+ veículos), fora de ``exclude`` e de ``usados``;
     3. o assunto mais coberto fora de ``exclude``, se tiver 12+ veículos;
     4. mercado com variação ≥ 2 desvios robustos;
@@ -1362,7 +1368,7 @@ def numero_do_dia(
     def vale(n: Numero | None, passo: int) -> bool:
         return n is not None and passo > apos and n.chave not in fora
 
-    forte = _mercado(edition, past, Z_FORTE, 1, election=election, nomes=nomes) if apos < 1 else None
+    forte = _mercado(edition, past, Z_FORTE, 1, election=election, nomes=nomes, evitar=ja | fora) if apos < 1 else None
     if vale(forte, 1):
         return forte
     if edition.mode == "ai":
@@ -1375,7 +1381,7 @@ def numero_do_dia(
             conc = _concentracao_numero(edition, election=election, nomes=nomes, exclude=excluded, usados=ja | fora)
             if conc:
                 return conc
-    medio = _mercado(edition, past, Z_MEDIO, 4, election=election, nomes=nomes) if apos < 4 else None
+    medio = _mercado(edition, past, Z_MEDIO, 4, election=election, nomes=nomes, evitar=ja | fora) if apos < 4 else None
     if vale(medio, 4):
         return medio
     acumulados = [n for n in _acumulados(edition, upto, min_pontos) if n.chave not in fora]

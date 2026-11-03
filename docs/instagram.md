@@ -35,9 +35,16 @@ Os horários e prazos ficam em `config/site.yaml`, no bloco `instagram` (`slots`
 - **Séries numeradas.** O número de cada série (`Fila.series`, em `fila.json`) só avança quando o
   post é publicado: refazer o dia mantém o número, e um post que expirou não gasta número. O Placar do
   dia é da série do Raio-X; o Mercado em linha, o Terminal e os stories não têm número.
-- **Lint antes de sair.** Toda peça passa por `redacao.lint` (palavras proibidas, verbos que julgam
-  veículo, léxico eleitoral no período, limites de caracteres e texto que transbordou no render).
-  Reprovada, cai para o substituto da tabela e o motivo vai para o log.
+- **Lint antes de sair.** Toda peça passa por `redacao.lint` (palavras proibidas, com a família
+  inteira do verbo, "despencarem", "disparada"; verbos que julgam veículo, léxico eleitoral no
+  período, limites de caracteres, texto que transbordou no render e, no Em 1 minuto e no Raio-X, a
+  1ª linha da legenda parecida com a de um post do mesmo formato dos últimos 14 dias). Reprovada, cai
+  para o substituto da tabela, e o motivo vai para o log, para o `redacao` do post que entrou no lugar
+  (`{"modo": "substituto", "de": [{"peca", "falhas"}]}`, em `fila.json`) e para o resumo da execução
+  no Actions. Com `instagram gerar --alert-out ARQUIVO`, cada substituição vira também uma linha do
+  alerta do dono (a issue "Instagram: ação necessária", que o GitHub manda por e-mail); o workflow
+  ainda não passa a opção: ligá-la é decisão do dono (no passo "Gerar", o mesmo
+  `--alert-out "$RUNNER_TEMP/ig-alerta.txt"` dos outros passos).
 - **Período eleitoral** (`election_until`, até 27/10/2026): política e assunto eleitoral ficam fora
   do Raio-X, do Placar, do Número e da capa do Em 1 minuto (eleição de outro país no título também);
   no Em 1 minuto, no máximo um item de política, sempre o último. Sempre, fora do período também: o

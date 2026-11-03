@@ -233,3 +233,17 @@ def test_render_sem_corte_e_com_a_faixa_visivel(dia, tmp_path):
             im = Image.open(res.path).convert("RGB")
             a, b = sorted((_luminancia(im.getpixel((540, 3))), _luminancia(im.getpixel((540, 20)))), reverse=True)
             assert (a + 0.05) / (b + 0.05) >= 3.0, nome
+
+
+@real
+def test_mercado_em_linha_evitar_e_o_ativo_no_ctx():
+    """Pendência da integração: ``evitar`` do substituto da noite tira o ativo do título (o do Número do dia), e o
+    ``ativo`` do ctx diz qual titulou (o Terminal evita esse também)."""
+    livre = M.mercado_em_linha(edicao("21"), {}, historia("21")).slides[0].ctx
+    assert livre["ativo"] == "brent" and livre["titulo"].startswith("Brent")  # o Ibovespa é o fechamento de ontem
+    sem = M.mercado_em_linha(edicao("21"), {}, historia("21"), evitar={"brent"}).slides[0].ctx
+    assert sem["ativo"] not in ("brent", "") and not sem["titulo"].startswith("Brent")
+    assert sem["titulo"].startswith(next(p["nome"] for p in sem["paineis"] if p["id"] == sem["ativo"]))
+    # com todos os ativos evitados, o título fica no maior |acumulado| (o Mercado nunca fica sem título)
+    todos = M.mercado_em_linha(edicao("21"), {}, historia("21"), evitar=set(M.ATIVOS)).slides[0].ctx
+    assert todos["titulo"] and todos["ativo"] in M.ATIVOS

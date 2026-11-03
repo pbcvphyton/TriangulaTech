@@ -133,9 +133,12 @@ _NEUTRO = {
     "despenca": "cai", "despencam": "caem", "despencou": "caiu", "despencaram": "caíram",
     "derrete": "cai", "derretem": "caem", "derreteu": "caiu", "derreteram": "caíram",
     "dispara": "sobe", "disparam": "sobem", "disparou": "subiu", "dispararam": "subiram",
+    "desabar": "cair", "despencar": "cair", "derreter": "cair", "disparar": "subir",
+    "desabarem": "caírem", "despencarem": "caírem", "derreterem": "caírem", "dispararem": "subirem",
+    "desabando": "caindo", "despencando": "caindo", "derretendo": "caindo", "disparando": "subindo",
 }
 _NEUTRO_RE = re.compile(
-    r"\b(" + "|".join(_NEUTRO) + r")(?=\s(?:(?:até|mais de|quase|cerca de)\s)?(?:R\$|US\$|€)?\s?\d)",
+    r"\b(" + "|".join(sorted(_NEUTRO, key=len, reverse=True)) + r")(?=\s(?:(?:até|mais de|quase|cerca de)\s)?(?:R\$|US\$|€)?\s?\d)",
     re.I,
 )
 

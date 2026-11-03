@@ -2,7 +2,9 @@
 
 Na Onda 1 não há IA nova: o lint confere o texto montado por moldes a partir do
 JSON da edição (§4.1 e itens 2, 3 e 11 do §5.4). Se uma peça reprova, ela cai
-para o substituto e o motivo vai para o log e para o e-mail.
+para o substituto e o motivo vai para o log, para o ``redacao`` do post que entrou
+no lugar (na fila), para o resumo da execução e, com ``instagram gerar
+--alert-out``, para o alerta do dono (a issue, que o GitHub manda por e-mail).
 """
 
 from __future__ import annotations
@@ -17,14 +19,24 @@ LEGENDA_MAX = 1300
 ALT_MAX = 1000
 REPETICAO_MAX = 0.6  # similaridade com um gancho dos últimos 14 dias que já reprova (§5.4, item 11)
 
+# Flexões dos verbos de sensacionalismo (§3: as famílias, não só a 3ª pessoa): infinitivo,
+# gerúndio, futuro, subjuntivo e, em "disparar", o substantivo "disparada". Lista fechada:
+# "disparo", "disparidade", "desabafo", "desabamento", "derretimento" e "explosão" ficam de fora.
+_AR = ("a", "am", "ou", "aram", "ar", "arem", "ando", "ará", "arão", "aria", "ariam", "asse", "assem")
+_ER = ("e", "em", "eu", "eram", "er", "erem", "endo", "erá", "erão", "eria", "eriam", "esse", "essem", "a", "am")
+_IR = ("e", "em", "iu", "iram", "ir", "irem", "indo", "irá", "irão", "iria", "iriam", "isse", "issem", "a", "am")
+FAMILIAS = (
+    tuple("despenc" + t for t in _AR) + ("despenque", "despenquem")
+    + tuple("dispar" + t for t in _AR) + ("dispare", "disparem", "disparada", "disparadas")
+    + tuple("derret" + t for t in _ER)
+    + tuple("desab" + t for t in _AR) + ("desabe", "desabem")
+    + tuple("explod" + t for t in _IR)
+)
+
 # §5.4, item 3: sensacionalismo e vícios de texto de IA.
 SENSACIONALISMO = (
     "urgente", "bomba", "chocante", "inacreditável",
-    "despenca", "despencam", "despencou", "despencaram",
-    "dispara", "disparam", "disparou", "dispararam",
-    "derrete", "derretem", "derreteu", "derreteram",
-    "desaba", "desabam", "desabou", "desabaram",
-    "explode", "explodem", "explodiu", "explodiram",
+    *FAMILIAS,
     "polêmica", "escândalo", "você não vai acreditar", "tudo o que você precisa saber", "a verdade sobre", "segredo",
 )
 VICIOS_IA = (

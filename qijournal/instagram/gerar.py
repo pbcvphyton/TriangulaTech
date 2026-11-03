@@ -18,7 +18,7 @@ import shutil
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
+from typing import Any, Callable, Iterable, Sequence
 from zoneinfo import ZoneInfo
 
 from jinja2 import Environment, FileSystemLoader, StrictUndefined
@@ -122,6 +122,20 @@ def veiculos(edition: Edition) -> list[str]:
     return sorted(n for n in nomes if n)
 
 
+# A 1ª linha da legenda não repete a de um post do mesmo formato dos últimos 14 dias (``recentes`` do
+# lint) só onde ela vem do fato do dia: o Em 1 minuto (a capa) e o Raio-X (o gancho). Fora, por desenho:
+# o Número (a chave dele já não volta em 7 dias, e a linha do acumulado é molde: "−3,5%: Ouro acumula
+# queda desde 29/09…"), o Placar ("Dia de consenso: 0 de 23 assuntos…"), o Mercado em linha e o Terminal,
+# moldes com o número do dia, e os stories, sem legenda. Em 14/10 a 02/11, a maior similaridade foi 0,38
+# no Em 1 minuto e 0,46 no Raio-X; no Número, 0,71, e no Placar, 0,88 (o limite é 0,6).
+LINT_RECENTES = ("Em 1 minuto", "Raio-X da cobertura")
+
+
+def linhas_recentes(fila: Fila, peca: conteudo.Peca, day: date) -> list[str]:
+    """O ``recentes`` do lint para a peça: as 1ªs linhas do mesmo formato (:data:`LINT_RECENTES`)."""
+    return fila.primeiras_linhas(peca.title, day) if peca.title in LINT_RECENTES else []
+
+
 def assunto_principal(peca: conteudo.Peca | None) -> str | None:
     """A matéria que a peça estampa (a 1ª de ``story_ids``); None no Mercado, no Terminal e no Placar."""
     if peca is None or peca.title in ("Placar do dia", "Mercado em linha", "Terminal da manhã"):
@@ -211,6 +225,7 @@ def build_pieces(
     *,
     aprovar: Aprovar | None = None,
     imagem: Imagem | None = None,
+    avisos: list[str] | None = None,
 ) -> list[conteudo.Peca]:
     """As publicações do dia, na ordem da fila: manhã, stories, número, noite.
 
@@ -227,6 +242,12 @@ def build_pieces(
       só o lint do texto.
     - ``imagem``: a imagem já renderizada de um slide de uma peça aprovada (``data:`` URI), para a
       miniatura da capa do Em 1 minuto na tela 4 dos stories. Sem ela, o desenho genérico.
+    - ``avisos``: recebe uma linha por peça reprovada (o quê, por quê e o que entrou no lugar), para o
+      alerta do dono (``instagram gerar --alert-out``) e o resumo da execução.
+
+    Cada peça aprovada leva em ``redacao`` como chegou lá: ``{"modo": "molde"}`` ou, quando substitui
+    outra do mesmo slot, ``{"modo": "substituto", "de": [{"peca": "Raio-X da cobertura", "falhas": [...]}]}``
+    (vai para ``Post.redacao`` na fila).
     """
     day = date.fromisoformat(edition.date)
     ig = config.instagram
@@ -238,18 +259,31 @@ def build_pieces(
         nomes_veiculos = veiculos(edition)
 
         def aprovar(peca: conteudo.Peca) -> list[str]:
-            return redacao.lint(peca, election=election, nomes=nomes, veiculos=nomes_veiculos)
+            return redacao.lint(
+                peca, election=election, nomes=nomes, veiculos=nomes_veiculos, recentes=linhas_recentes(fila, peca, day)
+            )
 
     def numero_serie(serie: str, slot: str) -> int:
         return fila.numero_para(serie, post_id(edition.date, slot))
+
+    caidas: dict[str, list[dict[str, Any]]] = {}  # slot → peças que caíram antes da aprovada
+
+    def caiu(slot: str, rotulo: str, falhas: list[str], depois: str) -> None:
+        caidas.setdefault(slot, []).append({"peca": rotulo, "falhas": falhas[:6]})
+        if avisos is not None:
+            avisos.append(f"{edition.date}: {rotulo} reprovado ({'; '.join(falhas[:3])}); {depois}.")
 
     def aprovada(peca: conteudo.Peca | None, depois: str) -> conteudo.Peca | None:
         if peca is None:
             return None
         problemas = aprovar(peca)
+        rotulo = f"{peca.title} ({peca.chave})" if peca.chave else peca.title
         if problemas:
-            log.warning("Instagram: %s reprovado no lint (%s); %s", peca.title, "; ".join(problemas[:6]), depois)
+            log.warning("Instagram: %s reprovado no lint (%s); %s", rotulo, "; ".join(problemas[:6]), depois)
+            caiu(peca.slot, rotulo, ["lint: " + p for p in problemas], depois)
             return None
+        de = caidas.get(peca.slot)
+        peca.redacao = {"modo": "substituto", "de": list(de)} if de else {"modo": "molde"}
         return peca
 
     # 1. Noite: a mais escassa primeiro.
@@ -290,8 +324,12 @@ def build_pieces(
             break
         rejeitadas.add(candidato.chave)
         apos = max(apos, min(_passo(candidato), 6))
-    if numero is None:
+    if numero is None and rejeitadas:
         log.warning("Instagram: sem Número do dia em %s (nenhum candidato passou no lint)", edition.date)
+    elif numero is None:  # 03 e 04/10: sem IA, série com menos de 10 leituras e sem Selic/IPCA
+        log.warning("Instagram: sem Número do dia em %s (a cadeia não teve candidato)", edition.date)
+        if avisos is not None:
+            avisos.append(f"{edition.date}: sem Número do dia (a cadeia não teve candidato).")
     if noite is None:  # o Mercado em linha, sem o ativo do Número no título
         evitar = {_ativo(numero.chave)} - {""} if numero is not None else set()
         noite = aprovada(
@@ -317,6 +355,7 @@ def build_pieces(
     principais = [assunto_principal(p) for p in (numero, noite)]
     if manha is not None and assunto_principal(manha) in [x for x in principais if x]:
         log.warning("Instagram: a capa do Em 1 minuto repete a matéria de outro post; a manhã vira o Terminal")
+        caiu(manha.slot, manha.title, ["a capa repete a matéria de outro post do dia"], "a manhã vira o Terminal")
         manha = None
     if manha is None:  # o Terminal, sem o ativo do Número nem o do título do Mercado em linha
         ocupados = {_ativo(numero.chave) if numero is not None else ""}
@@ -359,6 +398,7 @@ def _post(piece: conteudo.Peca, edition: Edition, pid: str, due: datetime, expir
         chave=piece.chave,
         entidades=list(piece.entidades),
         formula=piece.formula,
+        redacao=dict(piece.redacao),
     )
 
 
@@ -373,13 +413,15 @@ def generate(
     launch: bool = True,
     fila: Fila | None = None,
     history: Sequence[Edition] | None = None,
+    avisos: list[str] | None = None,
 ) -> list[Post]:
     """Renderiza as publicações do dia em ``media_dir/<data>/`` e devolve os itens da fila.
 
     Slots cujo prazo já passou não são gerados (a edição saiu tarde demais). Com ``launch``,
     inclui o manifesto (a fila só o aceita enquanto não saiu). ``fila`` dá a numeração das
     séries e o que saiu nos últimos dias; ``history`` (padrão: ``root/data`` dos últimos 90
-    dias) alimenta as séries do mercado, a véspera e o manifesto.
+    dias) alimenta as séries do mercado, a véspera e o manifesto. ``avisos`` recebe as peças
+    reprovadas e o que entrou no lugar (:func:`build_pieces`).
     """
     if not config.instagram.enabled:
         log.info("Instagram desligado em config/site.yaml")
@@ -408,10 +450,13 @@ def generate(
 
         def aprovar(piece: conteudo.Peca) -> list[str]:
             w = janela(piece)
+            antes = linhas_recentes(fila, piece, day) if fila is not None else []
             if w is None or now >= w[1]:  # não sai: só o lint do texto, sem renderizar
-                return redacao.lint(piece, election=election, nomes=nomes, veiculos=nomes_veiculos)
+                return redacao.lint(piece, election=election, nomes=nomes, veiculos=nomes_veiculos, recentes=antes)
             feita = _render_piece(renderer, env, piece, brand, out_dir, rel_dir)
-            problemas = redacao.lint(piece, election=election, nomes=nomes, veiculos=nomes_veiculos, overflow=feita.overflow())
+            problemas = redacao.lint(
+                piece, election=election, nomes=nomes, veiculos=nomes_veiculos, overflow=feita.overflow(), recentes=antes
+            )
             if problemas:
                 for img in feita.images:  # imagens da peça reprovada não ficam na pasta
                     (Path(media_dir) / img).unlink(missing_ok=True)
@@ -423,7 +468,7 @@ def generate(
             feita = feitas.get(id(piece))
             return data_uri(Path(media_dir) / feita.images[i]) if feita is not None and i < len(feita.images) else ""
 
-        pieces = build_pieces(edition, config, brand, fila, history, aprovar=aprovar, imagem=imagem)
+        pieces = build_pieces(edition, config, brand, fila, history, aprovar=aprovar, imagem=imagem, avisos=avisos)
         for piece in pieces:
             w = janela(piece)
             if w is None:
@@ -448,6 +493,8 @@ def generate(
             problemas = redacao.lint(piece, election=election, nomes=nomes, overflow=feita.overflow())
             if problemas:
                 log.warning("Instagram: manifesto reprovado no lint (%s); não entra na fila hoje", "; ".join(problemas[:6]))
+                if avisos is not None:
+                    avisos.append(f"{edition.date}: manifesto reprovado (lint: {'; '.join(problemas[:3])}); não entra na fila hoje.")
                 for img in feita.images:
                     (Path(media_dir) / img).unlink(missing_ok=True)
             else:

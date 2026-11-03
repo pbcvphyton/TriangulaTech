@@ -638,3 +638,41 @@ def test_titulo_literal_de_veiculo():
     assert E.titulo_literal(f"Tragédia: {titulo}", literais)  # o título inteiro dentro do texto
     assert not E.titulo_literal("Pelo menos 68 pessoas morreram após a colisão entre dois trens", literais)
     assert not E.titulo_literal("", literais)
+
+
+def test_numero_de_mercado_nao_repete_chave_usada():
+    """codigo#0: os passos 1 e 4 respeitam ``usados`` e caem para o próximo ativo; a leitura de sexta (ouro,
+    30/10 17h59) já não vale no sábado nem no domingo (leitura velha)."""
+    import dataclasses
+
+    h = E.load_history(DATA, date(2026, 10, 30), 90)
+    ed = dataclasses.replace(h[-1], mode="heuristic")  # sem IA: só mercado e acumulados
+    primeiro = E.numero_do_dia(ed, h, election=False, usados=set())
+    assert (primeiro.chave, primeiro.passo) == ("btc:−3,24%", 4)
+    outro = E.numero_do_dia(ed, h, election=False, usados={primeiro.chave})
+    assert outro.chave != primeiro.chave
+    for dia in (date(2026, 10, 31), date(2026, 11, 1)):
+        hd = E.load_history(DATA, dia, 90)
+        n = E.numero_do_dia(hd[-1], hd, election=False, usados={"gold:−3,29%"})
+        assert n.chave != "gold:−3,29%" and not n.chave.startswith("gold:"), dia
+
+
+def test_numero_do_dia_apos_e_rejeitadas_na_cadeia():
+    """O substituto de um Número reprovado (pendência da integração): ``apos`` pula os passos até ele, inclusive,
+    e ``rejeitadas`` nunca sai; o passo 7 vale sempre, com o maior acumulado ainda não rejeitado (30/10)."""
+    h = E.load_history(DATA, date(2026, 10, 30), 90)
+    e = h[-1]
+    cadeia = [(n.chave, n.passo) for n in (E.numero_do_dia(e, h, election=False, apos=a) for a in range(7))]
+    assert cadeia == [
+        ("82,9%", 2), ("82,9%", 2), ("conc:binance suspende saques apos roubo de us", 3), ("btc:−3,24%", 4),
+        ("acum:brent", 5), ("juroreal", 6), ("acum:brent", 7),
+    ]
+    # rejeitada no passo 2: o próximo triangulado do mesmo passo
+    n = E.numero_do_dia(e, h, election=False, rejeitadas={"82,9%"})
+    assert (n.chave, n.passo) == ("5,5bi", 2)
+    # rejeitada no passo 4 (o mercado também respeita): o acumulado
+    n = E.numero_do_dia(e, h, election=False, apos=3, rejeitadas={"btc:−3,24%"})
+    assert n.passo == 5 and n.chave.startswith("acum:")
+    # passo 7 sem o acumulado rejeitado: o seguinte em |variação|
+    n = E.numero_do_dia(e, h, election=False, apos=6, rejeitadas={"acum:brent", "juroreal"})
+    assert n.passo == 7 and n.chave.startswith("acum:") and n.chave != "acum:brent"

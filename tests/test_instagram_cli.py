@@ -204,6 +204,34 @@ def test_gerar_dia_especifico_e_refazer_o_dia(tmp_path, monkeypatch):
     assert {f"2026-10-20/{f.name}" for f in (tmp_path / "midia" / "2026-10-20").glob("*.jpg")} == usadas
 
 
+def test_gerar_com_alert_out_avisa_a_substituicao(tmp_path, monkeypatch):
+    """codigo#5: com --alert-out, cada peça reprovada no lint vira uma linha do alerta do dono (e do resumo da
+    execução); o Post do substituto guarda o motivo em ``redacao``."""
+    from datetime import date
+
+    from qijournal.instagram import gerar
+    from qijournal.instagram.fila import Fila
+    from tests.test_instagram_conteudo import FakeRenderer
+
+    monkeypatch.setattr(gerar, "Renderer", lambda: FakeRenderer({".noite-01.jpg": 1}))
+    resumo = tmp_path / "resumo.md"
+    monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(resumo))
+    _pasta_publicada(tmp_path)
+    alerta = tmp_path / "alerta.txt"
+    args = gerar_args(tmp_path, date=date(2026, 10, 20), alert_out=str(alerta))
+    assert cli.cmd_gerar(args, load_config()) == cli.EXIT_OK
+    linhas = alerta.read_text(encoding="utf-8").splitlines()
+    assert len(linhas) == 1 and linhas[0].startswith("Instagram (substituição no dia): 2026-10-20: Raio-X da cobertura reprovado")
+    assert "Raio-X da cobertura reprovado" in resumo.read_text(encoding="utf-8")
+    noite = Fila.load(tmp_path / "midia").get("2026-10-20-noite")
+    assert noite.title == "Mercado em linha" and noite.redacao["de"][0]["peca"] == "Raio-X da cobertura"
+    # sem substituição, nada no alerta (o "Fechar o aviso resolvido" do workflow continua valendo)
+    monkeypatch.setattr(gerar, "Renderer", FakeRenderer)
+    alerta.unlink()
+    assert cli.cmd_gerar(args, load_config()) == cli.EXIT_OK
+    assert not alerta.exists()
+
+
 def test_opcao_date_no_parser():
     from datetime import date
 

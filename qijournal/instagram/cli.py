@@ -99,10 +99,19 @@ def cmd_gerar(args: argparse.Namespace, config: Config) -> int:
     fila = Fila.load(media_dir)
     history = estatistica.load_history(root / pipeline.DATA_DIR, day, HISTORICO_DIAS)
     # O manifesto sai uma vez só: depois de publicado, nunca mais é gerado.
+    avisos: list[str] = []
     posts = generate(
         edition, config, root=root, media_dir=media_dir, now=now, launch=not fila.has_published(LAUNCH_ID),
-        fila=fila, history=history,
+        fila=fila, history=history, avisos=avisos,
     )
+    # Peça reprovada no lint: o motivo vai para o resumo da execução e, com --alert-out, para o alerta do
+    # dono (a issue "Instagram: ação necessária", que o GitHub manda por e-mail); também fica no Post.redacao.
+    for aviso in avisos:
+        _write_alert(getattr(args, "alert_out", None), f"Instagram (substituição no dia): {aviso}")
+    if avisos:
+        pipeline._append_step_summary(
+            os.environ, "### Instagram: substituições do dia\n\n" + "\n".join(f"- {a}" for a in avisos) + "\n"
+        )
     # Refazer o dia tira da fila o que a geração nova não tem mais (ex.: Raio-X que virou Placar).
     changed = fila.replace_day(edition.date, posts)
     today = pipeline.local_date(now, config.site.timezone)
@@ -258,6 +267,7 @@ def add_parser(commands: argparse._SubParsersAction, common: argparse.ArgumentPa
         "--date", type=date.fromisoformat, metavar="AAAA-MM-DD",
         help="gera o dia AAAA-MM-DD de data/ (prévias e testes; sem --now, vale o começo do dia)",
     )
+    gerar.add_argument("--alert-out", metavar="FILE", help="onde acrescentar uma linha por peça reprovada no lint (alerta do dono)")
     gerar.set_defaults(handler=cmd_gerar)
 
     publicar = sub.add_parser("publicar", parents=[common], help="publica o que já venceu na fila")

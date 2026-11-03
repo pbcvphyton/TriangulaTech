@@ -71,6 +71,7 @@ class Peca:
     chave: str = ""  # do Número do dia (Numero.chave)
     entidades: list[str] = field(default_factory=list)  # do Raio-X (selecao.entidades)
     formula: str = ""  # molde do gancho (selecao.Gancho.formula)
+    redacao: dict[str, Any] = field(default_factory=dict)  # Post.redacao: {modo, de, falhas} (o gerar preenche)
 
 
 # ── Utilidades de texto e números ─────────────────────────────────────────
