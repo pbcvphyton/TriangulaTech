@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import urlsplit
 
 from .. import text
 from ..termometro import agregacao, historico
@@ -202,6 +203,15 @@ class AnaliseView:
     resumo: str
     eixos: str
     evidencias: list[EvidenciaView] = field(default_factory=list)
+    dominio: str = ""  # site do texto original ("valor.globo.com"), na dica do link
+
+
+def _dominio(url: str | None) -> str:
+    try:
+        host = urlsplit(url or "").hostname or ""
+    except ValueError:
+        return ""
+    return host[4:] if host.startswith("www.") else host
 
 
 def _data_curta(iso: str | None) -> str:
@@ -229,12 +239,14 @@ def analise_view(a: Mapping[str, Any], *, evidencias: bool = True) -> AnaliseVie
             )
         )
     eixos = [EIXOS.get(str(x), str(x)) for x in (a.get("triagem") or {}).get("eixos") or []]
+    url = filters.safe_url(a.get("url"))
     return AnaliseView(
         id=str(a.get("id") or ""),
         veiculo=filters.plain(str(a.get("veiculo") or "")),
         editoria=filters.plain(str(a.get("editoria") or "")),
         titulo=filters.plain(str(a.get("titulo") or "")),
-        url=filters.safe_url(a.get("url")),
+        url=url,
+        dominio=_dominio(url),
         data=_data_curta(a.get("data_publicacao")),
         estado=estado,
         valor=fmt_t(valor),

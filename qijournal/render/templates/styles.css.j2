@@ -187,6 +187,8 @@ figure.img-fail{display:none}
 .srch-input:focus{border-color:var(--qi);box-shadow:0 0 0 3px rgba(var(--qi-rgb),.15)}
 .srch-input::placeholder{color:var(--faint)}
 .srch-count{margin-left:auto;font-family:var(--mn);font-size:9.5px;color:var(--link);flex-shrink:0}
+.srch-all{flex-shrink:0;height:30px;padding:0 12px;border:1.5px solid var(--rule);border-radius:20px;background:transparent;font-family:var(--mn);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;color:var(--link);cursor:pointer;transition:border-color .2s}
+.srch-all:hover{border-color:var(--link)}
 .no-res{padding:40px 22px;text-align:center;font-family:var(--ss);font-size:14px;color:var(--muted)}
 .no-res[hidden]{display:none}
 
@@ -246,12 +248,14 @@ html:not(.js) .tabs-bar{display:none}
 .radar-item .src{margin-left:6px;font-family:var(--ss);font-size:9px;font-weight:700;text-transform:uppercase;color:var(--mute2)}
 .radar-item .tt{display:block;margin-top:5px;font-family:var(--sf);font-size:13.5px;font-weight:600;line-height:1.35;color:var(--ink)}
 
-/* Modal da matéria */
+/* Modal da matéria: abre na tela inteira em qualquer tela (no computador e no
+   tablet, como no celular), com o texto numa coluna de leitura no meio. */
 body.modal-open{overflow:hidden}
-.mo{display:none;position:fixed;inset:0;z-index:1000;overflow-y:auto;overscroll-behavior:contain;padding:40px 20px;background:rgba(var(--qn-rgb),.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.mo{display:none;position:fixed;inset:0;z-index:1000;overflow-y:auto;overscroll-behavior:contain;padding:0;background:rgba(var(--qn-rgb),.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 :root[data-theme="dark"] .mo{background:rgba(0,0,0,.6)}
 .mo.on,html:not(.js) .mo:target{display:flex;justify-content:center;align-items:flex-start}
-.ml{position:relative;width:100%;max-width:700px;padding:40px 44px;background:var(--paper);border-top:4px solid var(--sc,var(--qi));box-shadow:0 20px 60px rgba(var(--qn-rgb),.2);animation:ml-in .35s cubic-bezier(.2,.9,.3,1.15)}
+.ml{position:relative;width:100%;min-height:100%;padding:56px 40px 64px;background:var(--paper);border-top:4px solid var(--sc,var(--qi));box-shadow:0 20px 60px rgba(var(--qn-rgb),.2);animation:ml-in .35s cubic-bezier(.2,.9,.3,1.15)}
+.ml>:not(.mc){max-width:720px;margin-left:auto;margin-right:auto}
 :root[data-theme="dark"] .ml{background:#161f31}
 .ml:focus{outline:none}
 @keyframes ml-in{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
@@ -472,6 +476,12 @@ body.modal-open .btt{visibility:hidden}
 .tl-tx a{color:var(--ink)}
 .tl-tx a:hover{color:var(--link);text-decoration:underline}
 .tl-r{font-size:11.5px;color:var(--muted);white-space:nowrap}
+/* Todas as análises: a linha inteira abre o texto original (o link do título a cobre) */
+.tl.tl-lk{position:relative;cursor:pointer;transition:background .2s}
+.tl.tl-lk:hover{background:var(--hover)}
+.tl.tl-lk:hover .tl-tx a{color:var(--link);text-decoration:underline}
+.tl.tl-lk:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:-2px}
+.tl-go{font-weight:700;color:var(--link)}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
@@ -535,6 +545,10 @@ body.modal-open .btt{visibility:hidden}
 .rk-v{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--muted)}
 .rk-v b{font-family:var(--mn);font-size:13px;color:var(--ink)}
 .rk-x{display:block;font-family:var(--mn);font-size:9.5px;color:var(--faint)}
+/* Veículos com amostra pequena (menos notícias com T que o mínimo da especificação): esmaecidos */
+.rk-nota{margin:0 0 6px}
+.rk-pq .rk-d,.rk-pq .rk-ic,.rk-pq .qb-bar span{opacity:.45}
+.rk-pq .rk-n{font-weight:600;color:var(--mute2)}
 .qb-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--rl)}
 .qb-bar span{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--qi)}
 :root[data-theme="dark"] .qb-bar span{background:var(--link)}
@@ -961,9 +975,11 @@ body.modal-open .btt{visibility:hidden}
   .dst ol{grid-template-columns:1fr}
   .dst li,.dst li:nth-child(even){padding:9px 0}
   .dst li:nth-child(odd){border-right:none}
-  .srch{padding:10px 16px}
+  .srch{flex-wrap:wrap;row-gap:6px;padding:10px 16px}
   .srch-label{display:none}
   .srch-input{max-width:none}
+  .srch-count{order:3;flex-basis:100%;margin-left:0}
+  .srch-count:empty{display:none}
   .tab-btn{padding:12px 14px}
   .tab-layout{flex-direction:column}
   .tab-main{border-right:none}

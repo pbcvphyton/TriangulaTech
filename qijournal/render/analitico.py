@@ -55,6 +55,11 @@ log = logging.getLogger(__name__)
 P = agregacao.P_ANALITICO
 PUXADORES_MAX = 8
 DOMINIOS = (25, 50, 100)
+# Rankings de veículos (T e qualidade): entram todos os veículos com ao menos esta
+# quantidade de notícias com T. Os que ainda não chegaram ao mínimo da especificação
+# (P["min_n"]) aparecem marcados como amostra pequena; o T ajustado da agregação já
+# os puxa para a média geral. O ranking de editorias segue o mínimo da especificação.
+MIN_N_VEICULOS = 1
 
 
 # ── views ────────────────────────────────────────────────────────────────────
@@ -116,6 +121,7 @@ class RankItemView:
     classe: str
     detalhe: str
     title: str
+    pequena: bool = False  # menos notícias com T que o mínimo da especificação (P["min_n"])
 
 
 @dataclass
@@ -125,6 +131,7 @@ class RankingView:
     escala: list[tuple[float, str]]
     zero: float
     fora: str
+    nota: str = ""  # como ler o ranking (veículos com amostra pequena)
 
 
 @dataclass
@@ -134,6 +141,7 @@ class QualidadeItemView:
     pct: float
     rotulo: str
     detalhe: str
+    pequena: bool = False
 
 
 @dataclass
@@ -370,8 +378,14 @@ def _serie_q(linhas: list[dict[str, Any]], inicio: str, fim: str) -> SerieView |
     return SerieView("Qualidade da apuração por semana (0 a 100)", aria, pontos, linha, faixa, grade, eixo_x)
 
 
-def _ranking(linhas: list[dict[str, Any]], inicio: str, fim: str, por: str, titulo: str) -> tuple[RankingView, dict]:
-    r = agregacao.ranking(linhas, inicio, fim, por=por)
+def _ranking(
+    linhas: list[dict[str, Any]], inicio: str, fim: str, por: str, titulo: str, *, min_n: int | None = None
+) -> tuple[RankingView, dict]:
+    """Ranking da agregação (T ajustado). ``min_n``: mínimo de notícias com T para
+    entrar (padrão: o da especificação); abaixo dele, o grupo entra marcado como
+    amostra pequena."""
+    minimo = P["min_n"] if min_n is None else max(1, min_n)
+    r = agregacao.ranking(linhas, inicio, fim, por=por, p={**P, "min_n": minimo})
     dominio = _dominio(
         [v for i in r["ranking"] for v in ([i["T_ajustado"]] + list(i["ic95_T"] or []))]
     )
@@ -380,6 +394,7 @@ def _ranking(linhas: list[dict[str, Any]], inicio: str, fim: str, por: str, titu
         ic = i["ic95_T"]
         left = _pos(ic[0], dominio) if ic else None
         nome = filters.plain(str(i["nome"]))
+        pequena = i["n"] < P["min_n"]
         itens.append(
             RankItemView(
                 nome=nome,
@@ -389,18 +404,34 @@ def _ranking(linhas: list[dict[str, Any]], inicio: str, fim: str, por: str, titu
                 ic_width=round(max(0.6, _pos(ic[1], dominio) - left), 2) if ic else None,
                 rotulo=i["rotulo"],
                 classe=CLASSE.get(i["rotulo"], "eq"),
-                detalhe=f"{contagem(i['n'], 'notícia', 'notícias')} · média bruta {fmt_t(i['media_T'])}",
-                title=(
-                    f"{nome}: T ajustado {fmt_t(i['T_ajustado'])} ({i['rotulo']}); média {fmt_t(i['media_T'])}, "
-                    f"intervalo de 95% {fmt_ic(ic)}; {i['n']} notícias"
+                detalhe=(
+                    f"{contagem(i['n'], 'notícia', 'notícias')} · média bruta {fmt_t(i['media_T'])}"
+                    + (" · amostra pequena" if pequena else "")
                 ),
+                title=(
+                    f"{nome}: T ajustado {fmt_t(i['T_ajustado'])} ({i['rotulo']}); média {fmt_t(i['media_T'])}"
+                    + (f", intervalo de 95% {fmt_ic(ic)}" if ic else "")
+                    + f"; {contagem(i['n'], 'notícia', 'notícias')}"
+                    + (f" (amostra pequena: menos de {P['min_n']})" if pequena else "")
+                ),
+                pequena=pequena,
             )
         )
     fora = ""
     if r["fora_do_ranking"]:
         nomes = ", ".join(f"{filters.plain(str(f['nome']))} ({f['n']})" for f in r["fora_do_ranking"])
-        fora = f"Fora do ranking (menos de {P['min_n']} notícias com T): {nomes}."
-    return RankingView(titulo, itens, _escala(dominio), _pos(0, dominio), fora), r
+        if minimo == 1:
+            fora = f"Sem notícia com T (só opinião, textos sem dimensão política ou inconclusivos): {nomes}."
+        else:
+            fora = f"Fora do ranking (menos de {minimo} notícias com T): {nomes}."
+    nota = ""
+    if any(item.pequena for item in itens):
+        nota = (
+            f"Todos os veículos com notícia analisada entram; os que têm menos de {P['min_n']} notícias com T "
+            "aparecem esmaecidos (amostra pequena): o T ajustado os puxa para a média geral, então ficam perto do "
+            "centro até acumularem textos."
+        )
+    return RankingView(titulo, itens, _escala(dominio), _pos(0, dominio), fora, nota), r
 
 
 def _qualidade(r: Mapping[str, Any]) -> list[QualidadeItemView]:
@@ -410,7 +441,11 @@ def _qualidade(r: Mapping[str, Any]) -> list[QualidadeItemView]:
             valor=fmt_q(i["Q_ajustado"]),
             pct=round(max(0.0, min(100.0, i["Q_ajustado"])), 2),
             rotulo=i["rotulo_Q"],
-            detalhe=f"média bruta {fmt_q(i['media_Q'])} em {contagem(i['n_Q'], 'texto', 'textos')}",
+            detalhe=(
+                f"média bruta {fmt_q(i['media_Q'])} em {contagem(i['n_Q'], 'texto', 'textos')}"
+                + (" · amostra pequena" if i["n"] < P["min_n"] else "")
+            ),
+            pequena=i["n"] < P["min_n"],
         )
         for i in r["ranking_qualidade"]
     ]
@@ -440,13 +475,16 @@ def analitico_view(
     registros = list(registros)
     analises = [a for a in todas_validas(registros) if a["versao_calculo"] == P["versao"]]
     metodo = [
-        f"Cada texto compilado nas edições passa pelo Termômetro de Viés Editorial (versão {P['versao']} do cálculo): "
+        f"Cada texto compilado nas edições (nas matérias e na cobertura comparada) passa pelo Termômetro de Viés "
+        f"Editorial (versão {P['versao']} do cálculo): "
         "a IA aponta sinais com a citação literal e o cálculo confere cada citação, aplica os pesos dos 11 critérios "
         "e dá T de −100 (esquerda) a +100 (direita) e a qualidade da apuração Q de 0 a 100.",
         "Médias, séries e rankings são das notícias; opinião (colunas, editoriais, análises) fica à parte. Um texto "
         "sem dimensão política ou inconclusivo conta nos totais, mas não na média de T.",
-        f"Ranking: grupos com {P['min_n']} ou mais notícias com T; o T ajustado puxa a média do grupo para a média "
-        f"geral com peso {P['peso_media_geral']}, o que segura grupos pequenos perto do centro. Intervalos de 95%.",
+        f"Ranking: editorias com {P['min_n']} ou mais notícias com T; nos veículos (termômetro e qualidade) entram "
+        f"todos os que têm notícia com T, e os com menos de {P['min_n']} ficam marcados como amostra pequena. O T "
+        f"ajustado puxa a média do grupo para a média geral com peso {P['peso_media_geral']}, o que segura grupos "
+        "pequenos perto do centro. Intervalos de 95%.",
         f"Para onde estamos indo: tendência mensal (regressão de todas as análises sobre o mês; meses com "
         f"{P['min_n_mes']}+ análises, mínimo de {P['min_meses_tendencia']} meses); janela recente dos últimos "
         f"{P['janela_recente_dias']} dias (no máximo metade do histórico) comparada ao resto; os puxadores dividem a "
@@ -508,11 +546,9 @@ def analitico_view(
         if series
         else f"As séries semanais começam quando uma semana reúne {P['min_n_semana']} ou mais notícias com T."
     )
-    rank_v, r_v = _ranking(linhas, inicio, fim, "veiculo", "Veículos")
+    rank_v, r_v = _ranking(linhas, inicio, fim, "veiculo", "Veículos", min_n=MIN_N_VEICULOS)
     rank_e, _r_e = _ranking(linhas, inicio, fim, "editoria", "Editorias")
-    qualidade_fora = (
-        "" if r_v["ranking_qualidade"] else f"O ranking de qualidade começa com {P['min_n']} notícias com T por veículo."
-    )
+    qualidade_fora = "" if r_v["ranking_qualidade"] else "O ranking de qualidade começa com a primeira notícia com T."
 
     eixos = []
     for chave, nome in EIXOS.items():

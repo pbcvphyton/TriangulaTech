@@ -57,7 +57,8 @@
 </li>
 {%- endmacro %}
 
-{#- Um texto analisado, em uma linha (lista de todo o histórico na aba Analítico Político). -#}
+{#- Um texto analisado, em uma linha (lista de todo o histórico na aba Analítico Político).
+    Com link, a linha inteira abre o texto original em nova aba (o link do título cobre a linha). -#}
 {% macro linha(a) -%}
-<li class="tl"><span class="ta-v"><i class="sw t-{{ a.classe }}" aria-hidden="true"></i>{{ a.valor }}</span><span class="tl-d">{{ a.data }}</span><span class="tl-tx"><b>{{ a.veiculo }}</b> · {% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.titulo }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ a.titulo }}{% endif %}</span><span class="tl-r">{{ a.rotulo }}{% if a.selo %} · {{ a.selo }}{% endif %}{% if a.q != "—" %} · apuração {{ a.q }}{% endif %}</span></li>
+<li class="tl{% if a.url %} tl-lk{% endif %}"><span class="ta-v"><i class="sw t-{{ a.classe }}" aria-hidden="true"></i>{{ a.valor }}</span><span class="tl-d">{{ a.data }}</span><span class="tl-tx"><b>{{ a.veiculo }}</b> · {% if a.url %}<a class="hit" href="{{ a.url }}" target="_blank" rel="noopener noreferrer" title="Abrir o texto original ({{ a.dominio }})">{{ a.titulo }}<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ a.titulo }}{% endif %}</span><span class="tl-r">{{ a.rotulo }}{% if a.selo %} · {{ a.selo }}{% endif %}{% if a.q != "—" %} · apuração {{ a.q }}{% endif %}</span></li>
 {%- endmacro %}

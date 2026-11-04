@@ -9,7 +9,9 @@ Layout publicado (raiz do GitHub Pages)::
     edicoes/latest.json        manifesto da última edição (usado pela rotina de e-mail)
     edicoes/email.html|.txt    e-mail da última edição
     edicoes/analitico.html     aba "Analítico Político": todo o histórico do termômetro (marca com termômetro)
+    edicoes/pesquisa.html      Pesquisa analítica: busca em todas as edições
     data/AAAA-MM-DD.json       edição em JSON (``Edition.to_dict``)
+    data/busca/AAAA-MM-DD.json  o que a edição publicou, compacto, para a Pesquisa analítica
     data/termometro/AAAA-MM-DD.json  análises do termômetro feitas no dia (nunca apagadas)
     build/bundle-AAAA-MM-DD.json   coleta crua (fora do git; artefato do Actions)
     build/pages-AAAA-MM-DD.json    páginas enriquecidas (reproduz o enriquecimento no ``render --bundle``)
@@ -47,6 +49,7 @@ from qijournal.deliver.smtp import send_email as deliver_email
 from qijournal.edit import ContextoTermometro, make_edition
 from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
+from qijournal.render import pesquisa
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
 from qijournal.render.web import index_page_name, render_archive_index, render_edition_page, render_index_page
@@ -404,6 +407,20 @@ def _archive_entry(day: date, data_dir: Path, current: Edition) -> dict[str, Any
     return entry
 
 
+def _busca_de_arquivo(day: date, data_dir: Path, config: Config) -> dict[str, Any] | None:
+    """Arquivo de busca de uma edição anterior, refeito de ``data/<data>.json``
+    (com as análises do termômetro feitas no dia); ``None`` sem o JSON da edição."""
+    json_path = data_dir / f"{day.isoformat()}.json"
+    if not json_path.is_file():
+        return None
+    try:
+        edition = Edition.from_dict(_read_json(json_path))
+        return pesquisa.dados_do_dia(edition, config, historico.carregar_dia(data_dir, day.isoformat()))
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
+        log.warning("Pesquisa analítica: edição ilegível (%s): %s — dia fora da busca", json_path, exc)
+        return None
+
+
 def _raw_base(repo_url: str) -> str | None:
     """``https://github.com/dono/repo`` → ``https://raw.githubusercontent.com/dono/repo/main/``."""
     match = re.match(r"^https://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$", (repo_url or "").strip())
@@ -469,10 +486,12 @@ def publish(
         "index": out_dir / "index.html",
         "edition": archive_dir / f"{edition.date}.html",
         "data": data_dir / f"{edition.date}.json",
+        "busca": pesquisa.caminho_do_dia(data_dir, edition.date),
         "email_html": archive_dir / "email.html",
         "email_text": archive_dir / "email.txt",
         "latest": archive_dir / "latest.json",
         "archive": archive_dir / "index.html",
+        "pesquisa": archive_dir / pesquisa.PAGINA,
     }
     if edition.index:  # todas as notícias do dia (edições antigas não têm a lista)
         paths["all_news"] = archive_dir / index_page_name(edition.date)
@@ -488,7 +507,12 @@ def publish(
     pages[today] = paths["edition"]
     records = _dated_files(data_dir, "json")
     index_pages = _index_files(archive_dir)
-    expired = sorted(p for d, p in [*pages.items(), *records.items(), *index_pages.items()] if is_expired(d))
+    search_files = _dated_files(data_dir / pesquisa.PASTA, "json")
+    expired = sorted(
+        p
+        for d, p in [*pages.items(), *records.items(), *index_pages.items(), *search_files.items()]
+        if is_expired(d)
+    )
     kept_days = sorted((d for d in pages if not is_expired(d)), reverse=True)
     entries = [_archive_entry(day, data_dir, edition) for day in kept_days]
 
@@ -518,7 +542,32 @@ def publish(
             )
             paths["analitico"] = archive_dir / ANALITICO_PAGINA
 
+    # Pesquisa analítica: o arquivo de busca do dia, os que faltam das edições do
+    # arquivo (refeitos de data/AAAA-MM-DD.json) e a página com o índice de todas.
+    termometro_hoje = termometro_dia
+    if termometro_hoje is None and config.termometro_ativo:
+        termometro_hoje = historico.carregar_dia(data_dir, edition.date)
+    busca_hoje = pesquisa.dados_do_dia(edition, config, termometro_hoje)
+    search_writes: dict[Path, str] = {paths["busca"]: pesquisa.serializar(busca_hoje)}
+    resumos = [pesquisa.resumo_do_dia(busca_hoje)]
+    for day in kept_days:
+        if day == today:
+            continue
+        search_path = pesquisa.caminho_do_dia(data_dir, day.isoformat())
+        dados = pesquisa.ler_dia(search_path)
+        if dados is None:
+            dados = _busca_de_arquivo(day, data_dir, config)
+            if dados is None:
+                continue
+            search_writes[search_path] = pesquisa.serializar(dados)
+        resumos.append(pesquisa.resumo_do_dia(dados))
+    if len(search_writes) > 1:
+        log.info("Pesquisa analítica: %d edição(ões) anterior(es) entram na busca", len(search_writes) - 1)
+
     # Renderiza tudo antes de escrever.
+    search_page = pesquisa.render_pesquisa_page(
+        resumos, config, home_href="../", archive_href="./", edition_date=edition.date
+    )
     home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/")
     archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
     archive_index = render_archive_index(entries, config, home_href="../")
@@ -536,6 +585,8 @@ def publish(
             manifest[key] = previous.get(key)
 
     _write_json(paths["data"], edition.to_dict())
+    for search_path, content in search_writes.items():
+        write_atomic(search_path, content)
     if termometro_dia is not None:
         _write_json(paths["termometro"], termometro_dia)
     write_atomic(paths["edition"], archived_page)
@@ -551,6 +602,7 @@ def publish(
         log.info("Arquivo: %d arquivo(s) de edições anteriores a %s removido(s)", len(expired), cutoff)
     if analitico_page is not None:
         write_atomic(paths["analitico"], analitico_page)
+    write_atomic(paths["pesquisa"], search_page)
     write_atomic(paths["archive"], archive_index)
     _write_json(paths["latest"], manifest)
     write_atomic(paths["index"], home_page)

@@ -40,7 +40,8 @@ Nada precisa ser feito à mão: o GitHub gera a edição sozinho a partir das
         ▼
   3. Páginas ── capa (index.html), cópia no arquivo (edicoes/), todas as notícias
         │      do dia (edicoes/AAAA-MM-DD-todas.html), aba Analítico Político
-        │      (edicoes/analitico.html), e-mail em HTML e texto
+        │      (edicoes/analitico.html), Pesquisa analítica (edicoes/pesquisa.html,
+        │      com data/busca/), e-mail em HTML e texto
         │
         ▼
   4. Commit no repositório ──► GitHub Pages publica o site
@@ -72,8 +73,10 @@ Garantias importantes:
 | Uma edição específica | `https://pbcvphyton.github.io/qi-journal/edicoes/AAAA-MM-DD.html` |
 | Todas as notícias de um dia | `https://pbcvphyton.github.io/qi-journal/edicoes/AAAA-MM-DD-todas.html` |
 | Analítico Político (todo o histórico do termômetro) | <https://pbcvphyton.github.io/qi-journal/edicoes/analitico.html> |
+| Pesquisa analítica (busca em todas as edições) | <https://pbcvphyton.github.io/qi-journal/edicoes/pesquisa.html> |
 
-Cada matéria tem endereço próprio (`…#s-<id>`). Os links do e-mail apontam para a
+Cada matéria tem endereço próprio (`…#s-<id>`) e, clicada, abre na tela inteira
+(no computador, no tablet e no celular). Os links do e-mail apontam para a
 cópia arquivada (`edicoes/AAAA-MM-DD.html#s-<id>`), que continua válida depois que a
 capa muda no dia seguinte. O
 arquivo guarda as edições dos últimos 400 dias (`archive_keep_days` em
@@ -181,9 +184,13 @@ Advogados não tem nada disso (`termometro.marcas` em `config/site.yaml`).
 
 Como cada texto é analisado:
 
-1. **Texto**: das matérias da edição (política, jurídico, economia, mundo,
-   mercados, natureza, tecnologia e imobiliário, nessa prioridade; esporte e
-   variedades ficam de fora), um veículo de cada matéria por vez. O texto segue o
+1. **Texto**: das matérias da edição e dos assuntos da **cobertura comparada**
+   (política, jurídico, economia, mundo, mercados, natureza, tecnologia e
+   imobiliário, nessa prioridade; esporte e variedades ficam de fora; as matérias
+   antes dos assuntos), um veículo de cada matéria ou assunto por vez, e em
+   rodízio também por veículo: o 1º texto de cada veículo vem antes do 2º de
+   qualquer um, para o termômetro alcançar o maior número de veículos. Cada
+   análise guarda a origem (`materia` ou `cobertura comparada`). O texto segue o
    formato da especificação: `P0` = título, `P1` = linha fina e o corpo extraído da
    página original (até 8.000 caracteres, com as falas curtas; o pedido avisa quando foi cortado). Texto
    com menos de 150 palavras não vai à IA (seria inconclusivo). Só português.
@@ -209,8 +216,11 @@ histórico** (`qijournal/termometro/agregacao.py`, conferida pelos testes da
 seção 14.7 da especificação): onde estamos (média geral), para onde estamos indo
 (tendência mensal de T e de Q, a janela recente comparada ao histórico e quem
 puxou a mudança, por editoria e por veículo), as séries semanais, os rankings
-por veículo e por editoria (T ajustado e qualidade, mínimo de 30 notícias), os
-recortes por eixo, a tabela de cada dia e a lista de todas as análises.
+por veículo e por editoria (T ajustado e qualidade; nas editorias, mínimo de 30
+notícias; nos veículos entram todos os que têm notícia com T, e os com menos de
+30 aparecem esmaecidos, como amostra pequena — o cálculo da agregação não muda),
+os recortes por eixo, a tabela de cada dia e a lista de todas as análises (clicar
+na linha abre o texto original, para conferir).
 
 - **Histórico**: as análises de cada dia ficam em `data/termometro/AAAA-MM-DD.json`
   e **nunca são apagadas** (a limpeza do arquivo de edições não toca nessa pasta).
@@ -226,6 +236,36 @@ recortes por eixo, a tabela de cada dia e a lista de todas as análises.
 - **Testes da especificação**: `tests/termometro/` guarda os scripts e casos como
   vieram (`testes.py`, `testes_ranking.py`); `tests/test_termometro_especificacao.py`
   roda os dois e exige `FALHAS: nenhuma`.
+
+### Pesquisa analítica (busca em todas as edições)
+
+O botão **Buscar** do cabeçalho (em todas as edições, no arquivo e no Analítico)
+abre a **Pesquisa analítica** (`edicoes/pesquisa.html`). A caixa de busca da
+edição continua filtrando as matérias do dia enquanto se digita; **Enter** (ou
+*Todas as edições*) leva o termo para a Pesquisa.
+
+- **O que entra**: as matérias (título, linha fina, texto e "por que importa"),
+  todas as notícias coletadas (título, veículo e link), a cobertura comparada
+  (assunto, conclusão e o foco de cada veículo) e as análises do Termômetro, de
+  todas as edições do arquivo.
+- **Como busca**: sem acento e sem diferenciar maiúsculas; todas as palavras
+  precisam aparecer; `"frase exata"`; `-palavra` exclui; palavras de até 3 letras
+  (STF, PT, IA) valem só inteiras, e as demais casam no começo da palavra ("juro"
+  acha "juros"; "lula" não acha "célula"). A mesma notícia coletada em mais de uma
+  edição aparece uma vez.
+- **Filtros**: tipo, período das edições (com atalhos de 7 e 30 dias), editoria,
+  veículo, ordem (recentes, relevantes, antigas) e "só nos títulos".
+- **Contagens**: resultados, edições e veículos; uma barra por edição (clicar
+  filtra o dia), os veículos e as editorias com mais resultados (clicar filtra) e,
+  nas análises encontradas, o T médio, os rótulos e a qualidade da apuração.
+- **Na prática**: cada resultado leva à matéria na edição (abre na tela inteira)
+  ou à notícia original; a busca fica no endereço (`pesquisa.html?q=…&de=…`), que
+  pode ser guardado ou enviado; **Baixar CSV** exporta todos os resultados.
+- **Dados**: cada edição ganha `data/busca/AAAA-MM-DD.json`, compacto, gravado no
+  `publish` (os dias que ainda não têm o arquivo são criados a partir de
+  `data/AAAA-MM-DD.json`) e apagado junto com a edição (`archive_keep_days`). A
+  página carrega só os dias do período pedido, das edições mais recentes para as
+  mais antigas, e busca no próprio navegador.
 
 ### Racional da edição e lista completa do dia
 
@@ -513,7 +553,7 @@ qijournal/                código do jornal
                           index.py = todas as notícias do dia) e modo automático
   render/                 páginas HTML e e-mail (modelos em render/templates/;
                           termometro.py e analitico.py = termômetro do dia e aba
-                          Analítico Político)
+                          Analítico Político; pesquisa.py = Pesquisa analítica)
   termometro/             Termômetro de Viés: referencia.py (cálculo, cópia literal
                           da especificação), agregacao.py (aba analítica),
                           analise.py (textos → IA → cálculo) e historico.py
@@ -534,8 +574,10 @@ docs/instagram.md         guia do Instagram
 index.html                edição do dia (gerado automaticamente)
 edicoes/                  arquivo de edições, todas as notícias de cada dia,
                           e-mail e latest.json (gerado)
-data/                     cada edição em JSON e, em data/termometro/, as análises
-                          do termômetro de cada dia, guardadas para sempre (gerado)
+data/                     cada edição em JSON; em data/termometro/, as análises
+                          do termômetro de cada dia, guardadas para sempre; em
+                          data/busca/, o que cada edição publicou, para a Pesquisa
+                          analítica (gerado)
 tests/                    testes automáticos
 .github/workflows/        daily.yml (edição diária), instagram.yml (posts do
                           Instagram) e ci.yml (testes)

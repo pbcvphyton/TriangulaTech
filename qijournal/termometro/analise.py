@@ -2,9 +2,12 @@
 
 Fluxo de :func:`analisar_edicao`, depois que a edição está pronta:
 
-1. **textos**: das matérias da edição (seções de ``termometro.secoes``, na ordem
-   de prioridade), os artigos de cada uma em rodízio (o 1º veículo de cada
-   matéria, depois o 2º…), só nos idiomas de ``termometro.idiomas``. Cada texto
+1. **textos**: das matérias da edição e dos assuntos da cobertura comparada
+   (seções de ``termometro.secoes``, na ordem de prioridade; as matérias antes),
+   os artigos de cada um em rodízio (o 1º veículo de cada matéria, depois o 2º…),
+   só nos idiomas de ``termometro.idiomas``, e em rodízio também por veículo: o
+   1º texto de cada veículo vem antes do 2º de qualquer um, para o termômetro
+   alcançar o maior número de veículos. Cada texto
    é montado como a especificação pede: ``P0`` = título, ``P1`` = linha fina
    (quando houver) e os parágrafos do corpo extraído da página original
    (:mod:`qijournal.collect.enrich`). Texto com menos de
@@ -343,12 +346,27 @@ def validar(valor: Any, schema: Mapping[str, Any], caminho: str = "saida") -> li
 # ═══════════════════════════════════════════════════════════════════════════
 
 
+ORIGEM_MATERIA = "materia"
+ORIGEM_COMPARADA = "cobertura comparada"
+
+
+@dataclass(frozen=True)
+class Assunto:
+    """Assunto da cobertura comparada (``Edition.compared``) de onde vem um texto:
+    faz, na seleção, o papel da matéria (``id`` e ``section``)."""
+
+    id: str  # "cobertura-N" (posição na cobertura comparada da edição)
+    section: str
+    article_ids: tuple[str, ...]
+    origem: str = ORIGEM_COMPARADA
+
+
 @dataclass
 class Texto:
     """Um texto compilado na edição, pronto para a análise."""
 
     artigo: Article
-    materia: str  # Story.id
+    materia: str  # Story.id ("" para os textos da cobertura comparada)
     secao: str  # id da seção do jornal
     editoria: str  # título da seção (a editoria da aba analítica)
     paragrafos: dict[str, str]
@@ -358,6 +376,7 @@ class Texto:
     palavras: int
     data_publicacao: str = ""  # dia da agregação: a data declarada ou, sem ela, a da edição
     chave: str = ""  # T1, T2… dentro do lote
+    origem: str = ORIGEM_MATERIA  # matéria da edição ou assunto da cobertura comparada
 
 
 def _dividir_paragrafo(paragrafo: str) -> list[str]:
@@ -422,7 +441,7 @@ def _data_local(published: str | None, tz: ZoneInfo) -> str | None:
 
 
 def montar_texto(
-    article: Article, story: Story, info: PageInfo | None, *, editoria: str, tz: ZoneInfo, data_edicao: str
+    article: Article, story: Story | Assunto, info: PageInfo | None, *, editoria: str, tz: ZoneInfo, data_edicao: str
 ) -> Texto:
     corpo, cortado = _corpo(info)
     linha_fina = _linha_fina(article, info, corpo) if corpo else ""
@@ -439,9 +458,10 @@ def montar_texto(
         "autor": getattr(info, "author", None),  # autoria declarada na página original
         "data": declarada,  # só a data que o texto declara conta para a qualidade (autoria_data)
     }
+    origem = getattr(story, "origem", ORIGEM_MATERIA)
     return Texto(
         artigo=article,
-        materia=story.id,
+        materia=story.id if origem == ORIGEM_MATERIA else "",
         secao=story.section,
         editoria=editoria,
         paragrafos=paragrafos,
@@ -450,11 +470,19 @@ def montar_texto(
         cortado=cortado,
         data_publicacao=declarada or data_edicao,
         palavras=contar_palavras(" ".join(paragrafos.values())),
+        origem=origem,
     )
 
 
-def candidatos(edition: Edition, bundle: Bundle, config: Config) -> list[tuple[Article, Story]]:
-    """Artigos das matérias da edição, em rodízio pelas matérias (seções na ordem de prioridade)."""
+def _veiculo(article: Article) -> str:
+    return " ".join((article.source_name or article.source_id or "").split()).casefold()
+
+
+def candidatos(edition: Edition, bundle: Bundle, config: Config) -> list[tuple[Article, Story | Assunto]]:
+    """Artigos das matérias da edição e dos assuntos da cobertura comparada (seções na
+    ordem de prioridade; as matérias antes dos assuntos), em rodízio pelas matérias e
+    assuntos e, depois, pelos veículos: o 1º texto de cada veículo vem antes do 2º de
+    qualquer veículo, o 2º antes do 3º, e assim por diante."""
     prioridade = {secao: i for i, secao in enumerate(config.termometro.secoes)}
     idiomas = tuple(i.lower() for i in config.termometro.idiomas)
     por_id = {a.id: a for a in bundle.articles}
@@ -462,22 +490,41 @@ def candidatos(edition: Edition, bundle: Bundle, config: Config) -> list[tuple[A
         (s for s in edition.stories if s.section in prioridade),
         key=lambda s: (prioridade[s.section], edition.stories.index(s)),
     )
+    assuntos = sorted(
+        (
+            Assunto(id=f"cobertura-{i}", section=c.section or "", article_ids=tuple(c.article_ids))
+            for i, c in enumerate(edition.compared, 1)
+            if c.section in prioridade and c.article_ids
+        ),
+        key=lambda a: (prioridade[a.section], int(a.id.rsplit("-", 1)[1])),
+    )
+    pautas: list[Story | Assunto] = [*materias, *assuntos]
     filas: list[list[Article]] = []
-    for story in materias:
+    for pauta in pautas:
         fila = []
-        for article_id in story.article_ids:
+        for article_id in pauta.article_ids:
             article = por_id.get(article_id)
             if article is not None and (not idiomas or (article.lang or "").lower().startswith(idiomas)):
                 fila.append(article)
         filas.append(fila)
     vistos: set[str] = set()
-    saida: list[tuple[Article, Story]] = []
+    rodizio: list[tuple[Article, Story | Assunto]] = []
     for posicao in range(max((len(f) for f in filas), default=0)):
-        for story, fila in zip(materias, filas, strict=True):
+        for pauta, fila in zip(pautas, filas, strict=True):
             if posicao < len(fila) and fila[posicao].id not in vistos:
                 vistos.add(fila[posicao].id)
-                saida.append((fila[posicao], story))
-    return saida
+                rodizio.append((fila[posicao], pauta))
+    # Rodízio por veículo, mantendo a ordem acima dentro de cada volta: um veículo
+    # com muitos textos na edição não ocupa a análise do dia sozinho.
+    voltas: list[list[tuple[Article, Story | Assunto]]] = []
+    contagem: dict[str, int] = {}
+    for article, pauta in rodizio:
+        volta = contagem.get(_veiculo(article), 0)
+        contagem[_veiculo(article)] = volta + 1
+        if volta == len(voltas):
+            voltas.append([])
+        voltas[volta].append((article, pauta))
+    return [par for volta in voltas for par in volta]
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -565,6 +612,7 @@ def registro_da_analise(t: Texto, r: Mapping[str, Any], data_edicao: str) -> dic
         "editoria": t.editoria,
         "secao": t.secao,
         "materia": t.materia,
+        "origem": t.origem,
         "data_publicacao": t.data_publicacao,
         "analisado_em": data_edicao,
         "versao_calculo": r["versao_calculo"],

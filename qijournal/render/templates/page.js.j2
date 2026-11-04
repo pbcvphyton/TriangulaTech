@@ -431,7 +431,8 @@
     layout();
   }
 
-  /* ── Busca em tempo real (sem acento e sem diferenciar maiúsculas) ─── */
+  /* ── Busca em tempo real nas matérias do dia (sem acento e sem diferenciar
+     maiúsculas); Enter leva o termo à Pesquisa analítica (todas as edições) ── */
   var modalIsOpen = function () { return false; };
   function setupSearch(tabsApi) {
     var input = d.getElementById('srchInput');
@@ -504,8 +505,8 @@
         clear();
       }
     });
-    var button = d.getElementById('srchBtn');
-    if (button) button.addEventListener('click', focusSearch);
+    // Enter (ou o botão "Todas as edições") envia o formulário: a busca segue para a
+    // Pesquisa analítica, com o termo, em todas as edições.
     d.addEventListener('keydown', function (event) {
       var target = event.target;
       var typing = target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
