@@ -386,27 +386,84 @@
 {% if v.termometro %}
 {% set t = v.termometro %}
 <section class="term" id="termometro" aria-labelledby="term-h">
-  <div class="arch-top">
+  <div class="tm-top">
     <h2 class="kicker" id="term-h">Termômetro do dia</h2>
-    {% if t.analitico_href %}<a class="arch-home" href="{{ t.analitico_href }}">Analítico Político &rarr;</a>{% endif %}
+    <p class="tm-links"><a href="#term-metodo">Como ler</a>{% if t.analitico_href %}<a href="{{ t.analitico_href }}">Analítico Político &rarr;</a>{% endif %}</p>
   </div>
   {% if t.vazio %}
-  <p class="term-note">Sem análise nesta edição: {{ t.motivo }}.</p>
+  <p class="tm-empty tm-empty-lg">Sem análise nesta edição: {{ t.motivo }}.</p>
   {% else %}
-  <p class="term-sum">{{ t.resumo }}{% if t.gauge and t.gauge.ic %} <span>(intervalo de 95%: {{ t.gauge.ic }})</span>{% endif %}</p>
-  {% if t.gauge %}{{ tm.gauge(t.gauge) }}{% endif %}
-  {% if t.distribuicao %}{{ tm.dist(t.distribuicao) }}{% endif %}
-  <p class="term-meta">{{ t.meta|join(" · ") }}</p>
-  <details class="term-det">
-    <summary>Cada texto analisado ({{ t.analises|length }})</summary>
-    <ol class="ta-list">
+  <p class="tm-dek">{{ t.resumo }}. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
+  {% if t.gauge %}{{ tm.placar(t.gauge, "T médio das notícias", t.base) }}{% else %}<p class="tm-empty">{{ t.resumo }}.</p>{% endif %}
+  {{ tm.indicadores(t.indicadores) }}
+  <div class="tm-panels">
+    {% if t.distribuicao %}
+    <section class="tm-panel" aria-labelledby="tmp-dist">
+      <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
+      <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
+      {{ tm.dist(t.distribuicao) }}
+    </section>
+    {% endif %}
+    <section class="tm-panel" aria-labelledby="tmp-sig">
+      <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
+      <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
+      {{ tm.sinais(t.sinais) }}
+    </section>
+    {% if t.checklist %}
+    <section class="tm-panel" aria-labelledby="tmp-q">
+      <h3 class="tm-ph" id="tmp-q">Qualidade da apuração</h3>
+      <p class="tm-pd">Notícias que cumprem cada boa prática, entre as {{ t.checklist.textos }} em que ela se aplica.</p>
+      {{ tm.checklist(t.checklist) }}
+    </section>
+    {% endif %}
+  </div>
+  {% if t.recortes %}
+  <div class="tm-panels tm-panels-2">
+    {% for r in t.recortes %}
+    <section class="tm-panel" aria-labelledby="tmp-r{{ loop.index }}">
+      <h3 class="tm-ph" id="tmp-r{{ loop.index }}">{{ r.titulo }}</h3>
+      <p class="tm-pd">T médio das notícias do dia{% if r.itens|length > 1 %}, do grupo com mais notícias para o com menos{% endif %}; a barra é o intervalo de 95%.</p>
+      {{ tm.recorte(r) }}
+    </section>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <section class="tm-list" aria-labelledby="tml-h">
+    <div class="tm-list-hd">
+      <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">{{ t.analises|length }}</span></h3>
+      <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
+    </div>
+    <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
+      <div class="tm-chips" role="group" aria-label="Mostrar">
+        <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>{{ t.analises|length }}</span></button>
+        <button type="button" class="tm-chip" data-f="sig" aria-pressed="false"{% if not t.com_sinais %} disabled{% endif %}>Com sinais <span>{{ t.com_sinais }}</span></button>
+        <button type="button" class="tm-chip" data-f="inc" aria-pressed="false"{% if not t.inclinados %} disabled{% endif %}>Fora do equilíbrio <span>{{ t.inclinados }}</span></button>
+        {% if t.opiniao %}<button type="button" class="tm-chip" data-f="op" aria-pressed="false">Opinião <span>{{ t.opiniao }}</span></button>{% endif %}
+      </div>
+      <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option>{% for o in t.veiculos %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
+      <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option>{% for o in t.editorias %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
+      <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
+      <p class="tm-shown" role="status" aria-live="polite"></p>
+    </form>
+    <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
+    <ol class="tr-list" id="tmList" data-visiveis="{{ t.visiveis }}">
       {% for a in t.analises %}
-      {{ tm.analise(a) }}
+      {{ tm.analise(a, loop.index) }}
       {% endfor %}
     </ol>
-  </details>
+    <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
+    <button class="tm-more" id="tmMore" type="button" hidden></button>
+  </section>
   {% endif %}
-  <p class="term-note">Termômetro de Viés Editorial (v1.1): a IA aponta, em cada texto compilado, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto e dá T de &minus;100 (esquerda) a +100 (direita). Mede o tratamento dado pelo texto, não a veracidade dos fatos; opinião fica à parte.</p>
+  <div class="tm-metodo" id="term-metodo">
+    <h3 class="tm-ph">Como ler</h3>
+    <dl>
+      <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
+      <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
+      <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
+    </dl>
+    <p class="tm-foot">Termômetro de Viés Editorial, cálculo v{{ "1.1" }}{% if not t.vazio and t.execucao %} · hoje: {{ t.execucao }}{% endif %}.</p>
+  </div>
 </section>
 {% endif %}
 

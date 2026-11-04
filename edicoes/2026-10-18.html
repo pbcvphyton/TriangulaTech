@@ -439,63 +439,257 @@ body.modal-open .btt{visibility:hidden}
 .arch-t{font-size:15px;font-weight:700;line-height:1.3;color:var(--ink)}
 .badge{flex-shrink:0;padding:1px 6px;border:1px solid var(--rule);border-radius:10px;font-family:var(--mn);font-size:8.5px;letter-spacing:1px;color:var(--faint)}
 .arch-empty{padding:30px 0;font-family:var(--ss);color:var(--muted)}
-/* Termômetro de Viés Editorial (fim da edição) e aba Analítico Político.
-   Escala divergente validada (rampa ordinal por braço, claro e escuro):
-   verde-azulado = esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. */
-:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD}
-:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748}
+/* Termômetro de Viés Editorial (painel do dia no fim da edição) e aba Analítico Político.
+   Escala divergente validada (rampa ordinal por braço, claro e escuro): verde-azulado =
+   esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. A cor vai só nas marcas
+   (faixas, ponteiro, colunas, barras e pontos); números e rótulos ficam nas cores de texto,
+   sempre escritos ao lado da marca. Marcas finas, réguas de 1 px e uma folga de 2 px na cor
+   do fundo entre as faixas. */
+:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD;--tm-pn:#f6f7f9;--tm-hl:#eef1f5;--tm-bar:var(--qi);--tm-trk:rgba(var(--qi-rgb),.14)}
+:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748;--tm-pn:#141c2b;--tm-hl:#1a2436;--tm-bar:#8fb0f5;--tm-trk:rgba(143,176,245,.16)}
 .t-ef{background:var(--t-ef)}.t-em{background:var(--t-em)}.t-el{background:var(--t-el)}.t-eq{background:var(--t-eq)}
 .t-dl{background:var(--t-dl)}.t-dm{background:var(--t-dm)}.t-df{background:var(--t-df)}.t-na{background:var(--t-na)}
 .t-mx{background:repeating-linear-gradient(135deg,var(--t-eq) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1px var(--t-eq)}
 .sw{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;vertical-align:baseline}
-.term{padding:22px var(--gut) 26px;border-top:2px solid var(--qn);background:var(--paper)}
+.term{padding:28px var(--gut) 34px;border-top:2px solid var(--qn);background:var(--paper)}
 :root[data-theme="dark"] .term{border-top-color:var(--qi)}
-.term-sum{max-width:900px;font-family:var(--sf);font-size:17px;font-weight:600;line-height:1.5;color:var(--ink)}
-.term-sum span{font-family:var(--mn);font-size:10.5px;font-weight:500;letter-spacing:.3px;color:var(--mute2)}
-.term-meta{max-width:900px;margin-top:12px;font-family:var(--mn);font-size:10px;letter-spacing:.3px;line-height:1.6;color:var(--mute2)}
+.tm-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tm-top .kicker{flex:1}
+.tm-links{display:flex;gap:18px;font-family:var(--ss);font-size:12px;font-weight:700}
+.tm-links a{color:var(--link)}
+.tm-links a:hover{text-decoration:underline}
+.tm-dek{max-width:860px;margin-top:4px;font-family:var(--sf);font-size:16px;line-height:1.55;color:var(--body)}
+.tm-k{display:block;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tm-ph{font-family:var(--ss);font-size:13.5px;font-weight:800;line-height:1.3;color:var(--ink)}
+.tm-pd{margin:3px 0 14px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-foot{margin-top:10px;font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
+.tm-foot .sw{vertical-align:0}
+.tm-empty{padding:14px 16px;border:1px solid var(--rl);border-radius:6px;background:var(--tm-pn);font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.tm-empty-lg{max-width:860px;margin-top:8px;font-size:14px}
+/* Placar: o número da média, o rótulo e o intervalo, ao lado da escala */
+.tm-placar{--tg-bg:var(--tm-pn);display:grid;grid-template-columns:minmax(190px,250px) minmax(0,1fr);gap:20px 36px;align-items:center;margin-top:18px;padding:22px 28px 18px;border:1px solid var(--rl);border-radius:8px;background:var(--tm-pn)}
+.tm-n{margin-top:8px;font-family:var(--ss);font-size:68px;font-weight:600;line-height:.95;letter-spacing:-2px;color:var(--ink)}
+.tm-r{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--ss);font-size:16px;font-weight:700;color:var(--ink)}
+.tm-r .sw{width:12px;height:12px;margin:0;border-radius:3px}
+.tm-ic{margin-top:7px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.tm-b{margin-top:3px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+/* Escala de −100 a +100: faixas, intervalo de 95%, ponteiro da média e um traço por notícia */
+.tg{--tg-bg:var(--paper);position:relative;min-width:0;margin:0;padding-top:34px;container-type:inline-size}
+.tm-placar .tg{--tg-bg:var(--tm-pn)}
+.tg.sm{padding-top:0}
+.tg.sm .tg-flag{display:none}
+.tg-flag{position:absolute;top:0;left:clamp(70px,var(--x),calc(100% - 70px));transform:translateX(-50%);padding:4px 10px;border-radius:5px;background:var(--ink);font-family:var(--ss);font-size:11.5px;font-weight:600;line-height:1.2;color:var(--tg-bg);white-space:nowrap}
+.tg-flag b{font-family:var(--mn);font-weight:600}
+.tg-track{position:relative;height:16px}
+.tg-f{position:absolute;top:0;bottom:0;border:0 solid var(--tg-bg);border-width:0 1px;background-clip:padding-box;opacity:.3}
+.tg-f:first-child{border-left-width:0;border-radius:8px 0 0 8px}
+.tg-f:nth-child(7){border-right-width:0;border-radius:0 8px 8px 0}
+.tg-f.on{opacity:1}
+:root[data-theme="dark"] .tg-f{opacity:.45}
+:root[data-theme="dark"] .tg-f.on{opacity:1}
+.tg-ic{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--ink);opacity:.3}
+.tg-needle{position:absolute;top:-9px;bottom:-9px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--tg-bg)}
+.tg-needle::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 3px var(--tg-bg)}
+.tg-rug{position:relative;height:12px;margin-top:12px}
+.tg-rug i{position:absolute;top:0;width:2px;height:12px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.3}
+.tg-ticks{position:relative;height:14px;margin-top:6px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.tg-rug+.tg-ticks{margin-top:4px}
+.tg-ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.tg-ticks span:first-child{transform:none}
+.tg-ticks span:last-child{transform:translateX(-100%)}
+.tg-zones{position:relative;height:16px;margin-top:2px;font-family:var(--ss);font-size:10.5px;color:var(--muted)}
+.tg-zones span{position:absolute;top:0;text-align:center;white-space:nowrap}
+.tg-zones .on{font-weight:700;color:var(--ink)}
+.tg-sides{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tg-rug-k{font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint)}
+.tg-rug-k i{display:inline-block;width:2px;height:10px;margin-right:6px;border-radius:1px;background:var(--ink);opacity:.45;vertical-align:-1px}
+/* Régua estreita: as marcas de ±10 e ±25 e os nomes das faixas não cabem sem se encostar */
+@container (max-width:640px){.tg-ticks .mn,.tg-zones{display:none}}
+@media (min-width:761px) and (max-width:1000px){@supports not (container-type:inline-size){.tg-ticks .mn,.tg-zones{display:none}}}
+/* Indicadores */
+.tm-kpis{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl)}
+.tm-kpis li{display:flex;flex-direction:column;gap:4px;min-width:0;padding:16px 20px 16px 0}
+.tm-kpis li+li{padding-left:20px;border-left:1px solid var(--rl)}
+.tm-kv{font-family:var(--ss);font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-.5px;color:var(--ink)}
+.tm-kv small{margin-left:3px;font-size:13px;font-weight:500;letter-spacing:0;color:var(--muted)}
+.tm-kd{font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-meter{display:block;height:6px;margin:3px 0 1px;border-radius:3px;background:var(--tm-trk);overflow:hidden}
+.tm-meter span{display:block;height:100%;border-radius:3px;background:var(--tm-bar)}
+/* Painéis */
+.tm-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:26px 40px;margin-top:26px}
+.tm-panel{min-width:0;padding-top:14px;border-top:1px solid var(--rule)}
+/* Distribuição: uma barra por faixa (contagem e parcela ao lado) */
+.th{list-style:none}
+.th li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.th li:first-child{border-top:none;padding-top:0}
+.th-l{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.th-l .sw{margin-right:7px;vertical-align:0}
+.th-m{display:block;height:10px;border-left:1px solid var(--rule)}
+.th-m span{display:block;height:100%;min-width:3px;border-radius:0 4px 4px 0}
+.th .zero .th-m span{display:none}
+.th .zero .th-l{color:var(--muted)}
+.th-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.th-v b{font-size:12px;font-weight:600;color:var(--ink)}
+.th .zero .th-v b{font-weight:400;color:var(--faint)}
+/* Sinais por critério: à esquerda e à direita de um eixo central */
+.tsg-hd,.tsg-list li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 36px;align-items:center}
+.tsg-hd{padding-bottom:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tsg-hd span:nth-child(2){padding-right:8px;text-align:right}
+.tsg-hd span:nth-child(3){padding-left:8px}
+.tsg-list{list-style:none}
+.tsg-list li{padding:5px 0;border-top:1px solid var(--rl)}
+.tsg-n{padding-right:10px;font-family:var(--ss);font-size:12px;line-height:1.3;color:var(--ink)}
+.tsg-l,.tsg-r{display:flex;align-items:center;gap:6px;min-height:18px}
+.tsg-l{justify-content:flex-end;padding-right:1px;border-right:1px solid var(--rule)}
+.tsg-r{padding-left:1px}
+.tsg-b{display:block;height:10px;min-width:3px}
+.tsg-l .tsg-b{border-radius:4px 0 0 4px}
+.tsg-r .tsg-b{border-radius:0 4px 4px 0}
+.tsg-l b,.tsg-r b{font-family:var(--mn);font-size:11px;font-weight:600;color:var(--ink)}
+.tsg-eq{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tsg-eq i{display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%}
+/* Qualidade da apuração: em quantas notícias cada prática aparece */
+.tq{list-style:none}
+.tq li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.tq li:first-child{border-top:none;padding-top:0}
+.tq-n{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.tq-m{display:block;height:8px;border-radius:4px;background:var(--tm-trk);overflow:hidden}
+.tq-m span{display:block;height:100%;border-radius:4px;background:var(--tm-bar)}
+.tq-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.tq-v b{font-size:12px;font-weight:600;color:var(--ink)}
+/* Recortes do dia (veículos e editorias): um ponto por grupo numa escala comum */
+.trc{list-style:none}
+.trc-i,.trc-axis{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 124px;gap:12px;align-items:center}
+.trc-i{padding:6px 0;border-top:1px solid var(--rl)}
+.trc>.trc-i:first-child{border-top:none;padding-top:0}
+.trc-n{font-family:var(--ss);font-size:12.5px;font-weight:700;line-height:1.3;color:var(--ink)}
+.trc-p{position:relative;height:16px}
+.trc-i .trc-p::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rl)}
+.trc-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.trc-ic{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--ink);opacity:.25}
+.trc-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.trc-v{font-family:var(--ss);font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.trc-v b{display:inline-block;min-width:32px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--ink)}
+.trc-x{font-family:var(--mn);font-size:10px}
+.trc-axis{padding-top:4px}
+.trc-axis .trc-p{height:12px}
+.trc-axis i{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mn);font-size:9.5px;font-style:normal;color:var(--faint);white-space:nowrap}
+.trc-axis i:first-child{transform:none}
+.trc-axis i:last-child{transform:translateX(-100%)}
+.trc-more>summary{margin:6px 0 2px;cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.trc-more>summary:hover{text-decoration:underline}
+.trc-more .trc>.trc-i:first-child{border-top:1px solid var(--rl);padding-top:6px}
+/* Cada texto analisado: filtros, ordem e uma linha por texto que abre o detalhe */
+.tm-list{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-cnt{margin-left:6px;padding:1px 8px;border-radius:10px;background:var(--tm-hl);font-family:var(--mn);font-size:11px;font-weight:600;vertical-align:1px;color:var(--muted)}
+.tm-fil{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:4px 0 14px}
+.tm-fil[hidden]{display:none}
+.tm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tm-chip{height:32px;padding:0 13px;border:1px solid var(--rule);border-radius:16px;background:var(--paper);font-family:var(--ss);font-size:12px;font-weight:600;color:var(--body);cursor:pointer;transition:border-color .2s,background .2s}
+.tm-chip span{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tm-chip:hover:not(:disabled){border-color:var(--ink)}
+.tm-chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.tm-chip[aria-pressed="true"] span{color:inherit;opacity:.75}
+.tm-chip:disabled{opacity:.45;cursor:default}
+.tm-sel{display:flex;flex-direction:column;gap:3px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tm-sel select{height:32px;min-width:140px;max-width:230px;padding:0 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
+.tm-shown{margin-left:auto;padding-bottom:8px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tr-hd,.tr>details>summary{display:grid;grid-template-columns:62px minmax(0,1fr) 128px 148px 74px 78px;gap:16px;align-items:center}
+.tr-hd{padding:0 12px 7px;border-bottom:1px solid var(--rule);font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tr-list{list-style:none}
+.tr{border-bottom:1px solid var(--rl)}
+.tr[hidden]{display:none}
+.tr>details>summary{padding:12px;list-style:none;cursor:pointer;transition:background .15s}
+.tr>details>summary::-webkit-details-marker{display:none}
+.tr>details>summary:hover{background:var(--hover)}
+.tr>details[open]>summary{background:var(--tm-hl)}
+.tr-t{display:flex;align-items:center;gap:9px;font-family:var(--mn);font-size:17px;font-weight:600;color:var(--ink)}
+.tr-sw{flex:0 0 4px;width:4px;height:30px;border-radius:2px}
+.tr-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tr-src{font-family:var(--ss);font-size:11px;line-height:1.35;color:var(--muted)}
+.tr-src b{font-weight:700;color:var(--ink)}
+.tr-h{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.tr-sc{position:relative;height:16px}
+.tr-sc::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--rl)}
+.tr-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.tr-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.tr>details[open]>summary .tr-d{box-shadow:0 0 0 2px var(--tm-hl),0 0 0 3px var(--ink)}
+.tr-r,.tr-q{display:flex;flex-direction:column;gap:2px;font-family:var(--ss);font-size:12.5px;line-height:1.3;color:var(--ink)}
+.tr-r span,.tr-q span{font-size:11px;color:var(--muted)}
+.tr-q b{font-family:var(--mn);font-size:14px;font-weight:600}
+.tr-sig{justify-self:end;display:flex;align-items:center;gap:9px;font-family:var(--ss);font-size:11px;font-weight:600;white-space:nowrap;color:var(--link)}
+.tr-sig::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.tr>details[open]>summary .tr-sig::after{transform:translateY(2px) rotate(-135deg)}
+.tr-body{padding:8px 12px 22px 90px}
+.tr-sum{max-width:820px;font-family:var(--sf);font-size:14.5px;line-height:1.55;color:var(--ink)}
+.tr-note{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.tr-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px 36px;margin-top:14px}
+.tr-k{margin:18px 0 8px;font-family:var(--ss);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tr-main>.tr-k:first-child,.tr-side>.tr-k:first-child{margin-top:0}
+.tev{list-style:none;display:flex;flex-direction:column;gap:14px}
+.tev li{padding-left:12px;border-left:3px solid var(--t-eq)}
+.tev li.tev-esq{border-left-color:var(--t-em)}
+.tev li.tev-dir{border-left-color:var(--t-dm)}
+.tev-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tev-d{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.tev blockquote{margin:5px 0 0;font-family:var(--sf);font-size:14px;font-style:italic;line-height:1.5;color:var(--ink)}
+.tev blockquote::before{content:"\201C"}
+.tev blockquote::after{content:"\201D"}
+.tev-x{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--body)}
+.tev-a{margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.45;color:var(--muted)}
+.tev-more{margin-top:12px}
+.tev-more>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.tev-more>summary:hover{text-decoration:underline}
+.tev-more>.tev{margin-top:12px}
+.tct{list-style:none;max-width:560px}
+.tct li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 44px;gap:10px;align-items:center;padding:3px 0;font-family:var(--ss);font-size:12px;color:var(--ink)}
+.tct-p{position:relative;height:10px}
+.tct-z{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--rule)}
+.tct-b{position:absolute;top:1px;bottom:1px}
+.tct-b.esq{right:50%;border-radius:4px 0 0 4px;background:var(--t-em)}
+.tct-b.dir{left:50%;border-radius:0 4px 4px 0;background:var(--t-dm)}
+.tct-b.eq{left:calc(50% - 1px);width:3px!important;background:var(--t-eq)}
+.tct-v{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tfr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.tfr dt{font-family:var(--ss);font-size:10.5px;font-weight:700;color:var(--muted)}
+.tfr dd{margin-top:2px;font-family:var(--ss);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.tr-inv{padding:10px 12px;border-radius:6px;background:var(--tm-hl);font-family:var(--sf);font-size:13.5px;line-height:1.55;color:var(--ink)}
+.tck{list-style:none;display:flex;flex-direction:column;gap:6px}
+.tck li{display:flex;align-items:flex-start;gap:8px;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tck i{position:relative;flex:0 0 16px;height:16px;margin-top:1px;border-radius:50%}
+.tck-sim i{background:var(--tm-bar)}
+.tck-sim i::after{content:"";position:absolute;left:5.5px;top:2.5px;width:3.5px;height:7.5px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.tck-nao{color:var(--muted)}
+.tck-nao i{border:1.5px solid var(--muted)}
+.tck-nao i::before,.tck-nao i::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.5px;margin:-.75px 0 0 -4px;background:var(--muted);transform:rotate(45deg)}
+.tck-nao i::after{transform:rotate(-45deg)}
+.tck-nao_se_aplica{color:var(--faint)}
+.tck-nao_se_aplica i{border:1.5px solid var(--rl)}
+.tck-nao_se_aplica i::after{content:"";position:absolute;left:3.5px;right:3.5px;top:50%;height:1.5px;margin-top:-.75px;background:var(--faint)}
+.tfo{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tfo li{display:flex;flex-direction:column;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tfo-m{font-size:11px;color:var(--muted)}
+.tfi{list-style:none;display:flex;flex-direction:column;gap:4px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
+.tr-go{margin-top:18px;font-family:var(--ss);font-size:12.5px;font-weight:700}
+.tr-go a{color:var(--link)}
+.tr-go a:hover{text-decoration:underline}
+.tm-more{display:block;height:36px;margin:16px auto 0;padding:0 22px;border:1px solid var(--rule);border-radius:18px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer;transition:border-color .2s}
+.tm-more:hover{border-color:var(--link)}
+.tm-more[hidden]{display:none}
+.tm-none{padding:18px 12px;font-family:var(--ss);font-size:13px;color:var(--muted)}
+/* Como ler */
+.tm-metodo{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-metodo dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 32px;margin-top:10px}
+.tm-metodo dt{font-family:var(--ss);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink)}
+.tm-metodo dd{margin-top:4px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-note{max-width:900px;margin-top:12px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-det{margin-top:14px}
 .term-det>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--link)}
 .term-det>summary:hover{text-decoration:underline}
-.tg{max-width:900px;margin-top:14px}
-.tg-track{position:relative;height:14px}
-.tg-bands{position:absolute;inset:0;overflow:hidden;border-radius:7px;background:var(--rl)}
-.tg-f{position:absolute;top:0;bottom:0;opacity:.38;border-right:2px solid var(--paper)}
-.tg-f:last-child{border-right:none}
-.tg-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--rule)}
-.tg-ic{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--ink);opacity:.28}
-.tg-dot{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid var(--paper);border-radius:50%;background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
-.tg-axis{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mn);font-size:9px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint)}
-.td{max-width:900px;margin-top:16px}
-.td-bar{display:flex;gap:2px;height:10px;overflow:hidden;border-radius:5px;background:var(--rl)}
-.td-bar span{display:block;height:100%;min-width:4px}
-.td-leg{list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:7px;font-family:var(--ss);font-size:11.5px;color:var(--muted)}
-.td-leg i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;vertical-align:-1px}
-.td-leg b{font-family:var(--mn);font-weight:600;color:var(--ink)}
-.ta-list{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin-top:8px}
-.ta{padding:14px 0;border-bottom:1px solid var(--rl)}
-.ta-hd{display:flex;gap:12px;align-items:flex-start}
-.ta-v{flex:0 0 auto;min-width:48px;padding:3px 0;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
-.ta-tx{min-width:0}
-.ta-src{font-family:var(--ss);font-size:11px;line-height:1.4;color:var(--muted)}
-.ta-src b{color:var(--ink)}
-.ta-t{margin-top:2px;font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
-.ta-t a:hover{color:var(--link);text-decoration:underline}
-.ta-scale{position:relative;height:4px;margin:10px 0 2px;border-radius:2px;background:var(--rl)}
-.ta-scale .tg-zero{top:-3px;bottom:-3px}
-.ta-dot{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border:2px solid var(--paper);border-radius:50%}
-.ta-r{margin-top:8px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
-.ta-r b{color:var(--ink)}
-.ta-sum{margin-top:4px;font-family:var(--sf);font-size:13.5px;line-height:1.5;color:var(--body)}
-.ta-ev{margin-top:6px}
-.ta-ev summary{cursor:pointer;font-family:var(--ss);font-size:11px;font-weight:700;color:var(--link)}
-.ta-ev ol{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:8px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
-.ta-ev b{color:var(--ink)}
-.ta-dir{margin-left:6px;font-family:var(--mn);font-size:10px;color:var(--mute2)}
-.ta-ev q{display:block;margin-top:2px;font-family:var(--sf);font-style:italic;color:var(--ink)}
-.ta-ex{display:block;margin-top:2px;color:var(--muted)}
+/* Uma análise por linha (todas as análises, na aba Analítico Político) */
+.ta-v{flex:0 0 auto;min-width:48px;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
 .tl-list{list-style:none;margin-top:8px}
-.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
+.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:8px 8px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
 .tl .ta-v{min-width:0;padding:0;font-size:12.5px}
 .tl-d{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
 .tl-tx b{color:var(--ink)}
@@ -508,9 +702,11 @@ body.modal-open .btt{visibility:hidden}
 .tl.tl-lk:hover .tl-tx a{color:var(--link);text-decoration:underline}
 .tl.tl-lk:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:-2px}
 .tl-go{font-weight:700;color:var(--link)}
+.tl-fora{margin-top:12px}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
+.an .tm-panels{grid-template-columns:minmax(0,760px)}
 .an-h{margin-bottom:10px;font-family:var(--ss);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--head)}
 .an-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 .an-tiles li,.an-reads li{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:3px solid var(--qi);background:var(--soft)}
@@ -578,15 +774,52 @@ body.modal-open .btt{visibility:hidden}
 .qb-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--rl)}
 .qb-bar span{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--qi)}
 :root[data-theme="dark"] .qb-bar span{background:var(--link)}
+@media (max-width:1100px){
+  .tr-hd,.tr>details>summary{grid-template-columns:56px minmax(0,1fr) 104px 124px 64px 70px;gap:12px}
+  .tr-body{padding-left:80px}
+}
+@media (max-width:860px){
+  .tm-placar{grid-template-columns:1fr;gap:14px}
+  .tm-hero{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center}
+  .tm-hero .tm-k{grid-column:1/-1}
+  .tm-n{grid-column:1;grid-row:2/span 3;margin-top:6px}
+  .tm-r,.tm-ic,.tm-b{grid-column:2}
+  .tm-r{margin-top:6px}
+  .tm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tm-kpis li:nth-child(odd){padding-left:0;border-left:none}
+  .tm-kpis li:nth-child(n+3){border-top:1px solid var(--rl)}
+}
 @media (max-width:760px){
   .term,.an{padding:18px 16px 24px}
-  .term-sum{font-size:15.5px}
-  .ta-list,.an-reads,.an-pux{grid-template-columns:1fr}
+  .tm-dek{font-size:15px}
+  .tm-placar{padding:16px 16px 14px}
+  .tm-n{font-size:54px}
+  .tm-kpis li{padding:12px 12px 12px 0}
+  .tm-kpis li+li{padding-left:12px}
+  .tm-kv{font-size:24px}
+  .tg-ticks .mn,.tg-zones,.tg-rug-k{display:none}
+  .tm-metodo dl{grid-template-columns:1fr}
+  .trc-i,.trc-axis{grid-template-columns:minmax(0,104px) minmax(0,1fr) 88px;gap:10px}
+  .trc-x{display:block}
+  .tr-hd{display:none}
+  .tr>details>summary{grid-template-columns:48px minmax(0,1fr) auto;gap:8px 10px;padding:12px 4px}
+  .tr-t{grid-column:1;grid-row:1/4;align-self:start;gap:7px;font-size:15px}
+  .tr-tx{grid-column:2/4;grid-row:1}
+  .tr-sc{grid-column:2;grid-row:2}
+  .tr-sig{grid-column:3;grid-row:2}
+  .tr-r{grid-column:2;grid-row:3;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+  .tr-q{grid-column:3;grid-row:3;flex-direction:row;align-items:baseline;gap:4px;justify-self:end}
+  .tr-body{padding:6px 4px 18px}
+  .tr-grid,.tfr{grid-template-columns:1fr}
+  .tm-fil{gap:8px 10px}
+  .tm-sel{flex:1 1 140px}
+  .tm-sel select{width:100%;max-width:none}
+  .tm-shown{width:100%;margin-left:0;padding-bottom:0}
+  .an-reads,.an-pux{grid-template-columns:1fr}
   .tl{grid-template-columns:52px minmax(0,1fr);gap:2px 10px}
   .tl-tx{grid-column:2;grid-row:1}
   .tl-d{grid-column:1;grid-row:2}
   .tl-r{grid-column:2;grid-row:2;white-space:normal}
-  .an-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .rk-i,.qb li,.rk-axis{grid-template-columns:34% minmax(0,1fr);gap:4px 10px}
   .rk-v{grid-column:1/-1}
   .rk-axis .rk-v{display:none}
@@ -2751,346 +2984,634 @@ body.modal-open .btt{visibility:hidden}
 </section>
 
 <section class="term" id="termometro" aria-labelledby="term-h">
-  <div class="arch-top">
+  <div class="tm-top">
     <h2 class="kicker" id="term-h">Termômetro do dia</h2>
-<a class="arch-home" href="./analitico.html">Analítico Político &rarr;</a>  </div>
-  <p class="term-sum">Equilibrado · T −2 na média de 16 notícias com dimensão política <span>(intervalo de 95%: −3 a 0)</span></p>
-<div class="tg" role="img" aria-label="Média das notícias do dia: T −2 (Equilibrado), intervalo de 95% de −3 a 0; escala de −100 (esquerda) a +100 (direita)">
-  <div class="tg-track">
-    <div class="tg-bands"><span class="tg-f t-ef" style="left:0.0%;width:25.0%" title="Esquerda forte"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%" title="Esquerda moderada"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%" title="Leve à esquerda"></span><span class="tg-f t-eq" style="left:45.0%;width:10.0%" title="Equilibrado"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%" title="Leve à direita"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%" title="Direita moderada"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%" title="Direita forte"></span></div>
-    <span class="tg-zero"></span><span class="tg-ic" style="left:48.54%;width:1.3%"></span><span class="tg-dot" style="left:49.19%"></span>
-  </div>  <div class="tg-axis" aria-hidden="true"><span>Esquerda · &minus;100</span><span>0</span><span>+100 · Direita</span></div></div><div class="td">
-  <div class="td-bar" role="img" aria-label="Rótulos dos textos: Equilibrado: 16"><span class="t-eq" style="width:100.0%" title="Equilibrado: 16"></span></div>
-  <ul class="td-leg"><li><i class="t-eq" aria-hidden="true"></i>Equilibrado <b>16</b></li></ul>
-</div>  <p class="term-meta">20 textos analisados de 3 veículos · 4 sem dimensão política · qualidade da apuração 95 de 100 (Boa)</p>
-  <details class="term-det">
-    <summary>Cada texto analisado (20)</summary>
-    <ol class="ta-list">
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−9</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/lula-quer-confronto-e-vai-desmascarar-flavio-bolsonaro-em-debate-diz-edinho.ghtml" target="_blank" rel="noopener noreferrer">Lula quer confronto e vai desmascarar Flávio Bolsonaro em debate, diz Edinho<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
+    <p class="tm-links"><a href="#term-metodo">Como ler</a><a href="./analitico.html">Analítico Político &rarr;</a></p>
   </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:45.5%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 84 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">esquerda · −6,7</span><q>O senador não comprou, vendeu, intermediou e nem possui qualquer vínculo com o imóvel em questão.</q><span class="ta-ex">A matéria dedica quase a totalidade do espaço aos ataques e estratégias formulados pelo presidente do PT, reservando apenas o último parágrafo para a defesa do senador acusado.</span></li>
-      <li><b>E2 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">esquerda · −2,6</span><q>Lula quer confronto e vai desmascarar Flávio Bolsonaro em debate, diz Edinho</q><span class="ta-ex">O título coloca a acusação (&#39;vai desmascarar&#39;) em destaque afirmativo, ainda que atribuída na oração final ao presidente do PT.</span></li>
-    </ol>
+  <p class="tm-dek">Equilibrado · T −2 na média de 16 notícias com dimensão política. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
+<div class="tm-placar">
+  <div class="tm-hero">
+    <p class="tm-k">T médio das notícias</p>
+    <p class="tm-n">−2</p>
+    <p class="tm-r"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</p>
+<p class="tm-ic">Intervalo de 95%: <span class="nw">−3 a 0</span></p><p class="tm-b">média de 16 notícias com dimensão política</p>  </div>
+  <figure class="tg" role="img" aria-label="Média das notícias do dia: T −2 (Equilibrado), intervalo de 95% de −3 a 0; escala de −100 (esquerda) a +100 (direita)">
+  <div class="tg-flag" style="--x:49.19%" aria-hidden="true"><b>T −2</b> Equilibrado</div>
+  <div class="tg-track" aria-hidden="true"><span class="tg-f t-ef" style="left:0.0%;width:25.0%"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%"></span><span class="tg-f t-eq on" style="left:45.0%;width:10.0%"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%"></span><span class="tg-ic" style="left:48.54%;width:1.3%"></span><span class="tg-needle" style="left:49.19%"></span>
+  </div>  <div class="tg-rug" aria-hidden="true"><i style="left:45.5%"></i><i style="left:47.0%"></i><i style="left:48.5%"></i><i style="left:48.5%"></i><i style="left:48.5%"></i><i style="left:49.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i></div>  <div class="tg-ticks" aria-hidden="true"><span style="left:0.0%">−100</span><span style="left:25.0%">−50</span><span class="mn" style="left:37.5%">−25</span><span class="mn" style="left:45.0%">−10</span><span style="left:50.0%">0</span><span class="mn" style="left:55.0%">+10</span><span class="mn" style="left:62.5%">+25</span><span style="left:75.0%">+50</span><span style="left:100.0%">+100</span></div>  <div class="tg-zones" aria-hidden="true"><span style="left:0.0%;width:25.0%">Forte</span><span style="left:25.0%;width:12.5%">Moderada</span><span style="left:37.5%;width:7.5%">Leve</span><span class="on" style="left:45.0%;width:10.0%">Equilibrado</span><span style="left:55.0%;width:7.5%">Leve</span><span style="left:62.5%;width:12.5%">Moderada</span><span style="left:75.0%;width:25.0%">Forte</span></div>  <div class="tg-sides" aria-hidden="true"><span>&larr; Esquerda</span><span class="tg-rug-k"><i></i>cada traço é uma notícia</span><span>Direita &rarr;</span></div>
+</figure>
+</div>  <ul class="tm-kpis">  <li><span class="tm-k">Textos analisados</span><span class="tm-kv">20</span><span class="tm-kd">3 veículos · 5 editorias</span></li>  <li><span class="tm-k">Notícias com T</span><span class="tm-kv">16</span><span class="tm-kd">4 sem dimensão política</span></li>  <li><span class="tm-k">Qualidade da apuração</span><span class="tm-kv">95<small>/100</small></span><span class="tm-meter" aria-hidden="true"><span style="width:95.0%"></span></span><span class="tm-kd">Boa · média das notícias</span></li>  <li><span class="tm-k">Sinais que pontuaram</span><span class="tm-kv">26</span><span class="tm-kd">em 16 notícias: 7 à esquerda · 0 à direita · 19 de equilíbrio</span></li></ul>
+  <div class="tm-panels">
+    <section class="tm-panel" aria-labelledby="tmp-dist">
+      <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
+      <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
+      <ol class="th" aria-label="Rótulos das notícias: Equilibrado: 16">  <li class="zero"><span class="th-l"><i class="sw t-ef" aria-hidden="true"></i>Esquerda forte</span><span class="th-m" aria-hidden="true"><span class="t-ef" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-em" aria-hidden="true"></i>Esquerda moderada</span><span class="th-m" aria-hidden="true"><span class="t-em" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-el" aria-hidden="true"></i>Leve à esquerda</span><span class="th-m" aria-hidden="true"><span class="t-el" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class=""><span class="th-l"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</span><span class="th-m" aria-hidden="true"><span class="t-eq" style="width:100.0%"></span></span><span class="th-v"><b>16</b> <span>100%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dl" aria-hidden="true"></i>Leve à direita</span><span class="th-m" aria-hidden="true"><span class="t-dl" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dm" aria-hidden="true"></i>Direita moderada</span><span class="th-m" aria-hidden="true"><span class="t-dm" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-df" aria-hidden="true"></i>Direita forte</span><span class="th-m" aria-hidden="true"><span class="t-df" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li></ol><p class="tm-foot">Fora da média: 4 sem dimensão política.</p>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-sig">
+      <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
+      <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
+      <div class="tsg">
+  <div class="tsg-hd" aria-hidden="true"><span></span><span>&larr; esquerda</span><span>direita &rarr;</span></div>
+  <ul class="tsg-list">    <li aria-label="Fontes e espaço: 1 à esquerda, 0 à direita, 10 de equilíbrio"><span class="tsg-n">Fontes e espaço</span><span class="tsg-l" aria-hidden="true"><b>1</b><span class="tsg-b t-em" style="width:25.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>10</span></li>    <li aria-label="Título, lead e &#39;mas&#39;: 4 à esquerda, 0 à direita, 2 de equilíbrio"><span class="tsg-n">Título, lead e &#39;mas&#39;</span><span class="tsg-l" aria-hidden="true"><b>4</b><span class="tsg-b t-em" style="width:100.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>2</span></li>    <li aria-label="Números e escala: 0 à esquerda, 0 à direita, 6 de equilíbrio"><span class="tsg-n">Números e escala</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>6</span></li>    <li aria-label="Carga avaliativa: 0 à esquerda, 0 à direita, 1 de equilíbrio"><span class="tsg-n">Carga avaliativa</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>1</span></li>    <li aria-label="Premissas de fundo: 1 à esquerda, 0 à direita"><span class="tsg-n">Premissas de fundo</span><span class="tsg-l" aria-hidden="true"><b>1</b><span class="tsg-b t-em" style="width:25.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"></span></li>    <li aria-label="Empatia desigual: 1 à esquerda, 0 à direita"><span class="tsg-n">Empatia desigual</span><span class="tsg-l" aria-hidden="true"><b>1</b><span class="tsg-b t-em" style="width:25.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"></span></li>  </ul>
+<p class="tm-foot"><i class="sw t-eq" aria-hidden="true"></i>Sinal de equilíbrio (contraponto ouvido, número com fonte, verbo neutro): não move o T.</p></div>
+
+    </section>
+  </div>
+  <div class="tm-panels tm-panels-2">
+    <section class="tm-panel" aria-labelledby="tmp-r1">
+      <h3 class="tm-ph" id="tmp-r1">Por veículo</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Valor Econômico: T −2 (Equilibrado) em 9 notícias, intervalo de 95% de −4 a 0; qualidade 92"><span class="trc-n">Valor Econômico</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:42.96%;width:7.85%"></span><span class="trc-d t-eq" style="left:46.89%"></span></span><span class="trc-v"><b>−2</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">9 notícias · Q 92</span></span></li>  <li class="trc-i" title="Folha de S.Paulo: T −1 (Equilibrado) em 6 notícias, intervalo de 95% de −2 a 0; qualidade 100"><span class="trc-n">Folha de S.Paulo</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:45.52%;width:4.96%"></span><span class="trc-d t-eq" style="left:48.0%"></span></span><span class="trc-v"><b>−1</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">6 notícias · Q 100</span></span></li>  <li class="trc-i" title="g1: T −6 (Equilibrado) em 1 notícia; qualidade 94"><span class="trc-n">g1</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:38.0%"></span></span><span class="trc-v"><b>−6</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 94</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-r2">
+      <h3 class="tm-ph" id="tmp-r2">Por editoria</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Política: T −2 (Equilibrado) em 6 notícias, intervalo de 95% de −4 a +1; qualidade 94"><span class="trc-n">Política</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:41.12%;width:11.76%"></span><span class="trc-d t-eq" style="left:47.0%"></span></span><span class="trc-v"><b>−2</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">6 notícias · Q 94</span></span></li>  <li class="trc-i" title="Geopolítica &amp; Mundo: T −1 (Equilibrado) em 5 notícias, intervalo de 95% de −2 a 0; qualidade 96"><span class="trc-n">Geopolítica &amp; Mundo</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:45.52%;width:4.96%"></span><span class="trc-d t-eq" style="left:48.0%"></span></span><span class="trc-v"><b>−1</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">5 notícias · Q 96</span></span></li>  <li class="trc-i" title="Jurídico &amp; Regulação: T −2 (Equilibrado) em 4 notícias, intervalo de 95% de −5 a +1; qualidade 99"><span class="trc-n">Jurídico &amp; Regulação</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:39.87%;width:11.26%"></span><span class="trc-d t-eq" style="left:45.5%"></span></span><span class="trc-v"><b>−2</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">4 notícias · Q 99</span></span></li>  <li class="trc-i" title="Natureza &amp; Meio Ambiente: T −3 (Equilibrado) em 1 notícia; qualidade 92"><span class="trc-n">Natureza &amp; Meio Ambiente</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:44.0%"></span></span><span class="trc-v"><b>−3</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 92</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
+  </div>
+  <section class="tm-list" aria-labelledby="tml-h">
+    <div class="tm-list-hd">
+      <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">20</span></h3>
+      <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
+    </div>
+    <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
+      <div class="tm-chips" role="group" aria-label="Mostrar">
+        <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>20</span></button>
+        <button type="button" class="tm-chip" data-f="sig" aria-pressed="false">Com sinais <span>16</span></button>
+        <button type="button" class="tm-chip" data-f="inc" aria-pressed="false" disabled>Fora do equilíbrio <span>0</span></button>
+      </div>
+      <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option><option value="Valor Econômico">Valor Econômico (11)</option><option value="Folha de S.Paulo">Folha de S.Paulo (8)</option><option value="g1">g1 (1)</option></select></label>
+      <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option><option value="Política">Política (7)</option><option value="Geopolítica &amp; Mundo">Geopolítica &amp; Mundo (6)</option><option value="Jurídico &amp; Regulação">Jurídico &amp; Regulação (4)</option><option value="Natureza &amp; Meio Ambiente">Natureza &amp; Meio Ambiente (2)</option><option value="Tecnologia &amp; Negócios">Tecnologia &amp; Negócios (1)</option></select></label>
+      <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
+      <p class="tm-shown" role="status" aria-live="polite"></p>
+    </form>
+    <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
+    <ol class="tr-list" id="tmList" data-visiveis="12">
+      <li class="tr" data-t="-9.0" data-q="84" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="1">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−9</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 17/10</span><span class="tr-h">Lula quer confronto e vai desmascarar Flávio Bolsonaro em debate, diz Edinho</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:45.5%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>84</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · esquerda · −6,7 pt · P10</span></p><blockquote>O senador não comprou, vendeu, intermediou e nem possui qualquer vínculo com o imóvel em questão.</blockquote><p class="tev-x">A matéria dedica quase a totalidade do espaço aos ataques e estratégias formulados pelo presidente do PT, reservando apenas o último parágrafo para a defesa do senador acusado.</p></li>            <li class="tev-esq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E2 · esquerda · −2,6 pt · P0</span></p><blockquote>Lula quer confronto e vai desmascarar Flávio Bolsonaro em debate, diz Edinho</blockquote><p class="tev-x">O título coloca a acusação (&#39;vai desmascarar&#39;) em destaque afirmativo, ainda que atribuída na oração final ao presidente do PT.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 84/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:84%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>537 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/lula-quer-confronto-e-vai-desmascarar-flavio-bolsonaro-em-debate-diz-edinho.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−6</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>g1</b> · Jurídico &amp; Regulação · 17/10</p>
-      <p class="ta-t"><a href="https://g1.globo.com/politica/noticia/2026/10/17/stj-abre-investigacao-e-exonera-servidor-suspeito-de-vazar-minutas-a-advogado-amigo-de-flavio.ghtml" target="_blank" rel="noopener noreferrer">STJ abre investigação e exonera servidor suspeito de vazar minutas de decisões a advogado amigo de Flávio<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:47.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">esquerda · −5,6</span><q>STJ abre investigação e exonera servidor suspeito de vazar minutas de decisões a advogado amigo de Flávio</q><span class="ta-ex">O título conecta imediatamente a apuração administrativa no STJ a Flávio Bolsonaro, embora o investigado principal seja o advogado e não o próprio senador.</span></li>
-      <li><b>E2 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Veja a nota na íntegra:</q><span class="ta-ex">A reportagem publica integralmente a nota de defesa do investigado Willer Tomaz, permitindo a apresentação de sua versão dos fatos.</span></li>
-    </ol>
+      <li class="tr" data-t="-6.0" data-q="94" data-s="2" data-c="eq" data-v="g1" data-e="Jurídico &amp; Regulação" data-o="0" data-i="2">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−6</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>g1</b> · Jurídico &amp; Regulação · 17/10</span><span class="tr-h">STJ abre investigação e exonera servidor suspeito de vazar minutas de decisões a advogado amigo de Flávio</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:47.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E1 · esquerda · −5,6 pt · P0</span></p><blockquote>STJ abre investigação e exonera servidor suspeito de vazar minutas de decisões a advogado amigo de Flávio</blockquote><p class="tev-x">O título conecta imediatamente a apuração administrativa no STJ a Flávio Bolsonaro, embora o investigado principal seja o advogado e não o próprio senador.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E2 · equilíbrio · P21</span></p><blockquote>Veja a nota na íntegra:</blockquote><p class="tev-x">A reportagem publica integralmente a nota de defesa do investigado Willer Tomaz, permitindo a apresentação de sua versão dos fatos.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>940 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://g1.globo.com/politica/noticia/2026/10/17/stj-abre-investigacao-e-exonera-servidor-suspeito-de-vazar-minutas-a-advogado-amigo-de-flavio.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (g1.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−3</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/advogado-amigo-de-flavio-recebeu-documentos-vazados-do-stj-e-mpf-diz-site.shtml" target="_blank" rel="noopener noreferrer">Advogado amigo de Flávio recebeu documentos vazados do STJ e MPF, diz site<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:48.5%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Instituições, Segurança</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">equilíbrio · 0,0</span><q>OUTRO LADO: Willer Tomaz afirmou que &#39;nega categoricamente&#39; as suspeitas</q><span class="ta-ex">A linha fina destaca imediatamente a manifestação de defesa do principal investigado.</span></li>
-      <li><b>E2 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">esquerda · −2,6</span><q>Advogado amigo de Flávio recebeu documentos vazados do STJ e MPF, diz site</q><span class="ta-ex">Puxa para o título a conexão pessoal com o candidato presidencial Flávio Bolsonaro, embora a apuração sobre minutas vazadas diga respeito centralmente a Willer Tomaz.</span></li>
-    </ol>
+      <li class="tr" data-t="-3.0" data-q="100" data-s="2" data-c="eq" data-v="Folha de S.Paulo" data-e="Jurídico &amp; Regulação" data-o="0" data-i="3">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−3</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</span><span class="tr-h">Advogado amigo de Flávio recebeu documentos vazados do STJ e MPF, diz site</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:48.5%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E2 · esquerda · −2,6 pt · P0</span></p><blockquote>Advogado amigo de Flávio recebeu documentos vazados do STJ e MPF, diz site</blockquote><p class="tev-x">Puxa para o título a conexão pessoal com o candidato presidencial Flávio Bolsonaro, embora a apuração sobre minutas vazadas diga respeito centralmente a Willer Tomaz.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E1 · equilíbrio · P1</span></p><blockquote>OUTRO LADO: Willer Tomaz afirmou que &#39;nega categoricamente&#39; as suspeitas</blockquote><p class="tev-x">A linha fina destaca imediatamente a manifestação de defesa do principal investigado.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Segurança</li>
+<li>Relevância política alta</li><li>606 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/advogado-amigo-de-flavio-recebeu-documentos-vazados-do-stj-e-mpf-diz-site.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−3</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mundo/2026/10/colonos-israelenses-atacam-comitiva-de-diplomatas-europeus-na-cisjordania.shtml" target="_blank" rel="noopener noreferrer">Colonos israelenses atacam comitiva de diplomatas europeus na Cisjordânia<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:48.5%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Segurança, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O ministro das Relações Exteriores de Israel, Gideon Saar, condenou o ataque e classificou os responsáveis como manifestantes israelenses violentos.</q><span class="ta-ex">Apresenta a manifestação e a defesa formal do governo israelense após as denúncias de agressão.</span></li>
-      <li><b>E2 · premissas de fundo</b> <span class="ta-dir">esquerda · −3,3</span><q>assim como foram expandidos, pelo governo Netanyahu, os assentamentos de judeus na região, ilegais sob o direito internacional.</q><span class="ta-ex">Enquadra a política habitacional de Netanyahu sob a classificação de ilegalidade pelo direito internacional.</span></li>
-    </ol>
+      <li class="tr" data-t="-3.0" data-q="100" data-s="2" data-c="eq" data-v="Folha de S.Paulo" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="4">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−3</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Colonos israelenses atacam comitiva de diplomatas europeus na Cisjordânia</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:48.5%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Premissas de fundo</b><span class="tev-d">E2 · esquerda · −3,3 pt · P11</span></p><blockquote>assim como foram expandidos, pelo governo Netanyahu, os assentamentos de judeus na região, ilegais sob o direito internacional.</blockquote><p class="tev-x">Enquadra a política habitacional de Netanyahu sob a classificação de ilegalidade pelo direito internacional.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P6</span></p><blockquote>O ministro das Relações Exteriores de Israel, Gideon Saar, condenou o ataque e classificou os responsáveis como manifestantes israelenses violentos.</blockquote><p class="tev-x">Apresenta a manifestação e a defesa formal do governo israelense após as denúncias de agressão.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Segurança, Instituições</li>
+<li>Relevância política alta</li><li>878 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mundo/2026/10/colonos-israelenses-atacam-comitiva-de-diplomatas-europeus-na-cisjordania.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−3</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Natureza &amp; Meio Ambiente · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/brasil/noticia/2026/10/17/governo-envia-comitiva-de-ministros-ao-amazonas-para-acompanhar-incndios-florestais.ghtml" target="_blank" rel="noopener noreferrer">Governo envia comitiva de ministros ao Amazonas para acompanhar incêndios florestais<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:48.5%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Geral, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>a Amazônia registrou 3.335 km² de área desmatada, o menor índice da série histórica iniciada em 1988.</q><span class="ta-ex">Apresenta dado oficial contextualizado com a série histórica completa e marcos temporais.</span></li>
-      <li><b>E2 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">esquerda · −2,8</span><q>A declaração do senador, no entanto, diverge dos números do Projeto de Monitoramento do Desmatamento na Amazônia Legal por Satélite (Prodes).</q><span class="ta-ex">A redação confronta de pronto a afirmação do candidato de oposição com base em estatísticas oficiais do Prodes.</span></li>
-    </ol>
+      <li class="tr" data-t="-3.0" data-q="94" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Natureza &amp; Meio Ambiente" data-o="0" data-i="5">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−3</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Natureza &amp; Meio Ambiente · 17/10</span><span class="tr-h">Governo envia comitiva de ministros ao Amazonas para acompanhar incêndios florestais</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:48.5%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E2 · esquerda · −2,8 pt · P8</span></p><blockquote>A declaração do senador, no entanto, diverge dos números do Projeto de Monitoramento do Desmatamento na Amazônia Legal por Satélite (Prodes).</blockquote><p class="tev-x">A redação confronta de pronto a afirmação do candidato de oposição com base em estatísticas oficiais do Prodes.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P7</span></p><blockquote>a Amazônia registrou 3.335 km² de área desmatada, o menor índice da série histórica iniciada em 1988.</blockquote><p class="tev-x">Apresenta dado oficial contextualizado com a série histórica completa e marcos temporais.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral, Instituições</li>
+<li>Relevância política alta</li><li>365 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/brasil/noticia/2026/10/17/governo-envia-comitiva-de-ministros-ao-amazonas-para-acompanhar-incndios-florestais.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−2</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/milhares-de-manifestantes-marcham-em-lisboa-contra-avano-do-custo-de-vida.ghtml" target="_blank" rel="noopener noreferrer">Milhares de manifestantes marcham em Lisboa contra avanço do custo de vida<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:49.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Econômico</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · empatia desigual</b> <span class="ta-dir">esquerda · −2,1</span><q>Carolina Cruz, de 26 anos, doutoranda e pesquisadora em biologia que recebe uma bolsa de cerca de 1.300 euros (US$ 1.460) por mês, corre o risco de perder a moradia</q><span class="ta-ex">Dá rosto e perfil pessoal empático aos manifestantes que criticam o custo de vida, sem personificação simétrica do lado da gestão pública.</span></li>
-      <li><b>E2 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O ministro dos Assuntos Parlamentares de Portugal, Carlos Abreu Amorim, disse na sexta-feira que o &#34;governo não cederá aos gritos da rua&#34;</q><span class="ta-ex">O texto registra a posição oficial do governo em resposta às manifestações e demandas apresentadas.</span></li>
-    </ol>
+      <li class="tr" data-t="-2.0" data-q="94" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="6">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−2</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Milhares de manifestantes marcham em Lisboa contra avanço do custo de vida</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:49.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Empatia desigual</b><span class="tev-d">E1 · esquerda · −2,1 pt · P11</span></p><blockquote>Carolina Cruz, de 26 anos, doutoranda e pesquisadora em biologia que recebe uma bolsa de cerca de 1.300 euros (US$ 1.460) por mês, corre o risco de perder a moradia</blockquote><p class="tev-x">Dá rosto e perfil pessoal empático aos manifestantes que criticam o custo de vida, sem personificação simétrica do lado da gestão pública.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E2 · equilíbrio · P16</span></p><blockquote>O ministro dos Assuntos Parlamentares de Portugal, Carlos Abreu Amorim, disse na sexta-feira que o &#34;governo não cederá aos gritos da rua&#34;</blockquote><p class="tev-x">O texto registra a posição oficial do governo em resposta às manifestações e demandas apresentadas.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico</li>
+<li>Relevância política média</li><li>469 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/milhares-de-manifestantes-marcham-em-lisboa-contra-avano-do-custo-de-vida.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</p>
-      <p class="ta-t"><a href="https://c-level.folha.uol.com.br/infraestrutura/2026/10/antt-faz-pente-fino-em-carajas-e-cobra-explicacoes-da-vale-sobre-r-116-bilhao.shtml" target="_blank" rel="noopener noreferrer">ANTT faz pente-fino em Carajás e cobra explicações da Vale sobre R$ 1,16 bilhão<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>À Folha a Vale declarou que &#34;reafirma seu compromisso com as diretrizes e bases gerais para a otimização dos contratos</q><span class="ta-ex">A reportagem busca e concede espaço para os esclarecimentos técnicos da Vale após detalhar os questionamentos da ANTT.</span></li>
-      <li><b>E2 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Na planilha entregue, 67 registros, com saldo remanescente de aproximadamente R$ 92 milhões, aparecem classificados como pertencentes a outros projetos</q><span class="ta-ex">Dados específicos com fonte, período e quantificação precisa do objeto em disputa técnica.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="2" data-c="eq" data-v="Folha de S.Paulo" data-e="Jurídico &amp; Regulação" data-o="0" data-i="7">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</span><span class="tr-h">ANTT faz pente-fino em Carajás e cobra explicações da Vale sobre R$ 1,16 bilhão</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P11</span></p><blockquote>À Folha a Vale declarou que &#34;reafirma seu compromisso com as diretrizes e bases gerais para a otimização dos contratos</blockquote><p class="tev-x">A reportagem busca e concede espaço para os esclarecimentos técnicos da Vale após detalhar os questionamentos da ANTT.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E2 · equilíbrio · P20</span></p><blockquote>Na planilha entregue, 67 registros, com saldo remanescente de aproximadamente R$ 92 milhões, aparecem classificados como pertencentes a outros projetos</blockquote><p class="tev-x">Dados específicos com fonte, período e quantificação precisa do objeto em disputa técnica.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política média</li><li>1.018 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://c-level.folha.uol.com.br/infraestrutura/2026/10/antt-faz-pente-fino-em-carajas-e-cobra-explicacoes-da-vale-sobre-r-116-bilhao.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (c-level.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/amiga-de-lulinha-afirma-que-quer-fazer-delacao-premiada-e-chama-presidente-de-mentiroso.shtml" target="_blank" rel="noopener noreferrer">Amiga de Lulinha afirma que quer fazer delação premiada e chama presidente de mentiroso<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Apesar disso, ela não apresentou informações novas sobre as investigações em curso.</q><span class="ta-ex">A reportagem faz a devida checagem factual ao apontar que a acusadora atacou o presidente sem apresentar provas ou elementos inéditos para respaldar as alegações.</span></li>
-      <li><b>E2 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Por meio de nota, o presidente afirmou desconhecer &#34;inteiramente os fatos relatados&#34;.</q><span class="ta-ex">A nota da Presidência e a resposta de Camilo Santana foram incluídas de maneira ampla para contrapor as falas concedidas à TV.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="2" data-c="eq" data-v="Folha de S.Paulo" data-e="Política" data-o="0" data-i="8">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Política · 17/10</span><span class="tr-h">Amiga de Lulinha afirma que quer fazer delação premiada e chama presidente de mentiroso</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P12</span></p><blockquote>Apesar disso, ela não apresentou informações novas sobre as investigações em curso.</blockquote><p class="tev-x">A reportagem faz a devida checagem factual ao apontar que a acusadora atacou o presidente sem apresentar provas ou elementos inéditos para respaldar as alegações.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E2 · equilíbrio · P5</span></p><blockquote>Por meio de nota, o presidente afirmou desconhecer &#34;inteiramente os fatos relatados&#34;.</blockquote><p class="tev-x">A nota da Presidência e a resposta de Camilo Santana foram incluídas de maneira ampla para contrapor as falas concedidas à TV.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>1.123 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/amiga-de-lulinha-afirma-que-quer-fazer-delacao-premiada-e-chama-presidente-de-mentiroso.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/tse-libera-atos-com-mote-de-democracia-no-rio-convocado-por-caetano-salvador-e-porto-alegre-e-rejeita-vetar-shows.shtml" target="_blank" rel="noopener noreferrer">TSE libera atos com mote de democracia no Rio, convocado por Caetano, Salvador e Porto Alegre, e rejeita vetar shows<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O Novo sustentava que as mobilizações convocadas para o domingo anterior ao segundo turno</q><span class="ta-ex">O texto resume os argumentos da petição inicial do Novo com clareza antes de contrapor com os fundamentos da decisão do corregedor.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="94" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="9">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 17/10</span><span class="tr-h">Quem está na frente para presidente no segundo turno? Veja resultado das últimas pesquisas por gênero, idade e escolaridade</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P8</span></p><blockquote>A margem de erro é de dois pontos percentuais, para mais ou para menos, e o nível de confiança é de 95%.</blockquote><p class="tev-x">O texto reporta integralmente as especificações metodológicas das pesquisas, indicando números, datas, margem de erro e número de registro no TSE.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Título, lead e &#39;mas&#39;</b><span class="tev-d">E2 · equilíbrio · P2</span></p><blockquote>mostram o candidato Flávio Bolsonaro (PL) numericamente à frente de Luiz Inácio Lula da Silva (PT) na disputa pela Presidência, apesar da diferença ainda estar dentro das margens de erro</blockquote><p class="tev-x">O texto qualifica a liderança como numérica e ressalva imediatamente a condição de empate técnico dentro da margem de erro.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>545 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/quem-esta-na-frente-para-presidente-no-segundo-turno-veja-resultado-das-ultimas-pesquisas-por-genero-idade-e-escolaridade.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mundo/2026/10/papa-leao-14-recebera-alta-do-hospital-neste-sabado-diz-vaticano.shtml" target="_blank" rel="noopener noreferrer">Papa Leão 14 recebe alta do hospital após retirada de tumor<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · carga avaliativa</b> <span class="ta-dir">equilíbrio · 0,0</span><q>um grande sinal para o mundo de que Leão 14 continua ativo e atento aos acontecimentos</q><span class="ta-ex">Classifica a ligação a Putin como &#39;um grande sinal&#39;, em afirmação avaliativa da redação, embora ancorada no contexto de retorno do pontífice às atividades.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="94" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="10">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Protestos violentos atingem cidades em toda a França</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P9</span></p><blockquote>Estamos lutando porque o custo de vida está insuportável, porque o preço do combustível está alto demais</blockquote><p class="tev-x">A matéria dá voz direta a manifestante explicando as demandas e queixas contra os cortes e condições de vida, equilibrando as falas oficiais.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E2 · equilíbrio · P16</span></p><blockquote>propôs 43 bilhões de euros, o equivalente a US$ 49 bilhões, em cortes de gastos no orçamento de 2027</blockquote><p class="tev-x">A reportagem contextualiza os números exatos e as metas fiscais que desencadearam a insatisfação social.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Segurança</li>
+<li>Relevância política alta</li><li>834 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/policia-francesa-entra-em-confronto-com-manifestantes-em-protesto-contra-o-custo-de-vida.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 18/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/18/lula-e-flavio-disputam-as-ruas-na-reta-final-da-campanha.ghtml" target="_blank" rel="noopener noreferrer">Lula e Flávio disputam as ruas na reta final da campanha<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 92 (Boa) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Flávio tem 47% e Lula, 45% das intenções de voto, empatados tecnicamente dentro da margem de erro</q><span class="ta-ex">Apresenta os dados da pesquisa indicando os percentuais de ambos os candidatos e a margem de erro técnica.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="1" data-c="eq" data-v="Folha de S.Paulo" data-e="Jurídico &amp; Regulação" data-o="0" data-i="11">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Jurídico &amp; Regulação · 17/10</span><span class="tr-h">TSE libera atos com mote de democracia no Rio, convocado por Caetano, Salvador e Porto Alegre, e rejeita vetar shows</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P6</span></p><blockquote>O Novo sustentava que as mobilizações convocadas para o domingo anterior ao segundo turno</blockquote><p class="tev-x">O texto resume os argumentos da petição inicial do Novo com clareza antes de contrapor com os fundamentos da decisão do corregedor.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>669 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/tse-libera-atos-com-mote-de-democracia-no-rio-convocado-por-caetano-salvador-e-porto-alegre-e-rejeita-vetar-shows.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/noticia/2026/10/17/roberta-luchsinger-diz-que-pretende-firmar-acordo-de-delao-premiada-e-promete-no-poupar-ningum.ghtml" target="_blank" rel="noopener noreferrer">Roberta Luchsinger diz que pretende firmar acordo de delação e promete ‘não poupar ninguém’<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Instituições, Segurança</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Em nota enviada ao Valor, a Secretaria de Comunicação Social da Presidência da República (Secom) afirmou que o presidente Lula</q><span class="ta-ex">A reportagem concede amplo espaço de contraponto à Presidência e aos ministérios citados para refutar as alegações da acusadora.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="1" data-c="eq" data-v="Folha de S.Paulo" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="12">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Papa Leão 14 recebe alta do hospital após retirada de tumor</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Carga avaliativa</b><span class="tev-d">E1 · equilíbrio · P10</span></p><blockquote>um grande sinal para o mundo de que Leão 14 continua ativo e atento aos acontecimentos</blockquote><p class="tev-x">Classifica a ligação a Putin como &#39;um grande sinal&#39;, em afirmação avaliativa da redação, embora ancorada no contexto de retorno do pontífice às atividades.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política média</li><li>946 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mundo/2026/10/papa-leao-14-recebera-alta-do-hospital-neste-sabado-diz-vaticano.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/quem-esta-na-frente-para-presidente-no-segundo-turno-ultimas-pesquisas-revelam-favorito-em-cada-faixa-salarial.ghtml" target="_blank" rel="noopener noreferrer">Quem está na frente para presidente no segundo turno? Últimas pesquisas revelam favorito em cada faixa salarial<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 92 (Boa) · Instituições, Econômico</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O levantamento ouviu 2.520 pessoas de 16 anos ou mais entre os dias 13 e 14 de outubro. A margem de erro é de dois pontos percentuais</q><span class="ta-ex">Informa detalhadamente os parâmetros metodológicos, amostra, período de coleta, margem de erro e registro eleitoral da pesquisa.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="92" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="13">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 18/10</span><span class="tr-h">Lula e Flávio disputam as ruas na reta final da campanha</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P13</span></p><blockquote>Flávio tem 47% e Lula, 45% das intenções de voto, empatados tecnicamente dentro da margem de erro</blockquote><p class="tev-x">Apresenta os dados da pesquisa indicando os percentuais de ambos os candidatos e a margem de erro técnica.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política alta</li><li>826 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/18/lula-e-flavio-disputam-as-ruas-na-reta-final-da-campanha.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/trump-suspende-sanes-e-tarifas-contra-a-rssia-sob-nova-lei.ghtml" target="_blank" rel="noopener noreferrer">Trump suspende sanções e tarifas contra a Rússia sob nova lei<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 95 (Boa) · Instituições, Econômico</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O representante dos EUA Don Beyer, um democrata da Virgínia, criticou duramente Trump pela isenção, afirmando que ele estava cedendo ao presidente russo Vladimir Putin.</q><span class="ta-ex">Apresenta o contraponto crítico da oposição no Congresso de forma equilibrada após expor os argumentos da Casa Branca.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="94" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="14">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 17/10</span><span class="tr-h">Roberta Luchsinger diz que pretende firmar acordo de delação e promete ‘não poupar ninguém’</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P12</span></p><blockquote>Em nota enviada ao Valor, a Secretaria de Comunicação Social da Presidência da República (Secom) afirmou que o presidente Lula</blockquote><p class="tev-x">A reportagem concede amplo espaço de contraponto à Presidência e aos ministérios citados para refutar as alegações da acusadora.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Segurança</li>
+<li>Relevância política alta</li><li>766 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/noticia/2026/10/17/roberta-luchsinger-diz-que-pretende-firmar-acordo-de-delao-premiada-e-promete-no-poupar-ningum.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/quem-esta-na-frente-para-presidente-no-segundo-turno-veja-resultado-das-ultimas-pesquisas-por-genero-idade-e-escolaridade.ghtml" target="_blank" rel="noopener noreferrer">Quem está na frente para presidente no segundo turno? Veja resultado das últimas pesquisas por gênero, idade e escolaridade<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>A margem de erro é de dois pontos percentuais, para mais ou para menos, e o nível de confiança é de 95%.</q><span class="ta-ex">O texto reporta integralmente as especificações metodológicas das pesquisas, indicando números, datas, margem de erro e número de registro no TSE.</span></li>
-      <li><b>E2 · título, lead e &#39;mas&#39;</b> <span class="ta-dir">equilíbrio · 0,0</span><q>mostram o candidato Flávio Bolsonaro (PL) numericamente à frente de Luiz Inácio Lula da Silva (PT) na disputa pela Presidência, apesar da diferença ainda estar dentro das margens de erro</q><span class="ta-ex">O texto qualifica a liderança como numérica e ressalva imediatamente a condição de empate técnico dentro da margem de erro.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="92" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="15">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 17/10</span><span class="tr-h">Quem está na frente para presidente no segundo turno? Últimas pesquisas revelam favorito em cada faixa salarial</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P4</span></p><blockquote>O levantamento ouviu 2.520 pessoas de 16 anos ou mais entre os dias 13 e 14 de outubro. A margem de erro é de dois pontos percentuais</blockquote><p class="tev-x">Informa detalhadamente os parâmetros metodológicos, amostra, período de coleta, margem de erro e registro eleitoral da pesquisa.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Econômico</li>
+<li>Relevância política alta</li><li>315 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/17/quem-esta-na-frente-para-presidente-no-segundo-turno-ultimas-pesquisas-revelam-favorito-em-cada-faixa-salarial.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/policia-francesa-entra-em-confronto-com-manifestantes-em-protesto-contra-o-custo-de-vida.ghtml" target="_blank" rel="noopener noreferrer">Protestos violentos atingem cidades em toda a França<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Econômico, Segurança</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Estamos lutando porque o custo de vida está insuportável, porque o preço do combustível está alto demais</q><span class="ta-ex">A matéria dá voz direta a manifestante explicando as demandas e queixas contra os cortes e condições de vida, equilibrando as falas oficiais.</span></li>
-      <li><b>E2 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>propôs 43 bilhões de euros, o equivalente a US$ 49 bilhões, em cortes de gastos no orçamento de 2027</q><span class="ta-ex">A reportagem contextualiza os números exatos e as metas fiscais que desencadearam a insatisfação social.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="95" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="16">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Trump suspende sanções e tarifas contra a Rússia sob nova lei</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>95</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P13</span></p><blockquote>O representante dos EUA Don Beyer, um democrata da Virgínia, criticou duramente Trump pela isenção, afirmando que ele estava cedendo ao presidente russo Vladimir Putin.</blockquote><p class="tev-x">Apresenta o contraponto crítico da oposição no Congresso de forma equilibrada após expor os argumentos da Casa Branca.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 95/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:95%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Econômico</li>
+<li>Relevância política alta</li><li>571 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/trump-suspende-sanes-e-tarifas-contra-a-rssia-sob-nova-lei.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Tecnologia &amp; Negócios · 17/10</p>
-      <p class="ta-t"><a href="https://c-level.folha.uol.com.br/financas/2026/10/citi-e-bank-of-america-sao-mais-dois-bancos-dos-eua-a-restringir-acesso-de-ia-a-contas-de-clientes.shtml" target="_blank" rel="noopener noreferrer">Citi e Bank of America são mais dois bancos dos EUA a restringir acesso de IA a contas de clientes<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <p class="ta-r"><b>Não se aplica</b> · apuração 100 (Boa) · Econômico</p>
-<p class="ta-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Política · 17/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/ex-presidente-jose-sarney-recebe-alta-apos-cirurgia-abdominal-no-maranhao.shtml" target="_blank" rel="noopener noreferrer">Ex-presidente José Sarney recebe alta após cirurgia abdominal no Maranhão<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <p class="ta-r"><b>Não se aplica</b> · apuração 100 (Boa) · Geral</p>
-<p class="ta-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/papa-leo-deixar-hospital-quatro-dias-aps-cirurgia-para-tratar-cncer-de-pulmo.ghtml" target="_blank" rel="noopener noreferrer">Papa Leão deixa hospital, quatro dias após cirurgia para tratar câncer de pulmão<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <p class="ta-r"><b>Não se aplica</b> · apuração 92 (Boa) · Geral</p>
-<p class="ta-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Natureza &amp; Meio Ambiente · 17/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/brasil/noticia/2026/10/17/chuvas-intensas-estiagem-e-queimadas-provocam-estragos-e-agravam-riscos-ambientais-em-diferentes-regioes-do-brasil.ghtml" target="_blank" rel="noopener noreferrer">Chuvas intensas, estiagem e queimadas provocam estragos e agravam riscos ambientais em diferentes regiões do Brasil<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <p class="ta-r"><b>Não se aplica</b> · apuração 90 (Boa) · Geral</p>
-<p class="ta-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p></li>
-    </ol>
+      <li class="tr" data-t="" data-q="100" data-s="0" data-c="na" data-v="Folha de S.Paulo" data-e="Tecnologia &amp; Negócios" data-o="0" data-i="17">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-na" aria-hidden="true"></i><b>—</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Tecnologia &amp; Negócios · 17/10</span><span class="tr-h">Citi e Bank of America são mais dois bancos dos EUA a restringir acesso de IA a contas de clientes</span></span>
+      <span class="tr-sc" aria-hidden="true"></span>
+      <span class="tr-r"><b>Não se aplica</b></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico</li>
+<li>Relevância política nenhuma</li><li>780 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://c-level.folha.uol.com.br/financas/2026/10/citi-e-bank-of-america-sao-mais-dois-bancos-dos-eua-a-restringir-acesso-de-ia-a-contas-de-clientes.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (c-level.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
-  <p class="term-note">Termômetro de Viés Editorial (v1.1): a IA aponta, em cada texto compilado, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto e dá T de &minus;100 (esquerda) a +100 (direita). Mede o tratamento dado pelo texto, não a veracidade dos fatos; opinião fica à parte.</p>
+</li>
+      <li class="tr" data-t="" data-q="100" data-s="0" data-c="na" data-v="Folha de S.Paulo" data-e="Política" data-o="0" data-i="18">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-na" aria-hidden="true"></i><b>—</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Política · 17/10</span><span class="tr-h">Ex-presidente José Sarney recebe alta após cirurgia abdominal no Maranhão</span></span>
+      <span class="tr-sc" aria-hidden="true"></span>
+      <span class="tr-r"><b>Não se aplica</b></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política nenhuma</li><li>363 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/ex-presidente-jose-sarney-recebe-alta-apos-cirurgia-abdominal-no-maranhao.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="" data-q="92" data-s="0" data-c="na" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="19">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-na" aria-hidden="true"></i><b>—</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 17/10</span><span class="tr-h">Papa Leão deixa hospital, quatro dias após cirurgia para tratar câncer de pulmão</span></span>
+      <span class="tr-sc" aria-hidden="true"></span>
+      <span class="tr-r"><b>Não se aplica</b></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política nenhuma</li><li>342 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/17/papa-leo-deixar-hospital-quatro-dias-aps-cirurgia-para-tratar-cncer-de-pulmo.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="" data-q="90" data-s="0" data-c="na" data-v="Valor Econômico" data-e="Natureza &amp; Meio Ambiente" data-o="0" data-i="20">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-na" aria-hidden="true"></i><b>—</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Natureza &amp; Meio Ambiente · 17/10</span><span class="tr-h">Chuvas intensas, estiagem e queimadas provocam estragos e agravam riscos ambientais em diferentes regiões do Brasil</span></span>
+      <span class="tr-sc" aria-hidden="true"></span>
+      <span class="tr-r"><b>Não se aplica</b></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política nenhuma</li><li>1.320 palavras (corpo cortado no fim)</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/brasil/noticia/2026/10/17/chuvas-intensas-estiagem-e-queimadas-provocam-estragos-e-agravam-riscos-ambientais-em-diferentes-regioes-do-brasil.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+    </ol>
+    <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
+    <button class="tm-more" id="tmMore" type="button" hidden></button>
+  </section>
+  <div class="tm-metodo" id="term-metodo">
+    <h3 class="tm-ph">Como ler</h3>
+    <dl>
+      <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
+      <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
+      <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
+    </dl>
+    <p class="tm-foot">Termômetro de Viés Editorial, cálculo v1.1 · hoje: 20 análises novas · 40 textos candidatos vistos (11 curtos demais) · 5 chamadas à IA (gemini-flash-latest).</p>
+  </div>
 </section>
 
 </main>
@@ -5076,6 +5597,68 @@ body.modal-open .btt{visibility:hidden}
     update();
   }
 
+  /* ── Termômetro do dia: filtros, ordem e "mostrar todos" na lista de textos ──
+     Sem script, a lista aparece inteira na ordem da página (mais inclinados primeiro)
+     e os filtros ficam ocultos. */
+  function setupTermometro() {
+    var list = d.getElementById('tmList'), form = d.getElementById('tmFil');
+    if (!list || !form) return;
+    var more = d.getElementById('tmMore'), none = d.getElementById('tmNone');
+    var shown = form.querySelector('.tm-shown');
+    var rows = Array.prototype.slice.call(list.children);
+    var chips = Array.prototype.slice.call(form.querySelectorAll('.tm-chip'));
+    var selV = form.querySelector('select[name="v"]');
+    var selE = form.querySelector('select[name="e"]');
+    var selO = form.querySelector('select[name="o"]');
+    var visiveis = parseInt(list.getAttribute('data-visiveis'), 10) || 12;
+    var filtro = 'all', todos = false;
+    function num(row, key, vazio) {
+      var v = parseFloat(row.getAttribute('data-' + key));
+      return isNaN(v) ? vazio : v;
+    }
+    function pos(a, b) { return num(a, 'i', 0) - num(b, 'i', 0); }
+    var ordens = {
+      inc: function (a, b) { return Math.abs(num(b, 't', 0)) - Math.abs(num(a, 't', 0)) || num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      lr: function (a, b) { return num(a, 't', 1000) - num(b, 't', 1000) || pos(a, b); },
+      q: function (a, b) { return num(a, 'q', 1000) - num(b, 'q', 1000) || pos(a, b); },
+      sig: function (a, b) { return num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      v: function (a, b) { return (a.getAttribute('data-v') || '').localeCompare(b.getAttribute('data-v') || '', 'pt-BR') || pos(a, b); }
+    };
+    function passa(row) {
+      if (filtro === 'sig' && !(num(row, 's', 0) > 0)) return false;
+      if (filtro === 'inc' && (row.getAttribute('data-t') === '' || row.getAttribute('data-c') === 'eq')) return false;
+      if (filtro === 'op' && row.getAttribute('data-o') !== '1') return false;
+      if (selV.value && row.getAttribute('data-v') !== selV.value) return false;
+      if (selE.value && row.getAttribute('data-e') !== selE.value) return false;
+      return true;
+    }
+    function render() {
+      var sel = rows.filter(passa).sort(ordens[selO.value] || ordens.inc);
+      var filtrado = filtro !== 'all' || selV.value || selE.value;
+      var limite = todos || filtrado ? sel.length : Math.min(visiveis, sel.length);
+      rows.forEach(function (r) { r.hidden = true; });
+      sel.forEach(function (r, i) { list.appendChild(r); r.hidden = i >= limite; });
+      none.hidden = sel.length > 0;
+      more.hidden = limite >= sel.length;
+      if (limite < sel.length) more.textContent = 'Mostrar todos os ' + sel.length + ' textos';
+      shown.textContent = limite < sel.length
+        ? 'Mostrando ' + limite + ' de ' + sel.length
+        : sel.length + (sel.length === 1 ? ' texto' : ' textos');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        filtro = chip.getAttribute('data-f');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        render();
+      });
+    });
+    [selV, selE, selO].forEach(function (s) { s.addEventListener('change', render); });
+    more.addEventListener('click', function () { todos = true; render(); });
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.hidden = false;
+    render();
+  }
+
   setupTheme();
   setupCanvas();
   setupTicker();
@@ -5087,6 +5670,7 @@ body.modal-open .btt{visibility:hidden}
   setupAges();
   setupModals();
   setupScroll();
+  setupTermometro();
 })();</script>
 </body>
 </html>

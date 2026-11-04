@@ -298,11 +298,11 @@ class TermometroConfig:
         default_factory=lambda: ["politica", "juridico", "brasil", "mundo", "mercados", "natureza", "tecnologia", "imobiliario"]
     )
     idiomas: list[str] = field(default_factory=lambda: ["pt"])
-    max_textos: int = 20  # análises novas por edição (textos já analisados são reaproveitados)
-    max_paginas: int = 60  # páginas originais consultadas atrás de texto suficiente
-    textos_por_chamada: int = 4
-    max_chamadas: int = 6  # teto de chamadas à IA por edição (contando novas tentativas na cadeia)
-    deadline_seconds: int = 480  # prazo da análise, depois da edição (soma-se ao da edição no job)
+    max_textos: int = 60  # análises novas por edição (textos já analisados são reaproveitados)
+    max_paginas: int = 180  # páginas originais consultadas atrás de texto suficiente
+    textos_por_chamada: int = 5
+    max_chamadas: int = 15  # teto de chamadas à IA por edição (contando novas tentativas na cadeia)
+    deadline_seconds: int = 720  # prazo da análise, depois da edição (soma-se ao da edição no job)
 
 
 @dataclass

@@ -277,7 +277,7 @@ def test_analise_usa_o_calculo_de_referencia_sem_alteracao(config):
     registro = analise.analisar_edicao(edition, bundle, config, backend=ia, enrich_fn=paginas)
     assert registro["motivo"] is None and registro["falhas"] == 0
     assert len(registro["analises"]) == 6  # política e economia, 3 veículos cada
-    assert [c["label"] for c in ia.calls] == ["termômetro 1/2", "termômetro 2/2"]  # 4 textos por chamada
+    assert [c["label"] for c in ia.calls] == ["termômetro 1/2", "termômetro 2/2"]  # 5 textos por chamada
     assert ia.calls[0]["system"] == analise.SISTEMA and "Falas diretas:" in ia.calls[0]["user_text"]
     primeira = registro["analises"][0]
     t = analise.montar_texto(
@@ -440,7 +440,14 @@ def test_bloco_do_dia_e_seguro_e_bem_formado(config):
     assert all(n == 1 for n in estrutura.ids.values())
     assert "<script>alert" not in html and "**" not in html and "*" not in visible_text(html)
     assert html.count("<script") == 2  # só os scripts da página
-    assert "Termômetro do dia" in html and "3 textos analisados" in html
+    assert "Termômetro do dia" in html
+    bloco = html[html.index('<section class="term"') : html.index('<footer class="ft">')]
+    # placar, indicadores, painéis e uma linha por texto (com os dados dos filtros escapados)
+    assert 'class="tm-placar"' in bloco and '<p class="tm-n">−14</p>' in bloco  # (−40 + 12) / 2
+    assert '<span class="tm-k">Textos analisados</span><span class="tm-kv">3</span>' in bloco
+    assert bloco.count('<li class="tr" ') == 3 and 'id="tmFil"' in bloco and 'id="term-metodo"' in bloco
+    assert 'data-v="&lt;script&gt;alert(1)&lt;/script&gt;"' in bloco
+    assert '<option value="&lt;script&gt;alert(1)&lt;/script&gt;">' in bloco
 
 
 def test_bloco_do_dia_sem_analise_mostra_o_motivo(config):
@@ -455,7 +462,8 @@ def test_media_do_dia_vem_da_agregacao_e_separa_opiniao():
     analises = [_analise("a", DATA, T=-30), _analise("b", DATA, T=-10), _analise("c", DATA, T=50, selo="Opinião")]
     view = termometro_dia_view(analise.registro_do_dia(DATA, analises))
     assert view.gauge.valor == "−20" and view.gauge.rotulo == "Leve à esquerda"  # (−30 −10)/2; opinião fora
-    assert any("1 texto de opinião (T +50, à parte)" == m for m in view.meta)
+    assert "1 texto de opinião (T +50, à parte)" in view.indicadores[1].detalhe  # Notícias com T
+    assert view.distribuicao.fora == "1 texto de opinião (T +50, à parte)"
 
 
 @pytest.mark.parametrize("dias", [0, 1, 40])
@@ -612,3 +620,125 @@ def test_todas_as_analises_a_linha_inteira_abre_o_texto_original(config):
     linha = re.search(r'<li class="tl tl-lk">.*?</li>', html, re.S).group(0)
     assert '<a class="hit" href="https://x.com/a" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (x.com)">' in linha
     assert ".tl.tl-lk{position:relative;cursor:pointer" in html  # o link do título cobre a linha (.hit::after)
+
+
+# ── volume e detalhes (nov/2026) ─────────────────────────────────────────────
+
+
+def test_volume_da_configuracao_triplica_a_analise(config):
+    cfg = config.termometro
+    assert (cfg.max_textos, cfg.max_paginas, cfg.textos_por_chamada, cfg.max_chamadas) == (60, 180, 5, 15)
+    assert cfg.deadline_seconds == 720
+    # o menor limite de saída da cadeia real (Gemini e Mistral: 32.000) comporta os 5 textos por chamada
+    menor = min(api.max_tokens for nome, api in config.llm.apis.items() if nome in config.llm.providers)
+    assert int(menor * analise.OUTPUT_SHARE) // analise.TOKENS_POR_TEXTO >= cfg.textos_por_chamada
+
+
+def test_sessenta_textos_em_doze_chamadas_com_todos_os_veiculos(config):
+    edition, bundle = cenario(n_materias=30, por_materia=3)  # 60 textos de política e economia, 3 veículos
+    ia = Falsa()
+    registro = analise.analisar_edicao(edition, bundle, config, backend=ia, enrich_fn=paginas)
+    assert len(registro["analises"]) == 60 and registro["falhas"] == 0 and registro["novas"] == 60
+    assert len(ia.calls) == 12 and all(c["user_text"].count('<texto id="') == 5 for c in ia.calls)
+    assert {a["veiculo"] for a in registro["analises"]} == {"Veículo 0", "Veículo 1", "Veículo 2"}
+
+
+def test_registro_guarda_os_detalhes_que_a_ia_devolve_e_o_calculo_confere():
+    a = artigo(7)
+    t = analise.Texto(
+        artigo=a, materia="m", secao="politica", editoria="Política", paragrafos=CASO["paragrafos"],
+        meta=CASO["meta"], linha_fina=True, cortado=False, palavras=500,
+    )
+    r = calcular(CASO["saida_modelo"], CASO["paragrafos"], CASO["lexico"], CASO["meta"])
+    reg = analise.registro_da_analise(t, r, DATA)
+    assert reg["T"] == r["T"] and reg["qualidade_apuracao"]["Q"] == r["qualidade_apuracao"]["Q"]
+    # checklist da qualidade: os 8 itens, na ordem dos pesos, com a resposta de cada um
+    assert list(reg["qualidade_apuracao"]["itens"]) == list(PARAMETROS["qualidade_pesos"])
+    assert set(reg["qualidade_apuracao"]["itens"].values()) <= {"sim", "nao", "nao_se_aplica"}
+    # enquadramento, teste de inversão e justificativa da triagem, como a IA escreveu (encurtados)
+    assert set(reg["enquadramento"]) == {"problema", "causa", "vitima", "culpado", "solucao", "motor_moral"}
+    assert reg["teste_inversao"] and len(reg["teste_inversao"]) <= analise.INVERSAO_MAX
+    assert reg["triagem"]["justificativa"]
+    # atores e fontes (com as palavras de fala direta contadas pelo cálculo) e a última palavra
+    assert reg["atores"] and all(set(x) == {"nome", "campo"} for x in reg["atores"])
+    assert sum(f["palavras"] for f in reg["fontes"]) == sum(f["palavras"] for f in r["fontes"])
+    assert sum(f["ultima"] for f in reg["fontes"]) == 1 and reg["falas"] == len(r["falas"])
+    assert reg["saldo_fontes"] == {"esquerda": r["saldo_fontes"]["esquerda"], "direita": r["saldo_fontes"]["direita"]}
+    # contribuição de cada critério que pontuou: a soma é o T (antes do arredondamento)
+    assert abs(sum(reg["criterios"].values()) - r["T_bruto"]) < 0.1 and reg["aplicaveis"] == len(r["aplicaveis"])
+    # cada sinal guarda intensidade, certeza e eixo; o ator favorecido ou desfavorecido sai pelo nome
+    assert all({"intensidade", "certeza", "eixo"} <= set(e) for e in reg["evidencias"])
+    assert any("desfavorece" in e or "favorece" in e for e in reg["evidencias"])
+    assert reg["motivos_confianca"]
+    json.dumps(reg)  # serializável como está
+
+
+def test_lista_do_analitico_mostra_as_mais_recentes_e_aponta_a_pesquisa(config, monkeypatch):
+    from qijournal.render import analitico
+
+    monkeypatch.setattr(analitico, "LISTA_MAX", 5)
+    analises = [_analise(f"a{i}", f"2026-10-{1 + i:02d}") for i in range(8)]
+    html = render_analitico_page([{"data": "2026-10-09", "analises": analises}], config, home_href="../", archive_href="./")
+    assert html.count('class="tl ') == 5 and "Texto a7" in html and "Texto a0" not in html
+    assert 'href="pesquisa.html?tipo=a"' in html and "3 análises mais antigas" in html
+
+
+def _registro_de_referencia() -> dict[str, Any]:
+    a = artigo(8)
+    t = analise.Texto(
+        artigo=a, materia="m", secao="politica", editoria="Política", paragrafos=CASO["paragrafos"],
+        meta=CASO["meta"], linha_fina=True, cortado=False, palavras=500, data_publicacao=DATA,
+    )
+    return analise.registro_da_analise(t, calcular(CASO["saida_modelo"], CASO["paragrafos"], CASO["lexico"], CASO["meta"]), DATA)
+
+
+def test_painel_do_dia_com_o_detalhe_das_analises(config):
+    ref = _registro_de_referencia()  # Esquerda forte, 15 sinais, checklist e enquadramento
+    outras = [_analise("b", DATA, T=0, veiculo="g1"), _analise("c", DATA, T=30, selo="Opinião", veiculo="g1")]
+    view = termometro_dia_view(analise.registro_do_dia(DATA, [ref, *outras], novas=3, candidatos=9, chamadas=1, modelo="m"))
+    # o traço de cada notícia na escala: a opinião fica de fora, como na média
+    assert len(view.gauge.rug) == 2 and view.gauge.faixas[2].ativa is (view.gauge.classe == "el")
+    rotulos = [k.rotulo for k in view.indicadores]
+    assert rotulos == ["Textos analisados", "Notícias com T", "Qualidade da apuração", "Sinais que pontuaram"]
+    assert view.indicadores[3].valor == str(len(ref["evidencias"]))
+    # sinais por critério: contagem das evidências, por lado
+    por_nome = {c.nome: c for c in view.sinais.criterios}
+    verbos = [e for e in ref["evidencias"] if e["criterio"] == "VERBOS"]
+    assert por_nome["Verbos de atribuição"].esq == sum(e["direcao"] == "esquerda" for e in verbos)
+    assert view.sinais.total == view.sinais.esq + view.sinais.dir + view.sinais.eq == len(ref["evidencias"])
+    # checklist: só a notícia com os itens guardados entra (a opinião e a análise antiga não)
+    assert view.checklist.textos == 1
+    assert {i.nome: i.pct for i in view.checklist.itens}["Contraponto ouvido ou procurado"] == 100
+    # recortes do dia pela agregação (opinião fora); filtros e contagens da lista
+    veiculos = {g.nome: g for g in view.recortes[0].itens}
+    assert veiculos["g1"].n == 1 and veiculos["g1"].valor == "0" and view.recortes[0].dominio == 100
+    assert [o.valor for o in view.veiculos] == ["g1", CASO["meta"]["veiculo"]] and view.opiniao == 1
+    assert view.com_sinais == 1 and view.inclinados == 2  # a referência e a opinião (+30) saem do equilíbrio
+    assert view.execucao == "3 análises novas · 9 textos candidatos vistos · 1 chamada à IA (m)"
+    # o texto de referência: sinais do maior peso para o menor, critério com inicial maiúscula,
+    # motor moral legível, contribuição de cada critério e checklist item a item
+    a = next(x for x in view.analises if x.id == ref["id"])
+    pesos = [abs(e["contribuicao"]) for e in ref["evidencias"]]
+    assert a.evidencias[0].contribuicao == analise_fmt(max(pesos)) and a.evidencias[0].criterio[0].isupper()
+    assert ("Valor moral", "cuidado e igualdade") in a.enquadramento
+    assert a.contribuicoes[0].lado == "esq" and a.contribuicoes[0].width == 100.0
+    assert [c.valor for c in a.checklist][:2] == ["nao", "sim"] and a.inversao and a.fontes and a.fala
+    html = render_edition_page(_edicao_registro([ref, *outras]), config, home_href="./", archive_href="edicoes/")
+    estrutura = parse(html)
+    assert estrutura.errors == [] and estrutura.stack == [] and all(n == 1 for n in estrutura.ids.values())
+    assert html.count('<li class="tev-') == len(ref["evidencias"]) and "Ver os outros 10 sinais" in html
+    assert "Como o T se formou" in html and "Teste de inversão" in html and "Quem fala (7)" in html
+    texto = visible_text(html)
+    assert "*" not in texto and "cuidado_igualdade" not in texto and "nao_se_aplica" not in texto
+
+
+def analise_fmt(valor: float) -> str:
+    from qijournal.render.termometro import fmt_dec
+
+    return fmt_dec(-valor)
+
+
+def _edicao_registro(analises: list[dict[str, Any]]) -> Edition:
+    edition = pipeline_edition(DATA)
+    edition.termometro = analise.registro_do_dia(DATA, analises)
+    return edition

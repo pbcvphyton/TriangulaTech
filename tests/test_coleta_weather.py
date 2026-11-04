@@ -146,8 +146,17 @@ def test_parse_forecast_without_temperatures_raises(data: dict) -> None:
 # ── collect_weather ──────────────────────────────────────────────────────────
 
 
-def test_collect_weather_config_cities_in_order() -> None:
+def test_config_weather_only_sao_paulo() -> None:
+    # Montevidéu saiu da faixa de clima: a edição só consulta São Paulo.
     cities = load_config(env={}).weather
+    assert [c.name for c in cities] == ["São Paulo"]
+    fetch = FakeFetch({forecast_url(cities[0]): fixture("openmeteo_sao_paulo.json")})
+    assert [w.city for w in collect_weather(cities, fetch=fetch)] == ["São Paulo"]
+    assert len(fetch.calls) == 1
+
+
+def test_collect_weather_cities_in_order() -> None:
+    cities = [SAO_PAULO, MONTEVIDEO]  # várias cidades: a ordem da configuração vale
     fetch = FakeFetch({
         forecast_url(cities[0]): fixture("openmeteo_sao_paulo.json"),
         forecast_url(cities[1]): fixture("openmeteo_montevideo.json"),

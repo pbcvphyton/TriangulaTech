@@ -66,8 +66,9 @@ class Internet:
         self.down = down
         self.routes: dict[str, Path] = {url: COLETA / "feeds" / name for url, name in FEEDS.items()}
         self.routes.update({url: COLETA / "market" / name for url, name in MARKET.items()})
-        for city, name in zip(config.weather, ("openmeteo_sao_paulo.json", "openmeteo_montevideo.json"), strict=True):
-            self.routes[forecast_url(city)] = COLETA / "weather" / name
+        previsoes = {"São Paulo": "openmeteo_sao_paulo.json", "Montevidéu": "openmeteo_montevideo.json"}
+        for city in config.weather:
+            self.routes[forecast_url(city)] = COLETA / "weather" / previsoes[city.name]
         self.calls: list[str] = []
         self._lock = threading.Lock()
 
@@ -105,7 +106,7 @@ def test_partial_network_failures_still_publish_a_complete_edition(tmp_path: Pat
     errors = {f["error"] for f in edition.stats.sources_failed}
     assert {"HTTP 403", "timeout", "XML inválido", "0 itens"} <= errors
     assert len(edition.quotes) == len(config.market)  # BTC pelo fallback (CoinGecko)
-    assert len(edition.weather) == 2
+    assert [w.city for w in edition.weather] == [c.name for c in config.weather] == ["São Paulo"]
     assert edition.stats.articles_collected >= config.edition.min_articles
 
     # edição completa em modo automático (sem chave) e publicada
