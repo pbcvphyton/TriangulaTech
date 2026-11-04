@@ -18,7 +18,7 @@ from qijournal import pipeline
 from qijournal.collect.enrich import PageInfo
 from qijournal.config import load_config
 from qijournal.edit.llm import LLMUnavailable, _Usage
-from qijournal.models import Article, Bundle, Edition, Section, SourceRef, Story
+from qijournal.models import Article, Bundle, Coverage, Edition, Section, SourceRef, Story
 from qijournal.render.analitico import render_analitico_page
 from qijournal.render.termometro import termometro_dia_view
 from qijournal.render.web import render_edition_page
@@ -229,8 +229,43 @@ def test_candidatos_em_rodizio_por_prioridade_e_idioma(config):
     edition, bundle = cenario(n_materias=3, por_materia=2)
     bundle.articles[1].lang = "en"
     ordem = [(a.id, s.id) for a, s in analise.candidatos(edition, bundle, config)]
-    # política (m0) antes de economia (m1); esporte (m2) fora; o 2º artigo de m0 está em inglês
-    assert ordem == [("t000", "m0"), ("t010", "m1"), ("t011", "m1")]
+    # política (m0) antes de economia (m1); esporte (m2) fora; o 2º artigo de m0 está em inglês;
+    # o 1º texto do Veículo 1 (t011) vem antes do 2º do Veículo 0 (t010)
+    assert ordem == [("t000", "m0"), ("t011", "m1"), ("t010", "m1")]
+
+
+def _com_cobertura_comparada(edition: Edition, bundle: Bundle) -> None:
+    """Dois assuntos da cobertura comparada: um de esporte (fora do termômetro) e um de política."""
+    bundle.articles += [
+        artigo(90, fonte="Veículo 0"), artigo(91, fonte="Agência X"), artigo(92, fonte="Revista Y", lang="en"),
+        artigo(93, fonte="Jornal Z"),
+    ]
+    edition.compared = [
+        Coverage(topic="Assunto de esporte", conclusion="", outlets=[], section="esporte", article_ids=["t093"]),
+        Coverage(topic="Assunto de política", conclusion="", outlets=[], section="politica", article_ids=["t090", "t091", "t092"]),
+    ]
+
+
+def test_candidatos_incluem_a_cobertura_comparada_e_alternam_os_veiculos(config):
+    edition, bundle = cenario(n_materias=2, por_materia=2)
+    _com_cobertura_comparada(edition, bundle)
+    ordem = [(a.id, s.id) for a, s in analise.candidatos(edition, bundle, config)]
+    # 1ª volta: o 1º texto de cada veículo (matérias antes dos assuntos comparados); 2ª e 3ª voltas: os
+    # demais textos do Veículo 0. O assunto de esporte fica de fora, e o texto em inglês também.
+    assert ordem == [
+        ("t000", "m0"), ("t001", "m0"), ("t091", "cobertura-2"), ("t010", "m1"), ("t011", "m1"), ("t090", "cobertura-2"),
+    ]
+
+
+def test_textos_da_cobertura_comparada_entram_na_analise_com_a_origem(config):
+    edition, bundle = cenario(n_materias=1, por_materia=1)
+    _com_cobertura_comparada(edition, bundle)
+    registro = analise.analisar_edicao(edition, bundle, config, backend=Falsa(), enrich_fn=paginas)
+    por_id = {a["id"]: a for a in registro["analises"]}
+    assert sorted(por_id) == ["t000", "t090", "t091"]
+    assert (por_id["t000"]["origem"], por_id["t000"]["materia"]) == ("materia", "m0")
+    assert (por_id["t091"]["origem"], por_id["t091"]["materia"]) == ("cobertura comparada", "")
+    assert por_id["t091"]["veiculo"] == "Agência X" and por_id["t091"]["editoria"] == "Política"
 
 
 # ── análise da edição ────────────────────────────────────────────────────────
@@ -554,3 +589,26 @@ def test_dia_a_dia_leva_a_edicao_em_que_os_textos_foram_analisados(config):
     html = render_analitico_page(registros, config, home_href="../", archive_href="./", edicoes=["2026-10-11", "2026-10-12"])
     linhas = re.findall(r'<a href="(\d{4}-\d{2}-\d{2})\.html#termometro">(\d{2}/\d{2}/\d{4})</a>', html)
     assert linhas == [("2026-10-12", "11/10/2026"), ("2026-10-11", "10/10/2026")]
+
+
+def test_ranking_de_veiculos_mostra_todos_e_marca_a_amostra_pequena(config):
+    analises = [_analise(f"f{i}", "2026-10-10") for i in range(35)]  # Folha: 35 notícias com T
+    analises += [_analise(f"g{i}", "2026-10-10", veiculo="g1") for i in range(2)]  # g1: só 2
+    html = render_analitico_page([{"data": "2026-10-10", "analises": analises}], config, home_href="../", archive_href="./")
+    veiculos = html[html.index('id="an-rk-1"') : html.index('id="an-rk-2"')]
+    assert '<li class="rk-i" title="Folha: T ajustado' in veiculos
+    assert '<li class="rk-i rk-pq" title="g1: T ajustado' in veiculos and "2 notícias · média bruta" in veiculos
+    assert "amostra pequena" in veiculos and "Fora do ranking" not in veiculos
+    qualidade = html[html.index('id="an-q"') :]
+    assert '<li class="rk-pq"><span class="rk-n">g1</span>' in qualidade
+    editorias = html[html.index('id="an-rk-2"') : html.index('id="an-q"')]
+    assert "rk-pq" not in editorias  # editorias seguem o mínimo da especificação (30)
+
+
+def test_todas_as_analises_a_linha_inteira_abre_o_texto_original(config):
+    html = render_analitico_page(
+        [{"data": "2026-10-10", "analises": [_analise("a", "2026-10-10")]}], config, home_href="../", archive_href="./"
+    )
+    linha = re.search(r'<li class="tl tl-lk">.*?</li>', html, re.S).group(0)
+    assert '<a class="hit" href="https://x.com/a" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (x.com)">' in linha
+    assert ".tl.tl-lk{position:relative;cursor:pointer" in html  # o link do título cobre a linha (.hit::after)

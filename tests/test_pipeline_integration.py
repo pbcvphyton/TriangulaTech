@@ -75,7 +75,11 @@ def test_archive_accumulates_days_and_reruns_are_idempotent(tmp_path: Path, clea
 
     archive = sorted(p.name for p in (tmp_path / "edicoes").glob("2026-*.html"))
     assert archive == ["2026-09-29-todas.html", "2026-09-29.html", "2026-09-30-todas.html", "2026-09-30.html"]
-    assert sorted(p.name for p in (tmp_path / "data").iterdir()) == ["2026-09-29.json", "2026-09-30.json"]
+    assert sorted(p.name for p in (tmp_path / "data").iterdir()) == ["2026-09-29.json", "2026-09-30.json", "busca"]
+    # Pesquisa analítica: um arquivo de busca por edição e a página com as duas
+    assert sorted(p.name for p in (tmp_path / "data" / "busca").iterdir()) == ["2026-09-29.json", "2026-09-30.json"]
+    pesquisa = (tmp_path / "edicoes" / "pesquisa.html").read_text(encoding="utf-8")
+    assert '"d":"2026-09-30"' in pesquisa and '"d":"2026-09-29"' in pesquisa
     assert json.loads((tmp_path / "edicoes" / "latest.json").read_text(encoding="utf-8"))["date"] == "2026-09-30"
     archive_index = (tmp_path / "edicoes" / "index.html").read_text(encoding="utf-8")
     assert archive_index.index('href="2026-09-30.html"') < archive_index.index('href="2026-09-29.html"')

@@ -32,9 +32,7 @@
     {% if v.termometro and v.termometro.analitico_href %}
     <a class="tool tool-an" href="{{ v.termometro.analitico_href }}" title="Analítico Político: todo o histórico do termômetro" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
     {% endif %}
-    {% if v.sections %}
-    <button class="tool" type="button" id="srchBtn" aria-controls="srchInput" title="Buscar (atalho: /)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Buscar</span></button>
-    {% endif %}
+    {{ m.search_tool(archive_href) }}
 {% endblock %}
 
 {% block content %}
@@ -300,11 +298,14 @@
 
 {% if v.sections %}
 <section class="tabs-wrap{% if v.default_all %} all{% endif %}" id="editorias" aria-label="Matérias por seção">
-  <div class="srch" role="search">
+  {# Digitar filtra as matérias do dia; Enter ou "Todas as edições" leva a busca
+     para a Pesquisa analítica (todas as edições). #}
+  <form class="srch" role="search" action="{{ archive_href }}pesquisa.html" method="get">
     <label class="srch-label" for="srchInput">Buscar</label>
-    <input class="srch-input" id="srchInput" type="search" placeholder="Pesquisar nas matérias do dia…" autocomplete="off" spellcheck="false" aria-keyshortcuts="/">
+    <input class="srch-input" id="srchInput" name="q" type="search" placeholder="Pesquisar nas matérias do dia…" autocomplete="off" spellcheck="false" aria-keyshortcuts="/">
     <span class="srch-count" id="srchCount" role="status" aria-live="polite"></span>
-  </div>
+    {{ m.search_all() }}
+  </form>
   <div class="tabs-nav">
   <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
   <div class="tabs-bar" role="tablist" aria-label="Seções">

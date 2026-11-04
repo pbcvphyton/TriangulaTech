@@ -54,10 +54,12 @@ def test_publish_writes_every_output(tmp_path: Path, render: FakeRender):
         "index": "index.html",
         "edition": "edicoes/2026-09-29.html",
         "data": "data/2026-09-29.json",
+        "busca": "data/busca/2026-09-29.json",
         "email_html": "edicoes/email.html",
         "email_text": "edicoes/email.txt",
         "latest": "edicoes/latest.json",
         "archive": "edicoes/index.html",
+        "pesquisa": "edicoes/pesquisa.html",
     }
     assert {k: p.relative_to(tmp_path).as_posix() for k, p in paths.items()} == expected
     assert all(p.is_file() and p.stat().st_size > 0 for p in paths.values())
@@ -201,6 +203,7 @@ def test_publishing_twice_the_same_day_overwrites(tmp_path: Path, render: FakeRe
         "email.txt",
         "index.html",
         "latest.json",
+        "pesquisa.html",
     ]
     assert [e["date"] for e in render.archives[-1]] == ["2026-09-29"]
     assert "Versão corrigida" in paths["index"].read_text(encoding="utf-8")

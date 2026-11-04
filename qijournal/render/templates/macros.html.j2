@@ -6,6 +6,17 @@
 
 {% macro lang(s) -%}{% if s.lang %} lang="{{ s.lang }}"{% endif %}{%- endmacro %}
 
+{#- Botão "Buscar" do cabeçalho: abre a Pesquisa analítica (todas as edições).
+    base: caminho da pasta das edições ("edicoes/" na capa, "./" ou "" dentro dela). -#}
+{% macro search_tool(base) -%}
+<a class="tool" href="{{ base }}pesquisa.html" title="Pesquisa analítica: buscar em todas as edições"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Buscar</span></a>
+{%- endmacro %}
+
+{#- Envia a caixa de busca da edição para a Pesquisa analítica. -#}
+{% macro search_all() -%}
+<button class="srch-all" type="submit" title="Buscar em todas as edições (Pesquisa analítica)"><span class="sr-only">Buscar em </span>Todas as edições<span aria-hidden="true"> &rarr;</span></button>
+{%- endmacro %}
+
 {% macro meta(s) -%}
 {% if s.source_names or s.age %}
 <p class="meta">{% if s.source_names %}<span>{{ s.source_names }}</span>{% endif %}{% if s.age %}<time datetime="{{ s.published }}" data-age>{{ s.age }}</time>{% endif %}</p>

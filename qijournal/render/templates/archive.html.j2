@@ -1,5 +1,6 @@
 {#- Índice do arquivo. Variáveis: brand, months [{label, items}], total, home_href, base_url, repo_url. -#}
 {% extends "layout.html.j2" %}
+{% import "macros.html.j2" as m %}
 
 {% block title %}{{ brand.name }} — Edições anteriores{% endblock %}
 {% block description %}Arquivo com todas as edições do {{ brand.name }}.{% endblock %}
@@ -8,6 +9,10 @@
 {% endblock %}
 {% block home_link %}{{ home_href }}{% endblock %}
 {% block dateline %}Arquivo de edições{% endblock %}
+
+{% block tools %}
+    {{ m.search_tool("") }}
+{% endblock %}
 
 {% block content %}
 <section class="arch" aria-labelledby="arch-h">

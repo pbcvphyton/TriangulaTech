@@ -156,6 +156,15 @@ def test_modal_content(page):
     assert '<button class="mc2" type="button">&larr; Voltar à edição</button>' in modal
 
 
+def test_modal_abre_na_tela_inteira_em_qualquer_tela(page):
+    # sem margem em volta nem largura máxima da caixa (antes: 700 px no computador e no tablet);
+    # o texto fica numa coluna de leitura no meio da tela
+    assert ".mo{display:none;position:fixed;inset:0;z-index:1000;overflow-y:auto;overscroll-behavior:contain;padding:0;" in page
+    assert ".ml{position:relative;width:100%;min-height:100%;padding:56px 40px 64px;" in page
+    assert ".ml>:not(.mc){max-width:720px;margin-left:auto;margin-right:auto}" in page
+    assert "max-width:700px" not in page
+
+
 def test_hero_lead_secondary_and_highlights(page, edition):
     hero = re.search(r'<section class="hero".*?</section>', page, re.S).group(0)
     lead = edition.story(LEAD_ID)
@@ -227,7 +236,11 @@ def test_header_dateline_and_tools(page):
     assert '<title id="triangula-logo-title">Triangula</title>' in page
     assert "dk-triangula-logo-title" not in page  # um só logo: o bloco é escuro nos dois modos
     assert 'class="q"' not in page  # wordmark de texto não é usado quando há logo
-    assert 'id="dmBtn"' in page and 'id="srchBtn"' in page and 'id="srchInput"' in page
+    assert 'id="dmBtn"' in page and 'id="srchInput"' in page
+    # "Buscar" leva à Pesquisa analítica (todas as edições); Enter na caixa da edição também
+    assert '<a class="tool" href="edicoes/pesquisa.html" title="Pesquisa analítica: buscar em todas as edições">' in page
+    assert '<form class="srch" role="search" action="edicoes/pesquisa.html" method="get">' in page
+    assert 'name="q" type="search"' in page and '<button class="srch-all" type="submit"' in page
     assert 'id="rdprog"' in page and 'id="btt"' in page
 
 

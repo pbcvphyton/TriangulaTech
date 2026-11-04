@@ -1,0 +1,623 @@
+{#- Pesquisa analítica (edicoes/pesquisa.html), sem bibliotecas: carrega sob demanda
+    os arquivos de busca das edições do período (data/busca/AAAA-MM-DD.json, das
+    mais recentes para as mais antigas), busca no navegador (sem acento, sem
+    diferenciar maiúsculas, todas as palavras; "frase exata"; -excluir) e mostra
+    os resultados, as contagens por edição, veículo e editoria e o CSV. O estado
+    da busca fica no endereço (?q=…&de=…), que pode ser guardado ou enviado. -#}
+(function () {
+  'use strict';
+  var d = document, w = window;
+  var dadosEl = d.getElementById('pqDados'), form = d.getElementById('pqForm');
+  if (!dadosEl || !form || !w.fetch || !String.prototype.normalize) return;
+  var M;
+  try { M = JSON.parse(dadosEl.textContent); } catch (e) { return; }
+
+  var DIAS = M.dias || [];  // da edição mais recente para a mais antiga
+  var POR_DATA = {};
+  DIAS.forEach(function (x) { POR_DATA[x.d] = x; });
+  var NOMES = {};
+  (M.tipos || []).forEach(function (t) { NOMES[t[0]] = t[1]; });
+  var SELO = { m: 'Matéria', n: 'Notícia', c: 'Cobertura comparada', a: 'Termômetro' };
+  var CLASSES = M.classes || {};
+  var FAIXAS = M.faixas || [10, 25, 50];
+  var ORDEM_TIPO = { m: 0, c: 1, a: 2, n: 3 };
+  var PESO_TIPO = { m: 4, c: 3, a: 2, n: 0 };
+  var PAGINA = 30, PARALELO = 6, TOPO = 10;
+
+  function $(id) { return d.getElementById(id); }
+  var qIn = $('pqQ'), deIn = $('pqDe'), ateIn = $('pqAte'), edIn = $('pqEd'), vIn = $('pqV'), ordIn = $('pqOrd'), titIn = $('pqTit');
+  var tipoIns = Array.prototype.slice.call(form.querySelectorAll('input[name="tipo"]'));
+  var statusEl = $('pqStatus'), outEl = $('pqOut'), anEl = $('pqAn'), countEl = $('pqCount'), listEl = $('pqList'), moreBtn = $('pqMore'), csvBtn = $('pqCsv');
+
+  /* ── texto ─────────────────────────────────────────────────────────── */
+  var MARCAS = /[̀-ͯ]/g;
+  function norm(s) { return String(s || '').normalize('NFD').replace(MARCAS, '').toLowerCase(); }
+  var ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ESC[c]; }); }
+  function num(n) { return Number(n).toLocaleString('pt-BR'); }
+  function plural(n, um, varios) { return num(n) + ' ' + (n === 1 ? um : varios); }
+  function dd(n) { return (n < 10 ? '0' : '') + n; }
+  function dataLonga(iso) { var p = iso.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+  function dataCurta(iso) { var p = iso.split('-'); return p[2] + '/' + p[1]; }
+  function inicioDia(iso) { var p = iso.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+  // Horários: minutos desde a meia-noite do dia da edição, no fuso do jornal
+  // (contados num relógio UTC "de mentira", que dispensa o fuso do leitor).
+  function momento(dia, minutos) { return minutos == null ? null : inicioDia(dia) + minutos * 60000; }
+  function dataHora(ms) {
+    var t = new Date(ms);
+    return dd(t.getUTCDate()) + '/' + dd(t.getUTCMonth() + 1) + '/' + t.getUTCFullYear() + ' ' + dd(t.getUTCHours()) + ':' + dd(t.getUTCMinutes());
+  }
+  function isoDe(ms) { var t = new Date(ms); return t.getUTCFullYear() + '-' + dd(t.getUTCMonth() + 1) + '-' + dd(t.getUTCDate()); }
+  function link(u) { return !u ? '' : (u.indexOf('://') < 0 ? 'https://' + u : u); }
+  function fmtT(t) { t = Math.round(t); return t < 0 ? '−' + Math.abs(t) : t > 0 ? '+' + t : '0'; }
+  function rotuloT(t) {
+    var r = Math.round(t), a = Math.abs(r), esq = r < 0;
+    if (a <= FAIXAS[0]) return 'Equilibrado';
+    if (a <= FAIXAS[1]) return esq ? 'Leve à esquerda' : 'Leve à direita';
+    if (a <= FAIXAS[2]) return esq ? 'Esquerda moderada' : 'Direita moderada';
+    return esq ? 'Esquerda forte' : 'Direita forte';
+  }
+
+  /* ── registros de uma edição ───────────────────────────────────────── */
+  function montar(dados) {
+    var dia = dados.data, V = dados.veiculos || [], S = dados.secoes || [], A = dados.assuntos || [], saida = [];
+    function secao(i) { return S[i] || ['', '', '']; }
+    function nomes(lista) { return (lista || []).map(function (i) { return V[i]; }).filter(Boolean); }
+    function add(r, extra) {
+      var s = secao(r.si);
+      r.d = dia;
+      r.s = s[0];
+      r.sl = s[1];
+      r.sc = s[2];
+      r.nt = norm(r.t);
+      r.nx = r.nt + '\n' + norm(extra);
+      saida.push(r);
+    }
+    (dados.materias || []).forEach(function (m) {
+      add({ k: 'm', si: m.s, w: momento(dia, m.h), f: nomes(m.f), t: m.t, l: m.l, x: m.c, p: m.p, id: m.id, lead: !!m.m },
+        [m.l, m.c, m.p].join('\n'));
+    });
+    (dados.noticias || []).forEach(function (n) {
+      var assunto = n[1] >= 0 ? A[n[1]] : null;
+      var titulo = assunto && assunto[0] !== n[3] ? assunto[0] : '';
+      // A notícia casa pelo próprio título; o assunto (agrupamento da edição) só aparece como contexto.
+      add({ k: 'n', si: n[0], w: momento(dia, n[5]), f: V[n[2]] ? [V[n[2]]] : [], t: n[3], u: link(n[4]), as: assunto, x: titulo }, '');
+    });
+    (dados.comparadas || []).forEach(function (c) {
+      var veiculos = (c.f || []).map(function (o) { return { n: V[o[0]], lado: o[1], foco: o[2], u: link(o[3]) }; })
+        .filter(function (o) { return o.n; });
+      add({ k: 'c', si: c.s, w: momento(dia, c.h), f: veiculos.map(function (o) { return o.n; }), t: c.t, x: c.c, c: c, vs: veiculos, u: link(c.u) },
+        [c.c, c.a, c.b].concat(veiculos.map(function (o) { return o.foco; })).join('\n'));
+    });
+    (dados.analises || []).forEach(function (a) {
+      add({ k: 'a', si: a.s, w: a.d ? inicioDia(a.d) : inicioDia(dia), soData: true, f: V[a.f] ? [V[a.f]] : [], t: a.t, x: a.z, u: link(a.u), a: a, id: 'a:' + a.id },
+        [a.z, a.e].join('\n'));
+    });
+    return saida;
+  }
+
+  var cache = {}, pendentes = {}, falhas = {};
+  function carregar(dia) {
+    if (cache[dia]) return Promise.resolve(cache[dia]);
+    if (!pendentes[dia]) {
+      pendentes[dia] = fetch((M.base || '../data/busca/') + dia + '.json')
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .then(function (dados) {
+          cache[dia] = montar(dados);
+          delete falhas[dia];
+          return cache[dia];
+        }, function () {
+          falhas[dia] = true;
+          return [];
+        })
+        .then(function (regs) {
+          delete pendentes[dia];
+          return regs;
+        });
+    }
+    return pendentes[dia];
+  }
+
+  /* ── consulta ──────────────────────────────────────────────────────── */
+  // Termos: palavras soltas (todas precisam aparecer), "frase exata" e -exclusão.
+  // Um termo casa no começo de uma palavra ("juro" acha "juros"; "lula" não acha
+  // "célula"); com até 3 letras, só a palavra inteira (STF, PT, IA).
+  function termos(q) {
+    var lista = [], re = /(-?)"([^"]*)"?|(-?)([^\s"]+)/g, m;
+    while ((m = re.exec(q))) {
+      var neg = !!(m[1] || m[3]), bruto = m[2] != null ? m[2] : m[4];
+      var n = norm(bruto).replace(/[^a-z0-9]+/g, ' ').trim();
+      if (!n) continue;
+      var corpo = n.replace(/ /g, '[^a-z0-9]+');
+      var fim = n.length <= 3 && n.indexOf(' ') < 0 ? '(?![a-z0-9])' : '';
+      var fonte = '(?:^|[^a-z0-9])(' + corpo + ')' + fim;
+      lista.push({ neg: neg, n: n, re: new RegExp(fonte), fonte: fonte });
+    }
+    return lista;
+  }
+  function casa(r, ts, soTitulo) {
+    var alvo = soTitulo ? r.nt : r.nx;
+    for (var i = 0; i < ts.length; i++) {
+      if (ts[i].re.test(alvo) === ts[i].neg) return false;
+    }
+    return true;
+  }
+  function pontos(r, ts) {
+    var p = PESO_TIPO[r.k] || 0;
+    ts.forEach(function (t) { if (!t.neg) p += t.re.test(r.nt) ? 10 : 2; });
+    return p;
+  }
+  function lerFiltros() {
+    var tipos = {}, algum = false;
+    tipoIns.forEach(function (i) { tipos[i.value] = i.checked; algum = algum || i.checked; });
+    if (!algum) tipoIns.forEach(function (i) { tipos[i.value] = true; });
+    var de = deIn.value, ate = ateIn.value;
+    if (de && ate && de > ate) { var x = de; de = ate; ate = x; }
+    return { q: qIn.value.trim(), tipos: tipos, de: de, ate: ate, ed: edIn.value, v: vIn.value, ord: ordIn.value || 'rec', tit: titIn.checked };
+  }
+  function passa(r, f) {
+    return f.tipos[r.k] && (!f.de || r.d >= f.de) && (!f.ate || r.d <= f.ate) && (!f.ed || r.s === f.ed) &&
+      (!f.v || r.f.indexOf(f.v) >= 0);
+  }
+
+  /* ── endereço ──────────────────────────────────────────────────────── */
+  var DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+  function opcao(select, valor) {
+    for (var i = 0; i < select.options.length; i++) {
+      if (select.options[i].value === valor) { select.selectedIndex = i; return; }
+    }
+    select.selectedIndex = 0;
+  }
+  function gravarEndereco(f) {
+    if (!w.history || !w.history.replaceState || !w.URLSearchParams) return;
+    var p = new URLSearchParams();
+    if (f.q) p.set('q', f.q);
+    var marcados = tipoIns.filter(function (i) { return i.checked; });
+    if (marcados.length && marcados.length < tipoIns.length) p.set('tipo', marcados.map(function (i) { return i.value; }).join(','));
+    ['de', 'ate', 'ed', 'v'].forEach(function (k) { if (f[k]) p.set(k, f[k]); });
+    if (f.ord !== 'rec') p.set('ord', f.ord);
+    if (f.tit) p.set('tit', '1');
+    var s = p.toString();
+    try { w.history.replaceState(null, '', s ? '?' + s : w.location.pathname); } catch (e) { /* file:// */ }
+  }
+  function lerEndereco() {
+    if (!w.URLSearchParams) return false;
+    var p = new URLSearchParams(w.location.search);
+    qIn.value = p.get('q') || '';
+    if (p.has('tipo')) {
+      var lista = (p.get('tipo') || '').split(',');
+      tipoIns.forEach(function (i) { i.checked = lista.indexOf(i.value) >= 0; });
+    }
+    deIn.value = DATA_ISO.test(p.get('de') || '') ? p.get('de') : '';
+    ateIn.value = DATA_ISO.test(p.get('ate') || '') ? p.get('ate') : '';
+    opcao(edIn, p.get('ed') || '');
+    opcao(vIn, p.get('v') || '');
+    opcao(ordIn, p.get('ord') || 'rec');
+    titIn.checked = p.get('tit') === '1';
+    return ['q', 'tipo', 'de', 'ate', 'ed', 'v', 'ord', 'tit'].some(function (k) { return p.has(k); });
+  }
+
+  /* ── busca ─────────────────────────────────────────────────────────── */
+  var corrida = 0, estado = null, desenhoPendente = 0;
+  function buscar() {
+    var f = lerFiltros(), ts = termos(f.q);
+    var dias = DIAS.filter(function (x) { return (!f.de || x.d >= f.de) && (!f.ate || x.d <= f.ate); });
+    var id = ++corrida;
+    estado = { f: f, ts: ts, res: [], chave: {}, dias: dias, feitos: 0, mostrar: PAGINA, fim: false };
+    gravarEndereco(f);
+    outEl.hidden = false;
+    listEl.innerHTML = '';
+    if (!dias.length) {
+      estado.fim = true;
+      desenhar();
+      return;
+    }
+    status('Buscando em ' + plural(dias.length, 'edição', 'edições') + '…');
+    var fila = dias.slice(), ativos = 0;
+    function proxima() {
+      while (ativos < PARALELO && fila.length) {
+        ativos++;
+        carregar(fila.shift().d).then(function (regs) {
+          ativos--;
+          if (id !== corrida) return;
+          processar(regs);
+          estado.feitos++;
+          if (estado.feitos === estado.dias.length) {
+            estado.fim = true;
+            desenhar();
+          } else {
+            agendar();
+            proxima();
+          }
+        });
+      }
+    }
+    proxima();
+  }
+  function processar(regs) {
+    var e = estado, f = e.f, ts = e.ts;
+    for (var i = 0; i < regs.length; i++) {
+      var r = regs[i];
+      if (!passa(r, f) || !casa(r, ts, f.tit)) continue;
+      // A mesma notícia (link) coletada em mais de uma edição aparece uma vez, na primeira.
+      var chave = r.k === 'n' ? r.u : r.k === 'a' ? r.id : null;
+      if (chave) {
+        var j = e.chave[chave];
+        if (j != null) {
+          var x = e.res[j];
+          x.n++;
+          if (r.d < x.r.d) x.r = r;
+          continue;
+        }
+        e.chave[chave] = e.res.length;
+      }
+      e.res.push({ r: r, n: 1, p: f.ord === 'rel' ? pontos(r, ts) : 0 });
+    }
+  }
+  function agendar() {
+    if (desenhoPendente) return;
+    desenhoPendente = w.setTimeout(function () {
+      desenhoPendente = 0;
+      if (estado && !estado.fim) desenhar();
+    }, 220);
+  }
+  function quando(r) { return r.w != null ? r.w : inicioDia(r.d); }
+  function ordenar(e) {
+    var ord = e.f.ord;
+    e.res.sort(function (a, b) {
+      if (ord === 'rel' && a.p !== b.p) return b.p - a.p;
+      var ta = quando(a.r), tb = quando(b.r);
+      if (ta !== tb) return ord === 'ant' ? ta - tb : tb - ta;
+      return ORDEM_TIPO[a.r.k] - ORDEM_TIPO[b.r.k];
+    });
+  }
+  function status(texto, erro) {
+    statusEl.textContent = texto || '';
+    statusEl.classList.toggle('err', !!erro);
+  }
+  function desenhar() {
+    var e = estado;
+    if (!e) return;
+    ordenar(e);
+    var faltam = e.dias.filter(function (x) { return falhas[x.d]; }).length;
+    if (!e.fim) status('Buscando… ' + e.feitos + ' de ' + plural(e.dias.length, 'edição', 'edições') + ' (resultados parciais)');
+    else if (faltam) status(plural(faltam, 'edição não carregou', 'edições não carregaram') + '; tente buscar de novo.', true);
+    else status('');
+    analitica(e);
+    lista(e);
+  }
+
+  /* ── contagens ─────────────────────────────────────────────────────── */
+  function contar(e) {
+    var c = { tipos: {}, dias: {}, veiculos: {}, secoes: {}, edicoes: 0, nveiculos: 0, T: [], Q: [], rotulos: {} };
+    var nomesSecao = {};
+    e.res.forEach(function (x) {
+      var r = x.r;
+      c.tipos[r.k] = (c.tipos[r.k] || 0) + 1;
+      c.dias[r.d] = (c.dias[r.d] || 0) + 1;
+      r.f.forEach(function (nome) { c.veiculos[nome] = (c.veiculos[nome] || 0) + 1; });
+      if (r.s) {
+        c.secoes[r.s] = (c.secoes[r.s] || 0) + 1;
+        nomesSecao[r.s] = r.sl;
+      }
+      if (r.k === 'a' && r.a.x !== 'Opinião') {
+        if (r.a.T != null) {
+          c.T.push(r.a.T);
+          c.rotulos[r.a.r] = (c.rotulos[r.a.r] || 0) + 1;
+        }
+        if (r.a.q != null) c.Q.push(r.a.q);
+      }
+    });
+    c.edicoes = Object.keys(c.dias).length;
+    c.nveiculos = Object.keys(c.veiculos).length;
+    c.nomesSecao = nomesSecao;
+    return c;
+  }
+  function topo(mapa, n) {
+    return Object.keys(mapa).map(function (k) { return [k, mapa[k]]; })
+      .sort(function (a, b) { return b[1] - a[1] || (a[0] < b[0] ? -1 : 1); }).slice(0, n);
+  }
+  function media(lista) { var s = 0; lista.forEach(function (v) { s += v; }); return lista.length ? s / lista.length : null; }
+  function analitica(e) {
+    if (!e.res.length) { anEl.innerHTML = ''; return; }
+    var c = contar(e), h = '';
+    h += '<div class="pq-kpis"><p class="pq-kpi"><b>' + num(e.res.length) + '</b>' + (e.res.length === 1 ? 'resultado' : 'resultados') + '</p>' +
+      '<p class="pq-kpi"><b>' + num(c.edicoes) + '</b>' + (c.edicoes === 1 ? 'edição' : 'edições') + '</p>' +
+      '<p class="pq-kpi"><b>' + num(c.nveiculos) + '</b>' + (c.nveiculos === 1 ? 'veículo' : 'veículos') + '</p></div>';
+    h += '<p class="pq-tps">' + (M.tipos || []).filter(function (t) { return c.tipos[t[0]]; }).map(function (t) {
+      return '<span>' + esc(t[1]) + ' <b>' + num(c.tipos[t[0]]) + '</b></span>';
+    }).join('') + '</p>';
+    // Por edição: uma barra por edição do período, da mais antiga para a mais recente.
+    var dias = e.dias.slice().reverse(), maior = 0;
+    dias.forEach(function (x) { maior = Math.max(maior, c.dias[x.d] || 0); });
+    if (dias.length > 1) {
+      h += '<figure class="pq-tl"><figcaption><h4>Resultados por edição</h4></figcaption><div class="pq-bars">';
+      dias.forEach(function (x) {
+        var n = c.dias[x.d] || 0, alt = maior ? Math.max(n ? 3 : 0, Math.round(n / maior * 100)) : 0;
+        h += '<button type="button" class="pq-b' + (n ? '' : ' z') + '" style="--h:' + alt + '%" data-dia="' + x.d + '" title="' +
+          esc(dataLonga(x.d) + ': ' + plural(n, 'resultado', 'resultados') + ' (clique para ver só esta edição)') + '"><span class="sr-only">' +
+          esc(dataLonga(x.d) + ': ' + plural(n, 'resultado', 'resultados')) + '</span></button>';
+      });
+      var meio = dias[Math.floor((dias.length - 1) / 2)].d;
+      h += '</div><div class="pq-ax" aria-hidden="true"><span>' + dataCurta(dias[0].d) + '</span><span>' + dataCurta(meio) + '</span><span>' +
+        dataCurta(dias[dias.length - 1].d) + '</span></div></figure>';
+    }
+    h += '<div class="pq-tops">';
+    var vs = topo(c.veiculos, TOPO), maxV = vs.length ? vs[0][1] : 1;
+    h += '<section><h4>Veículos com mais resultados</h4><ol class="pq-rk">' + vs.map(function (v) {
+      return '<li><button type="button" data-v="' + esc(v[0]) + '"' + (e.f.v === v[0] ? ' class="on"' : '') + ' title="Filtrar por ' + esc(v[0]) + '"><span>' +
+        esc(v[0]) + '</span><b>' + num(v[1]) + '</b><i style="--w:' + Math.round(v[1] / maxV * 100) + '%"></i></button></li>';
+    }).join('') + '</ol></section>';
+    var ss = topo(c.secoes, TOPO), maxS = ss.length ? ss[0][1] : 1;
+    h += '<section><h4>Editorias</h4><ol class="pq-rk">' + ss.map(function (s) {
+      return '<li><button type="button" data-ed="' + esc(s[0]) + '"' + (e.f.ed === s[0] ? ' class="on"' : '') + ' title="Filtrar por ' + esc(c.nomesSecao[s[0]]) + '"><span>' +
+        esc(c.nomesSecao[s[0]] || s[0]) + '</span><b>' + num(s[1]) + '</b><i style="--w:' + Math.round(s[1] / maxS * 100) + '%"></i></button></li>';
+    }).join('') + '</ol></section>';
+    if (c.tipos.a) {
+      var t = media(c.T), q = media(c.Q);
+      h += '<section class="pq-term"><h4>Termômetro nos textos encontrados</h4>';
+      if (t != null) {
+        var rot = rotuloT(t);
+        h += '<p><i class="sw t-' + esc(CLASSES[rot] || 'eq') + '" aria-hidden="true"></i><b>T ' + fmtT(t) + '</b> · ' + esc(rot) + ', na média simples de ' +
+          plural(c.T.length, 'notícia com T', 'notícias com T') + ' (opinião fora).</p>';
+        h += '<p>' + topo(c.rotulos, 8).map(function (x) { return esc(x[0]) + ' <b>' + num(x[1]) + '</b>'; }).join(' · ') + '</p>';
+      } else {
+        h += '<p>Nenhuma notícia com T entre os textos encontrados.</p>';
+      }
+      if (q != null) h += '<p>Qualidade da apuração: <b>' + Math.round(q) + '</b> de 100, em média.</p>';
+      if (M.analitico) h += '<p><a href="' + esc(M.analitico) + '">Ver o Analítico Político completo &rarr;</a></p>';
+      h += '</section>';
+    }
+    h += '</div>';
+    anEl.innerHTML = h;
+  }
+
+  /* ── resultados ────────────────────────────────────────────────────── */
+  // Marca os termos no texto original: o texto é normalizado letra a letra,
+  // guardando a posição de cada letra no original.
+  function marcar(texto, ts) {
+    texto = String(texto || '');
+    var positivos = ts.filter(function (t) { return !t.neg; });
+    if (!positivos.length || !texto) return esc(texto);
+    var n = '', mapa = [];
+    for (var i = 0; i < texto.length; i++) {
+      var c = norm(texto.charAt(i));
+      for (var j = 0; j < c.length; j++) { n += c.charAt(j); mapa.push(i); }
+    }
+    mapa.push(texto.length);
+    var faixas = [];
+    positivos.forEach(function (t) {
+      var re = new RegExp(t.fonte, 'g'), m;
+      while ((m = re.exec(n))) {
+        var ini = m.index + m[0].length - m[1].length, fim = ini + m[1].length;
+        faixas.push([mapa[ini], mapa[fim - 1] + 1]);
+        if (re.lastIndex === m.index) re.lastIndex++;
+      }
+    });
+    if (!faixas.length) return esc(texto);
+    faixas.sort(function (a, b) { return a[0] - b[0]; });
+    var html = '', pos = 0;
+    faixas.forEach(function (f) {
+      if (f[1] <= pos) return;
+      var ini = Math.max(f[0], pos);
+      html += esc(texto.slice(pos, ini)) + '<mark>' + esc(texto.slice(ini, f[1])) + '</mark>';
+      pos = f[1];
+    });
+    return html + esc(texto.slice(pos));
+  }
+  // Trecho de ~260 letras em volta do primeiro termo encontrado no texto.
+  function trecho(texto, ts, tamanho) {
+    texto = String(texto || '').replace(/\s*\n\s*/g, ' · ');
+    tamanho = tamanho || 260;
+    if (texto.length <= tamanho) return texto;
+    var n = norm(texto), ini = -1;
+    ts.forEach(function (t) {
+      if (t.neg) return;
+      var m = new RegExp(t.fonte).exec(n);
+      if (m && (ini < 0 || m.index < ini)) ini = m.index;
+    });
+    if (ini < 0) return texto.slice(0, tamanho).replace(/\s+\S*$/, '') + '…';
+    var a = Math.max(0, ini - 80), b = Math.min(texto.length, a + tamanho);
+    a = Math.max(0, b - tamanho);
+    var parte = texto.slice(a, b);
+    if (a > 0) parte = '…' + parte.replace(/^\S*\s/, '');
+    if (b < texto.length) parte = parte.replace(/\s+\S*$/, '') + '…';
+    return parte;
+  }
+  function veiculosTexto(lista) {
+    if (lista.length <= 4) return lista.join(', ');
+    return lista.slice(0, 4).join(', ') + ' e mais ' + (lista.length - 4);
+  }
+  function edicao(dia) { return dia + '.html'; }
+  function item(x, ts) {
+    var r = x.r, f = estado.f;
+    var hora = r.w == null ? dataLonga(r.d) : r.soData ? dataLonga(isoDe(r.w)) : dataHora(r.w);
+    var meta = ['<span class="pq-tp">' + esc(SELO[r.k] || r.k) + '</span>' + esc(hora)];
+    if (r.sl) meta.push(esc(r.sl));
+    var h = '<li class="pq-i pq-' + r.k + '"' + (r.sc ? ' style="--sc:' + esc(r.sc) + '"' : '') + '>';
+    var titulo = marcar(r.t, ts), dia = POR_DATA[r.d] || {};
+    var acoes = [];
+    if (r.k === 'm') {
+      if (r.f.length) meta.push(esc(veiculosTexto(r.f)));
+      h += '<p class="pq-m">' + meta.join(' · ') + (r.lead ? '<span class="pq-lead">Manchete</span>' : '') + '</p>';
+      h += '<h3 class="pq-t"><a href="' + esc(edicao(r.d) + '#s-' + encodeURIComponent(r.id)) + '">' + titulo + '</a></h3>';
+      var corpo = f.tit ? r.l : (r.l ? r.l + '\n' : '') + r.x + (r.p ? '\nPor que importa: ' + r.p : '');
+      if (corpo) h += '<p class="pq-x">' + marcar(trecho(corpo, ts), f.tit ? [] : ts) + '</p>';
+      acoes.push('<a href="' + esc(edicao(r.d) + '#s-' + encodeURIComponent(r.id)) + '">Abrir a matéria (edição de ' + dataCurta(r.d) + ')</a>');
+    } else if (r.k === 'n') {
+      if (r.f.length) meta.push(esc(r.f[0]));
+      if (x.n > 1) meta.push('em ' + x.n + ' edições');
+      h += '<p class="pq-m">' + meta.join(' · ') + '</p>';
+      h += '<h3 class="pq-t"><a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">' + titulo + '<span class="ext" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a notícia original em nova aba)</span></a></h3>';
+      if (r.as) {
+        var sobre = r.as[0] !== r.t ? 'Assunto: <b>' + marcar(r.as[0], f.tit ? [] : ts) + '</b>' : '';
+        var extras = [];
+        if (r.as[1]) extras.push('<a href="' + esc(edicao(r.d) + '#s-' + encodeURIComponent(r.as[1])) + '">virou matéria da edição</a>');
+        else if (r.as[2]) extras.push('<a href="' + esc(edicao(r.d) + '#cobertura') + '">na cobertura comparada</a>');
+        if (sobre || extras.length) h += '<p class="pq-v">' + [sobre].concat(extras).filter(Boolean).join(' · ') + '</p>';
+      }
+      acoes.push('<a href="' + esc(edicao(r.d)) + '">Edição de ' + dataCurta(r.d) + '</a>');
+      if (dia.t) acoes.push('<a href="' + esc(r.d + '-todas.html') + '">Todas as notícias do dia</a>');
+    } else if (r.k === 'c') {
+      meta.push(plural(r.f.length, 'veículo', 'veículos'));
+      h += '<p class="pq-m">' + meta.join(' · ') + '</p>';
+      h += '<h3 class="pq-t"><a href="' + esc(edicao(r.d) + '#cobertura') + '">' + titulo + '</a></h3>';
+      if (r.c.p) h += '<p class="pq-v">' + esc(r.c.p) + '</p>';
+      if (r.x && !f.tit) h += '<p class="pq-x">' + marcar(trecho(r.x, ts), ts) + '</p>';
+      if (r.vs.length) {
+        h += '<p class="pq-v">' + r.vs.slice(0, 8).map(function (o) {
+          var lado = o.lado === 'a' ? '<span class="ca">' + esc(r.c.a || 'lado A') + '</span>' : o.lado === 'b' ? '<span class="cb">' + esc(r.c.b || 'lado B') + '</span>' : 'neutro';
+          var nome = o.u ? '<a href="' + esc(o.u) + '" target="_blank" rel="noopener noreferrer">' + esc(o.n) + '</a>' : esc(o.n);
+          return nome + ' (' + lado + ')';
+        }).join(' · ') + (r.vs.length > 8 ? ' · e mais ' + (r.vs.length - 8) : '') + '</p>';
+      }
+      acoes.push('<a href="' + esc(edicao(r.d) + '#cobertura') + '">Ver na edição de ' + dataCurta(r.d) + '</a>');
+      if (r.u) acoes.push('<a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">Fonte principal &#8599;</a>');
+    } else if (r.k === 'a') {
+      var a = r.a;
+      if (r.f.length) meta.push(esc(r.f[0]));
+      if (a.o && a.o !== 'materia') meta.push(esc('da ' + a.o));
+      h += '<p class="pq-m">' + meta.join(' · ') + '</p>';
+      h += '<h3 class="pq-t">' + (r.u ? '<a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">' + titulo + '<span class="ext" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre o texto original em nova aba)</span></a>' : titulo) + '</h3>';
+      var valor = a.T != null ? '<span class="pq-T"><i class="sw t-' + esc(CLASSES[a.r] || 'na') + '" aria-hidden="true"></i>T ' + fmtT(a.T) + '</span> · ' : '';
+      h += '<p class="pq-v">' + valor + '<b>' + esc(a.r || '—') + '</b>' + (a.q != null ? ' · apuração ' + esc(a.q) : '') + (a.x ? ' · ' + esc(a.x) : '') + '</p>';
+      if (r.x && !f.tit) h += '<p class="pq-x">' + marcar(trecho(r.x, ts), ts) + '</p>';
+      if (POR_DATA[r.d]) acoes.push('<a href="' + esc(edicao(r.d) + '#termometro') + '">Sinais e citações no Termômetro do dia (' + dataCurta(r.d) + ')</a>');
+    }
+    if (acoes.length) h += '<p class="pq-act">' + acoes.join('') + '</p>';
+    return h + '</li>';
+  }
+  function lista(e) {
+    var total = e.res.length;
+    if (!total) {
+      countEl.innerHTML = '';
+      csvBtn.hidden = true;
+      moreBtn.hidden = true;
+      listEl.innerHTML = e.fim ? '<li class="pq-empty">Nada encontrado' + (e.f.q ? ' para <b>' + esc(e.f.q) + '</b>' : '') +
+        ' com esses filtros. Tente menos palavras, outra grafia, todos os tipos ou um período maior.</li>' : '';
+      return;
+    }
+    var mostrar = Math.min(e.mostrar, total);
+    countEl.innerHTML = esc(plural(total, 'resultado', 'resultados')) + (e.f.q ? ' para “' + esc(e.f.q) + '”' : '') +
+      ' <span>· ' + (e.f.ord === 'rel' ? 'mais relevantes primeiro' : e.f.ord === 'ant' ? 'mais antigos primeiro' : 'mais recentes primeiro') +
+      (mostrar < total ? ' · mostrando ' + num(mostrar) : '') + '</span>';
+    csvBtn.hidden = false;
+    var html = '';
+    for (var i = 0; i < mostrar; i++) html += item(e.res[i], e.ts);
+    listEl.innerHTML = html;
+    moreBtn.hidden = mostrar >= total;
+    moreBtn.textContent = 'Mostrar mais ' + num(Math.min(PAGINA, total - mostrar)) + ' (de ' + num(total - mostrar) + ' restantes)';
+  }
+
+  /* ── CSV ───────────────────────────────────────────────────────────── */
+  function celula(v, numero) {
+    v = v == null ? '' : String(v);
+    if (!numero && /^[=+\-@\t\r]/.test(v)) v = "'" + v;  // planilha não executa fórmula vinda do texto
+    return /[";\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  }
+  function absoluto(caminho) { try { return new URL(caminho, w.location.href).href; } catch (e) { return caminho; } }
+  csvBtn.addEventListener('click', function () {
+    var e = estado;
+    if (!e || !e.res.length) return;
+    var linhas = [['tipo', 'edição', 'data e hora', 'editoria', 'veículos', 'título', 'link', 'detalhe', 'T', 'rótulo', 'qualidade']];
+    e.res.forEach(function (x) {
+      var r = x.r, a = r.a || {};
+      var url = r.k === 'm' ? absoluto(edicao(r.d) + '#s-' + encodeURIComponent(r.id)) : r.k === 'c' ? absoluto(edicao(r.d) + '#cobertura') : r.u;
+      var detalhe = r.k === 'm' ? r.l : r.k === 'c' ? r.x : r.k === 'a' ? r.x : r.as && r.as[0] !== r.t ? r.as[0] : '';
+      var hora = r.w == null ? '' : r.soData ? dataLonga(isoDe(r.w)) : dataHora(r.w);
+      linhas.push([
+        celula(SELO[r.k] || r.k), celula(dataLonga(r.d)), celula(hora), celula(r.sl), celula(r.f.join(' | ')), celula(r.t),
+        celula(url), celula(detalhe), celula(a.T, true), celula(a.r), celula(a.q, true)
+      ]);
+    });
+    var csv = '﻿' + linhas.map(function (l) { return l.join(';'); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var nome = 'pesquisa-' + (norm(e.f.q).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'tudo') + '.csv';
+    var a = d.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nome;
+    d.body.appendChild(a);
+    a.click();
+    w.setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  });
+
+  /* ── eventos ───────────────────────────────────────────────────────── */
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    buscar();
+  });
+  var digitando = 0;
+  qIn.addEventListener('input', function () {
+    w.clearTimeout(digitando);
+    if (qIn.value.trim().length < 2) return;  // apagar o termo não lista tudo (para isso, o botão Buscar)
+    digitando = w.setTimeout(buscar, 450);
+  });
+  form.addEventListener('change', function (event) {
+    if (event.target === qIn) return;
+    if (estado || qIn.value.trim()) buscar();
+  });
+  Array.prototype.forEach.call(form.querySelectorAll('[data-dias]'), function (botao) {
+    botao.addEventListener('click', function () {
+      var n = +botao.getAttribute('data-dias');
+      if (!n || !DIAS.length) {
+        deIn.value = '';
+        ateIn.value = '';
+      } else {
+        ateIn.value = DIAS[0].d;
+        deIn.value = isoDe(inicioDia(DIAS[0].d) - (n - 1) * 86400000);
+      }
+      buscar();
+    });
+  });
+  $('pqLimpar').addEventListener('click', function () {
+    corrida++;
+    estado = null;
+    qIn.value = '';
+    tipoIns.forEach(function (i) { i.checked = true; });
+    deIn.value = ateIn.value = '';
+    edIn.selectedIndex = vIn.selectedIndex = ordIn.selectedIndex = 0;
+    titIn.checked = false;
+    outEl.hidden = true;
+    status('');
+    gravarEndereco(lerFiltros());
+    qIn.focus();
+  });
+  anEl.addEventListener('click', function (event) {
+    var alvo = event.target.closest ? event.target.closest('button') : null;
+    if (!alvo) return;
+    if (alvo.hasAttribute('data-dia')) {
+      deIn.value = ateIn.value = alvo.getAttribute('data-dia');
+    } else if (alvo.hasAttribute('data-v')) {
+      var v = alvo.getAttribute('data-v');
+      opcao(vIn, vIn.value === v ? '' : v);
+    } else if (alvo.hasAttribute('data-ed')) {
+      var ed = alvo.getAttribute('data-ed');
+      opcao(edIn, edIn.value === ed ? '' : ed);
+    } else {
+      return;
+    }
+    buscar();
+    form.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+  moreBtn.addEventListener('click', function () {
+    if (!estado) return;
+    estado.mostrar += PAGINA;
+    lista(estado);
+  });
+
+  // Celular: filtros recolhidos em "Filtros", salvo quando o endereço já traz algum.
+  var det = $('pqDet'), celular = w.matchMedia ? w.matchMedia('(max-width:760px)') : null;
+  var temEndereco = lerEndereco();
+  if (det && celular) {
+    var f0 = lerFiltros();
+    var usaFiltro = f0.de || f0.ate || f0.ed || f0.v || f0.tit || f0.ord !== 'rec' || tipoIns.some(function (i) { return !i.checked; });
+    if (celular.matches && !usaFiltro) det.open = false;
+    var abrir = function () { if (!celular.matches) det.open = true; };
+    if (celular.addEventListener) celular.addEventListener('change', abrir);
+  }
+  if (temEndereco) buscar();
+  else if (w.matchMedia && w.matchMedia('(pointer: fine)').matches) qIn.focus({ preventScroll: true });
+})();

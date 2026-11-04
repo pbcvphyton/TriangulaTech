@@ -1,0 +1,101 @@
+{#- Pesquisa analítica: busca em todas as edições. O navegador carrega os arquivos
+    de busca de cada edição (data/busca/AAAA-MM-DD.json) do período pedido, busca
+    neles e mostra os resultados com as contagens (pesquisa.js.j2).
+    Variáveis: p (PesquisaView), brand, home_href, archive_href, base_url, repo_url. -#}
+{% extends "layout.html.j2" %}
+
+{% block title %}{{ brand.name }} — Pesquisa analítica{% endblock %}
+{% block description %}Busca em todas as edições: matérias, todas as notícias coletadas, cobertura comparada e análises do Termômetro, com filtros por período, tipo, editoria e veículo.{% endblock %}
+{% block meta %}
+<link rel="canonical" href="{{ base_url }}edicoes/pesquisa.html">
+{% endblock %}
+{% block home_link %}{{ home_href }}{% endblock %}
+{% block dateline %}Pesquisa analítica{% if p.atualizado %}&nbsp;· <span class="nw">atualizada em {{ p.atualizado }}</span>{% endif %}{% endblock %}
+
+{% block tools %}
+    <a class="tool" href="{{ archive_href }}" title="Edições anteriores"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Edições</span></a>
+    {% if p.termometro %}
+    <a class="tool tool-an" href="{{ archive_href }}analitico.html" title="Analítico Político: todo o histórico do termômetro" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
+    {% endif %}
+{% endblock %}
+
+{% block styles %}
+{% include "pesquisa.css.j2" %}
+{% endblock %}
+
+{% block content %}
+<section class="pq" id="pesquisa" aria-labelledby="pq-h">
+  <div class="arch-top">
+    <h2 class="kicker" id="pq-h">Pesquisa analítica</h2>
+    <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
+  </div>
+  <p class="pq-intro">{{ p.intro }}</p>
+
+  <form class="pq-form" id="pqForm" role="search" method="get" action="">
+    <div class="pq-q">
+      <label class="sr-only" for="pqQ">O que você procura</label>
+      <input class="pq-in" id="pqQ" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Palavra, nome ou assunto: Selic, STF, Haddad, &quot;reforma tributária&quot;…">
+      <button class="pq-go" type="submit">Buscar</button>
+    </div>
+    <p class="pq-tip">Sem acento e sem diferenciar maiúsculas; todas as palavras precisam aparecer. Aspas buscam a frase exata (<code>"taxa Selic"</code>) e o traço exclui (<code>-futebol</code>). Palavras de até 3 letras (STF, PT, IA) valem só inteiras.</p>
+    <details class="pq-det" id="pqDet" open>
+    <summary class="pq-sum">Filtros</summary>
+    <div class="pq-fs">
+      <div class="pq-f" role="group" aria-labelledby="pqTiposL">
+        <span class="pq-fl" id="pqTiposL">Tipo</span>
+        <div class="pq-row">
+          {% for k, rotulo in p.tipos %}
+          <label class="pq-chip"><input type="checkbox" name="tipo" value="{{ k }}" checked> {{ rotulo }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="pq-f" role="group" aria-labelledby="pqPerL">
+        <span class="pq-fl" id="pqPerL">Período das edições</span>
+        <div class="pq-row">
+          <label><span class="sr-only">De</span><input type="date" id="pqDe" name="de" min="{{ p.primeira }}" max="{{ p.ultima }}"></label>
+          <span class="pq-a" aria-hidden="true">a</span>
+          <label><span class="sr-only">Até</span><input type="date" id="pqAte" name="ate" min="{{ p.primeira }}" max="{{ p.ultima }}"></label>
+          <span class="pq-pre"><button type="button" data-dias="7">7 dias</button><button type="button" data-dias="30">30 dias</button><button type="button" data-dias="0">Tudo</button></span>
+        </div>
+      </div>
+      <label class="pq-f"><span class="pq-fl">Editoria</span><select id="pqEd" name="ed"><option value="">Todas</option>{% for id, titulo in p.secoes %}<option value="{{ id }}">{{ titulo }}</option>{% endfor %}</select></label>
+      <label class="pq-f"><span class="pq-fl">Veículo</span><select id="pqV" name="v"><option value="">Todos</option>{% for nome in p.veiculos %}<option>{{ nome }}</option>{% endfor %}</select></label>
+      <label class="pq-f"><span class="pq-fl">Ordem</span><select id="pqOrd" name="ord"><option value="rec">Mais recentes</option><option value="rel">Mais relevantes</option><option value="ant">Mais antigas</option></select></label>
+      <div class="pq-f">
+        <span class="pq-fl" aria-hidden="true">&nbsp;</span>
+        <div class="pq-row">
+          <label class="pq-chip"><input type="checkbox" id="pqTit" name="tit" value="1"> Só nos títulos</label>
+          <button class="pq-clear" type="button" id="pqLimpar">Limpar</button>
+        </div>
+      </div>
+    </div>
+    </details>
+  </form>
+
+  <p class="pq-st" id="pqStatus" role="status" aria-live="polite"></p>
+  <div class="pq-out" id="pqOut" hidden>
+    <div class="pq-an" id="pqAn"></div>
+    <div class="pq-head">
+      <h3 class="pq-count" id="pqCount"></h3>
+      <button class="pq-csv" type="button" id="pqCsv" title="Baixar todos os resultados em planilha (CSV)">Baixar CSV</button>
+    </div>
+    <ol class="pq-list" id="pqList"></ol>
+    <button class="pq-more" type="button" id="pqMore" hidden></button>
+  </div>
+  <noscript><p class="pq-intro">A pesquisa roda no próprio navegador e precisa do JavaScript ligado.</p></noscript>
+</section>
+<script type="application/json" id="pqDados">{{ p.manifesto|safe }}</script>
+{% endblock %}
+
+{% block footer %}
+<footer class="ft">
+  <p><strong>{{ brand.name }}</strong> · Pesquisa analítica · {{ p.edicoes }} {{ "edição" if p.edicoes == 1 else "edições" }}{% if p.periodo %} · {{ p.periodo }}{% endif %}</p>
+  <p class="ft-links"><a href="{{ home_href }}">Edição mais recente</a> · <a href="{{ archive_href }}">Edições anteriores</a>{% if repo_url %} · <a href="{{ repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
+</footer>
+{% endblock %}
+
+{% block after %}
+<script>
+{% include "pesquisa.js.j2" %}
+</script>
+{% endblock %}
