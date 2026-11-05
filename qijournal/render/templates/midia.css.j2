@@ -32,7 +32,9 @@
 .md-tbl td{font-family:var(--mn);font-size:11.5px}
 .md-tbl tbody th button{padding:0;border:none;background:none;font:inherit;color:inherit;cursor:pointer;text-align:left}
 .md-tbl tbody th button:hover{color:var(--link);text-decoration:underline}
-.md-tbl .md-pq{opacity:.55}
+.md-tbl .md-pq th,.md-tbl .md-pq td{color:var(--mute2)}
+.md-tbl .md-pq th{font-weight:600}
+.md-tbl .md-pq .md-ix i{opacity:.45}
 .md-ex{display:inline-block;margin-left:6px;padding:0 5px;border-radius:3px;background:var(--soft);font-family:var(--mn);font-size:9px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
 .md-ix{min-width:118px}
 .md-ix i{display:inline-block;width:56px;height:6px;margin-right:8px;border-radius:3px;background:var(--rl);vertical-align:1px;overflow:hidden}
@@ -74,7 +76,12 @@
 .md-dl b{font-family:var(--mn);color:var(--ink)}
 .md .ca{color:var(--cov-a);font-weight:600}
 .md .cb{color:var(--cov-b);font-weight:600}
-.md-dv .ca,.md-dv .cb{font-weight:500}
+/* Atalho para o analítico (fica depois da lista) */
+.md-ir{margin-top:14px;font-family:var(--ss);font-size:12.5px;color:var(--muted)}
+.md-ir[hidden]{display:none}
+.md-ir a{font-weight:700;color:var(--link)}
+.md-ir a::after{content:" ↓"}
+.md-ir a:hover{text-decoration:underline}
 .md-par{list-style:none}
 .md-par li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:3px 10px;padding:5px 0 6px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
 .md-par li>span i{font-style:normal;color:var(--faint)}
@@ -98,13 +105,14 @@
 :root[data-theme="dark"] .nm-bar::before{background:var(--link)}
 .nm-tb{display:block;font-family:var(--ss);font-size:11px;font-weight:400;color:var(--faint)}
 .nm-t{font-weight:600}
-.nm-sobe{color:var(--qc)}
+.nm-sobe{color:#C2410C;color:color-mix(in srgb,var(--qc) 75%,#000)}
+:root[data-theme="dark"] .nm-sobe{color:var(--qc)}
 .nm-cai{color:var(--muted)}
 .nm-est,.nm-ins{color:var(--faint);font-weight:400}
 .nm-dv{display:inline-block;width:44px;height:6px;margin-right:8px;border-radius:3px;background:var(--rl);vertical-align:1px;overflow:hidden}
 .nm-dv::before{content:"";display:block;width:var(--d,0%);height:100%;background:var(--cov-b)}
 .nm-form{display:flex;gap:8px;max-width:640px;margin-top:14px}
-.nm-in{flex:1;min-width:0;height:40px;padding:0 16px;border:1.5px solid var(--rule);border-radius:22px;background:var(--paper);font-family:var(--ss);font-size:14px;color:var(--ink);outline:none}
+.nm-in{flex:1;min-width:0;height:40px;padding:0 16px;border:1.5px solid var(--rule);border-radius:22px;background:var(--paper);font-family:var(--ss);font-size:14px;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none}
 .nm-in:focus{border-color:var(--qi);box-shadow:0 0 0 3px rgba(var(--qi-rgb),.14)}
 .nm-go{flex-shrink:0;height:40px;padding:0 20px;border:none;border-radius:22px;background:var(--qi);font-family:var(--ss);font-size:13px;font-weight:700;color:#fff;cursor:pointer}
 .nm-go:hover{background:var(--qn)}
@@ -123,4 +131,13 @@
   .md-voc .md-chips{grid-column:1/-1}
   .md-sug{padding-left:0}
   .nm-form{max-width:none}
+  .nm-in{font-size:16px}
+  /* tabelas: o número principal à vista sem rolar de lado */
+  .md-tbl thead th,.md-tbl tbody th,.nm-tbl thead th,.nm-tbl tbody th{white-space:normal}
+  .md-tbl th,.md-tbl td{padding-right:6px}
+  .md-ix{min-width:0}
+  .md-ix i{width:32px;margin-right:6px}
+  .nm-tbl td.nm-n{min-width:0}
+  .nm-bar,.nm-dv{width:28px;margin-right:6px}
+  .nm-tbl th:nth-child(5),.nm-tbl td:nth-child(5),.nm-tbl th:nth-child(6),.nm-tbl td:nth-child(6){display:none}
 }

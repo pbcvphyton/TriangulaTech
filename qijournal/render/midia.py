@@ -15,9 +15,13 @@ páginas, sem mudar nada do que elas já mostravam:
 
 Os nomes saem das próprias manchetes em português (sequências de palavras com
 inicial maiúscula; a primeira palavra do título só conta se o mesmo nome aparece
-com maiúscula no meio de outros títulos do dia). A contagem final usa a mesma
-regra de busca da página (sem acento, começo de palavra; até 3 letras, só a
-palavra inteira), para os números da tabela baterem com o analítico do nome.
+com maiúscula no meio de outros títulos do dia; palavra que no meio das frases
+aparece mais em minúscula, como "eleições", não é nome). A contagem final é a do
+analítico do nome na Pesquisa, para os números da tabela baterem com a página que
+a linha abre: a mesma regra de busca (sem acento, começo de palavra; até 3 letras,
+só a palavra inteira — "Senado" também conta "senador"), todos os veículos, e a
+notícia coletada em mais de uma edição conta uma vez, se alguma versão do título
+citar o nome, na primeira edição em que citou.
 """
 
 from __future__ import annotations
@@ -41,23 +45,34 @@ LIMITE = 12  # nomes na tabela
 CANDIDATOS = 40  # nomes conferidos pela regra de busca antes do corte
 MIN_MANCHETES = 5  # menos que isso não entra na tabela
 MIN_BASE_SEMANA = 50  # manchetes da editoria por semana para dizer a tendência
+MIN_TENDENCIA = 10  # manchetes do nome nas duas semanas para dizer a tendência
 ESTAVEL = 0.15  # variação de até 15% é "estável"
 
 _MARCAS = re.compile("[\u0300-\u036f]")  # acentos (marcas combinantes, depois do NFD)
 _PALAVRA = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’\-][0-9A-Za-zÀ-ÖØ-öø-ÿ]+)*")
 _PONTUACAO = re.compile(r"[:.!?|\u2013\u2014\"\u201c\u201d\u2018']")
 _CONECTORES = frozenset({"de", "da", "do", "das", "dos", "del", "di", "van", "von"})
-# Palavras que nunca fazem parte de um nome (abrem frase com maiúscula: artigos,
-# verbos de chamada, meses, dias da semana).
-FORA = frozenset(
+# Meses e dias da semana: sozinhos não são nome ("Março tem inflação"), mas abrem
+# nomes ("Marco Rubio", "Segunda Turma do STF", "Outubro Rosa").
+CALENDARIO = frozenset(
     """
-    a o as os um uma e em no na nos nas de da do das dos ao aos com sem por para pela pelo sob sobre apos ate
-    que se como quando onde quem qual mais menos ja nao sim eis
-    veja saiba entenda confira assista leia ouca acompanhe conheca descubra
-    dia serie
     janeiro fevereiro marco abril maio junho julho agosto setembro outubro novembro dezembro
     segunda terca quarta quinta sexta sabado domingo
     """.split()
+)
+# Palavras que nunca fazem parte de um nome (abrem frase com maiúscula: artigos,
+# verbos de chamada; selos editoriais em caixa alta, "VÍDEO:", "FATO ou FAKE").
+FORA = (
+    frozenset(
+        """
+        a o as os um uma e em no na nos nas de da do das dos ao aos com sem por para pela pelo sob sobre apos ate
+        que se como quando onde quem qual mais menos ja nao sim eis
+        veja saiba entenda confira assista leia ouca acompanhe conheca descubra
+        dia serie
+        video videos fato fake exclusivo urgente opiniao editorial analise infografico
+        """.split()
+    )
+    | CALENDARIO
 )
 # Nomes inteiros genéricos demais para dizerem algo sobre a cobertura: o país, os
 # EUA, siglas de estado, cidades e emissoras (como parte de um nome maior, ficam:
@@ -105,9 +120,12 @@ class CorpusDia:
     """O que um dia de ``data/busca/`` oferece aos nomes em destaque."""
 
     data: str
-    titulos: list[tuple[str, str, str]] = field(default_factory=list)  # (link, título normalizado, veículo)
-    candidatos: Counter[str] = field(default_factory=Counter)  # nome normalizado → manchetes
-    formas: dict[str, Counter[str]] = field(default_factory=dict)  # grafias de cada nome
+    # (link, título normalizado, veículo): todas as manchetes da editoria, de todos os
+    # veículos (a base da Pesquisa); a mesma notícia uma vez no dia.
+    titulos: list[tuple[str, str, str]] = field(default_factory=list)
+    nomes: dict[str, list[str]] = field(default_factory=dict)  # link → nomes do título (veículos brasileiros)
+    # nome de uma palavra → (vezes com maiúscula, vezes em minúscula) no meio das frases do dia
+    caixa: dict[str, tuple[int, int]] = field(default_factory=dict)
     comparadas: list[tuple[str, int, int]] = field(default_factory=list)  # texto normalizado, lado A, lado B
 
 
@@ -120,8 +138,8 @@ def _inicio_de_frase(titulo: str, palavras: list[tuple[int, int, str]], k: int) 
     return k == 0 or bool(_PONTUACAO.search(titulo[palavras[k - 1][1] : palavras[k][0]]))
 
 
-def _nomes_proprios(titulos: Iterable[str]) -> set[str]:
-    """Palavras que, no meio das frases dos títulos, aparecem em geral com maiúscula."""
+def _caixa(titulos: Iterable[str]) -> tuple[Counter[str], Counter[str]]:
+    """Quantas vezes cada palavra aparece com maiúscula e em minúscula no meio das frases."""
     maiuscula: Counter[str] = Counter()
     minuscula: Counter[str] = Counter()
     for titulo in titulos:
@@ -129,7 +147,7 @@ def _nomes_proprios(titulos: Iterable[str]) -> set[str]:
         for k, (_a, _b, palavra) in enumerate(palavras):
             if not _inicio_de_frase(titulo, palavras, k):
                 (maiuscula if palavra[0].isupper() else minuscula)[norm(palavra)] += 1
-    return {p for p, n in maiuscula.items() if n >= 2 and n >= 2 * minuscula[p]}
+    return maiuscula, minuscula
 
 
 def nomes_do_titulo(titulo: str, proprios: set[str]) -> set[str]:
@@ -140,7 +158,11 @@ def nomes_do_titulo(titulo: str, proprios: set[str]) -> set[str]:
     def nome(k: int) -> bool:
         _a, _b, p = palavras[k]
         n = norm(p)
-        if len(p) < 2 or not p[0].isupper() or p[0].isdigit() or n in FORA:
+        if len(p) < 2 or not p[0].isupper() or p[0].isdigit():
+            return False
+        if n in CALENDARIO:  # só abrindo um nome: "Marco Rubio", "Segunda Turma"
+            return k + 1 < len(palavras) and junto(k) and nome(k + 1)
+        if n in FORA or (n == "vivo" and k > 0 and norm(palavras[k - 1][2]) == "ao"):  # "AO VIVO"
             return False
         return not _inicio_de_frase(titulo, palavras, k) or n in proprios or p.isupper()
 
@@ -175,8 +197,8 @@ def nomes_do_titulo(titulo: str, proprios: set[str]) -> set[str]:
 
 
 def corpus_do_dia(dados: Mapping[str, Any], estrangeiros: Iterable[str] = (), secao: str = SECAO) -> CorpusDia:
-    """As manchetes em português de uma editoria (``secao``), os nomes delas e os
-    assuntos da cobertura comparada da editoria (com os dois lados), de um arquivo
+    """As manchetes de uma editoria (``secao``), os nomes das manchetes em português
+    e os assuntos da cobertura comparada da editoria com os dois lados, de um arquivo
     de busca (:func:`qijournal.render.pesquisa.dados_do_dia`)."""
     fora = set(estrangeiros)
     veiculos = dados.get("veiculos") or []
@@ -197,26 +219,32 @@ def corpus_do_dia(dados: Mapping[str, Any], estrangeiros: Iterable[str] = (), se
         except (IndexError, TypeError):
             continue
         veiculo = veiculo_de(vi)
-        if not veiculo or veiculo in fora or not titulo or link in vistos:
+        if not veiculo or not titulo or link in vistos:
             continue
         vistos.add(link)
-        nacionais.append((link, str(titulo), veiculo))
+        if veiculo not in fora:
+            nacionais.append((str(link), str(titulo), veiculo))
         if secao_de(si) == secao:
             corpus.titulos.append((str(link), norm(titulo), veiculo))
-    proprios = _nomes_proprios(t for _l, t, _v in nacionais)
+    maiuscula, minuscula = _caixa(t for _l, t, _v in nacionais)
+    # Nome próprio no dia: no meio das frases, em geral com maiúscula.
+    proprios = {p for p, n in maiuscula.items() if n >= 2 and n >= 2 * minuscula[p]}
     na_secao = {link for link, _t, _v in corpus.titulos}
     for link, titulo, _v in nacionais:
         if link not in na_secao:
             continue
-        for achado in nomes_do_titulo(titulo, proprios):
+        achados = sorted(nomes_do_titulo(titulo, proprios))
+        if achados:
+            corpus.nomes[link] = achados
+        for achado in achados:
             chave = norm(achado)
-            corpus.candidatos[chave] += 1
-            corpus.formas.setdefault(chave, Counter())[achado] += 1
+            if " " not in chave:
+                corpus.caixa[chave] = (maiuscula[chave], minuscula[chave])
     for c in dados.get("comparadas") or []:
         if secao_de(c.get("s")) != secao or not (c.get("a") and c.get("b")):
             continue
         lados = Counter(o[1] for o in c.get("f") or [] if isinstance(o, list) and len(o) > 1)
-        if not lados["a"] + lados["b"]:
+        if not (lados["a"] and lados["b"]):  # todos do mesmo lado (ou neutros): não dividiu
             continue
         partes = [c.get("t"), c.get("c"), c.get("a"), c.get("b")] + [o[2] for o in c.get("f") or [] if len(o) > 2]
         corpus.comparadas.append(("\n".join(norm(p) for p in partes if p), lados["a"], lados["b"]))
@@ -275,20 +303,26 @@ def _pct(parte: int, todo: int) -> str:
 
 
 def _tendencia(por_dia: Mapping[str, int], base_dia: Mapping[str, int], dias: list[str]) -> tuple[str, str, str]:
+    """Últimas ``SEMANA`` edições contra as ``SEMANA`` anteriores, pela participação
+    (os mesmos rótulos do analítico do nome na Pesquisa)."""
     if len(dias) < 2 * SEMANA:
         return "—", "ins", f"A tendência compara {SEMANA} edições com as {SEMANA} anteriores."
     recente, anterior = dias[-SEMANA:], dias[-2 * SEMANA : -SEMANA]
     br, ba = sum(base_dia.get(d, 0) for d in recente), sum(base_dia.get(d, 0) for d in anterior)
     if br < MIN_BASE_SEMANA or ba < MIN_BASE_SEMANA:
         return "—", "ins", "Poucas manchetes na editoria para comparar as semanas."
-    sr = sum(por_dia.get(d, 0) for d in recente) / br
-    sa = sum(por_dia.get(d, 0) for d in anterior) / ba
+    kr, ka = sum(por_dia.get(d, 0) for d in recente), sum(por_dia.get(d, 0) for d in anterior)
+    if kr + ka < MIN_TENDENCIA:
+        return "—", "ins", f"Menos de {MIN_TENDENCIA} manchetes do nome nas duas semanas para comparar."
+    sr, sa = kr / br, ka / ba
     titulo = (
-        f"Participação nas manchetes: {_pct(round(sr * br), br)} nas últimas {SEMANA} edições, "
-        f"{_pct(round(sa * ba), ba)} nas {SEMANA} anteriores"
+        f"{kr} manchetes ({_pct(kr, br)}) nas últimas {SEMANA} edições, "
+        f"{ka} ({_pct(ka, ba)}) nas {SEMANA} anteriores"
     )
     if not sa:
-        return ("novo", "sobe", titulo) if sr else ("—", "ins", titulo)
+        return "novo", "sobe", titulo
+    if not sr:
+        return "zerou", "cai", titulo
     var = (sr - sa) / sa
     if abs(var) <= ESTAVEL:
         return "estável", "est", titulo
@@ -319,30 +353,49 @@ def destaques(
     except ValueError:
         return None
     dias = [c for c in todos if inicio <= c.data <= ultimo]
-    titulos: list[tuple[str, str, str]] = []  # (dia, título, veículo), a mesma notícia uma vez
-    vistos: set[str] = set()
-    candidatos: Counter[str] = Counter()
+    # Cada notícia (link) com as versões do título, da edição mais antiga à mais recente.
+    versoes: dict[str, list[tuple[str, str, str]]] = {}  # link → [(dia, título, veículo)]
+    candidatos: Counter[str] = Counter()  # nome → notícias em que aparece (uma vez cada)
     formas: dict[str, Counter[str]] = {}
+    caixa: dict[str, list[int]] = {}
+    ja: dict[str, set[str]] = {}
     for c in dias:
         for link, titulo, veiculo in c.titulos:
-            if link not in vistos:
-                vistos.add(link)
-                titulos.append((c.data, titulo, veiculo))
-        candidatos.update(c.candidatos)
-        for chave, grafias in c.formas.items():
-            formas.setdefault(chave, Counter()).update(grafias)
-    if not titulos:
+            versoes.setdefault(link, []).append((c.data, titulo, veiculo))
+        for link, achados in c.nomes.items():
+            vistos = ja.setdefault(link, set())
+            for achado in achados:
+                chave = norm(achado)
+                if chave not in vistos:
+                    vistos.add(chave)
+                    candidatos[chave] += 1
+                    formas.setdefault(chave, Counter())[achado] += 1
+        for chave, (cima, baixo) in c.caixa.items():
+            soma = caixa.setdefault(chave, [0, 0])
+            soma[0] += cima
+            soma[1] += baixo
+    if not versoes:
         return None
-    base_dia = Counter(d for d, _t, _v in titulos)
+    entrada = {link: vs[0][0] for link, vs in versoes.items()}  # edição em que a notícia apareceu
+    base_dia = Counter(entrada.values())
     datas = [c.data for c in dias]
 
-    contagens: list[tuple[str, int, list[tuple[str, str]]]] = []  # (nome, manchetes, [(dia, veículo)])
+    # (nome, manchetes, [(dia, veículo, link)]): a notícia conta se alguma versão do
+    # título cita o nome, na primeira edição em que citou (como nos resultados da busca).
+    contagens: list[tuple[str, int, list[tuple[str, str, str]]]] = []
     for chave, _n in candidatos.most_common(CANDIDATOS):
         nome = formas[chave].most_common(1)[0][0]
+        cima, baixo = caixa.get(chave, (0, 0))
+        if baixo > cima:  # no meio das frases, sai mais em minúscula: palavra comum ("Eleições")
+            continue
         regra = padrao(nome)
         if regra is None:
             continue
-        achados = [(d, v) for d, t, v in titulos if regra.search(t)]
+        achados = []
+        for link, vs in versoes.items():
+            dia = next((d for d, t, _v in vs if regra.search(t)), None)
+            if dia is not None:
+                achados.append((dia, vs[0][2], link))
         if len(achados) >= MIN_MANCHETES:
             contagens.append((nome, len(achados), achados))
     contagens.sort(key=lambda x: (-x[1], norm(x[0])))
@@ -363,6 +416,8 @@ def destaques(
                     e.update(nome=nome, chave=chave, n=n, achados=achados)
                 elif n >= 0.25 * e["n"] and not e["tambem"]:
                     e["tambem"] = nome
+            elif _contido(chave, e["chave"]):  # parte de um nome maior já escolhido (empate)
+                absorvido = True
             if absorvido:
                 break
         if not absorvido:
@@ -377,8 +432,14 @@ def destaques(
     for e in escolhidos:
         nome, n, achados = e["nome"], e["n"], e["achados"]
         regra = padrao(nome)
-        por_dia = Counter(d for d, _v in achados)
-        tendencia, classe, titulo = _tendencia(por_dia, base_dia, datas)
+        por_dia = Counter(d for d, _v, _l in achados)
+        # Na base, a notícia que cita o nome fica na edição em que entrou nos resultados.
+        base_nome = base_dia.copy()
+        for dia, _v, link in achados:
+            if dia != entrada[link]:
+                base_nome[entrada[link]] -= 1
+                base_nome[dia] += 1
+        tendencia, classe, titulo = _tendencia(por_dia, base_nome, datas)
         splits = [2 * min(a, b) / (a + b) for texto, a, b in comparadas if regra is not None and regra.search(texto)]
         media = sum(splits) / len(splits) if splits else None
         # O analítico do nome abre com a mesma editoria e o mesmo período da tabela.
@@ -390,8 +451,8 @@ def destaques(
                 consulta=consulta(nome),
                 href=href,
                 manchetes=n,
-                participacao=_pct(n, len(titulos)),
-                veiculos=len({v for _d, v in achados}),
+                participacao=_pct(n, len(versoes)),
+                veiculos=len({v for _d, v, _l in achados}),
                 tendencia=tendencia,
                 tendencia_classe=classe,
                 tendencia_titulo=titulo,
@@ -410,7 +471,7 @@ def destaques(
         fim=ultimo,
         periodo=periodo,
         edicoes=len(dias),
-        manchetes=len(titulos),
+        manchetes=len(versoes),
         nomes=nomes,
         pesquisa_href=pesquisa_href,
     )

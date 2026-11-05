@@ -55,6 +55,9 @@ def test_js_usa_a_mesma_regra_de_busca_e_de_nomes():
         assert bool(pontuacao.search(c)) == bool(midia._PONTUACAO.search(c)), c
     conectores = set(re.findall(r"'?([a-z]+)'?: 1", re.search(r"var CONECTORES = \{(.+?)\};", md).group(1)))
     assert conectores == set(midia._CONECTORES)
+    # meses e dias só abrindo um nome; "AO VIVO" não é nome (as mesmas regras de nomes_do_titulo)
+    assert "if (CALENDARIO[p.n]) return k + 1 < ps.length && junto(k) && nome(k + 1);" in md
+    assert "(p.n === 'vivo' && k > 0 && ps[k - 1].n === 'ao')" in md
 
 
 @pytest.mark.parametrize(
@@ -70,6 +73,13 @@ def test_js_usa_a_mesma_regra_de_busca_e_de_nomes():
         ("Banco do Brasil lucra mais", {"banco"}, {"Banco do Brasil"}),
         ("Gonet e STF discutem; Paulo Guedes fala", set(), {"STF", "Paulo Guedes"}),
         ("TV Globo faz debate no Rio", set(), set()),
+        ("Lula recebe Marco Rubio no Planalto", set(), {"Marco Rubio", "Planalto"}),  # mês abrindo nome
+        ("Segunda Turma do STF absolve deputado", set(), {"Segunda Turma do STF"}),
+        ("Março tem inflação menor", set(), set()),  # mês sozinho não é nome
+        ("VÍDEO: Lula discursa em ato", {"lula"}, {"Lula"}),  # selo editorial em caixa alta
+        ("É FAKE que o TSE mudou a urna", set(), {"TSE"}),
+        ("AO VIVO: Senado vota a PEC", set(), {"PEC"}),
+        ("TSE: prazo termina hoje", set(), {"TSE"}),  # sigla que abre o título continua
     ],
 )
 def test_nomes_do_titulo(titulo, proprios, esperado):
@@ -103,19 +113,22 @@ def _dias(n: int, fim: str = "2026-10-30") -> list[str]:
     return [(ultimo - timedelta(days=n - 1 - i)).isoformat() for i in range(n)]
 
 
-def test_corpus_fica_com_as_manchetes_em_portugues_da_editoria():
+def test_corpus_tem_a_base_da_pesquisa_e_os_nomes_das_manchetes_em_portugues():
     dados = _dia(
         "2026-10-30",
         [("Folha", "Lula sanciona lei; Senado reage"), ("The Guardian", "Lula Says Brazil Will Act"), ("Folha", "Lula sanciona lei; Senado reage")],
         comparadas=[{"s": 0, "t": "Lula e o Senado", "c": "", "a": "A", "b": "B", "f": [("Folha", "a"), ("g1", "b"), ("Estadão", "a")]},
+                    {"s": 0, "t": "Um lado só", "c": "", "a": "A", "b": "B", "f": [("Folha", "a"), ("g1", "a"), ("Estadão", "neutro")]},
                     {"s": 0, "t": "Sem lados", "c": "", "a": "", "b": "", "f": [("Folha", "neutro")]}],
         esporte=3,
     )
     dados["noticias"][2][4] = dados["noticias"][0][4]  # mesmo link: conta uma vez
     corpus = midia.corpus_do_dia(dados, ["The Guardian"])
-    assert [v for _l, _t, v in corpus.titulos] == ["Folha"]  # exterior e outras editorias fora
-    assert set(corpus.candidatos) == {"senado"}  # "Lula" abre o título e não aparece no meio de outro
-    assert corpus.comparadas == [("lula e o senado\na\nb\nfoco\nfoco\nfoco", 2, 1)]  # só a com dois lados
+    # A base é a da Pesquisa (todos os veículos da editoria); os nomes, só das manchetes em português.
+    assert [v for _l, _t, v in corpus.titulos] == ["Folha", "The Guardian"]
+    assert corpus.nomes == {"exemplo.com/2026-10-30/0": ["Senado"]}  # "Lula" abre o título e não aparece no meio de outro
+    assert corpus.caixa == {"senado": (1, 0)}
+    assert corpus.comparadas == [("lula e o senado\na\nb\nfoco\nfoco\nfoco", 2, 1)]  # só a com veículos dos dois lados
 
 
 def test_destaques_contam_com_a_regra_da_busca_e_juntam_as_formas_do_nome():
@@ -128,7 +141,8 @@ def test_destaques_contam_com_a_regra_da_busca_e_juntam_as_formas_do_nome():
             ("g1", f"Entre jovens, Flávio lidera {i}"),
             ("Estadão", f"Governo de Lula anuncia pacote {i}"),
             ("Valor", f"Hoje o Senado aprova projeto {i}") if recente else ("Valor", f"Mercado reage ao Copom {i}"),
-        ] + [("Valor", f"Bolsa fecha em alta no pregão {i}-{k}") for k in range(4)]
+            ("Valor", f"Bolsa sobe com o Senado {i}") if recente else ("Valor", f"Bolsa fecha em alta no pregão {i}"),
+        ] + [("Valor", f"Bolsa fecha em alta no pregão {i}-{k}") for k in range(3)]
         comparadas = [{"s": 0, "t": "Senado e o projeto", "c": "", "a": "A", "b": "B", "f": [("Folha", "a"), ("g1", "b")]}] if recente else []
         arquivos.append(_dia(dia, manchetes, comparadas))
     view = midia.destaques([midia.corpus_do_dia(d) for d in arquivos], fim=dias[-1])
@@ -141,7 +155,7 @@ def test_destaques_contam_com_a_regra_da_busca_e_juntam_as_formas_do_nome():
     assert lula.manchetes == 28 and lula.veiculos == 2 and lula.participacao == "25%"
     assert lula.tendencia == "estável" and lula.debates == 0 and lula.divergencia == "—"
     senado = por_nome["Senado"]  # só nas 7 últimas edições: tendência "novo"; debate 1 × 1 = divergência 100
-    assert senado.manchetes == 7 and senado.tendencia == "novo" and senado.tendencia_classe == "sobe"
+    assert senado.manchetes == 14 and senado.tendencia == "novo" and senado.tendencia_classe == "sobe"
     assert senado.debates == 7 and senado.divergencia == "100"
     assert lula.href == "pesquisa.html?q=Lula&de=2026-10-01&ed=politica#midia"
     assert por_nome["Flávio"].consulta == "Flávio"
@@ -157,6 +171,57 @@ def test_tendencia_em_vezes_quando_mais_que_dobra_e_sem_base_suficiente():
     assert midia._tendencia(por_dia, base, dias)[:2] == ("▼ 50%", "cai")
     assert midia._tendencia(por_dia, base, dias[:10])[:2] == ("—", "ins")  # menos de 14 edições
     assert midia._tendencia(por_dia, {d: 5 for d in dias}, dias)[:2] == ("—", "ins")  # semana com < 50 manchetes
+    # Os mesmos rótulos do analítico do nome na Pesquisa: "zerou" e "novo"…
+    assert midia._tendencia({d: (0 if i >= 7 else 2) for i, d in enumerate(dias)}, base, dias)[:2] == ("zerou", "cai")
+    assert midia._tendencia({d: (2 if i >= 7 else 0) for i, d in enumerate(dias)}, base, dias)[:2] == ("novo", "sobe")
+    # …e nada de tendência com poucas manchetes do nome (3 contra 4)
+    poucas = {dias[0]: 3, dias[-1]: 4}
+    assert midia._tendencia(poucas, base, dias)[:2] == ("—", "ins")
+
+
+def _destaques_de(arquivos: list[dict[str, Any]], **kw: Any) -> list[tuple[str, int]]:
+    view = midia.destaques([midia.corpus_do_dia(d) for d in arquivos], fim=arquivos[-1]["data"], **kw)
+    return [(n.nome, n.manchetes) for n in view.nomes] if view else []
+
+
+def test_destaques_contam_a_noticia_se_alguma_versao_do_titulo_cita_o_nome():
+    dias = _dias(6)
+    arquivos = [_dia(d, [("g1", f"Hoje o Senado vota a PEC {i}")]) for i, d in enumerate(dias)]
+    # um blog ao vivo: a mesma notícia (link) muda de título; só a versão de depois cita o Senado
+    for i, titulo in ((0, "Acompanhe a apuração ao vivo"), (5, "Apuração: Senado confirma resultado")):
+        arquivos[i]["noticias"].append([0, -1, 0, titulo, "g1.com/ao-vivo", 0])
+    assert ("Senado", 7) in _destaques_de(arquivos)
+    view = midia.destaques([midia.corpus_do_dia(d) for d in arquivos], fim=dias[-1])
+    assert view.manchetes == 7  # a notícia ao vivo entra uma vez na base
+
+
+def test_candidatos_contam_cada_noticia_uma_vez(monkeypatch):
+    # Uma notícia repetida em 20 edições não vale mais que um nome citado em 5 notícias.
+    dias = _dias(20)
+    arquivos = []
+    for i, d in enumerate(dias):
+        manchetes = [("Folha", "Hoje Fulano fala")] + ([("g1", f"Hoje Beltrano fala {i}")] if i < 5 else [])
+        dados = _dia(d, manchetes)
+        dados["noticias"][0][4] = "folha.com/fulano"  # o mesmo link todo dia
+        arquivos.append(dados)
+    monkeypatch.setattr(midia, "CANDIDATOS", 1)
+    assert _destaques_de(arquivos) == [("Beltrano", 5)]
+
+
+def test_palavra_comum_com_maiuscula_nao_vira_nome():
+    # "Eleições" sai com maiúscula às vezes, mas no meio das frases é mais "eleições": não é nome.
+    manchetes = [("Folha", f"Hoje o TSE divulga Eleições {i}") for i in range(6)]
+    manchetes += [("g1", f"Prazo das eleições termina {i}") for i in range(7)]
+    assert _destaques_de([_dia("2026-10-30", manchetes)]) == [("TSE", 6)]
+
+
+def test_nome_contido_em_outro_empatado_nao_vira_outra_linha():
+    # "Alexandre de Moraes" (empate com "Moraes", que vem depois na ordem alfabética) fica uma linha só.
+    arquivos = [
+        _dia(d, [("Folha", f"Alexandre de Moraes nega pedido {i}"), ("g1", f"Defesa recorre a Alexandre de Moraes {i}")])
+        for i, d in enumerate(_dias(6))
+    ]
+    assert _destaques_de(arquivos) == [("Alexandre de Moraes", 12)]
 
 
 def test_sem_manchetes_sem_destaques():
@@ -183,11 +248,15 @@ def _destaques() -> midia.DestaquesView:
 def test_pesquisa_traz_o_analitico_e_as_sugestoes(config):
     dados = pesquisa.dados_do_dia(make_edition("2026-10-30"), config, None)
     html = pesquisa.render_pesquisa_page([pesquisa.resumo_do_dia(dados)], config, home_href="../", archive_href="./", destaques=_destaques())
-    assert '<section class="md" id="midia" aria-labelledby="mdH" hidden></section>' in html
+    assert '<section class="md" id="midia" aria-labelledby="mdH" hidden></section>' in html and 'id="mdIr" hidden' in html
     assert "Como a mídia cobre " in html and "function leituraMidia(e, ts)" in html and "midia(e);" in html
-    assert 'class="md-sug"' in html and 'href="?q=Senado#midia"' in html and 'href="?q=PEC#midia"' in html
+    # as sugestões abrem a busca com a editoria e o período dos números (como no Analítico)
+    assert 'class="md-sug"' in html and 'href="pesquisa.html?q=Senado&amp;de=2026-' in html and "&amp;ed=politica#midia" in html
+    # o analítico vem depois da lista (os resultados ficam onde estavam), com um atalho acima
+    assert html.index('id="pqMore"') < html.index('id="midia"') and html.index('id="mdIr"') < html.index('id="pqList"')
     manifesto = json.loads(re.search(r'id="pqDados">(.*?)</script>', html, re.S).group(1))
     assert "The Guardian" in manifesto["exterior"] and "veja" in manifesto["fora"] and "sp" in manifesto["foraNomes"]
+    assert "marco" in manifesto["calendario"] and "marco" in manifesto["fora"]
     sem = pesquisa.render_pesquisa_page([pesquisa.resumo_do_dia(dados)], config, home_href="../", archive_href="./")
     assert 'class="md-sug"' not in sem and 'id="midia"' in sem  # sem nomes, o analítico da busca continua
 
@@ -197,7 +266,7 @@ def test_analitico_traz_os_nomes_em_destaque(config):
     html = render_analitico_page([], config, home_href="../", archive_href="./", destaques=view)
     assert 'id="an-nomes"' in html and "Nomes em destaque · como a mídia cobre cada um" in html
     assert 'href="pesquisa.html?q=Senado&amp;de=' in html and "&amp;ed=politica#midia" in html
-    assert 'action="pesquisa.html#midia"' in html and ".nm-tbl" in html
+    assert 'action="pesquisa.html#midia"' in html and ".nm-tbl" in html and 'required pattern=".*\\S.*"' in html
     sem = render_analitico_page([], config, home_href="../", archive_href="./")
     assert 'id="an-nomes"' not in sem and ".nm-tbl" not in sem  # sem nomes, a página fica como era
 
@@ -226,7 +295,7 @@ def test_publish_leva_os_nomes_ao_analitico_e_a_pesquisa(tmp_path, config):
     analitico = paths["analitico"].read_text(encoding="utf-8")
     assert 'id="an-nomes"' in analitico and ">Senado</a>" in analitico and "Texto a" in analitico
     busca = paths["pesquisa"].read_text(encoding="utf-8")
-    assert 'href="?q=Senado#midia"' in busca and 'id="midia"' in busca
+    assert 'href="pesquisa.html?q=Senado&amp;de=' in busca and 'id="midia"' in busca
 
 
 def test_falha_nos_nomes_nao_derruba_a_edicao(tmp_path, config, monkeypatch, caplog):

@@ -343,6 +343,7 @@ def pesquisa_view(
         # palavras e nomes que não contam como nome (as mesmas regras de midia.py).
         "exterior": midia.exterior(config),
         "fora": sorted(midia.FORA),
+        "calendario": sorted(midia.CALENDARIO),
         "foraNomes": sorted(midia.FORA_NOMES),
     }
     if dias:

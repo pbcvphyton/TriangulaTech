@@ -568,8 +568,10 @@ def publish(
     busca_hoje = pesquisa.dados_do_dia(edition, config, termometro_hoje)
     search_writes: dict[Path, str] = {paths["busca"]: pesquisa.serializar(busca_hoje)}
     resumos = [pesquisa.resumo_do_dia(busca_hoje)]
-    # Nomes em destaque (Analítico Político e sugestões da Pesquisa): das mesmas edições.
+    # Nomes em destaque (Analítico Político e sugestões da Pesquisa): das mesmas edições,
+    # só as da janela da tabela (as mais antigas não entram na conta).
     estrangeiros = midia.exterior(config)
+    inicio_nomes = today - timedelta(days=midia.JANELA_DIAS - 1)
     corpora = [_corpus_dos_nomes(busca_hoje, estrangeiros)]
     for day in kept_days:
         if day == today:
@@ -582,7 +584,8 @@ def publish(
                 continue
             search_writes[search_path] = pesquisa.serializar(dados)
         resumos.append(pesquisa.resumo_do_dia(dados))
-        corpora.append(_corpus_dos_nomes(dados, estrangeiros))
+        if day >= inicio_nomes:
+            corpora.append(_corpus_dos_nomes(dados, estrangeiros))
     if len(search_writes) > 1:
         log.info("Pesquisa analítica: %d edição(ões) anterior(es) entram na busca", len(search_writes) - 1)
     destaques = _nomes_em_destaque(corpora, edition.date, config)

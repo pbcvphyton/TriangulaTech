@@ -224,13 +224,15 @@ na linha abre o texto original, para conferir).
 
 Também à parte, antes da tabela de cada dia, o bloco **Nomes em destaque · como a
 mídia cobre cada um** (`qijournal/render/midia.py`): os 12 nomes mais citados nas
-manchetes de Política de veículos brasileiros nas edições dos últimos 30 dias
-(pessoas, partidos, instituições; saem das próprias manchetes e são contados com a
-regra da busca), com a participação nas manchetes, a tendência (últimas 7 edições
-contra as 7 anteriores), quantos veículos e a divergência média nos assuntos da
-cobertura comparada com dois lados. Cada nome abre o analítico dele na Pesquisa
-(mesma editoria e período), e a caixa "Analisar outro nome" leva qualquer termo
-para lá. O termômetro e o cálculo da aba não mudam.
+manchetes de Política nas edições dos últimos 30 dias (pessoas, partidos,
+instituições; saem das manchetes em português, e palavra comum com maiúscula, como
+"Eleições", ou selo como "VÍDEO" não conta), com a participação nas manchetes, a
+tendência (últimas 7 edições contra as 7 anteriores), quantos veículos e a
+divergência média nos assuntos da cobertura comparada com veículos dos dois lados.
+Os números são contados como no analítico do nome na Pesquisa (mesma regra de
+busca, todos os veículos, a notícia uma vez), e cada nome abre esse analítico, com a
+mesma editoria e período; a caixa "Analisar outro nome" leva qualquer termo para
+lá. O termômetro e o cálculo da aba não mudam.
 
 - **Histórico**: as análises de cada dia ficam em `data/termometro/AAAA-MM-DD.json`
   e **nunca são apagadas** (a limpeza do arquivo de edições não toca nessa pasta).
@@ -280,38 +282,47 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
 #### Como a mídia cobre (o analítico da busca)
 
 Ao fim de cada busca, a Pesquisa ganha, **além** dos resultados e das contagens
-acima (que não mudam), a seção **Como a mídia cobre "termo"** (`#midia`;
-`pesquisa.html?q=Lula#midia` abre direto nela). Ela lê os mesmos resultados, com
-os mesmos filtros, e usa como base todas as notícias das edições do período:
+(que não mudam e continuam no mesmo lugar), a seção **Como a mídia cobre "termo"**,
+depois da lista, com um atalho acima dela (`#midia`; `pesquisa.html?q=Lula#midia`
+abre direto nela). Ela lê os mesmos resultados, com os mesmos filtros, e usa como
+base todas as notícias das edições do período (precisa de todas: se alguma não
+carregar, pede para buscar de novo). A lista aparece primeiro; a leitura é
+calculada logo depois e não muda com a ordem escolhida para a lista:
 
 - **Leitura**: frases automáticas com o que importa: volume, quem dá mais e menos
   espaço, Brasil × exterior, o pico e o assunto que o puxou, a tendência, a
   divergência na cobertura comparada, quem destoa da maioria, quais veículos
   ficam em lados opostos e com quem o termo aparece.
 - **Atenção**: por veículo, quantas manchetes citam o termo, que parte do que o
-  veículo publicou isso representa e quanto acima ou abaixo da média ele está
-  (só com 30+ manchetes do veículo no período); Brasil × exterior (feeds em
-  outra língua); as últimas 7 edições contra as 7 anteriores.
+  veículo publicou isso representa e quanto acima ou abaixo **do esperado** ele
+  está: as manchetes que ele teria se desse ao termo, em cada editoria em que
+  publica, o mesmo espaço que o conjunto dá (um site de esporte não "deveria"
+  citar um político como um de política; só com 30+ manchetes do veículo no
+  período). Quem mais e quem menos dá espaço saem dos veículos que deveriam ter
+  citado o termo 3+ vezes (e quem não cita nenhuma vez aparece). Brasil × exterior
+  (feeds em outra língua); as últimas 7 edições contra as 7 anteriores (com 10+
+  manchetes do termo nas duas).
 - **Picos**: os três dias com mais manchetes e o assunto que puxou cada um.
 - **Pauta**: os nomes ("Quem aparece junto") e as palavras ("Temas") mais
   frequentes nas manchetes brasileiras dos resultados (clicar refina a busca) e os
   assuntos que mais renderam (link para a matéria ou a cobertura comparada).
 - **O que cada veículo enfatiza**: vocabulário distintivo de cada veículo
   brasileiro com 15+ manchetes sobre o termo, contra os demais (log-odds com prior
-  de Dirichlet informativo, Monroe, Colaresi e Quinn, 2008; z > 1,96).
+  de Dirichlet informativo, Monroe, Colaresi e Quinn, 2008; z > 3,3, um limiar
+  alto porque cada veículo testa muitas palavras de uma vez).
 - **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
-  quantos tiveram dois lados e quão dividida ficou cada um (divergência = 2 × o
-  lado menor ÷ (A + B): 0 = todos do mesmo lado, 100 = meio a meio); os mais
-  divididos, com os dois enfoques e o lado de cada veículo; **quem destoa da
-  maioria**; e os pares de veículos que mais ficam do mesmo lado ou em lados
-  opostos.
+  quantos tiveram dois lados (veículos nos dois enfoques; se todos ficaram no
+  mesmo, conta como sem divergência) e quão dividida ficou cada um (divergência =
+  2 × o lado menor ÷ (A + B): 100 = meio a meio); os mais divididos, com os dois
+  enfoques e, por escrito, os veículos de cada lado; **quem destoa da maioria**; e
+  os pares de veículos que mais ficam do mesmo lado ou em lados opostos.
 
 Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
 nem na IA). **Limite**: a busca não sabe se a menção é favorável ou desfavorável;
 os lados são os enfoques de cada assunto, não "a favor" ou "contra" a pessoa.
 
 Embaixo da caixa de busca, os **nomes em destaque** da Política (abaixo) viram
-atalhos para o analítico de cada um.
+atalhos para o analítico de cada um (com a editoria e o período da tabela).
 
 ### Racional da edição e lista completa do dia
 
