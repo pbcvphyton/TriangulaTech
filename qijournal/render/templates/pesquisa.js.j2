@@ -3,7 +3,8 @@
     mais recentes para as mais antigas), busca no navegador (sem acento, sem
     diferenciar maiúsculas, todas as palavras; "frase exata"; -excluir) e mostra
     os resultados, as contagens por edição, veículo e editoria e o CSV. O estado
-    da busca fica no endereço (?q=…&de=…), que pode ser guardado ou enviado. -#}
+    da busca fica no endereço (?q=…&de=…), que pode ser guardado ou enviado. Ao fim
+    da busca, "Como a mídia cobre" o termo (midia.js.j2). -#}
 (function () {
   'use strict';
   var d = document, w = window;
@@ -243,18 +244,19 @@
       var r = regs[i];
       if (!passa(r, f) || !casa(r, ts, f.tit)) continue;
       // A mesma notícia (link) coletada em mais de uma edição aparece uma vez, na primeira.
+      // O mapa guarda o próprio item, não a posição: o desenho parcial reordena e.res.
       var chave = r.k === 'n' ? r.u : r.k === 'a' ? r.id : null;
       if (chave) {
-        var j = e.chave[chave];
-        if (j != null) {
-          var x = e.res[j];
+        var x = e.chave[chave];
+        if (x) {
           x.n++;
           if (r.d < x.r.d) x.r = r;
           continue;
         }
-        e.chave[chave] = e.res.length;
       }
-      e.res.push({ r: r, n: 1, p: f.ord === 'rel' ? pontos(r, ts) : 0 });
+      var novo = { r: r, n: 1, p: f.ord === 'rel' ? pontos(r, ts) : 0 };
+      if (chave) e.chave[chave] = novo;
+      e.res.push(novo);
     }
   }
   function agendar() {
@@ -288,6 +290,7 @@
     else status('');
     analitica(e);
     lista(e);
+    midia(e);
   }
 
   /* ── contagens ─────────────────────────────────────────────────────── */
@@ -543,6 +546,8 @@
     a.click();
     w.setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   });
+
+{% include "midia.js.j2" %}
 
   /* ── eventos ───────────────────────────────────────────────────────── */
   form.addEventListener('submit', function (event) {

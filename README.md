@@ -222,6 +222,16 @@ notícias; nos veículos entram todos os que têm notícia com T, e os com menos
 os recortes por eixo, a tabela de cada dia e a lista de todas as análises (clicar
 na linha abre o texto original, para conferir).
 
+Também à parte, antes da tabela de cada dia, o bloco **Nomes em destaque · como a
+mídia cobre cada um** (`qijournal/render/midia.py`): os 12 nomes mais citados nas
+manchetes de Política de veículos brasileiros nas edições dos últimos 30 dias
+(pessoas, partidos, instituições; saem das próprias manchetes e são contados com a
+regra da busca), com a participação nas manchetes, a tendência (últimas 7 edições
+contra as 7 anteriores), quantos veículos e a divergência média nos assuntos da
+cobertura comparada com dois lados. Cada nome abre o analítico dele na Pesquisa
+(mesma editoria e período), e a caixa "Analisar outro nome" leva qualquer termo
+para lá. O termômetro e o cálculo da aba não mudam.
+
 - **Histórico**: as análises de cada dia ficam em `data/termometro/AAAA-MM-DD.json`
   e **nunca são apagadas** (a limpeza do arquivo de edições não toca nessa pasta).
   Um texto já analisado não volta à IA: é reaproveitado e conta uma vez só.
@@ -266,6 +276,42 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
   `data/AAAA-MM-DD.json`) e apagado junto com a edição (`archive_keep_days`). A
   página carrega só os dias do período pedido, das edições mais recentes para as
   mais antigas, e busca no próprio navegador.
+
+#### Como a mídia cobre (o analítico da busca)
+
+Ao fim de cada busca, a Pesquisa ganha, **além** dos resultados e das contagens
+acima (que não mudam), a seção **Como a mídia cobre "termo"** (`#midia`;
+`pesquisa.html?q=Lula#midia` abre direto nela). Ela lê os mesmos resultados, com
+os mesmos filtros, e usa como base todas as notícias das edições do período:
+
+- **Leitura**: frases automáticas com o que importa: volume, quem dá mais e menos
+  espaço, Brasil × exterior, o pico e o assunto que o puxou, a tendência, a
+  divergência na cobertura comparada, quem destoa da maioria, quais veículos
+  ficam em lados opostos e com quem o termo aparece.
+- **Atenção**: por veículo, quantas manchetes citam o termo, que parte do que o
+  veículo publicou isso representa e quanto acima ou abaixo da média ele está
+  (só com 30+ manchetes do veículo no período); Brasil × exterior (feeds em
+  outra língua); as últimas 7 edições contra as 7 anteriores.
+- **Picos**: os três dias com mais manchetes e o assunto que puxou cada um.
+- **Pauta**: os nomes ("Quem aparece junto") e as palavras ("Temas") mais
+  frequentes nas manchetes brasileiras dos resultados (clicar refina a busca) e os
+  assuntos que mais renderam (link para a matéria ou a cobertura comparada).
+- **O que cada veículo enfatiza**: vocabulário distintivo de cada veículo
+  brasileiro com 15+ manchetes sobre o termo, contra os demais (log-odds com prior
+  de Dirichlet informativo, Monroe, Colaresi e Quinn, 2008; z > 1,96).
+- **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
+  quantos tiveram dois lados e quão dividida ficou cada um (divergência = 2 × o
+  lado menor ÷ (A + B): 0 = todos do mesmo lado, 100 = meio a meio); os mais
+  divididos, com os dois enfoques e o lado de cada veículo; **quem destoa da
+  maioria**; e os pares de veículos que mais ficam do mesmo lado ou em lados
+  opostos.
+
+Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
+nem na IA). **Limite**: a busca não sabe se a menção é favorável ou desfavorável;
+os lados são os enfoques de cada assunto, não "a favor" ou "contra" a pessoa.
+
+Embaixo da caixa de busca, os **nomes em destaque** da Política (abaixo) viram
+atalhos para o analítico de cada um.
 
 ### Racional da edição e lista completa do dia
 
@@ -553,7 +599,8 @@ qijournal/                código do jornal
                           index.py = todas as notícias do dia) e modo automático
   render/                 páginas HTML e e-mail (modelos em render/templates/;
                           termometro.py e analitico.py = termômetro do dia e aba
-                          Analítico Político; pesquisa.py = Pesquisa analítica)
+                          Analítico Político; pesquisa.py = Pesquisa analítica;
+                          midia.py = nomes em destaque de "Como a mídia cobre")
   termometro/             Termômetro de Viés: referencia.py (cálculo, cópia literal
                           da especificação), agregacao.py (aba analítica),
                           analise.py (textos → IA → cálculo) e historico.py

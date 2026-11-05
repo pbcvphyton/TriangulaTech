@@ -3,6 +3,7 @@
 {% extends "layout.html.j2" %}
 {% import "termometro.html.j2" as tm %}
 {% import "macros.html.j2" as m %}
+{% import "midia.html.j2" as md %}
 
 {% block title %}{{ brand.name }} — Analítico Político{% endblock %}
 {% block description %}Todo o histórico do Termômetro de Viés Editorial: média, tendência, desvio, rankings por veículo e editoria e cada texto analisado.{% endblock %}
@@ -15,6 +16,10 @@
 {% block tools %}
     <a class="tool" href="{{ archive_href }}" title="Edições anteriores"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Edições</span></a>
     {{ m.search_tool(archive_href) }}
+{% endblock %}
+
+{% block styles %}
+{% if nm %}{% include "midia.css.j2" %}{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -133,6 +138,8 @@
   </div>
   {% endif %}
 
+  {% if nm %}{{ md.nomes(nm) }}{% endif %}
+
   <div class="an-blk">
     <h3 class="an-h" id="an-dias">Dia a dia</h3>
     <p class="term-note">Por data de publicação dos textos; o link abre a edição em que eles foram analisados.</p>
@@ -162,6 +169,8 @@
     </details>
     {% endfor %}
   </div>
+  {% elif nm %}
+  {{ md.nomes(nm) }}
   {% endif %}
 
   <div class="an-blk">
