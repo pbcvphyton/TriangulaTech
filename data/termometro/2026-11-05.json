@@ -1,0 +1,591 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-05",
+ "analises": [
+  {
+   "id": "4de91db71583",
+   "url": "https://valor.globo.com/opiniao/coluna/bc-interrompe-ciclo-de-afrouxamento-monetario.ghtml",
+   "titulo": "BC interrompe ciclo de afrouxamento monetário",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "copom-mantem-selic-em-13-75-e-interrompe-ciclo-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-05",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 22,
+   "rotulo": "Leve à direita",
+   "confianca": "media",
+   "resumo": "Leve à direita (confiança média). Principais sinais: vocabulário codificado (E1), premissas de fundo (E5) e sujeito do verbo (E3).",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 47,
+    "rotulo": "Fraca"
+   },
+   "palavras": 878,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 17.97,
+    "atores": 4.18,
+    "divergente": false
+   },
+   "por_eixo": {
+    "economico": 22.16
+   },
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "LEXICO",
+     "citacao": "Tem relação com o negacionismo fiscal do governo de Lula, que resiste a cortar despesas depois de ter empilhado uma porção de novas, de cunho eleitoreiro, na reta final da campanha.",
+     "paragrafo": "P8",
+     "direcao": "direita",
+     "contribuicao": 8.82,
+     "explicacao": "O texto usa 'negacionismo fiscal' para descrever a política do governo, um termo carregado que desqualifica a posição fiscal do governo e a apresenta como causa da alta do dólar e da inflação."
+    },
+    {
+     "id": "E2",
+     "criterio": "ADJETIVOS",
+     "citacao": "Com a piora significativa dos ativos financeiros após a vitória do presidente Lula nas eleições de outubro",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 3.66,
+     "explicacao": "O adjetivo 'significativa' intensifica a reação negativa do mercado à vitória de Lula, sugerindo que a eleição causou uma deterioração grave, sem apresentar dados comparativos."
+    },
+    {
+     "id": "E3",
+     "criterio": "AGENCIA",
+     "citacao": "O governo não fez movimentos assertivos nessa área e é possível que não os faça, sabotando suas próprias intenções de fazer a economia crescer.",
+     "paragrafo": "P9",
+     "direcao": "direita",
+     "contribuicao": 4.18,
+     "explicacao": "O texto atribui ao governo a responsabilidade pela falta de ajuste fiscal, usando verbos como 'sabotando' que implicam intenção deliberada de prejudicar a economia."
+    },
+    {
+     "id": "E5",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "Em algum momento terá de encarar corte de gastos, tarefa que pode ser gradual e eficaz, desde que sério e persistente, sem desmanchar os programas sociais que tanto preza.",
+     "paragrafo": "P10",
+     "direcao": "direita",
+     "contribuicao": 5.49,
+     "explicacao": "O texto toma como premissa que o corte de gastos é a solução necessária, e que o governo resiste a ele por 'prezar' programas sociais, enquadrando a política social como obstáculo."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "b6dbb54813f0",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/setor-de-telecom-preve-bomba-atomica-com-fim-da-6x1-e-sindicato-destaca-rotina-sob-pressao.shtml",
+   "titulo": "Setor de telecom prevê 'bomba atômica' com fim da 6x1 e sindicato destaca rotina sob pressão",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-05",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 1199,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -2.35,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Já para Mauro Britto, o secretário-geral do Sintetel-SP (Sindicato dos Trabalhadores em Telecomunicações no Estado de São Paulo), a mudança trará benefícios de produtividade e também do ponto de vista econômico.",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -2.35,
+     "explicacao": "O texto dedica mais parágrafos e falas diretas ao representante dos trabalhadores do que ao das empresas, embora ambos sejam ouvidos."
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "Em 2025, segundo dados do MTE, o setor registrou 405.497 admissões e 413.888 desligamentos, saldo negativo de 8.391 vagas.",
+     "paragrafo": "P19",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os números são contextualizados com fonte, ano e base, permitindo ao leitor avaliar a situação do setor."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d4166ad59996",
+   "url": "https://www.bloomberglinea.com.br/startups/revolut-e-avaliada-em-us-115-bilhoes-em-venda-secundaria-alta-de-53-em-quase-um-ano/",
+   "titulo": "Revolut é avaliada em US$ 115 bilhões em venda secundária, alta de 53% em quase um ano",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": []
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa"
+   },
+   "palavras": 238,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f9beee2e362f",
+   "url": "https://www.suno.com.br/noticias/lucro-dos-bancos-itau-itub4-bradesco/",
+   "titulo": "Lucro dos bancos: Itaú (ITUB4) lidera contra Bradesco (BBDC4) e Santander (SANB11)",
+   "veiculo": "Suno Notícias",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": []
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa"
+   },
+   "palavras": 678,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "068428e91ef6",
+   "url": "https://www.poder360.com.br/poder-economia/heineken-acerta-compra-da-better-drinks-dona-da-praya-e-baer-mate/",
+   "titulo": "Heineken acerta compra da Better Drinks, dona da Praya e Baer-Mate",
+   "veiculo": "Poder360",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-05",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 453,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "bc4e736e8286",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/nem-todo-mundo-esta-comprando-itub4-por-que-os-analistas-divergem-sobre-as-acoes-do-itau-apos-o-balanco-do-3t26-miql/",
+   "titulo": "Nem todo mundo quer comprar Itaú: por que ITUB4 ainda não convenceu todos os analistas após o 3T26",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa"
+   },
+   "palavras": 1260,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "XP, BTG Pactual, BB Investimentos e UBS BB reconhecem a força da franquia, mas divergem sobre o quanto dela ainda pode se transformar em novas revisões de lucro e valorização das ações.",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta visões de diferentes casas de análise, com argumentos positivos e cautelosos, sem favorecer um lado."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "faf06dc6a05a",
+   "url": "https://www.moneytimes.com.br/bolsas-da-asia-fecham-mistas-com-queda-de-acoes-de-ia-e-repercussao-de-eleicao-nos-eua-fets/",
+   "titulo": "Bolsas da Ásia fecham mistas com queda de ações de IA e repercussão de eleição nos EUA",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-05",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 77,
+    "rotulo": "Regular"
+   },
+   "palavras": 317,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "69bb1b535b76",
+   "url": "https://neofeed.com.br/negocios/o-remedio-amargo-da-cvs-para-agradar-washington/",
+   "titulo": "O “remédio amargo” da CVS para agradar Washington",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa"
+   },
+   "palavras": 647,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O CEO da CVS Health, David Joyner, afirmou que a pressão política e regulatória foi um dos fatores externos avaliados para a decisão de dividir a empresa, segundo o The New York Times.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta a versão da empresa e também críticas de consultores e analistas, sem favorecer um lado."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "43eab0a72f0c",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/04/brasil-abre-121305-vagas-com-carteira-assinada-em-setembro.ghtml",
+   "titulo": "Brasil abre 121.305 vagas com carteira assinada em setembro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "brasil-cria-121-3-mil-empregos-formais-em-setemb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa"
+   },
+   "palavras": 373,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a20020870137",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/heineken-acerta-compra-da-better-drinks-dona-das-marcas-praya-e-mamba-water.shtml",
+   "titulo": "Heineken acerta compra da Better Drinks, dona das marcas Praya e Mamba Water",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": []
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa"
+   },
+   "palavras": 336,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d402410a1ecf",
+   "url": "https://www.suno.com.br/noticias/petr4-fitch-eleva-perfil-credito-individual-petrobras/",
+   "titulo": "Petrobras (PETR4): Fitch eleva perfil de crédito individual da estatal",
+   "veiculo": "Suno Notícias",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 277,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "49d9f9dbe3c1",
+   "url": "https://neofeed.com.br/negocios/a-aprovacao-do-cade-para-um-ma-no-setor-de-oleo-e-gas-que-desagradou-a-petrobras/",
+   "titulo": "A aprovação do Cade para um M&A no setor de óleo e gás que desagradou a Petrobras",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "cade-aprova-fusao-entre-subsea7-e-saipem-com-ven",
+   "origem": "materia",
+   "data_publicacao": "2026-11-04",
+   "analisado_em": "2026-11-05",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 1064,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-05T10:39:55+00:00",
+   "provedor": "sensenova → gemini_lite",
+   "modelo": "gemini-flash-lite-latest + sensenova-6.8-flash-lite",
+   "candidatos": 40,
+   "textos_curtos": 6,
+   "falhas": 8,
+   "chamadas": 5,
+   "tokens": {
+    "entrada": 24758,
+    "saida": 29626
+   },
+   "analises": [
+    "4de91db71583",
+    "b6dbb54813f0",
+    "d4166ad59996",
+    "f9beee2e362f",
+    "068428e91ef6",
+    "bc4e736e8286",
+    "faf06dc6a05a",
+    "69bb1b535b76",
+    "43eab0a72f0c",
+    "a20020870137",
+    "d402410a1ecf",
+    "49d9f9dbe3c1"
+   ]
+  }
+ ]
+}
