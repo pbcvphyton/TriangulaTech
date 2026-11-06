@@ -1037,6 +1037,146 @@ body.modal-open .btt{visibility:hidden}
   #rdprog,#mast-canvas,.mast-tools,.tk-pause,.srch,.tabs-bar,.tab-side,.btt,.modals{display:none!important}
   .js .tab-pane,.pane-hd{display:block!important}
   .tk.run .tk-rail{animation:none}
+}/* Como a mídia cobre (o analítico da busca) */
+.md{margin-top:22px;padding-top:16px;border-top:2px solid var(--qn)}
+:root[data-theme="dark"] .md{border-top-color:var(--qi)}
+.md[hidden]{display:none}
+.md-h{font-family:var(--sf);font-size:22px;font-weight:700;line-height:1.25;color:var(--ink)}
+.md-sub{margin-top:4px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.md-sub a{font-weight:600;color:var(--link)}
+.md-sub a:hover{text-decoration:underline}
+.md-sint{list-style:none;max-width:980px;margin-top:12px;padding:12px 16px;border-left:3px solid var(--qc);background:var(--soft)}
+.md-sint li{position:relative;padding-left:16px;font-family:var(--sf);font-size:15px;line-height:1.55;color:var(--ink)}
+.md-sint li+li{margin-top:6px}
+.md-sint li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--qc)}
+.md-sint b{font-weight:700}
+.md-blk{margin-top:20px}
+.md h4,.md h5{margin-bottom:8px;font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--head)}
+.md h5{margin-top:16px;font-size:10px;letter-spacing:1.2px;color:var(--muted)}
+.md-note{margin-top:6px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.md-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.md-tiles li{display:flex;flex-direction:column;gap:2px;min-width:0;padding:10px 12px;border-left:3px solid var(--qi);background:var(--soft)}
+.md-tiles span{font-family:var(--mn);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
+.md-tiles b{font-family:var(--mn);font-size:20px;font-weight:600;line-height:1.2;color:var(--ink)}
+.md-tiles small{font-family:var(--ss);font-size:11.5px;color:var(--muted)}
+.md-tiles .md-sobe{border-left-color:var(--qc)}
+.md-tiles .md-cai{border-left-color:var(--t-eq)}
+.md-tbl{width:100%;border-collapse:collapse;font-family:var(--ss);font-size:12.5px;color:var(--body)}
+.md-tbl th,.md-tbl td{padding:6px 10px 6px 0;border-bottom:1px solid var(--rl);text-align:right;white-space:nowrap}
+.md-tbl th:first-child{text-align:left}
+.md-tbl thead th{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.md-tbl tbody th{font-weight:700;color:var(--ink)}
+.md-tbl td{font-family:var(--mn);font-size:11.5px}
+.md-tbl tbody th button{padding:0;border:none;background:none;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.md-tbl tbody th button:hover{color:var(--link);text-decoration:underline}
+.md-tbl .md-pq th,.md-tbl .md-pq td{color:var(--mute2)}
+.md-tbl .md-pq th{font-weight:600}
+.md-tbl .md-pq .md-ix i{opacity:.45}
+.md-ex{display:inline-block;margin-left:6px;padding:0 5px;border-radius:3px;background:var(--soft);font-family:var(--mn);font-size:9px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
+.md-ix{min-width:118px}
+.md-ix i{display:inline-block;width:56px;height:6px;margin-right:8px;border-radius:3px;background:var(--rl);vertical-align:1px;overflow:hidden}
+.md-ix i::before{content:"";display:block;width:var(--w,0%);height:100%;background:var(--qi)}
+:root[data-theme="dark"] .md-ix i::before{background:var(--link)}
+.md-ix.md-acima{color:var(--ink);font-weight:600}
+.md-ix.md-acima i::before{background:var(--qc)}
+.md-ix.md-abaixo{color:var(--faint)}
+.md-picos{list-style:none}
+.md-picos li{display:grid;grid-template-columns:62px minmax(0,auto) minmax(0,1fr);align-items:baseline;gap:4px 14px;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:13px;color:var(--body)}
+.md-picos button{padding:0;border:none;background:none;font-family:var(--mn);font-size:15px;color:var(--link);cursor:pointer;text-align:left}
+.md-picos button:hover{text-decoration:underline}
+.md-pn{font-family:var(--mn);font-size:11px;color:var(--muted);white-space:nowrap}
+.md-pa{font-family:var(--sf);font-size:14px;line-height:1.4;color:var(--ink)}
+.md-pa small{font-family:var(--ss);font-size:11px;color:var(--faint)}
+.md-2c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 30px}
+.md-chips{display:flex;flex-wrap:wrap;gap:6px}
+.md-chips button{display:inline-flex;align-items:baseline;gap:6px;min-height:28px;padding:3px 11px;border:1.5px solid var(--rule);border-radius:15px;background:var(--paper);font-family:var(--ss);font-size:12.5px;color:var(--ink);cursor:pointer;text-align:left}
+.md-chips button b{font-family:var(--mn);font-size:10.5px;font-weight:600;color:var(--mute2)}
+.md-chips button:hover{border-color:var(--link);color:var(--link)}
+.md-as{list-style:none}
+.md-as li{display:flex;flex-direction:column;gap:2px;padding:7px 0;border-bottom:1px solid var(--rl)}
+.md-as a{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.md-as a:hover{color:var(--link);text-decoration:underline}
+.md-as span{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.md-voc{list-style:none}
+.md-voc li{display:grid;grid-template-columns:minmax(150px,200px) 110px minmax(0,1fr);align-items:baseline;gap:4px 14px;padding:8px 0;border-bottom:1px solid var(--rl)}
+.md-vn{padding:0;border:none;background:none;font-family:var(--ss);font-size:13px;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+.md-vn:hover{color:var(--link);text-decoration:underline}
+.md-vc{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.md-vt{font-family:var(--ss);font-size:12px;font-style:italic;color:var(--muted)}
+.md-div{list-style:none}
+.md-div li{display:flex;flex-direction:column;gap:5px;padding:10px 0;border-bottom:1px solid var(--rl)}
+.md-dt{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.md-dt:hover{color:var(--link);text-decoration:underline}
+.md-dm{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.md-div .cov-bar{max-width:520px}
+.md-dl,.md-dv{font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.md-dl b{font-family:var(--mn);color:var(--ink)}
+.md .ca{color:var(--cov-a);font-weight:600}
+.md .cb{color:var(--cov-b);font-weight:600}
+/* Atalho para o analítico (fica depois da lista) */
+.md-ir{margin-top:14px;font-family:var(--ss);font-size:12.5px;color:var(--muted)}
+.md-ir[hidden]{display:none}
+.md-ir a{font-weight:700;color:var(--link)}
+.md-ir a::after{content:" ↓"}
+.md-ir a:hover{text-decoration:underline}
+.md-par{list-style:none}
+.md-par li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:3px 10px;padding:5px 0 6px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.md-par li>span i{font-style:normal;color:var(--faint)}
+.md-par b{font-family:var(--mn);font-size:11.5px;font-weight:600;color:var(--mute2)}
+.md-pb{grid-column:1/-1;display:block;height:4px;border-radius:2px;background:var(--rl)}
+.md-pb::before{content:"";display:block;width:var(--w,0%);height:100%;border-radius:2px;background:var(--qi)}
+:root[data-theme="dark"] .md-pb::before{background:var(--link)}
+.md-como{margin-top:20px;padding:10px 14px;border:1px solid var(--rl);border-radius:6px;background:var(--soft)}
+.md-como summary{font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer}
+.md-como p{max-width:980px;margin-top:8px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--body)}
+.md-como b{color:var(--ink)}
+/* Sugestões de busca (Pesquisa analítica) */
+.md-sug{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-top:10px;padding-left:20px;font-family:var(--ss);font-size:12.5px}
+.md-sl{font-family:var(--mn);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint)}
+.md-sug a{font-weight:600;color:var(--link)}
+.md-sug a:hover{text-decoration:underline}
+/* Nomes em destaque (Analítico Político) */
+.nm-tbl td.nm-n{min-width:130px}
+.nm-bar{display:inline-block;width:60px;height:6px;margin-right:8px;border-radius:3px;background:var(--rl);vertical-align:1px;overflow:hidden}
+.nm-bar::before{content:"";display:block;width:var(--w,0%);height:100%;background:var(--qi)}
+:root[data-theme="dark"] .nm-bar::before{background:var(--link)}
+.nm-tb{display:block;font-family:var(--ss);font-size:11px;font-weight:400;color:var(--faint)}
+.nm-t{font-weight:600}
+.nm-sobe{color:#C2410C;color:color-mix(in srgb,var(--qc) 75%,#000)}
+:root[data-theme="dark"] .nm-sobe{color:var(--qc)}
+.nm-cai{color:var(--muted)}
+.nm-est,.nm-ins{color:var(--faint);font-weight:400}
+.nm-dv{display:inline-block;width:44px;height:6px;margin-right:8px;border-radius:3px;background:var(--rl);vertical-align:1px;overflow:hidden}
+.nm-dv::before{content:"";display:block;width:var(--d,0%);height:100%;background:var(--cov-b)}
+.nm-form{display:flex;gap:8px;max-width:640px;margin-top:14px}
+.nm-in{flex:1;min-width:0;height:40px;padding:0 16px;border:1.5px solid var(--rule);border-radius:22px;background:var(--paper);font-family:var(--ss);font-size:14px;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none}
+.nm-in:focus{border-color:var(--qi);box-shadow:0 0 0 3px rgba(var(--qi-rgb),.14)}
+.nm-go{flex-shrink:0;height:40px;padding:0 20px;border:none;border-radius:22px;background:var(--qi);font-family:var(--ss);font-size:13px;font-weight:700;color:#fff;cursor:pointer}
+.nm-go:hover{background:var(--qn)}
+:root[data-theme="dark"] .nm-go:hover{background:var(--link);color:#0b0f17}
+@media (max-width:1023.98px){
+  .md-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .md-h{font-size:19px}
+  .md-sint{padding:10px 12px}
+  .md-sint li{font-size:14px}
+  .md-2c{grid-template-columns:minmax(0,1fr)}
+  .md-picos li{grid-template-columns:52px minmax(0,1fr)}
+  .md-pa{grid-column:1/-1}
+  .md-voc li{grid-template-columns:minmax(0,1fr) auto}
+  .md-voc .md-chips{grid-column:1/-1}
+  .md-sug{padding-left:0}
+  .nm-form{max-width:none}
+  .nm-in{font-size:16px}
+  /* tabelas: o número principal à vista sem rolar de lado */
+  .md-tbl thead th,.md-tbl tbody th,.nm-tbl thead th,.nm-tbl tbody th{white-space:normal}
+  .md-tbl th,.md-tbl td{padding-right:6px}
+  .md-ix{min-width:0}
+  .md-ix i{width:32px;margin-right:6px}
+  .nm-tbl td.nm-n{min-width:0}
+  .nm-bar,.nm-dv{width:28px;margin-right:6px}
+  .nm-tbl th:nth-child(5),.nm-tbl td:nth-child(5),.nm-tbl th:nth-child(6),.nm-tbl td:nth-child(6){display:none}
 }</style>
 </head>
 <body>
@@ -1067,21 +1207,21 @@ body.modal-open .btt{visibility:hidden}
     <h2 class="kicker" id="an-h">Analítico Político</h2>
     <a class="arch-home" href="../">&larr; Edição mais recente</a>
   </div>
-  <p class="an-intro">Todo o histórico do termômetro: 432 textos analisados de 18 veículos, publicados de 13/10/2026 a 05/11/2026.</p>
+  <p class="an-intro">Todo o histórico do termômetro: 452 textos analisados de 19 veículos, publicados de 13/10/2026 a 05/11/2026.</p>
 
   <div class="an-blk">
     <h3 class="an-h" id="an-onde">Onde estamos</h3>
-    <p class="term-sum">Equilibrado · T 0 na média de 381 notícias com dimensão política <span>(intervalo de 95%: 0 a 0)</span></p>
-<div class="tg" role="img" aria-label="Média de todo o histórico (notícias): T 0 (Equilibrado), intervalo de 95% de 0 a 0; escala de −100 (esquerda) a +100 (direita)">
+    <p class="term-sum">Equilibrado · T 0 na média de 400 notícias com dimensão política <span>(intervalo de 95%: −1 a 0)</span></p>
+<div class="tg" role="img" aria-label="Média de todo o histórico (notícias): T 0 (Equilibrado), intervalo de 95% de −1 a 0; escala de −100 (esquerda) a +100 (direita)">
   <div class="tg-track">
     <div class="tg-bands"><span class="tg-f t-ef" style="left:0.0%;width:25.0%" title="Esquerda forte"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%" title="Esquerda moderada"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%" title="Leve à esquerda"></span><span class="tg-f t-eq" style="left:45.0%;width:10.0%" title="Equilibrado"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%" title="Leve à direita"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%" title="Direita moderada"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%" title="Direita forte"></span></div>
-    <span class="tg-zero"></span><span class="tg-ic" style="left:49.76%;width:0.4%"></span><span class="tg-dot" style="left:49.85%"></span>
+    <span class="tg-zero"></span><span class="tg-ic" style="left:49.74%;width:0.4%"></span><span class="tg-dot" style="left:49.84%"></span>
   </div>  <div class="tg-axis" aria-hidden="true"><span>Esquerda · &minus;100</span><span>0</span><span>+100 · Direita</span></div></div><div class="td">
-  <div class="td-bar" role="img" aria-label="Rótulos dos textos: Equilibrado: 381"><span class="t-eq" style="width:100.0%" title="Equilibrado: 381"></span></div>
-  <ul class="td-leg"><li><i class="t-eq" aria-hidden="true"></i>Equilibrado <b>381</b></li></ul>
+  <div class="td-bar" role="img" aria-label="Rótulos dos textos: Leve à esquerda: 1; Equilibrado: 399"><span class="t-el" style="width:0.25%" title="Leve à esquerda: 1"></span><span class="t-eq" style="width:99.75%" title="Equilibrado: 399"></span></div>
+  <ul class="td-leg"><li><i class="t-el" aria-hidden="true"></i>Leve à esquerda <b>1</b></li><li><i class="t-eq" aria-hidden="true"></i>Equilibrado <b>399</b></li></ul>
 </div>    <ul class="an-tiles">
-      <li><span class="an-tl">Textos analisados</span><b>432</b><span class="an-td">18 veículos · 8 editorias · 24 dias</span></li>
-      <li><span class="an-tl">Notícias com T</span><b>381</b><span class="an-td">32 sem dimensão política · 0 inconclusivas</span></li>
+      <li><span class="an-tl">Textos analisados</span><b>452</b><span class="an-td">19 veículos · 8 editorias · 24 dias</span></li>
+      <li><span class="an-tl">Notícias com T</span><b>400</b><span class="an-td">33 sem dimensão política · 0 inconclusivas</span></li>
       <li><span class="an-tl">Qualidade da apuração</span><b>86</b><span class="an-td">de 100 · Boa</span></li>
       <li><span class="an-tl">Opinião (à parte)</span><b>19</b><span class="an-td">T médio +2</span></li>
     </ul>
@@ -1092,8 +1232,8 @@ body.modal-open .btt{visibility:hidden}
     <ul class="an-reads">
       <li class="rd-ins"><span class="an-tl">Tendência do termômetro</span><b>Dados insuficientes</b><p>2 meses com 30 ou mais análises; a tendência pede 6.</p></li>
       <li class="rd-ins"><span class="an-tl">Tendência da qualidade da apuração</span><b>Dados insuficientes</b><p>2 meses com 30 ou mais análises; a tendência pede 6.</p></li>
-      <li class="rd-est"><span class="an-tl">Janela recente × histórico: termômetro</span><b>Dentro do histórico</b><p>25/10/2026 a 05/11/2026: 0; 13/10/2026 a 24/10/2026: 0. Diferença de +0,3 (intervalo de 95%: −0,1 a +0,6).</p></li>
-      <li class="rd-est"><span class="an-tl">Janela recente × histórico: qualidade</span><b>Dentro do histórico</b><p>25/10/2026 a 05/11/2026: 85; 13/10/2026 a 24/10/2026: 87. Diferença de −2,0 (intervalo de 95%: −4,3 a +0,4).</p></li>
+      <li class="rd-est"><span class="an-tl">Janela recente × histórico: termômetro</span><b>Dentro do histórico</b><p>25/10/2026 a 05/11/2026: 0; 13/10/2026 a 24/10/2026: 0. Diferença de +0,2 (intervalo de 95%: −0,1 a +0,6).</p></li>
+      <li class="rd-pior"><span class="an-tl">Janela recente × histórico: qualidade</span><b>Piorou</b><p>25/10/2026 a 05/11/2026: 84; 13/10/2026 a 24/10/2026: 87. Diferença de −2,5 (intervalo de 95%: −4,8 a −0,1).</p></li>
     </ul>
     <div class="an-pux">
       <div class="an-tbl-wrap">
@@ -1103,11 +1243,11 @@ body.modal-open .btt{visibility:hidden}
           <tbody>
             <tr><th scope="row">Natureza &amp; Meio Ambiente</th><td>+0,1</td><td>+0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">Jurídico &amp; Regulação</th><td>+0,1</td><td>+0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
+            <tr><th scope="row">Geopolítica &amp; Mundo</th><td>−0,1</td><td>−0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">Mercados &amp; Finanças</th><td>+0,1</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">Imobiliário</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
-            <tr><th scope="row">Geopolítica &amp; Mundo</th><td>0,0</td><td>−0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
-            <tr><th scope="row">Política</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dentro do histórico</td></tr>
             <tr><th scope="row">Brasil · Economia</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
+            <tr><th scope="row">Política</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dentro do histórico</td></tr>
             <tr><th scope="row">Tecnologia &amp; Negócios</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
           </tbody>
         </table>
@@ -1117,14 +1257,14 @@ body.modal-open .btt{visibility:hidden}
           <caption>Quem puxou a mudança · Por veículo</caption>
           <thead><tr><th scope="col">Grupo</th><th scope="col">Contribuição</th><th scope="col">Inclinação</th><th scope="col">Pauta</th><th scope="col">No grupo</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Folha de S.Paulo</th><td>+0,2</td><td>+0,2</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
+            <tr><th scope="row">Folha de S.Paulo</th><td>+0,2</td><td>+0,2</td><td>0,0</td><td class="an-l">mudou para a direita</td></tr>
+            <tr><th scope="row">ClimaInfo</th><td>−0,1</td><td>−0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">((o))eco</th><td>0,0</td><td>+0,1</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">g1</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
-            <tr><th scope="row">ClimaInfo</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">Valor Econômico</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dentro do histórico</td></tr>
             <tr><th scope="row">Imobi Report</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
             <tr><th scope="row">Suno Notícias</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
-            <tr><th scope="row">Agência Brasil</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
+            <tr><th scope="row">CNN Brasil</th><td>0,0</td><td>0,0</td><td>0,0</td><td class="an-l">dados insuficientes</td></tr>
           </tbody>
         </table>
       </div>
@@ -1137,20 +1277,20 @@ body.modal-open .btt{visibility:hidden}
       <figcaption>Termômetro por semana (notícias)</figcaption>
       <div class="ts-plot" role="img" aria-label="Média semanal de T das notícias, 4 semana(s); última: 0 (Equilibrado). Escala de −25 a +25.">
 <span class="ts-g" style="top:100.0%"><i>−25</i></span><span class="ts-g" style="top:50.0%"><i>0</i></span><span class="ts-g" style="top:0.0%"><i>+25</i></span><span class="ts-g ts-z" style="top:50.0%"></span>        <svg class="ts-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-          <path class="ts-band" d="M0.0,505.8 L333.3,496.2 L666.7,499.7 L1000.0,493.0 L1000.0,506.2 L666.7,512.6 L333.3,507.7 L0.0,523.0 Z"/>
-          <path class="ts-line" d="M0.0,514.4 L333.3,502.0 L666.7,506.2 L1000.0,499.6" vector-effect="non-scaling-stroke"/>
+          <path class="ts-band" d="M0.0,505.8 L333.3,496.2 L666.7,499.7 L1000.0,493.9 L1000.0,513.7 L666.7,512.6 L333.3,507.7 L0.0,523.0 Z"/>
+          <path class="ts-line" d="M0.0,514.4 L333.3,502.0 L666.7,506.2 L1000.0,503.8" vector-effect="non-scaling-stroke"/>
         </svg>
-<span class="ts-pt" style="left:0.0%;top:51.44%" title="Semana de 12/10/2026: T −1 (Equilibrado), 100 notícias"></span><span class="ts-pt" style="left:33.33%;top:50.2%" title="Semana de 19/10/2026: T 0 (Equilibrado), 122 notícias"></span><span class="ts-pt" style="left:66.67%;top:50.62%" title="Semana de 26/10/2026: T 0 (Equilibrado), 110 notícias"></span><span class="ts-pt" style="left:100.0%;top:49.96%" title="Semana de 02/11/2026: T 0 (Equilibrado), 49 notícias"></span>      </div>
+<span class="ts-pt" style="left:0.0%;top:51.44%" title="Semana de 12/10/2026: T −1 (Equilibrado), 100 notícias"></span><span class="ts-pt" style="left:33.33%;top:50.2%" title="Semana de 19/10/2026: T 0 (Equilibrado), 122 notícias"></span><span class="ts-pt" style="left:66.67%;top:50.62%" title="Semana de 26/10/2026: T 0 (Equilibrado), 110 notícias"></span><span class="ts-pt" style="left:100.0%;top:50.38%" title="Semana de 02/11/2026: T 0 (Equilibrado), 68 notícias"></span>      </div>
       <div class="ts-x" aria-hidden="true"><span style="left:0.0%">12/10/2026</span><span style="left:66.67%">26/10/2026</span><span style="left:100.0%">02/11/2026</span></div>
     </figure>
     <figure class="ts">
       <figcaption>Qualidade da apuração por semana (0 a 100)</figcaption>
-      <div class="ts-plot" role="img" aria-label="Qualidade média da apuração por semana, 4 semana(s); última: 83 de 100.">
+      <div class="ts-plot" role="img" aria-label="Qualidade média da apuração por semana, 4 semana(s); última: 82 de 100.">
 <span class="ts-g" style="top:0.0%"><i>100</i></span><span class="ts-g" style="top:20%"><i>80</i></span><span class="ts-g" style="top:50%"><i>50</i></span><span class="ts-g" style="top:100.0%"><i>0</i></span>        <svg class="ts-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
-          <path class="ts-band" d="M0.0,91.5 L333.3,132.0 L666.7,122.3 L1000.0,136.5 L1000.0,210.1 L666.7,168.7 L333.3,171.8 L0.0,131.2 Z"/>
-          <path class="ts-line" d="M0.0,111.4 L333.3,151.9 L666.7,145.5 L1000.0,173.3" vector-effect="non-scaling-stroke"/>
+          <path class="ts-band" d="M0.0,91.5 L333.3,132.0 L666.7,122.3 L1000.0,148.7 L1000.0,215.5 L666.7,168.7 L333.3,171.8 L0.0,131.2 Z"/>
+          <path class="ts-line" d="M0.0,111.4 L333.3,151.9 L666.7,145.5 L1000.0,182.1" vector-effect="non-scaling-stroke"/>
         </svg>
-<span class="ts-pt" style="left:0.0%;top:11.14%" title="Semana de 12/10/2026: qualidade 89 (Boa)"></span><span class="ts-pt" style="left:33.33%;top:15.19%" title="Semana de 19/10/2026: qualidade 85 (Boa)"></span><span class="ts-pt" style="left:66.67%;top:14.55%" title="Semana de 26/10/2026: qualidade 85 (Boa)"></span><span class="ts-pt" style="left:100.0%;top:17.33%" title="Semana de 02/11/2026: qualidade 83 (Boa)"></span>      </div>
+<span class="ts-pt" style="left:0.0%;top:11.14%" title="Semana de 12/10/2026: qualidade 89 (Boa)"></span><span class="ts-pt" style="left:33.33%;top:15.19%" title="Semana de 19/10/2026: qualidade 85 (Boa)"></span><span class="ts-pt" style="left:66.67%;top:14.55%" title="Semana de 26/10/2026: qualidade 85 (Boa)"></span><span class="ts-pt" style="left:100.0%;top:18.21%" title="Semana de 02/11/2026: qualidade 82 (Boa)"></span>      </div>
       <div class="ts-x" aria-hidden="true"><span style="left:0.0%">12/10/2026</span><span style="left:66.67%">26/10/2026</span><span style="left:100.0%">02/11/2026</span></div>
     </figure>
   </div>
@@ -1158,95 +1298,100 @@ body.modal-open .btt{visibility:hidden}
   <div class="an-blk">
     <h3 class="an-h" id="an-rk-1">Ranking · Veículos</h3>
 <p class="term-note rk-nota">Todos os veículos com notícia analisada entram; os que têm menos de 30 notícias com T aparecem esmaecidos (amostra pequena): o T ajustado os puxa para a média geral, então ficam perto do centro até acumularem textos.</p>    <ol class="rk">
+      <li class="rk-i rk-pq" title="ClimaInfo: T ajustado −2 (Equilibrado); média −7, intervalo de 95% −16 a +2; 3 notícias (amostra pequena: menos de 30)">
+        <span class="rk-n">ClimaInfo</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:18.91%;width:34.18%"></span><span class="rk-d" style="left:46.27%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>−2</b> Equilibrado<span class="rk-x">3 notícias · média bruta −7 · amostra pequena</span></span>
+      </li>
       <li class="rk-i rk-pq" title="((o))eco: T ajustado −1 (Equilibrado); média −3, intervalo de 95% −9 a +3; 3 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">((o))eco</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:32.24%;width:23.52%"></span><span class="rk-d" style="left:48.14%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:32.24%;width:23.52%"></span><span class="rk-d" style="left:48.11%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">3 notícias · média bruta −3 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="ClimaInfo: T ajustado −1 (Equilibrado); média −3, intervalo de 95% −9 a +3; 2 notícias (amostra pequena: menos de 30)">
-        <span class="rk-n">ClimaInfo</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:32.24%;width:23.52%"></span><span class="rk-d" style="left:48.49%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">2 notícias · média bruta −3 · amostra pequena</span></span>
-      </li>
-      <li class="rk-i" title="Folha de S.Paulo: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 76 notícias">
+      <li class="rk-i" title="Folha de S.Paulo: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 78 notícias">
         <span class="rk-n">Folha de S.Paulo</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.4%;width:1.36%"></span><span class="rk-d" style="left:49.11%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">76 notícias · média bruta 0</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.44%;width:1.32%"></span><span class="rk-d" style="left:49.13%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">78 notícias · média bruta 0</span></span>
       </li>
-      <li class="rk-i rk-pq" title="Agência Brasil: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 7 notícias (amostra pequena: menos de 30)">
+      <li class="rk-i rk-pq" title="Agência Brasil: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 8 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">Agência Brasil</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:47.46%;width:3.36%"></span><span class="rk-d" style="left:49.29%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">7 notícias · média bruta 0 · amostra pequena</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:47.78%;width:2.94%"></span><span class="rk-d" style="left:49.3%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">8 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="g1: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 25 notícias (amostra pequena: menos de 30)">
+      <li class="rk-i rk-pq" title="g1: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 27 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">g1</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.25%;width:2.06%"></span><span class="rk-d" style="left:49.31%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">25 notícias · média bruta 0 · amostra pequena</span></span>
-      </li>
-      <li class="rk-i" title="Valor Econômico: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 225 notícias">
-        <span class="rk-n">Valor Econômico</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.9%;width:1.01%"></span><span class="rk-d" style="left:49.4%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">225 notícias · média bruta 0</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.37%;width:1.92%"></span><span class="rk-d" style="left:49.34%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">27 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
       <li class="rk-i rk-pq" title="Bloomberg Línea: T ajustado 0 (Equilibrado); média 0; 1 notícia (amostra pequena: menos de 30)">
         <span class="rk-n">Bloomberg Línea</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.44%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.4%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">1 notícia · média bruta 0 · amostra pequena</span></span>
       </li>
       <li class="rk-i rk-pq" title="Mongabay Brasil: T ajustado 0 (Equilibrado); média 0; 1 notícia (amostra pequena: menos de 30)">
         <span class="rk-n">Mongabay Brasil</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.44%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.4%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">1 notícia · média bruta 0 · amostra pequena</span></span>
+      </li>
+      <li class="rk-i" title="Valor Econômico: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 227 notícias">
+        <span class="rk-n">Valor Econômico</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.91%;width:1.0%"></span><span class="rk-d" style="left:49.41%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">227 notícias · média bruta 0</span></span>
       </li>
       <li class="rk-i rk-pq" title="Brazil Journal: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 3 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">Brazil Journal</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.53%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.5%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">3 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="Money Times: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 4 notícias (amostra pequena: menos de 30)">
+      <li class="rk-i rk-pq" title="Money Times: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 5 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">Money Times</span>
         <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.56%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">4 notícias · média bruta 0 · amostra pequena</span></span>
-      </li>
-      <li class="rk-i rk-pq" title="Seu Dinheiro: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 5 notícias (amostra pequena: menos de 30)">
-        <span class="rk-n">Seu Dinheiro</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.59%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">5 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
       <li class="rk-i rk-pq" title="Um Só Planeta: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 5 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">Um Só Planeta</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.59%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.56%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">5 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="InfoMoney: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 6 notícias (amostra pequena: menos de 30)">
-        <span class="rk-n">InfoMoney</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.62%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">6 notícias · média bruta 0 · amostra pequena</span></span>
+      <li class="rk-i rk-pq" title="Agência Câmara: T ajustado 0 (Equilibrado); média +1; 1 notícia (amostra pequena: menos de 30)">
+        <span class="rk-n">Agência Câmara</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.59%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">1 notícia · média bruta +1 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="NeoFeed: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 7 notícias (amostra pequena: menos de 30)">
+      <li class="rk-i rk-pq" title="InfoMoney: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 7 notícias (amostra pequena: menos de 30)">
+        <span class="rk-n">InfoMoney</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.61%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">7 notícias · média bruta 0 · amostra pequena</span></span>
+      </li>
+      <li class="rk-i rk-pq" title="Seu Dinheiro: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 7 notícias (amostra pequena: menos de 30)">
+        <span class="rk-n">Seu Dinheiro</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.61%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">7 notícias · média bruta 0 · amostra pequena</span></span>
+      </li>
+      <li class="rk-i rk-pq" title="NeoFeed: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 8 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">NeoFeed</span>
         <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:50.0%;width:0.6%"></span><span class="rk-d" style="left:49.64%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">7 notícias · média bruta 0 · amostra pequena</span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">8 notícias · média bruta 0 · amostra pequena</span></span>
       </li>
       <li class="rk-i rk-pq" title="Imobi Report: T ajustado 0 (Equilibrado); média +3; 1 notícia (amostra pequena: menos de 30)">
         <span class="rk-n">Imobi Report</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.99%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-d" style="left:49.95%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">1 notícia · média bruta +3 · amostra pequena</span></span>
       </li>
-      <li class="rk-i rk-pq" title="Poder360: T ajustado 0 (Equilibrado); média +1, intervalo de 95% −1 a +3; 3 notícias (amostra pequena: menos de 30)">
+      <li class="rk-i rk-pq" title="Poder360: T ajustado 0 (Equilibrado); média +1, intervalo de 95% −1 a +2; 4 notícias (amostra pequena: menos de 30)">
         <span class="rk-n">Poder360</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.08%;width:7.84%"></span><span class="rk-d" style="left:49.99%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">3 notícias · média bruta +1 · amostra pequena</span></span>
-      </li>
-      <li class="rk-i rk-pq" title="Suno Notícias: T ajustado 0 (Equilibrado); média +1, intervalo de 95% −1 a +3; 3 notícias (amostra pequena: menos de 30)">
-        <span class="rk-n">Suno Notícias</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.08%;width:7.84%"></span><span class="rk-d" style="left:49.99%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">3 notícias · média bruta +1 · amostra pequena</span></span>
-      </li>
-      <li class="rk-i rk-pq" title="CNN Brasil: T ajustado 0 (Equilibrado); média +1, intervalo de 95% −1 a +2; 4 notícias (amostra pequena: menos de 30)">
-        <span class="rk-n">CNN Brasil</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.56%;width:5.88%"></span><span class="rk-d" style="left:49.99%"><i class="t-eq"></i></span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.56%;width:5.88%"></span><span class="rk-d" style="left:49.96%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">4 notícias · média bruta +1 · amostra pequena</span></span>
+      </li>
+      <li class="rk-i rk-pq" title="Suno Notícias: T ajustado 0 (Equilibrado); média +1, intervalo de 95% −1 a +2; 5 notícias (amostra pequena: menos de 30)">
+        <span class="rk-n">Suno Notícias</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.85%;width:4.7%"></span><span class="rk-d" style="left:49.96%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">5 notícias · média bruta +1 · amostra pequena</span></span>
+      </li>
+      <li class="rk-i rk-pq" title="CNN Brasil: T ajustado 0 (Equilibrado); média +1, intervalo de 95% 0 a +1; 6 notícias (amostra pequena: menos de 30)">
+        <span class="rk-n">CNN Brasil</span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:49.04%;width:3.92%"></span><span class="rk-d" style="left:49.97%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">6 notícias · média bruta +1 · amostra pequena</span></span>
       </li>
     </ol>
     <div class="rk-axis" aria-hidden="true"><span class="rk-n"></span><span class="rk-p"><i style="left:0.0%">−25</i><i style="left:50.0%">0</i><i style="left:100.0%">+25</i></span><span class="rk-v"></span></div>
@@ -1254,61 +1399,62 @@ body.modal-open .btt{visibility:hidden}
   <div class="an-blk">
     <h3 class="an-h" id="an-rk-2">Ranking · Editorias</h3>
     <ol class="rk">
-      <li class="rk-i" title="Natureza &amp; Meio Ambiente: T ajustado −1 (Equilibrado); média −1, intervalo de 95% −2 a 0; 30 notícias">
+      <li class="rk-i" title="Natureza &amp; Meio Ambiente: T ajustado −1 (Equilibrado); média −1, intervalo de 95% −2 a 0; 31 notícias">
         <span class="rk-n">Natureza &amp; Meio Ambiente</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:45.76%;width:3.42%"></span><span class="rk-d" style="left:47.95%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">30 notícias · média bruta −1</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:45.89%;width:3.32%"></span><span class="rk-d" style="left:47.99%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">31 notícias · média bruta −1</span></span>
       </li>
-      <li class="rk-i" title="Política: T ajustado −1 (Equilibrado); média −1, intervalo de 95% −1 a 0; 96 notícias">
+      <li class="rk-i" title="Política: T ajustado −1 (Equilibrado); média −1, intervalo de 95% −1 a 0; 101 notícias">
         <span class="rk-n">Política</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:47.88%;width:1.87%"></span><span class="rk-d" style="left:48.87%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">96 notícias · média bruta −1</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.0%;width:1.78%"></span><span class="rk-d" style="left:48.93%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>−1</b> Equilibrado<span class="rk-x">101 notícias · média bruta −1</span></span>
       </li>
-      <li class="rk-i" title="Jurídico &amp; Regulação: T ajustado 0 (Equilibrado); média −1, intervalo de 95% −1 a 0; 47 notícias">
+      <li class="rk-i" title="Jurídico &amp; Regulação: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 49 notícias">
         <span class="rk-n">Jurídico &amp; Regulação</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.0%;width:1.95%"></span><span class="rk-d" style="left:49.05%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">47 notícias · média bruta −1</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.08%;width:1.88%"></span><span class="rk-d" style="left:49.08%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">49 notícias · média bruta 0</span></span>
       </li>
-      <li class="rk-i" title="Geopolítica &amp; Mundo: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 70 notícias">
+      <li class="rk-i" title="Geopolítica &amp; Mundo: T ajustado 0 (Equilibrado); média 0, intervalo de 95% −1 a 0; 74 notícias">
         <span class="rk-n">Geopolítica &amp; Mundo</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.93%;width:1.11%"></span><span class="rk-d" style="left:49.47%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">70 notícias · média bruta 0</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:48.17%;width:1.88%"></span><span class="rk-d" style="left:49.14%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">74 notícias · média bruta 0</span></span>
       </li>
       <li class="rk-i" title="Brasil · Economia: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a 0; 54 notícias">
         <span class="rk-n">Brasil · Economia</span>
         <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:49.16%;width:1.53%"></span><span class="rk-d" style="left:49.84%"><i class="t-eq"></i></span></span>
         <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">54 notícias · média bruta 0</span></span>
       </li>
-      <li class="rk-i" title="Mercados &amp; Finanças: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a +1; 56 notícias">
+      <li class="rk-i" title="Mercados &amp; Finanças: T ajustado 0 (Equilibrado); média 0, intervalo de 95% 0 a +1; 61 notícias">
         <span class="rk-n">Mercados &amp; Finanças</span>
-        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:49.9%;width:1.34%"></span><span class="rk-d" style="left:50.39%"><i class="t-eq"></i></span></span>
-        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">56 notícias · média bruta 0</span></span>
+        <span class="rk-p" aria-hidden="true"><span class="rk-z" style="left:50.0%"></span><span class="rk-ic" style="left:49.91%;width:1.23%"></span><span class="rk-d" style="left:50.36%"><i class="t-eq"></i></span></span>
+        <span class="rk-v"><b>0</b> Equilibrado<span class="rk-x">61 notícias · média bruta 0</span></span>
       </li>
     </ol>
     <div class="rk-axis" aria-hidden="true"><span class="rk-n"></span><span class="rk-p"><i style="left:0.0%">−25</i><i style="left:50.0%">0</i><i style="left:100.0%">+25</i></span><span class="rk-v"></span></div>
-<p class="term-note">Fora do ranking (menos de 30 notícias com T): Tecnologia &amp; Negócios (26), Imobiliário (2).</p>  </div>
+<p class="term-note">Fora do ranking (menos de 30 notícias com T): Tecnologia &amp; Negócios (28), Imobiliário (2).</p>  </div>
 
   <div class="an-blk">
     <h3 class="an-h" id="an-q">Qualidade da apuração · Veículos</h3>
     <ol class="qb">
-      <li><span class="rk-n">Folha de S.Paulo</span><span class="qb-bar" aria-hidden="true"><span style="width:90.84%"></span></span><span class="rk-v"><b>91</b> Boa<span class="rk-x">média bruta 91 em 79 textos</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Money Times</span><span class="qb-bar" aria-hidden="true"><span style="width:89.11%"></span></span><span class="rk-v"><b>89</b> Boa<span class="rk-x">média bruta 94 em 7 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Poder360</span><span class="qb-bar" aria-hidden="true"><span style="width:87.64%"></span></span><span class="rk-v"><b>88</b> Boa<span class="rk-x">média bruta 92 em 4 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Bloomberg Línea</span><span class="qb-bar" aria-hidden="true"><span style="width:87.33%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 95 em 2 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Seu Dinheiro</span><span class="qb-bar" aria-hidden="true"><span style="width:86.79%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 89 em 5 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Um Só Planeta</span><span class="qb-bar" aria-hidden="true"><span style="width:86.79%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 89 em 5 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Mongabay Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:86.54%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 94 em 1 texto · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">NeoFeed</span><span class="qb-bar" aria-hidden="true"><span style="width:86.11%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 87 em 7 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">((o))eco</span><span class="qb-bar" aria-hidden="true"><span style="width:85.99%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 87 em 3 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">InfoMoney</span><span class="qb-bar" aria-hidden="true"><span style="width:85.76%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 86 em 7 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Agência Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:85.52%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 85 em 7 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">g1</span><span class="qb-bar" aria-hidden="true"><span style="width:85.33%"></span></span><span class="rk-v"><b>85</b> Boa<span class="rk-x">média bruta 85 em 26 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Suno Notícias</span><span class="qb-bar" aria-hidden="true"><span style="width:84.99%"></span></span><span class="rk-v"><b>85</b> Boa<span class="rk-x">média bruta 83 em 4 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Brazil Journal</span><span class="qb-bar" aria-hidden="true"><span style="width:84.38%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 80 em 3 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">ClimaInfo</span><span class="qb-bar" aria-hidden="true"><span style="width:84.33%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 77 em 2 textos · amostra pequena</span></span></li>
-      <li><span class="rk-n">Valor Econômico</span><span class="qb-bar" aria-hidden="true"><span style="width:83.94%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 84 em 246 textos</span></span></li>
-      <li class="rk-pq"><span class="rk-n">CNN Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:83.71%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 79 em 4 textos · amostra pequena</span></span></li>
-      <li class="rk-pq"><span class="rk-n">Imobi Report</span><span class="qb-bar" aria-hidden="true"><span style="width:83.45%"></span></span><span class="rk-v"><b>83</b> Boa<span class="rk-x">média bruta 60 em 1 texto · amostra pequena</span></span></li>
+      <li><span class="rk-n">Folha de S.Paulo</span><span class="qb-bar" aria-hidden="true"><span style="width:90.9%"></span></span><span class="rk-v"><b>91</b> Boa<span class="rk-x">média bruta 92 em 81 textos</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Money Times</span><span class="qb-bar" aria-hidden="true"><span style="width:87.89%"></span></span><span class="rk-v"><b>88</b> Boa<span class="rk-x">média bruta 91 em 8 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Poder360</span><span class="qb-bar" aria-hidden="true"><span style="width:87.73%"></span></span><span class="rk-v"><b>88</b> Boa<span class="rk-x">média bruta 92 em 5 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Bloomberg Línea</span><span class="qb-bar" aria-hidden="true"><span style="width:87.08%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 95 em 2 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Um Só Planeta</span><span class="qb-bar" aria-hidden="true"><span style="width:86.6%"></span></span><span class="rk-v"><b>87</b> Boa<span class="rk-x">média bruta 89 em 5 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Mongabay Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:86.27%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 94 em 1 texto · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">InfoMoney</span><span class="qb-bar" aria-hidden="true"><span style="width:86.06%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 87 em 8 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">((o))eco</span><span class="qb-bar" aria-hidden="true"><span style="width:85.77%"></span></span><span class="rk-v"><b>86</b> Boa<span class="rk-x">média bruta 87 em 3 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Seu Dinheiro</span><span class="qb-bar" aria-hidden="true"><span style="width:85.41%"></span></span><span class="rk-v"><b>85</b> Boa<span class="rk-x">média bruta 85 em 7 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Agência Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:85.37%"></span></span><span class="rk-v"><b>85</b> Boa<span class="rk-x">média bruta 85 em 9 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Suno Notícias</span><span class="qb-bar" aria-hidden="true"><span style="width:84.81%"></span></span><span class="rk-v"><b>85</b> Boa<span class="rk-x">média bruta 84 em 6 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">NeoFeed</span><span class="qb-bar" aria-hidden="true"><span style="width:84.45%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 83 em 8 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">CNN Brasil</span><span class="qb-bar" aria-hidden="true"><span style="width:84.31%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 82 em 6 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">g1</span><span class="qb-bar" aria-hidden="true"><span style="width:84.24%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 84 em 28 textos · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Brazil Journal</span><span class="qb-bar" aria-hidden="true"><span style="width:84.15%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 80 em 3 textos · amostra pequena</span></span></li>
+      <li><span class="rk-n">Valor Econômico</span><span class="qb-bar" aria-hidden="true"><span style="width:83.95%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 84 em 248 textos</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Agência Câmara</span><span class="qb-bar" aria-hidden="true"><span style="width:83.82%"></span></span><span class="rk-v"><b>84</b> Boa<span class="rk-x">média bruta 67 em 1 texto · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">Imobi Report</span><span class="qb-bar" aria-hidden="true"><span style="width:83.18%"></span></span><span class="rk-v"><b>83</b> Boa<span class="rk-x">média bruta 60 em 1 texto · amostra pequena</span></span></li>
+      <li class="rk-pq"><span class="rk-n">ClimaInfo</span><span class="qb-bar" aria-hidden="true"><span style="width:80.69%"></span></span><span class="rk-v"><b>81</b> Boa<span class="rk-x">média bruta 65 em 3 textos · amostra pequena</span></span></li>
     </ol>
   </div>
 
@@ -1318,16 +1464,141 @@ body.modal-open .btt{visibility:hidden}
       <table class="an-tbl">
         <thead><tr><th scope="col">Eixo</th><th scope="col">Textos</th><th scope="col">Com T</th><th scope="col">T médio</th><th scope="col">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Econômico</th><td>231</td><td>211</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>85</td></tr>
-          <tr><th scope="row">Costumes</th><td>14</td><td>14</td><td><i class="sw t-eq" aria-hidden="true"></i>−1</td><td class="an-l">Equilibrado</td><td>79</td></tr>
-          <tr><th scope="row">Segurança</th><td>45</td><td>45</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>86</td></tr>
-          <tr><th scope="row">Instituições</th><td>255</td><td>254</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>85</td></tr>
-          <tr><th scope="row">Geral</th><td>124</td><td>116</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>86</td></tr>
+          <tr><th scope="row">Econômico</th><td>242</td><td>222</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>85</td></tr>
+          <tr><th scope="row">Costumes</th><td>17</td><td>17</td><td><i class="sw t-eq" aria-hidden="true"></i>−2</td><td class="an-l">Equilibrado</td><td>78</td></tr>
+          <tr><th scope="row">Segurança</th><td>47</td><td>47</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>86</td></tr>
+          <tr><th scope="row">Instituições</th><td>267</td><td>266</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>85</td></tr>
+          <tr><th scope="row">Geral</th><td>131</td><td>122</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>85</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
+<div class="an-blk nm" id="an-nomes">
+  <h3 class="an-h">Nomes em destaque · como a mídia cobre cada um</h3>
+  <p class="term-note">Os nomes mais citados nas 6.066 manchetes de Política nas edições de 07/10/2026 a 05/11/2026 (30 edições). Clique no nome para abrir o analítico completo dele na Pesquisa: quem dá mais espaço, os picos, com quem e com que temas ele aparece, o que cada veículo enfatiza e em que lado cada um ficou nos assuntos divididos.</p>
+  <div class="an-tbl-wrap">
+    <table class="an-tbl nm-tbl">
+      <thead><tr><th scope="col">Nome</th><th scope="col">Manchetes</th><th scope="col" title="Parte das manchetes da editoria no período que cita o nome">Participação</th><th scope="col" title="Participação nas últimas 7 edições contra as 7 anteriores">Tendência</th><th scope="col">Veículos</th><th scope="col" title="Assuntos da cobertura comparada que citam o nome e tiveram veículos dos dois lados">Assuntos divididos</th><th scope="col" title="Nos assuntos com veículos dos dois lados: perto de 0 = quase todos de um lado; 100 = meio a meio">Divergência</th></tr></thead>
+      <tbody>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Lula&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Lula na Pesquisa">Lula</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:100.0%" aria-hidden="true"></span>2.162</td>
+          <td>36%</td>
+          <td class="nm-t nm-cai" title="200 manchetes (22%) nas últimas 7 edições, 876 (41%) nas 7 anteriores">▼ 46%</td>
+          <td>33</td>
+          <td>17</td>
+          <td><span class="nm-dv" style="--d:86.0%" aria-hidden="true"></span>86</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Fl%C3%A1vio&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Flávio na Pesquisa">Flávio</a><span class="nm-tb">também “Flávio Bolsonaro”</span></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:97.6%" aria-hidden="true"></span>2.111</td>
+          <td>35%</td>
+          <td class="nm-t nm-cai" title="166 manchetes (18%) nas últimas 7 edições, 783 (37%) nas 7 anteriores">▼ 50%</td>
+          <td>29</td>
+          <td>19</td>
+          <td><span class="nm-dv" style="--d:80.0%" aria-hidden="true"></span>80</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Bolsonaro&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Bolsonaro na Pesquisa">Bolsonaro</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:59.7%" aria-hidden="true"></span>1.291</td>
+          <td>21%</td>
+          <td class="nm-t nm-cai" title="124 manchetes (14%) nas últimas 7 edições, 507 (24%) nas 7 anteriores">▼ 43%</td>
+          <td>31</td>
+          <td>10</td>
+          <td><span class="nm-dv" style="--d:75.0%" aria-hidden="true"></span>75</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Senado&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Senado na Pesquisa">Senado</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:14.2%" aria-hidden="true"></span>306</td>
+          <td>5,0%</td>
+          <td class="nm-t nm-sobe" title="106 manchetes (12%) nas últimas 7 edições, 57 (2,7%) nas 7 anteriores">▲ 4,4×</td>
+          <td>15</td>
+          <td>9</td>
+          <td><span class="nm-dv" style="--d:95.0%" aria-hidden="true"></span>95</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=TSE&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de TSE na Pesquisa">TSE</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:13.2%" aria-hidden="true"></span>285</td>
+          <td>4,7%</td>
+          <td class="nm-t nm-cai" title="16 manchetes (1,8%) nas últimas 7 edições, 82 (3,9%) nas 7 anteriores">▼ 54%</td>
+          <td>14</td>
+          <td>10</td>
+          <td><span class="nm-dv" style="--d:75.0%" aria-hidden="true"></span>75</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=PEC&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de PEC na Pesquisa">PEC</a><span class="nm-tb">também “PEC da Segurança”</span></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:8.8%" aria-hidden="true"></span>191</td>
+          <td>3,1%</td>
+          <td class="nm-t nm-sobe" title="46 manchetes (5,1%) nas últimas 7 edições, 6 (0,3%) nas 7 anteriores">▲ 18,0×</td>
+          <td>16</td>
+          <td>5</td>
+          <td><span class="nm-dv" style="--d:93.0%" aria-hidden="true"></span>93</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Trump&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Trump na Pesquisa">Trump</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:7.7%" aria-hidden="true"></span>167</td>
+          <td>2,8%</td>
+          <td class="nm-t nm-sobe" title="84 manchetes (9,3%) nas últimas 7 edições, 64 (3,0%) nas 7 anteriores">▲ 3,1×</td>
+          <td>15</td>
+          <td>2</td>
+          <td><span class="nm-dv" style="--d:83.0%" aria-hidden="true"></span>83</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=PT&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de PT na Pesquisa">PT</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:7.0%" aria-hidden="true"></span>151</td>
+          <td>2,5%</td>
+          <td class="nm-t nm-sobe" title="31 manchetes (3,4%) nas últimas 7 edições, 50 (2,4%) nas 7 anteriores">▲ 46%</td>
+          <td>12</td>
+          <td>6</td>
+          <td><span class="nm-dv" style="--d:83.0%" aria-hidden="true"></span>83</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Quaest&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Quaest na Pesquisa">Quaest</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:6.2%" aria-hidden="true"></span>134</td>
+          <td>2,2%</td>
+          <td class="nm-t nm-cai" title="0 manchetes (0,0%) nas últimas 7 edições, 24 (1,1%) nas 7 anteriores">zerou</td>
+          <td>11</td>
+          <td>0</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Congresso&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Congresso na Pesquisa">Congresso</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:6.2%" aria-hidden="true"></span>133</td>
+          <td>2,2%</td>
+          <td class="nm-t nm-sobe" title="26 manchetes (2,9%) nas últimas 7 edições, 37 (1,7%) nas 7 anteriores">▲ 65%</td>
+          <td>15</td>
+          <td>3</td>
+          <td><span class="nm-dv" style="--d:100.0%" aria-hidden="true"></span>100</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=Datafolha&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de Datafolha na Pesquisa">Datafolha</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:6.1%" aria-hidden="true"></span>131</td>
+          <td>2,2%</td>
+          <td class="nm-t nm-cai" title="0 manchetes (0,0%) nas últimas 7 edições, 58 (2,7%) nas 7 anteriores">zerou</td>
+          <td>10</td>
+          <td>2</td>
+          <td><span class="nm-dv" style="--d:83.0%" aria-hidden="true"></span>83</td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="pesquisa.html?q=PL&amp;de=2026-10-07&amp;ed=politica#midia" title="Abrir o analítico de PL na Pesquisa">PL</a></th>
+          <td class="nm-n"><span class="nm-bar" style="--w:5.7%" aria-hidden="true"></span>123</td>
+          <td>2,0%</td>
+          <td class="nm-t nm-sobe" title="20 manchetes (2,2%) nas últimas 7 edições, 37 (1,7%) nas 7 anteriores">▲ 27%</td>
+          <td>12</td>
+          <td>6</td>
+          <td><span class="nm-dv" style="--d:89.0%" aria-hidden="true"></span>89</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <form class="nm-form" action="pesquisa.html#midia" method="get" role="search">
+    <label class="sr-only" for="nmQ">Analisar outro nome ou assunto</label>
+    <input class="nm-in" id="nmQ" name="q" type="search" required pattern=".*\S.*" title="Digite um nome ou assunto" autocomplete="off" spellcheck="false" placeholder="Analisar outro nome ou assunto: Haddad, &quot;Banco Central&quot;, STF…">
+    <button class="nm-go" type="submit">Analisar</button>
+  </form>
+  <p class="term-note">Participação: parte das manchetes da editoria que cita o nome. Tendência: participação nas últimas 7 edições contra as 7 anteriores (com 10 ou mais manchetes do nome nas duas). Divergência: nos assuntos da cobertura comparada que citam o nome e tiveram veículos dos dois lados, quão dividida ficou a cobertura (100 = meio a meio), na média. Os nomes saem das manchetes em português (palavras com inicial maiúscula) e são contados como no analítico do nome que a linha abre: com a regra da busca, que acha o começo das palavras ("Senado" também conta "senador"), e a notícia coletada em mais de uma edição conta uma vez. Um nome pode reunir pessoas diferentes ("Bolsonaro"). Nada disso diz se a menção é favorável ou desfavorável.</p>
+</div>
   <div class="an-blk">
     <h3 class="an-h" id="an-dias">Dia a dia</h3>
     <p class="term-note">Por data de publicação dos textos; o link abre a edição em que eles foram analisados.</p>
@@ -1335,8 +1606,8 @@ body.modal-open .btt{visibility:hidden}
       <table class="an-tbl">
         <thead><tr><th scope="col">Publicação</th><th scope="col">Textos</th><th scope="col">Notícias com T</th><th scope="col">T médio</th><th scope="col">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
         <tbody>
-          <tr><th scope="row"><a href="2026-11-05.html#termometro">05/11/2026</a></th><td>4</td><td>3</td><td><i class="sw t-eq" aria-hidden="true"></i>−1</td><td class="an-l">Equilibrado</td><td>92</td></tr>
-          <tr><th scope="row"><a href="2026-11-05.html#termometro">04/11/2026</a></th><td>11</td><td>8</td><td><i class="sw t-eq" aria-hidden="true"></i>−1</td><td class="an-l">Equilibrado</td><td>81</td></tr>
+          <tr><th scope="row"><a href="2026-11-05.html#termometro">05/11/2026</a></th><td>21</td><td>19</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>84</td></tr>
+          <tr><th scope="row"><a href="2026-11-05.html#termometro">04/11/2026</a></th><td>14</td><td>11</td><td><i class="sw t-eq" aria-hidden="true"></i>−2</td><td class="an-l">Equilibrado</td><td>77</td></tr>
           <tr><th scope="row"><a href="2026-11-04.html#termometro">03/11/2026</a></th><td>21</td><td>21</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>86</td></tr>
           <tr><th scope="row"><a href="2026-11-03.html#termometro">02/11/2026</a></th><td>18</td><td>17</td><td><i class="sw t-eq" aria-hidden="true"></i>0</td><td class="an-l">Equilibrado</td><td>78</td></tr>
           <tr><th scope="row"><a href="2026-11-02.html#termometro">01/11/2026</a></th><td>25</td><td>24</td><td><i class="sw t-eq" aria-hidden="true"></i>−1</td><td class="an-l">Equilibrado</td><td>85</td></tr>
@@ -1368,12 +1639,29 @@ body.modal-open .btt{visibility:hidden}
     <h3 class="an-h" id="an-todas">Todas as análises</h3>
     <p class="term-note">Uma linha por texto, do mais recente para o mais antigo. Clique na linha para abrir o texto original (em nova aba) e conferir; o resumo do cálculo e os sinais de cada texto ficam no Termômetro do dia da edição.</p>
     <details class="term-det" open>
-      <summary>Novembro de 2026 · 79 textos</summary>
+      <summary>Novembro de 2026 · 99 textos</summary>
       <ol class="tl-list">
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>g1</b> · <a class="hit" href="https://g1.globo.com/mundo/noticia/2026/11/05/eua-batem-recorde-de-mulheres-governadoras-apos-eleicao-marcada-por-vitorias-ineditas.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (g1.globo.com)">EUA batem recorde de mulheres governadoras após eleição marcada por vitórias inéditas<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 82</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>g1</b> · <a class="hit" href="https://g1.globo.com/mundo/noticia/2026/11/05/melania-trump-recebe-representantes-da-ucrania-e-russia-na-casa-branca-em-meio-a-negociacoes-de-paz.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (g1.globo.com)">Melania Trump recebe representantes da Ucrânia e Rússia na Casa Branca em meio a negociações de paz<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 50</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-dl" aria-hidden="true"></i>+22</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Valor Econômico</b> · <a class="hit" href="https://valor.globo.com/opiniao/coluna/bc-interrompe-ciclo-de-afrouxamento-monetario.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (valor.globo.com)">BC interrompe ciclo de afrouxamento monetário<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Leve à direita · Opinião · apuração 47</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Valor Econômico</b> · <a class="hit" href="https://valor.globo.com/mundo/noticia/2026/11/05/quem-e-pedro-alliana-vice-presidente-do-paraguai-que-assume-o-lugar-depois-da-renuncia-de-santiago-pena.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (valor.globo.com)">Quem é Pedro Alliana, vice-presidente do Paraguai, que assume o lugar depois da renúncia de Santiago Peña<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 82</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Valor Econômico</b> · <a class="hit" href="https://valor.globo.com/legislacao/noticia/2026/11/05/stf-ministro-flavio-dino-marca-audiencia-de-conciliacao-sobre-fim-da-jornada-6x1.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (valor.globo.com)">STF marca audiência para discutir fim da escala 6 x 1<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 90</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Suno Notícias</b> · <a class="hit" href="https://www.suno.com.br/noticias/totvs-tots3-resultados-3t26/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (suno.com.br)">Totvs (TOTS3): IA ganha força, mas lucro cai 8,8% no 3T26<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 94</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Suno Notícias</b> · <a class="hit" href="https://www.suno.com.br/noticias/ibovespa-petrobras-petr4-ceab3/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (suno.com.br)">Ibovespa volta a cair, Petrobras (PETR4) perde 2,48% e C&amp;A (CEAB3) dispara 9%<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 76</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Seu Dinheiro</b> · <a class="hit" href="https://www.seudinheiro.com/2026/empresas/dividendos-e-jcps-sabesp-sbsp3-vai-depositar-r-26-bilhoes-e-ainda-da-para-aproveitar/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (seudinheiro.com)">Dividendos e JCPs: Sabesp (SBSP3) vai depositar R$ 2,6 bilhões — e ainda dá para aproveitar<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 59</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Seu Dinheiro</b> · <a class="hit" href="https://www.seudinheiro.com/2026/empresas/fleury-flry3-lucro-cresce-429-no-3t26-e-bate-expectativa-ceo-detalha-planos-para-sustentar-o-crescimento-lmrs/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (seudinheiro.com)">Fleury (FLRY3): Lucro cresce 42,9% no 3T26 e bate expectativa; CEO detalha planos para sustentar o crescimento<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · Entrevista · apuração 94</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Poder360</b> · <a class="hit" href="https://www.poder360.com.br/poder-economia/heineken-acerta-compra-da-better-drinks-dona-da-praya-e-baer-mate/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (poder360.com.br)">Heineken acerta compra da Better Drinks, dona da Praya e Baer-Mate<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 100</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Poder360</b> · <a class="hit" href="https://www.poder360.com.br/poder-internacional/lula-diz-que-deu-conselho-a-trump-escolha-ser-amado-ou-temido/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (poder360.com.br)">Lula diz que deu conselho a Trump: “Escolha ser amado ou temido”<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 92</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>NeoFeed</b> · <a class="hit" href="https://neofeed.com.br/negocios/oferta-de-nelson-peltz-para-comprar-a-wendys-volta-para-a-cozinha/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (neofeed.com.br)">Oferta de Nelson Peltz para comprar a Wendy’s “volta para a cozinha”<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 59</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Money Times</b> · <a class="hit" href="https://www.moneytimes.com.br/bolsas-da-asia-fecham-mistas-com-queda-de-acoes-de-ia-e-repercussao-de-eleicao-nos-eua-fets/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (moneytimes.com.br)">Bolsas da Ásia fecham mistas com queda de ações de IA e repercussão de eleição nos EUA<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 77</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Money Times</b> · <a class="hit" href="https://www.moneytimes.com.br/assai-asai3-reduz-alavancagem-e-apresenta-lucro-liquido-contabil-de-r-427-milhoes-mlem/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (moneytimes.com.br)">Lucro do Assaí (ASAI3) avança 55%, a R$ 248 milhões, e CEO espera ‘Natal mais gordo’ sem bets<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 70</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>InfoMoney</b> · <a class="hit" href="https://www.infomoney.com.br/mercados/dasa-dasa3-resultados-terceiro-trimestre-2026/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (infomoney.com.br)">Dasa (DASA3) lucra R$ 173 mi no 3º tri, alta de 79%<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 94</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−2</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Folha de S.Paulo</b> · <a class="hit" href="https://www1.folha.uol.com.br/mercado/2026/11/setor-de-telecom-preve-bomba-atomica-com-fim-da-6x1-e-sindicato-destaca-rotina-sob-pressao.shtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (www1.folha.uol.com.br)">Setor de telecom prevê &#39;bomba atômica&#39; com fim da 6x1 e sindicato destaca rotina sob pressão<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 100</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Folha de S.Paulo</b> · <a class="hit" href="https://c-level.folha.uol.com.br/negocios/2026/11/desembargadora-libera-tres-bets-e-chama-veto-de-lula-a-apostas-de-verdadeiro-confisco.shtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (c-level.folha.uol.com.br)">Desembargadora libera três bets e chama veto de Lula a apostas de &#39;verdadeiro confisco&#39;<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 100</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Folha de S.Paulo</b> · <a class="hit" href="https://www1.folha.uol.com.br/mundo/2026/11/manifestantes-voltam-as-ruas-da-franca-e-entram-em-confronto-com-policiais-torre-eiffel-e-fechada.shtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (www1.folha.uol.com.br)">Manifestantes voltam às ruas da França e entram em confronto com policiais; Torre Eiffel é fechada<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 90</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>CNN Brasil</b> · <a class="hit" href="https://www.cnnbrasil.com.br/internacional/presidente-de-israel-revela-surpresa-e-preocupacao-com-fim-de-ajuda-dos-eua/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (cnnbrasil.com.br)">Presidente de Israel revela surpresa e preocupação com fim de ajuda dos EUA<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 95</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">05/11</span><span class="tl-tx"><b>CNN Brasil</b> · <a class="hit" href="https://www.cnnbrasil.com.br/internacional/congresso-dos-eua-tera-numero-recorde-de-mulheres-em-2027/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (cnnbrasil.com.br)">Congresso dos EUA terá número recorde de mulheres em 2027<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 85</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span><span class="tl-d">05/11</span><span class="tl-tx"><b>Agência Brasil</b> · <a class="hit" href="https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/autoridades-investigam-quatro-mortes-relacionadas-temporais-no-sul" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (agenciabrasil.ebc.com.br)">Autoridades investigam quatro mortes relacionadas a temporais no Sul<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Não se aplica · apuração 86</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Valor Econômico</b> · <a class="hit" href="https://valor.globo.com/brasil/noticia/2026/11/04/brasil-abre-121305-vagas-com-carteira-assinada-em-setembro.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (valor.globo.com)">Brasil abre 121.305 vagas com carteira assinada em setembro<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 88</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Suno Notícias</b> · <a class="hit" href="https://www.suno.com.br/noticias/lucro-dos-bancos-itau-itub4-bradesco/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (suno.com.br)">Lucro dos bancos: Itaú (ITUB4) lidera contra Bradesco (BBDC4) e Santander (SANB11)<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Não se aplica · apuração 90</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Suno Notícias</b> · <a class="hit" href="https://www.suno.com.br/noticias/petr4-fitch-eleva-perfil-credito-individual-petrobras/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (suno.com.br)">Petrobras (PETR4): Fitch eleva perfil de crédito individual da estatal<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 94</span></li>
@@ -1384,7 +1672,10 @@ body.modal-open .btt{visibility:hidden}
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Folha de S.Paulo</b> · <a class="hit" href="https://www1.folha.uol.com.br/mundo/2026/11/eleicoes-nos-eua-consagram-lideres-ineditos-e-levam-minorias-ao-poder.shtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (www1.folha.uol.com.br)">Eleições nos EUA consagram líderes inéditos e levam minorias ao poder<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 55</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Folha de S.Paulo</b> · <a class="hit" href="https://c-level.folha.uol.com.br/negocios/2026/11/heineken-acerta-compra-da-better-drinks-dona-das-marcas-praya-e-mamba-water.shtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (c-level.folha.uol.com.br)">Heineken acerta compra da Better Drinks, dona das marcas Praya e Mamba Water<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Não se aplica · apuração 81</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−6</span><span class="tl-d">04/11</span><span class="tl-tx"><b>ClimaInfo</b> · <a class="hit" href="https://climainfo.org.br/2026/11/04/presidencia-da-cop30-lanca-mapa-do-caminho-global-para-eliminar-os-combustiveis-fosseis/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (climainfo.org.br)">Presidência da COP30 lança Mapa do Caminho global para eliminar os combustíveis fósseis<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 60</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-el" aria-hidden="true"></i>−15</span><span class="tl-d">04/11</span><span class="tl-tx"><b>ClimaInfo</b> · <a class="hit" href="https://climainfo.org.br/2026/11/04/tsunami-democrata-prepara-terreno-para-renovacao-de-politicas-climaticas-e-ambientais-dos-eua/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (climainfo.org.br)">“Tsunami” democrata prepara terreno para renovação de políticas climáticas e ambientais dos EUA<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Leve à esquerda · apuração 40</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Bloomberg Línea</b> · <a class="hit" href="https://www.bloomberglinea.com.br/startups/revolut-e-avaliada-em-us-115-bilhoes-em-venda-secundaria-alta-de-53-em-quase-um-ano/" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (bloomberglinea.com.br)">Revolut é avaliada em US$ 115 bilhões em venda secundária, alta de 53% em quase um ano<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Não se aplica · apuração 90</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>+1</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Agência Câmara</b> · <a class="hit" href="https://www.camara.leg.br/noticias/1316048-relator-da-pec-da-maioridade-penal-deve-apresentar-parecer-no-final-do-mes" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (camara.leg.br)">Relator da PEC da Maioridade Penal deve apresentar parecer no final do mês<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 67</span></li>
+        <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">04/11</span><span class="tl-tx"><b>Agência Brasil</b> · <a class="hit" href="https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/tornados-e-temporais-atingem-santa-catarina-e-rio-grande-do-sul" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (agenciabrasil.ebc.com.br)">Tornados e temporais atingem Santa Catarina e Rio Grande do Sul<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 85</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">03/11</span><span class="tl-tx"><b>g1</b> · <a class="hit" href="https://g1.globo.com/politica/noticia/2026/11/03/cadastro-eleitoral-reaberto-eleitores-podem-mudar-local-de-votacao-e-solicitar-outros-servicos-veja-como.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (g1.globo.com)">Cadastro eleitoral reaberto: eleitores podem mudar local de votação e solicitar outros serviços; veja como<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 89</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">03/11</span><span class="tl-tx"><b>g1</b> · <a class="hit" href="https://g1.globo.com/mundo/noticia/2026/11/03/bombardeio-russo-escola-ucrania-mortos.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (g1.globo.com)">Ataque russo contra escola na Ucrânia deixa 31 mortos; Zelensky acusa Rússia de bombardeio duplo<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 80</span></li>
         <li class="tl tl-lk"><span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span><span class="tl-d">03/11</span><span class="tl-tx"><b>Valor Econômico</b> · <a class="hit" href="https://valor.globo.com/financas/intraday/post/2026/11/piora-de-cenario-pos-eleicao-deve-levar-copom-a-pausar-cortes-na-selic.ghtml" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (valor.globo.com)">Piora de cenário pós-eleição deve levar Copom a pausar cortes na Selic<span class="tl-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></span><span class="tl-r">Equilibrado · apuração 94</span></li>
