@@ -29,6 +29,7 @@ from ..config import Config
 from ..termometro import agregacao
 from ..termometro.referencia import PARAMETROS
 from . import filters
+from .midia import DestaquesView
 from .termometro import (
     ANALITICO_PAGINA,
     CLASSE,
@@ -614,13 +615,16 @@ def render_analitico_page(
     archive_href: str,
     edition_date: str | None = None,
     edicoes: Iterable[str] = (),
+    destaques: DestaquesView | None = None,
 ) -> str:
-    """Página ``edicoes/analitico.html`` (autocontida, como as demais)."""
+    """Página ``edicoes/analitico.html`` (autocontida, como as demais). ``destaques``:
+    os nomes em destaque da Política (:mod:`qijournal.render.midia`), num bloco à parte."""
     view = analitico_view(registros, edicoes=edicoes, edition_date=edition_date)
     brand = brand_view(config)
     template = filters.environment().get_template("analitico.html.j2")
     html = template.render(
         a=view,
+        nm=destaques if destaques is not None and destaques.nomes else None,
         brand=brand,
         home_href=filters.safe_href(home_href) or "../",
         archive_href=filters.safe_href(archive_href) or "./",

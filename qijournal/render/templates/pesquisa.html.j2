@@ -3,6 +3,7 @@
     neles e mostra os resultados com as contagens (pesquisa.js.j2).
     Variáveis: p (PesquisaView), brand, home_href, archive_href, base_url, repo_url. -#}
 {% extends "layout.html.j2" %}
+{% import "midia.html.j2" as md %}
 
 {% block title %}{{ brand.name }} — Pesquisa analítica{% endblock %}
 {% block description %}Busca em todas as edições: matérias, todas as notícias coletadas, cobertura comparada e análises do Termômetro, com filtros por período, tipo, editoria e veículo.{% endblock %}
@@ -21,6 +22,7 @@
 
 {% block styles %}
 {% include "pesquisa.css.j2" %}
+{% include "midia.css.j2" %}
 {% endblock %}
 
 {% block content %}
@@ -38,6 +40,7 @@
       <button class="pq-go" type="submit">Buscar</button>
     </div>
     <p class="pq-tip">Sem acento e sem diferenciar maiúsculas; todas as palavras precisam aparecer. Aspas buscam a frase exata (<code>"taxa Selic"</code>) e o traço exclui (<code>-futebol</code>). Palavras de até 3 letras (STF, PT, IA) valem só inteiras.</p>
+    {% if p.destaques %}{{ md.sugestoes(p.destaques) }}{% endif %}
     <details class="pq-det" id="pqDet" open>
     <summary class="pq-sum">Filtros</summary>
     <div class="pq-fs">
@@ -75,12 +78,14 @@
   <p class="pq-st" id="pqStatus" role="status" aria-live="polite"></p>
   <div class="pq-out" id="pqOut" hidden>
     <div class="pq-an" id="pqAn"></div>
+    <p class="md-ir" id="mdIr" hidden></p>
     <div class="pq-head">
       <h3 class="pq-count" id="pqCount"></h3>
       <button class="pq-csv" type="button" id="pqCsv" title="Baixar todos os resultados em planilha (CSV)">Baixar CSV</button>
     </div>
     <ol class="pq-list" id="pqList"></ol>
     <button class="pq-more" type="button" id="pqMore" hidden></button>
+    <section class="md" id="midia" aria-labelledby="mdH" hidden></section>
   </div>
   <noscript><p class="pq-intro">A pesquisa roda no próprio navegador e precisa do JavaScript ligado.</p></noscript>
 </section>

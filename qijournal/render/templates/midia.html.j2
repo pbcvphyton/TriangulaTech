@@ -1,0 +1,38 @@
+{#- Como a mídia cobre: os nomes em destaque de uma editoria (qijournal/render/midia.py).
+    nomes(nm): tabela do Analítico Político; cada nome abre o analítico dele na Pesquisa.
+    sugestoes(nm): os mesmos nomes como atalhos de busca na Pesquisa analítica. -#}
+
+{% macro nomes(nm) -%}
+<div class="an-blk nm" id="an-nomes">
+  <h3 class="an-h">Nomes em destaque · como a mídia cobre cada um</h3>
+  <p class="term-note">Os nomes mais citados nas {{ "{:,}".format(nm.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} nas edições de {{ nm.periodo }} ({{ nm.edicoes }} {{ "edição" if nm.edicoes == 1 else "edições" }}). Clique no nome para abrir o analítico completo dele na Pesquisa: quem dá mais espaço, os picos, com quem e com que temas ele aparece, o que cada veículo enfatiza e em que lado cada um ficou nos assuntos divididos.</p>
+  <div class="an-tbl-wrap">
+    <table class="an-tbl nm-tbl">
+      <thead><tr><th scope="col">Nome</th><th scope="col">Manchetes</th><th scope="col" title="Parte das manchetes da editoria no período que cita o nome">Participação</th><th scope="col" title="Participação nas últimas 7 edições contra as 7 anteriores">Tendência</th><th scope="col">Veículos</th><th scope="col" title="Assuntos da cobertura comparada que citam o nome e tiveram veículos dos dois lados">Assuntos divididos</th><th scope="col" title="Nos assuntos com veículos dos dois lados: perto de 0 = quase todos de um lado; 100 = meio a meio">Divergência</th></tr></thead>
+      <tbody>
+        {% for n in nm.nomes %}
+        <tr>
+          <th scope="row"><a href="{{ n.href }}" title="Abrir o analítico de {{ n.consulta }} na Pesquisa">{{ n.nome }}</a>{% if n.tambem %}<span class="nm-tb">também “{{ n.tambem }}”</span>{% endif %}</th>
+          <td class="nm-n"><span class="nm-bar" style="--w:{{ n.barra }}%" aria-hidden="true"></span>{{ "{:,}".format(n.manchetes).replace(",", ".") }}</td>
+          <td>{{ n.participacao }}</td>
+          <td class="nm-t nm-{{ n.tendencia_classe }}" title="{{ n.tendencia_titulo }}">{{ n.tendencia }}</td>
+          <td>{{ n.veiculos }}</td>
+          <td>{{ n.debates }}</td>
+          <td>{% if n.divergencia_valor is not none %}<span class="nm-dv" style="--d:{{ (n.divergencia_valor * 100)|round(0) }}%" aria-hidden="true"></span>{% endif %}{{ n.divergencia }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <form class="nm-form" action="{{ nm.pesquisa_href }}#midia" method="get" role="search">
+    <label class="sr-only" for="nmQ">Analisar outro nome ou assunto</label>
+    <input class="nm-in" id="nmQ" name="q" type="search" required pattern=".*\S.*" title="Digite um nome ou assunto" autocomplete="off" spellcheck="false" placeholder="Analisar outro nome ou assunto: Haddad, &quot;Banco Central&quot;, STF…">
+    <button class="nm-go" type="submit">Analisar</button>
+  </form>
+  <p class="term-note">Participação: parte das manchetes da editoria que cita o nome. Tendência: participação nas últimas 7 edições contra as 7 anteriores (com 10 ou mais manchetes do nome nas duas). Divergência: nos assuntos da cobertura comparada que citam o nome e tiveram veículos dos dois lados, quão dividida ficou a cobertura (100 = meio a meio), na média. Os nomes saem das manchetes em português (palavras com inicial maiúscula) e são contados como no analítico do nome que a linha abre: com a regra da busca, que acha o começo das palavras ("Senado" também conta "senador"), e a notícia coletada em mais de uma edição conta uma vez. Um nome pode reunir pessoas diferentes ("Bolsonaro"). Nada disso diz se a menção é favorável ou desfavorável.</p>
+</div>
+{%- endmacro %}
+
+{% macro sugestoes(nm) -%}
+<p class="md-sug"><span class="md-sl">Em destaque na {{ nm.secao_titulo }} ({{ nm.periodo }}):</span>{% for n in nm.nomes %} <a href="{{ n.href }}" title="{{ "{:,}".format(n.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} no período (abre a busca com a editoria e o período)">{{ n.nome }}</a>{% endfor %}</p>
+{%- endmacro %}

@@ -32,7 +32,8 @@ from .. import text
 from ..config import Config
 from ..models import Edition
 from ..termometro.referencia import PARAMETROS
-from . import filters
+from . import filters, midia
+from .midia import DestaquesView
 from .termometro import ANALITICO_PAGINA, CLASSE, analises_validas
 from .web import DEFAULT_COLORS, brand_view, coverage_view
 
@@ -297,6 +298,7 @@ class PesquisaView:
     termometro: bool = False
     totais: dict[str, int] = field(default_factory=dict)
     atualizado: str = ""
+    destaques: DestaquesView | None = None  # nomes em destaque (sugestões de busca)
 
 
 def _data_label(iso: str) -> str:
@@ -306,7 +308,13 @@ def _data_label(iso: str) -> str:
         return iso
 
 
-def pesquisa_view(resumos: Iterable[Mapping[str, Any]], config: Config, *, edition_date: str | None = None) -> PesquisaView:
+def pesquisa_view(
+    resumos: Iterable[Mapping[str, Any]],
+    config: Config,
+    *,
+    edition_date: str | None = None,
+    destaques: DestaquesView | None = None,
+) -> PesquisaView:
     dias = sorted((r for r in resumos if r.get("d")), key=lambda r: str(r["d"]), reverse=True)
     ordem = {s.id: i for i, s in enumerate(config.sections)}
     secoes: dict[str, tuple[str, str]] = {}
@@ -331,6 +339,12 @@ def pesquisa_view(resumos: Iterable[Mapping[str, Any]], config: Config, *, editi
         "tipos": [list(t) for t in tipos],
         "classes": CLASSE,  # rótulo do termômetro → cor (t-ef, t-eq…)
         "faixas": list(PARAMETROS["faixas"]),
+        # Como a mídia cobre (o analítico da busca): veículos de fora do Brasil e as
+        # palavras e nomes que não contam como nome (as mesmas regras de midia.py).
+        "exterior": midia.exterior(config),
+        "fora": sorted(midia.FORA),
+        "calendario": sorted(midia.CALENDARIO),
+        "foraNomes": sorted(midia.FORA_NOMES),
     }
     if dias:
         primeira, ultima = str(dias[-1]["d"]), str(dias[0]["d"])
@@ -364,6 +378,7 @@ def pesquisa_view(resumos: Iterable[Mapping[str, Any]], config: Config, *, editi
         termometro=termometro,
         totais=dict(zip("mnca", totais, strict=True)),
         atualizado=_data_label(edition_date) if edition_date else "",
+        destaques=destaques if destaques is not None and destaques.nomes else None,
     )
 
 
@@ -374,10 +389,11 @@ def render_pesquisa_page(
     home_href: str,
     archive_href: str,
     edition_date: str | None = None,
+    destaques: DestaquesView | None = None,
 ) -> str:
     """Página ``edicoes/pesquisa.html`` (autocontida, como as demais; os dados de
-    cada edição vêm de ``data/busca/``)."""
-    view = pesquisa_view(resumos, config, edition_date=edition_date)
+    cada edição vêm de ``data/busca/``). ``destaques``: nomes sugeridos para buscar."""
+    view = pesquisa_view(resumos, config, edition_date=edition_date, destaques=destaques)
     brand = brand_view(config)
     template = filters.environment().get_template("pesquisa.html.j2")
     html = template.render(

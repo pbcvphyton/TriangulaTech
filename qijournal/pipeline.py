@@ -49,7 +49,7 @@ from qijournal.deliver.smtp import send_email as deliver_email
 from qijournal.edit import ContextoTermometro, make_edition
 from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
-from qijournal.render import pesquisa
+from qijournal.render import midia, pesquisa
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
 from qijournal.render.web import index_page_name, render_archive_index, render_edition_page, render_index_page
@@ -421,6 +421,29 @@ def _busca_de_arquivo(day: date, data_dir: Path, config: Config) -> dict[str, An
         return None
 
 
+def _corpus_dos_nomes(dados: Mapping[str, Any], estrangeiros: list[str]) -> midia.CorpusDia | None:
+    """O dia nos nomes em destaque; um arquivo de busca fora do formato fica de fora
+    (o bloco é adicional: nunca derruba a edição)."""
+    try:
+        return midia.corpus_do_dia(dados, estrangeiros)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Nomes em destaque: dia %s ignorado (%s)", dados.get("data"), exc)
+        return None
+
+
+def _nomes_em_destaque(corpora: list[midia.CorpusDia | None], fim: str, config: Config) -> midia.DestaquesView | None:
+    """Nomes em destaque da Política (Analítico Político e sugestões da Pesquisa);
+    ``None`` sem a editoria, sem manchetes ou se o cálculo falhar (as páginas saem sem o bloco)."""
+    secao = next((s for s in config.sections if s.id == midia.SECAO), None)
+    if secao is None:
+        return None
+    try:
+        return midia.destaques([c for c in corpora if c is not None], fim=fim, secao=secao.id, secao_titulo=secao.title)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Nomes em destaque: %s — páginas sem o bloco", exc)
+        return None
+
+
 def _raw_base(repo_url: str) -> str | None:
     """``https://github.com/dono/repo`` → ``https://raw.githubusercontent.com/dono/repo/main/``."""
     match = re.match(r"^https://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$", (repo_url or "").strip())
@@ -520,6 +543,8 @@ def publish(
     # expira) e a aba "Analítico Político" é refeita com todo o histórico.
     termometro_dia: dict[str, Any] | None = None
     analitico_page: str | None = None
+    gerar_analitico = False
+    registros: list[dict[str, Any]] = []
     if config.termometro_ativo:
         registros = historico.carregar_registros(data_dir)
         if edition.termometro is not None:
@@ -532,14 +557,7 @@ def publish(
                 )
                 paths["termometro"] = historico.caminho_do_dia(data_dir, edition.date)
         if edition.termometro is not None or any(historico.tem_analises(r) for r in registros):
-            analitico_page = render_analitico_page(
-                registros,
-                config,
-                home_href="../",
-                archive_href="./",
-                edition_date=edition.date,
-                edicoes=[day.isoformat() for day in kept_days],
-            )
+            gerar_analitico = True  # renderizada depois da busca (usa os nomes em destaque)
             paths["analitico"] = archive_dir / ANALITICO_PAGINA
 
     # Pesquisa analítica: o arquivo de busca do dia, os que faltam das edições do
@@ -550,6 +568,11 @@ def publish(
     busca_hoje = pesquisa.dados_do_dia(edition, config, termometro_hoje)
     search_writes: dict[Path, str] = {paths["busca"]: pesquisa.serializar(busca_hoje)}
     resumos = [pesquisa.resumo_do_dia(busca_hoje)]
+    # Nomes em destaque (Analítico Político e sugestões da Pesquisa): das mesmas edições,
+    # só as da janela da tabela (as mais antigas não entram na conta).
+    estrangeiros = midia.exterior(config)
+    inicio_nomes = today - timedelta(days=midia.JANELA_DIAS - 1)
+    corpora = [_corpus_dos_nomes(busca_hoje, estrangeiros)]
     for day in kept_days:
         if day == today:
             continue
@@ -561,13 +584,26 @@ def publish(
                 continue
             search_writes[search_path] = pesquisa.serializar(dados)
         resumos.append(pesquisa.resumo_do_dia(dados))
+        if day >= inicio_nomes:
+            corpora.append(_corpus_dos_nomes(dados, estrangeiros))
     if len(search_writes) > 1:
         log.info("Pesquisa analítica: %d edição(ões) anterior(es) entram na busca", len(search_writes) - 1)
+    destaques = _nomes_em_destaque(corpora, edition.date, config)
 
     # Renderiza tudo antes de escrever.
     search_page = pesquisa.render_pesquisa_page(
-        resumos, config, home_href="../", archive_href="./", edition_date=edition.date
+        resumos, config, home_href="../", archive_href="./", edition_date=edition.date, destaques=destaques
     )
+    if gerar_analitico:
+        analitico_page = render_analitico_page(
+            registros,
+            config,
+            home_href="../",
+            archive_href="./",
+            edition_date=edition.date,
+            edicoes=[day.isoformat() for day in kept_days],
+            destaques=destaques,
+        )
     home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/")
     archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
     archive_index = render_archive_index(entries, config, home_href="../")
