@@ -1,0 +1,1045 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-07",
+ "analises": [
+  {
+   "id": "85ea03b181d8",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/07/lula-cumprimenta-alliana-e-convida-novo-presidente-do-paraguai-a-braslia.ghtml",
+   "titulo": "Lula cumprimenta Alliana e convida novo presidente do Paraguai a Brasília",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-do-paraguai-cassa-santiago-pena-em-impeac",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 281,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "O presidente Luiz Inácio Lula da Silva parabenizou nesta sexta-feira Pedro Alliana por sua posse como novo mandatário do Paraguai",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto adota tom estritamente institucional e protocolar de diplomacia de Estado, sem carregar juízos ideológicos."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "bcbe0b99de14",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/justica-federal-extingue-acao-contra-bolsonaro-e-a-ex-funcionaria-wal-do-acai.shtml",
+   "titulo": "Justiça Federal extingue ação contra Bolsonaro e a ex-funcionária Wal do Açaí",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "justica-federal-extingue-acao-de-improbidade-con",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 625,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HIERARQUIA",
+     "citacao": "Justiça Federal extingue ação contra Bolsonaro e a ex-funcionária Wal do Açaí",
+     "paragrafo": "P0",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O título e o subtítulo destacam fielmente o resultado do julgamento e a tese do magistrado, sem distorção."
+    },
+    {
+     "id": "E2",
+     "criterio": "FONTES",
+     "citacao": "Não há nos autos demonstração de repasse de valores da servidora ao corréu, apropriação indevida ou qualquer partilha ilícita de remuneração.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A decisão absolutória é citada em detalhes textuais, permitindo a compreensão dos fundamentos jurídicos."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "33a650bf1fa8",
+   "url": "https://www.infomoney.com.br/onde-investir/fii-vende-nove-imoveis-cinco-deles-alugados-ao-atacadao-por-r-791-milhoes/",
+   "titulo": "FII vende nove imóveis, cinco deles alugados ao Atacadão, por R$ 791 milhões",
+   "veiculo": "InfoMoney",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "gare11-vende-carteira-de-nove-imoveis-por-r-791",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 464,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "81bfeb7506d0",
+   "url": "https://www.seudinheiro.com/2026/empresas/safra-rebaixa-bb-bbsa3-para-venda-itau-itub4-e-bradesco-bbdc4-tambem-sofrem-e-so-uma-acao-escapa-da-degola-rnda/",
+   "titulo": "Safra rebaixa BB (BBSA3) para venda; Itaú (ITUB4) e Bradesco (BBDC4) também sofrem e só uma ação escapa da degola",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 76,
+    "rotulo": "Regular"
+   },
+   "palavras": 983,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A avaliação dos analistas Daniel Vaz e Rafael Nobre é de que os bancos terão de atravessar um ambiente mais desafiador nos próximos anos",
+     "paragrafo": "P4",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "A matéria reporta apenas a visão dos analistas do Safra sem procurar o Banco do Brasil ou outros bancos citados para contraponto às previsões negativas."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "db78125bf13c",
+   "url": "https://www.cnnbrasil.com.br/internacional/russia-faz-grande-ataque-a-regiao-de-kiev-e-deixa-ao-menos-cinco-feridos/",
+   "titulo": "Rússia faz grande ataque à região de Kiev e deixa ao menos cinco feridos",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa"
+   },
+   "palavras": 210,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O prefeito da capital ucraniana afirmou que pelo menos cinco pessoas ficaram feridas.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto equilibra o relato russo das ações militares ouvindo a autoridade local ucraniana sobre os feridos decorrentes do ataque."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "81b7593c11cb",
+   "url": "https://g1.globo.com/tecnologia/noticia/2026/11/06/ue-exige-que-tiktok-modifique-os-feeds-personalizados-devido-aos-efeitos-nocivos.ghtml",
+   "titulo": "UE exige que TikTok mude feeds personalizados por possíveis efeitos nocivos",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa"
+   },
+   "palavras": 473,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "\"A Comissão formulou uma série de afirmações fundamentalmente inexatas\", reagiu um porta-voz do grupo à AFP.",
+     "paragrafo": "P14",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A reportagem inclui expressamente a contestação formal da empresa perante as acusações e exigências da Comissão Europeia."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c6bca2e78794",
+   "url": "https://www.moneytimes.com.br/petroleo-fecha-em-alta-nesta-sexta-feira-mas-recua-13-na-semana-davs/",
+   "titulo": "Petróleo fecha em alta nesta sexta-feira, mas recua 13% na semana",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 292,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O JP Morgan projeta que a oferta de petróleo tenha superado a demanda em 1,1 milhão de barris por dia (bpd) em setembro, com o excedente se ampliando para 1,4 milhão bpd em outubro.",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Números apresentados com fonte institucional explícita, base comparativa e período definido."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3024efa8dc55",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/chuvas-permanecem-intensas-no-sul-e-aumentam-no-sudeste-e-centro-oeste",
+   "titulo": "Chuvas permanecem intensas no Sul e aumentam no Sudeste e Centro-Oeste",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 423,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "23b79706287f",
+   "url": "https://umsoplaneta.globo.com/clima/noticia/2026/11/06/outubro-de-2026-registra-recorde-de-calor-global-e-ano-deve-ser-o-2o-mais-quente-da-historia.ghtml",
+   "titulo": "Outubro de 2026 registra recorde de calor global, e ano deve ser o 2º mais quente da história",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "ano-de-2026-deve-ser-o-segundo-mais-quente-da-hi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 814,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "temperatura média global do ar na superfície ficou 1,75°C acima dos níveis pré-industriais em outubro",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados técnicos apresentados com base temporal, base de comparação pré-industrial e fonte científica claramente atribuída."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "210647a093a0",
+   "url": "https://www.camara.leg.br/noticias/1316835-comissao-aprova-proibicao-de-posse-em-cargo-publico-para-condenados-por-crimes-contra-vulneraveis",
+   "titulo": "Comissão aprova proibição de posse em cargo público para condenados por crimes contra vulneráveis",
+   "veiculo": "Agência Câmara",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 520,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Os parlamentares aprovaram alteração feita pelo relator, deputado Merlong Solano (PT-PI)",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Notícia institucional de agência legislativa reportando objetivamente a atuação e as explicações técnicas do relator do projeto."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a19306283976",
+   "url": "https://www.poder360.com.br/poder-economia/vale-refeicao-passa-a-ser-aceito-em-maquininhas-de-diferentes-operadoras/",
+   "titulo": "Vale-refeição passa a ser aceito em maquininhas de diferentes operadoras",
+   "veiculo": "Poder360",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "interoperabilidade-de-cartoes-de-vale-refeicao-e",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 296,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A implementação, porém, enfrenta dificuldades operacionais. A Abrasel (Associação Brasileira de Bares e Restaurantes) afirma que os sistemas",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta tanto o objetivo regulatório governamental da medida quanto as críticas práticas do setor afetado (Abrasel)."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a81fedbf6ed2",
+   "url": "https://neofeed.com.br/negocios/o-projeto-de-us-1-bilhao-da-revolut-para-acelerar-na-america-latina/",
+   "titulo": "O projeto de US$ 1 bilhão da Revolut para “acelerar” na América Latina",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "revolut-preve-investir-us-1-bilhao-na-america-la",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 948,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8940907feb69",
+   "url": "https://www.suno.com.br/noticias/imposto-do-pecado-produtos-aliquotas/",
+   "titulo": "Cerveja, cigarro e refrigerante: quanto será cobrado pelo imposto do pecado?",
+   "veiculo": "Suno Notícias",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa"
+   },
+   "palavras": 639,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Representantes de setores atingidos, porém, alertam para possíveis efeitos sobre os preços e o mercado ilegal.",
+     "paragrafo": "P19",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta a preocupação do setor produtivo como contraponto à lógica arrecadatória e regulatória do governo."
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "O governo estima arrecadar R$ 41,9 bilhões com o tributo no próximo ano, conforme a previsão orçamentária",
+     "paragrafo": "P20",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados de estimativa orçamentária com base e período explícitos."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "17cc8b773673",
+   "url": "https://www.gazetaesportiva.com/bastidores/justica-libera-sites-apostas-apos-proibicao-bets/",
+   "titulo": "Justiça restabelece três sites de apostas apesar da proibição do governo Lula",
+   "veiculo": "Gazeta Esportiva",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "trf-3-derruba-liminar-que-autorizava-funcionamen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa"
+   },
+   "palavras": 326,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Para o governo, essas plataformas representam um problema de saúde pública devido à dependência que podem provocar e são uma das causas do endividamento recorde",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto expõe com clareza as justificativas do governo para editar a proibição, garantindo contraponto aos argumentos da empresa."
+    },
+    {
+     "id": "E2",
+     "criterio": "FONTES",
+     "citacao": "A Advocacia-Geral da União (AGU) anunciou que recorrerá da decisão.",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Registra a reação imediata do governo perante a decisão desfavorável."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "049fe408bb73",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/06/lula-sanciona-lei-que-estabelece-exame-de-proficincia-para-exerccio-da-medicina.ghtml",
+   "titulo": "Lula sanciona lei que estabelece exame de proficiência para exercício da medicina",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-sanciona-lei-que-cria-avaliacao-obrigatoria",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": -8,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular"
+   },
+   "palavras": 380,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -8.04,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O presidente Luiz Inácio Lula da Silva sancionou, nesta sexta-feira (6), a obrigatoriedade da realização de um exame de proficiência para o exercício da medicina no Brasil.",
+     "paragrafo": "P1",
+     "direcao": "esquerda",
+     "contribuicao": -6.67,
+     "explicacao": "A reportagem é construída exclusivamente em torno das declarações e da cerimônia do presidente da República, sem ouvir entidades médicas, estudantes ou faculdades privadas."
+    },
+    {
+     "id": "E2",
+     "criterio": "OMISSAO",
+     "citacao": "A maior parte dessas graduações era ligada às faculdades privadas.",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -1.37,
+     "explicacao": "Menciona o desempenho ruim das faculdades privadas e a crítica de Lula à mercantilização sem buscar posicionamento das entidades do setor educacional privado."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "be74b49445a0",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/cartoes-de-vr-e-va-devem-ser-aceitos-em-mais-restaurantes-a-partir-deste-sabado-7-entenda.shtml",
+   "titulo": "Cartões de VR e VA devem ser aceitos em mais restaurantes a partir deste sábado (7); entenda",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "interoperabilidade-de-cartoes-de-vale-refeicao-e",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 1206,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A implementação é contestada por empresas e entidades do setor, que afirmam que os sistemas ainda não estão preparados para a integração. O Ministério do Trabalho e Emprego descarta prorrogar",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Confronta de imediato no lead a versão das empresas de pagamento com a recusa taxativa do governo em prorrogar o prazo."
+    },
+    {
+     "id": "E2",
+     "criterio": "FONTES",
+     "citacao": "A Abrasel (Associação Brasileira de Bares e Restaurantes) apoia a abertura do mercado, mas afirma que os sistemas não estão integrados. Já a Federação de Hotéis, Restaurantes e Bares do Estado de São Paulo (Fhoresp) critica a possibilidade…",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta a multiplicidade de visões entre os setores de comércio e gastronomia sobre a aplicação da norma."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f001d52b41f9",
+   "url": "https://www.moneytimes.com.br/fundo-imobiliario-tem-segunda-locataria-em-recuperacao-judicial-contratos-representam-112-da-receita-do-fii-igdl/",
+   "titulo": "Fundo imobiliário enfrenta segunda recuperação judicial entre inquilinos; contratos representam 11,2% da receita do FII",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 465,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f5480d88cbfd",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/06/lula-sanciona-lei-que-institui-oab-da-medicina-para-novos-medicos.ghtml",
+   "titulo": "Lula sanciona lei que institui 'OAB da Medicina' para novos médicos",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-sanciona-lei-que-cria-avaliacao-obrigatoria",
+   "origem": "materia",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 565,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "O presidente Luiz Inácio Lula da Silva (PT) sancionou, nesta sexta-feira (6), uma lei que torna obrigatório o Exame Nacional de Avaliação Médica",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto descreve de maneira neutra e objetiva os atos institucionais da sanção e o funcionamento da nova legislação."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "7d16b0974bdb",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/ibge-confirma-crescimento-de-34-da-economia-em-2024",
+   "titulo": "IBGE confirma crescimento de 3,4% da economia em 2024",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-06",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 545,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Dados revisados pelo Instituto Brasileiro de Geografia e Estatística (IBGE) confirmam que a economia brasileira cresceu 3,4% em 2024.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação equilibrada e contextualizada de números oficiais, citando fontes, períodos e diferentes projeções de mercado e organismos internacionais."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a326bb82b46a",
+   "url": "https://www.cnnbrasil.com.br/nacional/sul/inmet-emite-alerta-vermelho-de-tempestade-para-o-sul-do-pais-neste-sabado/",
+   "titulo": "Inmet emite alerta vermelho de tempestade para o Sul do país neste sábado",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-07",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ]
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 397,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-07T10:21:37+00:00",
+   "provedor": "gemini",
+   "modelo": "gemini-flash-latest",
+   "candidatos": 40,
+   "textos_curtos": 6,
+   "falhas": 0,
+   "chamadas": 5,
+   "tokens": {
+    "entrada": 28801,
+    "saida": 16935
+   },
+   "analises": [
+    "85ea03b181d8",
+    "bcbe0b99de14",
+    "33a650bf1fa8",
+    "81bfeb7506d0",
+    "db78125bf13c",
+    "81b7593c11cb",
+    "c6bca2e78794",
+    "3024efa8dc55",
+    "23b79706287f",
+    "210647a093a0",
+    "a19306283976",
+    "a81fedbf6ed2",
+    "8940907feb69",
+    "17cc8b773673",
+    "049fe408bb73",
+    "be74b49445a0",
+    "f001d52b41f9",
+    "f5480d88cbfd",
+    "7d16b0974bdb",
+    "a326bb82b46a"
+   ]
+  }
+ ]
+}
