@@ -1,0 +1,940 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-08",
+ "analises": [
+  {
+   "id": "e7083cf7062f",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/quaest-61-dizem-que-eleicoes-foram-limpas-e-justas-30-fraudadas.shtml",
+   "titulo": "62% afirmam que Flávio errou ao fugir para os EUA, e 61% dizem que eleição foi justa, mostra pesquisa Quaest",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "quaest-aponta-que-62-reprovam-ida-de-flavio-bols",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": -6,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 759,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.88,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "carta golpista",
+     "paragrafo": "P14",
+     "direcao": "esquerda",
+     "contribuicao": -5.88,
+     "explicacao": "A redação adota o rótulo de 'golpista' para se referir à carta escrita por Flávio Bolsonaro."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a63003c8942d",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/07/promotores-do-paraguai-denunciam-ex-presidente-pea-e-pedem-priso-preventiva.ghtml",
+   "titulo": "Juiz do Paraguai ordena prisão preventiva do ex-presidente Santiago Peña",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "justica-do-paraguai-decreta-prisao-preventiva-do",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa"
+   },
+   "palavras": 499,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "452b477a100b",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/08/ilha-espanha-ajuda-migrantes.ghtml",
+   "titulo": "Ilha da Espanha entra em emergência após receber milhares de migrantes em poucos dias",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ilha-de-el-hierro-declara-emergencia-apos-chegad",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular"
+   },
+   "palavras": 535,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "77554cc2a028",
+   "url": "https://www.cnnbrasil.com.br/internacional/cop31-veja-onde-ocorreram-outras-edicoes-da-conferencia-climatica/",
+   "titulo": "COP31: Veja onde ocorreram outras edições da conferência climática",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "inicio-da-cop31-na-turquia-coloca-financiamento",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa"
+   },
+   "palavras": 345,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9c421e0508a8",
+   "url": "https://www.poder360.com.br/poder-governo/ao-vivo-lula-acompanha-aplicacao-do-enem-2026-no-inep/",
+   "titulo": "Ao vivo: Lula acompanha aplicação do Enem 2026 no Inep",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 197,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "5636c8ac6bcf",
+   "url": "https://www.infomoney.com.br/mundo/brasileiros-nos-eua-rechacam-trump-e-votam-nos-democratas-aponta-atlasintel/",
+   "titulo": "Brasileiros nos EUA rechaçam Trump e votam nos democratas, aponta AtlasIntel",
+   "veiculo": "InfoMoney",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular"
+   },
+   "palavras": 967,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A pesquisa entrevistou 878 latinos aptos a votarem entre 26 de outubro e 3 de novembro e estimou uma margem de erro de 3 pontos percentuais",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação detalhada da metodologia da pesquisa com amostra, período e margem de erro."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1fe2506c7eb3",
+   "url": "https://www.moneytimes.com.br/berkshire-hathaway-lucro-cai-28-no-3o-trimestre-pressionado-por-ganhos-menores-com-acoes-igdl/",
+   "titulo": "Berkshire Hathaway: lucro cai 28% no 3T26 após ganhos menores com ações",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 436,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0d2e662c9ae0",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/vr-e-va-podem-ser-aceitos-em-mais-maquininhas-partir-deste-sabado",
+   "titulo": "Vales refeição e alimentação podem ser aceitos em mais maquininhas",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 832,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A Associação Brasileira de Bares e Restaurantes (Abrasel) afirma que os sistemas das empresas ainda não estão totalmente integrados",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Inclusão do contraponto da entidade setorial trazendo as dificuldades operacionais e críticas à medida governamental."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6e6476d8ad4a",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/quaest-fim-da-6x1-e-isencao-da-cesta-basica-lideram-prioridades-de-eleitores-para-lula-4.shtml",
+   "titulo": "Quaest: Fim da 6x1 e isenção da cesta básica lideram prioridades de eleitores para Lula 4",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "quaest-mostra-aprovacao-de-lula-em-48-e-economia",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 998,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1deed91965bc",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/07/presidente-de-israel-escolhe-rival-de-netanyahu-para-tentar-formar-governo.ghtml",
+   "titulo": "Presidente de Israel escolhe rival de Netanyahu para tentar formar governo",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "presidente-de-israel-encarrega-rival-de-netanyah",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 63,
+    "rotulo": "Regular"
+   },
+   "palavras": 429,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "25266f97205f",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/07/imposto-do-pecado-nao-e-invencao-brasileira-alcool-e-tabaco-sao-taxados-nos-38-paises-da-ocde-grupo-de-nacoes-ricas.ghtml",
+   "titulo": "'Imposto do pecado' não é invenção brasileira: álcool e tabaco são taxados nos 38 países da OCDE, grupo de nações ricas",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 837,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "59e37239ee16",
+   "url": "https://www.cnnbrasil.com.br/internacional/o-que-se-sabe-sobre-a-onda-de-falsas-ameacas-de-bomba-na-europa/",
+   "titulo": "O que se sabe sobre a onda de falsas ameaças de bomba na Europa",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa"
+   },
+   "palavras": 1178,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c11a6ad740c4",
+   "url": "https://www.infomoney.com.br/politica/quaest-primeira-pesquisa-apos-as-eleicoes-mostra-uma-divisao-na-direita-entenda/",
+   "titulo": "Quaest: primeira pesquisa após as eleições mostra uma divisão na direita; entenda",
+   "veiculo": "InfoMoney",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "quaest-aponta-que-62-reprovam-ida-de-flavio-bols",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa"
+   },
+   "palavras": 639,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A pesquisa ouviu 2.004 pessoas entre os dias 30/10 e 02/11 e possui 95% de confiabilidade e 2 pontos percentuais de margem de erro.",
+     "paragrafo": "P20",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A pesquisa apresenta dados quantitativos com metodologia clara, amostragem, margem de erro e nível de confiança."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ad6ad7b494d1",
+   "url": "https://www.moneytimes.com.br/enquanto-wall-street-se-divide-sobre-o-futuro-da-inteligencia-artificial-investidores-comecam-a-mirar-na-proxima-onda-de-valorizacao-do-setor-lbrdgm105/",
+   "titulo": "Enquanto Wall Street se divide sobre o futuro da inteligência artificial, investidores começam a mirar na próxima onda de valorização do setor",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "wall-street-apaga-us-3-2-trilhoes-em-acoes-de-in",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular"
+   },
+   "palavras": 649,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Para os analistas da Empiricus, é justamente nesse contexto que pode estar uma mina de ouro.",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O veículo promove as teses da própria casa de análises (Empiricus) que assina a publicação, funcionando parcialmente como conteúdo nativo/divulgação comercial."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "273f81c64a6d",
+   "url": "https://www.poder360.com.br/poder-eleicoes-2026/59-rejeitam-criticas-de-flavio-ao-resultado-das-urnas-diz-quaest/",
+   "titulo": "59% rejeitam críticas de Flávio ao resultado das urnas, diz Quaest",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "quaest-aponta-que-62-reprovam-ida-de-flavio-bols",
+   "origem": "materia",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ]
+   },
+   "estado": "ok",
+   "T": -6,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 391,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.88,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "tem alegado, sem apresentar provas, que as eleições foram fraudadas.",
+     "paragrafo": "P3",
+     "direcao": "esquerda",
+     "contribuicao": -5.88,
+     "explicacao": "A redação utiliza a expressão estigmatizante 'sem apresentar provas' ao relatar as declarações do ator político."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d21def6394ac",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/pgr-pede-suspensao-de-acoes-contra-proibicao-de-bets",
+   "titulo": "PGR pede suspensão de ações contra proibição de bets",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "pgr-pede-ao-stf-suspensao-de-acoes-contra-mp-que",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa"
+   },
+   "palavras": 202,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "77896df618c0",
+   "url": "https://www.seudinheiro.com/2026/financas-pessoais/vale-refeicao-e-alimentacao-mudaram-agora-posso-usar-meu-cartao-em-qualquer-maquininha-lefp/",
+   "titulo": "Vale-refeição e alimentação mudaram: agora posso usar meu cartão em qualquer maquininha?",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-08",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa"
+   },
+   "palavras": 914,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ec882af40f24",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/07/cinco-pessoas-morrem-em-tiroteio-na-praa-principal-de-cracvia-na-polnia.ghtml",
+   "titulo": "Cinco pessoas morrem em tiroteio na praça principal de Cracóvia, na Polônia",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataque-a-tiros-deixa-seis-mortos-no-centro-de-cr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "seguranca"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular"
+   },
+   "palavras": 183,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "726861431fee",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/ucrania-relata-cortes-de-energia-em-cinco-regioes-apos-ataque-massivo-da-russia.shtml",
+   "titulo": "Ucrânia relata cortes de energia em cinco regiões após ataque massivo da Rússia",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataques-russos-danificam-rede-de-energia-na-ucra",
+   "origem": "materia",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular"
+   },
+   "palavras": 715,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ef593518932f",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/07/eua-oferecem-us-20-milhoes-por-informacoes-programa-nuclear-ira.ghtml",
+   "titulo": "Após Trump falar em 'destruir o resto do Irã', EUA oferecem US$ 20 milhões por informações sobre o programa nuclear iraniano",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-07",
+   "analisado_em": "2026-11-08",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ]
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa"
+   },
+   "palavras": 666,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-08T15:26:14+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 40,
+   "textos_curtos": 8,
+   "falhas": 0,
+   "chamadas": 5,
+   "tokens": {
+    "entrada": 32662,
+    "saida": 14982
+   },
+   "analises": [
+    "e7083cf7062f",
+    "a63003c8942d",
+    "452b477a100b",
+    "77554cc2a028",
+    "9c421e0508a8",
+    "5636c8ac6bcf",
+    "1fe2506c7eb3",
+    "0d2e662c9ae0",
+    "6e6476d8ad4a",
+    "1deed91965bc",
+    "25266f97205f",
+    "59e37239ee16",
+    "c11a6ad740c4",
+    "ad6ad7b494d1",
+    "273f81c64a6d",
+    "d21def6394ac",
+    "77896df618c0",
+    "ec882af40f24",
+    "726861431fee",
+    "ef593518932f"
+   ]
+  }
+ ]
+}
