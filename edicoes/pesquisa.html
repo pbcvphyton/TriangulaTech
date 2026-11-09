@@ -350,6 +350,31 @@ body.modal-open{overflow:hidden}
 .cmp-i h3{margin-bottom:8px;font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
 .cmp-i h3 a:hover{color:var(--link);text-decoration:underline}
 .cmp-t{font-weight:500;letter-spacing:.5px;color:var(--faint)}
+/* Cobertura comparada: abas por editoria; em cada aba, onde divergiu e o que foi relatado de forma semelhante */
+.cmp [hidden]{display:none!important}
+.cmp-tabs{margin-top:14px}
+.cmp .pane-hd{padding:18px 0 8px}
+.cmp-tabs.all .pane-hd{display:block}
+.cmp-tabs.all .cmp-pane+.cmp-pane{margin-top:10px}
+.tab-btn .cmp-dn{margin-left:6px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--cov-b)}
+.cmp-gh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-top:16px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.cmp-gh span{font-family:var(--ss);font-size:12px;font-weight:400;color:var(--muted)}
+.cmp-dv{font-weight:600;color:var(--cov-b)}
+.cmp-mt{font-weight:500;color:var(--faint)}
+.cmp-vazio{margin-top:10px;font-family:var(--ss);font-size:12.5px;font-style:italic;color:var(--muted)}
+.cmp-cl{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));column-gap:32px}
+.cmp-cl li{border-bottom:1px solid var(--rl)}
+.cmp-cl summary{display:flex;flex-direction:column;gap:1px;padding:8px 0 8px 16px;position:relative;cursor:pointer;list-style:none}
+.cmp-cl summary::-webkit-details-marker{display:none}
+.cmp-cl summary::before{content:"+";position:absolute;left:0;top:7px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--link)}
+.cmp-cl details[open] summary::before{content:"−"}
+.cmp-ct{font-family:var(--sf);font-size:14.5px;font-weight:700;line-height:1.35;color:var(--ink)}
+.cmp-cl summary:hover .cmp-ct{color:var(--link)}
+.cmp-cm{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.cmp-cl details>.cov,.cmp-cl .cmp-lk{margin:0 0 10px 16px}
+.cmp-lk{font-family:var(--ss);font-size:12.5px}
+.cmp-lk a{font-weight:700;color:var(--link)}
+.cmp-lk a:hover{text-decoration:underline}
 
 /* Racional da edição e lista completa do dia */
 .rat-strip{padding:9px var(--gut);border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
@@ -431,63 +456,257 @@ body.modal-open .btt{visibility:hidden}
 .arch-t{font-size:15px;font-weight:700;line-height:1.3;color:var(--ink)}
 .badge{flex-shrink:0;padding:1px 6px;border:1px solid var(--rule);border-radius:10px;font-family:var(--mn);font-size:8.5px;letter-spacing:1px;color:var(--faint)}
 .arch-empty{padding:30px 0;font-family:var(--ss);color:var(--muted)}
-/* Termômetro de Viés Editorial (fim da edição) e aba Analítico Político.
-   Escala divergente validada (rampa ordinal por braço, claro e escuro):
-   verde-azulado = esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. */
-:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD}
-:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748}
+/* Termômetro de Viés Editorial (painel do dia no fim da edição) e aba Analítico Político.
+   Escala divergente validada (rampa ordinal por braço, claro e escuro): verde-azulado =
+   esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. A cor vai só nas marcas
+   (faixas, ponteiro, colunas, barras e pontos); números e rótulos ficam nas cores de texto,
+   sempre escritos ao lado da marca. Marcas finas, réguas de 1 px e uma folga de 2 px na cor
+   do fundo entre as faixas. */
+:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD;--tm-pn:#f6f7f9;--tm-hl:#eef1f5;--tm-bar:var(--qi);--tm-trk:rgba(var(--qi-rgb),.14)}
+:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748;--tm-pn:#141c2b;--tm-hl:#1a2436;--tm-bar:#8fb0f5;--tm-trk:rgba(143,176,245,.16)}
 .t-ef{background:var(--t-ef)}.t-em{background:var(--t-em)}.t-el{background:var(--t-el)}.t-eq{background:var(--t-eq)}
 .t-dl{background:var(--t-dl)}.t-dm{background:var(--t-dm)}.t-df{background:var(--t-df)}.t-na{background:var(--t-na)}
 .t-mx{background:repeating-linear-gradient(135deg,var(--t-eq) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1px var(--t-eq)}
 .sw{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;vertical-align:baseline}
-.term{padding:22px var(--gut) 26px;border-top:2px solid var(--qn);background:var(--paper)}
+.term{padding:28px var(--gut) 34px;border-top:2px solid var(--qn);background:var(--paper)}
 :root[data-theme="dark"] .term{border-top-color:var(--qi)}
-.term-sum{max-width:900px;font-family:var(--sf);font-size:17px;font-weight:600;line-height:1.5;color:var(--ink)}
-.term-sum span{font-family:var(--mn);font-size:10.5px;font-weight:500;letter-spacing:.3px;color:var(--mute2)}
-.term-meta{max-width:900px;margin-top:12px;font-family:var(--mn);font-size:10px;letter-spacing:.3px;line-height:1.6;color:var(--mute2)}
+.tm-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tm-top .kicker{flex:1}
+.tm-links{display:flex;gap:18px;font-family:var(--ss);font-size:12px;font-weight:700}
+.tm-links a{color:var(--link)}
+.tm-links a:hover{text-decoration:underline}
+.tm-dek{max-width:860px;margin-top:4px;font-family:var(--sf);font-size:16px;line-height:1.55;color:var(--body)}
+.tm-k{display:block;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tm-ph{font-family:var(--ss);font-size:13.5px;font-weight:800;line-height:1.3;color:var(--ink)}
+.tm-pd{margin:3px 0 14px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-foot{margin-top:10px;font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
+.tm-foot .sw{vertical-align:0}
+.tm-empty{padding:14px 16px;border:1px solid var(--rl);border-radius:6px;background:var(--tm-pn);font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.tm-empty-lg{max-width:860px;margin-top:8px;font-size:14px}
+/* Placar: o número da média, o rótulo e o intervalo, ao lado da escala */
+.tm-placar{--tg-bg:var(--tm-pn);display:grid;grid-template-columns:minmax(190px,250px) minmax(0,1fr);gap:20px 36px;align-items:center;margin-top:18px;padding:22px 28px 18px;border:1px solid var(--rl);border-radius:8px;background:var(--tm-pn)}
+.tm-n{margin-top:8px;font-family:var(--ss);font-size:68px;font-weight:600;line-height:.95;letter-spacing:-2px;color:var(--ink)}
+.tm-r{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--ss);font-size:16px;font-weight:700;color:var(--ink)}
+.tm-r .sw{width:12px;height:12px;margin:0;border-radius:3px}
+.tm-ic{margin-top:7px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.tm-b{margin-top:3px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+/* Escala de −100 a +100: faixas, intervalo de 95%, ponteiro da média e um traço por notícia */
+.tg{--tg-bg:var(--paper);position:relative;min-width:0;margin:0;padding-top:34px;container-type:inline-size}
+.tm-placar .tg{--tg-bg:var(--tm-pn)}
+.tg.sm{padding-top:0}
+.tg.sm .tg-flag{display:none}
+.tg-flag{position:absolute;top:0;left:clamp(70px,var(--x),calc(100% - 70px));transform:translateX(-50%);padding:4px 10px;border-radius:5px;background:var(--ink);font-family:var(--ss);font-size:11.5px;font-weight:600;line-height:1.2;color:var(--tg-bg);white-space:nowrap}
+.tg-flag b{font-family:var(--mn);font-weight:600}
+.tg-track{position:relative;height:16px}
+.tg-f{position:absolute;top:0;bottom:0;border:0 solid var(--tg-bg);border-width:0 1px;background-clip:padding-box;opacity:.3}
+.tg-f:first-child{border-left-width:0;border-radius:8px 0 0 8px}
+.tg-f:nth-child(7){border-right-width:0;border-radius:0 8px 8px 0}
+.tg-f.on{opacity:1}
+:root[data-theme="dark"] .tg-f{opacity:.45}
+:root[data-theme="dark"] .tg-f.on{opacity:1}
+.tg-ic{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--ink);opacity:.3}
+.tg-needle{position:absolute;top:-9px;bottom:-9px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--tg-bg)}
+.tg-needle::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 3px var(--tg-bg)}
+.tg-rug{position:relative;height:12px;margin-top:12px}
+.tg-rug i{position:absolute;top:0;width:2px;height:12px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.3}
+.tg-ticks{position:relative;height:14px;margin-top:6px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.tg-rug+.tg-ticks{margin-top:4px}
+.tg-ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.tg-ticks span:first-child{transform:none}
+.tg-ticks span:last-child{transform:translateX(-100%)}
+.tg-zones{position:relative;height:16px;margin-top:2px;font-family:var(--ss);font-size:10.5px;color:var(--muted)}
+.tg-zones span{position:absolute;top:0;text-align:center;white-space:nowrap}
+.tg-zones .on{font-weight:700;color:var(--ink)}
+.tg-sides{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tg-rug-k{font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint)}
+.tg-rug-k i{display:inline-block;width:2px;height:10px;margin-right:6px;border-radius:1px;background:var(--ink);opacity:.45;vertical-align:-1px}
+/* Régua estreita: as marcas de ±10 e ±25 e os nomes das faixas não cabem sem se encostar */
+@container (max-width:640px){.tg-ticks .mn,.tg-zones{display:none}}
+@media (min-width:761px) and (max-width:1000px){@supports not (container-type:inline-size){.tg-ticks .mn,.tg-zones{display:none}}}
+/* Indicadores */
+.tm-kpis{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl)}
+.tm-kpis li{display:flex;flex-direction:column;gap:4px;min-width:0;padding:16px 20px 16px 0}
+.tm-kpis li+li{padding-left:20px;border-left:1px solid var(--rl)}
+.tm-kv{font-family:var(--ss);font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-.5px;color:var(--ink)}
+.tm-kv small{margin-left:3px;font-size:13px;font-weight:500;letter-spacing:0;color:var(--muted)}
+.tm-kd{font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-meter{display:block;height:6px;margin:3px 0 1px;border-radius:3px;background:var(--tm-trk);overflow:hidden}
+.tm-meter span{display:block;height:100%;border-radius:3px;background:var(--tm-bar)}
+/* Painéis */
+.tm-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:26px 40px;margin-top:26px}
+.tm-panel{min-width:0;padding-top:14px;border-top:1px solid var(--rule)}
+/* Distribuição: uma barra por faixa (contagem e parcela ao lado) */
+.th{list-style:none}
+.th li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.th li:first-child{border-top:none;padding-top:0}
+.th-l{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.th-l .sw{margin-right:7px;vertical-align:0}
+.th-m{display:block;height:10px;border-left:1px solid var(--rule)}
+.th-m span{display:block;height:100%;min-width:3px;border-radius:0 4px 4px 0}
+.th .zero .th-m span{display:none}
+.th .zero .th-l{color:var(--muted)}
+.th-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.th-v b{font-size:12px;font-weight:600;color:var(--ink)}
+.th .zero .th-v b{font-weight:400;color:var(--faint)}
+/* Sinais por critério: à esquerda e à direita de um eixo central */
+.tsg-hd,.tsg-list li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 36px;align-items:center}
+.tsg-hd{padding-bottom:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tsg-hd span:nth-child(2){padding-right:8px;text-align:right}
+.tsg-hd span:nth-child(3){padding-left:8px}
+.tsg-list{list-style:none}
+.tsg-list li{padding:5px 0;border-top:1px solid var(--rl)}
+.tsg-n{padding-right:10px;font-family:var(--ss);font-size:12px;line-height:1.3;color:var(--ink)}
+.tsg-l,.tsg-r{display:flex;align-items:center;gap:6px;min-height:18px}
+.tsg-l{justify-content:flex-end;padding-right:1px;border-right:1px solid var(--rule)}
+.tsg-r{padding-left:1px}
+.tsg-b{display:block;height:10px;min-width:3px}
+.tsg-l .tsg-b{border-radius:4px 0 0 4px}
+.tsg-r .tsg-b{border-radius:0 4px 4px 0}
+.tsg-l b,.tsg-r b{font-family:var(--mn);font-size:11px;font-weight:600;color:var(--ink)}
+.tsg-eq{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tsg-eq i{display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%}
+/* Qualidade da apuração: em quantas notícias cada prática aparece */
+.tq{list-style:none}
+.tq li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.tq li:first-child{border-top:none;padding-top:0}
+.tq-n{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.tq-m{display:block;height:8px;border-radius:4px;background:var(--tm-trk);overflow:hidden}
+.tq-m span{display:block;height:100%;border-radius:4px;background:var(--tm-bar)}
+.tq-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.tq-v b{font-size:12px;font-weight:600;color:var(--ink)}
+/* Recortes do dia (veículos e editorias): um ponto por grupo numa escala comum */
+.trc{list-style:none}
+.trc-i,.trc-axis{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 124px;gap:12px;align-items:center}
+.trc-i{padding:6px 0;border-top:1px solid var(--rl)}
+.trc>.trc-i:first-child{border-top:none;padding-top:0}
+.trc-n{font-family:var(--ss);font-size:12.5px;font-weight:700;line-height:1.3;color:var(--ink)}
+.trc-p{position:relative;height:16px}
+.trc-i .trc-p::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rl)}
+.trc-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.trc-ic{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--ink);opacity:.25}
+.trc-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.trc-v{font-family:var(--ss);font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.trc-v b{display:inline-block;min-width:32px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--ink)}
+.trc-x{font-family:var(--mn);font-size:10px}
+.trc-axis{padding-top:4px}
+.trc-axis .trc-p{height:12px}
+.trc-axis i{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mn);font-size:9.5px;font-style:normal;color:var(--faint);white-space:nowrap}
+.trc-axis i:first-child{transform:none}
+.trc-axis i:last-child{transform:translateX(-100%)}
+.trc-more>summary{margin:6px 0 2px;cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.trc-more>summary:hover{text-decoration:underline}
+.trc-more .trc>.trc-i:first-child{border-top:1px solid var(--rl);padding-top:6px}
+/* Cada texto analisado: filtros, ordem e uma linha por texto que abre o detalhe */
+.tm-list{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-cnt{margin-left:6px;padding:1px 8px;border-radius:10px;background:var(--tm-hl);font-family:var(--mn);font-size:11px;font-weight:600;vertical-align:1px;color:var(--muted)}
+.tm-fil{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:4px 0 14px}
+.tm-fil[hidden]{display:none}
+.tm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tm-chip{height:32px;padding:0 13px;border:1px solid var(--rule);border-radius:16px;background:var(--paper);font-family:var(--ss);font-size:12px;font-weight:600;color:var(--body);cursor:pointer;transition:border-color .2s,background .2s}
+.tm-chip span{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tm-chip:hover:not(:disabled){border-color:var(--ink)}
+.tm-chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.tm-chip[aria-pressed="true"] span{color:inherit;opacity:.75}
+.tm-chip:disabled{opacity:.45;cursor:default}
+.tm-sel{display:flex;flex-direction:column;gap:3px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tm-sel select{height:32px;min-width:140px;max-width:230px;padding:0 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
+.tm-shown{margin-left:auto;padding-bottom:8px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tr-hd,.tr>details>summary{display:grid;grid-template-columns:62px minmax(0,1fr) 128px 148px 74px 78px;gap:16px;align-items:center}
+.tr-hd{padding:0 12px 7px;border-bottom:1px solid var(--rule);font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tr-list{list-style:none}
+.tr{border-bottom:1px solid var(--rl)}
+.tr[hidden]{display:none}
+.tr>details>summary{padding:12px;list-style:none;cursor:pointer;transition:background .15s}
+.tr>details>summary::-webkit-details-marker{display:none}
+.tr>details>summary:hover{background:var(--hover)}
+.tr>details[open]>summary{background:var(--tm-hl)}
+.tr-t{display:flex;align-items:center;gap:9px;font-family:var(--mn);font-size:17px;font-weight:600;color:var(--ink)}
+.tr-sw{flex:0 0 4px;width:4px;height:30px;border-radius:2px}
+.tr-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tr-src{font-family:var(--ss);font-size:11px;line-height:1.35;color:var(--muted)}
+.tr-src b{font-weight:700;color:var(--ink)}
+.tr-h{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.tr-sc{position:relative;height:16px}
+.tr-sc::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--rl)}
+.tr-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.tr-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.tr>details[open]>summary .tr-d{box-shadow:0 0 0 2px var(--tm-hl),0 0 0 3px var(--ink)}
+.tr-r,.tr-q{display:flex;flex-direction:column;gap:2px;font-family:var(--ss);font-size:12.5px;line-height:1.3;color:var(--ink)}
+.tr-r span,.tr-q span{font-size:11px;color:var(--muted)}
+.tr-q b{font-family:var(--mn);font-size:14px;font-weight:600}
+.tr-sig{justify-self:end;display:flex;align-items:center;gap:9px;font-family:var(--ss);font-size:11px;font-weight:600;white-space:nowrap;color:var(--link)}
+.tr-sig::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.tr>details[open]>summary .tr-sig::after{transform:translateY(2px) rotate(-135deg)}
+.tr-body{padding:8px 12px 22px 90px}
+.tr-sum{max-width:820px;font-family:var(--sf);font-size:14.5px;line-height:1.55;color:var(--ink)}
+.tr-note{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.tr-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px 36px;margin-top:14px}
+.tr-k{margin:18px 0 8px;font-family:var(--ss);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tr-main>.tr-k:first-child,.tr-side>.tr-k:first-child{margin-top:0}
+.tev{list-style:none;display:flex;flex-direction:column;gap:14px}
+.tev li{padding-left:12px;border-left:3px solid var(--t-eq)}
+.tev li.tev-esq{border-left-color:var(--t-em)}
+.tev li.tev-dir{border-left-color:var(--t-dm)}
+.tev-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tev-d{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.tev blockquote{margin:5px 0 0;font-family:var(--sf);font-size:14px;font-style:italic;line-height:1.5;color:var(--ink)}
+.tev blockquote::before{content:"\201C"}
+.tev blockquote::after{content:"\201D"}
+.tev-x{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--body)}
+.tev-a{margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.45;color:var(--muted)}
+.tev-more{margin-top:12px}
+.tev-more>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.tev-more>summary:hover{text-decoration:underline}
+.tev-more>.tev{margin-top:12px}
+.tct{list-style:none;max-width:560px}
+.tct li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 44px;gap:10px;align-items:center;padding:3px 0;font-family:var(--ss);font-size:12px;color:var(--ink)}
+.tct-p{position:relative;height:10px}
+.tct-z{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--rule)}
+.tct-b{position:absolute;top:1px;bottom:1px}
+.tct-b.esq{right:50%;border-radius:4px 0 0 4px;background:var(--t-em)}
+.tct-b.dir{left:50%;border-radius:0 4px 4px 0;background:var(--t-dm)}
+.tct-b.eq{left:calc(50% - 1px);width:3px!important;background:var(--t-eq)}
+.tct-v{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tfr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.tfr dt{font-family:var(--ss);font-size:10.5px;font-weight:700;color:var(--muted)}
+.tfr dd{margin-top:2px;font-family:var(--ss);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.tr-inv{padding:10px 12px;border-radius:6px;background:var(--tm-hl);font-family:var(--sf);font-size:13.5px;line-height:1.55;color:var(--ink)}
+.tck{list-style:none;display:flex;flex-direction:column;gap:6px}
+.tck li{display:flex;align-items:flex-start;gap:8px;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tck i{position:relative;flex:0 0 16px;height:16px;margin-top:1px;border-radius:50%}
+.tck-sim i{background:var(--tm-bar)}
+.tck-sim i::after{content:"";position:absolute;left:5.5px;top:2.5px;width:3.5px;height:7.5px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.tck-nao{color:var(--muted)}
+.tck-nao i{border:1.5px solid var(--muted)}
+.tck-nao i::before,.tck-nao i::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.5px;margin:-.75px 0 0 -4px;background:var(--muted);transform:rotate(45deg)}
+.tck-nao i::after{transform:rotate(-45deg)}
+.tck-nao_se_aplica{color:var(--faint)}
+.tck-nao_se_aplica i{border:1.5px solid var(--rl)}
+.tck-nao_se_aplica i::after{content:"";position:absolute;left:3.5px;right:3.5px;top:50%;height:1.5px;margin-top:-.75px;background:var(--faint)}
+.tfo{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tfo li{display:flex;flex-direction:column;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tfo-m{font-size:11px;color:var(--muted)}
+.tfi{list-style:none;display:flex;flex-direction:column;gap:4px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
+.tr-go{margin-top:18px;font-family:var(--ss);font-size:12.5px;font-weight:700}
+.tr-go a{color:var(--link)}
+.tr-go a:hover{text-decoration:underline}
+.tm-more{display:block;height:36px;margin:16px auto 0;padding:0 22px;border:1px solid var(--rule);border-radius:18px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer;transition:border-color .2s}
+.tm-more:hover{border-color:var(--link)}
+.tm-more[hidden]{display:none}
+.tm-none{padding:18px 12px;font-family:var(--ss);font-size:13px;color:var(--muted)}
+/* Como ler */
+.tm-metodo{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-metodo dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 32px;margin-top:10px}
+.tm-metodo dt{font-family:var(--ss);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink)}
+.tm-metodo dd{margin-top:4px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-note{max-width:900px;margin-top:12px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-det{margin-top:14px}
 .term-det>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--link)}
 .term-det>summary:hover{text-decoration:underline}
-.tg{max-width:900px;margin-top:14px}
-.tg-track{position:relative;height:14px}
-.tg-bands{position:absolute;inset:0;overflow:hidden;border-radius:7px;background:var(--rl)}
-.tg-f{position:absolute;top:0;bottom:0;opacity:.38;border-right:2px solid var(--paper)}
-.tg-f:last-child{border-right:none}
-.tg-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--rule)}
-.tg-ic{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--ink);opacity:.28}
-.tg-dot{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid var(--paper);border-radius:50%;background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
-.tg-axis{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mn);font-size:9px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint)}
-.td{max-width:900px;margin-top:16px}
-.td-bar{display:flex;gap:2px;height:10px;overflow:hidden;border-radius:5px;background:var(--rl)}
-.td-bar span{display:block;height:100%;min-width:4px}
-.td-leg{list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:7px;font-family:var(--ss);font-size:11.5px;color:var(--muted)}
-.td-leg i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;vertical-align:-1px}
-.td-leg b{font-family:var(--mn);font-weight:600;color:var(--ink)}
-.ta-list{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin-top:8px}
-.ta{padding:14px 0;border-bottom:1px solid var(--rl)}
-.ta-hd{display:flex;gap:12px;align-items:flex-start}
-.ta-v{flex:0 0 auto;min-width:48px;padding:3px 0;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
-.ta-tx{min-width:0}
-.ta-src{font-family:var(--ss);font-size:11px;line-height:1.4;color:var(--muted)}
-.ta-src b{color:var(--ink)}
-.ta-t{margin-top:2px;font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
-.ta-t a:hover{color:var(--link);text-decoration:underline}
-.ta-scale{position:relative;height:4px;margin:10px 0 2px;border-radius:2px;background:var(--rl)}
-.ta-scale .tg-zero{top:-3px;bottom:-3px}
-.ta-dot{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border:2px solid var(--paper);border-radius:50%}
-.ta-r{margin-top:8px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
-.ta-r b{color:var(--ink)}
-.ta-sum{margin-top:4px;font-family:var(--sf);font-size:13.5px;line-height:1.5;color:var(--body)}
-.ta-ev{margin-top:6px}
-.ta-ev summary{cursor:pointer;font-family:var(--ss);font-size:11px;font-weight:700;color:var(--link)}
-.ta-ev ol{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:8px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
-.ta-ev b{color:var(--ink)}
-.ta-dir{margin-left:6px;font-family:var(--mn);font-size:10px;color:var(--mute2)}
-.ta-ev q{display:block;margin-top:2px;font-family:var(--sf);font-style:italic;color:var(--ink)}
-.ta-ex{display:block;margin-top:2px;color:var(--muted)}
+/* Uma análise por linha (todas as análises, na aba Analítico Político) */
+.ta-v{flex:0 0 auto;min-width:48px;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
 .tl-list{list-style:none;margin-top:8px}
-.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
+.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:8px 8px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
 .tl .ta-v{min-width:0;padding:0;font-size:12.5px}
 .tl-d{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
 .tl-tx b{color:var(--ink)}
@@ -500,9 +719,11 @@ body.modal-open .btt{visibility:hidden}
 .tl.tl-lk:hover .tl-tx a{color:var(--link);text-decoration:underline}
 .tl.tl-lk:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:-2px}
 .tl-go{font-weight:700;color:var(--link)}
+.tl-fora{margin-top:12px}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
+.an .tm-panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));max-width:1240px}
 .an-h{margin-bottom:10px;font-family:var(--ss);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--head)}
 .an-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 .an-tiles li,.an-reads li{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:3px solid var(--qi);background:var(--soft)}
@@ -517,12 +738,34 @@ body.modal-open .btt{visibility:hidden}
 .an-reads .rd-est,.an-reads .rd-melhor{border-left-color:var(--t-eq)}
 .an-reads .rd-pior{border-left-color:var(--qr)}
 .an-reads .rd-ins{border-left-color:var(--rule)}
+/* Nesta página (atalhos) e Em resumo (o termômetro em linguagem clara) */
+.an-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:12px;font-family:var(--ss);font-size:12.5px}
+.an-nav span{font-family:var(--mn);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint)}
+.an-nav a{font-weight:600;color:var(--link)}
+.an-nav a:hover{text-decoration:underline}
+.an-res-t{max-width:980px;font-family:var(--sf);font-size:20px;font-weight:700;line-height:1.35;color:var(--ink)}
+.an-res-l{list-style:none;max-width:980px;margin-top:10px;padding:12px 16px;border-left:3px solid var(--qc);background:var(--soft)}
+.an-res-l li{position:relative;padding-left:16px;font-family:var(--sf);font-size:15px;line-height:1.55;color:var(--ink)}
+.an-res-l li+li{margin-top:6px}
+.an-res-l li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--qc)}
+.an-res-mais{margin-top:10px;font-family:var(--ss);font-size:12.5px}
+.an-res-mais a{font-weight:700;color:var(--link)}
+.an-res-mais a:hover{text-decoration:underline}
+.an-crit{list-style:none}
+.an-crit li{display:grid;grid-template-columns:minmax(120px,190px) minmax(60px,1fr) minmax(120px,auto);align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.an-cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-cb{display:flex;height:8px;border-radius:4px;background:var(--rl);overflow:hidden}
+.an-cb i{display:block;height:100%}
+.an-cb .neu{background:var(--qi)}
+:root[data-theme="dark"] .an-cb .neu{background:var(--link)}
+.an-cv{font-family:var(--mn);font-size:11px;color:var(--muted);white-space:nowrap;text-align:right}
+.an-cv b{color:var(--ink);font-weight:600}
 .an-pux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
 .an-tbl-wrap{overflow-x:auto}
 .an-tbl{width:100%;border-collapse:collapse;font-family:var(--ss);font-size:12.5px;color:var(--body)}
 .an-tbl caption{margin-bottom:6px;text-align:left;font-size:11px;font-weight:700;color:var(--muted)}
 .an-tbl th,.an-tbl td{padding:7px 10px 7px 0;border-bottom:1px solid var(--rl);text-align:right;white-space:nowrap}
-.an-tbl th:first-child,.an-tbl td.an-l{text-align:left}
+.an-tbl th:first-child,.an-tbl td.an-l,.an-tbl th.an-l{text-align:left}
 .an-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
 .an-tbl tbody th{font-weight:700;color:var(--ink)}
 .an-tbl td{font-family:var(--mn);font-size:11.5px}
@@ -570,15 +813,57 @@ body.modal-open .btt{visibility:hidden}
 .qb-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--rl)}
 .qb-bar span{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--qi)}
 :root[data-theme="dark"] .qb-bar span{background:var(--link)}
+@media (max-width:1100px){
+  .tr-hd,.tr>details>summary{grid-template-columns:56px minmax(0,1fr) 104px 124px 64px 70px;gap:12px}
+  .tr-body{padding-left:80px}
+}
+@media (max-width:860px){
+  .tm-placar{grid-template-columns:1fr;gap:14px}
+  .tm-hero{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center}
+  .tm-hero .tm-k{grid-column:1/-1}
+  .tm-n{grid-column:1;grid-row:2/span 3;margin-top:6px}
+  .tm-r,.tm-ic,.tm-b{grid-column:2}
+  .tm-r{margin-top:6px}
+  .tm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tm-kpis li:nth-child(odd){padding-left:0;border-left:none}
+  .tm-kpis li:nth-child(n+3){border-top:1px solid var(--rl)}
+}
 @media (max-width:760px){
   .term,.an{padding:18px 16px 24px}
-  .term-sum{font-size:15.5px}
-  .ta-list,.an-reads,.an-pux{grid-template-columns:1fr}
+  .tm-dek{font-size:15px}
+  .tm-placar{padding:16px 16px 14px}
+  .tm-n{font-size:54px}
+  .tm-kpis li{padding:12px 12px 12px 0}
+  .tm-kpis li+li{padding-left:12px}
+  .tm-kv{font-size:24px}
+  .tg-ticks .mn,.tg-zones,.tg-rug-k{display:none}
+  .tm-metodo dl{grid-template-columns:1fr}
+  .trc-i,.trc-axis{grid-template-columns:minmax(0,104px) minmax(0,1fr) 88px;gap:10px}
+  .trc-x{display:block}
+  .tr-hd{display:none}
+  .tr>details>summary{grid-template-columns:48px minmax(0,1fr) auto;gap:8px 10px;padding:12px 4px}
+  .tr-t{grid-column:1;grid-row:1/4;align-self:start;gap:7px;font-size:15px}
+  .tr-tx{grid-column:2/4;grid-row:1}
+  .tr-sc{grid-column:2;grid-row:2}
+  .tr-sig{grid-column:3;grid-row:2}
+  .tr-r{grid-column:2;grid-row:3;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+  .tr-q{grid-column:3;grid-row:3;flex-direction:row;align-items:baseline;gap:4px;justify-self:end}
+  .tr-body{padding:6px 4px 18px}
+  .tr-grid,.tfr{grid-template-columns:1fr}
+  .tm-fil{gap:8px 10px}
+  .tm-sel{flex:1 1 140px}
+  .tm-sel select{width:100%;max-width:none}
+  .tm-shown{width:100%;margin-left:0;padding-bottom:0}
+  .an-reads,.an-pux{grid-template-columns:1fr}
   .tl{grid-template-columns:52px minmax(0,1fr);gap:2px 10px}
   .tl-tx{grid-column:2;grid-row:1}
   .tl-d{grid-column:1;grid-row:2}
   .tl-r{grid-column:2;grid-row:2;white-space:normal}
-  .an-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .an-res-t{font-size:17.5px}
+  .an-res-l{padding:10px 12px}
+  .an-res-l li{font-size:14px}
+  .an-crit li{grid-template-columns:minmax(0,1fr) auto;gap:2px 10px}
+  .an-cb{grid-column:1/-1;grid-row:2}
   .rk-i,.qb li,.rk-axis{grid-template-columns:34% minmax(0,1fr);gap:4px 10px}
   .rk-v{grid-column:1/-1}
   .rk-axis .rk-v{display:none}
@@ -803,6 +1088,13 @@ body.modal-open .btt{visibility:hidden}
   .cmp-i{position:relative;display:grid;grid-row:span 7;grid-template-rows:subgrid;align-content:start;padding:14px 0 16px;border-bottom:none;border-top:1px solid var(--rl)}
   .cmp-i:nth-child(-n+3){border-top:none}
   .cmp-i:not(:nth-child(3n+1))::before{content:"";position:absolute;left:-20px;top:14px;bottom:16px;width:1px;background:var(--rl)}
+  .cmp .tabs-bar{padding-left:0;background:transparent;border:none;border-bottom:1px solid var(--rl)}
+  .cmp .tab-btn{margin-bottom:0;padding:13px 12px 10px;border-bottom-width:2px}
+  .cmp .tab-btn:first-child{padding-left:0}
+  .cmp .tab-btn:hover,.cmp .tab-btn[aria-selected="true"]{background:transparent}
+  .cmp .tab-btn[aria-selected="true"]{border-bottom-width:4px;padding-bottom:8px}
+  .cmp .tabs-arrow.prev{background:linear-gradient(90deg,var(--paper) 55%,transparent)}
+  .cmp .tabs-arrow.next{background:linear-gradient(270deg,var(--paper) 55%,transparent)}
   .cmp-i>.cov.full{display:contents}
   .cmp-i>.cat{grid-row:1}
   .cmp-i>h3{grid-row:2;margin-bottom:8px;font-size:16px;line-height:1.28}
@@ -972,6 +1264,9 @@ body.modal-open .btt{visibility:hidden}
   .mast{padding-top:52px}
 }
 @media (max-width:760px){
+  .cmp-tabs{margin-left:-16px;margin-right:-16px}
+  .cmp-tabs .cmp-panes{padding:0 16px}
+  .cmp-gh{font-size:16px}
   .mast{padding:52px 16px 18px}
   .mast h1{font-size:36px}
   .mast h1.logo svg{height:92px}
@@ -1270,6 +1565,63 @@ body.modal-open .btt{visibility:hidden}
 .nm-go{flex-shrink:0;height:40px;padding:0 20px;border:none;border-radius:22px;background:var(--qi);font-family:var(--ss);font-size:13px;font-weight:700;color:#fff;cursor:pointer}
 .nm-go:hover{background:var(--qn)}
 :root[data-theme="dark"] .nm-go:hover{background:var(--link);color:#0b0f17}
+/* Tom das manchetes (desfavorável × favorável): barra divergente de −100 a +100 */
+:root{--tom-neg:#B42318;--tom-pos:#1F7A4D}
+:root[data-theme="dark"]{--tom-neg:#FF8A7A;--tom-pos:#6FD39C}
+.tom-bar{position:relative;display:inline-block;width:56px;height:8px;margin-right:8px;border-radius:4px;background:var(--rl);vertical-align:0;overflow:hidden}
+.tom-bar::after{content:"";position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:var(--faint)}
+.tom-bar i{position:absolute;top:0;bottom:0;display:block}
+.tom-bar i.neg{background:var(--tom-neg)}
+.tom-bar i.pos{background:var(--tom-pos)}
+.tom-neg{color:var(--tom-neg)}
+.tom-pos{color:var(--tom-pos)}
+.tom-est{color:var(--ink)}
+.nm-tom{min-width:96px}
+.md-tiles b .tom-bar{vertical-align:4px}
+.md-sem{list-style:none;max-width:560px}
+.md-sem li{display:grid;grid-template-columns:110px auto 48px minmax(0,1fr);align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12px;color:var(--body)}
+.md-sem .tom-bar{width:120px}
+.md-sw{font-family:var(--mn);font-size:11px;color:var(--muted)}
+.md-sem b{font-family:var(--mn);font-size:12px;font-weight:600}
+.md-sem small{font-size:11px;color:var(--faint)}
+.nm-tom a{color:inherit;font-weight:600}
+.nm-tom a:hover span{text-decoration:underline}
+/* Quem fala de quem, e como (Analítico Político) */
+.qf-n{margin-top:10px;border:1px solid var(--rl);border-radius:6px;background:var(--paper)}
+.qf-n[open]{border-color:var(--rule)}
+.qf-n>summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding:10px 14px;cursor:pointer;list-style-position:inside}
+.qf-n>summary::marker{color:var(--link)}
+.qf-nome{font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.qf-res{font-family:var(--ss);font-size:12px;color:var(--muted)}
+.qf-res b{font-family:var(--mn);font-size:12px;font-weight:600}
+.qf-c{color:var(--tom-neg);font-weight:600}
+.qf-f{color:var(--tom-pos);font-weight:600}
+.qf-n>:not(summary){margin-left:14px;margin-right:14px}
+.qf-lei{list-style:none;max-width:980px;margin-top:2px;margin-bottom:12px;padding:10px 14px;border-left:3px solid var(--qc);background:var(--soft)}
+.qf-lei li{position:relative;padding-left:14px;font-family:var(--sf);font-size:14.5px;line-height:1.5;color:var(--ink)}
+.qf-lei li+li{margin-top:5px}
+.qf-lei li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--qc)}
+.qf-tbl tbody th{white-space:normal;min-width:170px}
+.qf-as{display:block;max-width:340px;margin-top:2px;font-weight:400;font-size:11px;line-height:1.35;color:var(--faint)}
+.qf-pr{display:block;font-size:9.5px;color:var(--faint)}
+.qf-tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;vertical-align:1px}
+.qf-tag.qf-neg{background:color-mix(in srgb,var(--tom-neg) 14%,transparent);color:var(--tom-neg)}
+.qf-tag.qf-pos{background:color-mix(in srgb,var(--tom-pos) 14%,transparent);color:var(--tom-pos)}
+.qf-sd{min-width:130px}
+.qf-sd small{font-size:10px;color:var(--faint)}
+.qf-pd{max-width:220px;white-space:normal!important;text-align:left!important;font-family:var(--ss)!important;font-size:11px!important;line-height:1.35;color:var(--muted)}
+.qf-ex{list-style:none;margin-top:12px}
+.qf-ex li{display:flex;flex-direction:column;gap:2px;padding:7px 0 7px 12px;border-left:3px solid var(--rl)}
+.qf-ex li.qf-neg{border-left-color:var(--tom-neg)}
+.qf-ex li.qf-pos{border-left-color:var(--tom-pos)}
+.qf-ex li+li{margin-top:6px}
+.qf-et{font-family:var(--mn);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
+.qf-ex a{font-family:var(--sf);font-size:14.5px;font-weight:700;line-height:1.35;color:var(--ink)}
+.qf-ex a:hover{color:var(--link);text-decoration:underline}
+.qf-ex small{font-family:var(--ss);font-size:11px;color:var(--faint)}
+.qf-mais{margin-top:10px;margin-bottom:12px;font-family:var(--ss);font-size:12.5px}
+.qf-mais a{font-weight:700;color:var(--link)}
+.qf-mais a:hover{text-decoration:underline}
 @media (max-width:1023.98px){
   .md-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
@@ -1292,7 +1644,20 @@ body.modal-open .btt{visibility:hidden}
   .md-ix i{width:32px;margin-right:6px}
   .nm-tbl td.nm-n{min-width:0}
   .nm-bar,.nm-dv{width:28px;margin-right:6px}
-  .nm-tbl th:nth-child(5),.nm-tbl td:nth-child(5),.nm-tbl th:nth-child(6),.nm-tbl td:nth-child(6){display:none}
+  .nm-tbl th:nth-child(6),.nm-tbl td:nth-child(6),.nm-tbl th:nth-child(7),.nm-tbl td:nth-child(7){display:none}
+  .tom-bar{width:30px;margin-right:5px}
+  .nm-tom{min-width:0}
+  .qf-n>summary{padding:10px 12px}
+  .qf-n>:not(summary){margin-left:10px;margin-right:10px}
+  .qf-nome{font-size:16px}
+  .qf-lei li{font-size:14px}
+  .qf-tbl tbody th{min-width:120px}
+  .qf-as{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .qf-tbl th:nth-child(3),.qf-tbl td:nth-child(3),.qf-tbl th:nth-child(5),.qf-tbl td:nth-child(5),.qf-tbl th:nth-child(7),.qf-tbl td:nth-child(7),.qf-tbl th:nth-child(8),.qf-tbl td:nth-child(8){display:none}
+  .qf-sd{min-width:0}
+  .md-sem li{grid-template-columns:90px auto 40px}
+  .md-sem small{display:none}
+  .md-sem .tom-bar{width:80px}
 }</style>
 </head>
 <body>
@@ -1381,7 +1746,7 @@ body.modal-open .btt{visibility:hidden}
   </div>
   <noscript><p class="pq-intro">A pesquisa roda no próprio navegador e precisa do JavaScript ligado.</p></noscript>
 </section>
-<script type="application/json" id="pqDados">{"v":1,"base":"../data/busca/","analitico":"analitico.html","dias":[{"d":"2026-11-09","l":"Segunda-feira, 9 de novembro de 2026","t":true,"n":[24,1106,56,12]},{"d":"2026-11-08","l":"Domingo, 8 de novembro de 2026","t":true,"n":[20,957,49,20]},{"d":"2026-11-07","l":"Sábado, 7 de novembro de 2026","t":true,"n":[24,1401,67,20]},{"d":"2026-11-06","l":"Sexta-feira, 6 de novembro de 2026","t":true,"n":[12,1677,64,20]},{"d":"2026-11-05","l":"Quinta-feira, 5 de novembro de 2026","t":true,"n":[12,1738,80,32]},{"d":"2026-11-04","l":"Quarta-feira, 4 de novembro de 2026","t":true,"n":[24,1627,44,20]},{"d":"2026-11-03","l":"Terça-feira, 3 de novembro de 2026","t":true,"n":[11,1322,11,20]},{"d":"2026-11-02","l":"Segunda-feira, 2 de novembro de 2026","t":true,"n":[24,992,41,20]},{"d":"2026-11-01","l":"Domingo, 1 de novembro de 2026","t":true,"n":[24,1007,47,16]},{"d":"2026-10-31","l":"Sábado, 31 de outubro de 2026","t":true,"n":[13,1480,48,20]},{"d":"2026-10-30","l":"Sexta-feira, 30 de outubro de 2026","t":true,"n":[24,1738,80,16]},{"d":"2026-10-29","l":"Quinta-feira, 29 de outubro de 2026","t":true,"n":[24,1747,65,16]},{"d":"2026-10-28","l":"Quarta-feira, 28 de outubro de 2026","t":true,"n":[24,1676,70,12]},{"d":"2026-10-27","l":"Terça-feira, 27 de outubro de 2026","t":true,"n":[12,1706,50,20]},{"d":"2026-10-26","l":"Segunda-feira, 26 de outubro de 2026","t":true,"n":[9,1345,9,20]},{"d":"2026-10-25","l":"Domingo, 25 de outubro de 2026","t":true,"n":[21,1194,44,20]},{"d":"2026-10-24","l":"Sábado, 24 de outubro de 2026","t":true,"n":[24,1568,75,20]},{"d":"2026-10-23","l":"Sexta-feira, 23 de outubro de 2026","t":true,"n":[24,1671,73,20]},{"d":"2026-10-22","l":"Quinta-feira, 22 de outubro de 2026","t":true,"n":[14,1693,79,20]},{"d":"2026-10-21","l":"Quarta-feira, 21 de outubro de 2026","t":true,"n":[14,1640,71,20]},{"d":"2026-10-20","l":"Terça-feira, 20 de outubro de 2026","t":true,"n":[24,1581,71,20]},{"d":"2026-10-19","l":"Segunda-feira, 19 de outubro de 2026","t":true,"n":[24,1059,47,20]},{"d":"2026-10-18","l":"Domingo, 18 de outubro de 2026","t":true,"n":[24,942,47,20]},{"d":"2026-10-17","l":"Sábado, 17 de outubro de 2026","t":true,"n":[24,1429,72,20]},{"d":"2026-10-16","l":"Sexta-feira, 16 de outubro de 2026","t":true,"n":[22,1368,63,20]},{"d":"2026-10-15","l":"Quinta-feira, 15 de outubro de 2026","t":true,"n":[24,1775,73,20]},{"d":"2026-10-14","l":"Quarta-feira, 14 de outubro de 2026","t":true,"n":[24,1790,80,20]},{"d":"2026-10-13","l":"Terça-feira, 13 de outubro de 2026","t":true,"n":[24,1282,0,0]},{"d":"2026-10-12","l":"Segunda-feira, 12 de outubro de 2026","t":true,"n":[24,1011,0,0]},{"d":"2026-10-11","l":"Domingo, 11 de outubro de 2026","t":true,"n":[24,969,0,0]},{"d":"2026-10-10","l":"Sábado, 10 de outubro de 2026","t":true,"n":[24,1521,0,0]},{"d":"2026-10-09","l":"Sexta-feira, 9 de outubro de 2026","t":true,"n":[24,1758,0,0]},{"d":"2026-10-08","l":"Quinta-feira, 8 de outubro de 2026","t":true,"n":[24,1785,0,0]},{"d":"2026-10-07","l":"Quarta-feira, 7 de outubro de 2026","t":true,"n":[24,1781,0,0]},{"d":"2026-10-06","l":"Terça-feira, 6 de outubro de 2026","t":true,"n":[24,1721,0,0]},{"d":"2026-10-05","l":"Segunda-feira, 5 de outubro de 2026","t":true,"n":[24,1512,0,0]},{"d":"2026-10-04","l":"Domingo, 4 de outubro de 2026","t":true,"n":[24,1211,0,0]},{"d":"2026-10-03","l":"Sábado, 3 de outubro de 2026","t":true,"n":[24,1567,0,0]},{"d":"2026-10-02","l":"Sexta-feira, 2 de outubro de 2026","t":true,"n":[24,1810,0,0]},{"d":"2026-10-01","l":"Quinta-feira, 1 de outubro de 2026","t":true,"n":[24,1829,0,0]},{"d":"2026-09-30","l":"Quarta-feira, 30 de setembro de 2026","t":true,"n":[24,1806,0,0]},{"d":"2026-09-29","l":"Terça-feira, 29 de setembro de 2026","t":false,"n":[24,0,0,0]}],"secoes":[["brasil","Brasil · Economia","#1B2745"],["mercados","Mercados & Finanças","#2E6BD6"],["juridico","Jurídico & Regulação","#394A7A"],["politica","Política","#C90055"],["mundo","Geopolítica & Mundo","#0F7C8C"],["tecnologia","Tecnologia & Negócios","#C2410C"],["imobiliario","Imobiliário","#6B3FA0"],["esporte","Esporte","#B45309"],["natureza","Natureza & Meio Ambiente","#2F7D32"],["variedades","Cultura & Variedades","#4B5563"]],"tipos":[["m","Matérias"],["n","Todas as notícias"],["c","Cobertura comparada"],["a","Termômetro"]],"classes":{"Esquerda forte":"ef","Esquerda moderada":"em","Leve à esquerda":"el","Equilibrado":"eq","Leve à direita":"dl","Direita moderada":"dm","Direita forte":"df","Misto":"mx"},"faixas":[10,25,50],"exterior":["Al Jazeera","BBC News","BBC Sport","CNBC","ESPN","El País","Financial Times","MarketWatch","Mongabay","South China Morning Post","TechCrunch","The Guardian","The New York Times","The Wall Street Journal"],"fora":["a","abril","acompanhe","agosto","analise","ao","aos","apos","as","assista","ate","com","como","confira","conheca","da","das","de","descubra","dezembro","dia","do","domingo","dos","e","editorial","eis","em","entenda","exclusivo","fake","fato","fevereiro","infografico","ja","janeiro","julho","junho","leia","maio","mais","marco","menos","na","nao","nas","no","nos","novembro","o","onde","opiniao","os","ouca","outubro","para","pela","pelo","por","qual","quando","quarta","que","quem","quinta","sabado","saiba","se","segunda","sem","serie","setembro","sexta","sim","sob","sobre","terca","um","uma","urgente","veja","video","videos"],"calendario":["abril","agosto","dezembro","domingo","fevereiro","janeiro","julho","junho","maio","marco","novembro","outubro","quarta","quinta","sabado","segunda","setembro","sexta","terca"],"foraNomes":["ac","al","am","ap","ba","band","brasil","brasilia","ce","df","es","eua","globo","go","ma","mg","minas gerais","ms","mt","pa","pb","pe","pi","pr","record","rio","rio de janeiro","rj","rn","ro","rr","rs","sao paulo","sbt","sc","se","sp","to","tv","tv globo","us","usa"]}</script>
+<script type="application/json" id="pqDados">{"v":1,"base":"../data/busca/","analitico":"analitico.html","dias":[{"d":"2026-11-09","l":"Segunda-feira, 9 de novembro de 2026","t":true,"n":[24,1106,56,12]},{"d":"2026-11-08","l":"Domingo, 8 de novembro de 2026","t":true,"n":[20,957,49,20]},{"d":"2026-11-07","l":"Sábado, 7 de novembro de 2026","t":true,"n":[24,1401,67,20]},{"d":"2026-11-06","l":"Sexta-feira, 6 de novembro de 2026","t":true,"n":[12,1677,64,20]},{"d":"2026-11-05","l":"Quinta-feira, 5 de novembro de 2026","t":true,"n":[12,1738,80,32]},{"d":"2026-11-04","l":"Quarta-feira, 4 de novembro de 2026","t":true,"n":[24,1627,44,20]},{"d":"2026-11-03","l":"Terça-feira, 3 de novembro de 2026","t":true,"n":[11,1322,11,20]},{"d":"2026-11-02","l":"Segunda-feira, 2 de novembro de 2026","t":true,"n":[24,992,41,20]},{"d":"2026-11-01","l":"Domingo, 1 de novembro de 2026","t":true,"n":[24,1007,47,16]},{"d":"2026-10-31","l":"Sábado, 31 de outubro de 2026","t":true,"n":[13,1480,48,20]},{"d":"2026-10-30","l":"Sexta-feira, 30 de outubro de 2026","t":true,"n":[24,1738,80,16]},{"d":"2026-10-29","l":"Quinta-feira, 29 de outubro de 2026","t":true,"n":[24,1747,65,16]},{"d":"2026-10-28","l":"Quarta-feira, 28 de outubro de 2026","t":true,"n":[24,1676,70,12]},{"d":"2026-10-27","l":"Terça-feira, 27 de outubro de 2026","t":true,"n":[12,1706,50,20]},{"d":"2026-10-26","l":"Segunda-feira, 26 de outubro de 2026","t":true,"n":[9,1345,9,20]},{"d":"2026-10-25","l":"Domingo, 25 de outubro de 2026","t":true,"n":[21,1194,44,20]},{"d":"2026-10-24","l":"Sábado, 24 de outubro de 2026","t":true,"n":[24,1568,75,20]},{"d":"2026-10-23","l":"Sexta-feira, 23 de outubro de 2026","t":true,"n":[24,1671,73,20]},{"d":"2026-10-22","l":"Quinta-feira, 22 de outubro de 2026","t":true,"n":[14,1693,79,20]},{"d":"2026-10-21","l":"Quarta-feira, 21 de outubro de 2026","t":true,"n":[14,1640,71,20]},{"d":"2026-10-20","l":"Terça-feira, 20 de outubro de 2026","t":true,"n":[24,1581,71,20]},{"d":"2026-10-19","l":"Segunda-feira, 19 de outubro de 2026","t":true,"n":[24,1059,47,20]},{"d":"2026-10-18","l":"Domingo, 18 de outubro de 2026","t":true,"n":[24,942,47,20]},{"d":"2026-10-17","l":"Sábado, 17 de outubro de 2026","t":true,"n":[24,1429,72,20]},{"d":"2026-10-16","l":"Sexta-feira, 16 de outubro de 2026","t":true,"n":[22,1368,63,20]},{"d":"2026-10-15","l":"Quinta-feira, 15 de outubro de 2026","t":true,"n":[24,1775,73,20]},{"d":"2026-10-14","l":"Quarta-feira, 14 de outubro de 2026","t":true,"n":[24,1790,80,20]},{"d":"2026-10-13","l":"Terça-feira, 13 de outubro de 2026","t":true,"n":[24,1282,0,0]},{"d":"2026-10-12","l":"Segunda-feira, 12 de outubro de 2026","t":true,"n":[24,1011,0,0]},{"d":"2026-10-11","l":"Domingo, 11 de outubro de 2026","t":true,"n":[24,969,0,0]},{"d":"2026-10-10","l":"Sábado, 10 de outubro de 2026","t":true,"n":[24,1521,0,0]},{"d":"2026-10-09","l":"Sexta-feira, 9 de outubro de 2026","t":true,"n":[24,1758,0,0]},{"d":"2026-10-08","l":"Quinta-feira, 8 de outubro de 2026","t":true,"n":[24,1785,0,0]},{"d":"2026-10-07","l":"Quarta-feira, 7 de outubro de 2026","t":true,"n":[24,1781,0,0]},{"d":"2026-10-06","l":"Terça-feira, 6 de outubro de 2026","t":true,"n":[24,1721,0,0]},{"d":"2026-10-05","l":"Segunda-feira, 5 de outubro de 2026","t":true,"n":[24,1512,0,0]},{"d":"2026-10-04","l":"Domingo, 4 de outubro de 2026","t":true,"n":[24,1211,0,0]},{"d":"2026-10-03","l":"Sábado, 3 de outubro de 2026","t":true,"n":[24,1567,0,0]},{"d":"2026-10-02","l":"Sexta-feira, 2 de outubro de 2026","t":true,"n":[24,1810,0,0]},{"d":"2026-10-01","l":"Quinta-feira, 1 de outubro de 2026","t":true,"n":[24,1829,0,0]},{"d":"2026-09-30","l":"Quarta-feira, 30 de setembro de 2026","t":true,"n":[24,1806,0,0]},{"d":"2026-09-29","l":"Terça-feira, 29 de setembro de 2026","t":false,"n":[24,0,0,0]}],"secoes":[["brasil","Brasil · Economia","#1B2745"],["mercados","Mercados & Finanças","#2E6BD6"],["juridico","Jurídico & Regulação","#394A7A"],["politica","Política","#C90055"],["mundo","Geopolítica & Mundo","#0F7C8C"],["tecnologia","Tecnologia & Negócios","#C2410C"],["imobiliario","Imobiliário","#6B3FA0"],["esporte","Esporte","#B45309"],["natureza","Natureza & Meio Ambiente","#2F7D32"],["variedades","Cultura & Variedades","#4B5563"]],"tipos":[["m","Matérias"],["n","Todas as notícias"],["c","Cobertura comparada"],["a","Termômetro"]],"classes":{"Esquerda forte":"ef","Esquerda moderada":"em","Leve à esquerda":"el","Equilibrado":"eq","Leve à direita":"dl","Direita moderada":"dm","Direita forte":"df","Misto":"mx"},"faixas":[10,25,50],"exterior":["Al Jazeera","BBC News","BBC Sport","CNBC","ESPN","El País","Financial Times","MarketWatch","Mongabay","South China Morning Post","TechCrunch","The Guardian","The New York Times","The Wall Street Journal"],"fora":["a","abril","acompanhe","agosto","analise","ao","aos","apos","as","assista","ate","com","como","confira","conheca","da","das","de","descubra","dezembro","dia","do","domingo","dos","e","editorial","eis","em","entenda","exclusivo","fake","fato","fevereiro","infografico","ja","janeiro","julho","junho","leia","maio","mais","marco","menos","na","nao","nas","no","nos","novembro","o","onde","opiniao","os","ouca","outubro","para","pela","pelo","por","qual","quando","quarta","que","quem","quinta","sabado","saiba","se","segunda","sem","serie","setembro","sexta","sim","sob","sobre","terca","um","uma","urgente","veja","video","videos"],"calendario":["abril","agosto","dezembro","domingo","fevereiro","janeiro","julho","junho","maio","marco","novembro","outubro","quarta","quinta","sabado","segunda","setembro","sexta","terca"],"foraNomes":["ac","al","am","ap","ba","band","brasil","brasilia","ce","df","es","eua","globo","go","ma","mg","minas gerais","ms","mt","pa","pb","pe","pi","pr","record","rio","rio de janeiro","rj","rn","ro","rr","rs","sao paulo","sbt","sc","se","sp","to","tv","tv globo","us","usa"],"tom":{"janela":6,"negadores":["nao","nem","sem"],"neg":{"i":["acusacao","acusacoes","afastamento","alvo","alvos","bloqueio","briga","brigas","caem","cai","caiu","cassacao","condenacao","condenacoes","crime","crimes","crise","crises","criticas","denuncias","erra","erro","erros","errou","fiasco","foge","fuga","fugir","fugiu","golpe","golpes","impeachment","inelegibilidade","inelegiveis","inelegivel","investigacao","investigacoes","medo","mente","mentiu","multa","multas","perda","perdas","perde","perdem","perdeu","pior","piora","piores","piorou","presa","presas","preso","presos","pressao","prisao","prisoes","punicao","queda","quedas","racha","rachas","recua","recuo","recuos","recuou","rejeicao","reprova","reprovacao","reprovam","reu","reus","rombo","teme","temem","temor","vexame"],"c":["abuso","acusad","afastad","afunda","antidemocrat","bloquead","cassad","condenad","constrangiment","corrup","criminos","criticado","denunciad","derrota","derrotad","desaba","desaprov","desgast","despenca","desvio","escandalo","foragid","fracass","fraude","golpista","ilegal","impopular","indiciad","indiciamento","inquerito","investigad","irregular","isolad","mentira","multad","polemic","propina","punid","reprovado","suspeit","vaia","vaiad"],"p":["perde apoio","perdem apoio","perdeu apoio","volta atras"]},"pos":{"i":["absolve","absolveu","absolvicao","apoia","apoiam","apoio","apoios","apoiou","aprova","aprovada","aprovadas","aprovado","aprovados","aprovam","aprovou","arquivamento","avanca","avancam","avanco","avancou","cresce","crescem","cresceu","crescimento","eleita","eleito","eleitos","favorita","favoritismo","favorito","favoritos","ganha","ganham","ganhou","inocencia","lidera","lideram","liderando","liderar","liderou","melhora","melhorou","sobe","sobem","subiu","vence","vencem","vencer","venceu","virada"],"c":["absolvid","conquist","elogi","homenage","inocentad","recupera","reeleit","sucesso","vencedor","vitoria"],"p":["a frente","dispara nas","em alta","na frente"]},"contra":{"i":["acusa","acusam","acusou","ameaca","ameacam","ameacou","ataca","atacam","atacar","atacou","barra","barrou","bloqueia","bloqueou","cassa","cassou","cobra","cobram","cobrou","condena","condenam","condenou","contra","critica","criticam","criticar","criticou","denuncia","denunciam","denunciou","derruba","derrubou","indicia","indiciou","investiga","investigam","investigou","ironiza","ironizou","prende","prendem","prendeu","pressiona","pressionam","pressionou","processa","processam","processou","provoca","provocou","rebate","rebatem","rebateu","rejeita","rejeitou","suspende","suspendeu","xinga","xingou"],"c":[],"p":[]}},"tomP":{"min":20,"minV":10,"z":2.58,"zT":1.96,"minSem":20,"semV":3,"semD":10,"padS":3,"padF":0.75,"barra":50}}</script>
 </main>
 <footer class="ft">
   <p><strong>Triangula</strong> · Pesquisa analítica · 42 edições · 29/09/2026 a 09/11/2026</p>
@@ -1931,7 +2296,102 @@ body.modal-open .btt{visibility:hidden}
     w.setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   });
 
-/* ── Como a mídia cobre o termo (o analítico da busca) ─────────────── */
+function tomCriar(L) {
+    var TOKEN = /[0-9A-Za-zÀ-ÖØ-öø-ÿ]+/g, MARCAS = /[̀-ͯ]/g;
+    function nrm(s) { return String(s || '').normalize('NFD').replace(MARCAS, '').toLowerCase(); }
+    function conjunto(lista) { var o = {}; (lista || []).forEach(function (x) { o[x] = true; }); return o; }
+    function lista(x) { x = x || {}; return { i: conjunto(x.i), c: x.c || [], p: conjunto(x.p) }; }
+    var LS = { neg: lista(L.neg), pos: lista(L.pos), contra: lista(L.contra) };
+    var JANELA = L.janela || 6, NEGADORES = conjunto(L.negadores);
+    function casa(l, p) {
+      if (l.i[p]) return true;
+      for (var i = 0; i < l.c.length; i++) if (p.indexOf(l.c[i]) === 0) return true;
+      return false;
+    }
+    function palavras(t) {
+      var saida = [], m;
+      TOKEN.lastIndex = 0;
+      while ((m = TOKEN.exec(String(t || '')))) saida.push({ o: m[0], n: nrm(m[0]) });
+      return saida;
+    }
+    function sequencia(nome) { return palavras(nome).map(function (p) { return p.n; }); }
+    // Onde a sequência aparece (índices da primeira e da última palavra); "busca": a regra
+    // da Pesquisa (a última palavra casa pelo começo, salvo termo de até 3 letras).
+    function ocorrencias(ns, seq, busca) {
+      var n = seq.length, saida = [];
+      if (!n) return saida;
+      var inteira = !busca || (n === 1 && seq[0].length <= 3);
+      for (var i = 0; i + n <= ns.length; i++) {
+        var ok = true;
+        for (var j = 0; j < n - 1 && ok; j++) ok = ns[i + j] === seq[j];
+        if (ok) ok = inteira ? ns[i + n - 1] === seq[n - 1] : ns[i + n - 1].indexOf(seq[n - 1]) === 0;
+        if (ok) saida.push([i, i + n - 1]);
+      }
+      return saida;
+    }
+    // O tom da manchete para o nome (texto ou lista de termos), com os demais nomes do título.
+    function classificar(titulo, nome, outros) {
+      var ps = palavras(titulo), ns = ps.map(function (p) { return p.n; });
+      var termosN = typeof nome === 'string' ? [nome] : (nome || []);
+      var alvo = {}, ocupadas = {}, ancoras = [], tom = { tom: 'neutro', neg: 0, pos: 0, alvo: false, ataca: false, gatilhos: [] };
+      termosN.forEach(function (t) {
+        ocorrencias(ns, sequencia(t), true).forEach(function (o) {
+          ancoras.push([o[0], o[1], true]);
+          for (var k = o[0]; k <= o[1]; k++) { alvo[k] = true; ocupadas[k] = true; }
+        });
+      });
+      if (!ancoras.length) return tom;
+      (outros || []).forEach(function (t) {
+        ocorrencias(ns, sequencia(t), false).forEach(function (o) {
+          for (var k = o[0]; k <= o[1]; k++) if (alvo[k]) return;  // o mesmo nome (ou um maior): é o analisado
+          ancoras.push([o[0], o[1], false]);
+          for (k = o[0]; k <= o[1]; k++) ocupadas[k] = true;
+        });
+      });
+      ancoras.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1] || (a[2] === b[2] ? 0 : a[2] ? 1 : -1); });
+      function perto(k) {  // o nome mais próximo (empate: o de depois), até JANELA palavras
+        var melhor = null, dist = JANELA + 1;
+        ancoras.forEach(function (x) {
+          var d = x[0] > k ? x[0] - k : k - x[1];
+          if (d < dist || (d === dist && melhor !== null && x[0] > k && k > melhor[1])) { melhor = x; dist = d; }
+        });
+        return melhor;
+      }
+      function antes(k) {
+        var melhor = null;
+        ancoras.forEach(function (x) { if (x[1] < k && k - x[1] <= JANELA && (melhor === null || x[1] > melhor[1])) melhor = x; });
+        return melhor;
+      }
+      function depois(k) {
+        var melhor = null;
+        ancoras.forEach(function (x) { if (x[0] > k && x[0] - k <= JANELA && (melhor === null || x[0] < melhor[0])) melhor = x; });
+        return melhor;
+      }
+      var k = 0;
+      while (k < ns.length) {
+        if (ocupadas[k] || (k > 0 && NEGADORES[ns[k - 1]])) { k++; continue; }
+        var par = k + 1 < ns.length && !ocupadas[k + 1] ? ns[k] + ' ' + ns[k + 1] : '', cat = null, largura = 1;
+        if (par && LS.neg.p[par]) { cat = 'neg'; largura = 2; }
+        else if (par && LS.pos.p[par]) { cat = 'pos'; largura = 2; }
+        else if (casa(LS.contra, ns[k])) cat = 'contra';
+        else if (casa(LS.neg, ns[k])) cat = 'neg';
+        else if (casa(LS.pos, ns[k])) cat = 'pos';
+        var forma = ps.slice(k, k + largura).map(function (p) { return p.o; }).join(' ');
+        if (cat === 'contra') {
+          var a = antes(k), dp = depois(k);
+          if (dp && dp[2]) { tom.alvo = true; tom.neg++; tom.gatilhos.push(forma); }
+          else if (a && a[2]) tom.ataca = true;
+        } else if (cat) {
+          var p = perto(k);
+          if (p && p[2]) { tom[cat]++; tom.gatilhos.push(forma); }
+        }
+        k += largura;
+      }
+      tom.tom = tom.neg > tom.pos ? 'neg' : tom.pos > tom.neg ? 'pos' : tom.neg ? 'misto' : 'neutro';
+      return tom;
+    }
+    return { classificar: classificar };
+  }/* ── Como a mídia cobre o termo (o analítico da busca) ─────────────── */
   var mdEl = $('midia'), mdIr = $('mdIr'), irParaMidia = w.location.hash === '#midia', mdY0 = w.pageYOffset || 0;
   var EXTERIOR = {}, FORA = {}, FORA_NOMES = {}, CALENDARIO = {}, VAZIAS = {};
   (M.exterior || []).forEach(function (n) { EXTERIOR[n] = true; });
@@ -2251,6 +2711,226 @@ body.modal-open .btt{visibility:hidden}
     };
   }
 
+  /* ── tom das manchetes (a mesma conta de tom_do_nome em qijournal/render/midia.py) ── */
+  var TOM = tomCriar(M.tom || {});
+  var TP = M.tomP || { min: 20, minV: 10, z: 2.58, zT: 1.96, minSem: 20, semV: 3, semD: 10, padS: 3, padF: 0.75, barra: 50 };
+  var proprioCache = {};
+  // Nomes próprios do dia (como corpus_do_dia): manchetes de veículos brasileiros de todas as
+  // editorias da edição, a mesma notícia uma vez.
+  function propriosDoDia(dia) {
+    if (proprioCache[dia]) return proprioCache[dia];
+    var vistos = {}, itens = [];
+    (cache[dia] || []).forEach(function (r) {
+      if (r.k !== 'n' || !r.f[0] || !r.t || vistos[r.u]) return;
+      vistos[r.u] = true;
+      if (!EXTERIOR[r.f[0]]) itens.push({ t: r.t, ps: r.ps || (r.ps = palavras(r.t)) });
+    });
+    return (proprioCache[dia] = nomesProprios(itens));
+  }
+  function arred(x) {  // como round() do Python (meio para o par), para os números baterem com o Analítico
+    var f = Math.floor(x);
+    return x - f === 0.5 ? (f % 2 === 0 ? f : f + 1) : Math.round(x);
+  }
+  function saldoTxt(v) {
+    if (v === null || v === undefined) return '—';
+    var r = arred(v);
+    return r < 0 ? '−' + Math.abs(r) : r > 0 ? '+' + r : '0';
+  }
+  function notaDe(t) { return t === 'neg' ? -1 : t === 'pos' ? 1 : 0; }
+  function somaDe(l) { var s = 0; l.forEach(function (x) { s += x; }); return s; }
+  function saldoDe(l) { return l.length ? 100 * somaDe(l) / l.length : null; }
+  function comparar(a, b) {  // z com a variância das duas juntas (comparar() de midia.py)
+    if (!a.length || !b.length) return null;
+    var todas = a.concat(b), media = somaDe(todas) / todas.length, v = 0;
+    todas.forEach(function (x) { v += (x - media) * (x - media); });
+    v = todas.length > 1 ? v / (todas.length - 1) : 0;
+    var erro = Math.sqrt(v * (1 / a.length + 1 / b.length));
+    return erro === 0 ? null : (somaDe(a) / a.length - somaDe(b) / b.length) / erro;
+  }
+  function barraTom(v) {
+    if (v === null || v === undefined) return '<span class="tom-bar" aria-hidden="true"></span>';
+    var x = Math.max(-TP.barra, Math.min(TP.barra, v)) * 50 / TP.barra;
+    var left = x < 0 ? 50 + x : 50, width = Math.abs(x);
+    return '<span class="tom-bar" aria-hidden="true"><i class="' + (v < 0 ? 'neg' : 'pos') + '" style="left:' + left + '%;width:' + width + '%"></i></span>';
+  }
+  function bruto(u) { return u && u.indexOf('https://') === 0 ? u.slice(8) : (u || ''); }
+
+  function tomDoTermo(nots, e, ts, at) {
+    var termosQ = ts.map(function (t) { return t.n; });
+    var itens = [];
+    nots.forEach(function (r) {
+      var o = r.f[0];
+      if (!o || EXTERIOR[o]) return;
+      var ps = r.ps || (r.ps = palavras(r.t));
+      var outros = nomesDoTitulo(r.t, ps, propriosDoDia(r.d));
+      itens.push({ d: r.d, o: o, t: r.t, u: r.u, raw: bruto(r.u), as: r.as ? r.as[0] : '', tom: TOM.classificar(r.t, termosQ, outros) });
+    });
+    // A ordem de midia.py (dia, veículo, link): desempates iguais nos dois lados.
+    itens.sort(function (a, b) { return cmp(a.d, b.d) || cmp(a.o, b.o) || cmp(a.raw, b.raw); });
+    var n = itens.length;
+    if (n < TP.min) return { n: n, falta: true };
+    var notas = itens.map(function (i) { return notaDe(i.tom.tom); });
+    var neg = notas.filter(function (x) { return x < 0; }).length, pos = notas.filter(function (x) { return x > 0; }).length;
+    var saldo = saldoDe(notas);
+    var dias = e.dias.map(function (x) { return x.d; }).sort();
+    var ultimo = dias[dias.length - 1];
+    function semana(d) { return Math.floor((inicioDia(ultimo) - inicioDia(d)) / (7 * 86400000)); }
+    // Tendência do tom: últimas 7 edições × 7 anteriores.
+    var tend = null;
+    if (dias.length >= 2 * MD.semana) {
+      var rec = {}, ant = {};
+      dias.slice(-MD.semana).forEach(function (d) { rec[d] = true; });
+      dias.slice(-2 * MD.semana, -MD.semana).forEach(function (d) { ant[d] = true; });
+      var nr = itens.filter(function (i) { return rec[i.d]; }).map(function (i) { return notaDe(i.tom.tom); });
+      var na = itens.filter(function (i) { return ant[i.d]; }).map(function (i) { return notaDe(i.tom.tom); });
+      if (nr.length >= TP.minSem && na.length >= TP.minSem) {
+        var zt = comparar(nr, na);
+        tend = { sr: saldoDe(nr), sa: saldoDe(na), nr: nr.length, na: na.length,
+          v: zt !== null && zt <= -TP.zT ? 'piorou' : zt !== null && zt >= TP.zT ? 'melhorou' : 'estável' };
+      }
+    }
+    // Semana a semana (o termo todo).
+    var porSemana = {};
+    itens.forEach(function (i) { (porSemana[semana(i.d)] || (porSemana[semana(i.d)] = [])).push(notaDe(i.tom.tom)); });
+    var semanas = Object.keys(porSemana).map(Number).sort(function (a, b) { return a - b; }).slice(0, 6).map(function (w) {
+      var fim = inicioDia(ultimo) - w * 7 * 86400000, ini = fim - 6 * 86400000;
+      var de = isoDe(ini);
+      return { w: w, de: de < dias[0] ? dias[0] : de, ate: isoDe(fim), n: porSemana[w].length, s: saldoDe(porSemana[w]) };
+    });
+    // Por veículo, contra os demais.
+    var por = {}, ordem = [];
+    itens.forEach(function (i) { if (!por[i.o]) { por[i.o] = []; ordem.push(i.o); } por[i.o].push(i); });
+    ordem.sort(function (a, b) { return por[b].length - por[a].length || cmp(norm(a), norm(b)); });
+    var esp = {};
+    (at ? at.veiculos : []).forEach(function (v) { esp[v.o] = v; });
+    var veiculos = ordem.map(function (o) {
+      var meus = por[o], k = meus.length;
+      var minhas = meus.map(function (i) { return notaDe(i.tom.tom); });
+      var outras = itens.filter(function (i) { return i.o !== o; }).map(function (i) { return notaDe(i.tom.tom); });
+      var sv = saldoDe(minhas), so = saldoDe(outras), pequena = k < TP.minV, classe = '', padrao = '';
+      if (!pequena && outras.length) {
+        var z = comparar(minhas, outras);
+        if (z !== null && z <= -TP.z) classe = 'neg';
+        else if (z !== null && z >= TP.z) classe = 'pos';
+        var sv2 = {}, so2 = {};
+        itens.forEach(function (i) { var m = i.o === o ? sv2 : so2, w = semana(i.d); (m[w] || (m[w] = [])).push(notaDe(i.tom.tom)); });
+        var comp = Object.keys(sv2).filter(function (w) { return sv2[w].length >= TP.semV && (so2[w] || []).length >= TP.semD; });
+        if (comp.length >= TP.padS) {
+          var abaixo = 0, acima = 0;
+          comp.forEach(function (w) {
+            var a = somaDe(sv2[w]) / sv2[w].length, b = somaDe(so2[w]) / so2[w].length;
+            if (a < b) abaixo++; else if (a > b) acima++;
+          });
+          if (abaixo >= TP.padF * comp.length) padrao = 'mais negativo que os demais em ' + abaixo + ' de ' + comp.length + ' semanas';
+          else if (acima >= TP.padF * comp.length) padrao = 'mais positivo que os demais em ' + acima + ' de ' + comp.length + ' semanas';
+          else padrao = 'oscila: mais negativo em ' + abaixo + ' e mais positivo em ' + acima + ' de ' + comp.length + ' semanas';
+        }
+      }
+      // O assunto que mais rendeu (empate: o que apareceu primeiro, como Counter.most_common).
+      var cont = {}, prim = [], topo = null;
+      meus.forEach(function (i) { if (i.as) { if (!cont[i.as]) prim.push(i.as); cont[i.as] = (cont[i.as] || 0) + 1; } });
+      prim.forEach(function (a) { if (topo === null || cont[a] > cont[topo]) topo = a; });
+      var ve = esp[o], indice = ve ? ve.i : null, espN = ve ? ve.esp : 0;
+      var excesso = indice !== null && espN > 0 && (k - espN) / Math.sqrt(espN) >= TP.z;
+      var diasV = {};
+      meus.forEach(function (i) { diasV[i.d] = true; });
+      return {
+        o: o, k: k, i: indice, excesso: excesso, presenca: Object.keys(diasV).length, sv: sv, so: so, classe: classe, pequena: pequena,
+        desf: minhas.filter(function (x) { return x < 0; }).length, fav: minhas.filter(function (x) { return x > 0; }).length,
+        alvo: meus.filter(function (i) { return i.tom.alvo; }).length, padrao: padrao,
+        assunto: topo !== null && cont[topo] >= 2 ? topo : '', assuntoN: topo !== null ? cont[topo] : 0
+      };
+    });
+    function forca(i) { return i.tom.neg - i.tom.pos; }
+    function exemplos(tipo) {
+      return itens.filter(function (i) { return i.tom.tom === tipo; }).map(function (i, k) { return { i: i, k: k }; })
+        .sort(function (a, b) {
+          var fa = tipo === 'neg' ? forca(a.i) : -forca(a.i), fb = tipo === 'neg' ? forca(b.i) : -forca(b.i);
+          return fb - fa || cmp(b.i.d, a.i.d) || a.k - b.k;
+        }).slice(0, 3).map(function (x) { return x.i; });
+    }
+    return {
+      n: n, neg: neg, pos: pos, saldo: saldo, tend: tend, semanas: semanas, veiculos: veiculos,
+      alvo: itens.filter(function (i) { return i.tom.alvo; }).length, ataca: itens.filter(function (i) { return i.tom.ataca; }).length,
+      exNeg: exemplos('neg'), exPos: exemplos('pos'), dias: dias.length
+    };
+  }
+
+  function frasesTom(tm) {
+    if (!tm || tm.falta) return [];
+    var fr = [];
+    fr.push('Tom: <b>' + pct(tm.neg, tm.n) + '</b> das ' + plural(tm.n, 'manchete brasileira', 'manchetes brasileiras') + ' põem o termo em contexto desfavorável e <b>' +
+      pct(tm.pos, tm.n) + '</b> em favorável (saldo <b>' + saldoTxt(tm.saldo) + '</b>); é alvo de crítica, acusação ou punição em ' + pct(tm.alvo, tm.n) +
+      ' e age contra alguém em ' + pct(tm.ataca, tm.n) + '.');
+    var acima = tm.veiculos.filter(function (v) { return v.excesso && !v.pequena; })
+      .sort(function (a, b) { return b.i - a.i || b.k - a.k; });
+    if (acima.length) {
+      var m = acima[0];
+      fr.push('Quem mais fala, proporcionalmente: <b>' + esc(m.o) + '</b> (' + plural(m.k, 'manchete', 'manchetes') + ', ' + dec(m.i, 1) + '× o esperado pelo que publica' +
+        (m.assunto ? '), puxado por ' + esc(aspas(m.assunto)) + '.' : ').'));
+    }
+    var crit = tm.veiculos.filter(function (v) { return v.classe === 'neg'; }).sort(function (a, b) { return a.sv - b.sv || b.k - a.k; });
+    var fav = tm.veiculos.filter(function (v) { return v.classe === 'pos'; }).sort(function (a, b) { return b.sv - a.sv || b.k - a.k; });
+    if (crit.length) fr.push('Mais crítico: <b>' + esc(crit[0].o) + '</b> (saldo ' + saldoTxt(crit[0].sv) + ', contra ' + saldoTxt(crit[0].so) + ' nos demais veículos)' + (crit[0].padrao ? '; ' + crit[0].padrao : '') + '.');
+    if (fav.length) fr.push('Mais favorável: <b>' + esc(fav[0].o) + '</b> (saldo ' + saldoTxt(fav[0].sv) + ', contra ' + saldoTxt(fav[0].so) + ' nos demais)' + (fav[0].padrao ? '; ' + fav[0].padrao : '') + '.');
+    if (!crit.length && !fav.length && tm.veiculos.some(function (v) { return !v.pequena; })) fr.push('Nenhum veículo destoa dos demais no tom: as diferenças estão dentro do que o acaso explica.');
+    if (tm.tend && tm.tend.v !== 'estável') {
+      fr.push('O tom <b>' + tm.tend.v + '</b> nas últimas ' + MD.semana + ' edições (saldo ' + saldoTxt(tm.tend.sr) + ' em ' + num(tm.tend.nr) + ' manchetes, contra ' +
+        saldoTxt(tm.tend.sa) + ' em ' + num(tm.tend.na) + ' nas ' + MD.semana + ' anteriores).');
+    }
+    return fr;
+  }
+
+  function blocoTom(tm) {
+    var h = '<div class="md-blk" id="md-tom"><h4>Tom · fala bem ou mal?</h4>';
+    if (!tm || tm.falta) {
+      return h + '<p class="md-note">Para ler o tom, são precisas ' + TP.min + '+ manchetes de veículos brasileiros com o termo' + (tm ? ' (há ' + num(tm.n) + ')' : '') + '.</p></div>';
+    }
+    var cls = tm.saldo <= -10 ? 'neg' : tm.saldo >= 10 ? 'pos' : 'est';
+    h += '<ul class="md-tiles"><li><span>Desfavoráveis</span><b class="tom-neg">' + pct(tm.neg, tm.n) + '</b><small>' + plural(tm.neg, 'manchete', 'manchetes') + ' · ' + pct(tm.alvo, tm.n) + ' como alvo</small></li>' +
+      '<li><span>Favoráveis</span><b class="tom-pos">' + pct(tm.pos, tm.n) + '</b><small>' + plural(tm.pos, 'manchete', 'manchetes') + '</small></li>' +
+      '<li><span>Saldo</span><b class="tom-' + cls + '">' + barraTom(tm.saldo) + saldoTxt(tm.saldo) + '</b><small>favoráveis − desfavoráveis, em ' + num(tm.n) + '</small></li>';
+    if (tm.tend) {
+      var tc = tm.tend.v === 'piorou' ? 'cai' : tm.tend.v === 'melhorou' ? 'sobe' : 'est';
+      h += '<li class="md-' + tc + '"><span>Últimas ' + MD.semana + ' edições</span><b>' + tm.tend.v + '</b><small>saldo ' + saldoTxt(tm.tend.sr) + ' contra ' + saldoTxt(tm.tend.sa) + ' antes</small></li>';
+    } else {
+      h += '<li><span>Neutras ou mistas</span><b>' + pct(tm.n - tm.neg - tm.pos, tm.n) + '</b><small>sem palavra de tom perto do termo</small></li>';
+    }
+    h += '</ul>';
+    if (tm.semanas.length > 1) {
+      h += '<h5>Semana a semana · o tom se repete?</h5><ol class="md-sem">';
+      tm.semanas.forEach(function (w) {
+        h += '<li><span class="md-sw">' + dataCurta(w.de) + '–' + dataCurta(w.ate) + '</span>' + barraTom(w.s) + '<b class="tom-' + (w.s <= -10 ? 'neg' : w.s >= 10 ? 'pos' : 'est') + '">' + saldoTxt(w.s) + '</b><small>' + plural(w.n, 'manchete', 'manchetes') + '</small></li>';
+      });
+      h += '</ol>';
+    }
+    h += '<h5>Veículo a veículo · contra os demais</h5><div class="an-tbl-wrap"><table class="md-tbl qf-tbl"><thead><tr><th scope="col">Veículo · o assunto que mais rendeu</th><th scope="col">Manchetes</th>' +
+      '<th scope="col" title="Manchetes do veículo sobre o termo ÷ as esperadas pelo que ele publica (1× = o esperado)">vs. esperado</th><th scope="col">Desfav.</th><th scope="col">Fav.</th>' +
+      '<th scope="col" title="Favoráveis menos desfavoráveis; entre parênteses, o dos demais veículos">Saldo · demais</th><th scope="col" title="Manchetes em que o termo é alvo de crítica, acusação ou punição">É alvo</th>' +
+      '<th scope="col" title="Semanas com ' + TP.semV + '+ manchetes do veículo: de que lado dos demais ele fica">Padrão semanal</th></tr></thead><tbody>';
+    tm.veiculos.slice(0, MD.topo).forEach(function (v) {
+      var tag = v.classe === 'neg' ? ' <span class="qf-tag qf-neg">mais crítico</span>' : v.classe === 'pos' ? ' <span class="qf-tag qf-pos">mais favorável</span>' : '';
+      var ix = v.i === null ? '—' : dec(v.i, 1) + '×', ixc = v.i === null ? '' : v.i >= 1.5 ? ' md-acima' : v.i <= 0.67 ? ' md-abaixo' : '';
+      h += '<tr' + (v.pequena ? ' class="md-pq" title="Amostra pequena: menos de ' + TP.minV + ' manchetes (sem comparação de tom)"' : '') + '><th scope="row"><button type="button" data-v="' + esc(v.o) + '" title="Filtrar por ' + esc(v.o) + '">' + esc(v.o) + '</button>' + tag +
+        (v.assunto ? '<span class="qf-as">' + esc(v.assunto) + ' (' + v.assuntoN + ')</span>' : '') + '</th>' +
+        '<td>' + num(v.k) + '<span class="qf-pr">' + v.presenca + ' de ' + tm.dias + ' ed.</span></td><td class="md-ix' + ixc + '">' + ix + '</td>' +
+        '<td>' + pct(v.desf, v.k) + '</td><td>' + pct(v.fav, v.k) + '</td>' +
+        '<td class="qf-sd">' + barraTom(v.sv) + '<b class="tom-' + (v.classe || 'est') + '">' + saldoTxt(v.sv) + '</b> <small>(' + saldoTxt(v.so) + ')</small></td>' +
+        '<td>' + pct(v.alvo, v.k) + '</td><td class="qf-pd">' + (v.padrao ? esc(v.padrao) : '—') + '</td></tr>';
+    });
+    h += '</tbody></table></div>';
+    if (tm.veiculos.length > MD.topo) h += '<p class="md-note">E mais ' + plural(tm.veiculos.length - MD.topo, 'veículo', 'veículos') + ' com menos manchetes.</p>';
+    if (tm.exNeg.length || tm.exPos.length) {
+      var ex = function (i, tipo) {
+        return '<li class="qf-' + tipo + '"><span class="qf-et">' + (tipo === 'neg' ? 'Desfavorável' : 'Favorável') + '</span><a href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">' + esc(i.t) +
+          '</a><small>' + esc(i.o) + ' · ' + dataCurta(i.d) + ' · por: ' + esc(i.tom.gatilhos.join(', ')) + '</small></li>';
+      };
+      h += '<div class="md-2c"><section><h5>Manchetes mais desfavoráveis</h5><ul class="qf-ex">' + tm.exNeg.map(function (i) { return ex(i, 'neg'); }).join('') + '</ul></section>' +
+        '<section><h5>Manchetes mais favoráveis</h5><ul class="qf-ex">' + tm.exPos.map(function (i) { return ex(i, 'pos'); }).join('') + '</ul></section></div>';
+    }
+    return h + '</div>';
+  }
+
   /* ── leitura ───────────────────────────────────────────────────────── */
   function tendenciaTexto(t) {
     if (!t || t.v === null) return '';
@@ -2258,7 +2938,7 @@ body.modal-open .btt{visibility:hidden}
     if (t.v >= 1) return 'mais que dobrou (' + dec(t.sr / t.sa, 1) + '×)';
     return (t.v > 0 ? 'subiu ' : 'caiu ') + dec(Math.abs(t.v) * 100, 0) + '%';
   }
-  function sintese(e, at, pz, ld) {
+  function sintese(e, at, pz, ld, tm) {
     var frases = [], termo = esc(aspas(rotulo(e.f.q))), filtrada = e.f.ed || e.f.v;
     if (at) {
       frases.push(termo + ' aparece em <b>' + plural(at.n, 'manchete', 'manchetes') + '</b> de <b>' + plural(at.nveic, 'veículo', 'veículos') +
@@ -2307,6 +2987,7 @@ body.modal-open .btt{visibility:hidden}
           num(t.kr) + ' contra ' + plural(t.ka, 'manchete', 'manchetes') + ').');
       }
     }
+    frasesTom(tm).forEach(function (f) { frases.push(f); });
     if (ld.total) {
       if (ld.debates) {
         var top = ld.itens[0];
@@ -2485,7 +3166,8 @@ body.modal-open .btt{visibility:hidden}
       '<p><b>Pauta:</b> nomes (palavras com inicial maiúscula) e palavras mais frequentes nas manchetes de veículos brasileiros, fora o próprio termo. Os assuntos são os agrupamentos de cada edição.</p>' +
       '<p><b>O que cada veículo enfatiza:</b> vocabulário distintivo — log-odds com prior de Dirichlet informativo (Monroe, Colaresi e Quinn, 2008): palavras que o veículo usa mais que os demais veículos brasileiros nas manchetes sobre o termo, com z &gt; ' + dec(MD.z, 1) + ' (limiar alto porque cada veículo testa muitas palavras de uma vez) e 3+ usos; veículos com ' + MD.voc + '+ manchetes.</p>' +
       '<p><b>Lados:</b> da análise da cobertura feita pela IA em cada edição (o mesmo medidor das matérias): em cada assunto, os dois enfoques e o lado de cada veículo. Um assunto tem dois lados quando há veículos nos dois enfoques; se todos os que tomaram lado ficaram no mesmo, conta como sem divergência. Divergência = 2 × o lado menor ÷ (lado A + lado B), nos assuntos com dois lados: perto de 0 = quase todos de um lado; 100 = meio a meio. “Contra a maioria” = no lado com menos veículos (empates à parte); amostras com menos de ' + MD.pequena + ' assuntos com maioria definida ficam esmaecidas.</p>' +
-      '<p><b>Limites:</b> a busca não sabe se a menção é favorável ou desfavorável; os lados são os enfoques de cada assunto, não “a favor” ou “contra” a pessoa; nomes iguais de pessoas diferentes se somam (“Bolsonaro”).</p></details>';
+      '<p><b>Tom:</b> lido por palavras, sem IA, em cada manchete brasileira com o termo: palavras de contexto desfavorável (escândalo, investigação, derrota, crise, crítica recebida…) ou favorável (vitória, apoio, aprovação, liderança…) contam para o nome mais próximo delas no título (até ' + (M.tom && M.tom.janela || 6) + ' palavras); ações contra alguém (“critica”, “acusa”, “condena”, “investiga”…) põem o nome que vem depois como alvo, e o que vem antes como quem age. A manchete é desfavorável ao termo com mais palavras negativas que positivas, favorável no contrário. Saldo = favoráveis − desfavoráveis, em pontos (−100 a +100; a barra vai de −' + TP.barra + ' a +' + TP.barra + '). “Mais crítico” e “mais favorável”: o veículo difere dos demais além do que o acaso explica (99%; ' + TP.minV + '+ manchetes). Padrão semanal: semanas de 7 dias até a última edição, com ' + TP.semV + '+ manchetes do veículo e ' + TP.semD + '+ dos demais; “padrão” quando ele fica do mesmo lado em 3 de cada 4. São os mesmos números da tabela “Quem fala de quem” do Analítico Político.</p>' +
+      '<p><b>Limites:</b> o tom mede o contexto em que o termo aparece nas manchetes, não a opinião do veículo, e a leitura por palavras erra em parte delas (ironia, negação, o nome errado na frase) — por isso as manchetes de exemplo mostram as palavras que pesaram, e o que diz algo é a comparação entre veículos sobre o mesmo termo. Os lados são os enfoques de cada assunto, não “a favor” ou “contra” a pessoa; nomes iguais de pessoas diferentes se somam (“Bolsonaro”).</p></details>';
   }
 
   function leituraMidia(e, ts) {
@@ -2499,15 +3181,16 @@ body.modal-open .btt{visibility:hidden}
     var pz = nots.length ? pauta(nots, qs) : null;
     var vz = nots.length ? vozes(nots, qs) : null;
     var ld = lados(comps);
+    var tm = nots.length ? tomDoTermo(nots, e, ts, at) : null;
     var dias = e.dias.map(function (x) { return x.d; }).sort();
     var h = '<p class="md-sub">Leitura automática dos resultados: ' + (dias.length ? (dias.length === 1 ? 'edição de ' + dataCurta(dias[0]) : num(dias.length) + ' edições, de ' + dataCurta(dias[0]) + ' a ' + dataCurta(dias[dias.length - 1])) : '') +
       (e.f.ed || e.f.v ? ' · com os filtros de ' + [e.f.ed ? 'editoria' : '', e.f.v ? 'veículo (' + esc(e.f.v) + ')' : ''].filter(Boolean).join(' e ') : '') +
       '. <a href="#md-como">Como ler</a></p>';
-    h += sintese(e, at, pz, ld);
+    h += sintese(e, at, pz, ld, tm);
     if (!nots.length) {
       h += '<p class="md-note">Atenção, pauta e vocabulário usam as notícias coletadas: ' + (e.f.tipos.n ? 'nenhuma manchete casa com a busca.' : 'marque o tipo “Todas as notícias”.') + '</p>';
     } else {
-      h += blocoAtencao(at) + blocoPicos(at) + blocoPauta(pz) + blocoVozes(vz);
+      h += blocoAtencao(at) + blocoTom(tm) + blocoPicos(at) + blocoPauta(pz) + blocoVozes(vz);
     }
     h += blocoLados(ld) + blocoComoLer();
     return h;
@@ -2529,7 +3212,7 @@ body.modal-open .btt{visibility:hidden}
     var titulo = '<h3 class="md-h" id="mdH">Como a mídia cobre ' + termo + '</h3>';
     if (mdIr) {
       mdIr.hidden = false;
-      mdIr.innerHTML = '<a href="#midia">Como a mídia cobre ' + termo + '</a> · atenção, pauta, vocabulário e lados, depois da lista';
+      mdIr.innerHTML = '<a href="#midia">Como a mídia cobre ' + termo + '</a> · atenção, tom, pauta, vocabulário e lados, depois da lista';
     }
     if (!e.fim) {
       mdEl.innerHTML = titulo + '<p class="md-sub">A leitura da cobertura sai quando a busca terminar…</p>';
@@ -3295,6 +3978,48 @@ body.modal-open .btt{visibility:hidden}
     });
   }
 
+  /* ── Cobertura comparada: uma aba por editoria (como as abas das matérias) ── */
+  function setupCompareTabs() {
+    var wrap = d.querySelector('.cmp-tabs');
+    var bar = wrap && wrap.querySelector('.tabs-bar');
+    if (!bar) return;
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll('[role="tab"]'));
+    var panes = Array.prototype.slice.call(wrap.querySelectorAll('.cmp-pane'));
+    function reveal(tab) {
+      var left = tab.offsetLeft, right = left + tab.offsetWidth;
+      if (left < bar.scrollLeft) bar.scrollLeft = left - 16;
+      else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth + 16;
+    }
+    function select(tab, focus) {
+      var key = tab.getAttribute('data-cmp-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      wrap.classList.toggle('all', key === 'all');
+      panes.forEach(function (p) { p.classList.toggle('active', key === 'all' || p.id === 'cmp-pane-' + key); });
+      if (focus) tab.focus();
+      reveal(tab);
+    }
+    setupTabArrows(bar);
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { select(tab, false); });
+    });
+    bar.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(d.activeElement);
+      if (index < 0) return;
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      else if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      select(next, true);
+    });
+  }
+
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -3344,6 +4069,68 @@ body.modal-open .btt{visibility:hidden}
     update();
   }
 
+  /* ── Termômetro do dia: filtros, ordem e "mostrar todos" na lista de textos ──
+     Sem script, a lista aparece inteira na ordem da página (mais inclinados primeiro)
+     e os filtros ficam ocultos. */
+  function setupTermometro() {
+    var list = d.getElementById('tmList'), form = d.getElementById('tmFil');
+    if (!list || !form) return;
+    var more = d.getElementById('tmMore'), none = d.getElementById('tmNone');
+    var shown = form.querySelector('.tm-shown');
+    var rows = Array.prototype.slice.call(list.children);
+    var chips = Array.prototype.slice.call(form.querySelectorAll('.tm-chip'));
+    var selV = form.querySelector('select[name="v"]');
+    var selE = form.querySelector('select[name="e"]');
+    var selO = form.querySelector('select[name="o"]');
+    var visiveis = parseInt(list.getAttribute('data-visiveis'), 10) || 12;
+    var filtro = 'all', todos = false;
+    function num(row, key, vazio) {
+      var v = parseFloat(row.getAttribute('data-' + key));
+      return isNaN(v) ? vazio : v;
+    }
+    function pos(a, b) { return num(a, 'i', 0) - num(b, 'i', 0); }
+    var ordens = {
+      inc: function (a, b) { return Math.abs(num(b, 't', 0)) - Math.abs(num(a, 't', 0)) || num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      lr: function (a, b) { return num(a, 't', 1000) - num(b, 't', 1000) || pos(a, b); },
+      q: function (a, b) { return num(a, 'q', 1000) - num(b, 'q', 1000) || pos(a, b); },
+      sig: function (a, b) { return num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      v: function (a, b) { return (a.getAttribute('data-v') || '').localeCompare(b.getAttribute('data-v') || '', 'pt-BR') || pos(a, b); }
+    };
+    function passa(row) {
+      if (filtro === 'sig' && !(num(row, 's', 0) > 0)) return false;
+      if (filtro === 'inc' && (row.getAttribute('data-t') === '' || row.getAttribute('data-c') === 'eq')) return false;
+      if (filtro === 'op' && row.getAttribute('data-o') !== '1') return false;
+      if (selV.value && row.getAttribute('data-v') !== selV.value) return false;
+      if (selE.value && row.getAttribute('data-e') !== selE.value) return false;
+      return true;
+    }
+    function render() {
+      var sel = rows.filter(passa).sort(ordens[selO.value] || ordens.inc);
+      var filtrado = filtro !== 'all' || selV.value || selE.value;
+      var limite = todos || filtrado ? sel.length : Math.min(visiveis, sel.length);
+      rows.forEach(function (r) { r.hidden = true; });
+      sel.forEach(function (r, i) { list.appendChild(r); r.hidden = i >= limite; });
+      none.hidden = sel.length > 0;
+      more.hidden = limite >= sel.length;
+      if (limite < sel.length) more.textContent = 'Mostrar todos os ' + sel.length + ' textos';
+      shown.textContent = limite < sel.length
+        ? 'Mostrando ' + limite + ' de ' + sel.length
+        : sel.length + (sel.length === 1 ? ' texto' : ' textos');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        filtro = chip.getAttribute('data-f');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        render();
+      });
+    });
+    [selV, selE, selO].forEach(function (s) { s.addEventListener('change', render); });
+    more.addEventListener('click', function () { todos = true; render(); });
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.hidden = false;
+    render();
+  }
+
   setupTheme();
   setupCanvas();
   setupTicker();
@@ -3353,8 +4140,10 @@ body.modal-open .btt{visibility:hidden}
   setupLeadFit();
   setupRadarMore();
   setupAges();
+  setupCompareTabs();
   setupModals();
   setupScroll();
+  setupTermometro();
 })();</script>
 </body>
 </html>

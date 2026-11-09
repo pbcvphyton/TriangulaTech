@@ -358,6 +358,31 @@ body.modal-open{overflow:hidden}
 .cmp-i h3{margin-bottom:8px;font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
 .cmp-i h3 a:hover{color:var(--link);text-decoration:underline}
 .cmp-t{font-weight:500;letter-spacing:.5px;color:var(--faint)}
+/* Cobertura comparada: abas por editoria; em cada aba, onde divergiu e o que foi relatado de forma semelhante */
+.cmp [hidden]{display:none!important}
+.cmp-tabs{margin-top:14px}
+.cmp .pane-hd{padding:18px 0 8px}
+.cmp-tabs.all .pane-hd{display:block}
+.cmp-tabs.all .cmp-pane+.cmp-pane{margin-top:10px}
+.tab-btn .cmp-dn{margin-left:6px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--cov-b)}
+.cmp-gh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-top:16px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.cmp-gh span{font-family:var(--ss);font-size:12px;font-weight:400;color:var(--muted)}
+.cmp-dv{font-weight:600;color:var(--cov-b)}
+.cmp-mt{font-weight:500;color:var(--faint)}
+.cmp-vazio{margin-top:10px;font-family:var(--ss);font-size:12.5px;font-style:italic;color:var(--muted)}
+.cmp-cl{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));column-gap:32px}
+.cmp-cl li{border-bottom:1px solid var(--rl)}
+.cmp-cl summary{display:flex;flex-direction:column;gap:1px;padding:8px 0 8px 16px;position:relative;cursor:pointer;list-style:none}
+.cmp-cl summary::-webkit-details-marker{display:none}
+.cmp-cl summary::before{content:"+";position:absolute;left:0;top:7px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--link)}
+.cmp-cl details[open] summary::before{content:"−"}
+.cmp-ct{font-family:var(--sf);font-size:14.5px;font-weight:700;line-height:1.35;color:var(--ink)}
+.cmp-cl summary:hover .cmp-ct{color:var(--link)}
+.cmp-cm{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.cmp-cl details>.cov,.cmp-cl .cmp-lk{margin:0 0 10px 16px}
+.cmp-lk{font-family:var(--ss);font-size:12.5px}
+.cmp-lk a{font-weight:700;color:var(--link)}
+.cmp-lk a:hover{text-decoration:underline}
 
 /* Racional da edição e lista completa do dia */
 .rat-strip{padding:9px var(--gut);border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
@@ -706,7 +731,7 @@ body.modal-open .btt{visibility:hidden}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
-.an .tm-panels{grid-template-columns:minmax(0,760px)}
+.an .tm-panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));max-width:1240px}
 .an-h{margin-bottom:10px;font-family:var(--ss);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--head)}
 .an-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 .an-tiles li,.an-reads li{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:3px solid var(--qi);background:var(--soft)}
@@ -721,12 +746,34 @@ body.modal-open .btt{visibility:hidden}
 .an-reads .rd-est,.an-reads .rd-melhor{border-left-color:var(--t-eq)}
 .an-reads .rd-pior{border-left-color:var(--qr)}
 .an-reads .rd-ins{border-left-color:var(--rule)}
+/* Nesta página (atalhos) e Em resumo (o termômetro em linguagem clara) */
+.an-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:12px;font-family:var(--ss);font-size:12.5px}
+.an-nav span{font-family:var(--mn);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint)}
+.an-nav a{font-weight:600;color:var(--link)}
+.an-nav a:hover{text-decoration:underline}
+.an-res-t{max-width:980px;font-family:var(--sf);font-size:20px;font-weight:700;line-height:1.35;color:var(--ink)}
+.an-res-l{list-style:none;max-width:980px;margin-top:10px;padding:12px 16px;border-left:3px solid var(--qc);background:var(--soft)}
+.an-res-l li{position:relative;padding-left:16px;font-family:var(--sf);font-size:15px;line-height:1.55;color:var(--ink)}
+.an-res-l li+li{margin-top:6px}
+.an-res-l li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--qc)}
+.an-res-mais{margin-top:10px;font-family:var(--ss);font-size:12.5px}
+.an-res-mais a{font-weight:700;color:var(--link)}
+.an-res-mais a:hover{text-decoration:underline}
+.an-crit{list-style:none}
+.an-crit li{display:grid;grid-template-columns:minmax(120px,190px) minmax(60px,1fr) minmax(120px,auto);align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.an-cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-cb{display:flex;height:8px;border-radius:4px;background:var(--rl);overflow:hidden}
+.an-cb i{display:block;height:100%}
+.an-cb .neu{background:var(--qi)}
+:root[data-theme="dark"] .an-cb .neu{background:var(--link)}
+.an-cv{font-family:var(--mn);font-size:11px;color:var(--muted);white-space:nowrap;text-align:right}
+.an-cv b{color:var(--ink);font-weight:600}
 .an-pux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
 .an-tbl-wrap{overflow-x:auto}
 .an-tbl{width:100%;border-collapse:collapse;font-family:var(--ss);font-size:12.5px;color:var(--body)}
 .an-tbl caption{margin-bottom:6px;text-align:left;font-size:11px;font-weight:700;color:var(--muted)}
 .an-tbl th,.an-tbl td{padding:7px 10px 7px 0;border-bottom:1px solid var(--rl);text-align:right;white-space:nowrap}
-.an-tbl th:first-child,.an-tbl td.an-l{text-align:left}
+.an-tbl th:first-child,.an-tbl td.an-l,.an-tbl th.an-l{text-align:left}
 .an-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
 .an-tbl tbody th{font-weight:700;color:var(--ink)}
 .an-tbl td{font-family:var(--mn);font-size:11.5px}
@@ -820,6 +867,11 @@ body.modal-open .btt{visibility:hidden}
   .tl-tx{grid-column:2;grid-row:1}
   .tl-d{grid-column:1;grid-row:2}
   .tl-r{grid-column:2;grid-row:2;white-space:normal}
+  .an-res-t{font-size:17.5px}
+  .an-res-l{padding:10px 12px}
+  .an-res-l li{font-size:14px}
+  .an-crit li{grid-template-columns:minmax(0,1fr) auto;gap:2px 10px}
+  .an-cb{grid-column:1/-1;grid-row:2}
   .rk-i,.qb li,.rk-axis{grid-template-columns:34% minmax(0,1fr);gap:4px 10px}
   .rk-v{grid-column:1/-1}
   .rk-axis .rk-v{display:none}
@@ -1044,6 +1096,13 @@ body.modal-open .btt{visibility:hidden}
   .cmp-i{position:relative;display:grid;grid-row:span 7;grid-template-rows:subgrid;align-content:start;padding:14px 0 16px;border-bottom:none;border-top:1px solid var(--rl)}
   .cmp-i:nth-child(-n+3){border-top:none}
   .cmp-i:not(:nth-child(3n+1))::before{content:"";position:absolute;left:-20px;top:14px;bottom:16px;width:1px;background:var(--rl)}
+  .cmp .tabs-bar{padding-left:0;background:transparent;border:none;border-bottom:1px solid var(--rl)}
+  .cmp .tab-btn{margin-bottom:0;padding:13px 12px 10px;border-bottom-width:2px}
+  .cmp .tab-btn:first-child{padding-left:0}
+  .cmp .tab-btn:hover,.cmp .tab-btn[aria-selected="true"]{background:transparent}
+  .cmp .tab-btn[aria-selected="true"]{border-bottom-width:4px;padding-bottom:8px}
+  .cmp .tabs-arrow.prev{background:linear-gradient(90deg,var(--paper) 55%,transparent)}
+  .cmp .tabs-arrow.next{background:linear-gradient(270deg,var(--paper) 55%,transparent)}
   .cmp-i>.cov.full{display:contents}
   .cmp-i>.cat{grid-row:1}
   .cmp-i>h3{grid-row:2;margin-bottom:8px;font-size:16px;line-height:1.28}
@@ -1213,6 +1272,9 @@ body.modal-open .btt{visibility:hidden}
   .mast{padding-top:52px}
 }
 @media (max-width:760px){
+  .cmp-tabs{margin-left:-16px;margin-right:-16px}
+  .cmp-tabs .cmp-panes{padding:0 16px}
+  .cmp-gh{font-size:16px}
   .mast{padding:52px 16px 18px}
   .mast h1{font-size:36px}
   .mast h1.logo svg{height:92px}
@@ -1327,7 +1389,6 @@ body.modal-open .btt{visibility:hidden}
 
 <section class="wx" aria-label="Clima">
   <p><span role="img" aria-label="Nublado" title="Nublado">☁️</span><strong>São Paulo</strong>18°C <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>17° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>28°<span class="sep" aria-hidden="true">|</span>Amanhã <span role="img" aria-label="Nublado" title="Nublado">☁️</span> <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>18° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>31°</p>
-  <p><span role="img" aria-label="Predominantemente limpo" title="Predominantemente limpo">🌤️</span><strong>Montevidéu</strong>15°C <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>15° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>18°<span class="sep" aria-hidden="true">|</span>Amanhã <span role="img" aria-label="Garoa fraca" title="Garoa fraca">🌦️</span> <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>16° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>19°</p>
 </section>
 <nav class="sec-nav" aria-label="Editorias">
   <div class="sn-in">
@@ -1338,7 +1399,7 @@ body.modal-open .btt{visibility:hidden}
     <li><a href="#editorias" data-tab="all">Todas</a></li>
   </ul>
   <ul class="sn-x">
-<li><a href="#cobertura">Cobertura comparada</a></li><li><a href="#racional">Racional da edição</a></li><li><a href="https://pbcvphyton.github.io/qi-journal/edicoes/2026-11-03-todas.html">Todas as 1.322 notícias</a></li>  </ul>
+<li><a href="#cobertura">Cobertura comparada</a></li><li><a href="#termometro">Termômetro do dia</a></li><li><a href="#racional">Racional da edição</a></li><li><a href="https://pbcvphyton.github.io/qi-journal/edicoes/2026-11-03-todas.html">Todas as 1.322 notícias</a></li>  </ul>
   </div>
 </nav>
 
@@ -1787,13 +1848,307 @@ body.modal-open .btt{visibility:hidden}
 <section class="cmp" id="cobertura" aria-labelledby="cmp-h">
   <div class="cmp-top">
     <h2 class="kicker" id="cmp-h">Cobertura comparada</h2>
-    <p class="cmp-note">Os demais assuntos do dia vistos por dois ou mais veículos: em que sentido cada um conduziu a cobertura. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
+    <p class="cmp-note">Todos os assuntos do dia vistos por dois ou mais veículos — as 11 matérias da edição com análise e os demais —, separados por editoria. Em cada aba, primeiro <b>onde a mídia divergiu</b> (veículos dos dois lados; antes os assuntos com mais veículos no lado menor), depois o que os veículos relataram <b>de forma semelhante</b>. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
   </div>
-  <ol class="cmp-list">
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 05:33</span></p>
-      <h3><a href="https://www.ft.com/content/a6212e33-2175-4957-91d1-8f8f6bc3918b" target="_blank" rel="noopener noreferrer">Repercussão e negação da Coreia do Norte sobre o ataque hacker à Binance<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cmp-tabs">
+    <div class="tabs-nav">
+    <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
+    <div class="tabs-bar" role="tablist" aria-label="Cobertura comparada por editoria">
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-brasil" data-cmp-tab="brasil" aria-controls="cmp-pane-brasil" aria-selected="true" tabindex="0" style="--sc:#1B2745">Brasil · Economia<span class="n">5</span><span class="cmp-dn" title="1 assunto com veículos dos dois lados">1 div.</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-mercados" data-cmp-tab="mercados" aria-controls="cmp-pane-mercados" aria-selected="false" tabindex="-1" style="--sc:#2E6BD6">Mercados &amp; Finanças<span class="n">13</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-tecnologia" data-cmp-tab="tecnologia" aria-controls="cmp-pane-tecnologia" aria-selected="false" tabindex="-1" style="--sc:#C2410C">Tecnologia &amp; Negócios<span class="n">4</span><span class="cmp-dn" title="2 assuntos com veículos dos dois lados">2 div.</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-all" data-cmp-tab="all" aria-controls="cmp-panes" aria-selected="false" tabindex="-1" style="--sc:#394A7A">Todas<span class="n">22</span><span class="cmp-dn">3 div.</span></button>
+    </div>
+    <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
+    </div>
+    <div class="cmp-panes" id="cmp-panes">
+      <div class="tab-pane cmp-pane active" id="cmp-pane-brasil" role="tabpanel" aria-labelledby="cmp-tab-brasil" style="--sc:#1B2745">
+        <h3 class="pane-hd">Brasil · Economia</h3>
+        <h4 class="cmp-gh">Onde a mídia divergiu <span>1 de 5 assuntos</span></h4>
+        <ol class="cmp-list">
+          <li class="cmp-i" style="--sc:#1B2745">
+            <p class="cat">Brasil · Economia <span class="cmp-t">· ontem, 22:33</span> <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência 67</span> <span class="cmp-mt">· matéria da edição</span></p>
+            <h3><a href="#s-proposta-de-lara-resende-para-os-juros-reacende">Proposta de Lara Resende para os juros reacende debate econômico no PT</a></h3>
+            <div class="cov full lean-b" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Enfatiza o apoio político interno e os argumentos de flexibilização <b>1</b></span><span class="cov-sb"><b>2</b> Destaca o temor de descontrole inflacionário e reação negativa do mercado</span></div>
+  <div class="cov-bar" role="img" aria-label="Enfatiza o apoio político interno e os argumentos de flexibilização: 1 veículo; neutros: 2; Destaca o temor de descontrole inflacionário e reação negativa do mercado: 2 veículos"><span class="cov-a" style="width:20%"></span><span class="cov-n" style="width:40%"></span><span class="cov-b" style="width:40%"></span></div>
+  <p class="cov-lean">Pende para: Destaca o temor de descontrole inflacionário e reação negativa do mercado · 2 de 5 veículos</p>
+  <p class="cov-c">A cobertura dividiu-se entre registrar o alinhamento de alas do PT com a proposta e o alerta severo emitido por analistas econômicos.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (5)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Enfatiza o apoio político interno e os argumentos de flexibilização <span>(1)</span></h4>
+  <ul>
+    <li><a href="https://www.estadao.com.br/politica/coluna-do-estadao/proposta-de-lara-resende-sobre-tabelamento-dos-juros-reacende-disputa-no-pt-por-rumos-de-lula-4/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza a leitura de que a proposta do ex-arquiteto do Plano Real aprofunda divisões internas no partido governista.</p></li>
+  </ul>
+</div><div class="cov-col cb">
+  <h4>Destaca o temor de descontrole inflacionário e reação negativa do mercado <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://www.moneytimes.com.br/selic-a-75-para-conter-a-divida-proposta-de-lara-resende-ganha-apoio-no-pt-e-provoca-reacao-jcav/" target="_blank" rel="noopener noreferrer">Money Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na reação de alerta dos investidores e nas críticas de economistas ortodoxos à proposta de juros baixos.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/economia/por-que-o-possivel-encontro-de-lula-com-um-dos-pais-do-plano-real-deixou-o-mercado-financeiro-preocupado-sama/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o nervosismo gerado nos mercados financeiros diante da possível reaproximação entre o Palácio do Planalto e Lara Resende.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/brasil/noticia/2026/11/02/gabrielli-diz-que-situao-fiscal-menos-dramtica-e-elogia-proposta-de-lara-resende.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Expõe os argumentos de Gabrielli favoráveis a Lara Resende e pondera o contraponto de autoridades da Fazenda e do mercado.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/economista-ligado-a-lula-ve-quadro-fiscal-menos-dramatico-no-brasil-e-elogia-proposta-de-lara-resende.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+          </li>
+        </ol>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>4 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Copom inicia reunião e mercado aposta em manutenção da Selic a 13,75%</span><span class="cmp-cm">6 veículos · 05:00 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-copom-inicia-reuniao-e-mercado-aposta-em-manuten">Ler a matéria &rarr;</a></p>              <div class="cov full lean-a" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Destaca a necessidade de pausa nos cortes pelo risco fiscal <b>3</b></span><span class="cov-sb"><b>0</b> Aponta pressões do governo e debate sobre juros baixos</span></div>
+  <div class="cov-bar" role="img" aria-label="Destaca a necessidade de pausa nos cortes pelo risco fiscal: 3 veículos; neutros: 3; Aponta pressões do governo e debate sobre juros baixos: 0 veículos"><span class="cov-a" style="width:50%"></span><span class="cov-n" style="width:50%"></span></div>
+  <p class="cov-lean">Pende para: Destaca a necessidade de pausa nos cortes pelo risco fiscal · 3 de 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao relatar o fim das projeções de corte de juros e a virada para a manutenção da Selic, com ênfase na cautela dos analistas.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Destaca a necessidade de pausa nos cortes pelo risco fiscal <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/intraday/post/2026/11/piora-de-cenario-pos-eleicao-deve-levar-copom-a-pausar-cortes-na-selic.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza a visão de analistas sobre a deterioração das contas públicas e a alta probabilidade de manutenção da Selic.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/piora-na-percepcao-de-risco-pos-eleicao-pressiona-bc-a-interromper-ciclo-de-cortes-de-juros.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Conecta a pressão para interromper os cortes de juros diretamente à piora da percepção de risco político e fiscal.</p></li>
+    <li><a href="https://exame.com/economia/copom-mercado-muda-apostas-e-passa-a-prever-manutencao-da-selic-apos-eleicoes/" target="_blank" rel="noopener noreferrer">Exame<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca a guinada nas apostas dos contratos de opções na bolsa indicando a manutenção da taxa básica.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://www.estadao.com.br/economia/corte-manutencao-selic-mercado-dividido-copom/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a divisão inédita nas previsões do mercado financeiro antes do início oficial da reunião do Copom.</p></li>
+    <li><a href="https://www.infomoney.com.br/mercados/midterms-emprego-eua-itau-focus-agenda-03112026/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca no impacto imediato da reeleição sobre a abertura dos mercados e nas probabilidades de juros calculadas na B3.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/empresas/apos-decepcao-dos-rivais-no-3t26-e-a-vez-de-o-itau-itub4-mostrar-por-que-joga-em-outra-liga-veja-o-que-esperar-do-balanco-miql/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Governador Rafael Fonteles enaltece equilíbrio fiscal ao manter secretário</span><span class="cmp-cm">3 veículos · ontem, 20:55</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/brasil/noticia/2026/11/02/viva-o-equilbrio-fiscal-diz-nas-redes-sociais-rafael-fonteles-cotado-para-ser-ministro-da-fazenda.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 3 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao destacar o discurso fiscalista do governador cotado para o primeiro escalão do governo federal.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (3)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/brasil/noticia/2026/11/02/viva-o-equilbrio-fiscal-diz-nas-redes-sociais-rafael-fonteles-cotado-para-ser-ministro-da-fazenda.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca as métricas de endividamento e a classificação de crédito do Piauí em meio à cotação de Fonteles para a Fazenda.</p></li>
+    <li><a href="https://www.estadao.com.br/economia/viva-o-equilibrio-fiscal-diz-governador-cotado-para-a-fazenda-ao-anunciar-secretario-no-piaui/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na declaração enfática do governador petista sobre a importância da austeridade e o perfil de gestão fiscal.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/viva-o-equilibrio-fiscal-publica-governador-do-pi-cotado-para-fazenda-na-gestao-lula-4.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relaciona o anúncio de permanência do secretário de Fazenda estadual com as especulações em torno da equipe de Lula.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Entrada em vigor da obrigatoriedade de atendimento humano em SACs</span><span class="cmp-cm">3 veículos · ontem, 14:18</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/brasil/noticia/2026/11/02/sac-de-empresas-tera-atendimento-humano-obrigatorio-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 3 veículos</p>
+  <p class="cov-c">A cobertura convergiu na explicação prática das novas exigências legais voltadas aos serviços de atendimento ao cliente.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (3)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/brasil/noticia/2026/11/02/sac-de-empresas-tera-atendimento-humano-obrigatorio-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na implementação das novas regras do governo federal para setores regulados como bancos, energia e telecom.</p></li>
+    <li><a href="https://g1.globo.com/politica/noticia/2026/11/02/empresas-devem-oferecer-atendimento-humano-para-o-consumidor-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Esclarece os horários e obrigações impostos às empresas pelas novas normativas de atendimento aos consumidores.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/empresas/fim-da-secretaria-eletronica-empresas-terao-de-oferecer-atendimento-humano-obrigatorio-no-sac-veja-o-que-muda-sama/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o impacto prático do decreto no fim da dependência exclusiva de secretárias eletrônicas automatizadas.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Calendário de feriados nacionais restantes para o final de 2026</span><span class="cmp-cm">2 veículos · 04:00</span></summary>
+<p class="cmp-lk"><a href="https://www1.folha.uol.com.br/mercado/2026/11/proximo-feriado-nacional-cai-em-um-domingo-veja-calendario-ate-o-fim-do-ano.shtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
+  <p class="cov-c">A cobertura convergiu na prestação de serviço ao detalhar as datas dos feriados que restam no ano corrente.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/proximo-feriado-nacional-cai-em-um-domingo-veja-calendario-ate-o-fim-do-ano.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta a incidência do próximo feriado da Proclamação da República em pleno fim de semana.</p></li>
+    <li><a href="https://g1.globo.com/trabalho-e-carreira/noticia/2026/11/03/quais-sao-os-proximos-feriados-de-2026.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Lista os últimos períodos de folga restantes no calendário nacional após o feriado de Finados.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-mercados" role="tabpanel" aria-labelledby="cmp-tab-mercados" style="--sc:#2E6BD6">
+        <h3 class="pane-hd">Mercados &amp; Finanças</h3>
+        <p class="cmp-vazio">Nenhum assunto de Mercados &amp; Finanças teve veículos dos dois lados hoje.</p>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>13 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Petróleo desaba mais de 7% com expectativas de negociações entre EUA e Irã</span><span class="cmp-cm">6 veículos · 05:00 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-petroleo-desaba-mais-de-7-com-expectativas-de-ne">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 6 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu integralmente para o relato factual da queda acentuada do petróleo impulsionada pelos sinais de diplomacia no Oriente Médio.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/noticia/2026/11/03/risco-geopolitico-menor-leva-petroleo-a-queda-de-7.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a dissolução do prêmio de risco acumulado na semana anterior e as adaptações logísticas globais.</p></li>
+    <li><a href="https://www.suno.com.br/noticias/petroleo-fecha-forte-queda-02112026-go/" target="_blank" rel="noopener noreferrer">Suno Notícias<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relata o fechamento em baixa com foco na expectativa de reabertura do Estreito de Ormuz.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/bolsa-dolar/petroleo-cai-mais-de-8-com-expectativa-de-tregua-na-guerra-do-oriente-medio-lils-cbcb/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca que o petróleo aprofundou as perdas e terminou o pregão com desvalorização superior a 7%.</p></li>
+    <li><a href="https://www.ft.com/content/d7fe99f8-d292-4cb5-a8fd-45be0f8cc2b3" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca os comentários do presidente iraniano sobre a autoridade concedida para conversas diplomáticas.</p></li>
+    <li><a href="https://www.wsj.com/finance/investing/oil-tumbles-but-stocks-fail-to-launch-90972f94" target="_blank" rel="noopener noreferrer">The Wall Street Journal<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca no impacto imediato da queda do petróleo nos mercados e nas negociações de refino.</p></li>
+    <li><a href="https://www.theguardian.com/business/2026/nov/02/oil-price-falls-amid-hope-of-a-breakthrough-to-end-iran-war" target="_blank" rel="noopener noreferrer">The Guardian<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta que o petróleo caiu para o menor nível em mais de duas semanas com as esperanças de fim da guerra.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Mercado Bitcoin sofre ataque de US$ 49 milhões e bloqueia valores</span><span class="cmp-cm">5 veículos · ontem, 17:56 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-mercado-bitcoin-sofre-ataque-de-us-49-milhoes-e">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 5 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 5 veículos</p>
+  <p class="cov-c">A cobertura convergiu integralmente na apuração factual dos valores do ataque, no bloqueio parcial dos fundos e na suspensão das operações.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (5)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(5)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/criptomoedas/noticia/2026/11/02/mercado-bitcoin-bloqueia-us-112-milhoes-de-us-38-milhoes-envolvidos-em-ataque-hacker.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha os valores desviados, o montante bloqueado com ajuda da comunidade cripto e a suspensão preventiva da plataforma.</p></li>
+    <li><a href="https://c-level.folha.uol.com.br/financas/2026/11/corretora-mercado-bitcoin-bloqueia-us-11-mi-em-criptomoedas-apos-sofrer-ataque-hacker.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Informa o bloqueio de cerca de US$ 11 milhões e o contexto de vulnerabilidade após o megagolpe sofrido pela Binance.</p></li>
+    <li><a href="https://g1.globo.com/tecnologia/ciberseguranca/noticia/2026/11/02/mercado-bitcoin-incidente-seguranca.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca a suspensão de saques e depósitos e a proximidade temporal com o ataque bilionário registrado na Binance.</p></li>
+    <li><a href="https://www.poder360.com.br/poder-tech/mercado-bitcoin-bloqueia-us-11-milhoes-apos-ataque-hacker/" target="_blank" rel="noopener noreferrer">Poder360<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na ação rápida da corretora brasileira para congelar parte dos ativos e na comunicação oficial sobre o incidente.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/criptomoedas/mercado-bitcoin-mb-sofre-ataque-hacker-de-us-40-milhoes-e-bloqueia-movimentacoes/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relata o valor do ataque estimado em cerca de US$ 40 milhões e o bloqueio imediato das movimentações dos clientes.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Binance registra bilhões em saques após retomar operações pós-invasão</span><span class="cmp-cm">6 veículos · ontem, 08:38 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-binance-registra-bilhoes-em-saques-apos-retomar">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 6 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao reportar os dados oficiais de fluxo de saída da plataforma e as implicações de segurança para o mercado cripto.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/criptomoedas/noticia/2026/11/02/binance-diz-que-onda-de-saques-aps-roubo-de-us-63-bilhes-est-diminuindo.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Analisa que a onda de saques está diminuindo, mas aponta que grandes investidores atuarão com maior cautela.</p></li>
+    <li><a href="https://www.ft.com/content/1d4dd7b2-9dee-433b-ac2a-e8022af1dd07" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na promessa da empresa de reembolsar os usuários e no volume de US$ 5 bilhões retirados inicialmente.</p></li>
+    <li><a href="https://www.nytimes.com/2026/11/01/business/binance-hack-crypto-north-korea.html" target="_blank" rel="noopener noreferrer">The New York Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha os relatórios de saques líquidos e o percentual reduzido frente ao total sob gestão.</p></li>
+    <li><a href="https://www.scmp.com/business/cryptocurrency/article/3373009/crypto-industry-confronts-stark-security-challenges-after-us64b-binance-hack" target="_blank" rel="noopener noreferrer">South China Morning Post<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://www.bbc.co.uk/news/articles/cwj34gdmnly4o" target="_blank" rel="noopener noreferrer">BBC News<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o congelamento de transações e o total de saques em meio aos vínculos com hackers norte-coreanos.</p></li>
+    <li><a href="https://www.cnbc.com/2026/11/02/binance-outflow-hack-bitcoin.html" target="_blank" rel="noopener noreferrer">CNBC<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Apresenta os dados exatos de US$ 3,64 bilhões e a proporção de 2,1% dos ativos totais.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Banco da Reserva da Austrália eleva taxa de juros para 4,85% ao ano</span><span class="cmp-cm">2 veículos · 01:58 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-banco-da-reserva-da-australia-eleva-taxa-de-juro">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
+  <p class="cov-c">A cobertura convergiu totalmente para os aspectos factuais do aperto monetário na Austrália.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/noticia/2026/11/03/bc-da-australia-eleva-juros-para-485percent-ao-ano-nivel-mais-alto-em-18-anos.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o patamar de juros de 18 anos e a revisão significativa das projeções de inflação.</p></li>
+    <li><a href="https://www.ft.com/content/60283bdf-e45d-4723-a68e-5a857a5b949e" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza que esta é a quinta alta do ano devido à inflação acima da meta.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Apple supera expectativas de receita no trimestre, mas China preocupa</span><span class="cmp-cm">4 veículos · ontem, 19:41 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-apple-supera-expectativas-de-receita-no-trimestr">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 4 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao ponderar os números sólidos de faturamento com os alertas sobre margens e o mercado chinês.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (4)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(4)</span></h4>
+  <ul>
+    <li><a href="https://www.infomoney.com.br/mercados/vendas-da-apple-superam-estimativas-mas-china-segue-como-ponto-fraco/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o crescimento de 12% na receita e o ponto fraco das vendas na China.</p></li>
+    <li><a href="https://exame.com/invest/mercados/apple-supera-expectativas-com-receita-de-us-1145-bilhoes-e-recorde-de-vendas-do-iphone/" target="_blank" rel="noopener noreferrer">Exame<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a superação das expectativas com receita de US$ 114,48 bilhões e recorde de vendas do iPhone.</p></li>
+    <li><a href="https://www.wsj.com/tech/apple-beats-wall-street-expectations-with-boost-from-higher-prices-36749418" target="_blank" rel="noopener noreferrer">The Wall Street Journal<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na queda das ações da empresa e no alerta do CEO sobre margens futuras mais fracas.</p></li>
+    <li><a href="https://www.marketwatch.com/story/apples-iphone-business-is-booming-heres-why-the-stock-is-falling-anyway-07de9fff" target="_blank" rel="noopener noreferrer">MarketWatch<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta que, apesar da demanda firme pelo iPhone, a empresa enfrenta um agravamento na escassez de memória.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Embraer fecha acordo para fornecer até seis aviões KC-390 à Grécia</span><span class="cmp-cm">5 veículos · ontem, 09:32 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-embraer-fecha-acordo-para-fornecer-ate-seis-avio">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 5 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 5 veículos</p>
+  <p class="cov-c">A cobertura convergiu plenamente ao relatar os termos da venda, a importância para o mercado europeu e as especificações da aeronave.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (5)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(5)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/empresas/noticia/2026/11/02/grcia-acerta-aquisio-de-at-6-jatos-kc-390-millennium-da-embraer.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca os detalhes financeiros e contratuais do acordo governamental intermediado entre Grécia e Portugal.</p></li>
+    <li><a href="https://www.estadao.com.br/economia/negocios/embraer-acordo-kc-390-forca-aerea-grecia/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca no anúncio oficial da aquisição e no cronograma de entrega da primeira aeronave militar prevista para 2027.</p></li>
+    <li><a href="https://c-level.folha.uol.com.br/negocios/2026/11/grecia-e-o-8o-pais-da-otan-a-comprar-aviao-de-transporte-da-embraer.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a inserção estratégica do modelo como escolha de peso dentro dos países integrantes da Otan.</p></li>
+    <li><a href="https://g1.globo.com/sp/vale-do-paraiba-regiao/noticia/2026/11/02/saiba-como-e-o-kc-390-maior-aviao-produzido-na-america-latina-e-que-sera-comprado-pela-grecia.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Descreve as especificidades técnicas do KC-390 como o maior avião militar produzido na América Latina.</p></li>
+    <li><a href="https://www.suno.com.br/noticias/embraer-embj3-acordo-fornecer-ate-seis-avioes-kc-390-grecia-go/" target="_blank" rel="noopener noreferrer">Suno Notícias<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o impacto do novo contrato de exportação para as ações e os negócios da Embraer (EMBJ3).</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Repercussão e negação da Coreia do Norte sobre o ataque hacker à Binance</span><span class="cmp-cm">5 veículos · 05:33</span></summary>
+<p class="cmp-lk"><a href="https://www.ft.com/content/a6212e33-2175-4957-91d1-8f8f6bc3918b" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 5 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 5 veículos</p>
   <p class="cov-c">A cobertura convergiu ao contrapor o rastreamento técnico dos fundos roubados e a inédita defesa pública emitida por Pyongyang.</p>
@@ -1812,32 +2167,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#1B2745">
-      <p class="cat">Brasil · Economia <span class="cmp-t">· ontem, 20:55</span></p>
-      <h3><a href="https://valor.globo.com/brasil/noticia/2026/11/02/viva-o-equilbrio-fiscal-diz-nas-redes-sociais-rafael-fonteles-cotado-para-ser-ministro-da-fazenda.ghtml" target="_blank" rel="noopener noreferrer">Governador Rafael Fonteles enaltece equilíbrio fiscal ao manter secretário<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
-  <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
-  <p class="cov-lean">Sem divergência entre os 3 veículos</p>
-  <p class="cov-c">A cobertura convergiu ao destacar o discurso fiscalista do governador cotado para o primeiro escalão do governo federal.</p>
-  <details class="cov-who">
-    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (3)</summary>
-    <div class="cov-cols">
-<div class="cov-col cn">
-  <h4>Veículos <span>(3)</span></h4>
-  <ul>
-    <li><a href="https://valor.globo.com/brasil/noticia/2026/11/02/viva-o-equilbrio-fiscal-diz-nas-redes-sociais-rafael-fonteles-cotado-para-ser-ministro-da-fazenda.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca as métricas de endividamento e a classificação de crédito do Piauí em meio à cotação de Fonteles para a Fazenda.</p></li>
-    <li><a href="https://www.estadao.com.br/economia/viva-o-equilibrio-fiscal-diz-governador-cotado-para-a-fazenda-ao-anunciar-secretario-no-piaui/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na declaração enfática do governador petista sobre a importância da austeridade e o perfil de gestão fiscal.</p></li>
-    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/viva-o-equilibrio-fiscal-publica-governador-do-pi-cotado-para-fazenda-na-gestao-lula-4.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relaciona o anúncio de permanência do secretário de Fazenda estadual com as especulações em torno da equipe de Lula.</p></li>
-  </ul>
-</div>    </div>
-  </details>
-</div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· ontem, 16:10</span></p>
-      <h3><a href="https://valor.globo.com/financas/noticia/2026/11/02/prejuzo-trimestral-da-anthropic-diminui-e-receita-dispara-antes-de-ipo.ghtml" target="_blank" rel="noopener noreferrer">Resultados financeiros da Anthropic e preparação para IPO<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Resultados financeiros da Anthropic e preparação para IPO</span><span class="cmp-cm">3 veículos · ontem, 16:10</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/financas/noticia/2026/11/02/prejuzo-trimestral-da-anthropic-diminui-e-receita-dispara-antes-de-ipo.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 3 veículos</p>
   <p class="cov-c">A cobertura convergiu na divulgação dos dados contábeis sólidos apresentados pela empresa antes de sua abertura de capital.</p>
@@ -1854,32 +2189,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#1B2745">
-      <p class="cat">Brasil · Economia <span class="cmp-t">· ontem, 14:18</span></p>
-      <h3><a href="https://valor.globo.com/brasil/noticia/2026/11/02/sac-de-empresas-tera-atendimento-humano-obrigatorio-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">Entrada em vigor da obrigatoriedade de atendimento humano em SACs<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
-  <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
-  <p class="cov-lean">Sem divergência entre os 3 veículos</p>
-  <p class="cov-c">A cobertura convergiu na explicação prática das novas exigências legais voltadas aos serviços de atendimento ao cliente.</p>
-  <details class="cov-who">
-    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (3)</summary>
-    <div class="cov-cols">
-<div class="cov-col cn">
-  <h4>Veículos <span>(3)</span></h4>
-  <ul>
-    <li><a href="https://valor.globo.com/brasil/noticia/2026/11/02/sac-de-empresas-tera-atendimento-humano-obrigatorio-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na implementação das novas regras do governo federal para setores regulados como bancos, energia e telecom.</p></li>
-    <li><a href="https://g1.globo.com/politica/noticia/2026/11/02/empresas-devem-oferecer-atendimento-humano-para-o-consumidor-a-partir-desta-segunda-feira.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Esclarece os horários e obrigações impostos às empresas pelas novas normativas de atendimento aos consumidores.</p></li>
-    <li><a href="https://www.seudinheiro.com/2026/empresas/fim-da-secretaria-eletronica-empresas-terao-de-oferecer-atendimento-humano-obrigatorio-no-sac-veja-o-que-muda-sama/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o impacto prático do decreto no fim da dependência exclusiva de secretárias eletrônicas automatizadas.</p></li>
-  </ul>
-</div>    </div>
-  </details>
-</div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 05:00</span></p>
-      <h3><a href="https://valor.globo.com/financas/noticia/2026/11/03/renovacao-legislativa-nos-eua-esta-no-centro-das-atencoes-de-investidores.ghtml" target="_blank" rel="noopener noreferrer">Eleições de meio de mandato nos EUA e expectativas para os mercados<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Eleições de meio de mandato nos EUA e expectativas para os mercados</span><span class="cmp-cm">3 veículos · 05:00</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/financas/noticia/2026/11/03/renovacao-legislativa-nos-eua-esta-no-centro-das-atencoes-de-investidores.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 3 veículos</p>
   <p class="cov-c">Os veículos convergiram ao analisar os reflexos econômicos e históricos das eleições legislativas nos Estados Unidos.</p>
@@ -1896,11 +2211,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 06:30</span></p>
-      <h3><a href="https://www.moneytimes.com.br/bolsas-da-asia-fecham-em-baixa-tecnologia-pesa-em-seul-e-taiwan-fets/" target="_blank" rel="noopener noreferrer">Queda das bolsas asiáticas e europeias pressionadas por ações de tecnologia<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Queda das bolsas asiáticas e europeias pressionadas por ações de tecnologia</span><span class="cmp-cm">3 veículos · 06:30</span></summary>
+<p class="cmp-lk"><a href="https://www.moneytimes.com.br/bolsas-da-asia-fecham-em-baixa-tecnologia-pesa-em-seul-e-taiwan-fets/" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 3 veículos</p>
   <p class="cov-c">A cobertura convergiu ao traçar a correlação entre a liquidação de techs em Wall Street e o pessimismo nos mercados asiáticos e europeus.</p>
@@ -1917,11 +2233,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 06:26</span></p>
-      <h3><a href="https://www.infomoney.com.br/mercados/dow-jones-futuro-cai-com-pressao-sobre-tecnologia-e-cautela-antes-das-midterms/" target="_blank" rel="noopener noreferrer">Queda nos futuros de Wall Street e cautela pré-midterms nos EUA<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Queda nos futuros de Wall Street e cautela pré-midterms nos EUA</span><span class="cmp-cm">2 veículos · 06:26</span></summary>
+<p class="cmp-lk"><a href="https://www.infomoney.com.br/mercados/dow-jones-futuro-cai-com-pressao-sobre-tecnologia-e-cautela-antes-das-midterms/" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 2 veículos</p>
   <p class="cov-c">A cobertura convergiu ao associar o desempenho negativo dos mercados futuros americanos à cautela política e a perdas no setor tecnológico.</p>
@@ -1937,31 +2254,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#1B2745">
-      <p class="cat">Brasil · Economia <span class="cmp-t">· 04:00</span></p>
-      <h3><a href="https://www1.folha.uol.com.br/mercado/2026/11/proximo-feriado-nacional-cai-em-um-domingo-veja-calendario-ate-o-fim-do-ano.shtml" target="_blank" rel="noopener noreferrer">Calendário de feriados nacionais restantes para o final de 2026<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
-  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
-  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
-  <p class="cov-c">A cobertura convergiu na prestação de serviço ao detalhar as datas dos feriados que restam no ano corrente.</p>
-  <details class="cov-who">
-    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
-    <div class="cov-cols">
-<div class="cov-col cn">
-  <h4>Veículos <span>(2)</span></h4>
-  <ul>
-    <li><a href="https://www1.folha.uol.com.br/mercado/2026/11/proximo-feriado-nacional-cai-em-um-domingo-veja-calendario-ate-o-fim-do-ano.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta a incidência do próximo feriado da Proclamação da República em pleno fim de semana.</p></li>
-    <li><a href="https://g1.globo.com/trabalho-e-carreira/noticia/2026/11/03/quais-sao-os-proximos-feriados-de-2026.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Lista os últimos períodos de folga restantes no calendário nacional após o feriado de Finados.</p></li>
-  </ul>
-</div>    </div>
-  </details>
-</div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 05:00</span></p>
-      <h3><a href="https://valor.globo.com/financas/noticia/2026/11/02/oracle-planeja-levantar-us20-bilhes-por-meio-da-emisso-de-ttulos-e-venda-de-aes.ghtml" target="_blank" rel="noopener noreferrer">Oracle planeja captação bilionária para investimentos em inteligência artificial<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Oracle planeja captação bilionária para investimentos em inteligência artificial</span><span class="cmp-cm">2 veículos · 05:00</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/financas/noticia/2026/11/02/oracle-planeja-levantar-us20-bilhes-por-meio-da-emisso-de-ttulos-e-venda-de-aes.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 2 veículos</p>
   <p class="cov-c">Os veículos convergiram na abordagem factual da captação de recursos pela Oracle.</p>
@@ -1977,11 +2275,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· ontem, 21:59</span></p>
-      <h3><a href="https://www.cnbc.com/2026/11/02/palantir-pltr-earnings-q3-2026.html" target="_blank" rel="noopener noreferrer">Palantir reporta crescimento robusto com avanço da receita comercial nos EUA<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Palantir reporta crescimento robusto com avanço da receita comercial nos EUA</span><span class="cmp-cm">2 veículos · ontem, 21:59</span></summary>
+<p class="cmp-lk"><a href="https://www.cnbc.com/2026/11/02/palantir-pltr-earnings-q3-2026.html" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 2 veículos</p>
   <p class="cov-c">A cobertura convergiu ao destacar o marco comercial da empresa, ponderando reações mistas do mercado.</p>
@@ -1997,11 +2296,114 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C2410C">
-      <p class="cat">Tecnologia &amp; Negócios <span class="cmp-t">· ontem, 13:44</span></p>
-      <h3><a href="https://valor.globo.com/empresas/noticia/2026/11/02/spacex-negocia-compra-da-boost-mobile-ou-acesso-a-sua-rede-com-a-echostar-diz-jornal.ghtml" target="_blank" rel="noopener noreferrer">Negociações da SpaceX para compra da Boost Mobile<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-tecnologia" role="tabpanel" aria-labelledby="cmp-tab-tecnologia" style="--sc:#C2410C">
+        <h3 class="pane-hd">Tecnologia &amp; Negócios</h3>
+        <h4 class="cmp-gh">Onde a mídia divergiu <span>2 de 4 assuntos</span></h4>
+        <ol class="cmp-list">
+          <li class="cmp-i" style="--sc:#C2410C">
+            <p class="cat">Tecnologia &amp; Negócios <span class="cmp-t">· ontem, 19:53</span> <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência 100</span> <span class="cmp-mt">· matéria da edição</span></p>
+            <h3><a href="#s-apple-supera-projecao-de-vendas-do-iphone-mas-al">Apple supera projeção de vendas do iPhone, mas alerta para custos de chips</a></h3>
+            <div class="cov full lean-equilibrio" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Destaca o forte desempenho nas vendas e lucros <b>3</b></span><span class="cov-sb"><b>3</b> Enfatiza a pressão de custos e margens de chips</span></div>
+  <div class="cov-bar" role="img" aria-label="Destaca o forte desempenho nas vendas e lucros: 3 veículos; neutros: 2; Enfatiza a pressão de custos e margens de chips: 3 veículos"><span class="cov-a" style="width:38%"></span><span class="cov-n" style="width:25%"></span><span class="cov-b" style="width:37%"></span></div>
+  <p class="cov-lean">Equilíbrio: 3 × 3 de 8 veículos</p>
+  <p class="cov-c">Houve divisão entre veículos que priorizaram a superação das metas de vendas de aparelhos e aqueles que focaram nos riscos trazidos pela alta dos custos de chips.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (8)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Destaca o forte desempenho nas vendas e lucros <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/empresas/noticia/2026/11/02/apple-supera-projeo-de-venda-do-iphone-mas-fica-devendo-em-servios.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Equilibra o resultado forte de vendas e margem do iPhone com os desvios nas expectativas da divisão de serviços.</p></li>
+    <li><a href="https://www.estadao.com.br/economia/negocios/apple-supera-projecoes-de-lucro-e-receita-com-melhor-ano-fiscal-da-historia/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Ressalta o avanço de dois dígitos no lucro líquido e a superação das projeções financeiras.</p></li>
+    <li><a href="https://www.nytimes.com/2026/11/02/technology/apple-earnings.html" target="_blank" rel="noopener noreferrer">The New York Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza o crescimento de 12% no lucro impulsionado pela força contínua da demanda pelos iPhones.</p></li>
+  </ul>
+</div><div class="cov-col cb">
+  <h4>Enfatiza a pressão de custos e margens de chips <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://www.ft.com/content/f6ad8c32-cacb-48ad-ad85-a9a7edac3f16" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza o alerta da empresa sobre o encarecimento recorde dos componentes de memória e o impacto nas margens.</p></li>
+    <li><a href="https://www.theguardian.com/technology/2026/nov/02/apple-third-quarter-revenue-earnings" target="_blank" rel="noopener noreferrer">The Guardian<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na queda das ações após o aviso sobre a disputa por suprimentos de chips com data centers.</p></li>
+    <li><a href="https://techcrunch.com/2026/11/02/apple-says-its-hard-to-predict-when-iphone-duo-constraints-will-improve/" target="_blank" rel="noopener noreferrer">TechCrunch<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o salto de 154% nos estoques e as dificuldades com restrições na produção de dispositivos.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://c-level.folha.uol.com.br/negocios/2026/11/vendas-fortes-de-iphones-e-macs-no-3o-tri-compensam-desempenho-mais-fraco-da-apple-na-china.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://www.cnbc.com/2026/11/03/apple-palantir-stock-earnings.html" target="_blank" rel="noopener noreferrer">CNBC<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Pontua que o balanço não foi perfeito, mas conteve elementos suficientes para elevar preços-alvo.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+          </li>
+          <li class="cmp-i" style="--sc:#C2410C">
+            <p class="cat">Tecnologia &amp; Negócios <span class="cmp-t">· ontem, 10:18</span> <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência 67</span> <span class="cmp-mt">· matéria da edição</span></p>
+            <h3><a href="#s-marvell-compra-lumentum-por-us-115-bilhoes-em-ap">Marvell compra Lumentum por US$ 115 bilhões em aposta no mercado de data centers para IA</a></h3>
+            <div class="cov full lean-a" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Destaca a expansão estratégica e o potencial em IA <b>2</b></span><span class="cov-sb"><b>1</b> Questiona o valor e o momento inoportuno da compra</span></div>
+  <div class="cov-bar" role="img" aria-label="Destaca a expansão estratégica e o potencial em IA: 2 veículos; neutros: 3; Questiona o valor e o momento inoportuno da compra: 1 veículo"><span class="cov-a" style="width:33%"></span><span class="cov-n" style="width:50%"></span><span class="cov-b" style="width:17%"></span></div>
+  <p class="cov-lean">Pende para: Destaca a expansão estratégica e o potencial em IA · 2 de 6 veículos</p>
+  <p class="cov-c">A cobertura dividiu-se entre o registro corporativo otimista do potencial tecnológico e o ceticismo imediato de investidores e analistas quanto ao preço pago.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Destaca a expansão estratégica e o potencial em IA <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/empresas/noticia/2026/11/02/marvell-compra-lumentum-por-us-115-bilhes-em-aposta-no-mercado-de-data-centers-para-ia.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza os detalhes financeiros e o impacto competitivo do negócio frente à rival Broadcom, ponderando também as críticas de analistas quanto à avaliação.</p></li>
+    <li><a href="https://www.ft.com/content/92322fad-f293-48b8-a14b-00506d78eb3b" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a criação de uma liderança consolidada em conectividade para inteligência artificial defendida pelo Vale do Silício.</p></li>
+  </ul>
+</div><div class="cov-col cb">
+  <h4>Questiona o valor e o momento inoportuno da compra <span>(1)</span></h4>
+  <ul>
+    <li><a href="https://www.marketwatch.com/story/marvell-and-lumentum-shareholders-unite-in-panning-merger-deal-its-a-trash-offer-53a9f307" target="_blank" rel="noopener noreferrer">MarketWatch<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca a forte rejeição e o ceticismo de acionistas de ambas as empresas com relação aos termos e preços do acordo.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://c-level.folha.uol.com.br/negocios/2026/11/marvell-compra-lumentum-por-us-115-bilhoes-e-aposta-no-mercado-de-data-centers-para-ia.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca nos aspectos principais do acordo multibilionário em transação de ações.</p></li>
+    <li><a href="https://www.nytimes.com/2026/11/02/technology/marvell-lumentum-115-billion-merger-ai.html" target="_blank" rel="noopener noreferrer">The New York Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relata a fusão como parte do movimento impulsionado pelo boom de redes ópticas em data centers de IA.</p></li>
+    <li><a href="https://techcrunch.com/2026/11/02/in-one-of-the-largest-deals-in-tech-history-marvell-buys-lumentum-for-115b/" target="_blank" rel="noopener noreferrer">TechCrunch<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Registra a transação como uma das maiores da história recente do setor de tecnologia.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+          </li>
+        </ol>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>2 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Supermarkets in seven European countries hit by cyber-attack on cooling systems</span><span class="cmp-cm">6 veículos · ontem, 09:04 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-supermarkets-in-seven-european-countries-hit-by">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 6 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu integralmente para a gravidade factual dos ataques aos sistemas de refrigeração e os riscos apontados pela União Europeia.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://www1.folha.uol.com.br/tec/2026/11/freezers-de-supermercados-sao-atacados-na-suecia-e-belgica-e-superaquecem-a-mais-de-50c.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca no impacto do ataque nas redes de supermercados europeias e nas declarações das autoridades da UE.</p></li>
+    <li><a href="https://g1.globo.com/tecnologia/ciberseguranca/noticia/2026/11/02/hackers-atacam-supermercados-europeus-e-elevam-temperatura-de-freezers-a-50c.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta a suspeita de novos ataques direcionados a equipamentos conectados à internet na Bélgica e Luxemburgo.</p></li>
+    <li><a href="https://www.nytimes.com/2026/11/02/business/cyberattack-freezers-europe-us-army.html" target="_blank" rel="noopener noreferrer">The New York Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Contextualiza a onda de disrupções como um alerta para a fragilidade global das cadeias de suprimentos.</p></li>
+    <li><a href="https://www.ft.com/content/2526056c-c616-4116-94b1-ac278da21cca" target="_blank" rel="noopener noreferrer">Financial Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha as variações extremas de temperatura registradas nas redes de varejo de múltiplos países.</p></li>
+    <li><a href="https://www.theguardian.com/world/2026/nov/02/supermarket-freezers-across-europe-hit-by-second-suspected-cyber-attack" target="_blank" rel="noopener noreferrer">The Guardian<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a condenação oficial da União Europeia e levanta questionamentos sobre a autoria e os motivos por trás das invasões.</p></li>
+    <li><a href="https://www.bbc.co.uk/news/articles/ckpqg8lve73go" target="_blank" rel="noopener noreferrer">BBC News<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Questiona o nível geral de vulnerabilidade de tecnologias conectadas a partir do controle remoto dos freezers.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Negociações da SpaceX para compra da Boost Mobile</span><span class="cmp-cm">2 veículos · ontem, 13:44</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/empresas/noticia/2026/11/02/spacex-negocia-compra-da-boost-mobile-ou-acesso-a-sua-rede-com-a-echostar-diz-jornal.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 2 veículos</p>
   <p class="cov-c">A cobertura convergiu para o objetivo estratégico da SpaceX de expandir a utilidade da rede Starlink por meio de acesso terrestre.</p>
@@ -2017,8 +2419,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-  </ol>
+            </details>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="term" id="termometro" aria-labelledby="term-h">
@@ -3936,6 +4342,48 @@ body.modal-open .btt{visibility:hidden}
     });
   }
 
+  /* ── Cobertura comparada: uma aba por editoria (como as abas das matérias) ── */
+  function setupCompareTabs() {
+    var wrap = d.querySelector('.cmp-tabs');
+    var bar = wrap && wrap.querySelector('.tabs-bar');
+    if (!bar) return;
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll('[role="tab"]'));
+    var panes = Array.prototype.slice.call(wrap.querySelectorAll('.cmp-pane'));
+    function reveal(tab) {
+      var left = tab.offsetLeft, right = left + tab.offsetWidth;
+      if (left < bar.scrollLeft) bar.scrollLeft = left - 16;
+      else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth + 16;
+    }
+    function select(tab, focus) {
+      var key = tab.getAttribute('data-cmp-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      wrap.classList.toggle('all', key === 'all');
+      panes.forEach(function (p) { p.classList.toggle('active', key === 'all' || p.id === 'cmp-pane-' + key); });
+      if (focus) tab.focus();
+      reveal(tab);
+    }
+    setupTabArrows(bar);
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { select(tab, false); });
+    });
+    bar.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(d.activeElement);
+      if (index < 0) return;
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      else if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      select(next, true);
+    });
+  }
+
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -4056,6 +4504,7 @@ body.modal-open .btt{visibility:hidden}
   setupLeadFit();
   setupRadarMore();
   setupAges();
+  setupCompareTabs();
   setupModals();
   setupScroll();
   setupTermometro();

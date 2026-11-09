@@ -172,19 +172,19 @@ seção **Cobertura comparada**. No e-mail, cada matéria ganha a barra e a
 conclusão. A análise usa só o que os veículos publicaram; quando o trecho não
 permite dizer, o veículo fica como neutro.
 
-A seção **Cobertura comparada** é um mapa só de todos os assuntos do dia vistos
-por dois ou mais veículos — as matérias da edição com análise e os demais
-assuntos —, organizado para escolher o que ler:
+A seção **Cobertura comparada** reúne todos os assuntos do dia vistos por dois ou
+mais veículos — as matérias da edição com análise e os demais assuntos — em
+**abas por editoria**, no mesmo desenho das abas das matérias (Brasil · Economia,
+Mercados & Finanças, Política, Esporte…, e "Todas"): cada assunto entra na aba da
+editoria dele, e cada aba mostra quantos assuntos tem e quantos dividiram os
+veículos ("3 div."). Em cada aba:
 
 - **Onde a mídia divergiu**: os assuntos com veículos dos dois lados, primeiro os
   mais disputados (mais veículos no lado menor; depois o mais equilibrado), com a
   divergência de cada um (2 × o lado menor ÷ (A + B): 100 = meio a meio) e o link
   para a matéria, quando é da edição;
-- **Sem divergência, por editoria**: o resto, em listas curtas por editoria
-  (clicar abre a conclusão e a análise por veículo);
-- **filtro por editoria** no topo (com quantos assuntos e quantas divergências
-  cada uma tem): mostra só a editoria escolhida nas duas partes, e a contagem de
-  cada parte passa a ser a da editoria.
+- **Relataram de forma semelhante**: o resto, em lista curta (clicar abre a
+  conclusão e a análise por veículo).
 
 Os atalhos do topo da edição levam à Cobertura comparada, ao Termômetro do dia, ao
 Racional da edição e a todas as notícias do dia.
@@ -456,10 +456,18 @@ atalhos para o analítico de cada um (com a editoria e o período da tabela).
 
 ## Receber por e-mail
 
-O e-mail traz a manchete com imagem, o resumo do dia, cotações, clima, o
-racional da compilação e as principais matérias por seção, com links para a
-edição completa e para todas as notícias do dia. Há dois
-caminhos, que podem ser usados juntos ou separados.
+O e-mail segue o modelo do e-mail do **TSA Tech**: a faixa do cabeçalho (o logo
+sobre o marinho com a rede do site), o slogan e a data; **"Hoje em 6 notícias"**,
+com a manchete em destaque (editoria, título, linha fina e veículos) e as outras
+cinco em uma linha de duas colunas e outra de três (número, editoria, título e
+quantos veículos), uma por editoria quando dá, na ordem da primeira página; **"Ler
+a edição completa"** e o total de notícias do dia (link para a lista completa); e
+um rodapé curto (marca, slogan, fontes, edições anteriores, Instagram). Cada título
+abre a matéria na edição. O HTML é sempre claro, tem 600 px e cerca de 10 KB; no
+celular, as colunas ficam uma embaixo da outra. A versão em texto puro traz a
+manchete, as principais notícias com os links e os links da edição. A quantidade
+de notícias além da manchete fica em `email.max_stories` (`config/site.yaml`,
+padrão 5). Há dois caminhos, que podem ser usados juntos ou separados.
 
 ### Opção 1 — Rotina diária do Claude (Gmail) — já configurada
 
@@ -596,7 +604,8 @@ As fontes ficam em [`config/sources.yaml`](config/sources.yaml), uma por linha:
 - **Remover:** apague a linha ou use `enabled: false`.
 
 Seções, palavras-chave, cotações do ticker, cidades do clima (hoje só São Paulo;
-Montevidéu saiu em nov/2026) e limites da edição
+Montevidéu saiu em nov/2026: a faixa de clima mostra só as cidades configuradas,
+também nas edições refeitas) e limites da edição
 (quantidade de matérias, mínimos, idade máxima das notícias) ficam em
 [`config/site.yaml`](config/site.yaml), com comentários explicando cada item.
 
@@ -635,9 +644,12 @@ original.
   (`logo_height: 64`, `logo_height_mobile: 46`);
 - `assets/triangula-marca.svg` — o mesmo logo em marinho, para fundos claros;
 - `assets/triangula-favicon.svg` — o ícone: triângulo laranja sobre o marinho;
+- `assets/triangula-cabecalho-email.jpg` — faixa do topo do e-mail, no modelo do
+  TSA Tech: o logo sobre o marinho do cabeçalho com a rede do site, em 2x (1200 ×
+  264, exibida em 600 × 132), servida pelo GitHub Pages (`email_header`);
 - `assets/triangula-marca-email.png` — logo do e-mail (clientes de e-mail não
   exibem SVG), branco sobre a cor do cabeçalho, em 3x (248 × 64), servido pelo
-  GitHub Pages (`email_logo`). Os logos anteriores (em pixel: `triangula-logo*`,
+  GitHub Pages (`email_logo`; vale quando não há `email_header`). Os logos anteriores (em pixel: `triangula-logo*`,
   `pbcv-tech-*`) ficam no repositório com os mesmos nomes e tamanhos porque os
   e-mails já enviados apontam para eles.
 
