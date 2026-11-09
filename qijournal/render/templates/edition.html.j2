@@ -74,7 +74,7 @@
   </ul>
   {% if v.compared or v.rationale or v.index_url %}
   <ul class="sn-x">
-    {% if v.compared %}<li><a href="#cobertura">Cobertura comparada</a></li>{% endif %}
+    {% if v.compared_map %}<li><a href="#cobertura">Cobertura comparada</a></li>{% endif %}
     {% if v.rationale %}<li><a href="#racional">Racional da edição</a></li>{% endif %}
     {% if v.index_url %}<li><a href="{{ v.index_url }}">Todas as {{ v.index_total|num }} notícias</a></li>{% endif %}
   </ul>
@@ -365,21 +365,55 @@
 </section>
 {% endif %}
 
-{% if v.compared %}
+{% if v.compared_map %}{% set cm = v.compared_map %}
 <section class="cmp" id="cobertura" aria-labelledby="cmp-h">
   <div class="cmp-top">
     <h2 class="kicker" id="cmp-h">Cobertura comparada</h2>
-    <p class="cmp-note">Os demais assuntos do dia vistos por dois ou mais veículos: em que sentido cada um conduziu a cobertura. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
+    <p class="cmp-note">Todos os assuntos do dia vistos por dois ou mais veículos{% if cm.stories %} — as {{ cm.stories }} matérias da edição com análise e os demais —{% endif %} num mapa só: primeiro <b>onde a mídia divergiu</b> (veículos dos dois lados; antes os assuntos com mais veículos no lado menor), depois o que os veículos relataram <b>de forma semelhante</b>, por editoria. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
   </div>
-  <ol class="cmp-list">
-    {% for c in v.compared %}
-    <li class="cmp-i" style="--sc:{{ c.color }}">
-      <p class="cat">{{ c.section_title }}{% if c.time %} <span class="cmp-t">· {{ c.time }}</span>{% endif %}</p>
-      <h3>{% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">{{ c.topic }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ c.topic }}{% endif %}</h3>
-      {{ m.coverage(c) }}
-    </li>
-    {% endfor %}
-  </ol>
+  <div class="cmp-f" role="group" aria-label="Filtrar a cobertura comparada por editoria" hidden>
+    <button type="button" class="on" data-cmp-f="" aria-pressed="true">Todas <b>{{ cm.total }}</b></button>
+    {% for cat in cm.categories %}<button type="button" data-cmp-f="{{ cat.id }}" aria-pressed="false" style="--sc:{{ cat.color }}"><i class="cmp-fd" aria-hidden="true"></i>{{ cat.title }} <b>{{ cat.total }}</b>{% if cat.divided %}<span class="cmp-fv" title="{{ cat.divided }} com veículos dos dois lados">{{ cat.divided }} div.</span>{% endif %}</button>{% endfor %}
+  </div>
+  <div class="cmp-g" data-cmp-g>
+    <h3 class="cmp-gh">Onde a mídia divergiu <span>{{ cm.divided|length }} de {{ cm.total }} {{ "assunto" if cm.total == 1 else "assuntos" }} · os mais disputados primeiro</span></h3>
+    {% if cm.divided %}
+    <ol class="cmp-list">
+      {% for it in cm.divided %}{% set c = it.c %}
+      <li class="cmp-i" style="--sc:{{ c.color }}" data-s="{{ it.section or 'outras' }}">
+        <p class="cat">{{ c.section_title }}{% if c.time %} <span class="cmp-t">· {{ c.time }}</span>{% endif %} <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência {{ it.divergence_pct }}</span>{% if it.story_href %} <span class="cmp-mt">· matéria da edição</span>{% endif %}</p>
+        <h3>{% if it.story_href %}<a href="{{ it.story_href }}">{{ it.story_title }}</a>{% elif c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">{{ c.topic }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ c.topic }}{% endif %}</h3>
+        {{ m.coverage(c) }}
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+    <p class="cmp-vazio"{% if cm.divided %} hidden{% endif %}>Nenhum assunto {% if cm.divided %}desta editoria {% endif %}teve veículos dos dois lados.</p>
+  </div>
+  {% if cm.consensus %}
+  <div class="cmp-g cmp-cons" data-cmp-g>
+    <h3 class="cmp-gh">Sem divergência, por editoria <span>{{ cm.consensus }} {{ "assunto" if cm.consensus == 1 else "assuntos" }} que os veículos relataram de forma semelhante · clique para ver a análise</span></h3>
+    <div class="cmp-cats">
+      {% for cat in cm.categories if cat.items %}
+      <section class="cmp-cat" data-s="{{ cat.id }}" style="--sc:{{ cat.color }}">
+        <h4>{{ cat.title }} <span>{{ cat.items|length }}</span></h4>
+        <ol class="cmp-cl">
+          {% for it in cat.items %}{% set c = it.c %}
+          <li data-s="{{ cat.id }}">
+            <details>
+              <summary><span class="cmp-ct">{{ it.story_title or c.topic }}</span><span class="cmp-cm">{{ c.total }} {{ "veículo" if c.total == 1 else "veículos" }}{% if c.time %} · {{ c.time }}{% endif %}{% if it.story_href %} · matéria da edição{% endif %}</span></summary>
+              {% if it.story_href %}<p class="cmp-lk"><a href="{{ it.story_href }}">Ler a matéria &rarr;</a></p>{% elif c.url %}<p class="cmp-lk"><a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>{% endif %}
+              {{ m.coverage(c) }}
+            </details>
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endfor %}
+    </div>
+    <p class="cmp-vazio" hidden>Nenhum assunto sem divergência nesta editoria.</p>
+  </div>
+  {% endif %}
 </section>
 {% endif %}
 

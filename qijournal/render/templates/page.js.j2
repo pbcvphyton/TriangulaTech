@@ -619,6 +619,34 @@
     });
   }
 
+  /* ── Cobertura comparada: filtro por editoria ──────────────────────── */
+  function setupCompareFilter() {
+    var bar = d.querySelector('.cmp-f');
+    var section = bar && bar.closest ? bar.closest('.cmp') : null;
+    if (!section) return;
+    bar.hidden = false;
+    var buttons = Array.prototype.slice.call(bar.querySelectorAll('button[data-cmp-f]'));
+    bar.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('button[data-cmp-f]') : null;
+      if (!button) return;
+      var filter = button.getAttribute('data-cmp-f');
+      buttons.forEach(function (b) {
+        var on = b === button;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      section.classList.toggle('cmp-flt', !!filter);
+      Array.prototype.forEach.call(section.querySelectorAll('[data-s]'), function (el) {
+        el.hidden = !!filter && el.getAttribute('data-s') !== filter;
+      });
+      Array.prototype.forEach.call(section.querySelectorAll('[data-cmp-g]'), function (group) {
+        var empty = !group.querySelector('li[data-s]:not([hidden])');
+        var note = group.querySelector('.cmp-vazio');
+        if (note) note.hidden = !empty;
+      });
+    });
+  }
+
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -677,6 +705,7 @@
   setupLeadFit();
   setupRadarMore();
   setupAges();
+  setupCompareFilter();
   setupModals();
   setupScroll();
 })();

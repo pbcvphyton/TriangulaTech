@@ -689,10 +689,36 @@ def test_coverage_on_cards_modal_and_compared_section(edition, config):
     assert "Análise por veículo: o foco de cada um e o lado que seguiu (3)" in modal
     assert '<span class="cov-a" style="width:67%"></span><span class="cov-b" style="width:33%"></span>' in modal
     assert "A cobertura pendeu para o alívio." in modal
-    section = re.search(r'<section class="cmp" id="cobertura".*?</section>', page, re.S).group(0)
-    assert "<h3>Assunto do dia</h3>" in section  # URL insegura: título sem link
-    assert "Mercados &amp; Finanças" in section and "javascript:" not in page
+    section = page[page.index('<section class="cmp" id="cobertura"') : page.index("</main>") if "</main>" in page else None]
+    # Um mapa só: as matérias com dois lados em "Onde a mídia divergiu" (com link para a
+    # matéria) e o assunto sem divergência na editoria dele, sem link (URL insegura).
+    divergiu = section[section.index("Onde a mídia divergiu") : section.index("Sem divergência, por editoria")]
+    assert divergiu.count('<li class="cmp-i"') == 2 and f'href="#s-{LEAD_ID}"' in divergiu and "matéria da edição" in divergiu
+    assert "divergência 67" in divergiu
+    assert '<span class="cmp-ct">Assunto do dia</span>' in section and "Abrir a fonte" not in section
+    assert 'data-cmp-f="mercados"' in section and "Mercados &amp; Finanças" in section and "javascript:" not in page
     assert parse(page).errors == []
+
+
+def test_compared_map_puts_the_most_disputed_first_and_groups_the_rest(edition, config):
+    ed = copy.deepcopy(edition)
+    ed.compared = [
+        _coverage(["a", "b"], section="mercados"),  # 1 × 1: divergência 100, mas só 2 veículos
+        _coverage(["a", "a", "a", "b", "b", "b", "b"], section="politica"),  # 3 × 4: mais disputado
+        _coverage(["a", "neutro", "neutro"], section="politica"),  # um lado só: sem divergência
+        _coverage(["neutro", "neutro"], sides=("", ""), section="esporte"),
+    ]
+    cm = build_view(ed, config).compared_map
+    assert cm is not None and cm.total == 4 and cm.consensus == 2 and cm.stories == 0
+    assert [(len(i.c.a), len(i.c.b)) for i in cm.divided] == [(3, 4), (1, 1)]
+    assert [i.divergence_pct for i in cm.divided] == [86, 100]
+    cats = {c.id: c for c in cm.categories}
+    assert cats["politica"].total == 2 and cats["politica"].divided == 1 and len(cats["politica"].items) == 1
+    order = [s.id for s in config.sections]
+    assert [c.id for c in cm.categories] == sorted(cats, key=order.index)
+    page = render(ed, config)
+    assert 'class="cmp-f" role="group"' in page and "setupCompareFilter" in page
+    assert page.index("Onde a mídia divergiu") < page.index("Sem divergência, por editoria")
 
 
 def test_no_coverage_no_section(edition, config):

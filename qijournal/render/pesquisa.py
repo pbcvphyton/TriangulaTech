@@ -32,7 +32,7 @@ from .. import text
 from ..config import Config
 from ..models import Edition
 from ..termometro.referencia import PARAMETROS
-from . import filters, midia
+from . import filters, midia, tom
 from .midia import DestaquesView
 from .termometro import ANALITICO_PAGINA, CLASSE, analises_validas
 from .web import DEFAULT_COLORS, brand_view, coverage_view
@@ -345,6 +345,20 @@ def pesquisa_view(
         "fora": sorted(midia.FORA),
         "calendario": sorted(midia.CALENDARIO),
         "foraNomes": sorted(midia.FORA_NOMES),
+        # Tom das manchetes: o dicionário e os limites de qijournal/render/tom.py e midia.py.
+        "tom": tom.dicionario(),
+        "tomP": {
+            "min": midia.MIN_TOM,
+            "minV": midia.MIN_TOM_VEICULO,
+            "z": midia.Z_VEICULO,
+            "zT": midia.Z_TENDENCIA,
+            "minSem": midia.MIN_TOM_SEMANA,
+            "semV": midia.SEMANA_VEICULO,
+            "semD": midia.SEMANA_DEMAIS,
+            "padS": midia.PADRAO_SEMANAS,
+            "padF": midia.PADRAO_FRACAO,
+            "barra": midia.BARRA_TOM,
+        },
     }
     if dias:
         primeira, ultima = str(dias[-1]["d"]), str(dias[0]["d"])

@@ -612,3 +612,17 @@ def test_todas_as_analises_a_linha_inteira_abre_o_texto_original(config):
     linha = re.search(r'<li class="tl tl-lk">.*?</li>', html, re.S).group(0)
     assert '<a class="hit" href="https://x.com/a" target="_blank" rel="noopener noreferrer" title="Abrir o texto original (x.com)">' in linha
     assert ".tl.tl-lk{position:relative;cursor:pointer" in html  # o link do título cobre a linha (.hit::after)
+
+
+def test_analitico_abre_com_o_resultado_em_linguagem_clara(config):
+    evid = [{"id": "E1", "criterio": "ROTULOS", "citacao": "x", "paragrafo": "P1", "direcao": "esquerda", "contribuicao": -5.0}]
+    analises = [_analise(f"a{i}", "2026-10-10", T=0, rotulo="Equilibrado", veiculo="Valor" if i % 3 else "Folha") for i in range(30)]
+    analises[0] = {**analises[0], "evidencias": evid, "T": -6}
+    analises[1] = {**analises[1], "evidencias": [{**evid[0], "criterio": "FONTES", "direcao": "direita", "contribuicao": 3.0}]}
+    html = render_analitico_page([{"data": "2026-10-10", "analises": analises}], config, home_href="../", archive_href="./")
+    assert 'id="an-resumo"' in html and "Em resumo · o que o termômetro diz" in html
+    assert "O texto das notícias sai equilibrado" in html and "Em 30 das 30 notícias analisadas (100%)" in html
+    assert "Só 2 textos (6,7%) tiveram algum sinal que pontuou: 1 sinal para a esquerda e 1 para a direita." in html
+    assert "rótulos e aspas" in html and "fontes e espaço" in html  # os critérios com nome legível
+    assert html.index('id="an-resumo"') < html.index('id="an-onde"')  # a resposta vem antes dos números
+    assert 'class="an-nav"' in html and 'href="#an-resumo"' in html

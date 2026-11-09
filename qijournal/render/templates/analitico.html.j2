@@ -29,6 +29,51 @@
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
   <p class="an-intro">{{ a.intro }}</p>
+  <nav class="an-nav" aria-label="Nesta página">
+    <span>Nesta página:</span>
+    {% if a.em_resumo %}<a href="#an-resumo">Em resumo</a>{% endif %}
+    {% if nm %}<a href="#an-nomes">Nomes em destaque</a><a href="#an-quem">Quem fala de quem</a>{% endif %}
+    {% if not a.vazio %}<a href="#an-onde">Onde estamos</a><a href="#an-indo">Para onde vamos</a><a href="#an-series">Semana a semana</a><a href="#an-dias">Dia a dia</a><a href="#an-todas">Todas as análises</a>{% endif %}
+    <a href="#an-metodo">Método</a>
+  </nav>
+
+  {% if a.em_resumo %}{% set r = a.em_resumo %}
+  <div class="an-blk an-res" id="an-resumo">
+    <h3 class="an-h">Em resumo · o que o termômetro diz</h3>
+    <p class="an-res-t">{{ r.titulo }}</p>
+    <ul class="an-res-l">
+      {% for f in r.frases %}<li>{{ f }}</li>{% endfor %}
+    </ul>
+    {% if r.criterios or r.veiculos %}
+    <div class="an-res-2c">
+      {% if r.criterios %}
+      <section>
+        <h4 class="an-res-h">Onde estão os sinais · por critério</h4>
+        <ol class="an-crit">
+          {% for c in r.criterios %}
+          <li><span class="an-cn">{{ c.nome }}</span><span class="an-cb" aria-hidden="true"><i class="esq" style="width:{{ c.pct_esq }}%"></i><i class="dir" style="width:{{ c.pct_dir }}%"></i></span><span class="an-cv"><b>{{ c.n }}</b> · {{ c.esquerda }} esq. · {{ c.direita }} dir.</span></li>
+          {% endfor %}
+        </ol>
+        <p class="term-note">Sinais que pontuaram (com citação conferida no texto), pela direção que puxam.</p>
+      </section>
+      {% endif %}
+      {% if r.veiculos %}
+      <section>
+        <h4 class="an-res-h">Textos com algum sinal · por veículo</h4>
+        <ol class="an-crit">
+          {% for v in r.veiculos %}
+          <li><span class="an-cn">{{ v.nome }}</span><span class="an-cb" aria-hidden="true"><i class="neu" style="width:{{ v.barra }}%"></i></span><span class="an-cv"><b>{{ v.pct }}</b> · {{ v.com_sinal }} de {{ v.textos }}</span></li>
+          {% endfor %}
+        </ol>
+        <p class="term-note">Veículos com 10 ou mais notícias analisadas.</p>
+      </section>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if nm %}{{ md.nomes(nm) }}{{ md.dossie(nm) }}{% endif %}
 
   {% if not a.vazio %}
   <div class="an-blk">
@@ -138,8 +183,6 @@
   </div>
   {% endif %}
 
-  {% if nm %}{{ md.nomes(nm) }}{% endif %}
-
   <div class="an-blk">
     <h3 class="an-h" id="an-dias">Dia a dia</h3>
     <p class="term-note">Por data de publicação dos textos; o link abre a edição em que eles foram analisados.</p>
@@ -169,8 +212,6 @@
     </details>
     {% endfor %}
   </div>
-  {% elif nm %}
-  {{ md.nomes(nm) }}
   {% endif %}
 
   <div class="an-blk">
