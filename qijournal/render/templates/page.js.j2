@@ -639,10 +639,18 @@
       Array.prototype.forEach.call(section.querySelectorAll('[data-s]'), function (el) {
         el.hidden = !!filter && el.getAttribute('data-s') !== filter;
       });
+      var nome = filter ? button.textContent.replace(/\d+( div\.)?/g, '').trim() : '';
       Array.prototype.forEach.call(section.querySelectorAll('[data-cmp-g]'), function (group) {
-        var empty = !group.querySelector('li[data-s]:not([hidden])');
+        var visiveis = group.querySelectorAll('li[data-s]:not([hidden])').length;
         var note = group.querySelector('.cmp-vazio');
-        if (note) note.hidden = !empty;
+        if (note) note.hidden = visiveis > 0;
+        // A contagem do título acompanha o filtro (o texto original volta em "Todas").
+        var conta = group.querySelector('[data-cmp-n]');
+        if (!conta) return;
+        if (!conta.hasAttribute('data-orig')) conta.setAttribute('data-orig', conta.textContent);
+        conta.textContent = filter
+          ? (visiveis ? visiveis + ' ' + (visiveis === 1 ? 'assunto' : 'assuntos') : 'nenhum assunto') + ' em ' + nome
+          : conta.getAttribute('data-orig');
       });
     });
   }

@@ -72,9 +72,10 @@
     {% endfor %}
     <li><a href="#editorias" data-tab="all">Todas</a></li>
   </ul>
-  {% if v.compared or v.rationale or v.index_url %}
+  {% if v.compared_map or v.termometro or v.rationale or v.index_url %}
   <ul class="sn-x">
     {% if v.compared_map %}<li><a href="#cobertura">Cobertura comparada</a></li>{% endif %}
+    {% if v.termometro %}<li><a href="#termometro">Termômetro do dia</a></li>{% endif %}
     {% if v.rationale %}<li><a href="#racional">Racional da edição</a></li>{% endif %}
     {% if v.index_url %}<li><a href="{{ v.index_url }}">Todas as {{ v.index_total|num }} notícias</a></li>{% endif %}
   </ul>
@@ -376,7 +377,7 @@
     {% for cat in cm.categories %}<button type="button" data-cmp-f="{{ cat.id }}" aria-pressed="false" style="--sc:{{ cat.color }}"><i class="cmp-fd" aria-hidden="true"></i>{{ cat.title }} <b>{{ cat.total }}</b>{% if cat.divided %}<span class="cmp-fv" title="{{ cat.divided }} com veículos dos dois lados">{{ cat.divided }} div.</span>{% endif %}</button>{% endfor %}
   </div>
   <div class="cmp-g" data-cmp-g>
-    <h3 class="cmp-gh">Onde a mídia divergiu <span>{{ cm.divided|length }} de {{ cm.total }} {{ "assunto" if cm.total == 1 else "assuntos" }} · os mais disputados primeiro</span></h3>
+    <h3 class="cmp-gh">Onde a mídia divergiu <span data-cmp-n="divergiu">{{ cm.divided|length }} de {{ cm.total }} {{ "assunto" if cm.total == 1 else "assuntos" }} · os mais disputados primeiro</span></h3>
     {% if cm.divided %}
     <ol class="cmp-list">
       {% for it in cm.divided %}{% set c = it.c %}
@@ -392,7 +393,7 @@
   </div>
   {% if cm.consensus %}
   <div class="cmp-g cmp-cons" data-cmp-g>
-    <h3 class="cmp-gh">Sem divergência, por editoria <span>{{ cm.consensus }} {{ "assunto" if cm.consensus == 1 else "assuntos" }} que os veículos relataram de forma semelhante · clique para ver a análise</span></h3>
+    <h3 class="cmp-gh">Sem divergência, por editoria <span data-cmp-n="semelhante">{{ cm.consensus }} {{ "assunto" if cm.consensus == 1 else "assuntos" }} que os veículos relataram de forma semelhante · clique para ver a análise</span></h3>
     <div class="cmp-cats">
       {% for cat in cm.categories if cat.items %}
       <section class="cmp-cat" data-s="{{ cat.id }}" style="--sc:{{ cat.color }}">

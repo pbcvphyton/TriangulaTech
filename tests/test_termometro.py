@@ -630,10 +630,25 @@ def test_analitico_abre_com_o_resultado_em_linguagem_clara(config):
     html = render_analitico_page([{"data": "2026-10-10", "analises": analises}], config, home_href="../", archive_href="./")
     assert 'id="an-resumo"' in html and "Em resumo · o que o termômetro diz" in html
     assert "O texto das notícias sai equilibrado" in html and "Em 30 das 30 notícias analisadas (100%)" in html
-    assert "Só 2 textos (6,7%) tiveram algum sinal que pontuou: 1 sinal para a esquerda e 1 para a direita." in html
-    assert "rótulos e aspas" in html and "fontes e espaço" in html  # os critérios com nome legível
+    assert (
+        "Só 2 notícias (7%) tiveram sinal de tratamento desigual confirmado no texto: 1 sinal para a esquerda e "
+        "1 para a direita." in html
+    )
     assert html.index('id="an-resumo"') < html.index('id="an-onde"')  # a resposta vem antes dos números
     assert 'class="an-nav"' in html and 'href="#an-resumo"' in html
+    # Onde estão os sinais: o mesmo painel do Termômetro do dia, sobre todo o histórico
+    onde = html[html.index('id="an-onde"') : html.index('id="an-indo"')]
+    assert 'id="an-sinais"' in onde and "Rótulos e aspas" in onde and "Fontes e espaço" in onde
+    assert 'id="an-desig"' in onde and "Folha" in onde and 'href="#an-sinais"' in html
+
+
+def test_parcela_nao_arredonda_para_tudo_ou_nada():
+    from qijournal.render.termometro import distribuicao, porcento_txt
+
+    assert [porcento_txt(p, 453) for p in (0, 1, 452, 453, 227)] == ["0%", "0,2%", "99,8%", "100%", "50%"]
+    assert porcento_txt(1, 5000) == "<0,1%" and porcento_txt(0, 0) == "0%"
+    d = distribuicao({"Equilibrado": 452, "Leve à esquerda": 1})
+    assert {b.rotulo: b.share for b in d.barras if b.n} == {"Equilibrado": "99,8%", "Leve à esquerda": "0,2%"}
 
 
 # ── volume e detalhes (nov/2026) ─────────────────────────────────────────────

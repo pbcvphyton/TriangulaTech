@@ -141,6 +141,21 @@ def _porcento(parte: int, total: int) -> int:
     return arredondar(100 * parte / total) if total else 0
 
 
+def porcento_txt(parte: int, total: int) -> str:
+    """A parcela escrita sem esconder o que sobra: 452 de 453 é "99,8%", não "100%",
+    e 1 de 453 é "0,2%", não "0%" (só 0 e o total inteiro saem como 0% e 100%)."""
+    if not total or not parte:
+        return "0%"
+    if parte >= total:
+        return "100%"
+    valor = 100 * parte / total
+    if valor < 0.05:
+        return "<0,1%"
+    if valor < 1 or valor > 99:
+        return f"{text.format_number_pt(min(valor, 99.9), 1)}%"
+    return f"{arredondar(valor)}%"
+
+
 def _marca(valor: int) -> str:
     return f"{MENOS}{abs(valor)}" if valor < 0 else f"+{valor}" if valor > 0 else "0"
 
@@ -230,7 +245,7 @@ class BarraView:
     classe: str
     n: int
     largura: float  # % da barra maior
-    share: int  # % do total
+    share: str  # parcela do total, escrita ("99,8%")
 
 
 @dataclass
@@ -253,7 +268,7 @@ def distribuicao(rotulos: Mapping[str, int], *, fora: str = "") -> DistribuicaoV
         n = int(rotulos.get(r, 0) or 0)
         if r == "Misto" and not n:
             continue  # Misto só aparece quando há
-        barras.append(BarraView(r, CLASSE[r], n, round(n * 100 / maior, 2) if n else 0.0, _porcento(n, total)))
+        barras.append(BarraView(r, CLASSE[r], n, round(n * 100 / maior, 2) if n else 0.0, porcento_txt(n, total)))
     aria = "Rótulos das notícias: " + "; ".join(f"{b.rotulo}: {b.n}" for b in barras if b.n)
     return DistribuicaoView(barras=barras, total=total, aria=aria, fora=fora)
 
@@ -567,9 +582,13 @@ class SinaisView:
 @dataclass
 class ItemQualidadeView:
     nome: str
-    pct: int  # % de "sim" entre os textos em que o item se aplica
+    pct: int  # % de "sim" entre os textos em que o item se aplica (largura da barra)
     sim: int
     base: int
+
+    @property
+    def pct_txt(self) -> str:
+        return porcento_txt(self.sim, self.base)
 
 
 @dataclass

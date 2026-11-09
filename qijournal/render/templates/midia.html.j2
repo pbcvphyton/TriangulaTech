@@ -69,6 +69,7 @@
         </tbody>
       </table>
     </div>
+    {% if t.veiculos_fora %}<p class="md-note">E mais {{ t.veiculos_fora }} {{ "veículo" if t.veiculos_fora == 1 else "veículos" }} com menos manchetes (todos na Pesquisa).</p>{% endif %}
     {% if t.exemplos %}
     <ul class="qf-ex">
       {% for e in t.exemplos %}

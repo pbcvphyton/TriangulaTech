@@ -460,6 +460,7 @@ class TomView:
     exemplos: list[ExemploView]
     criticos: int  # veículos mais críticos que os demais (com significância)
     favoraveis_n: int
+    veiculos_fora: int = 0  # veículos com menos manchetes, fora da tabela
 
 
 BARRA_TOM = 50  # a barra do saldo vai de −50 a +50 (saldos de manchetes raramente passam disso)
@@ -628,6 +629,7 @@ def tom_do_nome(
         exemplos=exemplos,
         criticos=criticos,
         favoraveis_n=favoraveis,
+        veiculos_fora=max(0, len(veiculos) - VEICULOS_TOM),
     )
     view.leitura = _leitura_tom(view, veiculos, tendencia, t_titulo)
     return view

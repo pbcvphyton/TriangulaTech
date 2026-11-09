@@ -183,7 +183,11 @@ assuntos —, organizado para escolher o que ler:
 - **Sem divergência, por editoria**: o resto, em listas curtas por editoria
   (clicar abre a conclusão e a análise por veículo);
 - **filtro por editoria** no topo (com quantos assuntos e quantas divergências
-  cada uma tem): mostra só a editoria escolhida nas duas partes.
+  cada uma tem): mostra só a editoria escolhida nas duas partes, e a contagem de
+  cada parte passa a ser a da editoria.
+
+Os atalhos do topo da edição levam à Cobertura comparada, ao Termômetro do dia, ao
+Racional da edição e a todas as notícias do dia.
 
 ### Termômetro de Viés Editorial e Analítico Político (só Triangula)
 
@@ -254,13 +258,18 @@ o que está guardado, sem recalcular nada.
 
 A aba **Analítico Político** (`edicoes/analitico.html`) abre com **Em resumo · o
 que o termômetro diz**: a resposta em linguagem clara (hoje, que o texto das
-notícias sai equilibrado: quantas ficaram "Equilibrado", quantos textos tiveram
-algum sinal que pontuou e para que lado), o que isso quer dizer (as diferenças
-entre veículos aparecem antes do texto: no que cobrem, no espaço e no tom das
-manchetes), o aviso quando a amostra está concentrada em poucos veículos e onde
-estão os sinais (por critério, com a direção, e por veículo). Logo depois vêm os
-**Nomes em destaque** e **Quem fala de quem, e como** (abaixo), e então o
-histórico completo do termômetro.
+notícias sai equilibrado: quantas ficaram "Equilibrado", quantas tiveram sinal de
+tratamento desigual e para que lado, e quantos sinais foram de equilíbrio), o que
+isso quer dizer (as diferenças entre veículos aparecem antes do texto: no que
+cobrem, no espaço e no tom das manchetes) e o aviso quando a amostra está
+concentrada em poucos veículos. Logo depois vêm os **Nomes em destaque** e **Quem
+fala de quem, e como** (abaixo), e então o histórico completo do termômetro; em
+**Onde estamos**, ao lado da distribuição, ficam **Onde estão os sinais** (o mesmo
+painel do Termômetro do dia, por critério e lado, sobre todo o histórico), o
+**tratamento desigual por veículo** (a parte das notícias de cada um com algum
+sinal à esquerda ou à direita) e, nas análises que guardam o checklist, a
+**qualidade da apuração item a item**. As parcelas não arredondam para "tudo ou
+nada": 452 de 453 aparece como 99,8%, não 100%.
 
 O histórico agrega **todos os registros** (`qijournal/termometro/agregacao.py`, conferida pelos testes da
 seção 14.7 da especificação): onde estamos (média geral), para onde estamos indo

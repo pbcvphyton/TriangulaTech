@@ -55,7 +55,7 @@
 {% macro dist(d) -%}
 <ol class="th" aria-label="{{ d.aria }}">
   {%- for c in d.barras %}
-  <li class="{% if not c.n %}zero{% endif %}"><span class="th-l"><i class="sw t-{{ c.classe }}" aria-hidden="true"></i>{{ c.rotulo }}</span><span class="th-m" aria-hidden="true"><span class="t-{{ c.classe }}" style="width:{{ c.largura }}%"></span></span><span class="th-v"><b>{{ c.n }}</b> <span>{{ c.share }}%</span></span></li>
+  <li class="{% if not c.n %}zero{% endif %}"><span class="th-l"><i class="sw t-{{ c.classe }}" aria-hidden="true"></i>{{ c.rotulo }}</span><span class="th-m" aria-hidden="true"><span class="t-{{ c.classe }}" style="width:{{ c.largura }}%"></span></span><span class="th-v"><b>{{ c.n }}</b> <span>{{ c.share }}</span></span></li>
   {%- endfor %}
 </ol>
 {%- if d.fora %}<p class="tm-foot">Fora da média: {{ d.fora }}.</p>{% endif %}
@@ -82,7 +82,7 @@
 {% macro checklist(c) -%}
 <ul class="tq">
   {%- for i in c.itens %}
-  <li><span class="tq-n">{{ i.nome }}</span><span class="tq-m" aria-hidden="true"><span style="width:{{ i.pct }}%"></span></span><span class="tq-v"><b>{{ i.pct }}%</b> <span class="sr-only">dos textos, </span>{{ i.sim }} de {{ i.base }}</span></li>
+  <li><span class="tq-n">{{ i.nome }}</span><span class="tq-m" aria-hidden="true"><span style="width:{{ i.pct }}%"></span></span><span class="tq-v"><b>{{ i.pct_txt }}</b> <span class="sr-only">dos textos, </span>{{ i.sim }} de {{ i.base }}</span></li>
   {%- endfor %}
 </ul>
 {%- endmacro %}

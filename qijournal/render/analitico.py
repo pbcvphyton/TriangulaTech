@@ -27,7 +27,6 @@ from typing import Any
 from .. import text
 from ..config import Config
 from ..termometro import agregacao
-from ..termometro.referencia import NOMES as NOMES_CRITERIOS
 from ..termometro.referencia import PARAMETROS
 from . import filters
 from .midia import DestaquesView
@@ -36,8 +35,12 @@ from .termometro import (
     CLASSE,
     EIXOS,
     AnaliseView,
+    ChecklistView,
     DistribuicaoView,
     GaugeView,
+    SinaisView,
+    _checklist_do_dia,
+    _sinais,
     analise_view,
     contagem,
     distribuicao,
@@ -46,6 +49,7 @@ from .termometro import (
     fmt_q,
     fmt_t,
     gauge,
+    porcento_txt,
     todas_validas,
 )
 from .web import brand_view
@@ -172,16 +176,6 @@ class MesView:
 
 
 @dataclass
-class CriterioView:
-    nome: str
-    n: int
-    esquerda: int
-    direita: int
-    pct_esq: float  # % da barra (da maior contagem)
-    pct_dir: float
-
-
-@dataclass
 class SinalVeiculoView:
     nome: str
     textos: int
@@ -192,15 +186,18 @@ class SinalVeiculoView:
 
 @dataclass
 class ResumoView:
-    """O resultado do termômetro em linguagem clara: a resposta, o que ela quer dizer
-    e onde aparecem os poucos sinais que pontuaram."""
+    """O resultado do termômetro em linguagem clara (a resposta e o que ela quer dizer)
+    e, para "Onde estamos", onde aparecem os sinais: por critério e lado (o mesmo
+    painel do Termômetro do dia, sobre todo o histórico), os veículos com tratamento
+    desigual e o checklist da qualidade (só das análises que guardam os itens)."""
 
     titulo: str
     frases: list[str]
-    criterios: list[CriterioView]
+    sinais: SinaisView
     veiculos: list[SinalVeiculoView]
-    com_sinal: int
+    desiguais: int  # notícias com sinal de tratamento desigual (à esquerda ou à direita)
     noticias: int
+    checklist: ChecklistView | None = None
 
 
 @dataclass
@@ -515,17 +512,11 @@ def _linha_tabela(nome: str, s: Mapping[str, Any], href: str | None = None) -> L
 MIN_TEXTOS_VEICULO = 10  # textos do veículo para a lista de "onde aparecem os sinais"
 
 
-def _pct_txt(parte: int, todo: int) -> str:
-    if not todo:
-        return "—"
-    v = 100 * parte / todo
-    casas = 1 if v < 10 or (v > 99 and parte < todo) else 0  # 452 de 453 é 99,8%, não 100%
-    return f"{text.format_number_pt(v, casas)}%"
-
-
 def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> ResumoView | None:
     """O que o termômetro diz, sem jargão: a resposta, o que ela quer dizer e onde
-    estão os sinais (das notícias com T; opinião à parte)."""
+    estão os sinais (das notícias com T; opinião à parte). Os sinais são contados como
+    no Termômetro do dia: as evidências conferidas no texto, à esquerda, à direita ou
+    de equilíbrio (contraponto ouvido, número com fonte), que não move o T."""
     noticias = [
         a for a in analises
         if agregacao.tipo_de(a) == "noticia" and a.get("estado") == "ok" and a.get("T") is not None
@@ -535,19 +526,21 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
         return None
     rotulos = Counter(a.get("rotulo") or "" for a in noticias)
     equilibrado = rotulos.get("Equilibrado", 0)
-    sinais = [
-        (a, e) for a in noticias for e in (a.get("evidencias") or []) if e.get("contribuicao")
-    ]
-    com_sinal = len({a["id"] for a, _e in sinais})
-    esq = sum(1 for _a, e in sinais if e.get("direcao") == "esquerda")
-    dir_ = sum(1 for _a, e in sinais if e.get("direcao") == "direita")
+    sinais = _sinais([dict(a) for a in noticias])
+
+    def desigual(a: Mapping[str, Any]) -> bool:
+        return any(
+            isinstance(e, dict) and e.get("direcao") in ("esquerda", "direita") for e in a.get("evidencias") or []
+        )
+
+    desiguais = sum(1 for a in noticias if desigual(a))
     media = geral.get("media_T")
     frases = []
     if equilibrado >= 0.8 * n:
         titulo = "O texto das notícias sai equilibrado: o termômetro não encontra viés editorial relevante."
         frases.append(
             f"Em {text.format_number_pt(equilibrado, 0)} das {text.format_number_pt(n, 0)} notícias analisadas "
-            f"({_pct_txt(equilibrado, n)}) o texto ficou “Equilibrado”: os sinais de tratamento desigual que o "
+            f"({porcento_txt(equilibrado, n)}) o texto ficou “Equilibrado”: os sinais de tratamento desigual que o "
             "termômetro procura — rótulos, adjetivos, verbos, escolha e espaço das fontes, números, enquadramento — "
             "foram fracos ou não apareceram."
         )
@@ -556,15 +549,21 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
         titulo = f"O termômetro encontra viés editorial em parte das notícias, em média {lado}."
         frases.append(
             f"{text.format_number_pt(n - equilibrado, 0)} das {text.format_number_pt(n, 0)} notícias analisadas "
-            f"({_pct_txt(n - equilibrado, n)}) saíram fora de “Equilibrado”; a média é T {fmt_t(media or 0)}."
+            f"({porcento_txt(n - equilibrado, n)}) saíram fora de “Equilibrado”; a média é T {fmt_t(media or 0)}."
         )
-    if com_sinal:
-        frases.append(
-            f"Só {text.format_number_pt(com_sinal, 0)} textos ({_pct_txt(com_sinal, n)}) tiveram algum sinal que "
-            f"pontuou: {text.format_number_pt(esq, 0)} {'sinal' if esq == 1 else 'sinais'} para a esquerda e "
-            f"{text.format_number_pt(dir_, 0)} para a direita. Um sinal isolado move pouco o T de um texto, por "
-            "isso quase todos continuam “Equilibrado”."
+    if sinais.esq or sinais.dir:
+        frase = (
+            f"Só {text.format_number_pt(desiguais, 0)} {'notícia' if desiguais == 1 else 'notícias'} "
+            f"({porcento_txt(desiguais, n)}) tiveram sinal de tratamento desigual confirmado no texto: "
+            f"{text.format_number_pt(sinais.esq, 0)} {'sinal' if sinais.esq == 1 else 'sinais'} para a esquerda e "
+            f"{text.format_number_pt(sinais.dir, 0)} para a direita"
         )
+        if sinais.eq:
+            frase += (
+                f"; outros {text.format_number_pt(sinais.eq, 0)} foram de equilíbrio (contraponto ouvido, número "
+                "com fonte, verbo neutro), que não movem o T"
+            )
+        frases.append(frase + ". Um sinal isolado move pouco o T de um texto, por isso quase todos continuam “Equilibrado”.")
     por_veiculo = Counter(a.get("veiculo") or "" for a in noticias)
     if por_veiculo:
         topo = por_veiculo.most_common(2)
@@ -572,8 +571,8 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
         if soma >= 0.5 * n and len(por_veiculo) > 2:
             frases.append(
                 "A amostra é concentrada: "
-                + " e ".join(f"{filters.plain(v)} ({_pct_txt(k, n)})" for v, k in topo)
-                + f" somam {_pct_txt(soma, n)} das notícias, porque só entram textos com o corpo completo da "
+                + " e ".join(f"{filters.plain(v)} ({porcento_txt(k, n)})" for v, k in topo)
+                + f" somam {porcento_txt(soma, n)} das notícias, porque só entram textos com o corpo completo da "
                 "matéria disponível (150 palavras ou mais); comparações entre veículos menores ainda pedem cautela."
             )
     frases.append(
@@ -583,39 +582,18 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
         "logo abaixo."
     )
 
-    por_criterio: dict[str, list[int]] = {}
-    for _a, e in sinais:
-        c = por_criterio.setdefault(str(e.get("criterio") or ""), [0, 0])
-        if e.get("direcao") == "esquerda":
-            c[0] += 1
-        elif e.get("direcao") == "direita":
-            c[1] += 1
-    maior = max((sum(v) for v in por_criterio.values()), default=0) or 1
-    criterios = [
-        CriterioView(
-            nome=NOMES_CRITERIOS.get(k, k.lower()),
-            n=e + d,
-            esquerda=e,
-            direita=d,
-            pct_esq=round(100 * e / maior, 1),
-            pct_dir=round(100 * d / maior, 1),
+    com_sinal_v = Counter(a.get("veiculo") or "" for a in noticias if desigual(a))
+    veiculos = [
+        SinalVeiculoView(
+            nome=filters.plain(v), textos=k, com_sinal=com_sinal_v[v], pct=porcento_txt(com_sinal_v[v], k),
+            barra=round(100 * com_sinal_v[v] / k, 1),
         )
-        for k, (e, d) in sorted(por_criterio.items(), key=lambda kv: (-sum(kv[1]), kv[0]))
-        if e + d
+        for v, k in sorted(por_veiculo.items(), key=lambda kv: (-com_sinal_v[kv[0]] / kv[1], -kv[1], kv[0]))
+        if k >= MIN_TEXTOS_VEICULO
     ]
-    com_sinal_v = Counter(a.get("veiculo") or "" for a in {a["id"]: a for a, _e in sinais}.values())
-    veiculos = []
-    for v, k in sorted(por_veiculo.items(), key=lambda kv: (-com_sinal_v[kv[0]] / kv[1], -kv[1], kv[0])):
-        if k < MIN_TEXTOS_VEICULO:
-            continue
-        veiculos.append(
-            SinalVeiculoView(
-                nome=filters.plain(v), textos=k, com_sinal=com_sinal_v[v], pct=_pct_txt(com_sinal_v[v], k),
-                barra=round(100 * com_sinal_v[v] / k, 1),
-            )
-        )
-    return ResumoView(titulo, frases, criterios, veiculos, com_sinal, n)
-
+    return ResumoView(
+        titulo, frases, sinais, veiculos, desiguais, n, checklist=_checklist_do_dia([dict(a) for a in noticias])
+    )
 
 # ── view completa ────────────────────────────────────────────────────────────
 
