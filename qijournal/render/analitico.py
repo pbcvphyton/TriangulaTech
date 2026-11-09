@@ -62,6 +62,12 @@ DOMINIOS = (25, 50, 100)
 # (P["min_n"]) aparecem marcados como amostra pequena; o T ajustado da agregação já
 # os puxa para a média geral. O ranking de editorias segue o mínimo da especificação.
 MIN_N_VEICULOS = 1
+# "Todas as análises": a página lista as mais recentes (com até 60 análises por
+# edição, o histórico inteiro deixaria a página com vários MB); as demais ficam na
+# Pesquisa analítica, que busca em todas, com o filtro de tipo Termômetro e o CSV. Os
+# números da página (médias, séries, rankings) seguem calculados sobre todo o histórico.
+LISTA_MAX = 1200
+PESQUISA_ANALISES = "pesquisa.html?tipo=a"
 
 
 # ── views ────────────────────────────────────────────────────────────────────
@@ -220,6 +226,10 @@ class AnaliticoView:
     versao: str = PARAMETROS["versao"]
     atualizado: str = ""
     em_resumo: ResumoView | None = None
+    lista_fora: int = 0  # análises do histórico fora da lista (as mais antigas; estão na Pesquisa)
+    lista_total: int = 0
+    pesquisa_href: str = PESQUISA_ANALISES
+    base: str = ""  # "média de 373 notícias com dimensão política" (no placar)
 
 
 # ── auxiliares ───────────────────────────────────────────────────────────────
@@ -654,10 +664,11 @@ def analitico_view(
     dias_com = len({a["data_publicacao"][:10] for a in analises})
 
     medidor = gauge(geral["media_T"], geral["ic95_T"], geral["rotulo"], descricao="Média de todo o histórico (notícias)")
+    base_media = f"{contagem(geral['n'], 'notícia', 'notícias')} com dimensão política"
     resumo = (
-        f"{medidor.rotulo} · T {medidor.valor} na média de {contagem(geral['n'], 'notícia', 'notícias')} com dimensão política"
+        f"{medidor.rotulo} · T {medidor.valor} na média de {base_media}"
         if medidor
-        else "Ainda não há notícia com T (só textos sem dimensão política ou inconclusivos)."
+        else "Ainda não há notícia com T (só textos sem dimensão política ou inconclusivos)"
     )
     tiles = [
         TileView("Textos analisados", text.format_number_pt(tudo["n_total"], 0), f"{veiculos} veículos · {editorias} editorias · {dias_com} dias"),
@@ -716,7 +727,8 @@ def analitico_view(
         dias.append(linha)
 
     por_mes: dict[str, list[dict[str, Any]]] = {}
-    for a in sorted(analises, key=lambda a: (a["data_publicacao"], a.get("veiculo") or ""), reverse=True):
+    recentes = sorted(analises, key=lambda a: (a["data_publicacao"], a.get("veiculo") or ""), reverse=True)
+    for a in recentes[:LISTA_MAX]:
         por_mes.setdefault(a["data_publicacao"][:7], []).append(a)
     meses = [
         MesView(f"{_mes_label(m)} · {contagem(len(lista), 'texto', 'textos')}", [analise_view(a, evidencias=False) for a in lista], aberto=i == 0)
@@ -732,7 +744,18 @@ def analitico_view(
         ),
         gauge=medidor,
         resumo=resumo,
-        distribuicao=distribuicao(geral["rotulos"]),
+        distribuicao=distribuicao(
+            geral["rotulos"],
+            fora=" · ".join(
+                p
+                for p in (
+                    f"{geral['n_nao_se_aplica']} sem dimensão política" if geral["n_nao_se_aplica"] else "",
+                    contagem(geral["n_inconclusivo"], "inconclusiva", "inconclusivas") if geral["n_inconclusivo"] else "",
+                )
+                if p
+            ),
+        ),
+        base=f"média de {base_media}",
         tiles=tiles,
         leituras=leituras,
         puxadores=puxadores,
@@ -747,6 +770,8 @@ def analitico_view(
         metodo=metodo,
         atualizado=_data_label(edition_date) if edition_date else "",
         em_resumo=_em_resumo(analises, geral),
+        lista_fora=max(0, len(recentes) - LISTA_MAX),
+        lista_total=len(recentes),
     )
 
 

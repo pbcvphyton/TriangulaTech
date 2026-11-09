@@ -78,14 +78,18 @@
   {% if not a.vazio %}
   <div class="an-blk">
     <h3 class="an-h" id="an-onde">Onde estamos</h3>
-    <p class="term-sum">{{ a.resumo }}{% if a.gauge and a.gauge.ic %} <span>(intervalo de 95%: {{ a.gauge.ic }})</span>{% endif %}</p>
-    {% if a.gauge %}{{ tm.gauge(a.gauge) }}{% endif %}
-    {% if a.distribuicao %}{{ tm.dist(a.distribuicao) }}{% endif %}
-    <ul class="an-tiles">
-      {% for t in a.tiles %}
-      <li><span class="an-tl">{{ t.rotulo }}</span><b>{{ t.valor }}</b>{% if t.detalhe %}<span class="an-td">{{ t.detalhe }}</span>{% endif %}</li>
-      {% endfor %}
-    </ul>
+    <p class="tm-dek">{{ a.resumo }}.</p>
+    {% if a.gauge %}{{ tm.placar(a.gauge, "T médio de todo o histórico", a.base) }}{% endif %}
+    {{ tm.indicadores(a.tiles) }}
+    {% if a.distribuicao %}
+    <div class="tm-panels">
+      <section class="tm-panel" aria-labelledby="an-dist">
+        <h4 class="tm-ph" id="an-dist">Distribuição das notícias</h4>
+        <p class="tm-pd">Quantas notícias de todo o histórico caíram em cada faixa do termômetro.</p>
+        {{ tm.dist(a.distribuicao) }}
+      </section>
+    </div>
+    {% endif %}
   </div>
 
   <div class="an-blk">
@@ -211,6 +215,9 @@
       </ol>
     </details>
     {% endfor %}
+    {% if a.lista_fora %}
+    <p class="term-note tl-fora">A lista mostra as {{ a.lista_total - a.lista_fora }} análises mais recentes de {{ a.lista_total }}. As {{ a.lista_fora }} análises mais antigas estão na <a href="{{ a.pesquisa_href }}">Pesquisa analítica</a> (tipo Termômetro), com busca, filtros e CSV; os números desta página usam todo o histórico.</p>
+    {% endif %}
   </div>
   {% endif %}
 

@@ -23,7 +23,7 @@ Nada precisa ser feito à mão: o GitHub gera a edição sozinho a partir das
         ▼
   1. Coleta ── ~100 feeds (Valor, Folha, Estadão, FT, WSJ, NYT, JOTA, STF, STJ, ge,
         │      g1 Natureza…), cotações (Yahoo Finance, CoinGecko, Banco Central) e
-        │      clima (Open-Meteo). Nenhuma editoria é descartada.
+        │      clima de São Paulo (Open-Meteo). Nenhuma editoria é descartada.
         ▼
   2. Edição ── com IA, compilação por editoria: TODAS as notícias em blocos
         │      (Economia & Mercados, Política & Justiça, Empresas/Tecnologia/
@@ -211,18 +211,46 @@ Como cada texto é analisado:
    aspas e termos do dicionário) vai no pedido; a mesma cadeia de IAs da edição
    (o que a edição já gastou do limite de cada uma continua contando) devolve a
    saída no formato v1.1 (triagem, atores, fontes, enquadramento, evidências com
-   citação literal, teste de inversão e qualidade), 4 textos por chamada, até 20
-   textos e 6 chamadas por edição (`termometro` em `config/site.yaml`).
+   citação literal, teste de inversão e qualidade), 5 textos por chamada, até **60
+   textos** e 15 chamadas por edição, em até 12 minutos (`termometro` em
+   `config/site.yaml`; até out/2026 eram 20 textos). Cada edição tem de 140 a 380
+   textos candidatos; até 180 páginas originais são consultadas atrás de corpo
+   suficiente (cerca de 1 em 4 é curta demais).
 3. **Cálculo**: cada saída é validada contra `config/saida_modelo.schema.json` e
    passa pelo cálculo de referência **sem nenhuma alteração**
    (`qijournal/termometro/referencia.py`, cópia literal): ele confere cada citação
    no texto, aplica a regra da voz, os pesos dos 11 critérios e dá **T** (−100 a
    +100), o rótulo, a confiança e a **qualidade da apuração Q** (0 a 100).
+4. **Registro**: além do T e dos sinais que pontuaram (citação, critério, lado,
+   contribuição, intensidade, certeza e o ator favorecido ou desfavorecido), cada
+   análise guarda o que a IA já devolve e o cálculo confere: o checklist da
+   qualidade item a item, o enquadramento (problema, causa, quem sofre,
+   responsável, solução e valor moral), o teste de inversão, os atores, as fontes
+   (com as palavras de fala direta e quem tem a última palavra) e quantos pontos de
+   T cada critério somou. Análises anteriores a nov/2026 não têm esses detalhes.
 
-No fim da edição, o **Termômetro do dia** resume as notícias analisadas: a média
-de T com o intervalo de 95% numa escala de −100 a +100, quantos textos ficaram em
-cada rótulo, a qualidade média e, abrindo, cada texto com o resumo do cálculo e os
-sinais que pontuaram (citação, critério e contribuição). Opinião fica à parte.
+No fim da edição, o **Termômetro do dia** é um painel com:
+
+- **placar**: o T médio das notícias, o rótulo e o intervalo de 95%, ao lado da
+  escala de −100 a +100 com as sete faixas (a do dia em destaque), o intervalo, o
+  ponteiro da média e um traço por notícia;
+- **indicadores**: textos analisados (veículos e editorias), notícias com T,
+  qualidade média da apuração e sinais que pontuaram (à esquerda, à direita e de
+  equilíbrio);
+- **painéis**: a distribuição das notícias por faixa, onde estão os sinais (por
+  critério e lado) e a qualidade da apuração (em quantas notícias cada boa prática
+  aparece); e o T médio do dia **por veículo** e **por editoria**, com o intervalo;
+- **cada texto analisado**: uma linha por texto (T, veículo, título, escala,
+  rótulo, confiança e qualidade), com filtros (com sinais, fora do equilíbrio,
+  opinião, veículo, editoria) e ordem (mais inclinados, da esquerda à direita, menor
+  qualidade, mais sinais, veículo). Clicar abre o detalhe: o resumo do cálculo,
+  quantos pontos cada critério somou, os sinais com a citação literal, o
+  enquadramento, o teste de inversão, a qualidade item a item, quem fala e a ficha
+  do texto, com o link para o original.
+
+Opinião fica fora da média (aparece à parte). As médias do dia, por veículo e por
+editoria saem da agregação da especificação (`agregacao.resumo`); o painel só conta
+o que está guardado, sem recalcular nada.
 
 A aba **Analítico Político** (`edicoes/analitico.html`) abre com **Em resumo · o
 que o termômetro diz**: a resposta em linguagem clara (hoje, que o texto das
@@ -241,8 +269,11 @@ puxou a mudança, por editoria e por veículo), as séries semanais, os rankings
 por veículo e por editoria (T ajustado e qualidade; nas editorias, mínimo de 30
 notícias; nos veículos entram todos os que têm notícia com T, e os com menos de
 30 aparecem esmaecidos, como amostra pequena — o cálculo da agregação não muda),
-os recortes por eixo, a tabela de cada dia e a lista de todas as análises (clicar
-na linha abre o texto original, para conferir).
+os recortes por eixo, a tabela de cada dia e a lista das análises (clicar na linha
+abre o texto original, para conferir). A lista mostra as 1.200 análises mais
+recentes (`LISTA_MAX` em `qijournal/render/analitico.py`), para a página não passar
+de alguns MB com 60 análises por dia; as mais antigas ficam na Pesquisa analítica
+(tipo Termômetro, com CSV), e todos os números da aba usam o histórico inteiro.
 
 Também à parte, logo depois do resumo, o bloco **Nomes em destaque · como a
 mídia cobre cada um** (`qijournal/render/midia.py`): os 12 nomes mais citados nas
@@ -555,7 +586,8 @@ As fontes ficam em [`config/sources.yaml`](config/sources.yaml), uma por linha:
   para confirmar que o feed responde e tem notícias recentes.
 - **Remover:** apague a linha ou use `enabled: false`.
 
-Seções, palavras-chave, cotações do ticker, cidades do clima e limites da edição
+Seções, palavras-chave, cotações do ticker, cidades do clima (hoje só São Paulo;
+Montevidéu saiu em nov/2026) e limites da edição
 (quantidade de matérias, mínimos, idade máxima das notícias) ficam em
 [`config/site.yaml`](config/site.yaml), com comentários explicando cada item.
 

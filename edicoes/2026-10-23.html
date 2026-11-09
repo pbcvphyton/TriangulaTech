@@ -439,63 +439,257 @@ body.modal-open .btt{visibility:hidden}
 .arch-t{font-size:15px;font-weight:700;line-height:1.3;color:var(--ink)}
 .badge{flex-shrink:0;padding:1px 6px;border:1px solid var(--rule);border-radius:10px;font-family:var(--mn);font-size:8.5px;letter-spacing:1px;color:var(--faint)}
 .arch-empty{padding:30px 0;font-family:var(--ss);color:var(--muted)}
-/* Termômetro de Viés Editorial (fim da edição) e aba Analítico Político.
-   Escala divergente validada (rampa ordinal por braço, claro e escuro):
-   verde-azulado = esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. */
-:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD}
-:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748}
+/* Termômetro de Viés Editorial (painel do dia no fim da edição) e aba Analítico Político.
+   Escala divergente validada (rampa ordinal por braço, claro e escuro): verde-azulado =
+   esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. A cor vai só nas marcas
+   (faixas, ponteiro, colunas, barras e pontos); números e rótulos ficam nas cores de texto,
+   sempre escritos ao lado da marca. Marcas finas, réguas de 1 px e uma folga de 2 px na cor
+   do fundo entre as faixas. */
+:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD;--tm-pn:#f6f7f9;--tm-hl:#eef1f5;--tm-bar:var(--qi);--tm-trk:rgba(var(--qi-rgb),.14)}
+:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748;--tm-pn:#141c2b;--tm-hl:#1a2436;--tm-bar:#8fb0f5;--tm-trk:rgba(143,176,245,.16)}
 .t-ef{background:var(--t-ef)}.t-em{background:var(--t-em)}.t-el{background:var(--t-el)}.t-eq{background:var(--t-eq)}
 .t-dl{background:var(--t-dl)}.t-dm{background:var(--t-dm)}.t-df{background:var(--t-df)}.t-na{background:var(--t-na)}
 .t-mx{background:repeating-linear-gradient(135deg,var(--t-eq) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1px var(--t-eq)}
 .sw{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;vertical-align:baseline}
-.term{padding:22px var(--gut) 26px;border-top:2px solid var(--qn);background:var(--paper)}
+.term{padding:28px var(--gut) 34px;border-top:2px solid var(--qn);background:var(--paper)}
 :root[data-theme="dark"] .term{border-top-color:var(--qi)}
-.term-sum{max-width:900px;font-family:var(--sf);font-size:17px;font-weight:600;line-height:1.5;color:var(--ink)}
-.term-sum span{font-family:var(--mn);font-size:10.5px;font-weight:500;letter-spacing:.3px;color:var(--mute2)}
-.term-meta{max-width:900px;margin-top:12px;font-family:var(--mn);font-size:10px;letter-spacing:.3px;line-height:1.6;color:var(--mute2)}
+.tm-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tm-top .kicker{flex:1}
+.tm-links{display:flex;gap:18px;font-family:var(--ss);font-size:12px;font-weight:700}
+.tm-links a{color:var(--link)}
+.tm-links a:hover{text-decoration:underline}
+.tm-dek{max-width:860px;margin-top:4px;font-family:var(--sf);font-size:16px;line-height:1.55;color:var(--body)}
+.tm-k{display:block;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tm-ph{font-family:var(--ss);font-size:13.5px;font-weight:800;line-height:1.3;color:var(--ink)}
+.tm-pd{margin:3px 0 14px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-foot{margin-top:10px;font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
+.tm-foot .sw{vertical-align:0}
+.tm-empty{padding:14px 16px;border:1px solid var(--rl);border-radius:6px;background:var(--tm-pn);font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.tm-empty-lg{max-width:860px;margin-top:8px;font-size:14px}
+/* Placar: o número da média, o rótulo e o intervalo, ao lado da escala */
+.tm-placar{--tg-bg:var(--tm-pn);display:grid;grid-template-columns:minmax(190px,250px) minmax(0,1fr);gap:20px 36px;align-items:center;margin-top:18px;padding:22px 28px 18px;border:1px solid var(--rl);border-radius:8px;background:var(--tm-pn)}
+.tm-n{margin-top:8px;font-family:var(--ss);font-size:68px;font-weight:600;line-height:.95;letter-spacing:-2px;color:var(--ink)}
+.tm-r{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--ss);font-size:16px;font-weight:700;color:var(--ink)}
+.tm-r .sw{width:12px;height:12px;margin:0;border-radius:3px}
+.tm-ic{margin-top:7px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.tm-b{margin-top:3px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+/* Escala de −100 a +100: faixas, intervalo de 95%, ponteiro da média e um traço por notícia */
+.tg{--tg-bg:var(--paper);position:relative;min-width:0;margin:0;padding-top:34px;container-type:inline-size}
+.tm-placar .tg{--tg-bg:var(--tm-pn)}
+.tg.sm{padding-top:0}
+.tg.sm .tg-flag{display:none}
+.tg-flag{position:absolute;top:0;left:clamp(70px,var(--x),calc(100% - 70px));transform:translateX(-50%);padding:4px 10px;border-radius:5px;background:var(--ink);font-family:var(--ss);font-size:11.5px;font-weight:600;line-height:1.2;color:var(--tg-bg);white-space:nowrap}
+.tg-flag b{font-family:var(--mn);font-weight:600}
+.tg-track{position:relative;height:16px}
+.tg-f{position:absolute;top:0;bottom:0;border:0 solid var(--tg-bg);border-width:0 1px;background-clip:padding-box;opacity:.3}
+.tg-f:first-child{border-left-width:0;border-radius:8px 0 0 8px}
+.tg-f:nth-child(7){border-right-width:0;border-radius:0 8px 8px 0}
+.tg-f.on{opacity:1}
+:root[data-theme="dark"] .tg-f{opacity:.45}
+:root[data-theme="dark"] .tg-f.on{opacity:1}
+.tg-ic{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--ink);opacity:.3}
+.tg-needle{position:absolute;top:-9px;bottom:-9px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--tg-bg)}
+.tg-needle::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 3px var(--tg-bg)}
+.tg-rug{position:relative;height:12px;margin-top:12px}
+.tg-rug i{position:absolute;top:0;width:2px;height:12px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.3}
+.tg-ticks{position:relative;height:14px;margin-top:6px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.tg-rug+.tg-ticks{margin-top:4px}
+.tg-ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.tg-ticks span:first-child{transform:none}
+.tg-ticks span:last-child{transform:translateX(-100%)}
+.tg-zones{position:relative;height:16px;margin-top:2px;font-family:var(--ss);font-size:10.5px;color:var(--muted)}
+.tg-zones span{position:absolute;top:0;text-align:center;white-space:nowrap}
+.tg-zones .on{font-weight:700;color:var(--ink)}
+.tg-sides{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tg-rug-k{font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint)}
+.tg-rug-k i{display:inline-block;width:2px;height:10px;margin-right:6px;border-radius:1px;background:var(--ink);opacity:.45;vertical-align:-1px}
+/* Régua estreita: as marcas de ±10 e ±25 e os nomes das faixas não cabem sem se encostar */
+@container (max-width:640px){.tg-ticks .mn,.tg-zones{display:none}}
+@media (min-width:761px) and (max-width:1000px){@supports not (container-type:inline-size){.tg-ticks .mn,.tg-zones{display:none}}}
+/* Indicadores */
+.tm-kpis{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl)}
+.tm-kpis li{display:flex;flex-direction:column;gap:4px;min-width:0;padding:16px 20px 16px 0}
+.tm-kpis li+li{padding-left:20px;border-left:1px solid var(--rl)}
+.tm-kv{font-family:var(--ss);font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-.5px;color:var(--ink)}
+.tm-kv small{margin-left:3px;font-size:13px;font-weight:500;letter-spacing:0;color:var(--muted)}
+.tm-kd{font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-meter{display:block;height:6px;margin:3px 0 1px;border-radius:3px;background:var(--tm-trk);overflow:hidden}
+.tm-meter span{display:block;height:100%;border-radius:3px;background:var(--tm-bar)}
+/* Painéis */
+.tm-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:26px 40px;margin-top:26px}
+.tm-panel{min-width:0;padding-top:14px;border-top:1px solid var(--rule)}
+/* Distribuição: uma barra por faixa (contagem e parcela ao lado) */
+.th{list-style:none}
+.th li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.th li:first-child{border-top:none;padding-top:0}
+.th-l{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.th-l .sw{margin-right:7px;vertical-align:0}
+.th-m{display:block;height:10px;border-left:1px solid var(--rule)}
+.th-m span{display:block;height:100%;min-width:3px;border-radius:0 4px 4px 0}
+.th .zero .th-m span{display:none}
+.th .zero .th-l{color:var(--muted)}
+.th-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.th-v b{font-size:12px;font-weight:600;color:var(--ink)}
+.th .zero .th-v b{font-weight:400;color:var(--faint)}
+/* Sinais por critério: à esquerda e à direita de um eixo central */
+.tsg-hd,.tsg-list li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 36px;align-items:center}
+.tsg-hd{padding-bottom:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tsg-hd span:nth-child(2){padding-right:8px;text-align:right}
+.tsg-hd span:nth-child(3){padding-left:8px}
+.tsg-list{list-style:none}
+.tsg-list li{padding:5px 0;border-top:1px solid var(--rl)}
+.tsg-n{padding-right:10px;font-family:var(--ss);font-size:12px;line-height:1.3;color:var(--ink)}
+.tsg-l,.tsg-r{display:flex;align-items:center;gap:6px;min-height:18px}
+.tsg-l{justify-content:flex-end;padding-right:1px;border-right:1px solid var(--rule)}
+.tsg-r{padding-left:1px}
+.tsg-b{display:block;height:10px;min-width:3px}
+.tsg-l .tsg-b{border-radius:4px 0 0 4px}
+.tsg-r .tsg-b{border-radius:0 4px 4px 0}
+.tsg-l b,.tsg-r b{font-family:var(--mn);font-size:11px;font-weight:600;color:var(--ink)}
+.tsg-eq{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tsg-eq i{display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%}
+/* Qualidade da apuração: em quantas notícias cada prática aparece */
+.tq{list-style:none}
+.tq li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.tq li:first-child{border-top:none;padding-top:0}
+.tq-n{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.tq-m{display:block;height:8px;border-radius:4px;background:var(--tm-trk);overflow:hidden}
+.tq-m span{display:block;height:100%;border-radius:4px;background:var(--tm-bar)}
+.tq-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.tq-v b{font-size:12px;font-weight:600;color:var(--ink)}
+/* Recortes do dia (veículos e editorias): um ponto por grupo numa escala comum */
+.trc{list-style:none}
+.trc-i,.trc-axis{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 124px;gap:12px;align-items:center}
+.trc-i{padding:6px 0;border-top:1px solid var(--rl)}
+.trc>.trc-i:first-child{border-top:none;padding-top:0}
+.trc-n{font-family:var(--ss);font-size:12.5px;font-weight:700;line-height:1.3;color:var(--ink)}
+.trc-p{position:relative;height:16px}
+.trc-i .trc-p::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rl)}
+.trc-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.trc-ic{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--ink);opacity:.25}
+.trc-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.trc-v{font-family:var(--ss);font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.trc-v b{display:inline-block;min-width:32px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--ink)}
+.trc-x{font-family:var(--mn);font-size:10px}
+.trc-axis{padding-top:4px}
+.trc-axis .trc-p{height:12px}
+.trc-axis i{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mn);font-size:9.5px;font-style:normal;color:var(--faint);white-space:nowrap}
+.trc-axis i:first-child{transform:none}
+.trc-axis i:last-child{transform:translateX(-100%)}
+.trc-more>summary{margin:6px 0 2px;cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.trc-more>summary:hover{text-decoration:underline}
+.trc-more .trc>.trc-i:first-child{border-top:1px solid var(--rl);padding-top:6px}
+/* Cada texto analisado: filtros, ordem e uma linha por texto que abre o detalhe */
+.tm-list{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-cnt{margin-left:6px;padding:1px 8px;border-radius:10px;background:var(--tm-hl);font-family:var(--mn);font-size:11px;font-weight:600;vertical-align:1px;color:var(--muted)}
+.tm-fil{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:4px 0 14px}
+.tm-fil[hidden]{display:none}
+.tm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tm-chip{height:32px;padding:0 13px;border:1px solid var(--rule);border-radius:16px;background:var(--paper);font-family:var(--ss);font-size:12px;font-weight:600;color:var(--body);cursor:pointer;transition:border-color .2s,background .2s}
+.tm-chip span{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tm-chip:hover:not(:disabled){border-color:var(--ink)}
+.tm-chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.tm-chip[aria-pressed="true"] span{color:inherit;opacity:.75}
+.tm-chip:disabled{opacity:.45;cursor:default}
+.tm-sel{display:flex;flex-direction:column;gap:3px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tm-sel select{height:32px;min-width:140px;max-width:230px;padding:0 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
+.tm-shown{margin-left:auto;padding-bottom:8px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tr-hd,.tr>details>summary{display:grid;grid-template-columns:62px minmax(0,1fr) 128px 148px 74px 78px;gap:16px;align-items:center}
+.tr-hd{padding:0 12px 7px;border-bottom:1px solid var(--rule);font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tr-list{list-style:none}
+.tr{border-bottom:1px solid var(--rl)}
+.tr[hidden]{display:none}
+.tr>details>summary{padding:12px;list-style:none;cursor:pointer;transition:background .15s}
+.tr>details>summary::-webkit-details-marker{display:none}
+.tr>details>summary:hover{background:var(--hover)}
+.tr>details[open]>summary{background:var(--tm-hl)}
+.tr-t{display:flex;align-items:center;gap:9px;font-family:var(--mn);font-size:17px;font-weight:600;color:var(--ink)}
+.tr-sw{flex:0 0 4px;width:4px;height:30px;border-radius:2px}
+.tr-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tr-src{font-family:var(--ss);font-size:11px;line-height:1.35;color:var(--muted)}
+.tr-src b{font-weight:700;color:var(--ink)}
+.tr-h{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.tr-sc{position:relative;height:16px}
+.tr-sc::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--rl)}
+.tr-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.tr-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.tr>details[open]>summary .tr-d{box-shadow:0 0 0 2px var(--tm-hl),0 0 0 3px var(--ink)}
+.tr-r,.tr-q{display:flex;flex-direction:column;gap:2px;font-family:var(--ss);font-size:12.5px;line-height:1.3;color:var(--ink)}
+.tr-r span,.tr-q span{font-size:11px;color:var(--muted)}
+.tr-q b{font-family:var(--mn);font-size:14px;font-weight:600}
+.tr-sig{justify-self:end;display:flex;align-items:center;gap:9px;font-family:var(--ss);font-size:11px;font-weight:600;white-space:nowrap;color:var(--link)}
+.tr-sig::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.tr>details[open]>summary .tr-sig::after{transform:translateY(2px) rotate(-135deg)}
+.tr-body{padding:8px 12px 22px 90px}
+.tr-sum{max-width:820px;font-family:var(--sf);font-size:14.5px;line-height:1.55;color:var(--ink)}
+.tr-note{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.tr-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px 36px;margin-top:14px}
+.tr-k{margin:18px 0 8px;font-family:var(--ss);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tr-main>.tr-k:first-child,.tr-side>.tr-k:first-child{margin-top:0}
+.tev{list-style:none;display:flex;flex-direction:column;gap:14px}
+.tev li{padding-left:12px;border-left:3px solid var(--t-eq)}
+.tev li.tev-esq{border-left-color:var(--t-em)}
+.tev li.tev-dir{border-left-color:var(--t-dm)}
+.tev-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tev-d{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.tev blockquote{margin:5px 0 0;font-family:var(--sf);font-size:14px;font-style:italic;line-height:1.5;color:var(--ink)}
+.tev blockquote::before{content:"\201C"}
+.tev blockquote::after{content:"\201D"}
+.tev-x{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--body)}
+.tev-a{margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.45;color:var(--muted)}
+.tev-more{margin-top:12px}
+.tev-more>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.tev-more>summary:hover{text-decoration:underline}
+.tev-more>.tev{margin-top:12px}
+.tct{list-style:none;max-width:560px}
+.tct li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 44px;gap:10px;align-items:center;padding:3px 0;font-family:var(--ss);font-size:12px;color:var(--ink)}
+.tct-p{position:relative;height:10px}
+.tct-z{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--rule)}
+.tct-b{position:absolute;top:1px;bottom:1px}
+.tct-b.esq{right:50%;border-radius:4px 0 0 4px;background:var(--t-em)}
+.tct-b.dir{left:50%;border-radius:0 4px 4px 0;background:var(--t-dm)}
+.tct-b.eq{left:calc(50% - 1px);width:3px!important;background:var(--t-eq)}
+.tct-v{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tfr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.tfr dt{font-family:var(--ss);font-size:10.5px;font-weight:700;color:var(--muted)}
+.tfr dd{margin-top:2px;font-family:var(--ss);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.tr-inv{padding:10px 12px;border-radius:6px;background:var(--tm-hl);font-family:var(--sf);font-size:13.5px;line-height:1.55;color:var(--ink)}
+.tck{list-style:none;display:flex;flex-direction:column;gap:6px}
+.tck li{display:flex;align-items:flex-start;gap:8px;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tck i{position:relative;flex:0 0 16px;height:16px;margin-top:1px;border-radius:50%}
+.tck-sim i{background:var(--tm-bar)}
+.tck-sim i::after{content:"";position:absolute;left:5.5px;top:2.5px;width:3.5px;height:7.5px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.tck-nao{color:var(--muted)}
+.tck-nao i{border:1.5px solid var(--muted)}
+.tck-nao i::before,.tck-nao i::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.5px;margin:-.75px 0 0 -4px;background:var(--muted);transform:rotate(45deg)}
+.tck-nao i::after{transform:rotate(-45deg)}
+.tck-nao_se_aplica{color:var(--faint)}
+.tck-nao_se_aplica i{border:1.5px solid var(--rl)}
+.tck-nao_se_aplica i::after{content:"";position:absolute;left:3.5px;right:3.5px;top:50%;height:1.5px;margin-top:-.75px;background:var(--faint)}
+.tfo{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tfo li{display:flex;flex-direction:column;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tfo-m{font-size:11px;color:var(--muted)}
+.tfi{list-style:none;display:flex;flex-direction:column;gap:4px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
+.tr-go{margin-top:18px;font-family:var(--ss);font-size:12.5px;font-weight:700}
+.tr-go a{color:var(--link)}
+.tr-go a:hover{text-decoration:underline}
+.tm-more{display:block;height:36px;margin:16px auto 0;padding:0 22px;border:1px solid var(--rule);border-radius:18px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer;transition:border-color .2s}
+.tm-more:hover{border-color:var(--link)}
+.tm-more[hidden]{display:none}
+.tm-none{padding:18px 12px;font-family:var(--ss);font-size:13px;color:var(--muted)}
+/* Como ler */
+.tm-metodo{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-metodo dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 32px;margin-top:10px}
+.tm-metodo dt{font-family:var(--ss);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink)}
+.tm-metodo dd{margin-top:4px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-note{max-width:900px;margin-top:12px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-det{margin-top:14px}
 .term-det>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--link)}
 .term-det>summary:hover{text-decoration:underline}
-.tg{max-width:900px;margin-top:14px}
-.tg-track{position:relative;height:14px}
-.tg-bands{position:absolute;inset:0;overflow:hidden;border-radius:7px;background:var(--rl)}
-.tg-f{position:absolute;top:0;bottom:0;opacity:.38;border-right:2px solid var(--paper)}
-.tg-f:last-child{border-right:none}
-.tg-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--rule)}
-.tg-ic{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--ink);opacity:.28}
-.tg-dot{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid var(--paper);border-radius:50%;background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
-.tg-axis{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mn);font-size:9px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint)}
-.td{max-width:900px;margin-top:16px}
-.td-bar{display:flex;gap:2px;height:10px;overflow:hidden;border-radius:5px;background:var(--rl)}
-.td-bar span{display:block;height:100%;min-width:4px}
-.td-leg{list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:7px;font-family:var(--ss);font-size:11.5px;color:var(--muted)}
-.td-leg i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;vertical-align:-1px}
-.td-leg b{font-family:var(--mn);font-weight:600;color:var(--ink)}
-.ta-list{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin-top:8px}
-.ta{padding:14px 0;border-bottom:1px solid var(--rl)}
-.ta-hd{display:flex;gap:12px;align-items:flex-start}
-.ta-v{flex:0 0 auto;min-width:48px;padding:3px 0;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
-.ta-tx{min-width:0}
-.ta-src{font-family:var(--ss);font-size:11px;line-height:1.4;color:var(--muted)}
-.ta-src b{color:var(--ink)}
-.ta-t{margin-top:2px;font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
-.ta-t a:hover{color:var(--link);text-decoration:underline}
-.ta-scale{position:relative;height:4px;margin:10px 0 2px;border-radius:2px;background:var(--rl)}
-.ta-scale .tg-zero{top:-3px;bottom:-3px}
-.ta-dot{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border:2px solid var(--paper);border-radius:50%}
-.ta-r{margin-top:8px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
-.ta-r b{color:var(--ink)}
-.ta-sum{margin-top:4px;font-family:var(--sf);font-size:13.5px;line-height:1.5;color:var(--body)}
-.ta-ev{margin-top:6px}
-.ta-ev summary{cursor:pointer;font-family:var(--ss);font-size:11px;font-weight:700;color:var(--link)}
-.ta-ev ol{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:8px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
-.ta-ev b{color:var(--ink)}
-.ta-dir{margin-left:6px;font-family:var(--mn);font-size:10px;color:var(--mute2)}
-.ta-ev q{display:block;margin-top:2px;font-family:var(--sf);font-style:italic;color:var(--ink)}
-.ta-ex{display:block;margin-top:2px;color:var(--muted)}
+/* Uma análise por linha (todas as análises, na aba Analítico Político) */
+.ta-v{flex:0 0 auto;min-width:48px;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
 .tl-list{list-style:none;margin-top:8px}
-.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
+.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:8px 8px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
 .tl .ta-v{min-width:0;padding:0;font-size:12.5px}
 .tl-d{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
 .tl-tx b{color:var(--ink)}
@@ -508,9 +702,11 @@ body.modal-open .btt{visibility:hidden}
 .tl.tl-lk:hover .tl-tx a{color:var(--link);text-decoration:underline}
 .tl.tl-lk:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:-2px}
 .tl-go{font-weight:700;color:var(--link)}
+.tl-fora{margin-top:12px}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
+.an .tm-panels{grid-template-columns:minmax(0,760px)}
 .an-h{margin-bottom:10px;font-family:var(--ss);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--head)}
 .an-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 .an-tiles li,.an-reads li{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:3px solid var(--qi);background:var(--soft)}
@@ -578,15 +774,52 @@ body.modal-open .btt{visibility:hidden}
 .qb-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--rl)}
 .qb-bar span{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--qi)}
 :root[data-theme="dark"] .qb-bar span{background:var(--link)}
+@media (max-width:1100px){
+  .tr-hd,.tr>details>summary{grid-template-columns:56px minmax(0,1fr) 104px 124px 64px 70px;gap:12px}
+  .tr-body{padding-left:80px}
+}
+@media (max-width:860px){
+  .tm-placar{grid-template-columns:1fr;gap:14px}
+  .tm-hero{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center}
+  .tm-hero .tm-k{grid-column:1/-1}
+  .tm-n{grid-column:1;grid-row:2/span 3;margin-top:6px}
+  .tm-r,.tm-ic,.tm-b{grid-column:2}
+  .tm-r{margin-top:6px}
+  .tm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tm-kpis li:nth-child(odd){padding-left:0;border-left:none}
+  .tm-kpis li:nth-child(n+3){border-top:1px solid var(--rl)}
+}
 @media (max-width:760px){
   .term,.an{padding:18px 16px 24px}
-  .term-sum{font-size:15.5px}
-  .ta-list,.an-reads,.an-pux{grid-template-columns:1fr}
+  .tm-dek{font-size:15px}
+  .tm-placar{padding:16px 16px 14px}
+  .tm-n{font-size:54px}
+  .tm-kpis li{padding:12px 12px 12px 0}
+  .tm-kpis li+li{padding-left:12px}
+  .tm-kv{font-size:24px}
+  .tg-ticks .mn,.tg-zones,.tg-rug-k{display:none}
+  .tm-metodo dl{grid-template-columns:1fr}
+  .trc-i,.trc-axis{grid-template-columns:minmax(0,104px) minmax(0,1fr) 88px;gap:10px}
+  .trc-x{display:block}
+  .tr-hd{display:none}
+  .tr>details>summary{grid-template-columns:48px minmax(0,1fr) auto;gap:8px 10px;padding:12px 4px}
+  .tr-t{grid-column:1;grid-row:1/4;align-self:start;gap:7px;font-size:15px}
+  .tr-tx{grid-column:2/4;grid-row:1}
+  .tr-sc{grid-column:2;grid-row:2}
+  .tr-sig{grid-column:3;grid-row:2}
+  .tr-r{grid-column:2;grid-row:3;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+  .tr-q{grid-column:3;grid-row:3;flex-direction:row;align-items:baseline;gap:4px;justify-self:end}
+  .tr-body{padding:6px 4px 18px}
+  .tr-grid,.tfr{grid-template-columns:1fr}
+  .tm-fil{gap:8px 10px}
+  .tm-sel{flex:1 1 140px}
+  .tm-sel select{width:100%;max-width:none}
+  .tm-shown{width:100%;margin-left:0;padding-bottom:0}
+  .an-reads,.an-pux{grid-template-columns:1fr}
   .tl{grid-template-columns:52px minmax(0,1fr);gap:2px 10px}
   .tl-tx{grid-column:2;grid-row:1}
   .tl-d{grid-column:1;grid-row:2}
   .tl-r{grid-column:2;grid-row:2;white-space:normal}
-  .an-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .rk-i,.qb li,.rk-axis{grid-template-columns:34% minmax(0,1fr);gap:4px 10px}
   .rk-v{grid-column:1/-1}
   .rk-axis .rk-v{display:none}
@@ -3365,298 +3598,620 @@ body.modal-open .btt{visibility:hidden}
 </section>
 
 <section class="term" id="termometro" aria-labelledby="term-h">
-  <div class="arch-top">
+  <div class="tm-top">
     <h2 class="kicker" id="term-h">Termômetro do dia</h2>
-<a class="arch-home" href="./analitico.html">Analítico Político &rarr;</a>  </div>
-  <p class="term-sum">Equilibrado · T −1 na média de 19 notícias com dimensão política <span>(intervalo de 95%: −2 a 0)</span></p>
-<div class="tg" role="img" aria-label="Média das notícias do dia: T −1 (Equilibrado), intervalo de 95% de −2 a 0; escala de −100 (esquerda) a +100 (direita)">
-  <div class="tg-track">
-    <div class="tg-bands"><span class="tg-f t-ef" style="left:0.0%;width:25.0%" title="Esquerda forte"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%" title="Esquerda moderada"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%" title="Leve à esquerda"></span><span class="tg-f t-eq" style="left:45.0%;width:10.0%" title="Equilibrado"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%" title="Leve à direita"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%" title="Direita moderada"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%" title="Direita forte"></span></div>
-    <span class="tg-zero"></span><span class="tg-ic" style="left:49.16%;width:1.0%"></span><span class="tg-dot" style="left:49.66%"></span>
-  </div>  <div class="tg-axis" aria-hidden="true"><span>Esquerda · &minus;100</span><span>0</span><span>+100 · Direita</span></div></div><div class="td">
-  <div class="td-bar" role="img" aria-label="Rótulos dos textos: Equilibrado: 19"><span class="t-eq" style="width:100.0%" title="Equilibrado: 19"></span></div>
-  <ul class="td-leg"><li><i class="t-eq" aria-hidden="true"></i>Equilibrado <b>19</b></li></ul>
-</div>  <p class="term-meta">20 textos analisados de 7 veículos · 1 sem dimensão política · qualidade da apuração 85 de 100 (Boa)</p>
-  <details class="term-det">
-    <summary>Cada texto analisado (20)</summary>
-    <ol class="ta-list">
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−9</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>((o))eco</b> · Natureza &amp; Meio Ambiente · 22/10</p>
-      <p class="ta-t"><a href="https://oeco.org.br/noticias/queda-no-desmatamento-faz-emissoes-do-brasil-cairem-pelo-2o-ano-consecutivo/" target="_blank" rel="noopener noreferrer">Queda no desmatamento faz emissões do Brasil caírem pelo 2º ano consecutivo<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
+    <p class="tm-links"><a href="#term-metodo">Como ler</a><a href="./analitico.html">Analítico Político &rarr;</a></p>
   </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:45.5%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 60 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · rótulos e aspas</b> <span class="ta-dir">esquerda · −9,3</span><q>Atacado em várias frentes durante presidência de Jair Messias, INPE não merece outra gestão bolsonarista</q><span class="ta-ex">A nota editorializa abertamente contra o ex-presidente e sua gestão, rotulando negativamente a possibilidade de seu retorno.</span></li>
-    </ol>
+  <p class="tm-dek">Equilibrado · T −1 na média de 19 notícias com dimensão política. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
+<div class="tm-placar">
+  <div class="tm-hero">
+    <p class="tm-k">T médio das notícias</p>
+    <p class="tm-n">−1</p>
+    <p class="tm-r"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</p>
+<p class="tm-ic">Intervalo de 95%: <span class="nw">−2 a 0</span></p><p class="tm-b">média de 19 notícias com dimensão política</p>  </div>
+  <figure class="tg" role="img" aria-label="Média das notícias do dia: T −1 (Equilibrado), intervalo de 95% de −2 a 0; escala de −100 (esquerda) a +100 (direita)">
+  <div class="tg-flag" style="--x:49.66%" aria-hidden="true"><b>T −1</b> Equilibrado</div>
+  <div class="tg-track" aria-hidden="true"><span class="tg-f t-ef" style="left:0.0%;width:25.0%"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%"></span><span class="tg-f t-eq on" style="left:45.0%;width:10.0%"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%"></span><span class="tg-ic" style="left:49.16%;width:1.0%"></span><span class="tg-needle" style="left:49.66%"></span>
+  </div>  <div class="tg-rug" aria-hidden="true"><i style="left:45.5%"></i><i style="left:48.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i></div>  <div class="tg-ticks" aria-hidden="true"><span style="left:0.0%">−100</span><span style="left:25.0%">−50</span><span class="mn" style="left:37.5%">−25</span><span class="mn" style="left:45.0%">−10</span><span style="left:50.0%">0</span><span class="mn" style="left:55.0%">+10</span><span class="mn" style="left:62.5%">+25</span><span style="left:75.0%">+50</span><span style="left:100.0%">+100</span></div>  <div class="tg-zones" aria-hidden="true"><span style="left:0.0%;width:25.0%">Forte</span><span style="left:25.0%;width:12.5%">Moderada</span><span style="left:37.5%;width:7.5%">Leve</span><span class="on" style="left:45.0%;width:10.0%">Equilibrado</span><span style="left:55.0%;width:7.5%">Leve</span><span style="left:62.5%;width:12.5%">Moderada</span><span style="left:75.0%;width:25.0%">Forte</span></div>  <div class="tg-sides" aria-hidden="true"><span>&larr; Esquerda</span><span class="tg-rug-k"><i></i>cada traço é uma notícia</span><span>Direita &rarr;</span></div>
+</figure>
+</div>  <ul class="tm-kpis">  <li><span class="tm-k">Textos analisados</span><span class="tm-kv">20</span><span class="tm-kd">7 veículos · 7 editorias</span></li>  <li><span class="tm-k">Notícias com T</span><span class="tm-kv">19</span><span class="tm-kd">1 sem dimensão política</span></li>  <li><span class="tm-k">Qualidade da apuração</span><span class="tm-kv">85<small>/100</small></span><span class="tm-meter" aria-hidden="true"><span style="width:85.0%"></span></span><span class="tm-kd">Boa · média das notícias</span></li>  <li><span class="tm-k">Sinais que pontuaram</span><span class="tm-kv">10</span><span class="tm-kd">em 9 notícias: 2 à esquerda · 0 à direita · 8 de equilíbrio</span></li></ul>
+  <div class="tm-panels">
+    <section class="tm-panel" aria-labelledby="tmp-dist">
+      <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
+      <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
+      <ol class="th" aria-label="Rótulos das notícias: Equilibrado: 19">  <li class="zero"><span class="th-l"><i class="sw t-ef" aria-hidden="true"></i>Esquerda forte</span><span class="th-m" aria-hidden="true"><span class="t-ef" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-em" aria-hidden="true"></i>Esquerda moderada</span><span class="th-m" aria-hidden="true"><span class="t-em" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-el" aria-hidden="true"></i>Leve à esquerda</span><span class="th-m" aria-hidden="true"><span class="t-el" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class=""><span class="th-l"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</span><span class="th-m" aria-hidden="true"><span class="t-eq" style="width:100.0%"></span></span><span class="th-v"><b>19</b> <span>100%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dl" aria-hidden="true"></i>Leve à direita</span><span class="th-m" aria-hidden="true"><span class="t-dl" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dm" aria-hidden="true"></i>Direita moderada</span><span class="th-m" aria-hidden="true"><span class="t-dm" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-df" aria-hidden="true"></i>Direita forte</span><span class="th-m" aria-hidden="true"><span class="t-df" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li></ol><p class="tm-foot">Fora da média: 1 sem dimensão política.</p>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-sig">
+      <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
+      <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
+      <div class="tsg">
+  <div class="tsg-hd" aria-hidden="true"><span></span><span>&larr; esquerda</span><span>direita &rarr;</span></div>
+  <ul class="tsg-list">    <li aria-label="Números e escala: 0 à esquerda, 0 à direita, 4 de equilíbrio"><span class="tsg-n">Números e escala</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>4</span></li>    <li aria-label="Fontes e espaço: 1 à esquerda, 0 à direita, 2 de equilíbrio"><span class="tsg-n">Fontes e espaço</span><span class="tsg-l" aria-hidden="true"><b>1</b><span class="tsg-b t-em" style="width:100.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>2</span></li>    <li aria-label="Verbos de atribuição: 0 à esquerda, 0 à direita, 1 de equilíbrio"><span class="tsg-n">Verbos de atribuição</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>1</span></li>    <li aria-label="Rótulos e aspas: 1 à esquerda, 0 à direita"><span class="tsg-n">Rótulos e aspas</span><span class="tsg-l" aria-hidden="true"><b>1</b><span class="tsg-b t-em" style="width:100.0%"></span></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"></span></li>    <li aria-label="Contexto omitido: 0 à esquerda, 0 à direita, 1 de equilíbrio"><span class="tsg-n">Contexto omitido</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>1</span></li>  </ul>
+<p class="tm-foot"><i class="sw t-eq" aria-hidden="true"></i>Sinal de equilíbrio (contraponto ouvido, número com fonte, verbo neutro): não move o T.</p></div>
+
+    </section>
+  </div>
+  <div class="tm-panels tm-panels-2">
+    <section class="tm-panel" aria-labelledby="tmp-r1">
+      <h3 class="tm-ph" id="tmp-r1">Por veículo</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Valor Econômico: T 0 (Equilibrado) em 11 notícias, intervalo de 95% de −1 a 0; qualidade 85"><span class="trc-n">Valor Econômico</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:47.85%;width:2.85%"></span><span class="trc-d t-eq" style="left:49.27%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">11 notícias · Q 85</span></span></li>  <li class="trc-i" title="Folha de S.Paulo: T 0 (Equilibrado) em 4 notícias, intervalo de 95% de 0 a 0; qualidade 89"><span class="trc-n">Folha de S.Paulo</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">4 notícias · Q 89</span></span></li>  <li class="trc-i" title="((o))eco: T −9 (Equilibrado) em 1 notícia; qualidade 60"><span class="trc-n">((o))eco</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:32.0%"></span></span><span class="trc-v"><b>−9</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 60</span></span></li>  <li class="trc-i" title="NeoFeed: T 0 (Equilibrado) em 1 notícia; qualidade 100"><span class="trc-n">NeoFeed</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 100</span></span></li>  <li class="trc-i" title="Seu Dinheiro: T 0 (Equilibrado) em 1 notícia; qualidade 92"><span class="trc-n">Seu Dinheiro</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 92</span></span></li>  <li class="trc-i" title="g1: T 0 (Equilibrado) em 1 notícia; qualidade 69"><span class="trc-n">g1</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 69</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-r2">
+      <h3 class="tm-ph" id="tmp-r2">Por editoria</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Mercados &amp; Finanças: T 0 (Equilibrado) em 6 notícias, intervalo de 95% de 0 a 0; qualidade 88"><span class="trc-n">Mercados &amp; Finanças</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">6 notícias · Q 88</span></span></li>  <li class="trc-i" title="Geopolítica &amp; Mundo: T 0 (Equilibrado) em 4 notícias, intervalo de 95% de 0 a 0; qualidade 86"><span class="trc-n">Geopolítica &amp; Mundo</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">4 notícias · Q 86</span></span></li>  <li class="trc-i" title="Política: T −1 (Equilibrado) em 3 notícias, intervalo de 95% de −4 a +1; qualidade 85"><span class="trc-n">Política</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:42.11%;width:10.45%"></span><span class="trc-d t-eq" style="left:47.33%"></span></span><span class="trc-v"><b>−1</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">3 notícias · Q 85</span></span></li>  <li class="trc-i" title="Natureza &amp; Meio Ambiente: T −5 (Equilibrado) em 2 notícias, intervalo de 95% de −13 a +4; qualidade 80"><span class="trc-n">Natureza &amp; Meio Ambiente</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:23.36%;width:35.28%"></span><span class="trc-d t-eq" style="left:41.0%"></span></span><span class="trc-v"><b>−5</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">2 notícias · Q 80</span></span></li>  <li class="trc-i" title="Brasil · Economia: T 0 (Equilibrado) em 2 notícias, intervalo de 95% de 0 a 0; qualidade 90"><span class="trc-n">Brasil · Economia</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">2 notícias · Q 90</span></span></li>  <li class="trc-i" title="Jurídico &amp; Regulação: T 0 (Equilibrado) em 1 notícia; qualidade 90"><span class="trc-n">Jurídico &amp; Regulação</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 90</span></span></li>  <li class="trc-i" title="Tecnologia &amp; Negócios: T 0 (Equilibrado) em 1 notícia; qualidade 63"><span class="trc-n">Tecnologia &amp; Negócios</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 63</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
+  </div>
+  <section class="tm-list" aria-labelledby="tml-h">
+    <div class="tm-list-hd">
+      <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">20</span></h3>
+      <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
+    </div>
+    <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
+      <div class="tm-chips" role="group" aria-label="Mostrar">
+        <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>20</span></button>
+        <button type="button" class="tm-chip" data-f="sig" aria-pressed="false">Com sinais <span>9</span></button>
+        <button type="button" class="tm-chip" data-f="inc" aria-pressed="false" disabled>Fora do equilíbrio <span>0</span></button>
+      </div>
+      <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option><option value="Valor Econômico">Valor Econômico (11)</option><option value="Folha de S.Paulo">Folha de S.Paulo (4)</option><option value="g1">g1 (1)</option><option value="Money Times">Money Times (1)</option><option value="NeoFeed">NeoFeed (1)</option><option value="((o))eco">((o))eco (1)</option><option value="Seu Dinheiro">Seu Dinheiro (1)</option></select></label>
+      <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option><option value="Mercados &amp; Finanças">Mercados &amp; Finanças (7)</option><option value="Geopolítica &amp; Mundo">Geopolítica &amp; Mundo (4)</option><option value="Política">Política (3)</option><option value="Brasil · Economia">Brasil · Economia (2)</option><option value="Natureza &amp; Meio Ambiente">Natureza &amp; Meio Ambiente (2)</option><option value="Jurídico &amp; Regulação">Jurídico &amp; Regulação (1)</option><option value="Tecnologia &amp; Negócios">Tecnologia &amp; Negócios (1)</option></select></label>
+      <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
+      <p class="tm-shown" role="status" aria-live="polite"></p>
+    </form>
+    <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
+    <ol class="tr-list" id="tmList" data-visiveis="12">
+      <li class="tr" data-t="-9.0" data-q="60" data-s="1" data-c="eq" data-v="((o))eco" data-e="Natureza &amp; Meio Ambiente" data-o="0" data-i="1">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−9</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>((o))eco</b> · Natureza &amp; Meio Ambiente · 22/10</span><span class="tr-h">Queda no desmatamento faz emissões do Brasil caírem pelo 2º ano consecutivo</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:45.5%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>60</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Rótulos e aspas</b><span class="tev-d">E1 · esquerda · −9,3 pt · P28</span></p><blockquote>Atacado em várias frentes durante presidência de Jair Messias, INPE não merece outra gestão bolsonarista</blockquote><p class="tev-x">A nota editorializa abertamente contra o ex-presidente e sua gestão, rotulando negativamente a possibilidade de seu retorno.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 60/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:60%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>1.137 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://oeco.org.br/noticias/queda-no-desmatamento-faz-emissoes-do-brasil-cairem-pelo-2o-ano-consecutivo/" target="_blank" rel="noopener noreferrer">Abrir o texto original (oeco.org.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>−4</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/alckmin-acusa-flvio-bolsonaro-de-criar-obstculos-para-abertura-de-sigilos.ghtml" target="_blank" rel="noopener noreferrer">Alckmin diz que Flávio Bolsonaro cria obstáculos para abrir sigilos<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:48.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 72 (Regular) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">esquerda · −3,5</span><q>O vice-presidente Geraldo Alckmin (PSB) criticou nesta quinta-feira (22) o senador Flávio Bolsonaro (PL)</q><span class="ta-ex">O texto abre espaço de destaque para críticas fortes do vice-presidente da chapa adversária contra Flávio Bolsonaro sem trazer imediatamente o contraponto detalhado da defesa do candidato citado no mesmo nível de citação.</span></li>
-    </ol>
+      <li class="tr" data-t="-4.0" data-q="72" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="2">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>−4</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 22/10</span><span class="tr-h">Alckmin diz que Flávio Bolsonaro cria obstáculos para abrir sigilos</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:48.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>72</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-esq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · esquerda · −3,5 pt · P2</span></p><blockquote>O vice-presidente Geraldo Alckmin (PSB) criticou nesta quinta-feira (22) o senador Flávio Bolsonaro (PL)</blockquote><p class="tev-x">O texto abre espaço de destaque para críticas fortes do vice-presidente da chapa adversária contra Flávio Bolsonaro sem trazer imediatamente o contraponto detalhado da defesa do candidato citado no mesmo nível de citação.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 72/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:72%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política alta</li><li>774 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/alckmin-acusa-flvio-bolsonaro-de-criar-obstculos-para-abertura-de-sigilos.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Mercados &amp; Finanças · 22/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mercado/2026/10/dolar-abre-em-alta-nesta-quinta-feira-a-espera-de-pesquisa-datafolha-da-eleicao-presidencial.shtml" target="_blank" rel="noopener noreferrer">Bolsa cai mais de 1% com disputa eleitoral acirrada e alta do petróleo; dólar sobe<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Na véspera, a pesquisa Quaest mostrou o senador com 45% das intenções de voto, ante 44% do presidente.</q><span class="ta-ex">Apresenta dados numéricos de pesquisas de diferentes institutos para ilustrar o cenário eleitoral de forma balanceada.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="94" data-s="2" data-c="eq" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="3">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 22/10</span><span class="tr-h">Rússia e Ucrânia trocam ataques apesar de expectativa de retomada das negociações</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P5</span></p><blockquote>A Ucrânia afirmou que a Rússia disparou pelo menos 21 mísseis balísticos em três ondas de ataques</blockquote><p class="tev-x">A reportagem apresenta as alegações e os danos reportados pelo lado ucraniano e, em seguida, os ataques e baixas informados pelo lado russo.</p></li>            <li class="tev-eq"><p class="tev-h"><b>Contexto omitido</b><span class="tev-d">E2 · equilíbrio · P5</span></p><blockquote>O Ministério da Defesa russo não respondeu imediatamente a um pedido de comentário.</blockquote><p class="tev-x">O veículo procurou o lado russo para contraponto sobre os mísseis e registrou a ausência imediata de resposta.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Segurança, Instituições</li>
+<li>Relevância política alta</li><li>1.097 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/rssia-e-ucrnia-trocam-ataques-apesar-de-expectativa-de-retomada-das-negociaes.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Natureza &amp; Meio Ambiente · 22/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/ambiente/2026/10/mudanca-climatica-levou-a-32-mil-mortes-em-ondas-de-calor-no-verao-europeu.shtml" target="_blank" rel="noopener noreferrer">Mudança climática levou a 32 mil mortes em ondas de calor no verão europeu<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Econômico, Costumes</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Das 50 mil mortes em excesso detectadas pela metodologia, 32 mil podem ser atribuídas à mudança climática.</q><span class="ta-ex">Traz dados quantitativos baseados em estudos científicos publicados com metodologia detalhada.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="1" data-c="eq" data-v="Folha de S.Paulo" data-e="Mercados &amp; Finanças" data-o="0" data-i="4">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Mercados &amp; Finanças · 22/10</span><span class="tr-h">Bolsa cai mais de 1% com disputa eleitoral acirrada e alta do petróleo; dólar sobe</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P8</span></p><blockquote>Na véspera, a pesquisa Quaest mostrou o senador com 45% das intenções de voto, ante 44% do presidente.</blockquote><p class="tev-x">Apresenta dados numéricos de pesquisas de diferentes institutos para ilustrar o cenário eleitoral de forma balanceada.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>1.166 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mercado/2026/10/dolar-abre-em-alta-nesta-quinta-feira-a-espera-de-pesquisa-datafolha-da-eleicao-presidencial.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 22/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mundo/2026/10/terremoto-de-magnitude-7-atinge-regiao-do-tibete-na-china.shtml" target="_blank" rel="noopener noreferrer">Terremoto de magnitude 7 mata 16 pessoas e fere 32 na região do Tibete, na China<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 81 (Boa) · Geral, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 22/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mundo/2026/10/russia-e-ucrania-se-atacam-horas-apos-anunciar-negociacao.shtml" target="_blank" rel="noopener noreferrer">Rússia e Ucrânia se atacam horas após anunciar negociação<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 75 (Regular) · Instituições, Segurança</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>NeoFeed</b> · Mercados &amp; Finanças · 22/10</p>
-      <p class="ta-t"><a href="https://neofeed.com.br/negocios/exclusivo-com-divida-de-r-172-bilhao-grupo-euro17-pede-recuperacao-judicial/" target="_blank" rel="noopener noreferrer">EXCLUSIVO: Com dívida de R$ 1,72 bilhão, Grupo Euro17 pede recuperação judicial<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · verbos de atribuição</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O grupo atribui a crise a dois fatores.</q><span class="ta-ex">Usa verbo neutro de atribuição para relatar a justificativa da empresa sobre a crise.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="1" data-c="eq" data-v="Folha de S.Paulo" data-e="Natureza &amp; Meio Ambiente" data-o="0" data-i="5">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Natureza &amp; Meio Ambiente · 22/10</span><span class="tr-h">Mudança climática levou a 32 mil mortes em ondas de calor no verão europeu</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P12</span></p><blockquote>Das 50 mil mortes em excesso detectadas pela metodologia, 32 mil podem ser atribuídas à mudança climática.</blockquote><p class="tev-x">Traz dados quantitativos baseados em estudos científicos publicados com metodologia detalhada.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Costumes</li>
+<li>Relevância política alta</li><li>933 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/ambiente/2026/10/mudanca-climatica-levou-a-32-mil-mortes-em-ondas-de-calor-no-verao-europeu.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Seu Dinheiro</b> · Mercados &amp; Finanças · 23/10</p>
-      <p class="ta-t"><a href="https://www.seudinheiro.com/2026/economia/mega-sena-acumula-novamente-premio-alcanca-230-milhoes-boloes-dividem-lotofacil-quina-dia-de-sorte-loterias-resultados-rsgp/" target="_blank" rel="noopener noreferrer">Mega-Sena acumula novamente e prêmio alcança R$ 230 milhões; 3 bolões com dezenas de pessoas dividem a Lotofácil<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 92 (Boa) · Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/datafolha-flavio-bolsonaro-tem-47percent-e-lula-46percent-das-intencoes-de-voto.ghtml" target="_blank" rel="noopener noreferrer">Datafolha: Flávio Bolsonaro tem 47% e Lula, 46% das intenções de voto<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 92 (Boa) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 23/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/23/quem-vai-ao-debate-presidencial-da-globo-entre-lula-e-flavio-bolsonaro.ghtml" target="_blank" rel="noopener noreferrer">Quem vai ao debate presidencial da Globo entre Lula e Flávio Bolsonaro?<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 90 (Boa) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/tse-manda-meta-explicar-em-ate-12-horas-alcance-de-perfil-de-nikolas-ferreira-no-instagram.ghtml" target="_blank" rel="noopener noreferrer">TSE manda Meta explicar em até 12 horas alcance de perfil de Nikolas Ferreira no Instagram<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 90 (Boa) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Brasil · Economia · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/brasil/noticia/2026/10/22/arrecadacao-do-governo-com-bets-somou-r-11-bi-de-janeiro-a-setembro.ghtml" target="_blank" rel="noopener noreferrer">Arrecadação do governo com ‘bets’ somou R$ 11 bi de janeiro a setembro<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 92 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>A arrecadação federal com apostas on-line, as chamadas &#34;bets&#34;, foi de R$ 11,116 bilhões de janeiro a setembro</q><span class="ta-ex">Apresenta números oficiais com base, período definido e atribuição clara à Receita Federal.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="100" data-s="1" data-c="eq" data-v="NeoFeed" data-e="Mercados &amp; Finanças" data-o="0" data-i="6">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>NeoFeed</b> · Mercados &amp; Finanças · 22/10</span><span class="tr-h">EXCLUSIVO: Com dívida de R$ 1,72 bilhão, Grupo Euro17 pede recuperação judicial</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Verbos de atribuição</b><span class="tev-d">E1 · equilíbrio · P5</span></p><blockquote>O grupo atribui a crise a dois fatores.</blockquote><p class="tev-x">Usa verbo neutro de atribuição para relatar a justificativa da empresa sobre a crise.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política média</li><li>1.351 palavras (corpo cortado no fim)</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://neofeed.com.br/negocios/exclusivo-com-divida-de-r-172-bilhao-grupo-euro17-pede-recuperacao-judicial/" target="_blank" rel="noopener noreferrer">Abrir o texto original (neofeed.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/rssia-e-ucrnia-trocam-ataques-apesar-de-expectativa-de-retomada-das-negociaes.ghtml" target="_blank" rel="noopener noreferrer">Rússia e Ucrânia trocam ataques apesar de expectativa de retomada das negociações<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Segurança, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>A Ucrânia afirmou que a Rússia disparou pelo menos 21 mísseis balísticos em três ondas de ataques</q><span class="ta-ex">A reportagem apresenta as alegações e os danos reportados pelo lado ucraniano e, em seguida, os ataques e baixas informados pelo lado russo.</span></li>
-      <li><b>E2 · contexto omitido</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O Ministério da Defesa russo não respondeu imediatamente a um pedido de comentário.</q><span class="ta-ex">O veículo procurou o lado russo para contraponto sobre os mísseis e registrou a ausência imediata de resposta.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="92" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Brasil · Economia" data-o="0" data-i="7">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Brasil · Economia · 22/10</span><span class="tr-h">Arrecadação do governo com ‘bets’ somou R$ 11 bi de janeiro a setembro</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P2</span></p><blockquote>A arrecadação federal com apostas on-line, as chamadas &#34;bets&#34;, foi de R$ 11,116 bilhões de janeiro a setembro</blockquote><p class="tev-x">Apresenta números oficiais com base, período definido e atribuição clara à Receita Federal.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política média</li><li>268 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/brasil/noticia/2026/10/22/arrecadacao-do-governo-com-bets-somou-r-11-bi-de-janeiro-a-setembro.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/ir-relata-ataques-a-sete-petroleiros-em-ormuz-em-meio-a-temor-de-retomada-da-guerra.ghtml" target="_blank" rel="noopener noreferrer">Irã relata ataques a sete petroleiros em Ormuz em meio a temor de retomada da guerra<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Segurança, Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>A Associated Press (AP) não conseguiu confirmar de forma independente os incidentes.</q><span class="ta-ex">Ressalva explícita sobre a falta de verificação independente das informações divulgadas pela TV estatal iraniana.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="94" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="8">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Geopolítica &amp; Mundo · 22/10</span><span class="tr-h">Irã relata ataques a sete petroleiros em Ormuz em meio a temor de retomada da guerra</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P4</span></p><blockquote>A Associated Press (AP) não conseguiu confirmar de forma independente os incidentes.</blockquote><p class="tev-x">Ressalva explícita sobre a falta de verificação independente das informações divulgadas pela TV estatal iraniana.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Segurança, Econômico, Instituições</li>
+<li>Relevância política alta</li><li>572 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/ir-relata-ataques-a-sete-petroleiros-em-ormuz-em-meio-a-temor-de-retomada-da-guerra.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Mercados &amp; Finanças · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/financas/noticia/2026/10/22/petroleo-brent-sobe-4percent-e-supera-us-113-maior-preco-desde-maio.ghtml" target="_blank" rel="noopener noreferrer">Petróleo Brent sobe 4% e supera US$ 113, maior preço desde maio<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 92 (Boa) · Econômico</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>petróleo Brent para entrega em dezembro fechou em alta de 4,35%, a US$ 113,17 por barril</q><span class="ta-ex">Cotações exatas com bolsa de negociação (ICE e Nymex) e percentuais devidamente contextualizados.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="92" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Mercados &amp; Finanças" data-o="0" data-i="9">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Mercados &amp; Finanças · 22/10</span><span class="tr-h">Petróleo Brent sobe 4% e supera US$ 113, maior preço desde maio</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P3</span></p><blockquote>petróleo Brent para entrega em dezembro fechou em alta de 4,35%, a US$ 113,17 por barril</blockquote><p class="tev-x">Cotações exatas com bolsa de negociação (ICE e Nymex) e percentuais devidamente contextualizados.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico</li>
+<li>Relevância política baixa</li><li>281 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/financas/noticia/2026/10/22/petroleo-brent-sobe-4percent-e-supera-us-113-maior-preco-desde-maio.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Tecnologia &amp; Negócios · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/empresas/noticia/2026/10/22/deepseek-conclui-captao-de-us-15-bilhes-para-impulsionar-corrida-da-ia-dizem-fontes.ghtml" target="_blank" rel="noopener noreferrer">DeepSeek conclui captação de US$ 15 bilhões para impulsionar corrida da IA, dizem fontes<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 63 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Brasil · Economia · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/brasil/noticia/2026/10/22/arrecadacao-federal-soma-r-239384-bilhoes-em-setembro-alta-de-562percent-e-recorde-para-o-mes-diz-receita.ghtml" target="_blank" rel="noopener noreferrer">Arrecadação federal soma R$ 239,384 bi em setembro, alta de 5,62% e recorde para o mês, diz Receita<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 88 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Mercados &amp; Finanças · 22/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/ataque-a-aeroporto-em-cidade-petrolfera-da-arbia-saudita-deixa-dois-mortos.ghtml" target="_blank" rel="noopener noreferrer">Ataque a aeroporto em cidade petrolífera da Arábia Saudita deixa dois mortos<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 63 (Regular) · Instituições, Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>g1</b> · Mercados &amp; Finanças · 22/10</p>
-      <p class="ta-t"><a href="https://g1.globo.com/economia/noticia/2026/10/22/dolar-ibovespa.ghtml" target="_blank" rel="noopener noreferrer">Dólar sobe e fecha a R$ 5,03 com alta do petróleo e reta final das eleições no radar; Ibovespa cai<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 69 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-na" aria-hidden="true"></i>—</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Money Times</b> · Mercados &amp; Finanças · 23/10</p>
-      <p class="ta-t"><a href="https://www.moneytimes.com.br/mega-sena-acumula-novamente-premio-alcanca-230-milhoes-lotofacil-dia-de-sorte-quina-timemania-loterias-resultados-rsgp/" target="_blank" rel="noopener noreferrer">Mega-Sena encalha de novo e prêmio vai a R$ 230 milhões; Lotofácil tem 57 ganhadores<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <p class="ta-r"><b>Não se aplica</b> · apuração 100 (Boa) · Geral</p>
-<p class="ta-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="81" data-s="0" data-c="eq" data-v="Folha de S.Paulo" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="10">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 22/10</span><span class="tr-h">Terremoto de magnitude 7 mata 16 pessoas e fere 32 na região do Tibete, na China</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>81</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 81/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:81%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral, Instituições</li>
+<li>Relevância política média</li><li>973 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mundo/2026/10/terremoto-de-magnitude-7-atinge-regiao-do-tibete-na-china.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
-  <p class="term-note">Termômetro de Viés Editorial (v1.1): a IA aponta, em cada texto compilado, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto e dá T de &minus;100 (esquerda) a +100 (direita). Mede o tratamento dado pelo texto, não a veracidade dos fatos; opinião fica à parte.</p>
+</li>
+      <li class="tr" data-t="0.0" data-q="75" data-s="0" data-c="eq" data-v="Folha de S.Paulo" data-e="Geopolítica &amp; Mundo" data-o="0" data-i="11">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Geopolítica &amp; Mundo · 22/10</span><span class="tr-h">Rússia e Ucrânia se atacam horas após anunciar negociação</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>75</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 75/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:75%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Segurança</li>
+<li>Relevância política alta</li><li>979 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mundo/2026/10/russia-e-ucrania-se-atacam-horas-apos-anunciar-negociacao.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="92" data-s="0" data-c="eq" data-v="Seu Dinheiro" data-e="Mercados &amp; Finanças" data-o="0" data-i="12">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Seu Dinheiro</b> · Mercados &amp; Finanças · 23/10</span><span class="tr-h">Mega-Sena acumula novamente e prêmio alcança R$ 230 milhões; 3 bolões com dezenas de pessoas dividem a Lotofácil</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política baixa</li><li>674 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www.seudinheiro.com/2026/economia/mega-sena-acumula-novamente-premio-alcanca-230-milhoes-boloes-dividem-lotofacil-quina-dia-de-sorte-loterias-resultados-rsgp/" target="_blank" rel="noopener noreferrer">Abrir o texto original (seudinheiro.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="92" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="13">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 22/10</span><span class="tr-h">Datafolha: Flávio Bolsonaro tem 47% e Lula, 46% das intenções de voto</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política alta</li><li>994 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/datafolha-flavio-bolsonaro-tem-47percent-e-lula-46percent-das-intencoes-de-voto.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="90" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="14">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 23/10</span><span class="tr-h">Quem vai ao debate presidencial da Globo entre Lula e Flávio Bolsonaro?</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política média</li><li>230 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/23/quem-vai-ao-debate-presidencial-da-globo-entre-lula-e-flavio-bolsonaro.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="90" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="15">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 22/10</span><span class="tr-h">TSE manda Meta explicar em até 12 horas alcance de perfil de Nikolas Ferreira no Instagram</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política alta</li><li>331 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/22/tse-manda-meta-explicar-em-ate-12-horas-alcance-de-perfil-de-nikolas-ferreira-no-instagram.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="63" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Tecnologia &amp; Negócios" data-o="0" data-i="16">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Tecnologia &amp; Negócios · 22/10</span><span class="tr-h">DeepSeek conclui captação de US$ 15 bilhões para impulsionar corrida da IA, dizem fontes</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>63</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 63/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:63%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política média</li><li>644 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/empresas/noticia/2026/10/22/deepseek-conclui-captao-de-us-15-bilhes-para-impulsionar-corrida-da-ia-dizem-fontes.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="88" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Brasil · Economia" data-o="0" data-i="17">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Brasil · Economia · 22/10</span><span class="tr-h">Arrecadação federal soma R$ 239,384 bi em setembro, alta de 5,62% e recorde para o mês, diz Receita</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>88</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 88/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:88%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>774 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/brasil/noticia/2026/10/22/arrecadacao-federal-soma-r-239384-bilhoes-em-setembro-alta-de-562percent-e-recorde-para-o-mes-diz-receita.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="63" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Mercados &amp; Finanças" data-o="0" data-i="18">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Mercados &amp; Finanças · 22/10</span><span class="tr-h">Ataque a aeroporto em cidade petrolífera da Arábia Saudita deixa dois mortos</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>63</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 63/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:63%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Geral</li>
+<li>Relevância política média</li><li>541 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/mundo/noticia/2026/10/22/ataque-a-aeroporto-em-cidade-petrolfera-da-arbia-saudita-deixa-dois-mortos.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="69" data-s="0" data-c="eq" data-v="g1" data-e="Mercados &amp; Finanças" data-o="0" data-i="19">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>g1</b> · Mercados &amp; Finanças · 22/10</span><span class="tr-h">Dólar sobe e fecha a R$ 5,03 com alta do petróleo e reta final das eleições no radar; Ibovespa cai</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>69</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 69/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:69%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>769 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://g1.globo.com/economia/noticia/2026/10/22/dolar-ibovespa.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (g1.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="" data-q="100" data-s="0" data-c="na" data-v="Money Times" data-e="Mercados &amp; Finanças" data-o="0" data-i="20">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-na" aria-hidden="true"></i><b>—</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Money Times</b> · Mercados &amp; Finanças · 23/10</span><span class="tr-h">Mega-Sena encalha de novo e prêmio vai a R$ 230 milhões; Lotofácil tem 57 ganhadores</span></span>
+      <span class="tr-sc" aria-hidden="true"></span>
+      <span class="tr-r"><b>Não se aplica</b></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Não se aplica: o texto não tem dimensão político-ideológica relevante.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política nenhuma</li><li>590 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www.moneytimes.com.br/mega-sena-acumula-novamente-premio-alcanca-230-milhoes-lotofacil-dia-de-sorte-quina-timemania-loterias-resultados-rsgp/" target="_blank" rel="noopener noreferrer">Abrir o texto original (moneytimes.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+    </ol>
+    <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
+    <button class="tm-more" id="tmMore" type="button" hidden></button>
+  </section>
+  <div class="tm-metodo" id="term-metodo">
+    <h3 class="tm-ph">Como ler</h3>
+    <dl>
+      <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
+      <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
+      <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
+    </dl>
+    <p class="tm-foot">Termômetro de Viés Editorial, cálculo v1.1 · hoje: 20 análises novas · 40 textos candidatos vistos (12 curtos demais) · 5 chamadas à IA (gemini-flash-latest + gemini-flash-lite-latest).</p>
+  </div>
 </section>
 
 </main>
@@ -5702,6 +6257,68 @@ body.modal-open .btt{visibility:hidden}
     update();
   }
 
+  /* ── Termômetro do dia: filtros, ordem e "mostrar todos" na lista de textos ──
+     Sem script, a lista aparece inteira na ordem da página (mais inclinados primeiro)
+     e os filtros ficam ocultos. */
+  function setupTermometro() {
+    var list = d.getElementById('tmList'), form = d.getElementById('tmFil');
+    if (!list || !form) return;
+    var more = d.getElementById('tmMore'), none = d.getElementById('tmNone');
+    var shown = form.querySelector('.tm-shown');
+    var rows = Array.prototype.slice.call(list.children);
+    var chips = Array.prototype.slice.call(form.querySelectorAll('.tm-chip'));
+    var selV = form.querySelector('select[name="v"]');
+    var selE = form.querySelector('select[name="e"]');
+    var selO = form.querySelector('select[name="o"]');
+    var visiveis = parseInt(list.getAttribute('data-visiveis'), 10) || 12;
+    var filtro = 'all', todos = false;
+    function num(row, key, vazio) {
+      var v = parseFloat(row.getAttribute('data-' + key));
+      return isNaN(v) ? vazio : v;
+    }
+    function pos(a, b) { return num(a, 'i', 0) - num(b, 'i', 0); }
+    var ordens = {
+      inc: function (a, b) { return Math.abs(num(b, 't', 0)) - Math.abs(num(a, 't', 0)) || num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      lr: function (a, b) { return num(a, 't', 1000) - num(b, 't', 1000) || pos(a, b); },
+      q: function (a, b) { return num(a, 'q', 1000) - num(b, 'q', 1000) || pos(a, b); },
+      sig: function (a, b) { return num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      v: function (a, b) { return (a.getAttribute('data-v') || '').localeCompare(b.getAttribute('data-v') || '', 'pt-BR') || pos(a, b); }
+    };
+    function passa(row) {
+      if (filtro === 'sig' && !(num(row, 's', 0) > 0)) return false;
+      if (filtro === 'inc' && (row.getAttribute('data-t') === '' || row.getAttribute('data-c') === 'eq')) return false;
+      if (filtro === 'op' && row.getAttribute('data-o') !== '1') return false;
+      if (selV.value && row.getAttribute('data-v') !== selV.value) return false;
+      if (selE.value && row.getAttribute('data-e') !== selE.value) return false;
+      return true;
+    }
+    function render() {
+      var sel = rows.filter(passa).sort(ordens[selO.value] || ordens.inc);
+      var filtrado = filtro !== 'all' || selV.value || selE.value;
+      var limite = todos || filtrado ? sel.length : Math.min(visiveis, sel.length);
+      rows.forEach(function (r) { r.hidden = true; });
+      sel.forEach(function (r, i) { list.appendChild(r); r.hidden = i >= limite; });
+      none.hidden = sel.length > 0;
+      more.hidden = limite >= sel.length;
+      if (limite < sel.length) more.textContent = 'Mostrar todos os ' + sel.length + ' textos';
+      shown.textContent = limite < sel.length
+        ? 'Mostrando ' + limite + ' de ' + sel.length
+        : sel.length + (sel.length === 1 ? ' texto' : ' textos');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        filtro = chip.getAttribute('data-f');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        render();
+      });
+    });
+    [selV, selE, selO].forEach(function (s) { s.addEventListener('change', render); });
+    more.addEventListener('click', function () { todos = true; render(); });
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.hidden = false;
+    render();
+  }
+
   setupTheme();
   setupCanvas();
   setupTicker();
@@ -5713,6 +6330,7 @@ body.modal-open .btt{visibility:hidden}
   setupAges();
   setupModals();
   setupScroll();
+  setupTermometro();
 })();</script>
 </body>
 </html>

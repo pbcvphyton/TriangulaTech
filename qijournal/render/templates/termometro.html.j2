@@ -1,59 +1,210 @@
-{#- Peças do Termômetro de Viés Editorial (edição e aba Analítico Político).
-    Cores: verde-azulado para a esquerda, âmbar para a direita e cinza no
-    equilíbrio (classes ef/em/el/eq/dl/dm/df; mx = misto, hachurado). -#}
+{#- Peças do Termômetro de Viés Editorial (painel do dia na edição e aba Analítico Político).
+    Escala divergente validada (rampa ordinal por braço, claro e escuro): verde-azulado à
+    esquerda, âmbar à direita e cinza no equilíbrio (classes ef/em/el/eq/dl/dm/df; mx = misto,
+    hachurado). Os textos ficam nas cores de texto; a cor só vai nas marcas (faixas, ponteiro,
+    pontos e barras), sempre com o número ou o rótulo escrito ao lado. -#}
 
-{#- Escala de −100 a +100 com as faixas, o intervalo de 95% e o ponto da média (g: GaugeView). -#}
+{#- Escala de −100 a +100 (g: GaugeView): as sete faixas (a da média em destaque), o
+    intervalo de 95%, o ponteiro da média e, no painel do dia, um traço por notícia. -#}
 {% macro gauge(g, small=False) -%}
-<div class="tg{% if small %} sm{% endif %}" role="img" aria-label="{{ g.aria }}">
-  <div class="tg-track">
-    <div class="tg-bands">{% for f in g.faixas %}<span class="tg-f t-{{ f.classe }}" style="left:{{ f.left }}%;width:{{ f.width }}%" title="{{ f.rotulo }}"></span>{% endfor %}</div>
-    <span class="tg-zero"></span>
+<figure class="tg{% if small %} sm{% endif %}" role="img" aria-label="{{ g.aria }}">
+  <div class="tg-flag" style="--x:{{ g.pct }}%" aria-hidden="true"><b>T {{ g.valor }}</b> {{ g.rotulo }}</div>
+  <div class="tg-track" aria-hidden="true">
+    {%- for f in g.faixas %}<span class="tg-f t-{{ f.classe }}{% if f.ativa %} on{% endif %}" style="left:{{ f.left }}%;width:{{ f.width }}%"></span>{% endfor -%}
     {%- if g.ic_left is not none %}<span class="tg-ic" style="left:{{ g.ic_left }}%;width:{{ g.ic_width }}%"></span>{% endif -%}
-    <span class="tg-dot" style="left:{{ g.pct }}%"></span>
+    <span class="tg-needle" style="left:{{ g.pct }}%"></span>
   </div>
-  {%- if not small %}
-  <div class="tg-axis" aria-hidden="true"><span>Esquerda · &minus;100</span><span>0</span><span>+100 · Direita</span></div>
+  {%- if g.rug %}
+  <div class="tg-rug" aria-hidden="true">{% for p in g.rug %}<i style="left:{{ p }}%"></i>{% endfor %}</div>
   {%- endif %}
+  <div class="tg-ticks" aria-hidden="true">{% for m in g.marcas %}<span{% if m.menor %} class="mn"{% endif %} style="left:{{ m.left }}%">{{ m.rotulo }}</span>{% endfor %}</div>
+  {%- if not small %}
+  <div class="tg-zones" aria-hidden="true">{% for f in g.faixas %}<span{% if f.ativa %} class="on"{% endif %} style="left:{{ f.left }}%;width:{{ f.width }}%">{{ f.zona }}</span>{% endfor %}</div>
+  {%- endif %}
+  <div class="tg-sides" aria-hidden="true"><span>&larr; Esquerda</span>{% if g.rug %}<span class="tg-rug-k"><i></i>cada traço é uma notícia</span>{% endif %}<span>Direita &rarr;</span></div>
+</figure>
+{%- endmacro %}
+
+{#- Placar: o número da média, o rótulo e o intervalo ao lado da escala. -#}
+{% macro placar(g, titulo, base) -%}
+<div class="tm-placar">
+  <div class="tm-hero">
+    <p class="tm-k">{{ titulo }}</p>
+    <p class="tm-n">{{ g.valor }}</p>
+    <p class="tm-r"><i class="sw t-{{ g.classe }}" aria-hidden="true"></i>{{ g.rotulo }}</p>
+    {% if g.ic %}<p class="tm-ic">Intervalo de 95%: <span class="nw">{{ g.ic }}</span></p>{% endif %}
+    {% if base %}<p class="tm-b">{{ base }}</p>{% endif %}
+  </div>
+  {{ gauge(g) }}
 </div>
 {%- endmacro %}
 
-{#- Quantos textos em cada rótulo (d: DistribuicaoView). -#}
+{#- Indicadores (lista de IndicadorView ou TileView). -#}
+{% macro indicadores(lista) -%}
+<ul class="tm-kpis">
+  {%- for k in lista %}
+  <li><span class="tm-k">{{ k.rotulo }}</span><span class="tm-kv">{{ k.valor }}{% if k.unidade is defined and k.unidade %}<small>{{ k.unidade }}</small>{% endif %}</span>
+    {%- if k.meter is defined and k.meter is not none %}<span class="tm-meter" aria-hidden="true"><span style="width:{{ k.meter }}%"></span></span>{% endif -%}
+    {%- if k.detalhe %}<span class="tm-kd">{{ k.detalhe }}</span>{% endif %}</li>
+  {%- endfor %}
+</ul>
+{%- endmacro %}
+
+{#- Quantos textos em cada rótulo (d: DistribuicaoView): uma barra por faixa, da esquerda forte
+    à direita forte, com a contagem e a parcela escritas ao lado. -#}
 {% macro dist(d) -%}
-<div class="td">
-  <div class="td-bar" role="img" aria-label="{{ d.aria }}">
-    {%- for s in d.segmentos %}<span class="t-{{ s.classe }}" style="width:{{ s.pct }}%" title="{{ s.rotulo }}: {{ s.n }}"></span>{% endfor -%}
-  </div>
-  <ul class="td-leg">
-    {%- for s in d.segmentos %}<li><i class="t-{{ s.classe }}" aria-hidden="true"></i>{{ s.rotulo }} <b>{{ s.n }}</b></li>{% endfor -%}
-  </ul>
-</div>
+<ol class="th" aria-label="{{ d.aria }}">
+  {%- for c in d.barras %}
+  <li class="{% if not c.n %}zero{% endif %}"><span class="th-l"><i class="sw t-{{ c.classe }}" aria-hidden="true"></i>{{ c.rotulo }}</span><span class="th-m" aria-hidden="true"><span class="t-{{ c.classe }}" style="width:{{ c.largura }}%"></span></span><span class="th-v"><b>{{ c.n }}</b> <span>{{ c.share }}%</span></span></li>
+  {%- endfor %}
+</ol>
+{%- if d.fora %}<p class="tm-foot">Fora da média: {{ d.fora }}.</p>{% endif %}
 {%- endmacro %}
 
-{#- Um texto analisado (a: AnaliseView). -#}
-{% macro analise(a) -%}
-<li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-{{ a.classe }}" aria-hidden="true"></i>{{ a.valor }}</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>{{ a.veiculo }}</b> · {{ a.editoria }} · {{ a.data }}{% if a.selo %} · <em>{{ a.selo }}</em>{% endif %}</p>
-      <p class="ta-t">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.titulo }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ a.titulo }}{% endif %}</p>
+{#- Sinais que pontuaram, por critério (s: SinaisView): à esquerda e à direita de um eixo central. -#}
+{% macro sinais(s) -%}
+{% if s.criterios %}
+<div class="tsg">
+  <div class="tsg-hd" aria-hidden="true"><span></span><span>&larr; esquerda</span><span>direita &rarr;</span></div>
+  <ul class="tsg-list">
+    {%- for c in s.criterios %}
+    <li aria-label="{{ c.aria }}"><span class="tsg-n">{{ c.nome }}</span><span class="tsg-l" aria-hidden="true">{% if c.esq %}<b>{{ c.esq }}</b><span class="tsg-b t-em" style="width:{{ c.w_esq }}%"></span>{% endif %}</span><span class="tsg-r" aria-hidden="true">{% if c.dir %}<span class="tsg-b t-dm" style="width:{{ c.w_dir }}%"></span><b>{{ c.dir }}</b>{% endif %}</span><span class="tsg-eq" aria-hidden="true">{% if c.eq %}<i class="t-eq"></i>{{ c.eq }}{% endif %}</span></li>
+    {%- endfor %}
+  </ul>
+  {% if s.eq %}<p class="tm-foot"><i class="sw t-eq" aria-hidden="true"></i>Sinal de equilíbrio (contraponto ouvido, número com fonte, verbo neutro): não move o T.</p>{% endif %}
+</div>
+{% else %}
+<p class="tm-empty">Nenhum sinal pontuou: o cálculo não confirmou tratamento desigual nos textos analisados.</p>
+{% endif %}
+{%- endmacro %}
+
+{#- Checklist da qualidade da apuração (c: ChecklistView). -#}
+{% macro checklist(c) -%}
+<ul class="tq">
+  {%- for i in c.itens %}
+  <li><span class="tq-n">{{ i.nome }}</span><span class="tq-m" aria-hidden="true"><span style="width:{{ i.pct }}%"></span></span><span class="tq-v"><b>{{ i.pct }}%</b> <span class="sr-only">dos textos, </span>{{ i.sim }} de {{ i.base }}</span></li>
+  {%- endfor %}
+</ul>
+{%- endmacro %}
+
+{#- T médio de cada grupo do dia (r: RecorteView): um ponto por grupo numa escala comum. -#}
+{% macro recorte_linha(i) -%}
+<li class="trc-i" title="{{ i.title }}"><span class="trc-n">{{ i.nome }}</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span>{% if i.ic_left is not none %}<span class="trc-ic" style="left:{{ i.ic_left }}%;width:{{ i.ic_width }}%"></span>{% endif %}<span class="trc-d t-{{ i.classe }}" style="left:{{ i.pct }}%"></span></span><span class="trc-v"><b>{{ i.valor }}</b><span class="sr-only"> ({{ i.rotulo }}), </span><span class="trc-x">{{ i.n }} {{ "notícia" if i.n == 1 else "notícias" }} · Q {{ i.q }}</span></span></li>
+{%- endmacro %}
+
+{% macro recorte(r) -%}
+<ol class="trc">
+  {%- for i in r.itens %}
+  {{ recorte_linha(i) }}
+  {%- endfor %}
+</ol>
+{%- if r.mais %}
+<details class="trc-more">
+  <summary>Ver todos ({{ r.itens|length + r.mais|length }})</summary>
+  <ol class="trc">
+    {%- for i in r.mais %}
+    {{ recorte_linha(i) }}
+    {%- endfor %}
+  </ol>
+</details>
+{%- endif %}
+<div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p">{% for left, rot in r.escala %}<i style="left:{{ left }}%">{{ rot }}</i>{% endfor %}</span><span></span></div>
+{%- endmacro %}
+
+{#- Um sinal que pontuou (e: EvidenciaView), com a citação literal do texto. -#}
+{% macro evidencia(e) -%}
+<li class="tev-{{ e.seta }}"><p class="tev-h"><b>{{ e.criterio }}</b><span class="tev-d">{% if e.id %}{{ e.id }} · {% endif %}{{ e.direcao }}{% if e.contribuicao %} · {{ e.contribuicao }} pt{% endif %}{% if e.intensidade %} · {{ e.intensidade }}{% endif %}{% if e.paragrafo %} · {{ e.paragrafo }}{% endif %}</span></p><blockquote>{{ e.citacao }}</blockquote>{% if e.explicacao %}<p class="tev-x">{{ e.explicacao }}</p>{% endif %}{% if e.favorece or e.desfavorece %}<p class="tev-a">{% if e.favorece %}Favorece: {{ e.favorece }}{% endif %}{% if e.favorece and e.desfavorece %} · {% endif %}{% if e.desfavorece %}Desfavorece: {{ e.desfavorece }}{% endif %}</p>{% endif %}{% if e.ressalva %}<p class="tev-a">Ressalva: {{ e.ressalva }}</p>{% endif %}</li>
+{%- endmacro %}
+
+{#- Um texto analisado (a: AnaliseView): a linha (T, título, veículo, escala, rótulo e
+    qualidade) abre o detalhe — o resumo do cálculo, os sinais com a citação literal, o
+    enquadramento, a qualidade item a item, as fontes e o teste de inversão. -#}
+{% macro analise(a, n) -%}
+<li class="tr" data-t="{{ a.t_num if a.t_num is not none else '' }}" data-q="{{ a.q_num if a.q_num is not none else '' }}" data-s="{{ a.sinais }}" data-c="{{ a.classe }}" data-v="{{ a.veiculo }}" data-e="{{ a.editoria }}" data-o="{{ 1 if a.opiniao else 0 }}" data-i="{{ n }}">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-{{ a.classe }}" aria-hidden="true"></i><b>{{ a.valor }}</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>{{ a.veiculo }}</b> · {{ a.editoria }} · {{ a.data }}{% if a.selo %} · <em>{{ a.selo }}</em>{% endif %}</span><span class="tr-h">{{ a.titulo }}</span></span>
+      <span class="tr-sc" aria-hidden="true">{% if a.pct is not none %}<span class="tr-z"></span><span class="tr-d t-{{ a.classe }}" style="left:{{ a.pct }}%"></span>{% endif %}</span>
+      <span class="tr-r"><b>{{ a.rotulo }}</b>{% if a.confianca %}<span>confiança {{ a.confianca }}</span>{% endif %}</span>
+      <span class="tr-q">{% if a.q != "—" %}<b>{{ a.q }}</b><span>qualidade</span>{% else %}<b>—</b><span>qualidade</span>{% endif %}</span>
+      <span class="tr-sig">{% if a.sinais %}{{ a.sinais }} {{ "sinal" if a.sinais == 1 else "sinais" }}{% endif %}</span>
+    </summary>
+    <div class="tr-body">
+      {% if a.resumo %}<p class="tr-sum">{{ a.resumo }}</p>{% endif %}
+      {% if a.motivos %}<p class="tr-note">Confiança {{ a.confianca }}: {{ a.motivos }}.</p>{% endif %}
+      <div class="tr-grid">
+        <div class="tr-main">
+          {% if a.contribuicoes %}
+          <h4 class="tr-k">Como o T se formou (pontos por critério)</h4>
+          <ul class="tct">
+            {%- for c in a.contribuicoes %}
+            <li><span class="tct-n">{{ c.nome }}</span><span class="tct-p" aria-hidden="true"><span class="tct-z"></span><span class="tct-b {{ c.lado }}" style="width:{{ c.width / 2 }}%"></span></span><span class="tct-v">{{ c.valor }}</span></li>
+            {%- endfor %}
+          </ul>
+          {% endif %}
+          {% if a.evidencias %}
+          <h4 class="tr-k">Sinais que pontuaram ({{ a.evidencias|length }}){% if a.evidencias|length > 1 %}, do maior peso para o menor{% endif %}</h4>
+          <ol class="tev">
+            {%- for e in a.evidencias[:5] %}
+            {{ evidencia(e) }}
+            {%- endfor %}
+          </ol>
+          {% if a.evidencias|length > 5 %}
+          <details class="tev-more">
+            <summary>Ver os outros {{ a.evidencias|length - 5 }} sinais</summary>
+            <ol class="tev">
+              {%- for e in a.evidencias[5:] %}
+              {{ evidencia(e) }}
+              {%- endfor %}
+            </ol>
+          </details>
+          {% endif %}
+          {% endif %}
+          {% if a.enquadramento %}
+          <h4 class="tr-k">Enquadramento</h4>
+          <dl class="tfr">
+            {%- for nome, valor in a.enquadramento %}<div><dt>{{ nome }}</dt><dd>{{ valor }}</dd></div>{% endfor -%}
+          </dl>
+          {% endif %}
+          {% if a.inversao %}
+          <h4 class="tr-k">Teste de inversão</h4>
+          <p class="tr-inv">{{ a.inversao }}</p>
+          {% endif %}
+        </div>
+        <div class="tr-side">
+          {% if a.checklist %}
+          <h4 class="tr-k">Qualidade da apuração · {{ a.q }}/100{% if a.q_rotulo %} ({{ a.q_rotulo }}){% endif %}</h4>
+          <ul class="tck">
+            {%- for c in a.checklist %}<li class="tck-{{ c.valor }}"><i aria-hidden="true"></i>{{ c.nome }}<span class="sr-only">: {{ c.texto }}</span></li>{% endfor -%}
+          </ul>
+          {% elif a.q_num is not none %}
+          <h4 class="tr-k">Qualidade da apuração · {{ a.q }}/100{% if a.q_rotulo %} ({{ a.q_rotulo }}){% endif %}</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:{{ a.q_num }}%"></span></span>
+          {% endif %}
+          {% if a.fontes %}
+          <h4 class="tr-k">Quem fala ({{ a.fontes|length }})</h4>
+          <ul class="tfo">
+            {%- for f in a.fontes %}<li><span>{{ f.rotulo }}</span><span class="tfo-m">{{ f.campo }}{% if f.anonima %} · anônima{% endif %}{% if f.palavras %} · {{ f.palavras }} {{ "palavra" if f.palavras == 1 else "palavras" }} em fala direta{% endif %}{% if f.ultima %} · última palavra{% endif %}</span></li>{% endfor -%}
+          </ul>
+          {% if a.fala %}<p class="tr-note">{{ a.fala }}.</p>{% endif %}
+          {% endif %}
+          {% if a.atores %}
+          <h4 class="tr-k">Atores em disputa</h4>
+          <p class="tr-note">{{ a.atores }}</p>
+          {% endif %}
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>{% if a.genero %}Gênero: {{ a.genero }}{% else %}{{ a.selo or "Notícia" }}{% endif %}{% if a.eixos %} · eixos: {{ a.eixos }}{% endif %}</li>
+            {% if a.relevancia %}<li>Relevância política {{ a.relevancia }}{% if a.justificativa %}: {{ a.justificativa }}{% endif %}</li>{% endif %}
+            {% if a.palavras %}<li>{{ a.palavras }}{% if a.cortado %} (corpo cortado no fim){% endif %}{% if a.origem %} · da {{ a.origem }}{% endif %}</li>{% endif %}
+            {% if a.descartadas %}<li>{{ a.descartadas }} {{ "sinal descartado" if a.descartadas == 1 else "sinais descartados" }} na conferência (citação fora do texto, fala de fonte ou trecho repetido)</li>{% endif %}
+          </ul>
+        </div>
+      </div>
+      {% if a.url %}<p class="tr-go"><a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">Abrir o texto original{% if a.dominio %} ({{ a.dominio }}){% endif %} <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>{% endif %}
     </div>
-  </div>
-  {% if a.pct is not none %}
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-{{ a.classe }}" style="left:{{ a.pct }}%"></span></div>
-  {% endif %}
-  <p class="ta-r"><b>{{ a.rotulo }}</b>{% if a.confianca %} · confiança {{ a.confianca }}{% endif %}{% if a.q != "—" %} · apuração {{ a.q }} ({{ a.q_rotulo }}){% endif %}{% if a.eixos %} · {{ a.eixos }}{% endif %}</p>
-  {% if a.resumo %}<p class="ta-sum">{{ a.resumo }}</p>{% endif %}
-  {% if a.evidencias %}
-  <details class="ta-ev">
-    <summary>Sinais que pontuaram ({{ a.evidencias|length }})</summary>
-    <ol>
-      {% for e in a.evidencias %}
-      <li><b>{{ e.id }} · {{ e.criterio }}</b> <span class="ta-dir">{{ e.direcao }} · {{ e.contribuicao }}</span><q>{{ e.citacao }}</q>{% if e.explicacao %}<span class="ta-ex">{{ e.explicacao }}</span>{% endif %}</li>
-      {% endfor %}
-    </ol>
   </details>
-  {% endif %}
 </li>
 {%- endmacro %}
 

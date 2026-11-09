@@ -62,7 +62,10 @@ SCHEMA_ARQUIVO = "saida_modelo.schema.json"
 LEXICO_ARQUIVO = "lexico.yaml"
 ATORES_ARQUIVO = "atores.yaml"
 
-TOKENS_POR_TEXTO = 3500  # saída estimada de uma análise (evidências com citação e explicação)
+# Saída estimada de uma análise (evidências com citação e explicação). Medido nas
+# edições de out-nov/2026: 600 a 1.100 tokens por texto (Gemini Flash e Flash-Lite);
+# 3.000 deixa folga de ~3x para um texto com muitos sinais sem cortar a resposta.
+TOKENS_POR_TEXTO = 3000
 OUTPUT_SHARE = 0.5  # parte da saída máxima para a resposta visível (o resto: raciocínio do modelo)
 PARAGRAFO_LONGO = 1200  # corpo em bloco único (ex.: articleBody do JSON-LD) é dividido em trechos
 TRECHO_ALVO = 700
@@ -70,6 +73,16 @@ LINHA_FINA_MAX = 400
 CITACAO_MAX = 240
 EXPLICACAO_MAX = 320
 RESUMO_MAX = 400
+# Detalhes de cada análise guardados no histórico (a IA já devolve tudo isso no formato
+# v1.1; antes só o T e os sinais ficavam): limites para o arquivo do dia seguir enxuto.
+ENQUADRAMENTO_MAX = 220
+INVERSAO_MAX = 480
+JUSTIFICATIVA_MAX = 240
+RESSALVA_MAX = 240
+NOME_MAX = 90
+ATORES_MAX = 10
+FONTES_MAX = 12
+MOTIVOS_MAX = 4
 RESERVA_SEGUNDOS = 30  # sem esse tempo no prazo, os lotes restantes nem saem
 
 # Seção de coluna/opinião (a mesma expressão do cálculo, aplicada aos diretórios da URL).
@@ -586,13 +599,72 @@ def _arred(valor: Any, casas: int = 2) -> Any:
     return round(valor, casas) if isinstance(valor, float) else valor
 
 
+def _curto(valor: Any, limite: int) -> str:
+    return text.truncate(_uma_linha(valor or ""), limite) if isinstance(valor, str) else ""
+
+
+def _itens_qualidade(qualidade: Mapping[str, Any]) -> dict[str, str]:
+    """Checklist da qualidade da apuração (item -> sim, nao ou nao_se_aplica), na ordem dos pesos."""
+    itens = {}
+    for i in qualidade.get("itens") or []:
+        if isinstance(i, dict) and i.get("item") in PARAMETROS["qualidade_pesos"]:
+            itens[i["item"]] = str(i.get("valor") or "nao")
+    return itens
+
+
+def _atores(r: Mapping[str, Any]) -> list[dict[str, str]]:
+    atores = []
+    for a in (r.get("atores") or [])[:ATORES_MAX]:
+        if isinstance(a, dict) and _curto(a.get("nome"), NOME_MAX):
+            atores.append({"id": str(a.get("id") or ""), "nome": _curto(a.get("nome"), NOME_MAX), "campo": str(a.get("campo") or "indefinido")})
+    return atores
+
+
+def _fontes(r: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Quem fala no texto, com as palavras de fala direta de cada fonte (contagem do cálculo)."""
+    fontes = []
+    for f in (r.get("fontes") or [])[:FONTES_MAX]:
+        if not isinstance(f, dict):
+            continue
+        fontes.append(
+            {
+                "rotulo": _curto(f.get("rotulo"), NOME_MAX),
+                "campo": str(f.get("campo") or "indefinido"),
+                "anonima": bool(f.get("anonima")),
+                "vinculo": bool(f.get("vinculo_informado")),
+                "palavras": int(f.get("palavras") or 0),
+                "ultima": bool(f.get("ultima_palavra")),
+            }
+        )
+    return fontes
+
+
+def _criterios(r: Mapping[str, Any]) -> dict[str, float]:
+    """Pontos de T que cada critério somou (só os que pontuaram), na ordem fixa dos pesos."""
+    por_criterio = r.get("por_criterio") or {}
+    saida = {}
+    for k in PARAMETROS["pesos"]:
+        c = por_criterio.get(k) or {}
+        if c.get("n_evidencias") and isinstance(c.get("contribuicao"), (int, float)):
+            saida[k] = round(float(c["contribuicao"]), 2)
+    return saida
+
+
 def registro_da_analise(t: Texto, r: Mapping[str, Any], data_edicao: str) -> dict[str, Any]:
     """O que fica guardado de uma análise: os campos que a aba analítica agrega
-    (formato das análises da especificação) e o que explica o resultado."""
+    (formato das análises da especificação) e o que explica o resultado — o
+    checklist da qualidade, o enquadramento, o teste de inversão, atores, fontes
+    e a contribuição de cada critério, tudo como a IA devolveu e o cálculo conferiu."""
     qualidade = r.get("qualidade_apuracao") or {}
     decomposicao = r.get("decomposicao")
-    evidencias = [
-        {
+    triagem = r.get("triagem") or {}
+    atores = _atores(r)
+    nomes = {a["id"]: a["nome"] for a in atores if a["id"]}
+    evidencias = []
+    for e in r.get("evidencias") or []:
+        if not e.get("pontua"):
+            continue
+        item = {
             "id": e["id"],
             "criterio": e["criterio"],
             "citacao": text.truncate(_uma_linha(e["citacao"]), CITACAO_MAX),
@@ -600,10 +672,20 @@ def registro_da_analise(t: Texto, r: Mapping[str, Any], data_edicao: str) -> dic
             "direcao": e["direcao_final"],
             "contribuicao": _arred(e.get("contribuicao", 0.0)),
             "explicacao": text.truncate(_uma_linha(e.get("explicacao") or ""), EXPLICACAO_MAX),
+            "intensidade": e.get("intensidade"),
+            "certeza": _arred(e.get("certeza_final")),
+            "eixo": e.get("eixo"),
         }
-        for e in r.get("evidencias") or []
-        if e.get("pontua")
-    ]
+        for chave, destino in (("ator_favorecido", "favorece"), ("ator_desfavorecido", "desfavorece")):
+            if nomes.get(e.get(chave) or ""):
+                item[destino] = nomes[e[chave]]
+        if _curto(e.get("ressalva"), RESSALVA_MAX):
+            item["ressalva"] = _curto(e.get("ressalva"), RESSALVA_MAX)
+        evidencias.append(item)
+    enquadramento = {
+        k: _curto(v, ENQUADRAMENTO_MAX) for k, v in (r.get("enquadramento") or {}).items() if _curto(v, ENQUADRAMENTO_MAX)
+    }
+    saldo = r.get("saldo_fontes") or {}
     return {
         "id": t.artigo.id,
         "url": t.artigo.url,
@@ -619,22 +701,32 @@ def registro_da_analise(t: Texto, r: Mapping[str, Any], data_edicao: str) -> dic
         "selo": r.get("selo"),
         "genero": r.get("genero"),
         "triagem": {
-            "relevancia_politica": (r.get("triagem") or {}).get("relevancia_politica"),
-            "eixos": list((r.get("triagem") or {}).get("eixos") or []),
+            "relevancia_politica": triagem.get("relevancia_politica"),
+            "eixos": list(triagem.get("eixos") or []),
+            "justificativa": _curto(triagem.get("justificativa"), JUSTIFICATIVA_MAX),
         },
         "estado": r["estado"],
         "T": r.get("T"),
         "rotulo": r.get("rotulo"),
         "confianca": r.get("confianca"),
+        "motivos_confianca": [_curto(m, 160) for m in (r.get("motivos_confianca") or [])[:MOTIVOS_MAX]],
         "resumo": text.truncate(_uma_linha(r.get("resumo") or ""), RESUMO_MAX),
         "motivo_estado": r.get("motivo_estado"),
-        "qualidade_apuracao": {"Q": qualidade.get("Q"), "rotulo": qualidade.get("rotulo")},
+        "qualidade_apuracao": {"Q": qualidade.get("Q"), "rotulo": qualidade.get("rotulo"), "itens": _itens_qualidade(qualidade)},
         "palavras": r.get("palavras"),
         "cortado": t.cortado,
         "decomposicao": (
             {k: _arred(v) for k, v in decomposicao.items()} if isinstance(decomposicao, dict) else None
         ),
         "por_eixo": {k: _arred(v) for k, v in (r.get("por_eixo") or {}).items()},
+        "criterios": _criterios(r),
+        "aplicaveis": len(r.get("aplicaveis") or []),
+        "enquadramento": enquadramento,
+        "teste_inversao": _curto(r.get("teste_inversao"), INVERSAO_MAX),
+        "atores": [{"nome": a["nome"], "campo": a["campo"]} for a in atores],
+        "fontes": _fontes(r),
+        "saldo_fontes": {"esquerda": int(saldo.get("esquerda") or 0), "direita": int(saldo.get("direita") or 0)},
+        "falas": len(r.get("falas") or []),
         "evidencias": evidencias,
         "descartadas": len(r.get("descartadas") or []),
     }
