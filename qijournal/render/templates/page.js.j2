@@ -619,39 +619,45 @@
     });
   }
 
-  /* ── Cobertura comparada: filtro por editoria ──────────────────────── */
-  function setupCompareFilter() {
-    var bar = d.querySelector('.cmp-f');
-    var section = bar && bar.closest ? bar.closest('.cmp') : null;
-    if (!section) return;
-    bar.hidden = false;
-    var buttons = Array.prototype.slice.call(bar.querySelectorAll('button[data-cmp-f]'));
-    bar.addEventListener('click', function (event) {
-      var button = event.target.closest ? event.target.closest('button[data-cmp-f]') : null;
-      if (!button) return;
-      var filter = button.getAttribute('data-cmp-f');
-      buttons.forEach(function (b) {
-        var on = b === button;
-        b.classList.toggle('on', on);
-        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  /* ── Cobertura comparada: uma aba por editoria (como as abas das matérias) ── */
+  function setupCompareTabs() {
+    var wrap = d.querySelector('.cmp-tabs');
+    var bar = wrap && wrap.querySelector('.tabs-bar');
+    if (!bar) return;
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll('[role="tab"]'));
+    var panes = Array.prototype.slice.call(wrap.querySelectorAll('.cmp-pane'));
+    function reveal(tab) {
+      var left = tab.offsetLeft, right = left + tab.offsetWidth;
+      if (left < bar.scrollLeft) bar.scrollLeft = left - 16;
+      else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth + 16;
+    }
+    function select(tab, focus) {
+      var key = tab.getAttribute('data-cmp-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
       });
-      section.classList.toggle('cmp-flt', !!filter);
-      Array.prototype.forEach.call(section.querySelectorAll('[data-s]'), function (el) {
-        el.hidden = !!filter && el.getAttribute('data-s') !== filter;
-      });
-      var nome = filter ? button.textContent.replace(/\d+( div\.)?/g, '').trim() : '';
-      Array.prototype.forEach.call(section.querySelectorAll('[data-cmp-g]'), function (group) {
-        var visiveis = group.querySelectorAll('li[data-s]:not([hidden])').length;
-        var note = group.querySelector('.cmp-vazio');
-        if (note) note.hidden = visiveis > 0;
-        // A contagem do título acompanha o filtro (o texto original volta em "Todas").
-        var conta = group.querySelector('[data-cmp-n]');
-        if (!conta) return;
-        if (!conta.hasAttribute('data-orig')) conta.setAttribute('data-orig', conta.textContent);
-        conta.textContent = filter
-          ? (visiveis ? visiveis + ' ' + (visiveis === 1 ? 'assunto' : 'assuntos') : 'nenhum assunto') + ' em ' + nome
-          : conta.getAttribute('data-orig');
-      });
+      wrap.classList.toggle('all', key === 'all');
+      panes.forEach(function (p) { p.classList.toggle('active', key === 'all' || p.id === 'cmp-pane-' + key); });
+      if (focus) tab.focus();
+      reveal(tab);
+    }
+    setupTabArrows(bar);
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { select(tab, false); });
+    });
+    bar.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(d.activeElement);
+      if (index < 0) return;
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      else if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      select(next, true);
     });
   }
 
@@ -775,7 +781,7 @@
   setupLeadFit();
   setupRadarMore();
   setupAges();
-  setupCompareFilter();
+  setupCompareTabs();
   setupModals();
   setupScroll();
   setupTermometro();

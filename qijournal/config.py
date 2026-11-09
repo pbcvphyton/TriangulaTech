@@ -65,6 +65,9 @@ class BrandConfig:
     favicon_svg: str | None = None
     email_logo: dict[str, Any] | None = None  # {src, width, height}: imagem servida em base_url + src
     email_logo_dark: dict[str, Any] | None = None  # versão do modo escuro (mesmo formato)
+    # Faixa do topo do e-mail (o logo sobre a arte do cabeçalho do site), {src, width,
+    # height} em base_url + src, como no e-mail do TSA Tech; sem ela, vale o email_logo.
+    email_header: dict[str, Any] | None = None
 
 
 @dataclass
@@ -394,7 +397,7 @@ class CityConfig:
 @dataclass
 class EmailConfig:
     subject_template: str = "{brand} · {date}: {lead}"
-    max_stories: int = 14
+    max_stories: int = 5  # notícias além da manchete (o modelo do TSA Tech: 2 + 3)
     to: list[str] = field(default_factory=list)  # só via ambiente (EMAIL_TO)
 
 
@@ -478,6 +481,7 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
         favicon_svg=_read_svg(root, brand_raw.get("favicon_svg")),
         email_logo=dict(brand_raw["email_logo"]) if brand_raw.get("email_logo") else None,
         email_logo_dark=dict(brand_raw["email_logo_dark"]) if brand_raw.get("email_logo_dark") else None,
+        email_header=dict(brand_raw["email_header"]) if brand_raw.get("email_header") else None,
     )
 
     sections = []

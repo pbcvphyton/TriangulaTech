@@ -256,6 +256,7 @@ class BrandView:
     logo_height_mobile: int | None = None  # no celular (px)
     email_logo: EmailLogo | None = None
     email_logo_dark: EmailLogo | None = None  # só com email_logo
+    email_header: EmailLogo | None = None  # faixa do topo do e-mail (modelo do TSA Tech)
     termometro: bool = False  # marca com Termômetro de Viés (estilos do bloco do dia e da aba Analítico Político)
 
 
@@ -276,18 +277,22 @@ class CompareItemView:
 
 @dataclass
 class CompareCategoryView:
+    """Uma aba da cobertura comparada: os assuntos de uma editoria."""
+
     id: str
     title: str
     color: str
     total: int
     divided: int
     items: list[CompareItemView] = field(default_factory=list)  # sem divergência, na editoria
+    divergentes: list[CompareItemView] = field(default_factory=list)  # com dois lados, mais disputados primeiro
 
 
 @dataclass
 class ComparedMapView:
-    """Cobertura comparada organizada para escolher o que ler: primeiro onde a mídia
-    divergiu (os mais disputados antes), depois o resto, por editoria."""
+    """Cobertura comparada organizada para escolher o que ler: uma aba por editoria
+    (na ordem do jornal) e "Todas"; em cada aba, primeiro onde a mídia divergiu (os
+    mais disputados antes), depois o que os veículos relataram de forma semelhante."""
 
     divided: list[CompareItemView]
     categories: list[CompareCategoryView]
@@ -387,6 +392,7 @@ def brand_view(config: Config) -> BrandView:
         logo_height_mobile=mobile if height else None,
         email_logo=(email_logo := _email_logo(brand.email_logo, config.site.base_url)),
         email_logo_dark=_email_logo(brand.email_logo_dark, config.site.base_url) if email_logo else None,
+        email_header=_email_logo(brand.email_header, config.site.base_url),
         termometro=config.termometro_ativo,
     )
 
@@ -602,9 +608,15 @@ def _quote_view(quote: Quote) -> QuoteView:
     )
 
 
-def _weather_views(edition: Edition) -> list[WeatherView]:
+def _weather_views(edition: Edition, config: Config) -> list[WeatherView]:
+    """A faixa de clima mostra só as cidades da configuração (``weather`` em
+    ``config/site.yaml``): uma cidade que saiu de lá some também das edições refeitas,
+    mesmo que a coleta daquele dia a tenha registrado."""
+    cidades = {text.normalize(c.name) for c in config.weather}
     views = []
     for w in edition.weather:
+        if cidades and text.normalize(w.city) not in cidades:
+            continue
         now_temp = filters.temp(w.current_c)
         views.append(
             WeatherView(
@@ -765,6 +777,7 @@ def _compared_map(
         (i for i in itens if i.divergence is not None),
         key=lambda i: (-min(len(i.c.a), len(i.c.b)), -(i.divergence or 0), -i.c.total, posicao[id(i)]),
     )
+    ordem_dividido = {id(i): k for k, i in enumerate(divididos)}
     categorias: dict[str, CompareCategoryView] = {}
     for item in itens:
         cat = categorias.get(item.section)
@@ -776,8 +789,11 @@ def _compared_map(
         cat.total += 1
         if item.divergence is not None:
             cat.divided += 1
+            cat.divergentes.append(item)
         else:
             cat.items.append(item)
+    for cat in categorias.values():
+        cat.divergentes.sort(key=lambda i: ordem_dividido[id(i)])
     lista = sorted(categorias.values(), key=lambda c: (ordem.get(c.id, len(ordem)), c.title))
     return ComparedMapView(
         divided=divididos,
@@ -989,7 +1005,7 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
         compared=[view for _sec, view in pares],
         compared_map=_compared_map(edition, ordered, pares, lookup, config, default_color),
         quotes=[_quote_view(q) for q in edition.quotes],
-        weather=_weather_views(edition),
+        weather=_weather_views(edition, config),
         sources_total=edition.stats.sources_total,
         sources_ok=edition.stats.sources_ok,
         source_groups=_source_groups(edition, config),

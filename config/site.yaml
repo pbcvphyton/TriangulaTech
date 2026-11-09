@@ -36,6 +36,9 @@ brands:
     # Logo do e-mail (PNG 3x, branco sobre a cor do cabeçalho), servido pelo GitHub
     # Pages em base_url + src. O cabeçalho é escuro nos dois modos: sem versão escura.
     email_logo: {src: "assets/triangula-marca-email.png", width: 248, height: 64}
+    # Faixa do topo do e-mail, no modelo do TSA Tech: o logo sobre o marinho do
+    # cabeçalho com a rede do site (JPG 2x, 1200 × 264, exibida em 600 × 132).
+    email_header: {src: "assets/triangula-cabecalho-email.jpg", width: 600, height: 132}
     # Paleta do quadro "Sinal": marinho e ardósia frios, com o laranja de sinal
     # como destaque; altas e quedas do ticker como no cabeçalho de jornal do quadro.
     # O bloco do cabeçalho é um marinho um tom acima do ticker, como a ardósia do
@@ -314,4 +317,6 @@ email:
   # EMAIL_TO no GitHub Actions ou a rotina de e-mail do Claude.
   # Campos: {brand}, {date} (29/09/2026), {date_label} e {lead} (manchete, até 70 caracteres).
   subject_template: "{brand} · {date}: {lead}"
-  max_stories: 14
+  # Notícias além da manchete ("Hoje em 6 notícias", como o e-mail do TSA Tech: uma
+  # linha de 2 e outra de 3; com mais, linhas de 3).
+  max_stories: 5
