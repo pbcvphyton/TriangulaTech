@@ -37,6 +37,7 @@ from urllib.parse import urlencode
 
 from .. import text
 from ..config import Config
+from . import tom as tom_mod
 
 SECAO = "politica"  # editoria dos nomes em destaque
 JANELA_DIAS = 30  # edições dos últimos 30 dias
@@ -47,6 +48,17 @@ MIN_MANCHETES = 5  # menos que isso não entra na tabela
 MIN_BASE_SEMANA = 50  # manchetes da editoria por semana para dizer a tendência
 MIN_TENDENCIA = 10  # manchetes do nome nas duas semanas para dizer a tendência
 ESTAVEL = 0.15  # variação de até 15% é "estável"
+# Tom das manchetes (qijournal/render/tom.py): só manchetes de veículos brasileiros.
+MIN_TOM = 20  # manchetes do nome para dizer o tom
+MIN_TOM_VEICULO = 10  # manchetes do veículo sobre o nome para comparar o tom dele com o dos demais
+Z_VEICULO = 2.58  # veículo × demais: 99% (cada nome compara muitos veículos de uma vez)
+Z_TENDENCIA = 1.96  # últimas 7 edições × 7 anteriores: 95%
+MIN_TOM_SEMANA = 20  # manchetes do nome em cada janela para dizer se o tom mudou
+SEMANA_VEICULO = 3  # manchetes do veículo numa semana para a semana contar no padrão
+SEMANA_DEMAIS = 10  # manchetes dos demais veículos na mesma semana
+PADRAO_SEMANAS = 3  # semanas comparáveis para falar em padrão
+PADRAO_FRACAO = 0.75  # "padrão": no mesmo sentido em 3 de cada 4 semanas
+VEICULOS_TOM = 10  # veículos na tabela de cada nome
 
 _MARCAS = re.compile("[\u0300-\u036f]")  # acentos (marcas combinantes, depois do NFD)
 _PALAVRA = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’\-][0-9A-Za-zÀ-ÖØ-öø-ÿ]+)*")
@@ -127,6 +139,9 @@ class CorpusDia:
     # nome de uma palavra → (vezes com maiúscula, vezes em minúscula) no meio das frases do dia
     caixa: dict[str, tuple[int, int]] = field(default_factory=dict)
     comparadas: list[tuple[str, int, int]] = field(default_factory=list)  # texto normalizado, lado A, lado B
+    originais: dict[str, str] = field(default_factory=dict)  # link → título como publicado (manchetes da editoria)
+    assuntos: dict[str, str] = field(default_factory=dict)  # link → assunto da edição (agrupamento), se houver
+    exterior: set[str] = field(default_factory=set)  # links de veículos de fora do Brasil
 
 
 def _palavras(titulo: str) -> list[tuple[int, int, str]]:
@@ -210,12 +225,19 @@ def corpus_do_dia(dados: Mapping[str, Any], estrangeiros: Iterable[str] = (), se
     def veiculo_de(i: Any) -> str:
         return veiculos[i] if isinstance(i, int) and 0 <= i < len(veiculos) else ""
 
+    assuntos = dados.get("assuntos") or []
+
+    def assunto_de(i: Any) -> str:
+        if isinstance(i, int) and 0 <= i < len(assuntos) and isinstance(assuntos[i], list) and assuntos[i]:
+            return str(assuntos[i][0] or "")
+        return ""
+
     corpus = CorpusDia(data=str(dados.get("data") or ""))
     nacionais: list[tuple[str, str, str]] = []  # (link, título, veículo), todas as editorias
     vistos: set[str] = set()
     for n in dados.get("noticias") or []:
         try:
-            si, _assunto, vi, titulo, link = n[0], n[1], n[2], n[3], n[4]
+            si, ai, vi, titulo, link = n[0], n[1], n[2], n[3], n[4]
         except (IndexError, TypeError):
             continue
         veiculo = veiculo_de(vi)
@@ -226,6 +248,11 @@ def corpus_do_dia(dados: Mapping[str, Any], estrangeiros: Iterable[str] = (), se
             nacionais.append((str(link), str(titulo), veiculo))
         if secao_de(si) == secao:
             corpus.titulos.append((str(link), norm(titulo), veiculo))
+            corpus.originais[str(link)] = str(titulo)
+            if assunto_de(ai):
+                corpus.assuntos[str(link)] = assunto_de(ai)
+            if veiculo in fora:
+                corpus.exterior.add(str(link))
     maiuscula, minuscula = _caixa(t for _l, t, _v in nacionais)
     # Nome próprio no dia: no meio das frases, em geral com maiúscula.
     proprios = {p for p, n in maiuscula.items() if n >= 2 and n >= 2 * minuscula[p]}
@@ -270,6 +297,7 @@ class NomeView:
     divergencia: str  # 0 a 100 (100 = racha meio a meio); "—" sem debate
     divergencia_valor: float | None
     barra: float  # % da maior contagem (barra da coluna de manchetes)
+    tom: TomView | None = None  # tom das manchetes brasileiras e comparação entre veículos
 
 
 @dataclass
@@ -332,6 +360,326 @@ def _tendencia(por_dia: Mapping[str, int], base_dia: Mapping[str, int], dias: li
     return f"{seta} {text.format_number_pt(abs(var) * 100, 0)}%", ("sobe" if var > 0 else "cai"), titulo
 
 
+
+# ── tom das manchetes por nome e por veículo ────────────────────────────────
+
+
+def _saldo(valor: float | None) -> str:
+    """Saldo do tom (favoráveis − desfavoráveis, em pontos percentuais), com sinal."""
+    if valor is None:
+        return "—"
+    v = round(valor)
+    return f"−{abs(v)}" if v < 0 else f"+{v}" if v > 0 else "0"
+
+
+def comparar(a: list[int], b: list[int]) -> float | None:
+    """z entre as médias das notas (−1 desfavorável, +1 favorável, 0 as demais) de
+    dois grupos de manchetes, com a variância das duas juntas (um grupo todo neutro
+    não vira "diferente" só por não variar); ``None`` sem variação para comparar."""
+    if not a or not b:
+        return None
+    todas = a + b
+    media = sum(todas) / len(todas)
+    var = sum((x - media) ** 2 for x in todas) / (len(todas) - 1) if len(todas) > 1 else 0.0
+    erro = (var * (1 / len(a) + 1 / len(b))) ** 0.5
+    return None if erro == 0 else (sum(a) / len(a) - sum(b) / len(b)) / erro
+
+
+def _nota(t: str) -> int:
+    return -1 if t == "neg" else 1 if t == "pos" else 0
+
+
+def _saldo_de(notas: list[int]) -> float | None:
+    return 100 * sum(notas) / len(notas) if notas else None
+
+
+@dataclass
+class ManchetesTom:
+    """Uma manchete com o tom dela para o nome."""
+
+    dia: str
+    veiculo: str
+    titulo: str
+    link: str
+    assunto: str
+    tom: tom_mod.Tom
+
+
+@dataclass
+class VeiculoTomView:
+    nome: str
+    manchetes: int
+    esperado: str  # "1,4×" (manchetes ÷ esperadas pela editoria) ou "—"
+    esperado_classe: str  # acima | abaixo | ""
+    esperado_valor: float | None  # o mesmo índice, em número
+    presenca: str  # "28 de 30 edições"
+    desfavoraveis: str
+    favoraveis: str
+    saldo: str
+    saldo_valor: float | None
+    demais: str  # saldo dos demais veículos (mesmo nome, mesmo período)
+    destaque: str  # "mais crítico" | "mais favorável" | ""
+    classe: str  # neg | pos | "" (o destaque)
+    alvo: str
+    assunto: str  # o assunto que mais rendeu ao veículo sobre o nome
+    padrao: str  # "mais crítico em 4 de 5 semanas"
+    barra_left: float
+    barra_width: float
+    pequena: bool  # menos de MIN_TOM_VEICULO manchetes: tom sem comparação
+    excesso: bool = False  # fala mais do nome do que o esperado, além do acaso
+
+
+@dataclass
+class ExemploView:
+    tipo: str  # neg | pos
+    titulo: str
+    veiculo: str
+    data: str
+    href: str
+    gatilhos: str
+
+
+@dataclass
+class TomView:
+    manchetes: int  # manchetes brasileiras com o nome
+    desfavoraveis: str
+    favoraveis: str
+    neutras: str
+    saldo: str
+    saldo_valor: float
+    classe: str  # neg | pos | est (saldo perto de zero)
+    alvo: str
+    ataca: str
+    barra_left: float
+    barra_width: float
+    tendencia: str  # "piorou" | "melhorou" | "estável" | ""
+    tendencia_classe: str  # cai | sobe | est | ins
+    tendencia_titulo: str
+    leitura: list[str]
+    veiculos: list[VeiculoTomView]
+    exemplos: list[ExemploView]
+    criticos: int  # veículos mais críticos que os demais (com significância)
+    favoraveis_n: int
+    veiculos_fora: int = 0  # veículos com menos manchetes, fora da tabela
+
+
+BARRA_TOM = 50  # a barra do saldo vai de −50 a +50 (saldos de manchetes raramente passam disso)
+
+
+def _barra(saldo: float | None) -> tuple[float, float]:
+    """Barra divergente de −BARRA_TOM a +BARRA_TOM (meio = 50%), em % da largura."""
+    if saldo is None:
+        return 50.0, 0.0
+    v = max(-BARRA_TOM, min(BARRA_TOM, saldo)) * 50 / BARRA_TOM
+    return (round(50 + v, 2), round(-v, 2)) if v < 0 else (50.0, round(v, 2))
+
+
+def _href(link: str) -> str:
+    return link if "://" in link else f"https://{link}"
+
+
+def tom_do_nome(
+    itens: list[ManchetesTom],
+    *,
+    dias: list[str],
+    base_veiculo: Mapping[str, int],
+    participacao: float,
+    fim: str,
+) -> TomView | None:
+    """O tom das manchetes brasileiras sobre um nome e a comparação entre veículos
+    (``base_veiculo``: manchetes de cada veículo na editoria no período;
+    ``participacao``: a parte das manchetes da editoria que cita o nome)."""
+    if len(itens) < MIN_TOM:
+        return None
+    n = len(itens)
+    notas = [_nota(i.tom.tom) for i in itens]
+    neg = sum(1 for i in itens if i.tom.tom == "neg")
+    pos = sum(1 for i in itens if i.tom.tom == "pos")
+    saldo = _saldo_de(notas) or 0.0
+    try:
+        ultimo = date.fromisoformat(fim[:10])
+    except ValueError:
+        ultimo = date.fromisoformat(max(i.dia for i in itens))
+
+    def semana(dia: str) -> int:
+        return (ultimo - date.fromisoformat(dia)).days // 7
+
+    # Tendência do tom: as últimas SEMANA edições contra as SEMANA anteriores.
+    tendencia, t_classe, t_titulo = "", "ins", f"O tom muda quando as últimas {SEMANA} edições diferem das {SEMANA} anteriores."
+    if len(dias) >= 2 * SEMANA:
+        recente, anterior = set(dias[-SEMANA:]), set(dias[-2 * SEMANA : -SEMANA])
+        nr = [_nota(i.tom.tom) for i in itens if i.dia in recente]
+        na = [_nota(i.tom.tom) for i in itens if i.dia in anterior]
+        if len(nr) >= MIN_TOM_SEMANA and len(na) >= MIN_TOM_SEMANA:
+            z = comparar(nr, na)
+            t_titulo = (
+                f"Saldo {_saldo(_saldo_de(nr))} em {len(nr)} manchetes nas últimas {SEMANA} edições, "
+                f"{_saldo(_saldo_de(na))} em {len(na)} nas {SEMANA} anteriores"
+            )
+            if z is not None and z <= -Z_TENDENCIA:
+                tendencia, t_classe = "piorou", "cai"
+            elif z is not None and z >= Z_TENDENCIA:
+                tendencia, t_classe = "melhorou", "sobe"
+            else:
+                tendencia, t_classe = "estável", "est"
+
+    por_veiculo: dict[str, list[ManchetesTom]] = {}
+    for i in itens:
+        por_veiculo.setdefault(i.veiculo, []).append(i)
+    veiculos: list[VeiculoTomView] = []
+    criticos = favoraveis = 0
+    ordem = sorted(por_veiculo, key=lambda v: (-len(por_veiculo[v]), norm(v)))
+    for v in ordem:
+        meus = por_veiculo[v]
+        k = len(meus)
+        minhas = [_nota(i.tom.tom) for i in meus]
+        outras = [_nota(i.tom.tom) for i in itens if i.veiculo != v]
+        s_v, s_o = _saldo_de(minhas), _saldo_de(outras)
+        pequena = k < MIN_TOM_VEICULO
+        destaque = classe = padrao = ""
+        if not pequena and outras:
+            z = comparar(minhas, outras)
+            if z is not None and z <= -Z_VEICULO:
+                destaque, classe = "mais crítico", "neg"
+            elif z is not None and z >= Z_VEICULO:
+                destaque, classe = "mais favorável", "pos"
+            # Padrão: semana a semana, de que lado dos demais o veículo fica.
+            sem_v: dict[int, list[int]] = {}
+            sem_o: dict[int, list[int]] = {}
+            for i in itens:
+                (sem_v if i.veiculo == v else sem_o).setdefault(semana(i.dia), []).append(_nota(i.tom.tom))
+            comparaveis = [
+                w for w in sem_v if len(sem_v[w]) >= SEMANA_VEICULO and len(sem_o.get(w, [])) >= SEMANA_DEMAIS
+            ]
+            if len(comparaveis) >= PADRAO_SEMANAS:
+                abaixo = sum(1 for w in comparaveis if sum(sem_v[w]) / len(sem_v[w]) < sum(sem_o[w]) / len(sem_o[w]))
+                acima = sum(1 for w in comparaveis if sum(sem_v[w]) / len(sem_v[w]) > sum(sem_o[w]) / len(sem_o[w]))
+                total = len(comparaveis)
+                if abaixo >= PADRAO_FRACAO * total:
+                    padrao = f"mais negativo que os demais em {abaixo} de {total} semanas"
+                elif acima >= PADRAO_FRACAO * total:
+                    padrao = f"mais positivo que os demais em {acima} de {total} semanas"
+                else:
+                    padrao = f"oscila: mais negativo em {abaixo} e mais positivo em {acima} de {total} semanas"
+        criticos += classe == "neg"
+        favoraveis += classe == "pos"
+        base = base_veiculo.get(v, 0)
+        esperado_n = base * participacao
+        indice = k / esperado_n if base >= 30 and esperado_n > 0 else None
+        # Excesso de atenção que o acaso não explica (contagem de Poisson): z das manchetes contra as esperadas.
+        excesso = indice is not None and (k - esperado_n) / esperado_n**0.5 >= Z_VEICULO
+        assuntos = Counter(i.assunto for i in meus if i.assunto)
+        topo = assuntos.most_common(1)[0] if assuntos else None
+        left, width = _barra(s_v)
+        veiculos.append(
+            VeiculoTomView(
+                nome=v,
+                manchetes=k,
+                esperado="—" if indice is None else f"{text.format_number_pt(indice, 1)}×",
+                esperado_classe="" if indice is None else "acima" if indice >= 1.5 else "abaixo" if indice <= 0.67 else "",
+                esperado_valor=indice,
+                presenca=f"{len({i.dia for i in meus})} de {len(dias)}",
+                desfavoraveis=_pct(sum(1 for x in minhas if x < 0), k),
+                favoraveis=_pct(sum(1 for x in minhas if x > 0), k),
+                saldo=_saldo(s_v),
+                saldo_valor=s_v,
+                demais=_saldo(s_o),
+                destaque=destaque,
+                classe=classe,
+                alvo=_pct(sum(1 for i in meus if i.tom.alvo), k),
+                assunto=f"{topo[0]} ({topo[1]})" if topo and topo[1] >= 2 else "",
+                padrao=padrao,
+                barra_left=left,
+                barra_width=width,
+                pequena=pequena,
+                excesso=excesso,
+            )
+        )
+
+    def forca(i: ManchetesTom) -> int:
+        return i.tom.neg - i.tom.pos
+
+    exemplos = []
+    for tipo, chave in (("neg", lambda i: (forca(i), i.dia)), ("pos", lambda i: (-forca(i), i.dia))):
+        candidatos = [i for i in itens if i.tom.tom == tipo]
+        if candidatos:
+            i = max(candidatos, key=chave)
+            exemplos.append(
+                ExemploView(tipo, i.titulo, i.veiculo, _data_curta(i.dia), _href(i.link), ", ".join(i.tom.gatilhos))
+            )
+
+    left, width = _barra(saldo)
+    view = TomView(
+        manchetes=n,
+        desfavoraveis=_pct(neg, n),
+        favoraveis=_pct(pos, n),
+        neutras=_pct(n - neg - pos, n),
+        saldo=_saldo(saldo),
+        saldo_valor=saldo,
+        classe="neg" if saldo <= -10 else "pos" if saldo >= 10 else "est",
+        alvo=_pct(sum(1 for i in itens if i.tom.alvo), n),
+        ataca=_pct(sum(1 for i in itens if i.tom.ataca), n),
+        barra_left=left,
+        barra_width=width,
+        tendencia=tendencia,
+        tendencia_classe=t_classe,
+        tendencia_titulo=t_titulo,
+        leitura=[],
+        veiculos=veiculos[:VEICULOS_TOM],
+        exemplos=exemplos,
+        criticos=criticos,
+        favoraveis_n=favoraveis,
+        veiculos_fora=max(0, len(veiculos) - VEICULOS_TOM),
+    )
+    view.leitura = _leitura_tom(view, veiculos, tendencia, t_titulo)
+    return view
+
+
+def _data_curta(iso: str) -> str:
+    try:
+        return text.pt_short_date(date.fromisoformat(iso[:10]))
+    except ValueError:
+        return iso
+
+
+def _leitura_tom(t: TomView, veiculos: list[VeiculoTomView], tendencia: str, t_titulo: str) -> list[str]:
+    """Frases automáticas: quem fala mais e por quê, como fala, se há padrão."""
+    frases = [
+        f"Tom: {t.desfavoraveis} das {text.format_number_pt(t.manchetes, 0)} manchetes brasileiras põem o nome em "
+        f"contexto desfavorável e {t.favoraveis} em favorável (saldo {t.saldo}); é alvo de crítica, acusação ou "
+        f"punição em {t.alvo} e age contra alguém em {t.ataca}."
+    ]
+    acima = [v for v in veiculos if v.excesso and not v.pequena]
+    if acima:
+        mais = max(acima, key=lambda v: (v.esperado_valor or 0, v.manchetes))
+        frase = (
+            f"Quem mais fala, proporcionalmente: {mais.nome} ({mais.manchetes} manchetes, {mais.esperado} o esperado "
+            "pelo que publica na editoria)"
+        )
+        frases.append(frase + (f", puxado por “{mais.assunto.rsplit(' (', 1)[0]}”." if mais.assunto else "."))
+    else:
+        frases.append("Nenhum veículo fala do nome bem acima do esperado pelo que publica na editoria.")
+    criticos = sorted((v for v in veiculos if v.classe == "neg"), key=lambda v: (v.saldo_valor or 0, -v.manchetes))
+    favoraveis = sorted((v for v in veiculos if v.classe == "pos"), key=lambda v: (-(v.saldo_valor or 0), -v.manchetes))
+    if criticos:
+        v = criticos[0]
+        frases.append(
+            f"Mais crítico: {v.nome} (saldo {v.saldo}, contra {v.demais} nos demais veículos)"
+            + (f"; {v.padrao}." if v.padrao else ".")
+        )
+    if favoraveis:
+        v = favoraveis[0]
+        frases.append(
+            f"Mais favorável: {v.nome} (saldo {v.saldo}, contra {v.demais} nos demais)"
+            + (f"; {v.padrao}." if v.padrao else ".")
+        )
+    if not criticos and not favoraveis and any(not v.pequena for v in veiculos):
+        frases.append("Nenhum veículo destoa dos demais no tom: as diferenças estão dentro do que o acaso explica.")
+    if tendencia in ("piorou", "melhorou"):
+        frases.append(f"O tom {tendencia} nas últimas {SEMANA} edições ({t_titulo[0].lower() + t_titulo[1:]}).")
+    return frases
+
+
 def destaques(
     corpora: Iterable[CorpusDia],
     *,
@@ -378,7 +726,9 @@ def destaques(
         return None
     entrada = {link: vs[0][0] for link, vs in versoes.items()}  # edição em que a notícia apareceu
     base_dia = Counter(entrada.values())
+    base_veiculo = Counter(vs[0][2] for vs in versoes.values())  # manchetes de cada veículo na editoria
     datas = [c.data for c in dias]
+    corpus_de = {c.data: c for c in dias}
 
     # (nome, manchetes, [(dia, veículo, link)]): a notícia conta se alguma versão do
     # título cita o nome, na primeira edição em que citou (como nos resultados da busca).
@@ -444,6 +794,22 @@ def destaques(
         media = sum(splits) / len(splits) if splits else None
         # O analítico do nome abre com a mesma editoria e o mesmo período da tabela.
         href = f"{pesquisa_href}?" + urlencode({"q": consulta(nome), "de": inicio, "ed": secao}) + "#midia"
+        # Tom: as manchetes brasileiras, na versão do título que entrou nos resultados.
+        itens_tom = []
+        for dia, veiculo, link in sorted(achados):
+            c = corpus_de[dia]
+            manchete = c.originais.get(link)
+            if manchete is None or link in c.exterior:
+                continue
+            itens_tom.append(
+                ManchetesTom(
+                    dia, veiculo, manchete, link, c.assuntos.get(link, ""),
+                    tom_mod.classificar(manchete, nome, c.nomes.get(link, [])),
+                )
+            )
+        tom_view = tom_do_nome(
+            itens_tom, dias=datas, base_veiculo=base_veiculo, participacao=n / len(versoes), fim=ultimo
+        )
         nomes.append(
             NomeView(
                 nome=nome,
@@ -460,6 +826,7 @@ def destaques(
                 divergencia="—" if media is None else text.format_number_pt(media * 100, 0),
                 divergencia_valor=media,
                 barra=round(100 * n / maior, 1),
+                tom=tom_view,
             )
         )
     primeira, ultima = (text.pt_short_date(date.fromisoformat(c.data)) for c in (dias[0], dias[-1]))

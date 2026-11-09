@@ -36,6 +36,9 @@ brands:
     # Logo do e-mail (PNG 3x, branco sobre a cor do cabeçalho), servido pelo GitHub
     # Pages em base_url + src. O cabeçalho é escuro nos dois modos: sem versão escura.
     email_logo: {src: "assets/triangula-marca-email.png", width: 248, height: 64}
+    # Faixa do topo do e-mail, no modelo do TSA Tech: o logo sobre o marinho do
+    # cabeçalho com a rede do site (JPG 2x, 1200 × 264, exibida em 600 × 132).
+    email_header: {src: "assets/triangula-cabecalho-email.jpg", width: 600, height: 132}
     # Paleta do quadro "Sinal": marinho e ardósia frios, com o laranja de sinal
     # como destaque; altas e quedas do ticker como no cabeçalho de jornal do quadro.
     # O bloco do cabeçalho é um marinho um tom acima do ticker, como a ardósia do
@@ -245,11 +248,15 @@ termometro:
   # Prioridade das seções; as de fora (esporte, variedades) não são analisadas.
   secoes: [politica, juridico, brasil, mundo, mercados, natureza, tecnologia, imobiliario]
   idiomas: [pt]               # o dicionário e as regras de texto são do português
-  max_textos: 20              # análises novas por edição; textos já analisados são reaproveitados
-  max_paginas: 60             # páginas originais consultadas atrás de corpo suficiente (150+ palavras)
-  textos_por_chamada: 4
-  max_chamadas: 6             # teto de chamadas à IA por edição (a AIML gratuita tem 10 por hora no total)
-  deadline_seconds: 480       # prazo da análise depois da edição (cabe no timeout do daily.yml)
+  # Volume (nov/2026): cada edição tem de 140 a 380 textos candidatos (matérias e
+  # cobertura comparada, em português, nas seções acima); até out/2026 só 40 eram
+  # olhados e 20 analisados. Agora: até 60 análises novas por edição, em rodízio por
+  # veículo (mais veículos e editorias no termômetro do dia e no histórico).
+  max_textos: 60              # análises novas por edição; textos já analisados são reaproveitados
+  max_paginas: 180            # páginas originais consultadas atrás de corpo suficiente (150+ palavras; ~1 em 4 é curta)
+  textos_por_chamada: 5       # medido: ~1.000 tokens de saída por texto (o limite da chamada vem de TOKENS_POR_TEXTO)
+  max_chamadas: 15            # teto de chamadas à IA por edição (60 textos = 12 lotes; folga para editores de saída menor)
+  deadline_seconds: 720       # prazo da análise depois da edição (12 min; cabe no timeout do daily.yml)
 
 # Instagram (qijournal/instagram, workflow instagram.yml): imagens e legendas
 # geradas da edição do dia e publicadas pela API oficial. Horários em Brasília;
@@ -301,13 +308,15 @@ market:
   - {id: igpm12m, label: "IGP-M 12m", kind: inflation, provider: bcb_sgs, series: 189, transform: accum12, format: pct, decimals: 2}
   - {id: incc12m, label: "INCC 12m", kind: inflation, provider: bcb_sgs, series: 192, transform: accum12, format: pct, decimals: 2}
 
+# Cidades da faixa de clima (Open-Meteo), na ordem de exibição.
 weather:
   - {name: "São Paulo", lat: -23.55, lon: -46.63, timezone: "America/Sao_Paulo"}
-  - {name: "Montevidéu", lat: -34.90, lon: -56.16, timezone: "America/Montevideo"}
 
 email:
   # Destinatários NÃO ficam aqui (o repositório é público): use o segredo
   # EMAIL_TO no GitHub Actions ou a rotina de e-mail do Claude.
   # Campos: {brand}, {date} (29/09/2026), {date_label} e {lead} (manchete, até 70 caracteres).
   subject_template: "{brand} · {date}: {lead}"
-  max_stories: 14
+  # Notícias além da manchete ("Hoje em 6 notícias", como o e-mail do TSA Tech: uma
+  # linha de 2 e outra de 3; com mais, linhas de 3).
+  max_stories: 5

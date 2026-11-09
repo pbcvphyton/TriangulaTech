@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from typing import Any
 
@@ -256,7 +256,52 @@ class BrandView:
     logo_height_mobile: int | None = None  # no celular (px)
     email_logo: EmailLogo | None = None
     email_logo_dark: EmailLogo | None = None  # só com email_logo
+    email_header: EmailLogo | None = None  # faixa do topo do e-mail (modelo do TSA Tech)
     termometro: bool = False  # marca com Termômetro de Viés (estilos do bloco do dia e da aba Analítico Político)
+
+
+@dataclass
+class CompareItemView:
+    """Um assunto no mapa da cobertura comparada (matéria da edição ou demais assuntos)."""
+
+    c: CoverageView
+    section: str  # id da editoria (filtro por categoria)
+    divergence: float | None  # 0 a 1: 2 × lado menor ÷ (A + B); None sem dois lados
+    story_href: str = ""  # matéria da edição: âncora que abre a matéria
+    story_title: str = ""
+
+    @property
+    def divergence_pct(self) -> int:
+        return round((self.divergence or 0) * 100)
+
+
+@dataclass
+class CompareCategoryView:
+    """Uma aba da cobertura comparada: os assuntos de uma editoria."""
+
+    id: str
+    title: str
+    color: str
+    total: int
+    divided: int
+    items: list[CompareItemView] = field(default_factory=list)  # sem divergência, na editoria
+    divergentes: list[CompareItemView] = field(default_factory=list)  # com dois lados, mais disputados primeiro
+
+
+@dataclass
+class ComparedMapView:
+    """Cobertura comparada organizada para escolher o que ler: uma aba por editoria
+    (na ordem do jornal) e "Todas"; em cada aba, primeiro onde a mídia divergiu (os
+    mais disputados antes), depois o que os veículos relataram de forma semelhante."""
+
+    divided: list[CompareItemView]
+    categories: list[CompareCategoryView]
+    total: int
+    stories: int  # matérias da edição no mapa
+
+    @property
+    def consensus(self) -> int:
+        return self.total - len(self.divided)
 
 
 @dataclass
@@ -289,6 +334,7 @@ class EditionView:
     mode: str = "heuristic"  # "ai" | "heuristic"
     default_all: bool = False  # aba "Todas" aberta por padrão (1ª seção com poucas matérias)
     compared: list[CoverageView] = field(default_factory=list)  # demais assuntos com cobertura comparada
+    compared_map: ComparedMapView | None = None  # todos os assuntos comparados (matérias + demais), por categoria
     rationale: RationaleView | None = None  # racional da compilação (vazio em edições antigas)
     index: list[IndexSectionView] = field(default_factory=list)  # todas as notícias do dia, por seção
     instagram_url: str = ""  # perfil do Instagram (config instagram.handle), no rodapé
@@ -346,6 +392,7 @@ def brand_view(config: Config) -> BrandView:
         logo_height_mobile=mobile if height else None,
         email_logo=(email_logo := _email_logo(brand.email_logo, config.site.base_url)),
         email_logo_dark=_email_logo(brand.email_logo_dark, config.site.base_url) if email_logo else None,
+        email_header=_email_logo(brand.email_header, config.site.base_url),
         termometro=config.termometro_ativo,
     )
 
@@ -561,9 +608,15 @@ def _quote_view(quote: Quote) -> QuoteView:
     )
 
 
-def _weather_views(edition: Edition) -> list[WeatherView]:
+def _weather_views(edition: Edition, config: Config) -> list[WeatherView]:
+    """A faixa de clima mostra só as cidades da configuração (``weather`` em
+    ``config/site.yaml``): uma cidade que saiu de lá some também das edições refeitas,
+    mesmo que a coleta daquele dia a tenha registrado."""
+    cidades = {text.normalize(c.name) for c in config.weather}
     views = []
     for w in edition.weather:
+        if cidades and text.normalize(w.city) not in cidades:
+            continue
         now_temp = filters.temp(w.current_c)
         views.append(
             WeatherView(
@@ -663,15 +716,91 @@ def _radar(edition: Edition, ordered: list[StoryView], tz: str) -> list[RadarIte
     ]
 
 
-def _compared(edition: Edition, lookup: dict[str, tuple[str, str]], default_color: str, tz: str) -> list[CoverageView]:
-    """Demais assuntos com cobertura comparada, na ordem da edição (mais veículos primeiro)."""
-    views = []
+def _compared_pairs(
+    edition: Edition, lookup: dict[str, tuple[str, str]], default_color: str, tz: str
+) -> list[tuple[str, CoverageView]]:
+    """Demais assuntos com cobertura comparada (``(editoria, view)``), na ordem da edição
+    (mais veículos primeiro)."""
+    pares = []
     for coverage in edition.compared:
         section = lookup.get(coverage.section or "", ("", default_color))
         view = coverage_view(coverage, section=section, tz=tz, now_iso=edition.generated_at)
         if view is not None and view.topic:
-            views.append(view)
-    return views
+            pares.append((coverage.section or "", view))
+    return pares
+
+
+def _compared(edition: Edition, lookup: dict[str, tuple[str, str]], default_color: str, tz: str) -> list[CoverageView]:
+    """Demais assuntos com cobertura comparada, na ordem da edição (mais veículos primeiro)."""
+    return [view for _sec, view in _compared_pairs(edition, lookup, default_color, tz)]
+
+
+def _divergence(c: CoverageView) -> float | None:
+    """2 × o lado menor ÷ (A + B), só com veículos dos dois lados (100% = meio a meio)."""
+    if not (c.side_a and c.a and c.b):
+        return None
+    return 2 * min(len(c.a), len(c.b)) / (len(c.a) + len(c.b))
+
+
+def _compared_map(
+    edition: Edition,
+    ordered: list[StoryView],
+    pares: list[tuple[str, CoverageView]],
+    lookup: dict[str, tuple[str, str]],
+    config: Config,
+    default_color: str,
+) -> ComparedMapView | None:
+    """Matérias da edição com análise da cobertura + demais assuntos comparados, num
+    mapa só: onde a mídia divergiu (mais disputados primeiro) e o resto por editoria."""
+    secao_da_materia = {s.id: s.section or "" for s in edition.stories}
+    itens: list[CompareItemView] = []
+    for view in ordered:
+        if view.coverage is None:
+            continue
+        sec = secao_da_materia.get(view.id, "")
+        cov = view.coverage
+        if not cov.section_title:
+            titulo, cor = lookup.get(sec, (view.section_title, view.color))
+            cov = replace(cov, section_title=titulo or view.section_title, color=cor or view.color, time=view.time)
+        itens.append(
+            CompareItemView(c=cov, section=sec, divergence=_divergence(cov), story_href=f"#{view.anchor}", story_title=view.headline)
+        )
+    for sec, view in pares:
+        itens.append(CompareItemView(c=view, section=sec, divergence=_divergence(view)))
+    if not itens:
+        return None
+    ordem = {s.id: i for i, s in enumerate(config.sections)}
+    posicao = {id(item): i for i, item in enumerate(itens)}
+    # Mais disputados primeiro: mais veículos no lado menor (um 1 × 1 entre dois veículos
+    # não vale um 3 × 4), depois o mais equilibrado e o com mais veículos.
+    divididos = sorted(
+        (i for i in itens if i.divergence is not None),
+        key=lambda i: (-min(len(i.c.a), len(i.c.b)), -(i.divergence or 0), -i.c.total, posicao[id(i)]),
+    )
+    ordem_dividido = {id(i): k for k, i in enumerate(divididos)}
+    categorias: dict[str, CompareCategoryView] = {}
+    for item in itens:
+        cat = categorias.get(item.section)
+        if cat is None:
+            titulo, cor = lookup.get(item.section, (item.c.section_title or "Outras", default_color))
+            cat = categorias[item.section] = CompareCategoryView(
+                id=item.section or "outras", title=titulo or "Outras", color=cor, total=0, divided=0
+            )
+        cat.total += 1
+        if item.divergence is not None:
+            cat.divided += 1
+            cat.divergentes.append(item)
+        else:
+            cat.items.append(item)
+    for cat in categorias.values():
+        cat.divergentes.sort(key=lambda i: ordem_dividido[id(i)])
+    lista = sorted(categorias.values(), key=lambda c: (ordem.get(c.id, len(ordem)), c.title))
+    return ComparedMapView(
+        divided=divididos,
+        categories=lista,
+        total=len(itens),
+        stories=sum(1 for i in itens if i.story_href),
+    )
 
 
 _METHOD_TEXT = {
@@ -856,6 +985,7 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
 
     description = filters.plain(edition.editorial) or (lead.dek if lead else "") or brand.tagline
     base_url = config.site.base_url
+    pares = _compared_pairs(edition, lookup, default_color, tz)
     return EditionView(
         brand=brand,
         date_label=edition.date_label,
@@ -872,9 +1002,10 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
         sections=sections,
         stories=ordered,
         radar=radar,
-        compared=_compared(edition, lookup, default_color, tz),
+        compared=[view for _sec, view in pares],
+        compared_map=_compared_map(edition, ordered, pares, lookup, config, default_color),
         quotes=[_quote_view(q) for q in edition.quotes],
-        weather=_weather_views(edition),
+        weather=_weather_views(edition, config),
         sources_total=edition.stats.sources_total,
         sources_ok=edition.stats.sources_ok,
         source_groups=_source_groups(edition, config),

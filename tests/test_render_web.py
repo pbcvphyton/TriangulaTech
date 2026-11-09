@@ -224,8 +224,18 @@ def test_ticker_and_weather(page):
     assert re.search(r"Selic <b>13,75%</b></li>", page)  # indicador sem variação
     weather = re.search(r'<section class="wx".*?</section>', page, re.S).group(0)
     assert "<strong>São Paulo</strong>19°C" in weather
-    assert "<strong>Montevidéu</strong>14°C" in weather
+    # Montevidéu foi coletada nesse dia, mas saiu da configuração: a faixa mostra só as cidades configuradas
+    assert "Montevidéu" not in weather
     assert "Amanhã" in weather and 'aria-label="Pancadas de chuva fracas"' in weather
+
+
+def test_weather_strip_follows_the_configured_cities(edition):
+    from qijournal.config import CityConfig
+
+    cfg = default_config()
+    cfg.weather = [*cfg.weather, CityConfig(name="Montevidéu", lat=-34.9, lon=-56.16, timezone="America/Montevideo")]
+    weather = re.search(r'<section class="wx".*?</section>', render(edition, cfg), re.S).group(0)
+    assert "<strong>São Paulo</strong>19°C" in weather and "<strong>Montevidéu</strong>14°C" in weather
 
 
 def test_header_dateline_and_tools(page):
@@ -689,10 +699,46 @@ def test_coverage_on_cards_modal_and_compared_section(edition, config):
     assert "Análise por veículo: o foco de cada um e o lado que seguiu (3)" in modal
     assert '<span class="cov-a" style="width:67%"></span><span class="cov-b" style="width:33%"></span>' in modal
     assert "A cobertura pendeu para o alívio." in modal
-    section = re.search(r'<section class="cmp" id="cobertura".*?</section>', page, re.S).group(0)
-    assert "<h3>Assunto do dia</h3>" in section  # URL insegura: título sem link
+    section = page[page.index('<section class="cmp" id="cobertura"') : page.index("</main>") if "</main>" in page else None]
+    # Uma aba por editoria (as matérias com análise e os demais assuntos) e "Todas"; na aba,
+    # os assuntos com dois lados primeiro (com link para a matéria) e depois os semelhantes.
+    assert 'role="tablist" aria-label="Cobertura comparada por editoria"' in section
+    assert 'data-cmp-tab="mercados"' in section and 'data-cmp-tab="all"' in section
+    assert section.count('<li class="cmp-i"') == 2 and f'href="#s-{LEAD_ID}"' in section and "matéria da edição" in section
+    assert "divergência 67" in section
+    mercados = re.search(r'<div class="tab-pane cmp-pane[^"]*" id="cmp-pane-mercados".*?(?=<div class="tab-pane cmp-pane|</section>)', section, re.S).group(0)
+    assert '<span class="cmp-ct">Assunto do dia</span>' in mercados and "Abrir a fonte" not in mercados  # URL insegura: sem link
     assert "Mercados &amp; Finanças" in section and "javascript:" not in page
     assert parse(page).errors == []
+
+
+def test_compared_map_puts_the_most_disputed_first_and_groups_the_rest(edition, config):
+    ed = copy.deepcopy(edition)
+    ed.compared = [
+        _coverage(["a", "b"], section="mercados"),  # 1 × 1: divergência 100, mas só 2 veículos
+        _coverage(["a", "a", "a", "b", "b", "b", "b"], section="politica"),  # 3 × 4: mais disputado
+        _coverage(["a", "neutro", "neutro"], section="politica"),  # um lado só: sem divergência
+        _coverage(["neutro", "neutro"], sides=("", ""), section="esporte"),
+    ]
+    cm = build_view(ed, config).compared_map
+    assert cm is not None and cm.total == 4 and cm.consensus == 2 and cm.stories == 0
+    assert [(len(i.c.a), len(i.c.b)) for i in cm.divided] == [(3, 4), (1, 1)]
+    assert [i.divergence_pct for i in cm.divided] == [86, 100]
+    cats = {c.id: c for c in cm.categories}
+    assert cats["politica"].total == 2 and cats["politica"].divided == 1 and len(cats["politica"].items) == 1
+    order = [s.id for s in config.sections]
+    assert [c.id for c in cm.categories] == sorted(cats, key=order.index)
+    assert [i.divergence_pct for i in cats["politica"].divergentes] == [86]
+    assert [i.divergence_pct for i in cats["mercados"].divergentes] == [100]
+    page = render(ed, config)
+    assert "setupCompareTabs" in page and 'id="cmp-pane-politica"' in page and 'id="cmp-tab-politica"' in page
+    # a primeira aba (editoria na ordem do jornal) abre selecionada; "Todas" fica por último
+    tabs = re.findall(r'data-cmp-tab="([^"]+)" aria-controls="[^"]+" aria-selected="(true|false)"', page)
+    assert tabs[0][1] == "true" and [t for t, on in tabs if on == "true"] == [tabs[0][0]] and tabs[-1][0] == "all"
+    politica = page[page.index('id="cmp-pane-politica"') :]
+    politica = politica[: politica.index("</div>\n      </div>") if "</div>\n      </div>" in politica else None]
+    assert politica.index("Onde a mídia divergiu") < politica.index("Relataram de forma semelhante")
+    assert "Nenhum assunto de Esporte teve veículos dos dois lados hoje." in page
 
 
 def test_no_coverage_no_section(edition, config):

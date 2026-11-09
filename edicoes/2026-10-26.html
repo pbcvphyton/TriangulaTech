@@ -358,6 +358,31 @@ body.modal-open{overflow:hidden}
 .cmp-i h3{margin-bottom:8px;font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
 .cmp-i h3 a:hover{color:var(--link);text-decoration:underline}
 .cmp-t{font-weight:500;letter-spacing:.5px;color:var(--faint)}
+/* Cobertura comparada: abas por editoria; em cada aba, onde divergiu e o que foi relatado de forma semelhante */
+.cmp [hidden]{display:none!important}
+.cmp-tabs{margin-top:14px}
+.cmp .pane-hd{padding:18px 0 8px}
+.cmp-tabs.all .pane-hd{display:block}
+.cmp-tabs.all .cmp-pane+.cmp-pane{margin-top:10px}
+.tab-btn .cmp-dn{margin-left:6px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--cov-b)}
+.cmp-gh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-top:16px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.cmp-gh span{font-family:var(--ss);font-size:12px;font-weight:400;color:var(--muted)}
+.cmp-dv{font-weight:600;color:var(--cov-b)}
+.cmp-mt{font-weight:500;color:var(--faint)}
+.cmp-vazio{margin-top:10px;font-family:var(--ss);font-size:12.5px;font-style:italic;color:var(--muted)}
+.cmp-cl{list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));column-gap:32px}
+.cmp-cl li{border-bottom:1px solid var(--rl)}
+.cmp-cl summary{display:flex;flex-direction:column;gap:1px;padding:8px 0 8px 16px;position:relative;cursor:pointer;list-style:none}
+.cmp-cl summary::-webkit-details-marker{display:none}
+.cmp-cl summary::before{content:"+";position:absolute;left:0;top:7px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--link)}
+.cmp-cl details[open] summary::before{content:"−"}
+.cmp-ct{font-family:var(--sf);font-size:14.5px;font-weight:700;line-height:1.35;color:var(--ink)}
+.cmp-cl summary:hover .cmp-ct{color:var(--link)}
+.cmp-cm{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.cmp-cl details>.cov,.cmp-cl .cmp-lk{margin:0 0 10px 16px}
+.cmp-lk{font-family:var(--ss);font-size:12.5px}
+.cmp-lk a{font-weight:700;color:var(--link)}
+.cmp-lk a:hover{text-decoration:underline}
 
 /* Racional da edição e lista completa do dia */
 .rat-strip{padding:9px var(--gut);border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
@@ -439,63 +464,257 @@ body.modal-open .btt{visibility:hidden}
 .arch-t{font-size:15px;font-weight:700;line-height:1.3;color:var(--ink)}
 .badge{flex-shrink:0;padding:1px 6px;border:1px solid var(--rule);border-radius:10px;font-family:var(--mn);font-size:8.5px;letter-spacing:1px;color:var(--faint)}
 .arch-empty{padding:30px 0;font-family:var(--ss);color:var(--muted)}
-/* Termômetro de Viés Editorial (fim da edição) e aba Analítico Político.
-   Escala divergente validada (rampa ordinal por braço, claro e escuro):
-   verde-azulado = esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. */
-:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD}
-:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748}
+/* Termômetro de Viés Editorial (painel do dia no fim da edição) e aba Analítico Político.
+   Escala divergente validada (rampa ordinal por braço, claro e escuro): verde-azulado =
+   esquerda, âmbar = direita, cinza = equilíbrio; misto hachurado. A cor vai só nas marcas
+   (faixas, ponteiro, colunas, barras e pontos); números e rótulos ficam nas cores de texto,
+   sempre escritos ao lado da marca. Marcas finas, réguas de 1 px e uma folga de 2 px na cor
+   do fundo entre as faixas. */
+:root{--t-ef:#0B5F6B;--t-em:#2E8F9C;--t-el:#7FBCC4;--t-eq:#AEB6C2;--t-dl:#E2A66E;--t-dm:#C77A2E;--t-df:#8F4A0E;--t-na:#D0D5DD;--tm-pn:#f6f7f9;--tm-hl:#eef1f5;--tm-bar:var(--qi);--tm-trk:rgba(var(--qi-rgb),.14)}
+:root[data-theme="dark"]{--t-ef:#86D3DC;--t-em:#46A9B6;--t-el:#327E88;--t-eq:#4A576B;--t-dl:#9A6536;--t-dm:#CF8A45;--t-df:#F2B577;--t-na:#2D3748;--tm-pn:#141c2b;--tm-hl:#1a2436;--tm-bar:#8fb0f5;--tm-trk:rgba(143,176,245,.16)}
 .t-ef{background:var(--t-ef)}.t-em{background:var(--t-em)}.t-el{background:var(--t-el)}.t-eq{background:var(--t-eq)}
 .t-dl{background:var(--t-dl)}.t-dm{background:var(--t-dm)}.t-df{background:var(--t-df)}.t-na{background:var(--t-na)}
 .t-mx{background:repeating-linear-gradient(135deg,var(--t-eq) 0 3px,transparent 3px 6px);box-shadow:inset 0 0 0 1px var(--t-eq)}
 .sw{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;vertical-align:baseline}
-.term{padding:22px var(--gut) 26px;border-top:2px solid var(--qn);background:var(--paper)}
+.term{padding:28px var(--gut) 34px;border-top:2px solid var(--qn);background:var(--paper)}
 :root[data-theme="dark"] .term{border-top-color:var(--qi)}
-.term-sum{max-width:900px;font-family:var(--sf);font-size:17px;font-weight:600;line-height:1.5;color:var(--ink)}
-.term-sum span{font-family:var(--mn);font-size:10.5px;font-weight:500;letter-spacing:.3px;color:var(--mute2)}
-.term-meta{max-width:900px;margin-top:12px;font-family:var(--mn);font-size:10px;letter-spacing:.3px;line-height:1.6;color:var(--mute2)}
+.tm-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tm-top .kicker{flex:1}
+.tm-links{display:flex;gap:18px;font-family:var(--ss);font-size:12px;font-weight:700}
+.tm-links a{color:var(--link)}
+.tm-links a:hover{text-decoration:underline}
+.tm-dek{max-width:860px;margin-top:4px;font-family:var(--sf);font-size:16px;line-height:1.55;color:var(--body)}
+.tm-k{display:block;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tm-ph{font-family:var(--ss);font-size:13.5px;font-weight:800;line-height:1.3;color:var(--ink)}
+.tm-pd{margin:3px 0 14px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-foot{margin-top:10px;font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
+.tm-foot .sw{vertical-align:0}
+.tm-empty{padding:14px 16px;border:1px solid var(--rl);border-radius:6px;background:var(--tm-pn);font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.tm-empty-lg{max-width:860px;margin-top:8px;font-size:14px}
+/* Placar: o número da média, o rótulo e o intervalo, ao lado da escala */
+.tm-placar{--tg-bg:var(--tm-pn);display:grid;grid-template-columns:minmax(190px,250px) minmax(0,1fr);gap:20px 36px;align-items:center;margin-top:18px;padding:22px 28px 18px;border:1px solid var(--rl);border-radius:8px;background:var(--tm-pn)}
+.tm-n{margin-top:8px;font-family:var(--ss);font-size:68px;font-weight:600;line-height:.95;letter-spacing:-2px;color:var(--ink)}
+.tm-r{display:flex;align-items:center;gap:8px;margin-top:12px;font-family:var(--ss);font-size:16px;font-weight:700;color:var(--ink)}
+.tm-r .sw{width:12px;height:12px;margin:0;border-radius:3px}
+.tm-ic{margin-top:7px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.tm-b{margin-top:3px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+/* Escala de −100 a +100: faixas, intervalo de 95%, ponteiro da média e um traço por notícia */
+.tg{--tg-bg:var(--paper);position:relative;min-width:0;margin:0;padding-top:34px;container-type:inline-size}
+.tm-placar .tg{--tg-bg:var(--tm-pn)}
+.tg.sm{padding-top:0}
+.tg.sm .tg-flag{display:none}
+.tg-flag{position:absolute;top:0;left:clamp(70px,var(--x),calc(100% - 70px));transform:translateX(-50%);padding:4px 10px;border-radius:5px;background:var(--ink);font-family:var(--ss);font-size:11.5px;font-weight:600;line-height:1.2;color:var(--tg-bg);white-space:nowrap}
+.tg-flag b{font-family:var(--mn);font-weight:600}
+.tg-track{position:relative;height:16px}
+.tg-f{position:absolute;top:0;bottom:0;border:0 solid var(--tg-bg);border-width:0 1px;background-clip:padding-box;opacity:.3}
+.tg-f:first-child{border-left-width:0;border-radius:8px 0 0 8px}
+.tg-f:nth-child(7){border-right-width:0;border-radius:0 8px 8px 0}
+.tg-f.on{opacity:1}
+:root[data-theme="dark"] .tg-f{opacity:.45}
+:root[data-theme="dark"] .tg-f.on{opacity:1}
+.tg-ic{position:absolute;top:4px;bottom:4px;border-radius:4px;background:var(--ink);opacity:.3}
+.tg-needle{position:absolute;top:-9px;bottom:-9px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--ink);box-shadow:0 0 0 2px var(--tg-bg)}
+.tg-needle::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 3px var(--tg-bg)}
+.tg-rug{position:relative;height:12px;margin-top:12px}
+.tg-rug i{position:absolute;top:0;width:2px;height:12px;margin-left:-1px;border-radius:1px;background:var(--ink);opacity:.3}
+.tg-ticks{position:relative;height:14px;margin-top:6px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.tg-rug+.tg-ticks{margin-top:4px}
+.tg-ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.tg-ticks span:first-child{transform:none}
+.tg-ticks span:last-child{transform:translateX(-100%)}
+.tg-zones{position:relative;height:16px;margin-top:2px;font-family:var(--ss);font-size:10.5px;color:var(--muted)}
+.tg-zones span{position:absolute;top:0;text-align:center;white-space:nowrap}
+.tg-zones .on{font-weight:700;color:var(--ink)}
+.tg-sides{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tg-rug-k{font-weight:500;text-transform:none;letter-spacing:0;color:var(--faint)}
+.tg-rug-k i{display:inline-block;width:2px;height:10px;margin-right:6px;border-radius:1px;background:var(--ink);opacity:.45;vertical-align:-1px}
+/* Régua estreita: as marcas de ±10 e ±25 e os nomes das faixas não cabem sem se encostar */
+@container (max-width:640px){.tg-ticks .mn,.tg-zones{display:none}}
+@media (min-width:761px) and (max-width:1000px){@supports not (container-type:inline-size){.tg-ticks .mn,.tg-zones{display:none}}}
+/* Indicadores */
+.tm-kpis{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;border-top:1px solid var(--rl);border-bottom:1px solid var(--rl)}
+.tm-kpis li{display:flex;flex-direction:column;gap:4px;min-width:0;padding:16px 20px 16px 0}
+.tm-kpis li+li{padding-left:20px;border-left:1px solid var(--rl)}
+.tm-kv{font-family:var(--ss);font-size:30px;font-weight:600;line-height:1.1;letter-spacing:-.5px;color:var(--ink)}
+.tm-kv small{margin-left:3px;font-size:13px;font-weight:500;letter-spacing:0;color:var(--muted)}
+.tm-kd{font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tm-meter{display:block;height:6px;margin:3px 0 1px;border-radius:3px;background:var(--tm-trk);overflow:hidden}
+.tm-meter span{display:block;height:100%;border-radius:3px;background:var(--tm-bar)}
+/* Painéis */
+.tm-panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:26px 40px;margin-top:26px}
+.tm-panel{min-width:0;padding-top:14px;border-top:1px solid var(--rule)}
+/* Distribuição: uma barra por faixa (contagem e parcela ao lado) */
+.th{list-style:none}
+.th li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.th li:first-child{border-top:none;padding-top:0}
+.th-l{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.th-l .sw{margin-right:7px;vertical-align:0}
+.th-m{display:block;height:10px;border-left:1px solid var(--rule)}
+.th-m span{display:block;height:100%;min-width:3px;border-radius:0 4px 4px 0}
+.th .zero .th-m span{display:none}
+.th .zero .th-l{color:var(--muted)}
+.th-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.th-v b{font-size:12px;font-weight:600;color:var(--ink)}
+.th .zero .th-v b{font-weight:400;color:var(--faint)}
+/* Sinais por critério: à esquerda e à direita de um eixo central */
+.tsg-hd,.tsg-list li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 36px;align-items:center}
+.tsg-hd{padding-bottom:6px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tsg-hd span:nth-child(2){padding-right:8px;text-align:right}
+.tsg-hd span:nth-child(3){padding-left:8px}
+.tsg-list{list-style:none}
+.tsg-list li{padding:5px 0;border-top:1px solid var(--rl)}
+.tsg-n{padding-right:10px;font-family:var(--ss);font-size:12px;line-height:1.3;color:var(--ink)}
+.tsg-l,.tsg-r{display:flex;align-items:center;gap:6px;min-height:18px}
+.tsg-l{justify-content:flex-end;padding-right:1px;border-right:1px solid var(--rule)}
+.tsg-r{padding-left:1px}
+.tsg-b{display:block;height:10px;min-width:3px}
+.tsg-l .tsg-b{border-radius:4px 0 0 4px}
+.tsg-r .tsg-b{border-radius:0 4px 4px 0}
+.tsg-l b,.tsg-r b{font-family:var(--mn);font-size:11px;font-weight:600;color:var(--ink)}
+.tsg-eq{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tsg-eq i{display:inline-block;width:8px;height:8px;margin-right:4px;border-radius:50%}
+/* Qualidade da apuração: em quantas notícias cada prática aparece */
+.tq{list-style:none}
+.tq li{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) 84px;gap:12px;align-items:center;padding:6px 0;border-top:1px solid var(--rl)}
+.tq li:first-child{border-top:none;padding-top:0}
+.tq-n{font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.tq-m{display:block;height:8px;border-radius:4px;background:var(--tm-trk);overflow:hidden}
+.tq-m span{display:block;height:100%;border-radius:4px;background:var(--tm-bar)}
+.tq-v{font-family:var(--mn);font-size:10.5px;text-align:right;white-space:nowrap;color:var(--muted)}
+.tq-v b{font-size:12px;font-weight:600;color:var(--ink)}
+/* Recortes do dia (veículos e editorias): um ponto por grupo numa escala comum */
+.trc{list-style:none}
+.trc-i,.trc-axis{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) 124px;gap:12px;align-items:center}
+.trc-i{padding:6px 0;border-top:1px solid var(--rl)}
+.trc>.trc-i:first-child{border-top:none;padding-top:0}
+.trc-n{font-family:var(--ss);font-size:12.5px;font-weight:700;line-height:1.3;color:var(--ink)}
+.trc-p{position:relative;height:16px}
+.trc-i .trc-p::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rl)}
+.trc-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.trc-ic{position:absolute;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--ink);opacity:.25}
+.trc-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.trc-v{font-family:var(--ss);font-size:11.5px;white-space:nowrap;color:var(--muted)}
+.trc-v b{display:inline-block;min-width:32px;font-family:var(--mn);font-size:13px;font-weight:600;color:var(--ink)}
+.trc-x{font-family:var(--mn);font-size:10px}
+.trc-axis{padding-top:4px}
+.trc-axis .trc-p{height:12px}
+.trc-axis i{position:absolute;top:0;transform:translateX(-50%);font-family:var(--mn);font-size:9.5px;font-style:normal;color:var(--faint);white-space:nowrap}
+.trc-axis i:first-child{transform:none}
+.trc-axis i:last-child{transform:translateX(-100%)}
+.trc-more>summary{margin:6px 0 2px;cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.trc-more>summary:hover{text-decoration:underline}
+.trc-more .trc>.trc-i:first-child{border-top:1px solid var(--rl);padding-top:6px}
+/* Cada texto analisado: filtros, ordem e uma linha por texto que abre o detalhe */
+.tm-list{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-cnt{margin-left:6px;padding:1px 8px;border-radius:10px;background:var(--tm-hl);font-family:var(--mn);font-size:11px;font-weight:600;vertical-align:1px;color:var(--muted)}
+.tm-fil{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:4px 0 14px}
+.tm-fil[hidden]{display:none}
+.tm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.tm-chip{height:32px;padding:0 13px;border:1px solid var(--rule);border-radius:16px;background:var(--paper);font-family:var(--ss);font-size:12px;font-weight:600;color:var(--body);cursor:pointer;transition:border-color .2s,background .2s}
+.tm-chip span{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tm-chip:hover:not(:disabled){border-color:var(--ink)}
+.tm-chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.tm-chip[aria-pressed="true"] span{color:inherit;opacity:.75}
+.tm-chip:disabled{opacity:.45;cursor:default}
+.tm-sel{display:flex;flex-direction:column;gap:3px;font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tm-sel select{height:32px;min-width:140px;max-width:230px;padding:0 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
+.tm-shown{margin-left:auto;padding-bottom:8px;font-family:var(--mn);font-size:11px;color:var(--faint)}
+.tr-hd,.tr>details>summary{display:grid;grid-template-columns:62px minmax(0,1fr) 128px 148px 74px 78px;gap:16px;align-items:center}
+.tr-hd{padding:0 12px 7px;border-bottom:1px solid var(--rule);font-family:var(--ss);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tr-list{list-style:none}
+.tr{border-bottom:1px solid var(--rl)}
+.tr[hidden]{display:none}
+.tr>details>summary{padding:12px;list-style:none;cursor:pointer;transition:background .15s}
+.tr>details>summary::-webkit-details-marker{display:none}
+.tr>details>summary:hover{background:var(--hover)}
+.tr>details[open]>summary{background:var(--tm-hl)}
+.tr-t{display:flex;align-items:center;gap:9px;font-family:var(--mn);font-size:17px;font-weight:600;color:var(--ink)}
+.tr-sw{flex:0 0 4px;width:4px;height:30px;border-radius:2px}
+.tr-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tr-src{font-family:var(--ss);font-size:11px;line-height:1.35;color:var(--muted)}
+.tr-src b{font-weight:700;color:var(--ink)}
+.tr-h{font-family:var(--sf);font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
+.tr-sc{position:relative;height:16px}
+.tr-sc::before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;border-radius:2px;background:var(--rl)}
+.tr-z{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--rule)}
+.tr-d{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--ink)}
+.tr>details[open]>summary .tr-d{box-shadow:0 0 0 2px var(--tm-hl),0 0 0 3px var(--ink)}
+.tr-r,.tr-q{display:flex;flex-direction:column;gap:2px;font-family:var(--ss);font-size:12.5px;line-height:1.3;color:var(--ink)}
+.tr-r span,.tr-q span{font-size:11px;color:var(--muted)}
+.tr-q b{font-family:var(--mn);font-size:14px;font-weight:600}
+.tr-sig{justify-self:end;display:flex;align-items:center;gap:9px;font-family:var(--ss);font-size:11px;font-weight:600;white-space:nowrap;color:var(--link)}
+.tr-sig::after{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.tr>details[open]>summary .tr-sig::after{transform:translateY(2px) rotate(-135deg)}
+.tr-body{padding:8px 12px 22px 90px}
+.tr-sum{max-width:820px;font-family:var(--sf);font-size:14.5px;line-height:1.55;color:var(--ink)}
+.tr-note{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.tr-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px 36px;margin-top:14px}
+.tr-k{margin:18px 0 8px;font-family:var(--ss);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted)}
+.tr-main>.tr-k:first-child,.tr-side>.tr-k:first-child{margin-top:0}
+.tev{list-style:none;display:flex;flex-direction:column;gap:14px}
+.tev li{padding-left:12px;border-left:3px solid var(--t-eq)}
+.tev li.tev-esq{border-left-color:var(--t-em)}
+.tev li.tev-dir{border-left-color:var(--t-dm)}
+.tev-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tev-d{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.tev blockquote{margin:5px 0 0;font-family:var(--sf);font-size:14px;font-style:italic;line-height:1.5;color:var(--ink)}
+.tev blockquote::before{content:"\201C"}
+.tev blockquote::after{content:"\201D"}
+.tev-x{margin-top:4px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--body)}
+.tev-a{margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.45;color:var(--muted)}
+.tev-more{margin-top:12px}
+.tev-more>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;color:var(--link)}
+.tev-more>summary:hover{text-decoration:underline}
+.tev-more>.tev{margin-top:12px}
+.tct{list-style:none;max-width:560px}
+.tct li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) 44px;gap:10px;align-items:center;padding:3px 0;font-family:var(--ss);font-size:12px;color:var(--ink)}
+.tct-p{position:relative;height:10px}
+.tct-z{position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--rule)}
+.tct-b{position:absolute;top:1px;bottom:1px}
+.tct-b.esq{right:50%;border-radius:4px 0 0 4px;background:var(--t-em)}
+.tct-b.dir{left:50%;border-radius:0 4px 4px 0;background:var(--t-dm)}
+.tct-b.eq{left:calc(50% - 1px);width:3px!important;background:var(--t-eq)}
+.tct-v{font-family:var(--mn);font-size:11px;text-align:right;color:var(--muted)}
+.tfr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 22px}
+.tfr dt{font-family:var(--ss);font-size:10.5px;font-weight:700;color:var(--muted)}
+.tfr dd{margin-top:2px;font-family:var(--ss);font-size:12.5px;line-height:1.45;color:var(--ink)}
+.tr-inv{padding:10px 12px;border-radius:6px;background:var(--tm-hl);font-family:var(--sf);font-size:13.5px;line-height:1.55;color:var(--ink)}
+.tck{list-style:none;display:flex;flex-direction:column;gap:6px}
+.tck li{display:flex;align-items:flex-start;gap:8px;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tck i{position:relative;flex:0 0 16px;height:16px;margin-top:1px;border-radius:50%}
+.tck-sim i{background:var(--tm-bar)}
+.tck-sim i::after{content:"";position:absolute;left:5.5px;top:2.5px;width:3.5px;height:7.5px;border:solid var(--paper);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.tck-nao{color:var(--muted)}
+.tck-nao i{border:1.5px solid var(--muted)}
+.tck-nao i::before,.tck-nao i::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:1.5px;margin:-.75px 0 0 -4px;background:var(--muted);transform:rotate(45deg)}
+.tck-nao i::after{transform:rotate(-45deg)}
+.tck-nao_se_aplica{color:var(--faint)}
+.tck-nao_se_aplica i{border:1.5px solid var(--rl)}
+.tck-nao_se_aplica i::after{content:"";position:absolute;left:3.5px;right:3.5px;top:50%;height:1.5px;margin-top:-.75px;background:var(--faint)}
+.tfo{list-style:none;display:flex;flex-direction:column;gap:7px}
+.tfo li{display:flex;flex-direction:column;font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--ink)}
+.tfo-m{font-size:11px;color:var(--muted)}
+.tfi{list-style:none;display:flex;flex-direction:column;gap:4px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
+.tr-go{margin-top:18px;font-family:var(--ss);font-size:12.5px;font-weight:700}
+.tr-go a{color:var(--link)}
+.tr-go a:hover{text-decoration:underline}
+.tm-more{display:block;height:36px;margin:16px auto 0;padding:0 22px;border:1px solid var(--rule);border-radius:18px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer;transition:border-color .2s}
+.tm-more:hover{border-color:var(--link)}
+.tm-more[hidden]{display:none}
+.tm-none{padding:18px 12px;font-family:var(--ss);font-size:13px;color:var(--muted)}
+/* Como ler */
+.tm-metodo{margin-top:30px;padding-top:16px;border-top:1px solid var(--rule)}
+.tm-metodo dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 32px;margin-top:10px}
+.tm-metodo dt{font-family:var(--ss);font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink)}
+.tm-metodo dd{margin-top:4px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-note{max-width:900px;margin-top:12px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--muted)}
 .term-det{margin-top:14px}
 .term-det>summary{cursor:pointer;font-family:var(--ss);font-size:12px;font-weight:700;letter-spacing:.3px;color:var(--link)}
 .term-det>summary:hover{text-decoration:underline}
-.tg{max-width:900px;margin-top:14px}
-.tg-track{position:relative;height:14px}
-.tg-bands{position:absolute;inset:0;overflow:hidden;border-radius:7px;background:var(--rl)}
-.tg-f{position:absolute;top:0;bottom:0;opacity:.38;border-right:2px solid var(--paper)}
-.tg-f:last-child{border-right:none}
-.tg-zero{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--rule)}
-.tg-ic{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--ink);opacity:.28}
-.tg-dot{position:absolute;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid var(--paper);border-radius:50%;background:var(--ink);box-shadow:0 0 0 1px var(--ink)}
-.tg-axis{display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mn);font-size:9px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint)}
-.td{max-width:900px;margin-top:16px}
-.td-bar{display:flex;gap:2px;height:10px;overflow:hidden;border-radius:5px;background:var(--rl)}
-.td-bar span{display:block;height:100%;min-width:4px}
-.td-leg{list-style:none;display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:7px;font-family:var(--ss);font-size:11.5px;color:var(--muted)}
-.td-leg i{display:inline-block;width:9px;height:9px;margin-right:5px;border-radius:2px;vertical-align:-1px}
-.td-leg b{font-family:var(--mn);font-weight:600;color:var(--ink)}
-.ta-list{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;margin-top:8px}
-.ta{padding:14px 0;border-bottom:1px solid var(--rl)}
-.ta-hd{display:flex;gap:12px;align-items:flex-start}
-.ta-v{flex:0 0 auto;min-width:48px;padding:3px 0;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
-.ta-tx{min-width:0}
-.ta-src{font-family:var(--ss);font-size:11px;line-height:1.4;color:var(--muted)}
-.ta-src b{color:var(--ink)}
-.ta-t{margin-top:2px;font-size:15px;font-weight:700;line-height:1.35;color:var(--ink)}
-.ta-t a:hover{color:var(--link);text-decoration:underline}
-.ta-scale{position:relative;height:4px;margin:10px 0 2px;border-radius:2px;background:var(--rl)}
-.ta-scale .tg-zero{top:-3px;bottom:-3px}
-.ta-dot{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border:2px solid var(--paper);border-radius:50%}
-.ta-r{margin-top:8px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
-.ta-r b{color:var(--ink)}
-.ta-sum{margin-top:4px;font-family:var(--sf);font-size:13.5px;line-height:1.5;color:var(--body)}
-.ta-ev{margin-top:6px}
-.ta-ev summary{cursor:pointer;font-family:var(--ss);font-size:11px;font-weight:700;color:var(--link)}
-.ta-ev ol{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:8px;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body)}
-.ta-ev b{color:var(--ink)}
-.ta-dir{margin-left:6px;font-family:var(--mn);font-size:10px;color:var(--mute2)}
-.ta-ev q{display:block;margin-top:2px;font-family:var(--sf);font-style:italic;color:var(--ink)}
-.ta-ex{display:block;margin-top:2px;color:var(--muted)}
+/* Uma análise por linha (todas as análises, na aba Analítico Político) */
+.ta-v{flex:0 0 auto;min-width:48px;font-family:var(--mn);font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap}
 .tl-list{list-style:none;margin-top:8px}
-.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
+.tl{display:grid;grid-template-columns:56px 44px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:8px 8px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.4;color:var(--body)}
 .tl .ta-v{min-width:0;padding:0;font-size:12.5px}
 .tl-d{font-family:var(--mn);font-size:10.5px;color:var(--faint)}
 .tl-tx b{color:var(--ink)}
@@ -508,9 +727,11 @@ body.modal-open .btt{visibility:hidden}
 .tl.tl-lk:hover .tl-tx a{color:var(--link);text-decoration:underline}
 .tl.tl-lk:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:-2px}
 .tl-go{font-weight:700;color:var(--link)}
+.tl-fora{margin-top:12px}
 .an{padding:24px var(--gut) 36px}
 .an-intro{max-width:900px;font-family:var(--sf);font-size:16px;line-height:1.6;color:var(--ink)}
 .an-blk{margin-top:26px;padding-top:16px;border-top:1px solid var(--rl)}
+.an .tm-panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));max-width:1240px}
 .an-h{margin-bottom:10px;font-family:var(--ss);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--head)}
 .an-tiles{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 .an-tiles li,.an-reads li{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-left:3px solid var(--qi);background:var(--soft)}
@@ -525,12 +746,34 @@ body.modal-open .btt{visibility:hidden}
 .an-reads .rd-est,.an-reads .rd-melhor{border-left-color:var(--t-eq)}
 .an-reads .rd-pior{border-left-color:var(--qr)}
 .an-reads .rd-ins{border-left-color:var(--rule)}
+/* Nesta página (atalhos) e Em resumo (o termômetro em linguagem clara) */
+.an-nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;margin-top:12px;font-family:var(--ss);font-size:12.5px}
+.an-nav span{font-family:var(--mn);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--faint)}
+.an-nav a{font-weight:600;color:var(--link)}
+.an-nav a:hover{text-decoration:underline}
+.an-res-t{max-width:980px;font-family:var(--sf);font-size:20px;font-weight:700;line-height:1.35;color:var(--ink)}
+.an-res-l{list-style:none;max-width:980px;margin-top:10px;padding:12px 16px;border-left:3px solid var(--qc);background:var(--soft)}
+.an-res-l li{position:relative;padding-left:16px;font-family:var(--sf);font-size:15px;line-height:1.55;color:var(--ink)}
+.an-res-l li+li{margin-top:6px}
+.an-res-l li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--qc)}
+.an-res-mais{margin-top:10px;font-family:var(--ss);font-size:12.5px}
+.an-res-mais a{font-weight:700;color:var(--link)}
+.an-res-mais a:hover{text-decoration:underline}
+.an-crit{list-style:none}
+.an-crit li{display:grid;grid-template-columns:minmax(120px,190px) minmax(60px,1fr) minmax(120px,auto);align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.an-cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.an-cb{display:flex;height:8px;border-radius:4px;background:var(--rl);overflow:hidden}
+.an-cb i{display:block;height:100%}
+.an-cb .neu{background:var(--qi)}
+:root[data-theme="dark"] .an-cb .neu{background:var(--link)}
+.an-cv{font-family:var(--mn);font-size:11px;color:var(--muted);white-space:nowrap;text-align:right}
+.an-cv b{color:var(--ink);font-weight:600}
 .an-pux{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
 .an-tbl-wrap{overflow-x:auto}
 .an-tbl{width:100%;border-collapse:collapse;font-family:var(--ss);font-size:12.5px;color:var(--body)}
 .an-tbl caption{margin-bottom:6px;text-align:left;font-size:11px;font-weight:700;color:var(--muted)}
 .an-tbl th,.an-tbl td{padding:7px 10px 7px 0;border-bottom:1px solid var(--rl);text-align:right;white-space:nowrap}
-.an-tbl th:first-child,.an-tbl td.an-l{text-align:left}
+.an-tbl th:first-child,.an-tbl td.an-l,.an-tbl th.an-l{text-align:left}
 .an-tbl thead th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
 .an-tbl tbody th{font-weight:700;color:var(--ink)}
 .an-tbl td{font-family:var(--mn);font-size:11.5px}
@@ -578,15 +821,57 @@ body.modal-open .btt{visibility:hidden}
 .qb-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--rl)}
 .qb-bar span{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--qi)}
 :root[data-theme="dark"] .qb-bar span{background:var(--link)}
+@media (max-width:1100px){
+  .tr-hd,.tr>details>summary{grid-template-columns:56px minmax(0,1fr) 104px 124px 64px 70px;gap:12px}
+  .tr-body{padding-left:80px}
+}
+@media (max-width:860px){
+  .tm-placar{grid-template-columns:1fr;gap:14px}
+  .tm-hero{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:18px;align-items:center}
+  .tm-hero .tm-k{grid-column:1/-1}
+  .tm-n{grid-column:1;grid-row:2/span 3;margin-top:6px}
+  .tm-r,.tm-ic,.tm-b{grid-column:2}
+  .tm-r{margin-top:6px}
+  .tm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tm-kpis li:nth-child(odd){padding-left:0;border-left:none}
+  .tm-kpis li:nth-child(n+3){border-top:1px solid var(--rl)}
+}
 @media (max-width:760px){
   .term,.an{padding:18px 16px 24px}
-  .term-sum{font-size:15.5px}
-  .ta-list,.an-reads,.an-pux{grid-template-columns:1fr}
+  .tm-dek{font-size:15px}
+  .tm-placar{padding:16px 16px 14px}
+  .tm-n{font-size:54px}
+  .tm-kpis li{padding:12px 12px 12px 0}
+  .tm-kpis li+li{padding-left:12px}
+  .tm-kv{font-size:24px}
+  .tg-ticks .mn,.tg-zones,.tg-rug-k{display:none}
+  .tm-metodo dl{grid-template-columns:1fr}
+  .trc-i,.trc-axis{grid-template-columns:minmax(0,104px) minmax(0,1fr) 88px;gap:10px}
+  .trc-x{display:block}
+  .tr-hd{display:none}
+  .tr>details>summary{grid-template-columns:48px minmax(0,1fr) auto;gap:8px 10px;padding:12px 4px}
+  .tr-t{grid-column:1;grid-row:1/4;align-self:start;gap:7px;font-size:15px}
+  .tr-tx{grid-column:2/4;grid-row:1}
+  .tr-sc{grid-column:2;grid-row:2}
+  .tr-sig{grid-column:3;grid-row:2}
+  .tr-r{grid-column:2;grid-row:3;flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+  .tr-q{grid-column:3;grid-row:3;flex-direction:row;align-items:baseline;gap:4px;justify-self:end}
+  .tr-body{padding:6px 4px 18px}
+  .tr-grid,.tfr{grid-template-columns:1fr}
+  .tm-fil{gap:8px 10px}
+  .tm-sel{flex:1 1 140px}
+  .tm-sel select{width:100%;max-width:none}
+  .tm-shown{width:100%;margin-left:0;padding-bottom:0}
+  .an-reads,.an-pux{grid-template-columns:1fr}
   .tl{grid-template-columns:52px minmax(0,1fr);gap:2px 10px}
   .tl-tx{grid-column:2;grid-row:1}
   .tl-d{grid-column:1;grid-row:2}
   .tl-r{grid-column:2;grid-row:2;white-space:normal}
-  .an-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .an-res-t{font-size:17.5px}
+  .an-res-l{padding:10px 12px}
+  .an-res-l li{font-size:14px}
+  .an-crit li{grid-template-columns:minmax(0,1fr) auto;gap:2px 10px}
+  .an-cb{grid-column:1/-1;grid-row:2}
   .rk-i,.qb li,.rk-axis{grid-template-columns:34% minmax(0,1fr);gap:4px 10px}
   .rk-v{grid-column:1/-1}
   .rk-axis .rk-v{display:none}
@@ -811,6 +1096,13 @@ body.modal-open .btt{visibility:hidden}
   .cmp-i{position:relative;display:grid;grid-row:span 7;grid-template-rows:subgrid;align-content:start;padding:14px 0 16px;border-bottom:none;border-top:1px solid var(--rl)}
   .cmp-i:nth-child(-n+3){border-top:none}
   .cmp-i:not(:nth-child(3n+1))::before{content:"";position:absolute;left:-20px;top:14px;bottom:16px;width:1px;background:var(--rl)}
+  .cmp .tabs-bar{padding-left:0;background:transparent;border:none;border-bottom:1px solid var(--rl)}
+  .cmp .tab-btn{margin-bottom:0;padding:13px 12px 10px;border-bottom-width:2px}
+  .cmp .tab-btn:first-child{padding-left:0}
+  .cmp .tab-btn:hover,.cmp .tab-btn[aria-selected="true"]{background:transparent}
+  .cmp .tab-btn[aria-selected="true"]{border-bottom-width:4px;padding-bottom:8px}
+  .cmp .tabs-arrow.prev{background:linear-gradient(90deg,var(--paper) 55%,transparent)}
+  .cmp .tabs-arrow.next{background:linear-gradient(270deg,var(--paper) 55%,transparent)}
   .cmp-i>.cov.full{display:contents}
   .cmp-i>.cat{grid-row:1}
   .cmp-i>h3{grid-row:2;margin-bottom:8px;font-size:16px;line-height:1.28}
@@ -980,6 +1272,9 @@ body.modal-open .btt{visibility:hidden}
   .mast{padding-top:52px}
 }
 @media (max-width:760px){
+  .cmp-tabs{margin-left:-16px;margin-right:-16px}
+  .cmp-tabs .cmp-panes{padding:0 16px}
+  .cmp-gh{font-size:16px}
   .mast{padding:52px 16px 18px}
   .mast h1{font-size:36px}
   .mast h1.logo svg{height:92px}
@@ -1094,7 +1389,6 @@ body.modal-open .btt{visibility:hidden}
 
 <section class="wx" aria-label="Clima">
   <p><span role="img" aria-label="Nublado" title="Nublado">☁️</span><strong>São Paulo</strong>15°C <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>13° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>18°<span class="sep" aria-hidden="true">|</span>Amanhã <span role="img" aria-label="Garoa fraca" title="Garoa fraca">🌦️</span> <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>12° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>21°</p>
-  <p><span role="img" aria-label="Nublado" title="Nublado">☁️</span><strong>Montevidéu</strong>12°C <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>11° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>13°<span class="sep" aria-hidden="true">|</span>Amanhã <span role="img" aria-label="Garoa fraca" title="Garoa fraca">🌦️</span> <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>10° <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>15°</p>
 </section>
 <nav class="sec-nav" aria-label="Editorias">
   <div class="sn-in">
@@ -1107,7 +1401,7 @@ body.modal-open .btt{visibility:hidden}
     <li><a href="#editorias" data-tab="all">Todas</a></li>
   </ul>
   <ul class="sn-x">
-<li><a href="#cobertura">Cobertura comparada</a></li><li><a href="#racional">Racional da edição</a></li><li><a href="https://pbcvphyton.github.io/qi-journal/edicoes/2026-10-26-todas.html">Todas as 1.345 notícias</a></li>  </ul>
+<li><a href="#cobertura">Cobertura comparada</a></li><li><a href="#termometro">Termômetro do dia</a></li><li><a href="#racional">Racional da edição</a></li><li><a href="https://pbcvphyton.github.io/qi-journal/edicoes/2026-10-26-todas.html">Todas as 1.345 notícias</a></li>  </ul>
   </div>
 </nav>
 
@@ -1526,13 +1820,113 @@ body.modal-open .btt{visibility:hidden}
 <section class="cmp" id="cobertura" aria-labelledby="cmp-h">
   <div class="cmp-top">
     <h2 class="kicker" id="cmp-h">Cobertura comparada</h2>
-    <p class="cmp-note">Os demais assuntos do dia vistos por dois ou mais veículos: em que sentido cada um conduziu a cobertura. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
+    <p class="cmp-note">Todos os assuntos do dia vistos por dois ou mais veículos — as 9 matérias da edição com análise e os demais —, separados por editoria. Em cada aba, primeiro <b>onde a mídia divergiu</b> (veículos dos dois lados; antes os assuntos com mais veículos no lado menor), depois o que os veículos relataram <b>de forma semelhante</b>. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
   </div>
-  <ol class="cmp-list">
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 06:37</span></p>
-      <h3><a href="https://valor.globo.com/financas/noticia/2026/10/26/bolsas-na-asia-fecham-mistas-e-petroleo-recua-com-foco-em-balancos.ghtml" target="_blank" rel="noopener noreferrer">Bolsas na Ásia sem direção única e queda nos preços do petróleo<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cmp-tabs">
+    <div class="tabs-nav">
+    <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
+    <div class="tabs-bar" role="tablist" aria-label="Cobertura comparada por editoria">
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-brasil" data-cmp-tab="brasil" aria-controls="cmp-pane-brasil" aria-selected="true" tabindex="0" style="--sc:#1B2745">Brasil · Economia<span class="n">2</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-mercados" data-cmp-tab="mercados" aria-controls="cmp-pane-mercados" aria-selected="false" tabindex="-1" style="--sc:#2E6BD6">Mercados &amp; Finanças<span class="n">3</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-juridico" data-cmp-tab="juridico" aria-controls="cmp-pane-juridico" aria-selected="false" tabindex="-1" style="--sc:#394A7A">Jurídico &amp; Regulação<span class="n">3</span><span class="cmp-dn" title="1 assunto com veículos dos dois lados">1 div.</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-politica" data-cmp-tab="politica" aria-controls="cmp-pane-politica" aria-selected="false" tabindex="-1" style="--sc:#C90055">Política<span class="n">9</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-esporte" data-cmp-tab="esporte" aria-controls="cmp-pane-esporte" aria-selected="false" tabindex="-1" style="--sc:#B45309">Esporte<span class="n">1</span></button>
+      <button class="tab-btn" type="button" role="tab" id="cmp-tab-all" data-cmp-tab="all" aria-controls="cmp-panes" aria-selected="false" tabindex="-1" style="--sc:#394A7A">Todas<span class="n">18</span><span class="cmp-dn">1 div.</span></button>
+    </div>
+    <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
+    </div>
+    <div class="cmp-panes" id="cmp-panes">
+      <div class="tab-pane cmp-pane active" id="cmp-pane-brasil" role="tabpanel" aria-labelledby="cmp-tab-brasil" style="--sc:#1B2745">
+        <h3 class="pane-hd">Brasil · Economia</h3>
+        <p class="cmp-vazio">Nenhum assunto de Brasil · Economia teve veículos dos dois lados hoje.</p>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>2 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Equipe econômica de Lula prepara medidas de ajuste fiscal para o quarto mandato</span><span class="cmp-cm">5 veículos · ontem, 22:18 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-equipe-economica-de-lula-prepara-medidas-de-ajus">Ler a matéria &rarr;</a></p>              <div class="cov full lean-a" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Enfoque na preservação de gastos sociais <b>3</b></span><span class="cov-sb"><b>0</b> Enfoque na necessidade urgente de corte de despesas</span></div>
+  <div class="cov-bar" role="img" aria-label="Enfoque na preservação de gastos sociais: 3 veículos; neutros: 2; Enfoque na necessidade urgente de corte de despesas: 0 veículos"><span class="cov-a" style="width:60%"></span><span class="cov-n" style="width:40%"></span></div>
+  <p class="cov-lean">Pende para: Enfoque na preservação de gastos sociais · 3 de 5 veículos</p>
+  <p class="cov-c">A maioria dos veículos apontou o desafio fiscal, dividindo-se entre a narrativa oficial de preservação de políticas públicas e a cobrança de medidas duras de contenção de gastos.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (5)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Enfoque na preservação de gastos sociais <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://www.estadao.com.br/economia/presidente-eleito-tem-encontro-marcado-com-divida-crescente-e-risco-de-colapso-na-maquina-publica/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca o volume trilionário dos juros da dívida pública e o desafio colossal que aguarda o Palácio do Planalto.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/mercado/2026/10/conta-da-babaquice-fiscal-tera-de-ser-paga-pelo-proprio-lula.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza a preparação da PEC fiscal e cobra o pagamento da conta decorrente da expansão de gastos durante a campanha.</p></li>
+    <li><a href="https://www.moneytimes.com.br/lula-vai-ao-quarto-mandato-com-desafio-de-retomar-credibilidade-fiscal-apos-elevar-gastos-na-campanha-fets/" target="_blank" rel="noopener noreferrer">Money Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o ceticismo de agentes de mercado frente ao histórico recente de elevação das despesas públicas.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/brasil/noticia/2026/10/25/exclusivo-ajuste-fiscal-seguira-em-ritmo-gradual-diz-ministro-do-planejamento.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza as declarações do Ministério do Planejamento sobre a gradualidade do ajuste e a manutenção de investimentos sociais.</p></li>
+    <li><a href="https://www.cnnbrasil.com.br/economia/equipe-economica-avalia-mesa-com-ortodoxos-e-tripe-de-medidas-de-ajuste/" target="_blank" rel="noopener noreferrer">CNN Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha as propostas em estudo pela equipe econômica, como a revisão de incentivos e alterações nos pisos constitucionais.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Início do pagamento dos benefícios do INSS referentes a outubro</span><span class="cmp-cm">2 veículos · 02:00</span></summary>
+<p class="cmp-lk"><a href="https://g1.globo.com/economia/noticia/2026/10/26/inss-inicia-pagamento-de-beneficios-de-outubro-veja-calendario.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
+  <p class="cov-c">Os veículos convergiram ao prestar serviço prático aos segurados sobre o cronograma de repasses.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://g1.globo.com/economia/noticia/2026/10/26/inss-inicia-pagamento-de-beneficios-de-outubro-veja-calendario.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Informa o início do calendário de pagamentos do INSS e as regras baseadas no número final do benefício.</p></li>
+    <li><a href="https://exame.com/invest/minhas-financas/inss-comeca-folha-de-outubro-nesta-segunda-26-veja-quem-recebe/" target="_blank" rel="noopener noreferrer">Exame<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Confirma a largada da folha de outubro para os segurados com final de benefício 1 que recebem até um salário mínimo.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-mercados" role="tabpanel" aria-labelledby="cmp-tab-mercados" style="--sc:#2E6BD6">
+        <h3 class="pane-hd">Mercados &amp; Finanças</h3>
+        <p class="cmp-vazio">Nenhum assunto de Mercados &amp; Finanças teve veículos dos dois lados hoje.</p>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>3 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Reeleição de Lula derruba ativos brasileiros e EWZ desaba até 26% no exterior</span><span class="cmp-cm">6 veículos · ontem, 23:48 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-reeleicao-de-lula-derruba-ativos-brasileiros-e-e">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 6 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu integralmente para o relato da aversão ao risco e das perdas severas nos ativos brasileiros logo após o resultado eleitoral.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/financas/intraday/noticia/2026/10/25/reeleicao-de-lula-contrata-pregao-turbulento-nos-mercados.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza as perdas registradas no exterior e a ausência do benefício da dúvida por parte dos agentes financeiros.</p></li>
+    <li><a href="https://braziljournal.com/acoes-domesticas-boas-devem-cair-20-30-gestores-preveem-segunda-caotica" target="_blank" rel="noopener noreferrer">Brazil Journal<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Projeta um pregão caótico com base nas estimativas de queda de gestores para ações domésticas e setores específicos.</p></li>
+    <li><a href="https://www.infomoney.com.br/mercados/reeleicao-lula-divida-publica-agenda-26102026/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca a forte queda expressiva do ETF EWZ no pré-mercado e o impacto imediato da confirmação da reeleição.</p></li>
+    <li><a href="https://g1.globo.com/economia/noticia/2026/10/25/ewz-desaba-19percent-apos-reeleicao-de-lula.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://www.seudinheiro.com/2026/bolsa-dolar/lula-venceu-e-a-festa-da-bolsa-pode-acabar-o-que-esperar-dos-investimentos-agora-miql/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aponta o fim da euforia na Bolsa e detalha o tombo imediato de ações de grandes empresas no after hours.</p></li>
+    <li><a href="https://exame.com/invest/mercados/reeleicao-de-lula-focus-e-divida-publica-o-que-move-os-mercados/" target="_blank" rel="noopener noreferrer">Exame<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o impacto da reeleição sobre a renda fixa, ações de estatais e a pressão sobre o câmbio.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Bolsas na Ásia sem direção única e queda nos preços do petróleo</span><span class="cmp-cm">5 veículos · 06:37</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/financas/noticia/2026/10/26/bolsas-na-asia-fecham-mistas-e-petroleo-recua-com-foco-em-balancos.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 5 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 5 veículos</p>
   <p class="cov-c">A cobertura seguiu unânime ao relatar o comportamento cauteloso dos mercados asiáticos e a desvalorização do petróleo.</p>
@@ -1551,11 +1945,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#2E6BD6">
-      <p class="cat">Mercados &amp; Finanças <span class="cmp-t">· 02:00</span></p>
-      <h3><a href="https://www.suno.com.br/noticias/renda-fixa-tesouro-sobe-30-por-cento-eleicoes-2026/" target="_blank" rel="noopener noreferrer">Investimentos e o impacto da renda fixa após as eleições<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Investimentos e o impacto da renda fixa após as eleições</span><span class="cmp-cm">4 veículos · 02:00</span></summary>
+<p class="cmp-lk"><a href="https://www.suno.com.br/noticias/renda-fixa-tesouro-sobe-30-por-cento-eleicoes-2026/" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 4 veículos</p>
   <p class="cov-c">A cobertura convergiu na orientação aos investidores sobre a realocação de recursos em renda fixa frente ao cenário político.</p>
@@ -1573,11 +1968,210 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C90055">
-      <p class="cat">Política <span class="cmp-t">· 05:41</span></p>
-      <h3><a href="https://www.estadao.com.br/internacional/lideres-estrangeiros-cumprimentam-lula-reeleicao/" target="_blank" rel="noopener noreferrer">Repercussão internacional e cumprimentação de líderes latino-americanos à reeleição de Lula<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-juridico" role="tabpanel" aria-labelledby="cmp-tab-juridico" style="--sc:#394A7A">
+        <h3 class="pane-hd">Jurídico &amp; Regulação</h3>
+        <h4 class="cmp-gh">Onde a mídia divergiu <span>1 de 3 assuntos</span></h4>
+        <ol class="cmp-list">
+          <li class="cmp-i" style="--sc:#394A7A">
+            <p class="cat">Jurídico &amp; Regulação <span class="cmp-t">· 05:00</span> <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência 40</span> <span class="cmp-mt">· matéria da edição</span></p>
+            <h3><a href="#s-prorrogacao-do-horario-de-votacao-pelo-stf-gera">Prorrogação do horário de votação pelo STF gera confusão e críticas no segundo turno</a></h3>
+            <div class="cov full lean-b" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Defende a necessidade e validade da prorrogação <b>1</b></span><span class="cov-sb"><b>4</b> Aponta instabilidade e falhas logísticas</span></div>
+  <div class="cov-bar" role="img" aria-label="Defende a necessidade e validade da prorrogação: 1 veículo; neutros: 6; Aponta instabilidade e falhas logísticas: 4 veículos"><span class="cov-a" style="width:9%"></span><span class="cov-n" style="width:55%"></span><span class="cov-b" style="width:36%"></span></div>
+  <p class="cov-lean">Pende para: Aponta instabilidade e falhas logísticas · 4 de 11 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao relatar os fatos centrais da decisão inédita, mas dividiu-se entre veículos que enfatizaram os riscos e a confusão institucional gerada e aqueles que destacaram a condução técnica e a normalização do pleito pelo TSE.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (11)</summary>
+    <div class="cov-cols">
+<div class="cov-col ca">
+  <h4>Defende a necessidade e validade da prorrogação <span>(1)</span></h4>
+  <ul>
+    <li><a href="https://www.jota.info/eleicoes/eleicoes-2026/urnas-lacradas-os-relatos-de-eleitores-e-mesarios-confusos-apos-decisao-de-zanin" target="_blank" rel="noopener noreferrer">JOTA<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na linha do tempo detalhada dos pedidos das campanhas e na fundamentação jurídica que embasou a liminar do STF.</p></li>
+  </ul>
+</div><div class="cov-col cb">
+  <h4>Aponta instabilidade e falhas logísticas <span>(4)</span></h4>
+  <ul>
+    <li><a href="https://www1.folha.uol.com.br/poder/2026/10/decisao-de-zanin-endosso-de-kassio-e-contestacao-de-flavio-no-2o-turno-veja-linha-do-tempo.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatiza as críticas de juristas e as contestações políticas ao adiamento do término da votação.</p></li>
+    <li><a href="https://www.estadao.com.br/politica/eleicoes/nunes-marques-diz-que-decisao-do-stf-provocou-dificuldades-a-eleicao/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca a confusão gerada nas seções eleitorais e os entraves provocados pela comunicação tardia da ordem judicial.</p></li>
+    <li><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/demora-de-kassio-e-decisao-de-zanin-provocam-criticas-nos-tribunais-e-reuniao-de-emergencia-no-tse.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Reporta as críticas intensas nos tribunais, as reuniões de emergência e os relatos de eleitores frustrados.</p></li>
+    <li><a href="https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/prorrogacao-da-votacao-teve-baixa-procura-e-frustracao-de-eleitores" target="_blank" rel="noopener noreferrer">Agência Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Evidencia o impacto prático nos estados, cobrando baixa procura de eleitores e protestos de centrais sindicais.</p></li>
+  </ul>
+</div><div class="cov-col cn">
+  <h4>Neutros <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/26/temos-absoluta-confianca-de-todo-o-processo-eleitoral-diz-nunes-marques.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha os aspectos técnicos da decisão de Zanin e pondera as declarações de Nunes Marques sobre a totalização.</p></li>
+    <li><a href="https://www.infomoney.com.br/politica/nunes-marques-nao-houve-nenhuma-alteracao-advinda-de-decisao-do-stf/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Prioriza a manifestação oficial do TSE assegurando que o resultado final e a apuração não foram comprometidos.</p></li>
+    <li><a href="https://www12.senado.leg.br/noticias/videos/2026/10/nunes-marques-explica-como-tse-tratou-decisao-de-prorrogar-horario-da-eleicao" target="_blank" rel="noopener noreferrer">Agência Senado<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Registra o pronunciamento institucional e o apoio formal de lideranças do Congresso à Justiça Eleitoral.</p></li>
+    <li><a href="https://www.suno.com.br/noticias/zanin-stf-prorroga-votacao-segundo-turno-19h-eleicoes-2026-go/" target="_blank" rel="noopener noreferrer">Suno Notícias<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foco essencialmente factual e direto na comunicação inicial da liminar concedida pelo Supremo.</p></li>
+    <li><a href="https://www.seudinheiro.com/2026/politica/temos-absoluta-seguranca-de-todo-o-processo-eleitoral-diz-nunes-marques-em-declaracao-no-tse-apos-eleicoes-davs/" target="_blank" rel="noopener noreferrer">Seu Dinheiro<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Aborda o caráter inédito da medida e reproduz as garantias de segurança dadas pela presidência do TSE.</p></li>
+    <li><a href="https://www.cnnbrasil.com.br/eleicoes/kassio-diz-que-prorrogacao-nao-comprometeu-eleicao-absoluta-confianca/" target="_blank" rel="noopener noreferrer">CNN Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Atualiza dados numéricos sobre substituição de urnas e repercute o discurso de normalidade do TSE.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+          </li>
+        </ol>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>2 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Decisão de Cristiano Zanin prorroga votação até 19h e gera forte debate político</span><span class="cmp-cm">3 veículos · 05:00 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-decisao-de-cristiano-zanin-prorroga-votacao-ate">Ler a matéria &rarr;</a></p>              <div class="cov full lean-equilibrio" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Defende a medida como necessária para garantir o direito ao voto <b>0</b></span><span class="cov-sb"><b>0</b> Aponta a decisão como interferência indevida e gera insegurança</span></div>
+  <div class="cov-bar" role="img" aria-label="Defende a medida como necessária para garantir o direito ao voto: 0 veículos; neutros: 3; Aponta a decisão como interferência indevida e gera insegurança: 0 veículos"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Equilíbrio: 0 × 0 de 3 veículos</p>
+  <p class="cov-c">A cobertura dividiu-se entre registrar o impacto prático da decisão para assegurar eleitores na fila e ecoar as críticas da oposição sobre a legalidade da medida.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (3)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Neutros <span>(3)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/26/especialistas-entendem-ser-dificil-uma-mudanca-do-resultado.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Abordou a repercussão da decisão de Zanin sob a ótica do mercado financeiro e a avaliação de especialistas sobre a inviabilidade de reverter o resultado.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/colunas/painel/2026/10/ricardo-nunes-diz-ser-dificil-entender-reviravolta-na-vitoria-de-lula.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destacou o cenário de incerteza gerado pelas perguntas sem respostas imediatas após a prorrogação do horário de votação.</p></li>
+    <li><a href="https://agenciabrasil.ebc.com.br/justica/noticia/2026-10/ministros-do-tse-se-reunem-a-portas-fechadas-apos-decisao-de-zanin" target="_blank" rel="noopener noreferrer">Agência Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Registrou os bastidores das reuniões fechadas dos ministros do TSE para lidar com o impacto prático da ordem do STF.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">STJ decide que site Reclame Aqui não responde automaticamente por conteúdo de usuários</span><span class="cmp-cm">2 veículos · 05:00</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/legislacao/noticia/2026/10/26/destaque.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
+  <p class="cov-c">A cobertura convergiu integralmente para o reconhecimento da jurisprudência em favor da plataforma digital com base na liberdade de informação.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/legislacao/noticia/2026/10/26/destaque.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Menciona sucintamente a decisão da Terceira Turma no radar de destaques jurídicos.</p></li>
+    <li><a href="https://www.stj.jus.br/sites/portalp/Paginas/Comunicacao/Noticias/2026/23102026-Site-Reclame-Aqui-nao-pode-ser-automaticamente-responsabilizado-por-avaliacoes-negativas-de-consumidores-.aspx" target="_blank" rel="noopener noreferrer">STJ<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Explica detalhadamente o acórdão que prioriza a liberdade de expressão e afasta a responsabilidade objetiva da plataforma.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-politica" role="tabpanel" aria-labelledby="cmp-tab-politica" style="--sc:#C90055">
+        <h3 class="pane-hd">Política</h3>
+        <p class="cmp-vazio">Nenhum assunto de Política teve veículos dos dois lados hoje.</p>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>9 assuntos · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Lula vence Flávio Bolsonaro em virada histórica e conquista quarto mandato</span><span class="cmp-cm">11 veículos · 00:53 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-lula-vence-flavio-bolsonaro-em-virada-historica">Ler a matéria &rarr;</a></p>              <div class="cov full lean-equilibrio" lang="pt-BR">
+  <div class="cov-scale"><span class="cov-sa">Destaca a virada histórica e os desafios de governabilidade <b>0</b></span><span class="cov-sb"><b>0</b> Enfatiza a contestação do resultado e críticas ao Judiciário</span></div>
+  <div class="cov-bar" role="img" aria-label="Destaca a virada histórica e os desafios de governabilidade: 0 veículos; neutros: 11; Enfatiza a contestação do resultado e críticas ao Judiciário: 0 veículos"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Equilíbrio: 0 × 0 de 11 veículos</p>
+  <p class="cov-c">A cobertura convergiu ao relatar o fato central da vitória de Lula e a contestação de Flávio Bolsonaro, com forte ênfase na virada inédita.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (11)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Neutros <span>(11)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/politica/noticia/2026/10/26/em-discurso-na-avenida-paulista-lula-exalta-soberania-e-promete-investimentos-na-educao.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Analisou os impactos econômicos da vitória, a nova configuração do Congresso e os desafios fiscais e de articulação para o novo mandato.</p></li>
+    <li><a href="https://www.jota.info/eleicoes/eleicoes-2026/lula-atribui-virada-historica-a-juventude-e-fala-em-proteger-brasil-de-interferencia-estrangeira" target="_blank" rel="noopener noreferrer">JOTA<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Retratou a vitória de Lula como um feito político improvável aos 80 anos e detalhou os bastidores da disputa eleitoral acirrada.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/poder/2026/10/na-paulista-lula-prestigia-alckmin-e-exalta-janones.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Focou na promessa de mudança de rumo no governo, nos ataques às big techs e na ampla mobilização popular que garantiu a virada.</p></li>
+    <li><a href="https://www.infomoney.com.br/politica/em-discurso-de-vitoria-lula-agradece-a-juventude-e-critica-big-techs-e-flavio/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/regulacao-das-big-techs-seguranca-educacao-e-congresso-o-que-lula-falou-no-primeiro-discurso-apos-ser-reeleito.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destacou os recordes históricos de votação de Lula, sua idade avançada e a repercussão internacional dos líderes estrangeiros.</p></li>
+    <li><a href="https://www.moneytimes.com.br/lula-supera-proprio-recorde-e-alcanca-maior-votacao-da-historia-do-brasil-fets/" target="_blank" rel="noopener noreferrer">Money Times<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/lula-agradece-votos-e-diz-que-teve-de-vencer-intromissao-vinda-de-fora" target="_blank" rel="noopener noreferrer">Agência Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Apresentou o balanço oficial da votação e os agradecimentos do presidente reeleito à população e aos eleitores.</p></li>
+    <li><a href="https://www.cnnbrasil.com.br/eleicoes/lula-bate-o-proprio-recorde-e-e-o-presidente-mais-votado-da-historia/" target="_blank" rel="noopener noreferrer">CNN Brasil<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://www.nytimes.com/live/2026/10/25/world/brazil-election" target="_blank" rel="noopener noreferrer">The New York Times<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destacou que a vitória de Lula interrompeu uma sequência de triunfos conservadores na região e registrou a recusa do oponente em aceitar o resultado.</p></li>
+    <li><a href="https://www.wsj.com/world/americas/lula-clings-to-power-in-brazil-election-upset-dba88f6c" target="_blank" rel="noopener noreferrer">The Wall Street Journal<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Tratou o resultado como uma reviravolta eleitoral que estende uma das carreiras políticas mais longas da América Latina.</p></li>
+    <li><a href="https://www.theguardian.com/world/2026/oct/26/lula-wins-brazil-election" target="_blank" rel="noopener noreferrer">The Guardian<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enquadrou a vitória como uma derrota expressiva para a extrema-direita representada por Flávio Bolsonaro em um contexto de forte polarização.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Direita amplia força nos estados e define governadores em cinco estados no segundo turno</span><span class="cmp-cm">6 veículos · 05:00 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-direita-amplia-forca-nos-estados-e-define-govern">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 6 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 6 veículos</p>
+  <p class="cov-c">A cobertura convergiu na análise dos resultados estaduais, destacando o fortalecimento do centrão e da direita nos governos locais.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (6)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(6)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/26/pl-e-psd-elegem-o-maior-numero-de-governadores.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Focou no balanço partidário que apontou o PL com a maior parte dos governadores eleitos no acumulado dos dois turnos.</p></li>
+    <li><a href="https://www.jota.info/eleicoes/eleicoes-2026/direita-passa-a-comandar-15-estados-no-pais" target="_blank" rel="noopener noreferrer">JOTA<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalhou as apurações locais específicas, como a vitória apertada de Cadu de Lula no Rio Grande do Norte e Omar Aziz no Amazonas.</p></li>
+    <li><a href="https://www1.folha.uol.com.br/poder/2026/10/direita-amplia-forca-nos-estados-e-pt-mantem-os-quatro-governadores.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://brasil.mongabay.com/short-article/2026/10/eleicoes-1o-turno-amplia-avanco-da-direita-em-estados-da-amazonia/" target="_blank" rel="noopener noreferrer">Mongabay Brasil<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/presidente-governadores-eleitos-apoios-estados.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatizou o panorama geral dos governadores reeleitos e aqueles que conseguiram viradas expressivas no segundo turno.</p></li>
+    <li><a href="https://agenciabrasil.ebc.com.br/politica/noticia/2026-10/rio-grande-do-norte-elege-cadu-de-lula-governador-do-estado" target="_blank" rel="noopener noreferrer">Agência Brasil<span class="sr-only"> (abre em nova aba)</span></a></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Abstenção no segundo turno registra menor patamar em 20 anos e atrai 3 milhões a mais de eleitores</span><span class="cmp-cm">2 veículos · ontem, 23:17 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-abstencao-no-segundo-turno-registra-menor-patama">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
+  <p class="cov-c">A cobertura foi puramente factual, convergindo na análise dos dados estatísticos fornecidos pelo TSE sobre a participação popular.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(2)</span></h4>
+  <ul>
+    <li><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/segundo-turno-leva-quase-3-milhoes-de-eleitores-as-urnas-a-mais-que-o-primeiro.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destacou o dado histórico de queda na abstenção e sua correlação com a quebra de paradigmas na reeleição presidencial.</p></li>
+    <li><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/bahia-pernambuco-sao-paulo-maiores-quedas-taxa-abstencao-percentual-estado.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Mapeou detalhadamente o comportamento do eleitorado por estados e municípios onde a queda do absenteísmo foi mais acentuada.</p></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Presidentes do Senado e da Câmara telefonam para Lula e defendem pacificação nacional</span><span class="cmp-cm">4 veículos · ontem, 22:49 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-presidentes-do-senado-e-da-camara-telefonam-para">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 4 veículos</p>
+  <p class="cov-c">A cobertura convergiu na divulgação das mensagens institucionais de moderação e diálogo vindas dos líderes do Congresso.</p>
+  <details class="cov-who">
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (4)</summary>
+    <div class="cov-cols">
+<div class="cov-col cn">
+  <h4>Veículos <span>(4)</span></h4>
+  <ul>
+    <li><a href="https://www1.folha.uol.com.br/poder/2026/10/alcolumbre-e-motta-ligam-para-lula-oferecem-apoio-e-pedem-que-ele-atue-para-unir-o-brasil.shtml" target="_blank" rel="noopener noreferrer">Folha de S.Paulo<span class="sr-only"> (abre em nova aba)</span></a></li>
+    <li><a href="https://www.infomoney.com.br/politica/alcolumbre-e-motta-oferecem-apoio-a-lula-e-pedem-uniao-do-pais-apos-eleicao/" target="_blank" rel="noopener noreferrer">InfoMoney<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Registrou os telefonemas institucionais de Alcolumbre e Motta cobrando que o governo atue para atender a totalidade da população.</p></li>
+    <li><a href="https://www12.senado.leg.br/noticias/materias/2026/10/25/passadas-as-eleicoes-congresso-atuara-pela-pacificacao-afirma-davi-alcolumbre" target="_blank" rel="noopener noreferrer">Agência Senado<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Enfatizou os pronunciamentos de Davi Alcolumbre pregando o respeito ao resultado soberano das urnas e a pacificação nacional.</p></li>
+    <li><a href="https://www.cnnbrasil.com.br/eleicoes/davi-alcolumbre-pede-humildade-a-lula-e-diz-que-e-preciso-unir-o-pais/" target="_blank" rel="noopener noreferrer">CNN Brasil<span class="sr-only"> (abre em nova aba)</span></a></li>
+  </ul>
+</div>    </div>
+  </details>
+</div>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Repercussão internacional e cumprimentação de líderes latino-americanos à reeleição de Lula</span><span class="cmp-cm">4 veículos · 05:41</span></summary>
+<p class="cmp-lk"><a href="https://www.estadao.com.br/internacional/lideres-estrangeiros-cumprimentam-lula-reeleicao/" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 4 veículos</p>
   <p class="cov-c">Os veículos convergiram ao relatar as manifestações diplomáticas internacionais de reconhecimento ao pleito brasileiro.</p>
@@ -1595,11 +2189,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C90055">
-      <p class="cat">Política <span class="cmp-t">· ontem, 23:24</span></p>
-      <h3><a href="https://www1.folha.uol.com.br/poder/2026/10/lula-vira-sobre-flavio-em-minas-espelho-eleitoral-do-pais-veja-como-votaram-regioes-estados-e-capitais.shtml" target="_blank" rel="noopener noreferrer">Minas Gerais e capitais como focos exclusivos de virada na disputa presidencial<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Minas Gerais e capitais como focos exclusivos de virada na disputa presidencial</span><span class="cmp-cm">4 veículos · ontem, 23:24</span></summary>
+<p class="cmp-lk"><a href="https://www1.folha.uol.com.br/poder/2026/10/lula-vira-sobre-flavio-em-minas-espelho-eleitoral-do-pais-veja-como-votaram-regioes-estados-e-capitais.shtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 4 veículos</p>
   <p class="cov-c">A cobertura convergiu ao analisar os dados geográficos e estatísticos da migração de votos nas regiões centrais.</p>
@@ -1617,11 +2212,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C90055">
-      <p class="cat">Política <span class="cmp-t">· 00:32</span></p>
-      <h3><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/em-discurso-da-vitria-lula-agradece-janones-reclama-de-intromisso-externa-e-diz-que-far-um-governo-diferente.ghtml" target="_blank" rel="noopener noreferrer">Protagonismo do deputado André Janones e da estratégia digital na campanha de Lula<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Protagonismo do deputado André Janones e da estratégia digital na campanha de Lula</span><span class="cmp-cm">4 veículos · 00:32</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/em-discurso-da-vitria-lula-agradece-janones-reclama-de-intromisso-externa-e-diz-que-far-um-governo-diferente.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 4 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 4 veículos</p>
   <p class="cov-c">Os veículos convergiram ao reconhecer a relevância da mobilização digital liderada por Janones para o resultado eleitoral.</p>
@@ -1639,11 +2235,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C90055">
-      <p class="cat">Política <span class="cmp-t">· 04:36</span></p>
-      <h3><a href="https://www1.folha.uol.com.br/poder/2026/10/tse-desmente-flavio-bolsonaro-e-diz-que-nao-retirou-fiscais-do-pl-da-sala-cofre.shtml" target="_blank" rel="noopener noreferrer">Acusações de fraude pela oposição e desmentidos oficiais do TSE<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Acusações de fraude pela oposição e desmentidos oficiais do TSE</span><span class="cmp-cm">3 veículos · 04:36</span></summary>
+<p class="cmp-lk"><a href="https://www1.folha.uol.com.br/poder/2026/10/tse-desmente-flavio-bolsonaro-e-diz-que-nao-retirou-fiscais-do-pl-da-sala-cofre.shtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 3 veículos</p>
   <p class="cov-c">A cobertura focou no embate entre as alegações sem provas da oposição e os esclarecimentos formais do tribunal eleitoral.</p>
@@ -1660,11 +2257,12 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#C90055">
-      <p class="cat">Política <span class="cmp-t">· 05:17</span></p>
-      <h3><a href="https://valor.globo.com/financas/noticia/2026/10/25/febraban-cumprimenta-lula-e-alckmin-e-diz-que-bancos-mantm-postura-colaborativa.ghtml" target="_blank" rel="noopener noreferrer">Reação inicial dos mercados financeiros e do setor bancário à vitória de Lula<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Reação inicial dos mercados financeiros e do setor bancário à vitória de Lula</span><span class="cmp-cm">3 veículos · 05:17</span></summary>
+<p class="cmp-lk"><a href="https://valor.globo.com/financas/noticia/2026/10/25/febraban-cumprimenta-lula-e-alckmin-e-diz-que-bancos-mantm-postura-colaborativa.ghtml" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
   <div class="cov-bar" role="img" aria-label="Todos os 3 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
   <p class="cov-lean">Sem divergência entre os 3 veículos</p>
   <p class="cov-c">A cobertura destacou a dualidade entre a receptividade institucional dos bancos e o pesssequismo de curto prazo nos mercados futuros.</p>
@@ -1681,314 +2279,650 @@ body.modal-open .btt{visibility:hidden}
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#1B2745">
-      <p class="cat">Brasil · Economia <span class="cmp-t">· 02:00</span></p>
-      <h3><a href="https://g1.globo.com/economia/noticia/2026/10/26/inss-inicia-pagamento-de-beneficios-de-outubro-veja-calendario.ghtml" target="_blank" rel="noopener noreferrer">Início do pagamento dos benefícios do INSS referentes a outubro<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
-  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
-  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
-  <p class="cov-c">Os veículos convergiram ao prestar serviço prático aos segurados sobre o cronograma de repasses.</p>
+            </details>
+          </li>
+        </ol>
+      </div>
+      <div class="tab-pane cmp-pane" id="cmp-pane-esporte" role="tabpanel" aria-labelledby="cmp-tab-esporte" style="--sc:#B45309">
+        <h3 class="pane-hd">Esporte</h3>
+        <p class="cmp-vazio">Nenhum assunto de Esporte teve veículos dos dois lados hoje.</p>
+        <h4 class="cmp-gh">Relataram de forma semelhante <span>1 assunto · clique para ver a análise</span></h4>
+        <ol class="cmp-cl">
+          <li>
+            <details>
+              <summary><span class="cmp-ct">Prêmio Bola de Ouro 2026 realiza cerimônia histórica em Londres</span><span class="cmp-cm">5 veículos · 00:00 · matéria da edição</span></summary>
+<p class="cmp-lk"><a href="#s-premio-bola-de-ouro-2026-realiza-cerimonia-histo">Ler a matéria &rarr;</a></p>              <div class="cov full lean-convergente" lang="pt-BR">
+  <div class="cov-bar" role="img" aria-label="Todos os 5 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
+  <p class="cov-lean">Sem divergência entre os 5 veículos</p>
+  <p class="cov-c">A cobertura convergiu na divulgação factual dos detalhes da premiação, da mudança de sede para Londres e dos concorrentes ao título.</p>
   <details class="cov-who">
-    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
+    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (5)</summary>
     <div class="cov-cols">
 <div class="cov-col cn">
-  <h4>Veículos <span>(2)</span></h4>
+  <h4>Veículos <span>(5)</span></h4>
   <ul>
-    <li><a href="https://g1.globo.com/economia/noticia/2026/10/26/inss-inicia-pagamento-de-beneficios-de-outubro-veja-calendario.ghtml" target="_blank" rel="noopener noreferrer">g1<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Informa o início do calendário de pagamentos do INSS e as regras baseadas no número final do benefício.</p></li>
-    <li><a href="https://exame.com/invest/minhas-financas/inss-comeca-folha-de-outubro-nesta-segunda-26-veja-quem-recebe/" target="_blank" rel="noopener noreferrer">Exame<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Confirma a largada da folha de outubro para os segurados com final de benefício 1 que recebem até um salário mínimo.</p></li>
+    <li><a href="https://ge.globo.com/futebol/futebol-internacional/noticia/2026/10/26/bola-de-ouro-2026-confira-todos-os-indicados-e-regulamento.ghtml" target="_blank" rel="noopener noreferrer">ge<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Detalha o regulamento, os critérios de avaliação e a lista abrangente de indicados brasileiros em múltiplas categorias.</p></li>
+    <li><a href="https://www.estadao.com.br/esportes/futebol/bola-de-ouro-2026-novo-melhor-do-mundo-e-incognita-veja-os-concorrentes/" target="_blank" rel="noopener noreferrer">Estadão<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Foca na indefinição e na ausência de um claro favorito ao prêmio de melhor jogador do mundo.</p></li>
+    <li><a href="https://www.gazetaesportiva.com/campeonatos/laliga/as-vesperas-da-bola-de-ouro-veja-concorrentes-que-entram-em-campo-no-el-clasico/" target="_blank" rel="noopener noreferrer">Gazeta Esportiva<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Relaciona a proximidade da cerimônia com o impacto dos atletas indicados que atuam no clássico espanhol.</p></li>
+    <li><a href="https://trivela.com.br/mundo/acompanhe-ao-vivo-hora-assistir-bola-ouro-2026/" target="_blank" rel="noopener noreferrer">Trivela<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Acompanha a expectativa para o evento histórico em Londres e traz análises e opiniões da redação sobre os concorrentes.</p></li>
+    <li><a href="https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional/bola-de-ouro-2026-quem-sao-os-brasileiros-que-concorrem-ao-premio/" target="_blank" rel="noopener noreferrer">CNN Brasil<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Destaca especificamente os nomes dos jogadores e atletas brasileiros que concorrem aos troféus da temporada.</p></li>
   </ul>
 </div>    </div>
   </details>
 </div>
-    </li>
-    <li class="cmp-i" style="--sc:#394A7A">
-      <p class="cat">Jurídico &amp; Regulação <span class="cmp-t">· 05:00</span></p>
-      <h3><a href="https://valor.globo.com/legislacao/noticia/2026/10/26/destaque.ghtml" target="_blank" rel="noopener noreferrer">STJ decide que site Reclame Aqui não responde automaticamente por conteúdo de usuários<span class="sr-only"> (abre a fonte em nova aba)</span></a></h3>
-      <div class="cov full lean-convergente" lang="pt-BR">
-  <div class="cov-bar" role="img" aria-label="Todos os 2 veículos relataram o assunto de forma semelhante"><span class="cov-n" style="width:100%"></span></div>
-  <p class="cov-lean">Sem divergência entre os 2 veículos</p>
-  <p class="cov-c">A cobertura convergiu integralmente para o reconhecimento da jurisprudência em favor da plataforma digital com base na liberdade de informação.</p>
-  <details class="cov-who">
-    <summary>Análise por veículo: o foco de cada um e o lado que seguiu (2)</summary>
-    <div class="cov-cols">
-<div class="cov-col cn">
-  <h4>Veículos <span>(2)</span></h4>
-  <ul>
-    <li><a href="https://valor.globo.com/legislacao/noticia/2026/10/26/destaque.ghtml" target="_blank" rel="noopener noreferrer">Valor Econômico<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Menciona sucintamente a decisão da Terceira Turma no radar de destaques jurídicos.</p></li>
-    <li><a href="https://www.stj.jus.br/sites/portalp/Paginas/Comunicacao/Noticias/2026/23102026-Site-Reclame-Aqui-nao-pode-ser-automaticamente-responsabilizado-por-avaliacoes-negativas-de-consumidores-.aspx" target="_blank" rel="noopener noreferrer">STJ<span class="sr-only"> (abre em nova aba)</span></a><p class="cov-f">Explica detalhadamente o acórdão que prioriza a liberdade de expressão e afasta a responsabilidade objetiva da plataforma.</p></li>
-  </ul>
-</div>    </div>
-  </details>
-</div>
-    </li>
-  </ol>
+            </details>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="term" id="termometro" aria-labelledby="term-h">
-  <div class="arch-top">
+  <div class="tm-top">
     <h2 class="kicker" id="term-h">Termômetro do dia</h2>
-<a class="arch-home" href="./analitico.html">Analítico Político &rarr;</a>  </div>
-  <p class="term-sum">Equilibrado · T 0 na média de 16 notícias com dimensão política <span>(intervalo de 95%: 0 a +1)</span></p>
-<div class="tg" role="img" aria-label="Média das notícias do dia: T 0 (Equilibrado), intervalo de 95% de 0 a +1; escala de −100 (esquerda) a +100 (direita)">
-  <div class="tg-track">
-    <div class="tg-bands"><span class="tg-f t-ef" style="left:0.0%;width:25.0%" title="Esquerda forte"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%" title="Esquerda moderada"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%" title="Leve à esquerda"></span><span class="tg-f t-eq" style="left:45.0%;width:10.0%" title="Equilibrado"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%" title="Leve à direita"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%" title="Direita moderada"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%" title="Direita forte"></span></div>
-    <span class="tg-zero"></span><span class="tg-ic" style="left:49.88%;width:0.49%"></span><span class="tg-dot" style="left:50.12%"></span>
-  </div>  <div class="tg-axis" aria-hidden="true"><span>Esquerda · &minus;100</span><span>0</span><span>+100 · Direita</span></div></div><div class="td">
-  <div class="td-bar" role="img" aria-label="Rótulos dos textos: Equilibrado: 16"><span class="t-eq" style="width:100.0%" title="Equilibrado: 16"></span></div>
-  <ul class="td-leg"><li><i class="t-eq" aria-hidden="true"></i>Equilibrado <b>16</b></li></ul>
-</div>  <p class="term-meta">20 textos analisados de 6 veículos · qualidade da apuração 85 de 100 (Boa) · 4 textos de opinião (T +5, à parte)</p>
-  <details class="term-det">
-    <summary>Cada texto analisado (20)</summary>
-    <ol class="ta-list">
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Brazil Journal</b> · Mercados &amp; Finanças · 26/10</p>
-      <p class="ta-t"><a href="https://braziljournal.com/acoes-domesticas-boas-devem-cair-20-30-gestores-preveem-segunda-caotica" target="_blank" rel="noopener noreferrer">“Ações domésticas boas devem cair 20-30%”. Gestores preveem segunda caótica<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
+    <p class="tm-links"><a href="#term-metodo">Como ler</a><a href="./analitico.html">Analítico Político &rarr;</a></p>
   </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 69 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Política · 25/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/alcolumbre-e-motta-ligam-para-lula-oferecem-apoio-e-pedem-que-ele-atue-para-unir-o-brasil.shtml" target="_blank" rel="noopener noreferrer">Alcolumbre e Motta ligam para Lula, oferecem apoio e pedem que ele atue para unir o Brasil<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
+  <p class="tm-dek">Equilibrado · T 0 na média de 16 notícias com dimensão política. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
+<div class="tm-placar">
+  <div class="tm-hero">
+    <p class="tm-k">T médio das notícias</p>
+    <p class="tm-n">0</p>
+    <p class="tm-r"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</p>
+<p class="tm-ic">Intervalo de 95%: <span class="nw">0 a +1</span></p><p class="tm-b">média de 16 notícias com dimensão política</p>  </div>
+  <figure class="tg" role="img" aria-label="Média das notícias do dia: T 0 (Equilibrado), intervalo de 95% de 0 a +1; escala de −100 (esquerda) a +100 (direita)">
+  <div class="tg-flag" style="--x:50.12%" aria-hidden="true"><b>T 0</b> Equilibrado</div>
+  <div class="tg-track" aria-hidden="true"><span class="tg-f t-ef" style="left:0.0%;width:25.0%"></span><span class="tg-f t-em" style="left:25.0%;width:12.5%"></span><span class="tg-f t-el" style="left:37.5%;width:7.5%"></span><span class="tg-f t-eq on" style="left:45.0%;width:10.0%"></span><span class="tg-f t-dl" style="left:55.0%;width:7.5%"></span><span class="tg-f t-dm" style="left:62.5%;width:12.5%"></span><span class="tg-f t-df" style="left:75.0%;width:25.0%"></span><span class="tg-ic" style="left:49.88%;width:0.49%"></span><span class="tg-needle" style="left:50.12%"></span>
+  </div>  <div class="tg-rug" aria-hidden="true"><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:50.0%"></i><i style="left:52.0%"></i></div>  <div class="tg-ticks" aria-hidden="true"><span style="left:0.0%">−100</span><span style="left:25.0%">−50</span><span class="mn" style="left:37.5%">−25</span><span class="mn" style="left:45.0%">−10</span><span style="left:50.0%">0</span><span class="mn" style="left:55.0%">+10</span><span class="mn" style="left:62.5%">+25</span><span style="left:75.0%">+50</span><span style="left:100.0%">+100</span></div>  <div class="tg-zones" aria-hidden="true"><span style="left:0.0%;width:25.0%">Forte</span><span style="left:25.0%;width:12.5%">Moderada</span><span style="left:37.5%;width:7.5%">Leve</span><span class="on" style="left:45.0%;width:10.0%">Equilibrado</span><span style="left:55.0%;width:7.5%">Leve</span><span style="left:62.5%;width:12.5%">Moderada</span><span style="left:75.0%;width:25.0%">Forte</span></div>  <div class="tg-sides" aria-hidden="true"><span>&larr; Esquerda</span><span class="tg-rug-k"><i></i>cada traço é uma notícia</span><span>Direita &rarr;</span></div>
+</figure>
+</div>  <ul class="tm-kpis">  <li><span class="tm-k">Textos analisados</span><span class="tm-kv">20</span><span class="tm-kd">6 veículos · 4 editorias</span></li>  <li><span class="tm-k">Notícias com T</span><span class="tm-kv">16</span><span class="tm-kd">4 textos de opinião (T +5, à parte)</span></li>  <li><span class="tm-k">Qualidade da apuração</span><span class="tm-kv">85<small>/100</small></span><span class="tm-meter" aria-hidden="true"><span style="width:85.0%"></span></span><span class="tm-kd">Boa · média das notícias</span></li>  <li><span class="tm-k">Sinais que pontuaram</span><span class="tm-kv">3</span><span class="tm-kd">em 3 notícias: 0 à esquerda · 1 à direita · 2 de equilíbrio</span></li></ul>
+  <div class="tm-panels">
+    <section class="tm-panel" aria-labelledby="tmp-dist">
+      <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
+      <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
+      <ol class="th" aria-label="Rótulos das notícias: Equilibrado: 16">  <li class="zero"><span class="th-l"><i class="sw t-ef" aria-hidden="true"></i>Esquerda forte</span><span class="th-m" aria-hidden="true"><span class="t-ef" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-em" aria-hidden="true"></i>Esquerda moderada</span><span class="th-m" aria-hidden="true"><span class="t-em" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-el" aria-hidden="true"></i>Leve à esquerda</span><span class="th-m" aria-hidden="true"><span class="t-el" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class=""><span class="th-l"><i class="sw t-eq" aria-hidden="true"></i>Equilibrado</span><span class="th-m" aria-hidden="true"><span class="t-eq" style="width:100.0%"></span></span><span class="th-v"><b>16</b> <span>100%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dl" aria-hidden="true"></i>Leve à direita</span><span class="th-m" aria-hidden="true"><span class="t-dl" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-dm" aria-hidden="true"></i>Direita moderada</span><span class="th-m" aria-hidden="true"><span class="t-dm" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li>  <li class="zero"><span class="th-l"><i class="sw t-df" aria-hidden="true"></i>Direita forte</span><span class="th-m" aria-hidden="true"><span class="t-df" style="width:0.0%"></span></span><span class="th-v"><b>0</b> <span>0%</span></span></li></ol><p class="tm-foot">Fora da média: 4 textos de opinião (T +5, à parte).</p>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-sig">
+      <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
+      <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
+      <div class="tsg">
+  <div class="tsg-hd" aria-hidden="true"><span></span><span>&larr; esquerda</span><span>direita &rarr;</span></div>
+  <ul class="tsg-list">    <li aria-label="Fontes e espaço: 0 à esquerda, 1 à direita, 1 de equilíbrio"><span class="tsg-n">Fontes e espaço</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"><span class="tsg-b t-dm" style="width:100.0%"></span><b>1</b></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>1</span></li>    <li aria-label="Números e escala: 0 à esquerda, 0 à direita, 1 de equilíbrio"><span class="tsg-n">Números e escala</span><span class="tsg-l" aria-hidden="true"></span><span class="tsg-r" aria-hidden="true"></span><span class="tsg-eq" aria-hidden="true"><i class="t-eq"></i>1</span></li>  </ul>
+<p class="tm-foot"><i class="sw t-eq" aria-hidden="true"></i>Sinal de equilíbrio (contraponto ouvido, número com fonte, verbo neutro): não move o T.</p></div>
+
+    </section>
   </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 85 (Boa) · Instituições, Econômico</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Política · 26/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/poder/2026/10/na-paulista-lula-prestigia-alckmin-e-exalta-janones.shtml" target="_blank" rel="noopener noreferrer">Na Paulista, Lula prestigia Alckmin, exalta Janones e se declara a Janja<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
+  <div class="tm-panels tm-panels-2">
+    <section class="tm-panel" aria-labelledby="tmp-r1">
+      <h3 class="tm-ph" id="tmp-r1">Por veículo</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Valor Econômico: T 0 (Equilibrado) em 7 notícias, intervalo de 95% de 0 a 0; qualidade 87"><span class="trc-n">Valor Econômico</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">7 notícias · Q 87</span></span></li>  <li class="trc-i" title="g1: T 0 (Equilibrado) em 3 notícias, intervalo de 95% de 0 a 0; qualidade 90"><span class="trc-n">g1</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">3 notícias · Q 90</span></span></li>  <li class="trc-i" title="Folha de S.Paulo: T +1 (Equilibrado) em 3 notícias, intervalo de 95% de −1 a +4; qualidade 75"><span class="trc-n">Folha de S.Paulo</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:47.44%;width:10.45%"></span><span class="trc-d t-eq" style="left:52.67%"></span></span><span class="trc-v"><b>+1</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">3 notícias · Q 75</span></span></li>  <li class="trc-i" title="InfoMoney: T 0 (Equilibrado) em 2 notícias, intervalo de 95% de 0 a 0; qualidade 88"><span class="trc-n">InfoMoney</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">2 notícias · Q 88</span></span></li>  <li class="trc-i" title="Brazil Journal: T 0 (Equilibrado) em 1 notícia; qualidade 69"><span class="trc-n">Brazil Journal</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 69</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
+    <section class="tm-panel" aria-labelledby="tmp-r2">
+      <h3 class="tm-ph" id="tmp-r2">Por editoria</h3>
+      <p class="tm-pd">T médio das notícias do dia, do grupo com mais notícias para o com menos; a barra é o intervalo de 95%.</p>
+      <ol class="trc">  <li class="trc-i" title="Política: T 0 (Equilibrado) em 8 notícias, intervalo de 95% de 0 a 0; qualidade 84"><span class="trc-n">Política</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">8 notícias · Q 84</span></span></li>  <li class="trc-i" title="Jurídico &amp; Regulação: T 0 (Equilibrado) em 5 notícias, intervalo de 95% de 0 a 0; qualidade 89"><span class="trc-n">Jurídico &amp; Regulação</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">5 notícias · Q 89</span></span></li>  <li class="trc-i" title="Mercados &amp; Finanças: T 0 (Equilibrado) em 2 notícias, intervalo de 95% de 0 a 0; qualidade 80"><span class="trc-n">Mercados &amp; Finanças</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-ic" style="left:50.0%;width:0.6%"></span><span class="trc-d t-eq" style="left:50.0%"></span></span><span class="trc-v"><b>0</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">2 notícias · Q 80</span></span></li>  <li class="trc-i" title="Brasil · Economia: T +4 (Equilibrado) em 1 notícia; qualidade 75"><span class="trc-n">Brasil · Economia</span><span class="trc-p" aria-hidden="true"><span class="trc-z"></span><span class="trc-d t-eq" style="left:58.0%"></span></span><span class="trc-v"><b>+4</b><span class="sr-only"> (Equilibrado), </span><span class="trc-x">1 notícia · Q 75</span></span></li></ol><div class="trc-axis" aria-hidden="true"><span></span><span class="trc-p"><i style="left:0.0%">−25</i><i style="left:30.0%">−10</i><i style="left:50.0%">0</i><i style="left:70.0%">+10</i><i style="left:100.0%">+25</i></span><span></span></div>
+    </section>
   </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 65 (Regular) · Instituições, Costumes</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>InfoMoney</b> · Política · 25/10</p>
-      <p class="ta-t"><a href="https://www.infomoney.com.br/politica/alcolumbre-e-motta-oferecem-apoio-a-lula-e-pedem-uniao-do-pais-apos-eleicao/" target="_blank" rel="noopener noreferrer">Alcolumbre e Motta pedem conciliação e dizem que Lula deve governar para todos<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
+  <section class="tm-list" aria-labelledby="tml-h">
+    <div class="tm-list-hd">
+      <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">20</span></h3>
+      <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
     </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 85 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>InfoMoney</b> · Mercados &amp; Finanças · 26/10</p>
-      <p class="ta-t"><a href="https://www.infomoney.com.br/mercados/reeleicao-lula-divida-publica-agenda-26102026/" target="_blank" rel="noopener noreferrer">Reeleição de Lula, dívida pública, Gerdau, Focus e mais destaques desta segunda<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 90 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">equilíbrio · 0,0</span><q>O resultado contraria o cenário-base e entrega a maior surpresa desta eleição com a vitória de Lula</q><span class="ta-ex">Uso de fontes do mercado financeiro para relatar a reação dos ativos, acompanhado da fala do candidato derrotado contestando o pleito.</span></li>
-    </ol>
+    <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
+      <div class="tm-chips" role="group" aria-label="Mostrar">
+        <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>20</span></button>
+        <button type="button" class="tm-chip" data-f="sig" aria-pressed="false">Com sinais <span>4</span></button>
+        <button type="button" class="tm-chip" data-f="inc" aria-pressed="false">Fora do equilíbrio <span>1</span></button>
+<button type="button" class="tm-chip" data-f="op" aria-pressed="false">Opinião <span>4</span></button>      </div>
+      <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option><option value="Valor Econômico">Valor Econômico (9)</option><option value="Folha de S.Paulo">Folha de S.Paulo (4)</option><option value="g1">g1 (3)</option><option value="InfoMoney">InfoMoney (2)</option><option value="Brazil Journal">Brazil Journal (1)</option><option value="Money Times">Money Times (1)</option></select></label>
+      <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option><option value="Política">Política (10)</option><option value="Jurídico &amp; Regulação">Jurídico &amp; Regulação (5)</option><option value="Brasil · Economia">Brasil · Economia (3)</option><option value="Mercados &amp; Finanças">Mercados &amp; Finanças (2)</option></select></label>
+      <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
+      <p class="tm-shown" role="status" aria-live="polite"></p>
+    </form>
+    <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
+    <ol class="tr-list" id="tmList" data-visiveis="12">
+      <li class="tr" data-t="19.0" data-q="50" data-s="2" data-c="dl" data-v="Folha de S.Paulo" data-e="Brasil · Economia" data-o="1" data-i="1">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-dl" aria-hidden="true"></i><b>+19</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Brasil · Economia · 25/10 · <em>Opinião</em></span><span class="tr-h">Conta da &#39;babaquice&#39; fiscal terá de ser paga pelo próprio Lula</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-dl" style="left:59.5%"></span></span>
+      <span class="tr-r"><b>Leve à direita</b><span>confiança baixa</span></span>
+      <span class="tr-q"><b>50</b><span>qualidade</span></span>
+      <span class="tr-sig">2 sinais</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Leve à direita (confiança baixa). Principais sinais: rótulos e aspas (E1) e carga avaliativa (E2).</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (2), do maior peso para o menor</h4>
+          <ol class="tev">            <li class="tev-dir"><p class="tev-h"><b>Rótulos e aspas</b><span class="tev-d">E1 · direita · +12,5 pt · P0</span></p><blockquote>Conta da &#39;babaquice&#39; fiscal terá de ser paga pelo próprio Lula</blockquote><p class="tev-x">Uso de termos pejorativos na voz do autor e título para caracterizar a política econômica do governo.</p></li>            <li class="tev-dir"><p class="tev-h"><b>Carga avaliativa</b><span class="tev-d">E2 · direita · +6,0 pt · P4</span></p><blockquote>A soberba não deve resistir aos fatos e, vitorioso, terá de resolver o problema que criou para si.</blockquote><p class="tev-x">Atribuição de traços morais negativos ao governante.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 50/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:50%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: opinião · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>719 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mercado/2026/10/conta-da-babaquice-fiscal-tera-de-ser-paga-pelo-proprio-lula.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Money Times</b> · Brasil · Economia · 26/10 · <em>Opinião</em></p>
-      <p class="ta-t"><a href="https://www.moneytimes.com.br/lula-vai-ao-quarto-mandato-com-desafio-de-retomar-credibilidade-fiscal-apos-elevar-gastos-na-campanha-fets/" target="_blank" rel="noopener noreferrer">Lula vai ao quarto mandato com desafio de retomar credibilidade fiscal após elevar gastos na campanha<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 100 (Boa) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/segundo-turno-leva-quase-3-milhoes-de-eleitores-as-urnas-a-mais-que-o-primeiro.ghtml" target="_blank" rel="noopener noreferrer">Segundo turno leva quase 3 milhões de eleitores às urnas a mais que o primeiro<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 88 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 26/10 · <em>Opinião</em></p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/26/abstencao-no-segundo-turno-foi-a-menor-desde-2006.ghtml" target="_blank" rel="noopener noreferrer">Abstenção no segundo turno foi a menor desde 2006<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 94 (Boa) · Instituições, Econômico</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/quem-decidiu-prorrogar-as-eleicoes-entenda.ghtml" target="_blank" rel="noopener noreferrer">Quem decidiu prorrogar as eleições? Entenda<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 90 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/tre-ba-afirma-nao-ter-recebido-votos-em-papel-apos-prorrogacao-da-votacao.ghtml" target="_blank" rel="noopener noreferrer">TRE-BA afirma não ter recebido votos em papel após prorrogação da votação<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança média · apuração 93 (Boa) · Instituições, Segurança</p>
-<p class="ta-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 25/10 · <em>Opinião</em></p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/lula-e-reeleito-presidente-da-republica.ghtml" target="_blank" rel="noopener noreferrer">Em virada histórica, Lula se reelege e quebra onda mundial de avanço da direita<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 82 (Boa) · Instituições, Econômico, Costumes</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Política · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/mesmo-com-derrota-no-2o-turno-pl-elege-a-maior-parte-dos-governadores-em-2026-veja-lista.ghtml" target="_blank" rel="noopener noreferrer">Mesmo com derrota no 2º turno, PL elege a maior parte dos governadores em 2026; veja lista<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 80 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/por-que-a-eleicao-foi-prorrogada.ghtml" target="_blank" rel="noopener noreferrer">Por que a eleição foi prorrogada? Veja perguntas e respostas<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 95 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · números e escala</b> <span class="ta-dir">equilíbrio · 0,0</span><q>Por que a apuração tinha 0,25% após às 17h no site do TSE?</q><span class="ta-ex">O texto aborda de forma transparente uma dúvida comum do público sobre os dados divulgados, esclarecendo-a com base técnica.</span></li>
-    </ol>
+      <li class="tr" data-t="4.0" data-q="75" data-s="1" data-c="eq" data-v="Folha de S.Paulo" data-e="Brasil · Economia" data-o="0" data-i="2">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>+4</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Brasil · Economia · 25/10</span><span class="tr-h">Equipe de Lula prepara PEC para buscar centro da meta fiscal e prevê menos crédito subsidiado</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:52.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>75</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-dir"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · direita · +3,5 pt · P29</span></p><blockquote>Os governos de esquerda a princípio já têm menos entrada com os agentes do mercado financeiro</blockquote><p class="tev-x">A análise dá voz a especialistas do setor financeiro para caracterizar a relação entre governos progressistas e o mercado, refletindo a visão predominante desse setor.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 75/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:75%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>1.311 palavras (corpo cortado no fim)</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/mercado/2026/10/equipe-de-lula-prepara-pec-para-buscar-centro-da-meta-fiscal-e-preve-menos-credito-subsidiado.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/noticia/2026/10/25/nunes-marques-parabeniza-lula-pelo-quarto-mandato-e-ressalta-queda-da-abstencao.ghtml" target="_blank" rel="noopener noreferrer">Nunes Marques: Prorrogação de horário não alterou nada na eleição<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 88 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</p>
-      <p class="ta-t"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/deputados-do-pl-falam-em-golpe-e-questionam-deciso-de-zanin-de-prorrogar-votao.ghtml" target="_blank" rel="noopener noreferrer">Deputados do PL falam em golpe e questionam decisão de Zanin de prorrogar votação<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 78 (Regular) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>g1</b> · Política · 26/10</p>
-      <p class="ta-t"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/bahia-pernambuco-sao-paulo-maiores-quedas-taxa-abstencao-percentual-estado.ghtml" target="_blank" rel="noopener noreferrer">Bahia, Pernambuco e São Paulo lideram queda na taxa de abstenção; veja percentuais por estado<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 89 (Boa) · Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>g1</b> · Política · 26/10</p>
-      <p class="ta-t"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/nas-10-cidades-onde-a-abstencao-mais-caiu-entre-os-turnos-veja-como-foi-a-votacao-para-presidente.ghtml" target="_blank" rel="noopener noreferrer">Nas 10 cidades onde a abstenção mais caiu entre os turnos, veja como foi a votação para presidente<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 90 (Boa) · Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>0</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>g1</b> · Política · 25/10</p>
-      <p class="ta-t"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/25/veja-as-10-cidades-com-menor-abstencao-no-2o-turno-e-o-que-mudou-em-relacao-ao-1o-turno-e-2022.ghtml" target="_blank" rel="noopener noreferrer">Veja as 10 cidades com menor abstenção no 2º turno e o que mudou em relação ao 1º turno e 2022<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:50.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 92 (Boa) · Geral</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p></li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-eq" aria-hidden="true"></i>+4</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Brasil · Economia · 25/10</p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mercado/2026/10/equipe-de-lula-prepara-pec-para-buscar-centro-da-meta-fiscal-e-preve-menos-credito-subsidiado.shtml" target="_blank" rel="noopener noreferrer">Equipe de Lula prepara PEC para buscar centro da meta fiscal e prevê menos crédito subsidiado<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-eq" style="left:52.0%"></span></div>
-  <p class="ta-r"><b>Equilibrado</b> · confiança alta · apuração 75 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (1)</summary>
-    <ol>
-      <li><b>E1 · fontes e espaço</b> <span class="ta-dir">direita · +3,5</span><q>Os governos de esquerda a princípio já têm menos entrada com os agentes do mercado financeiro</q><span class="ta-ex">A análise dá voz a especialistas do setor financeiro para caracterizar a relação entre governos progressistas e o mercado, refletindo a visão predominante desse setor.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="90" data-s="1" data-c="eq" data-v="InfoMoney" data-e="Mercados &amp; Finanças" data-o="0" data-i="3">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>InfoMoney</b> · Mercados &amp; Finanças · 26/10</span><span class="tr-h">Reeleição de Lula, dívida pública, Gerdau, Focus e mais destaques desta segunda</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Fontes e espaço</b><span class="tev-d">E1 · equilíbrio · P7</span></p><blockquote>O resultado contraria o cenário-base e entrega a maior surpresa desta eleição com a vitória de Lula</blockquote><p class="tev-x">Uso de fontes do mercado financeiro para relatar a reação dos ativos, acompanhado da fala do candidato derrotado contestando o pleito.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>787 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www.infomoney.com.br/mercados/reeleicao-lula-divida-publica-agenda-26102026/" target="_blank" rel="noopener noreferrer">Abrir o texto original (infomoney.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
-      <li class="ta">
-  <div class="ta-hd">
-    <span class="ta-v"><i class="sw t-dl" aria-hidden="true"></i>+19</span>
-    <div class="ta-tx">
-      <p class="ta-src"><b>Folha de S.Paulo</b> · Brasil · Economia · 25/10 · <em>Opinião</em></p>
-      <p class="ta-t"><a href="https://www1.folha.uol.com.br/mercado/2026/10/conta-da-babaquice-fiscal-tera-de-ser-paga-pelo-proprio-lula.shtml" target="_blank" rel="noopener noreferrer">Conta da &#39;babaquice&#39; fiscal terá de ser paga pelo próprio Lula<span class="sr-only"> (abre a fonte em nova aba)</span></a></p>
-    </div>
-  </div>
-  <div class="ta-scale" aria-hidden="true"><span class="tg-zero"></span><span class="ta-dot t-dl" style="left:59.5%"></span></div>
-  <p class="ta-r"><b>Leve à direita</b> · confiança baixa · apuração 50 (Regular) · Econômico, Instituições</p>
-<p class="ta-sum">Leve à direita (confiança baixa). Principais sinais: rótulos e aspas (E1) e carga avaliativa (E2).</p>  <details class="ta-ev">
-    <summary>Sinais que pontuaram (2)</summary>
-    <ol>
-      <li><b>E1 · rótulos e aspas</b> <span class="ta-dir">direita · +12,5</span><q>Conta da &#39;babaquice&#39; fiscal terá de ser paga pelo próprio Lula</q><span class="ta-ex">Uso de termos pejorativos na voz do autor e título para caracterizar a política econômica do governo.</span></li>
-      <li><b>E2 · carga avaliativa</b> <span class="ta-dir">direita · +6,0</span><q>A soberba não deve resistir aos fatos e, vitorioso, terá de resolver o problema que criou para si.</q><span class="ta-ex">Atribuição de traços morais negativos ao governante.</span></li>
-    </ol>
+      <li class="tr" data-t="0.0" data-q="95" data-s="1" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="4">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</span><span class="tr-h">Por que a eleição foi prorrogada? Veja perguntas e respostas</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>95</b><span>qualidade</span></span>
+      <span class="tr-sig">1 sinal</span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+          <h4 class="tr-k">Sinais que pontuaram (1)</h4>
+          <ol class="tev">            <li class="tev-eq"><p class="tev-h"><b>Números e escala</b><span class="tev-d">E1 · equilíbrio · P9</span></p><blockquote>Por que a apuração tinha 0,25% após às 17h no site do TSE?</blockquote><p class="tev-x">O texto aborda de forma transparente uma dúvida comum do público sobre os dados divulgados, esclarecendo-a com base técnica.</p></li>          </ol>
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 95/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:95%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>410 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/por-que-a-eleicao-foi-prorrogada.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="69" data-s="0" data-c="eq" data-v="Brazil Journal" data-e="Mercados &amp; Finanças" data-o="0" data-i="5">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Brazil Journal</b> · Mercados &amp; Finanças · 26/10</span><span class="tr-h">“Ações domésticas boas devem cair 20-30%”. Gestores preveem segunda caótica</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>69</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 69/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:69%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>331 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://braziljournal.com/acoes-domesticas-boas-devem-cair-20-30-gestores-preveem-segunda-caotica" target="_blank" rel="noopener noreferrer">Abrir o texto original (braziljournal.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="85" data-s="0" data-c="eq" data-v="Folha de S.Paulo" data-e="Política" data-o="0" data-i="6">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Política · 25/10</span><span class="tr-h">Alcolumbre e Motta ligam para Lula, oferecem apoio e pedem que ele atue para unir o Brasil</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>85</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 85/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:85%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Econômico</li>
+<li>Relevância política alta</li><li>841 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/alcolumbre-e-motta-ligam-para-lula-oferecem-apoio-e-pedem-que-ele-atue-para-unir-o-brasil.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="65" data-s="0" data-c="eq" data-v="Folha de S.Paulo" data-e="Política" data-o="0" data-i="7">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Folha de S.Paulo</b> · Política · 26/10</span><span class="tr-h">Na Paulista, Lula prestigia Alckmin, exalta Janones e se declara a Janja</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>65</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 65/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:65%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Costumes</li>
+<li>Relevância política alta</li><li>629 palavras</li><li>1 sinal descartado na conferência (citação fora do texto, fala de fonte ou trecho repetido)</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www1.folha.uol.com.br/poder/2026/10/na-paulista-lula-prestigia-alckmin-e-exalta-janones.shtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (www1.folha.uol.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="85" data-s="0" data-c="eq" data-v="InfoMoney" data-e="Política" data-o="0" data-i="8">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>InfoMoney</b> · Política · 25/10</span><span class="tr-h">Alcolumbre e Motta pedem conciliação e dizem que Lula deve governar para todos</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>85</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 85/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:85%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>299 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www.infomoney.com.br/politica/alcolumbre-e-motta-oferecem-apoio-a-lula-e-pedem-uniao-do-pais-apos-eleicao/" target="_blank" rel="noopener noreferrer">Abrir o texto original (infomoney.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="100" data-s="0" data-c="eq" data-v="Money Times" data-e="Brasil · Economia" data-o="1" data-i="9">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Money Times</b> · Brasil · Economia · 26/10 · <em>Opinião</em></span><span class="tr-h">Lula vai ao quarto mandato com desafio de retomar credibilidade fiscal após elevar gastos na campanha</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>100</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 100/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:100%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: análise · eixos: Econômico, Instituições</li>
+<li>Relevância política alta</li><li>1.229 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://www.moneytimes.com.br/lula-vai-ao-quarto-mandato-com-desafio-de-retomar-credibilidade-fiscal-apos-elevar-gastos-na-campanha-fets/" target="_blank" rel="noopener noreferrer">Abrir o texto original (moneytimes.com.br) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="88" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="10">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 25/10</span><span class="tr-h">Segundo turno leva quase 3 milhões de eleitores às urnas a mais que o primeiro</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>88</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 88/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:88%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política baixa</li><li>181 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/segundo-turno-leva-quase-3-milhoes-de-eleitores-as-urnas-a-mais-que-o-primeiro.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="94" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="1" data-i="11">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 26/10 · <em>Opinião</em></span><span class="tr-h">Abstenção no segundo turno foi a menor desde 2006</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>94</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 94/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:94%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: análise · eixos: Instituições, Econômico</li>
+<li>Relevância política alta</li><li>1.127 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/26/abstencao-no-segundo-turno-foi-a-menor-desde-2006.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="90" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="12">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</span><span class="tr-h">Quem decidiu prorrogar as eleições? Entenda</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>450 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/quem-decidiu-prorrogar-as-eleicoes-entenda.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="93" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="13">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</span><span class="tr-h">TRE-BA afirma não ter recebido votos em papel após prorrogação da votação</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança média</span></span>
+      <span class="tr-q"><b>93</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 93/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:93%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições, Segurança</li>
+<li>Relevância política alta</li><li>264 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/tre-ba-afirma-nao-ter-recebido-votos-em-papel-apos-prorrogacao-da-votacao.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="82" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="1" data-i="14">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 25/10 · <em>Opinião</em></span><span class="tr-h">Em virada histórica, Lula se reelege e quebra onda mundial de avanço da direita</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>82</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 82/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:82%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: análise · eixos: Instituições, Econômico, Costumes</li>
+<li>Relevância política alta</li><li>1.118 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/lula-e-reeleito-presidente-da-republica.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="80" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Política" data-o="0" data-i="15">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Política · 25/10</span><span class="tr-h">Mesmo com derrota no 2º turno, PL elege a maior parte dos governadores em 2026; veja lista</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>80</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 80/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:80%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>825 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/mesmo-com-derrota-no-2o-turno-pl-elege-a-maior-parte-dos-governadores-em-2026-veja-lista.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="88" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="16">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</span><span class="tr-h">Nunes Marques: Prorrogação de horário não alterou nada na eleição</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>88</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 88/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:88%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>467 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/noticia/2026/10/25/nunes-marques-parabeniza-lula-pelo-quarto-mandato-e-ressalta-queda-da-abstencao.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="78" data-s="0" data-c="eq" data-v="Valor Econômico" data-e="Jurídico &amp; Regulação" data-o="0" data-i="17">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>Valor Econômico</b> · Jurídico &amp; Regulação · 25/10</span><span class="tr-h">Deputados do PL falam em golpe e questionam decisão de Zanin de prorrogar votação</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>78</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 78/100 (Regular)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:78%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>300 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://valor.globo.com/politica/eleicoes-2026/noticia/2026/10/25/deputados-do-pl-falam-em-golpe-e-questionam-deciso-de-zanin-de-prorrogar-votao.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (valor.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="89" data-s="0" data-c="eq" data-v="g1" data-e="Política" data-o="0" data-i="18">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>g1</b> · Política · 26/10</span><span class="tr-h">Bahia, Pernambuco e São Paulo lideram queda na taxa de abstenção; veja percentuais por estado</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>89</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 89/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:89%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política média</li><li>554 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/bahia-pernambuco-sao-paulo-maiores-quedas-taxa-abstencao-percentual-estado.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (g1.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="90" data-s="0" data-c="eq" data-v="g1" data-e="Política" data-o="0" data-i="19">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>g1</b> · Política · 26/10</span><span class="tr-h">Nas 10 cidades onde a abstenção mais caiu entre os turnos, veja como foi a votação para presidente</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>90</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 90/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:90%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Instituições</li>
+<li>Relevância política alta</li><li>381 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/26/nas-10-cidades-onde-a-abstencao-mais-caiu-entre-os-turnos-veja-como-foi-a-votacao-para-presidente.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (g1.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
+  </details>
+</li>
+      <li class="tr" data-t="0.0" data-q="92" data-s="0" data-c="eq" data-v="g1" data-e="Política" data-o="0" data-i="20">
+  <details>
+    <summary>
+      <span class="tr-t"><i class="tr-sw t-eq" aria-hidden="true"></i><b>0</b></span>
+      <span class="tr-tx"><span class="tr-src"><b>g1</b> · Política · 25/10</span><span class="tr-h">Veja as 10 cidades com menor abstenção no 2º turno e o que mudou em relação ao 1º turno e 2022</span></span>
+      <span class="tr-sc" aria-hidden="true"><span class="tr-z"></span><span class="tr-d t-eq" style="left:50.0%"></span></span>
+      <span class="tr-r"><b>Equilibrado</b><span>confiança alta</span></span>
+      <span class="tr-q"><b>92</b><span>qualidade</span></span>
+      <span class="tr-sig"></span>
+    </summary>
+    <div class="tr-body">
+<p class="tr-sum">Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.</p>      <div class="tr-grid">
+        <div class="tr-main">
+        </div>
+        <div class="tr-side">
+          <h4 class="tr-k">Qualidade da apuração · 92/100 (Boa)</h4>
+          <span class="tm-meter" aria-hidden="true"><span style="width:92%"></span></span>
+          <h4 class="tr-k">Ficha</h4>
+          <ul class="tfi">
+            <li>Gênero: notícia · eixos: Geral</li>
+<li>Relevância política baixa</li><li>506 palavras</li>          </ul>
+        </div>
+      </div>
+<p class="tr-go"><a href="https://g1.globo.com/politica/eleicoes/2026/noticia/2026/10/25/veja-as-10-cidades-com-menor-abstencao-no-2o-turno-e-o-que-mudou-em-relacao-ao-1o-turno-e-2022.ghtml" target="_blank" rel="noopener noreferrer">Abrir o texto original (g1.globo.com) <span aria-hidden="true">&#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a></p>    </div>
   </details>
 </li>
     </ol>
-  </details>
-  <p class="term-note">Termômetro de Viés Editorial (v1.1): a IA aponta, em cada texto compilado, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto e dá T de &minus;100 (esquerda) a +100 (direita). Mede o tratamento dado pelo texto, não a veracidade dos fatos; opinião fica à parte.</p>
+    <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
+    <button class="tm-more" id="tmMore" type="button" hidden></button>
+  </section>
+  <div class="tm-metodo" id="term-metodo">
+    <h3 class="tm-ph">Como ler</h3>
+    <dl>
+      <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
+      <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
+      <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
+    </dl>
+    <p class="tm-foot">Termômetro de Viés Editorial, cálculo v1.1 · hoje: 20 análises novas · 40 textos candidatos vistos (19 curtos demais) · 5 chamadas à IA (gemini-flash-lite-latest).</p>
+  </div>
 </section>
 
 </main>
@@ -3188,6 +4122,48 @@ body.modal-open .btt{visibility:hidden}
     });
   }
 
+  /* ── Cobertura comparada: uma aba por editoria (como as abas das matérias) ── */
+  function setupCompareTabs() {
+    var wrap = d.querySelector('.cmp-tabs');
+    var bar = wrap && wrap.querySelector('.tabs-bar');
+    if (!bar) return;
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll('[role="tab"]'));
+    var panes = Array.prototype.slice.call(wrap.querySelectorAll('.cmp-pane'));
+    function reveal(tab) {
+      var left = tab.offsetLeft, right = left + tab.offsetWidth;
+      if (left < bar.scrollLeft) bar.scrollLeft = left - 16;
+      else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth + 16;
+    }
+    function select(tab, focus) {
+      var key = tab.getAttribute('data-cmp-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      wrap.classList.toggle('all', key === 'all');
+      panes.forEach(function (p) { p.classList.toggle('active', key === 'all' || p.id === 'cmp-pane-' + key); });
+      if (focus) tab.focus();
+      reveal(tab);
+    }
+    setupTabArrows(bar);
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { select(tab, false); });
+    });
+    bar.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(d.activeElement);
+      if (index < 0) return;
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      else if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      select(next, true);
+    });
+  }
+
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -3237,6 +4213,68 @@ body.modal-open .btt{visibility:hidden}
     update();
   }
 
+  /* ── Termômetro do dia: filtros, ordem e "mostrar todos" na lista de textos ──
+     Sem script, a lista aparece inteira na ordem da página (mais inclinados primeiro)
+     e os filtros ficam ocultos. */
+  function setupTermometro() {
+    var list = d.getElementById('tmList'), form = d.getElementById('tmFil');
+    if (!list || !form) return;
+    var more = d.getElementById('tmMore'), none = d.getElementById('tmNone');
+    var shown = form.querySelector('.tm-shown');
+    var rows = Array.prototype.slice.call(list.children);
+    var chips = Array.prototype.slice.call(form.querySelectorAll('.tm-chip'));
+    var selV = form.querySelector('select[name="v"]');
+    var selE = form.querySelector('select[name="e"]');
+    var selO = form.querySelector('select[name="o"]');
+    var visiveis = parseInt(list.getAttribute('data-visiveis'), 10) || 12;
+    var filtro = 'all', todos = false;
+    function num(row, key, vazio) {
+      var v = parseFloat(row.getAttribute('data-' + key));
+      return isNaN(v) ? vazio : v;
+    }
+    function pos(a, b) { return num(a, 'i', 0) - num(b, 'i', 0); }
+    var ordens = {
+      inc: function (a, b) { return Math.abs(num(b, 't', 0)) - Math.abs(num(a, 't', 0)) || num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      lr: function (a, b) { return num(a, 't', 1000) - num(b, 't', 1000) || pos(a, b); },
+      q: function (a, b) { return num(a, 'q', 1000) - num(b, 'q', 1000) || pos(a, b); },
+      sig: function (a, b) { return num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      v: function (a, b) { return (a.getAttribute('data-v') || '').localeCompare(b.getAttribute('data-v') || '', 'pt-BR') || pos(a, b); }
+    };
+    function passa(row) {
+      if (filtro === 'sig' && !(num(row, 's', 0) > 0)) return false;
+      if (filtro === 'inc' && (row.getAttribute('data-t') === '' || row.getAttribute('data-c') === 'eq')) return false;
+      if (filtro === 'op' && row.getAttribute('data-o') !== '1') return false;
+      if (selV.value && row.getAttribute('data-v') !== selV.value) return false;
+      if (selE.value && row.getAttribute('data-e') !== selE.value) return false;
+      return true;
+    }
+    function render() {
+      var sel = rows.filter(passa).sort(ordens[selO.value] || ordens.inc);
+      var filtrado = filtro !== 'all' || selV.value || selE.value;
+      var limite = todos || filtrado ? sel.length : Math.min(visiveis, sel.length);
+      rows.forEach(function (r) { r.hidden = true; });
+      sel.forEach(function (r, i) { list.appendChild(r); r.hidden = i >= limite; });
+      none.hidden = sel.length > 0;
+      more.hidden = limite >= sel.length;
+      if (limite < sel.length) more.textContent = 'Mostrar todos os ' + sel.length + ' textos';
+      shown.textContent = limite < sel.length
+        ? 'Mostrando ' + limite + ' de ' + sel.length
+        : sel.length + (sel.length === 1 ? ' texto' : ' textos');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        filtro = chip.getAttribute('data-f');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        render();
+      });
+    });
+    [selV, selE, selO].forEach(function (s) { s.addEventListener('change', render); });
+    more.addEventListener('click', function () { todos = true; render(); });
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.hidden = false;
+    render();
+  }
+
   setupTheme();
   setupCanvas();
   setupTicker();
@@ -3246,8 +4284,10 @@ body.modal-open .btt{visibility:hidden}
   setupLeadFit();
   setupRadarMore();
   setupAges();
+  setupCompareTabs();
   setupModals();
   setupScroll();
+  setupTermometro();
 })();</script>
 </body>
 </html>

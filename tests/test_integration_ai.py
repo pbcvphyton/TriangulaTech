@@ -268,7 +268,8 @@ def test_ai_edition_end_to_end(tmp_path: Path, config):
     email_text = (tmp_path / "edicoes" / "email.txt").read_text(encoding="utf-8")
     assert "Edição gerada por IA (claude-opus-5-5)" in page
     assert "Por que importa" in page
-    assert "<strong>câmbio</strong>" in page and "<strong>câmbio</strong>" in email_html
+    assert "<strong>câmbio</strong>" in page  # o editorial (com negrito) fica na edição; o e-mail é só a lista do dia
+    assert edition.story(edition.lead).headline in email_html
     for html in (page, email_html):
         assert INJECTION not in html  # nada de HTML vindo da IA sem escape
         body_html = re.sub(r"<(script|style)\b.*?</\1>", "", html, flags=re.S)

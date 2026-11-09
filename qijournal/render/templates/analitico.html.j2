@@ -29,18 +29,70 @@
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
   <p class="an-intro">{{ a.intro }}</p>
+  <nav class="an-nav" aria-label="Nesta página">
+    <span>Nesta página:</span>
+    {% if a.em_resumo %}<a href="#an-resumo">Em resumo</a>{% endif %}
+    {% if nm %}<a href="#an-nomes">Nomes em destaque</a><a href="#an-quem">Quem fala de quem</a>{% endif %}
+    {% if not a.vazio %}<a href="#an-onde">Onde estamos</a><a href="#an-indo">Para onde vamos</a><a href="#an-series">Semana a semana</a><a href="#an-dias">Dia a dia</a><a href="#an-todas">Todas as análises</a>{% endif %}
+    <a href="#an-metodo">Método</a>
+  </nav>
+
+  {% if a.em_resumo %}{% set r = a.em_resumo %}
+  <div class="an-blk an-res" id="an-resumo">
+    <h3 class="an-h">Em resumo · o que o termômetro diz</h3>
+    <p class="an-res-t">{{ r.titulo }}</p>
+    <ul class="an-res-l">
+      {% for f in r.frases %}<li>{{ f }}</li>{% endfor %}
+    </ul>
+    {% if not a.vazio %}<p class="an-res-mais"><a href="#an-sinais">Onde estão os sinais, por critério e por veículo &darr;</a></p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if nm %}{{ md.nomes(nm) }}{{ md.dossie(nm) }}{% endif %}
 
   {% if not a.vazio %}
   <div class="an-blk">
     <h3 class="an-h" id="an-onde">Onde estamos</h3>
-    <p class="term-sum">{{ a.resumo }}{% if a.gauge and a.gauge.ic %} <span>(intervalo de 95%: {{ a.gauge.ic }})</span>{% endif %}</p>
-    {% if a.gauge %}{{ tm.gauge(a.gauge) }}{% endif %}
-    {% if a.distribuicao %}{{ tm.dist(a.distribuicao) }}{% endif %}
-    <ul class="an-tiles">
-      {% for t in a.tiles %}
-      <li><span class="an-tl">{{ t.rotulo }}</span><b>{{ t.valor }}</b>{% if t.detalhe %}<span class="an-td">{{ t.detalhe }}</span>{% endif %}</li>
-      {% endfor %}
-    </ul>
+    <p class="tm-dek">{{ a.resumo }}.</p>
+    {% if a.gauge %}{{ tm.placar(a.gauge, "T médio de todo o histórico", a.base) }}{% endif %}
+    {{ tm.indicadores(a.tiles) }}
+    {% set r = a.em_resumo %}
+    {% if a.distribuicao or r %}
+    <div class="tm-panels">
+      {% if a.distribuicao %}
+      <section class="tm-panel" aria-labelledby="an-dist">
+        <h4 class="tm-ph" id="an-dist">Distribuição das notícias</h4>
+        <p class="tm-pd">Quantas notícias de todo o histórico caíram em cada faixa do termômetro.</p>
+        {{ tm.dist(a.distribuicao) }}
+      </section>
+      {% endif %}
+      {% if r %}
+      <section class="tm-panel" aria-labelledby="an-sinais">
+        <h4 class="tm-ph" id="an-sinais">Onde estão os sinais</h4>
+        <p class="tm-pd">Sinais confirmados no texto de todas as notícias do histórico, por critério e lado favorecido.</p>
+        {{ tm.sinais(r.sinais) }}
+      </section>
+      {% if r.veiculos %}
+      <section class="tm-panel" aria-labelledby="an-desig">
+        <h4 class="tm-ph" id="an-desig">Tratamento desigual, por veículo</h4>
+        <p class="tm-pd">Parte das notícias de cada veículo com algum sinal à esquerda ou à direita (veículos com 10 ou mais notícias analisadas).</p>
+        <ol class="an-crit">
+          {% for v in r.veiculos %}
+          <li><span class="an-cn">{{ v.nome }}</span><span class="an-cb" aria-hidden="true"><i class="neu" style="width:{{ v.barra }}%"></i></span><span class="an-cv"><b>{{ v.pct }}</b> · {{ v.com_sinal }} de {{ v.textos }}</span></li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endif %}
+      {% if r.checklist %}
+      <section class="tm-panel" aria-labelledby="an-check">
+        <h4 class="tm-ph" id="an-check">Qualidade da apuração, item a item</h4>
+        <p class="tm-pd">Em quantas notícias cada item foi cumprido, entre as que guardam o checklist ({{ r.checklist.textos }}).</p>
+        {{ tm.checklist(r.checklist) }}
+      </section>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
 
   <div class="an-blk">
@@ -56,7 +108,7 @@
       <div class="an-tbl-wrap">
         <table class="an-tbl">
           <caption>Quem puxou a mudança · {{ titulo }}</caption>
-          <thead><tr><th scope="col">Grupo</th><th scope="col">Contribuição</th><th scope="col">Inclinação</th><th scope="col">Pauta</th><th scope="col">No grupo</th></tr></thead>
+          <thead><tr><th scope="col">Grupo</th><th scope="col">Contribuição</th><th scope="col">Inclinação</th><th scope="col">Pauta</th><th scope="col" class="an-l">No grupo</th></tr></thead>
           <tbody>
             {% for p in itens %}
             <tr><th scope="row">{{ p.nome }}</th><td>{{ p.contribuicao }}</td><td>{{ p.inclinacao }}</td><td>{{ p.pauta }}</td><td class="an-l">{{ p.leitura }}</td></tr>
@@ -127,7 +179,7 @@
     <h3 class="an-h" id="an-eixos">Por eixo</h3>
     <div class="an-tbl-wrap">
       <table class="an-tbl">
-        <thead><tr><th scope="col">Eixo</th><th scope="col">Textos</th><th scope="col">Com T</th><th scope="col">T médio</th><th scope="col">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
+        <thead><tr><th scope="col">Eixo</th><th scope="col">Textos</th><th scope="col">Com T</th><th scope="col">T médio</th><th scope="col" class="an-l">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
         <tbody>
           {% for e in a.eixos %}
           <tr><th scope="row">{{ e.nome }}</th><td>{{ e.textos }}</td><td>{{ e.validas }}</td><td><i class="sw t-{{ e.classe }}" aria-hidden="true"></i>{{ e.valor }}</td><td class="an-l">{{ e.rotulo }}</td><td>{{ e.q }}</td></tr>
@@ -138,14 +190,12 @@
   </div>
   {% endif %}
 
-  {% if nm %}{{ md.nomes(nm) }}{% endif %}
-
   <div class="an-blk">
     <h3 class="an-h" id="an-dias">Dia a dia</h3>
     <p class="term-note">Por data de publicação dos textos; o link abre a edição em que eles foram analisados.</p>
     <div class="an-tbl-wrap">
       <table class="an-tbl">
-        <thead><tr><th scope="col">Publicação</th><th scope="col">Textos</th><th scope="col">Notícias com T</th><th scope="col">T médio</th><th scope="col">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
+        <thead><tr><th scope="col">Publicação</th><th scope="col">Textos</th><th scope="col">Notícias com T</th><th scope="col">T médio</th><th scope="col" class="an-l">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
         <tbody>
           {% for d in a.dias %}
           <tr><th scope="row">{% if d.href %}<a href="{{ d.href }}">{{ d.nome }}</a>{% else %}{{ d.nome }}{% endif %}</th><td>{{ d.textos }}</td><td>{{ d.validas }}</td><td><i class="sw t-{{ d.classe }}" aria-hidden="true"></i>{{ d.valor }}</td><td class="an-l">{{ d.rotulo }}</td><td>{{ d.q }}</td></tr>
@@ -168,9 +218,10 @@
       </ol>
     </details>
     {% endfor %}
+    {% if a.lista_fora %}
+    <p class="term-note tl-fora">A lista mostra as {{ a.lista_total - a.lista_fora }} análises mais recentes de {{ a.lista_total }}. As {{ a.lista_fora }} análises mais antigas estão na <a href="{{ a.pesquisa_href }}">Pesquisa analítica</a> (tipo Termômetro), com busca, filtros e CSV; os números desta página usam todo o histórico.</p>
+    {% endif %}
   </div>
-  {% elif nm %}
-  {{ md.nomes(nm) }}
   {% endif %}
 
   <div class="an-blk">

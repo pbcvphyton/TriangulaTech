@@ -86,8 +86,8 @@ jobs:
     # uma chamada por bloco de editoria + o fechamento (até 9); se uma IA
     # estourar o limite, a seguinte da cadeia assume. Se nenhuma conseguir a
     # tempo, a edição sai em modo automático. Depois, o termômetro de viés
-    # (termometro.deadline_seconds: 8 min) analisa os textos compilados.
-    timeout-minutes: 65
+    # (termometro.deadline_seconds: 12 min; até 60 textos) analisa os textos compilados.
+    timeout-minutes: 70
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v5

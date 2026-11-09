@@ -417,7 +417,8 @@ def test_quality_warnings(tmp_path: Path, render: FakeRender, editor: FakeEditor
     assert "Edição gerada sem IA" in warnings  # IA pedida, edição saiu heurística
     assert "2 de 8 feeds com erro" in warnings
     assert "Cotações indisponíveis: usd, eur, cny, ibov" in warnings
-    assert "Clima indisponível: São Paulo, Montevidéu" in warnings
+    assert "Clima indisponível: São Paulo" in warnings
+    assert "Montevidéu" not in warnings  # saiu da faixa de clima (config/site.yaml)
 
 
 def test_no_ai_warning_when_ai_was_not_requested(tmp_path: Path, render: FakeRender, editor: FakeEditor):

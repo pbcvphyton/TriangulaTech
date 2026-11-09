@@ -619,6 +619,48 @@
     });
   }
 
+  /* ── Cobertura comparada: uma aba por editoria (como as abas das matérias) ── */
+  function setupCompareTabs() {
+    var wrap = d.querySelector('.cmp-tabs');
+    var bar = wrap && wrap.querySelector('.tabs-bar');
+    if (!bar) return;
+    var tabs = Array.prototype.slice.call(bar.querySelectorAll('[role="tab"]'));
+    var panes = Array.prototype.slice.call(wrap.querySelectorAll('.cmp-pane'));
+    function reveal(tab) {
+      var left = tab.offsetLeft, right = left + tab.offsetWidth;
+      if (left < bar.scrollLeft) bar.scrollLeft = left - 16;
+      else if (right > bar.scrollLeft + bar.clientWidth) bar.scrollLeft = right - bar.clientWidth + 16;
+    }
+    function select(tab, focus) {
+      var key = tab.getAttribute('data-cmp-tab');
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      wrap.classList.toggle('all', key === 'all');
+      panes.forEach(function (p) { p.classList.toggle('active', key === 'all' || p.id === 'cmp-pane-' + key); });
+      if (focus) tab.focus();
+      reveal(tab);
+    }
+    setupTabArrows(bar);
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { select(tab, false); });
+    });
+    bar.addEventListener('keydown', function (event) {
+      var index = tabs.indexOf(d.activeElement);
+      if (index < 0) return;
+      var next = null;
+      if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+      else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+      else if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      if (!next) return;
+      event.preventDefault();
+      select(next, true);
+    });
+  }
+
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -668,6 +710,68 @@
     update();
   }
 
+  /* ── Termômetro do dia: filtros, ordem e "mostrar todos" na lista de textos ──
+     Sem script, a lista aparece inteira na ordem da página (mais inclinados primeiro)
+     e os filtros ficam ocultos. */
+  function setupTermometro() {
+    var list = d.getElementById('tmList'), form = d.getElementById('tmFil');
+    if (!list || !form) return;
+    var more = d.getElementById('tmMore'), none = d.getElementById('tmNone');
+    var shown = form.querySelector('.tm-shown');
+    var rows = Array.prototype.slice.call(list.children);
+    var chips = Array.prototype.slice.call(form.querySelectorAll('.tm-chip'));
+    var selV = form.querySelector('select[name="v"]');
+    var selE = form.querySelector('select[name="e"]');
+    var selO = form.querySelector('select[name="o"]');
+    var visiveis = parseInt(list.getAttribute('data-visiveis'), 10) || 12;
+    var filtro = 'all', todos = false;
+    function num(row, key, vazio) {
+      var v = parseFloat(row.getAttribute('data-' + key));
+      return isNaN(v) ? vazio : v;
+    }
+    function pos(a, b) { return num(a, 'i', 0) - num(b, 'i', 0); }
+    var ordens = {
+      inc: function (a, b) { return Math.abs(num(b, 't', 0)) - Math.abs(num(a, 't', 0)) || num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      lr: function (a, b) { return num(a, 't', 1000) - num(b, 't', 1000) || pos(a, b); },
+      q: function (a, b) { return num(a, 'q', 1000) - num(b, 'q', 1000) || pos(a, b); },
+      sig: function (a, b) { return num(b, 's', 0) - num(a, 's', 0) || pos(a, b); },
+      v: function (a, b) { return (a.getAttribute('data-v') || '').localeCompare(b.getAttribute('data-v') || '', 'pt-BR') || pos(a, b); }
+    };
+    function passa(row) {
+      if (filtro === 'sig' && !(num(row, 's', 0) > 0)) return false;
+      if (filtro === 'inc' && (row.getAttribute('data-t') === '' || row.getAttribute('data-c') === 'eq')) return false;
+      if (filtro === 'op' && row.getAttribute('data-o') !== '1') return false;
+      if (selV.value && row.getAttribute('data-v') !== selV.value) return false;
+      if (selE.value && row.getAttribute('data-e') !== selE.value) return false;
+      return true;
+    }
+    function render() {
+      var sel = rows.filter(passa).sort(ordens[selO.value] || ordens.inc);
+      var filtrado = filtro !== 'all' || selV.value || selE.value;
+      var limite = todos || filtrado ? sel.length : Math.min(visiveis, sel.length);
+      rows.forEach(function (r) { r.hidden = true; });
+      sel.forEach(function (r, i) { list.appendChild(r); r.hidden = i >= limite; });
+      none.hidden = sel.length > 0;
+      more.hidden = limite >= sel.length;
+      if (limite < sel.length) more.textContent = 'Mostrar todos os ' + sel.length + ' textos';
+      shown.textContent = limite < sel.length
+        ? 'Mostrando ' + limite + ' de ' + sel.length
+        : sel.length + (sel.length === 1 ? ' texto' : ' textos');
+    }
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        filtro = chip.getAttribute('data-f');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        render();
+      });
+    });
+    [selV, selE, selO].forEach(function (s) { s.addEventListener('change', render); });
+    more.addEventListener('click', function () { todos = true; render(); });
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.hidden = false;
+    render();
+  }
+
   setupTheme();
   setupCanvas();
   setupTicker();
@@ -677,6 +781,8 @@
   setupLeadFit();
   setupRadarMore();
   setupAges();
+  setupCompareTabs();
   setupModals();
   setupScroll();
+  setupTermometro();
 })();

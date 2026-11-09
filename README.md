@@ -23,7 +23,7 @@ Nada precisa ser feito à mão: o GitHub gera a edição sozinho a partir das
         ▼
   1. Coleta ── ~100 feeds (Valor, Folha, Estadão, FT, WSJ, NYT, JOTA, STF, STJ, ge,
         │      g1 Natureza…), cotações (Yahoo Finance, CoinGecko, Banco Central) e
-        │      clima (Open-Meteo). Nenhuma editoria é descartada.
+        │      clima de São Paulo (Open-Meteo). Nenhuma editoria é descartada.
         ▼
   2. Edição ── com IA, compilação por editoria: TODAS as notícias em blocos
         │      (Economia & Mercados, Política & Justiça, Empresas/Tecnologia/
@@ -168,9 +168,26 @@ No site, um **medidor** mostra cada veículo como um trecho da barra (lado A à
 esquerda, neutros no meio, lado B à direita): a barra cresce para o lado com
 mais veículos, com o rótulo "Pende para: …". Ele aparece no card de cada
 matéria, na janela da matéria (com a conclusão e a **análise por veículo**) e na
-seção **Cobertura comparada**, com os demais assuntos do dia. No e-mail, cada
-matéria ganha a barra e a conclusão. A análise usa só o que os veículos
-publicaram; quando o trecho não permite dizer, o veículo fica como neutro.
+seção **Cobertura comparada**. No e-mail, cada matéria ganha a barra e a
+conclusão. A análise usa só o que os veículos publicaram; quando o trecho não
+permite dizer, o veículo fica como neutro.
+
+A seção **Cobertura comparada** reúne todos os assuntos do dia vistos por dois ou
+mais veículos — as matérias da edição com análise e os demais assuntos — em
+**abas por editoria**, no mesmo desenho das abas das matérias (Brasil · Economia,
+Mercados & Finanças, Política, Esporte…, e "Todas"): cada assunto entra na aba da
+editoria dele, e cada aba mostra quantos assuntos tem e quantos dividiram os
+veículos ("3 div."). Em cada aba:
+
+- **Onde a mídia divergiu**: os assuntos com veículos dos dois lados, primeiro os
+  mais disputados (mais veículos no lado menor; depois o mais equilibrado), com a
+  divergência de cada um (2 × o lado menor ÷ (A + B): 100 = meio a meio) e o link
+  para a matéria, quando é da edição;
+- **Relataram de forma semelhante**: o resto, em lista curta (clicar abre a
+  conclusão e a análise por veículo).
+
+Os atalhos do topo da edição levam à Cobertura comparada, ao Termômetro do dia, ao
+Racional da edição e a todas as notícias do dia.
 
 ### Termômetro de Viés Editorial e Analítico Político (só Triangula)
 
@@ -198,31 +215,76 @@ Como cada texto é analisado:
    aspas e termos do dicionário) vai no pedido; a mesma cadeia de IAs da edição
    (o que a edição já gastou do limite de cada uma continua contando) devolve a
    saída no formato v1.1 (triagem, atores, fontes, enquadramento, evidências com
-   citação literal, teste de inversão e qualidade), 4 textos por chamada, até 20
-   textos e 6 chamadas por edição (`termometro` em `config/site.yaml`).
+   citação literal, teste de inversão e qualidade), 5 textos por chamada, até **60
+   textos** e 15 chamadas por edição, em até 12 minutos (`termometro` em
+   `config/site.yaml`; até out/2026 eram 20 textos). Cada edição tem de 140 a 380
+   textos candidatos; até 180 páginas originais são consultadas atrás de corpo
+   suficiente (cerca de 1 em 4 é curta demais).
 3. **Cálculo**: cada saída é validada contra `config/saida_modelo.schema.json` e
    passa pelo cálculo de referência **sem nenhuma alteração**
    (`qijournal/termometro/referencia.py`, cópia literal): ele confere cada citação
    no texto, aplica a regra da voz, os pesos dos 11 critérios e dá **T** (−100 a
    +100), o rótulo, a confiança e a **qualidade da apuração Q** (0 a 100).
+4. **Registro**: além do T e dos sinais que pontuaram (citação, critério, lado,
+   contribuição, intensidade, certeza e o ator favorecido ou desfavorecido), cada
+   análise guarda o que a IA já devolve e o cálculo confere: o checklist da
+   qualidade item a item, o enquadramento (problema, causa, quem sofre,
+   responsável, solução e valor moral), o teste de inversão, os atores, as fontes
+   (com as palavras de fala direta e quem tem a última palavra) e quantos pontos de
+   T cada critério somou. Análises anteriores a nov/2026 não têm esses detalhes.
 
-No fim da edição, o **Termômetro do dia** resume as notícias analisadas: a média
-de T com o intervalo de 95% numa escala de −100 a +100, quantos textos ficaram em
-cada rótulo, a qualidade média e, abrindo, cada texto com o resumo do cálculo e os
-sinais que pontuaram (citação, critério e contribuição). Opinião fica à parte.
+No fim da edição, o **Termômetro do dia** é um painel com:
 
-A aba **Analítico Político** (`edicoes/analitico.html`) agrega **todo o
-histórico** (`qijournal/termometro/agregacao.py`, conferida pelos testes da
+- **placar**: o T médio das notícias, o rótulo e o intervalo de 95%, ao lado da
+  escala de −100 a +100 com as sete faixas (a do dia em destaque), o intervalo, o
+  ponteiro da média e um traço por notícia;
+- **indicadores**: textos analisados (veículos e editorias), notícias com T,
+  qualidade média da apuração e sinais que pontuaram (à esquerda, à direita e de
+  equilíbrio);
+- **painéis**: a distribuição das notícias por faixa, onde estão os sinais (por
+  critério e lado) e a qualidade da apuração (em quantas notícias cada boa prática
+  aparece); e o T médio do dia **por veículo** e **por editoria**, com o intervalo;
+- **cada texto analisado**: uma linha por texto (T, veículo, título, escala,
+  rótulo, confiança e qualidade), com filtros (com sinais, fora do equilíbrio,
+  opinião, veículo, editoria) e ordem (mais inclinados, da esquerda à direita, menor
+  qualidade, mais sinais, veículo). Clicar abre o detalhe: o resumo do cálculo,
+  quantos pontos cada critério somou, os sinais com a citação literal, o
+  enquadramento, o teste de inversão, a qualidade item a item, quem fala e a ficha
+  do texto, com o link para o original.
+
+Opinião fica fora da média (aparece à parte). As médias do dia, por veículo e por
+editoria saem da agregação da especificação (`agregacao.resumo`); o painel só conta
+o que está guardado, sem recalcular nada.
+
+A aba **Analítico Político** (`edicoes/analitico.html`) abre com **Em resumo · o
+que o termômetro diz**: a resposta em linguagem clara (hoje, que o texto das
+notícias sai equilibrado: quantas ficaram "Equilibrado", quantas tiveram sinal de
+tratamento desigual e para que lado, e quantos sinais foram de equilíbrio), o que
+isso quer dizer (as diferenças entre veículos aparecem antes do texto: no que
+cobrem, no espaço e no tom das manchetes) e o aviso quando a amostra está
+concentrada em poucos veículos. Logo depois vêm os **Nomes em destaque** e **Quem
+fala de quem, e como** (abaixo), e então o histórico completo do termômetro; em
+**Onde estamos**, ao lado da distribuição, ficam **Onde estão os sinais** (o mesmo
+painel do Termômetro do dia, por critério e lado, sobre todo o histórico), o
+**tratamento desigual por veículo** (a parte das notícias de cada um com algum
+sinal à esquerda ou à direita) e, nas análises que guardam o checklist, a
+**qualidade da apuração item a item**. As parcelas não arredondam para "tudo ou
+nada": 452 de 453 aparece como 99,8%, não 100%.
+
+O histórico agrega **todos os registros** (`qijournal/termometro/agregacao.py`, conferida pelos testes da
 seção 14.7 da especificação): onde estamos (média geral), para onde estamos indo
 (tendência mensal de T e de Q, a janela recente comparada ao histórico e quem
 puxou a mudança, por editoria e por veículo), as séries semanais, os rankings
 por veículo e por editoria (T ajustado e qualidade; nas editorias, mínimo de 30
 notícias; nos veículos entram todos os que têm notícia com T, e os com menos de
 30 aparecem esmaecidos, como amostra pequena — o cálculo da agregação não muda),
-os recortes por eixo, a tabela de cada dia e a lista de todas as análises (clicar
-na linha abre o texto original, para conferir).
+os recortes por eixo, a tabela de cada dia e a lista das análises (clicar na linha
+abre o texto original, para conferir). A lista mostra as 1.200 análises mais
+recentes (`LISTA_MAX` em `qijournal/render/analitico.py`), para a página não passar
+de alguns MB com 60 análises por dia; as mais antigas ficam na Pesquisa analítica
+(tipo Termômetro, com CSV), e todos os números da aba usam o histórico inteiro.
 
-Também à parte, antes da tabela de cada dia, o bloco **Nomes em destaque · como a
+Também à parte, logo depois do resumo, o bloco **Nomes em destaque · como a
 mídia cobre cada um** (`qijournal/render/midia.py`): os 12 nomes mais citados nas
 manchetes de Política nas edições dos últimos 30 dias (pessoas, partidos,
 instituições; saem das manchetes em português, e palavra comum com maiúscula, como
@@ -232,7 +294,48 @@ divergência média nos assuntos da cobertura comparada com veículos dos dois l
 Os números são contados como no analítico do nome na Pesquisa (mesma regra de
 busca, todos os veículos, a notícia uma vez), e cada nome abre esse analítico, com a
 mesma editoria e período; a caixa "Analisar outro nome" leva qualquer termo para
-lá. O termômetro e o cálculo da aba não mudam.
+lá. A coluna **Tom** traz o saldo do tom das manchetes brasileiras sobre o nome
+(abaixo). O termômetro e o cálculo da aba não mudam.
+
+Em seguida, **Quem fala de quem, e como** responde, para cada nome em destaque:
+**por que um veículo fala tanto dele** (manchetes do veículo contra as esperadas
+pelo que ele publica na editoria, quantas edições e o assunto que mais rendeu),
+**o que costuma falar e se fala bem ou mal** (manchetes desfavoráveis, favoráveis,
+o saldo do veículo contra o dos demais e quantas vezes o nome é alvo de crítica,
+acusação ou punição) e **se há padrão** (semana a semana, de que lado dos demais
+o veículo fica). Cada nome traz frases automáticas com o que importa (quem fala
+mais além do acaso, o veículo mais crítico e o mais favorável, se o tom piorou ou
+melhorou nas últimas 7 edições), as manchetes mais desfavorável e mais favorável
+com as palavras que pesaram e o link para o analítico completo na Pesquisa.
+
+#### Tom das manchetes (`qijournal/render/tom.py`)
+
+Lido por palavras, sem IA, com a mesma regra no servidor e no navegador
+(`tom.js.j2`), em cada manchete brasileira que cita o nome:
+
+1. palavras de contexto **desfavorável** (escândalo, investigação, prisão,
+   derrota, crise, rejeição, crítica recebida…) ou **favorável** (vitória, apoio,
+   aprovado, lidera, cresce, elogio…) contam para o nome **mais próximo** delas no
+   título (até 6 palavras; no empate, o nome que vem depois, como em "fuga de
+   Flávio"); depois de "não", "sem" ou "nem", não contam;
+2. **ações contra alguém** ("critica", "acusa", "condena", "investiga",
+   "suspende", "contra"…) põem o nome que vem depois como **alvo** (conta como
+   desfavorável) e o que vem antes como quem age (não pesa no tom dele);
+3. a manchete é desfavorável ao nome com mais palavras negativas que positivas,
+   favorável no contrário, neutra sem nenhuma e mista no empate. **Saldo** =
+   favoráveis − desfavoráveis, em pontos (−100 a +100).
+
+"Mais crítico" e "mais favorável" só aparecem quando o veículo (10+ manchetes do
+nome) difere dos demais além do que o acaso explica (z ≥ 2,58 com a variância dos
+dois grupos juntos); a tendência do tom compara as últimas 7 edições com as 7
+anteriores (20+ manchetes em cada, z ≥ 1,96); "padrão" é ficar do mesmo lado dos
+demais em 3 de cada 4 semanas comparáveis (3+ manchetes do veículo e 10+ dos
+demais). **Limite**: o tom mede o contexto em que o nome aparece nas manchetes,
+não a opinião do veículo, e a leitura por palavras erra em parte delas (ironia,
+negação, o nome errado na frase); por isso o que diz algo é a comparação entre
+veículos sobre o mesmo nome, e as manchetes de exemplo mostram as palavras que
+pesaram. O dicionário fica em `qijournal/render/tom.py` (`NEGATIVO`, `POSITIVO`,
+`CONTRA`).
 
 - **Histórico**: as análises de cada dia ficam em `data/termometro/AAAA-MM-DD.json`
   e **nunca são apagadas** (a limpeza do arquivo de edições não toca nessa pasta).
@@ -310,6 +413,15 @@ calculada logo depois e não muda com a ordem escolhida para a lista:
   brasileiro com 15+ manchetes sobre o termo, contra os demais (log-odds com prior
   de Dirichlet informativo, Monroe, Colaresi e Quinn, 2008; z > 3,3, um limiar
   alto porque cada veículo testa muitas palavras de uma vez).
+- **Tom · fala bem ou mal?**: das manchetes brasileiras com o termo, quantas o
+  põem em contexto desfavorável e favorável, o saldo, se o tom piorou ou melhorou
+  nas últimas 7 edições, o saldo semana a semana e, veículo a veículo, o tom de
+  cada um contra o dos demais (com "mais crítico" e "mais favorável" quando a
+  diferença passa do acaso), quantas vezes o termo é alvo, o padrão semanal, o
+  espaço contra o esperado e o assunto que mais rendeu; e as manchetes mais
+  desfavoráveis e mais favoráveis, com as palavras que pesaram (a regra está em
+  "Tom das manchetes", acima; com a editoria e o período da tabela, os números são
+  os de "Quem fala de quem" no Analítico Político).
 - **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
   quantos tiveram dois lados (veículos nos dois enfoques; se todos ficaram no
   mesmo, conta como sem divergência) e quão dividida ficou cada um (divergência =
@@ -318,8 +430,9 @@ calculada logo depois e não muda com a ordem escolhida para a lista:
   os pares de veículos que mais ficam do mesmo lado ou em lados opostos.
 
 Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
-nem na IA). **Limite**: a busca não sabe se a menção é favorável ou desfavorável;
-os lados são os enfoques de cada assunto, não "a favor" ou "contra" a pessoa.
+nem na IA). **Limites**: o tom é lido por palavras (veja acima) e mede o contexto,
+não a opinião do veículo; os lados são os enfoques de cada assunto, não "a favor"
+ou "contra" a pessoa.
 
 Embaixo da caixa de busca, os **nomes em destaque** da Política (abaixo) viram
 atalhos para o analítico de cada um (com a editoria e o período da tabela).
@@ -343,10 +456,18 @@ atalhos para o analítico de cada um (com a editoria e o período da tabela).
 
 ## Receber por e-mail
 
-O e-mail traz a manchete com imagem, o resumo do dia, cotações, clima, o
-racional da compilação e as principais matérias por seção, com links para a
-edição completa e para todas as notícias do dia. Há dois
-caminhos, que podem ser usados juntos ou separados.
+O e-mail segue o modelo do e-mail do **TSA Tech**: a faixa do cabeçalho (o logo
+sobre o marinho com a rede do site), o slogan e a data; **"Hoje em 6 notícias"**,
+com a manchete em destaque (editoria, título, linha fina e veículos) e as outras
+cinco em uma linha de duas colunas e outra de três (número, editoria, título e
+quantos veículos), uma por editoria quando dá, na ordem da primeira página; **"Ler
+a edição completa"** e o total de notícias do dia (link para a lista completa); e
+um rodapé curto (marca, slogan, fontes, edições anteriores, Instagram). Cada título
+abre a matéria na edição. O HTML é sempre claro, tem 600 px e cerca de 10 KB; no
+celular, as colunas ficam uma embaixo da outra. A versão em texto puro traz a
+manchete, as principais notícias com os links e os links da edição. A quantidade
+de notícias além da manchete fica em `email.max_stories` (`config/site.yaml`,
+padrão 5). Há dois caminhos, que podem ser usados juntos ou separados.
 
 ### Opção 1 — Rotina diária do Claude (Gmail) — já configurada
 
@@ -482,7 +603,9 @@ As fontes ficam em [`config/sources.yaml`](config/sources.yaml), uma por linha:
   para confirmar que o feed responde e tem notícias recentes.
 - **Remover:** apague a linha ou use `enabled: false`.
 
-Seções, palavras-chave, cotações do ticker, cidades do clima e limites da edição
+Seções, palavras-chave, cotações do ticker, cidades do clima (hoje só São Paulo;
+Montevidéu saiu em nov/2026: a faixa de clima mostra só as cidades configuradas,
+também nas edições refeitas) e limites da edição
 (quantidade de matérias, mínimos, idade máxima das notícias) ficam em
 [`config/site.yaml`](config/site.yaml), com comentários explicando cada item.
 
@@ -521,9 +644,12 @@ original.
   (`logo_height: 64`, `logo_height_mobile: 46`);
 - `assets/triangula-marca.svg` — o mesmo logo em marinho, para fundos claros;
 - `assets/triangula-favicon.svg` — o ícone: triângulo laranja sobre o marinho;
+- `assets/triangula-cabecalho-email.jpg` — faixa do topo do e-mail, no modelo do
+  TSA Tech: o logo sobre o marinho do cabeçalho com a rede do site, em 2x (1200 ×
+  264, exibida em 600 × 132), servida pelo GitHub Pages (`email_header`);
 - `assets/triangula-marca-email.png` — logo do e-mail (clientes de e-mail não
   exibem SVG), branco sobre a cor do cabeçalho, em 3x (248 × 64), servido pelo
-  GitHub Pages (`email_logo`). Os logos anteriores (em pixel: `triangula-logo*`,
+  GitHub Pages (`email_logo`; vale quando não há `email_header`). Os logos anteriores (em pixel: `triangula-logo*`,
   `pbcv-tech-*`) ficam no repositório com os mesmos nomes e tamanhos porque os
   e-mails já enviados apontam para eles.
 
@@ -611,7 +737,8 @@ qijournal/                código do jornal
   render/                 páginas HTML e e-mail (modelos em render/templates/;
                           termometro.py e analitico.py = termômetro do dia e aba
                           Analítico Político; pesquisa.py = Pesquisa analítica;
-                          midia.py = nomes em destaque de "Como a mídia cobre")
+                          midia.py = nomes em destaque de "Como a mídia cobre"
+                          e "Quem fala de quem"; tom.py = tom das manchetes)
   termometro/             Termômetro de Viés: referencia.py (cálculo, cópia literal
                           da especificação), agregacao.py (aba analítica),
                           analise.py (textos → IA → cálculo) e historico.py

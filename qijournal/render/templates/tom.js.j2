@@ -1,0 +1,101 @@
+{#- Tom das manchetes (a mesma regra de qijournal/render/tom.py, com o dicionário que a
+    página recebe em M.tom): o contexto em que um nome aparece numa manchete —
+    desfavorável, favorável, misto ou neutro — e se ele é alvo de uma ação ou quem ataca.
+    Autocontido (só usa L, o dicionário), para ser incluído em midia.js.j2 e testado
+    sozinho. -#}
+  function tomCriar(L) {
+    var TOKEN = /[0-9A-Za-zÀ-ÖØ-öø-ÿ]+/g, MARCAS = /[̀-ͯ]/g;
+    function nrm(s) { return String(s || '').normalize('NFD').replace(MARCAS, '').toLowerCase(); }
+    function conjunto(lista) { var o = {}; (lista || []).forEach(function (x) { o[x] = true; }); return o; }
+    function lista(x) { x = x || {}; return { i: conjunto(x.i), c: x.c || [], p: conjunto(x.p) }; }
+    var LS = { neg: lista(L.neg), pos: lista(L.pos), contra: lista(L.contra) };
+    var JANELA = L.janela || 6, NEGADORES = conjunto(L.negadores);
+    function casa(l, p) {
+      if (l.i[p]) return true;
+      for (var i = 0; i < l.c.length; i++) if (p.indexOf(l.c[i]) === 0) return true;
+      return false;
+    }
+    function palavras(t) {
+      var saida = [], m;
+      TOKEN.lastIndex = 0;
+      while ((m = TOKEN.exec(String(t || '')))) saida.push({ o: m[0], n: nrm(m[0]) });
+      return saida;
+    }
+    function sequencia(nome) { return palavras(nome).map(function (p) { return p.n; }); }
+    // Onde a sequência aparece (índices da primeira e da última palavra); "busca": a regra
+    // da Pesquisa (a última palavra casa pelo começo, salvo termo de até 3 letras).
+    function ocorrencias(ns, seq, busca) {
+      var n = seq.length, saida = [];
+      if (!n) return saida;
+      var inteira = !busca || (n === 1 && seq[0].length <= 3);
+      for (var i = 0; i + n <= ns.length; i++) {
+        var ok = true;
+        for (var j = 0; j < n - 1 && ok; j++) ok = ns[i + j] === seq[j];
+        if (ok) ok = inteira ? ns[i + n - 1] === seq[n - 1] : ns[i + n - 1].indexOf(seq[n - 1]) === 0;
+        if (ok) saida.push([i, i + n - 1]);
+      }
+      return saida;
+    }
+    // O tom da manchete para o nome (texto ou lista de termos), com os demais nomes do título.
+    function classificar(titulo, nome, outros) {
+      var ps = palavras(titulo), ns = ps.map(function (p) { return p.n; });
+      var termosN = typeof nome === 'string' ? [nome] : (nome || []);
+      var alvo = {}, ocupadas = {}, ancoras = [], tom = { tom: 'neutro', neg: 0, pos: 0, alvo: false, ataca: false, gatilhos: [] };
+      termosN.forEach(function (t) {
+        ocorrencias(ns, sequencia(t), true).forEach(function (o) {
+          ancoras.push([o[0], o[1], true]);
+          for (var k = o[0]; k <= o[1]; k++) { alvo[k] = true; ocupadas[k] = true; }
+        });
+      });
+      if (!ancoras.length) return tom;
+      (outros || []).forEach(function (t) {
+        ocorrencias(ns, sequencia(t), false).forEach(function (o) {
+          for (var k = o[0]; k <= o[1]; k++) if (alvo[k]) return;  // o mesmo nome (ou um maior): é o analisado
+          ancoras.push([o[0], o[1], false]);
+          for (k = o[0]; k <= o[1]; k++) ocupadas[k] = true;
+        });
+      });
+      ancoras.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1] || (a[2] === b[2] ? 0 : a[2] ? 1 : -1); });
+      function perto(k) {  // o nome mais próximo (empate: o de depois), até JANELA palavras
+        var melhor = null, dist = JANELA + 1;
+        ancoras.forEach(function (x) {
+          var d = x[0] > k ? x[0] - k : k - x[1];
+          if (d < dist || (d === dist && melhor !== null && x[0] > k && k > melhor[1])) { melhor = x; dist = d; }
+        });
+        return melhor;
+      }
+      function antes(k) {
+        var melhor = null;
+        ancoras.forEach(function (x) { if (x[1] < k && k - x[1] <= JANELA && (melhor === null || x[1] > melhor[1])) melhor = x; });
+        return melhor;
+      }
+      function depois(k) {
+        var melhor = null;
+        ancoras.forEach(function (x) { if (x[0] > k && x[0] - k <= JANELA && (melhor === null || x[0] < melhor[0])) melhor = x; });
+        return melhor;
+      }
+      var k = 0;
+      while (k < ns.length) {
+        if (ocupadas[k] || (k > 0 && NEGADORES[ns[k - 1]])) { k++; continue; }
+        var par = k + 1 < ns.length && !ocupadas[k + 1] ? ns[k] + ' ' + ns[k + 1] : '', cat = null, largura = 1;
+        if (par && LS.neg.p[par]) { cat = 'neg'; largura = 2; }
+        else if (par && LS.pos.p[par]) { cat = 'pos'; largura = 2; }
+        else if (casa(LS.contra, ns[k])) cat = 'contra';
+        else if (casa(LS.neg, ns[k])) cat = 'neg';
+        else if (casa(LS.pos, ns[k])) cat = 'pos';
+        var forma = ps.slice(k, k + largura).map(function (p) { return p.o; }).join(' ');
+        if (cat === 'contra') {
+          var a = antes(k), dp = depois(k);
+          if (dp && dp[2]) { tom.alvo = true; tom.neg++; tom.gatilhos.push(forma); }
+          else if (a && a[2]) tom.ataca = true;
+        } else if (cat) {
+          var p = perto(k);
+          if (p && p[2]) { tom[cat]++; tom.gatilhos.push(forma); }
+        }
+        k += largura;
+      }
+      tom.tom = tom.neg > tom.pos ? 'neg' : tom.pos > tom.neg ? 'pos' : tom.neg ? 'misto' : 'neutro';
+      return tom;
+    }
+    return { classificar: classificar };
+  }

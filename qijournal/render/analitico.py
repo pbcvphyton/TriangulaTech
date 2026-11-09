@@ -35,8 +35,12 @@ from .termometro import (
     CLASSE,
     EIXOS,
     AnaliseView,
+    ChecklistView,
     DistribuicaoView,
     GaugeView,
+    SinaisView,
+    _checklist_do_dia,
+    _sinais,
     analise_view,
     contagem,
     distribuicao,
@@ -45,6 +49,7 @@ from .termometro import (
     fmt_q,
     fmt_t,
     gauge,
+    porcento_txt,
     todas_validas,
 )
 from .web import brand_view
@@ -61,6 +66,12 @@ DOMINIOS = (25, 50, 100)
 # (P["min_n"]) aparecem marcados como amostra pequena; o T ajustado da agregação já
 # os puxa para a média geral. O ranking de editorias segue o mínimo da especificação.
 MIN_N_VEICULOS = 1
+# "Todas as análises": a página lista as mais recentes (com até 60 análises por
+# edição, o histórico inteiro deixaria a página com vários MB); as demais ficam na
+# Pesquisa analítica, que busca em todas, com o filtro de tipo Termômetro e o CSV. Os
+# números da página (médias, séries, rankings) seguem calculados sobre todo o histórico.
+LISTA_MAX = 1200
+PESQUISA_ANALISES = "pesquisa.html?tipo=a"
 
 
 # ── views ────────────────────────────────────────────────────────────────────
@@ -165,6 +176,31 @@ class MesView:
 
 
 @dataclass
+class SinalVeiculoView:
+    nome: str
+    textos: int
+    com_sinal: int
+    pct: str
+    barra: float
+
+
+@dataclass
+class ResumoView:
+    """O resultado do termômetro em linguagem clara (a resposta e o que ela quer dizer)
+    e, para "Onde estamos", onde aparecem os sinais: por critério e lado (o mesmo
+    painel do Termômetro do dia, sobre todo o histórico), os veículos com tratamento
+    desigual e o checklist da qualidade (só das análises que guardam os itens)."""
+
+    titulo: str
+    frases: list[str]
+    sinais: SinaisView
+    veiculos: list[SinalVeiculoView]
+    desiguais: int  # notícias com sinal de tratamento desigual (à esquerda ou à direita)
+    noticias: int
+    checklist: ChecklistView | None = None
+
+
+@dataclass
 class AnaliticoView:
     vazio: bool
     periodo: str
@@ -186,6 +222,11 @@ class AnaliticoView:
     metodo: list[str]
     versao: str = PARAMETROS["versao"]
     atualizado: str = ""
+    em_resumo: ResumoView | None = None
+    lista_fora: int = 0  # análises do histórico fora da lista (as mais antigas; estão na Pesquisa)
+    lista_total: int = 0
+    pesquisa_href: str = PESQUISA_ANALISES
+    base: str = ""  # "média de 373 notícias com dimensão política" (no placar)
 
 
 # ── auxiliares ───────────────────────────────────────────────────────────────
@@ -465,6 +506,95 @@ def _linha_tabela(nome: str, s: Mapping[str, Any], href: str | None = None) -> L
     )
 
 
+
+# ── em resumo ────────────────────────────────────────────────────────────────
+
+MIN_TEXTOS_VEICULO = 10  # textos do veículo para a lista de "onde aparecem os sinais"
+
+
+def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> ResumoView | None:
+    """O que o termômetro diz, sem jargão: a resposta, o que ela quer dizer e onde
+    estão os sinais (das notícias com T; opinião à parte). Os sinais são contados como
+    no Termômetro do dia: as evidências conferidas no texto, à esquerda, à direita ou
+    de equilíbrio (contraponto ouvido, número com fonte), que não move o T."""
+    noticias = [
+        a for a in analises
+        if agregacao.tipo_de(a) == "noticia" and a.get("estado") == "ok" and a.get("T") is not None
+    ]
+    n = len(noticias)
+    if not n:
+        return None
+    rotulos = Counter(a.get("rotulo") or "" for a in noticias)
+    equilibrado = rotulos.get("Equilibrado", 0)
+    sinais = _sinais([dict(a) for a in noticias])
+
+    def desigual(a: Mapping[str, Any]) -> bool:
+        return any(
+            isinstance(e, dict) and e.get("direcao") in ("esquerda", "direita") for e in a.get("evidencias") or []
+        )
+
+    desiguais = sum(1 for a in noticias if desigual(a))
+    media = geral.get("media_T")
+    frases = []
+    if equilibrado >= 0.8 * n:
+        titulo = "O texto das notícias sai equilibrado: o termômetro não encontra viés editorial relevante."
+        frases.append(
+            f"Em {text.format_number_pt(equilibrado, 0)} das {text.format_number_pt(n, 0)} notícias analisadas "
+            f"({porcento_txt(equilibrado, n)}) o texto ficou “Equilibrado”: os sinais de tratamento desigual que o "
+            "termômetro procura — rótulos, adjetivos, verbos, escolha e espaço das fontes, números, enquadramento — "
+            "foram fracos ou não apareceram."
+        )
+    else:
+        lado = "à esquerda" if (media or 0) < 0 else "à direita"
+        titulo = f"O termômetro encontra viés editorial em parte das notícias, em média {lado}."
+        frases.append(
+            f"{text.format_number_pt(n - equilibrado, 0)} das {text.format_number_pt(n, 0)} notícias analisadas "
+            f"({porcento_txt(n - equilibrado, n)}) saíram fora de “Equilibrado”; a média é T {fmt_t(media or 0)}."
+        )
+    if sinais.esq or sinais.dir:
+        frase = (
+            f"Só {text.format_number_pt(desiguais, 0)} {'notícia' if desiguais == 1 else 'notícias'} "
+            f"({porcento_txt(desiguais, n)}) tiveram sinal de tratamento desigual confirmado no texto: "
+            f"{text.format_number_pt(sinais.esq, 0)} {'sinal' if sinais.esq == 1 else 'sinais'} para a esquerda e "
+            f"{text.format_number_pt(sinais.dir, 0)} para a direita"
+        )
+        if sinais.eq:
+            frase += (
+                f"; outros {text.format_number_pt(sinais.eq, 0)} foram de equilíbrio (contraponto ouvido, número "
+                "com fonte, verbo neutro), que não movem o T"
+            )
+        frases.append(frase + ". Um sinal isolado move pouco o T de um texto, por isso quase todos continuam “Equilibrado”.")
+    por_veiculo = Counter(a.get("veiculo") or "" for a in noticias)
+    if por_veiculo:
+        topo = por_veiculo.most_common(2)
+        soma = sum(k for _v, k in topo)
+        if soma >= 0.5 * n and len(por_veiculo) > 2:
+            frases.append(
+                "A amostra é concentrada: "
+                + " e ".join(f"{filters.plain(v)} ({porcento_txt(k, n)})" for v, k in topo)
+                + f" somam {porcento_txt(soma, n)} das notícias, porque só entram textos com o corpo completo da "
+                "matéria disponível (150 palavras ou mais); comparações entre veículos menores ainda pedem cautela."
+            )
+    frases.append(
+        "O que isso quer dizer: medido pelo texto, os veículos relatam de forma parecida e neutra. As diferenças "
+        "entre eles aparecem antes do texto — no que cada um escolhe cobrir, quanto espaço dá a cada nome e em que "
+        "contexto o nome aparece nas manchetes. É o que mostram “Nomes em destaque” e “Quem fala de quem, e como”, "
+        "logo abaixo."
+    )
+
+    com_sinal_v = Counter(a.get("veiculo") or "" for a in noticias if desigual(a))
+    veiculos = [
+        SinalVeiculoView(
+            nome=filters.plain(v), textos=k, com_sinal=com_sinal_v[v], pct=porcento_txt(com_sinal_v[v], k),
+            barra=round(100 * com_sinal_v[v] / k, 1),
+        )
+        for v, k in sorted(por_veiculo.items(), key=lambda kv: (-com_sinal_v[kv[0]] / kv[1], -kv[1], kv[0]))
+        if k >= MIN_TEXTOS_VEICULO
+    ]
+    return ResumoView(
+        titulo, frases, sinais, veiculos, desiguais, n, checklist=_checklist_do_dia([dict(a) for a in noticias])
+    )
+
 # ── view completa ────────────────────────────────────────────────────────────
 
 
@@ -512,10 +642,11 @@ def analitico_view(
     dias_com = len({a["data_publicacao"][:10] for a in analises})
 
     medidor = gauge(geral["media_T"], geral["ic95_T"], geral["rotulo"], descricao="Média de todo o histórico (notícias)")
+    base_media = f"{contagem(geral['n'], 'notícia', 'notícias')} com dimensão política"
     resumo = (
-        f"{medidor.rotulo} · T {medidor.valor} na média de {contagem(geral['n'], 'notícia', 'notícias')} com dimensão política"
+        f"{medidor.rotulo} · T {medidor.valor} na média de {base_media}"
         if medidor
-        else "Ainda não há notícia com T (só textos sem dimensão política ou inconclusivos)."
+        else "Ainda não há notícia com T (só textos sem dimensão política ou inconclusivos)"
     )
     tiles = [
         TileView("Textos analisados", text.format_number_pt(tudo["n_total"], 0), f"{veiculos} veículos · {editorias} editorias · {dias_com} dias"),
@@ -574,7 +705,8 @@ def analitico_view(
         dias.append(linha)
 
     por_mes: dict[str, list[dict[str, Any]]] = {}
-    for a in sorted(analises, key=lambda a: (a["data_publicacao"], a.get("veiculo") or ""), reverse=True):
+    recentes = sorted(analises, key=lambda a: (a["data_publicacao"], a.get("veiculo") or ""), reverse=True)
+    for a in recentes[:LISTA_MAX]:
         por_mes.setdefault(a["data_publicacao"][:7], []).append(a)
     meses = [
         MesView(f"{_mes_label(m)} · {contagem(len(lista), 'texto', 'textos')}", [analise_view(a, evidencias=False) for a in lista], aberto=i == 0)
@@ -590,7 +722,18 @@ def analitico_view(
         ),
         gauge=medidor,
         resumo=resumo,
-        distribuicao=distribuicao(geral["rotulos"]),
+        distribuicao=distribuicao(
+            geral["rotulos"],
+            fora=" · ".join(
+                p
+                for p in (
+                    f"{geral['n_nao_se_aplica']} sem dimensão política" if geral["n_nao_se_aplica"] else "",
+                    contagem(geral["n_inconclusivo"], "inconclusiva", "inconclusivas") if geral["n_inconclusivo"] else "",
+                )
+                if p
+            ),
+        ),
+        base=f"média de {base_media}",
         tiles=tiles,
         leituras=leituras,
         puxadores=puxadores,
@@ -604,6 +747,9 @@ def analitico_view(
         meses=meses,
         metodo=metodo,
         atualizado=_data_label(edition_date) if edition_date else "",
+        em_resumo=_em_resumo(analises, geral),
+        lista_fora=max(0, len(recentes) - LISTA_MAX),
+        lista_total=len(recentes),
     )
 
 

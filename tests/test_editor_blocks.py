@@ -329,5 +329,6 @@ def test_rationale_and_full_list_are_rendered(config, monkeypatch):
     assert f'href="{edition.date}.html#s-{lead.id}"' in everything  # assunto que virou matéria
 
     subject, html, plain = render_email(edition, config)
-    assert "Como foi compilada" in html and f"{edition.date}-todas.html" in html
-    assert "COMO FOI COMPILADA" in plain and f"{edition.date}-todas.html" in plain
+    # o e-mail (modelo do TSA Tech) não traz o racional; leva à lista completa do dia
+    assert f"{edition.date}-todas.html" in html and "notícias hoje</a>" in html
+    assert f"notícias do dia: {config.site.base_url}edicoes/{edition.date}-todas.html" in plain
