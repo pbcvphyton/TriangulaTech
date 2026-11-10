@@ -72,7 +72,7 @@ Garantias importantes:
 | Arquivo (edições anteriores) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/> |
 | Uma edição específica | `https://pbcvphyton.github.io/TriangulaTech/edicoes/AAAA-MM-DD.html` |
 | Todas as notícias de um dia | `https://pbcvphyton.github.io/TriangulaTech/edicoes/AAAA-MM-DD-todas.html` |
-| Analítico Político (todo o histórico do termômetro) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/analitico.html> |
+| Analítico Político (como a imprensa cobre a política: manchetes, enquadramento e termômetro) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/analitico.html> |
 | Pesquisa analítica (busca em todas as edições) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/pesquisa.html> |
 
 Cada matéria tem endereço próprio (`…#s-<id>`) e, clicada, abre na tela inteira
@@ -256,57 +256,121 @@ Opinião fica fora da média (aparece à parte). As médias do dia, por veículo
 editoria saem da agregação da especificação (`agregacao.resumo`); o painel só conta
 o que está guardado, sem recalcular nada.
 
-A aba **Analítico Político** (`edicoes/analitico.html`) abre com **Em resumo · o
-que o termômetro diz**: a resposta em linguagem clara (hoje, que o texto das
-notícias sai equilibrado: quantas ficaram "Equilibrado", quantas tiveram sinal de
-tratamento desigual e para que lado, e quantos sinais foram de equilíbrio), o que
-isso quer dizer (as diferenças entre veículos aparecem antes do texto: no que
-cobrem, no espaço e no tom das manchetes) e o aviso quando a amostra está
-concentrada em poucos veículos. Logo depois vêm os **Nomes em destaque** e **Quem
-fala de quem, e como** (abaixo), e então o histórico completo do termômetro; em
-**Onde estamos**, ao lado da distribuição, ficam **Onde estão os sinais** (o mesmo
-painel do Termômetro do dia, por critério e lado, sobre todo o histórico), o
-**tratamento desigual por veículo** (a parte das notícias de cada um com algum
-sinal à esquerda ou à direita) e, nas análises que guardam o checklist, a
-**qualidade da apuração item a item**. As parcelas não arredondam para "tudo ou
-nada": 452 de 453 aparece como 99,8%, não 100%.
+A aba **Analítico Político** (`edicoes/analitico.html`) responde a uma pergunta só:
+**como a imprensa cobre a política**. Ela se organiza pelo que os dados têm a dizer, não
+pela ordem em que foram calculados: abre com a leitura, desce pelas três lentes e guarda
+a base completa do termômetro, recolhida, no fim. Só vira afirmação o que passa do
+acaso; o resto aparece, mas quieto.
 
-O histórico agrega **todos os registros** (`qijournal/termometro/agregacao.py`, conferida pelos testes da
-seção 14.7 da especificação): onde estamos (média geral), para onde estamos indo
-(tendência mensal de T e de Q, a janela recente comparada ao histórico e quem
-puxou a mudança, por editoria e por veículo), as séries semanais, os rankings
-por veículo e por editoria (T ajustado e qualidade; nas editorias, mínimo de 30
-notícias; nos veículos entram todos os que têm notícia com T, e os com menos de
-30 aparecem esmaecidos, como amostra pequena — o cálculo da agregação não muda),
-os recortes por eixo, a tabela de cada dia e a lista das análises (clicar na linha
-abre o texto original, para conferir). A lista mostra as 1.200 análises mais
-recentes (`LISTA_MAX` em `qijournal/render/analitico.py`), para a página não passar
-de alguns MB com 60 análises por dia; as mais antigas ficam na Pesquisa analítica
-(tipo Termômetro, com CSV), e todos os números da aba usam o histórico inteiro.
+**A leitura** (`qijournal/render/achados.py`). A manchete é o achado de maior peso; logo
+abaixo vêm a prova dela (os números e o link para onde ela está na página), a linha fina
+(sempre o que o termômetro diz do texto) e **mais achados**, numerados, um por tipo:
 
-Também à parte, logo depois do resumo, o bloco **Nomes em destaque · como a
-mídia cobre cada um** (`qijournal/render/midia.py`): os 12 nomes mais citados nas
-manchetes de Política nas edições dos últimos 30 dias (pessoas, partidos,
-instituições; saem das manchetes em português, e palavra comum com maiúscula, como
-"Eleições", ou selo como "VÍDEO" não conta), com a participação nas manchetes, a
-tendência (últimas 7 edições contra as 7 anteriores), quantos veículos e a
-divergência média nos assuntos da cobertura comparada com veículos dos dois lados.
-Os números são contados como no analítico do nome na Pesquisa (mesma regra de
-busca, todos os veículos, a notícia uma vez), e cada nome abre esse analítico, com a
-mesma editoria e período; a caixa "Analisar outro nome" leva qualquer termo para
-lá. A coluna **Tom** traz o saldo do tom das manchetes brasileiras sobre o nome
-(abaixo). O termômetro e o cálculo da aba não mudam.
+| Achado | Entra quando | De onde sai |
+|---|---|---|
+| Tom | o tom das manchetes sobre um nome piorou ou melhorou nas últimas 7 edições (95%) | manchetes |
+| Espaço | um nome ganhou ou perdeu espaço nas manchetes além do acaso (duas proporções, 99%) | manchetes |
+| Veículos | um veículo é mais crítico ou mais favorável a um nome que os demais (99%) | manchetes |
+| Distância | o tom dos dois nomes mais citados difere além do acaso (99%) | manchetes |
+| Presença | sempre que há nomes: quem domina as manchetes (o que sobra quando nada passa do acaso) | manchetes |
+| Lados | um par de veículos fica do mesmo lado, ou em lados opostos, além do acaso (99%); senão, quantos assuntos racharam | enquadramento |
+| Texto | sempre: o veredito do termômetro (vai para a linha fina) | texto |
+| Texto, os desvios | as notícias que saem do zero pendem para um lado além do acaso (teste de sinal, 99%) | texto |
+| Texto, o mais inclinado | há texto fora de "Equilibrado" nas últimas 7 edições | texto |
+| Tendência | a tendência mensal ou a janela recente do termômetro passou do acaso | base completa |
+| Apuração | sempre que há nota de qualidade | texto |
 
-Em seguida, **Quem fala de quem, e como** responde, para cada nome em destaque:
-**por que um veículo fala tanto dele** (manchetes do veículo contra as esperadas
-pelo que ele publica na editoria, quantas edições e o assunto que mais rendeu),
-**o que costuma falar e se fala bem ou mal** (manchetes desfavoráveis, favoráveis,
-o saldo do veículo contra o dos demais e quantas vezes o nome é alvo de crítica,
-acusação ou punição) e **se há padrão** (semana a semana, de que lado dos demais
-o veículo fica). Cada nome traz frases automáticas com o que importa (quem fala
-mais além do acaso, o veículo mais crítico e o mais favorável, se o tom piorou ou
-melhorou nas últimas 7 edições), as manchetes mais desfavorável e mais favorável
-com as palavras que pesaram e o link para o analítico completo na Pesquisa.
+O peso de cada achado é a força do efeito vezes a importância do nome (a raiz da parte
+das manchetes dele sobre a do nome mais citado), sobre uma base por tipo; dá para refazer
+a ordem à mão com os números mostrados. Ao lado ficam **as lentes** (com a base de cada
+uma) e **o que mudou em sete edições**: todas as mudanças de espaço e de tom que
+passaram do acaso, da maior para a menor.
+
+**1 · Manchetes — de quem a imprensa fala, e em que tom** (`qijournal/render/midia.py`):
+
+- **Placar dos nomes**: os 12 nomes mais citados nas manchetes de Política nas edições
+  dos últimos 30 dias (pessoas, partidos, instituições; saem das manchetes em português,
+  e palavra comum com maiúscula, como "Eleições", ou selo como "VÍDEO" não conta). Uma
+  linha por nome: a parte das manchetes, a curva das 30 edições (as últimas 7 em
+  destaque), a variação (últimas 7 edições contra as 7 anteriores), o tom (quanto das
+  manchetes brasileiras o põe em contexto desfavorável e favorável, e o saldo), o tom
+  antes e agora e quem destoa. A variação de espaço e a de tom só ganham a marca escura
+  quando passam do acaso. Os números são contados como no analítico do nome na Pesquisa
+  (mesma regra de busca, todos os veículos, a notícia uma vez).
+- **Dossiê do nome**: clicar na linha abre **quem fala de quem, e como**: por que um
+  veículo fala tanto dele (manchetes do veículo contra as esperadas pelo que ele publica
+  na editoria, quantas edições e o assunto que mais rendeu), o que costuma falar e se
+  fala bem ou mal (desfavoráveis, favoráveis, o saldo do veículo contra o dos demais e
+  quantas vezes o nome é alvo de crítica, acusação ou punição) e se há padrão (semana a
+  semana, de que lado dos demais o veículo fica); frases automáticas com o que importa,
+  as manchetes mais desfavorável e mais favorável com as palavras que pesaram, os
+  assuntos da cobertura comparada que dividiram os veículos e o link para o analítico
+  completo do nome na Pesquisa, com a mesma editoria e período. A caixa "Analisar outro
+  nome" leva qualquer termo para lá.
+- **Veículo por veículo**: a matriz veículo × nome, com o saldo do tom de cada veículo
+  sobre cada nome; a cor acompanha o saldo, o contorno marca o veículo que difere dos
+  demais além do acaso e o ponto, o que tem menos de 10 manchetes.
+
+**2 · Enquadramento — onde a imprensa rachou** (`qijournal/render/lados.py`). Entram os
+assuntos de Política que dois ou mais veículos cobriram, nas matérias da edição e nos
+demais assuntos da cobertura comparada, das mesmas 30 edições (lidos de
+`data/AAAA-MM-DD.json`):
+
+- **os assuntos que mais dividiram** nas últimas 7 edições e no período: os dois
+  enfoques, os veículos de cada um e a divergência, com o link para a matéria ou para a
+  Cobertura comparada da edição;
+- **quem fica com quem**: para cada par de veículos, em quantos assuntos divididos os
+  dois tomaram o mesmo lado, contra o que o acaso daria;
+- **quem destoa da maioria**: em quantos assuntos com maioria cada veículo ficou no lado
+  menor, também contra o acaso.
+
+O acaso não é "metade das vezes": num assunto rachado em 2 × 2, dois veículos só caem do
+mesmo lado 1 vez em 3. Cada contagem é comparada com a esperada dado o placar de cada
+assunto (os lados embaralhados entre os veículos que tomaram lado) e só vira afirmação
+quando passa de 99%. Os lados são os enfoques de cada assunto, não "a favor" ou "contra"
+alguém.
+
+**3 · Texto — como as reportagens escrevem** (o termômetro):
+
+- **o que o termômetro diz**, em linguagem clara (hoje, que o texto das notícias sai
+  equilibrado: quantas ficaram "Equilibrado", quantas tiveram sinal de tratamento
+  desigual e para que lado, e quantos sinais foram de equilíbrio), com o aviso quando a
+  amostra está concentrada em poucos veículos; o placar da média geral e os indicadores;
+- **os desvios**: o histograma das notícias com T diferente de zero (as que ficam
+  exatamente em zero vão no centro, fora das colunas) e o teste de sinal: elas pendem
+  para um lado além do que uma moeda daria?
+- **os textos mais inclinados** das últimas sete edições, com o sinal que mais pesou em
+  cada um (a citação literal e a explicação), os recordes do histórico e a opinião, à
+  parte;
+- **onde aparecem os sinais** (o mesmo painel do Termômetro do dia, por critério e lado,
+  sobre todo o histórico) e o **tratamento desigual por veículo** (a parte das notícias
+  de cada um com algum sinal à esquerda ou à direita);
+- **qualidade da apuração**: quantas notícias em cada faixa (boa, regular, fraca), os
+  veículos com amostra (30 ou mais notícias com T) à vista, os demais num "ver mais" e,
+  nas análises que guardam o checklist, a qualidade item a item.
+
+As parcelas não arredondam para "tudo ou nada": 452 de 453 aparece como 99,8%, não 100%.
+
+**Base completa do termômetro**, bloco a bloco, cada um fechado e com o que tem dentro
+escrito no título (`qijournal/termometro/agregacao.py`, conferida pelos testes da seção
+14.7 da especificação): a distribuição por faixa, para onde estamos indo (tendência
+mensal de T e de Q, a janela recente comparada ao histórico e quem puxou a mudança, por
+editoria e por veículo), as séries semanais, os rankings por veículo e por editoria (T
+ajustado; nas editorias, mínimo de 30 notícias; nos veículos entram todos os que têm
+notícia com T, e os com menos de 30 aparecem esmaecidos, como amostra pequena — o
+cálculo da agregação não muda), os recortes por eixo, a tabela de cada dia e a lista das
+análises (clicar na linha abre o texto original, para conferir; com o script, a lista
+ganha um filtro por texto e por T diferente de zero). Um bloco da base sobe sozinho
+quando tem o que dizer: uma tendência ou um desvio que passa do acaso abre o bloco e
+vira achado na leitura. A lista mostra as 1.200 análises mais recentes (`LISTA_MAX` em
+`qijournal/render/analitico.py`), para a página não passar de alguns MB com 60 análises
+por dia; as mais antigas ficam na Pesquisa analítica (tipo Termômetro, com CSV), e todos
+os números da aba usam o histórico inteiro.
+
+**Como ler**, no fim, reúne o método de cada lente. A navegação fica no alto e marca a
+seção da vez; os achados e a matriz levam ao bloco da prova (abrindo-o, se estiver
+fechado) e as marcas dos gráficos mostram a dica ao passar o mouse. Tudo isso é reforço:
+sem script, a página continua completa. O termômetro e o cálculo da aba não mudam.
 
 #### Tom das manchetes (`qijournal/render/tom.py`)
 
@@ -330,7 +394,11 @@ nome) difere dos demais além do que o acaso explica (z ≥ 2,58 com a variânci
 dois grupos juntos); a tendência do tom compara as últimas 7 edições com as 7
 anteriores (20+ manchetes em cada, z ≥ 1,96); "padrão" é ficar do mesmo lado dos
 demais em 3 de cada 4 semanas comparáveis (3+ manchetes do veículo e 10+ dos
-demais). **Limite**: o tom mede o contexto em que o nome aparece nas manchetes,
+demais). No Analítico, o espaço de um nome só "mudou" quando a parte das manchetes das
+últimas 7 edições difere da das 7 anteriores além do acaso (duas proporções, z ≥ 2,58), e
+o par vermelho × verde do tom foi conferido com um validador de paleta, no claro e no
+escuro (separação para daltônicos e contraste): a cor nunca vai sozinha, o sinal do
+saldo ou a posição (esquerda × direita) a acompanha. **Limite**: o tom mede o contexto em que o nome aparece nas manchetes,
 não a opinião do veículo, e a leitura por palavras erra em parte delas (ironia,
 negação, o nome errado na frase); por isso o que diz algo é a comparação entre
 veículos sobre o mesmo nome, e as manchetes de exemplo mostram as palavras que
@@ -420,8 +488,8 @@ calculada logo depois e não muda com a ordem escolhida para a lista:
   diferença passa do acaso), quantas vezes o termo é alvo, o padrão semanal, o
   espaço contra o esperado e o assunto que mais rendeu; e as manchetes mais
   desfavoráveis e mais favoráveis, com as palavras que pesaram (a regra está em
-  "Tom das manchetes", acima; com a editoria e o período da tabela, os números são
-  os de "Quem fala de quem" no Analítico Político).
+  "Tom das manchetes", acima; com a editoria e o período do placar, os números são
+  os do dossiê do nome no Analítico Político).
 - **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
   quantos tiveram dois lados (veículos nos dois enfoques; se todos ficaram no
   mesmo, conta como sem divergência) e quão dividida ficou cada um (divergência =
@@ -434,8 +502,9 @@ nem na IA). **Limites**: o tom é lido por palavras (veja acima) e mede o contex
 não a opinião do veículo; os lados são os enfoques de cada assunto, não "a favor"
 ou "contra" a pessoa.
 
-Embaixo da caixa de busca, os **nomes em destaque** da Política (abaixo) viram
-atalhos para o analítico de cada um (com a editoria e o período da tabela).
+Embaixo da caixa de busca, os **nomes em destaque** da Política (os do placar do
+Analítico) viram atalhos para o analítico de cada um (com a editoria e o período do
+placar).
 
 ### Racional da edição e lista completa do dia
 
@@ -736,9 +805,12 @@ qijournal/                código do jornal
                           index.py = todas as notícias do dia) e modo automático
   render/                 páginas HTML e e-mail (modelos em render/templates/;
                           termometro.py e analitico.py = termômetro do dia e aba
-                          Analítico Político; pesquisa.py = Pesquisa analítica;
-                          midia.py = nomes em destaque de "Como a mídia cobre"
-                          e "Quem fala de quem"; tom.py = tom das manchetes)
+                          Analítico Político; achados.py = a leitura da aba (os
+                          achados, o placar dos nomes e a matriz); lados.py = a
+                          lente do enquadramento (assuntos divididos, pares);
+                          pesquisa.py = Pesquisa analítica; midia.py = nomes em
+                          destaque de "Como a mídia cobre"; tom.py = tom das
+                          manchetes)
   termometro/             Termômetro de Viés: referencia.py (cálculo, cópia literal
                           da especificação), agregacao.py (aba analítica),
                           analise.py (textos → IA → cálculo) e historico.py

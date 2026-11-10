@@ -162,9 +162,11 @@ def test_tom_do_nome_aponta_o_veiculo_mais_critico_e_o_padrao():
 def test_analitico_mostra_o_tom_e_quem_fala_de_quem():
     config = load_config(env={})
     html = render_analitico_page([], config, home_href="../", archive_href="./", destaques=_destaques_com_tom())
-    assert 'id="an-quem"' in html and "Quem fala de quem, e como" in html
+    assert 'id="an-quem"' in html and "quem fala de quem, e como" in html
     assert '<span class="qf-tag qf-neg">mais crítico</span>' in html and "mais negativo que os demais em 3 de 3 semanas" in html
-    assert 'class="nm-tom"' in html and 'href="#qf-1"' in html and ".tom-bar" in html
+    # o placar diz quem destoa, a matriz contorna a célula e as duas levam ao dossiê do nome
+    assert '<span class="az-dq neg"><b>Folha</b> mais crítico</span>' in html and 'class="az-c az-n3 az-on"' in html
+    assert 'href="#qf-1"' in html and ".tom-bar" in html
 
 
 def test_pesquisa_recebe_o_dicionario_e_os_limites_do_tom():

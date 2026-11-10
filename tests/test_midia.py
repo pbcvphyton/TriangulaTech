@@ -264,11 +264,13 @@ def test_pesquisa_traz_o_analitico_e_as_sugestoes(config):
 def test_analitico_traz_os_nomes_em_destaque(config):
     view = _destaques()
     html = render_analitico_page([], config, home_href="../", archive_href="./", destaques=view)
-    assert 'id="an-nomes"' in html and "Nomes em destaque · como a mídia cobre cada um" in html
+    # a lente das manchetes: o placar dos nomes; cada linha abre o dossiê, que leva ao analítico do nome na Pesquisa
+    assert 'id="an-nomes"' in html and "De quem a imprensa fala, e em que tom" in html and 'id="an-quem"' in html
+    assert '<details class="az-n" id="qf-1">' in html and "<b>Senado</b>" in html
     assert 'href="pesquisa.html?q=Senado&amp;de=' in html and "&amp;ed=politica#midia" in html
-    assert 'action="pesquisa.html#midia"' in html and ".nm-tbl" in html and 'required pattern=".*\\S.*"' in html
+    assert 'action="pesquisa.html#midia"' in html and ".nm-in" in html and 'required pattern=".*\\S.*"' in html
     sem = render_analitico_page([], config, home_href="../", archive_href="./")
-    assert 'id="an-nomes"' not in sem and ".nm-tbl" not in sem  # sem nomes, a página fica como era
+    assert 'id="an-nomes"' not in sem and ".nm-in" not in sem  # sem nomes, a página é só a do termômetro
 
 
 def test_publish_leva_os_nomes_ao_analitico_e_a_pesquisa(tmp_path, config):
@@ -293,7 +295,7 @@ def test_publish_leva_os_nomes_ao_analitico_e_a_pesquisa(tmp_path, config):
     edition.termometro = analise.registro_do_dia("2026-09-29", analises, provedor="falsa")
     paths = pipeline.publish(edition, config, out_dir=tmp_path, subject="s", email_html="<p>e</p>", email_text="e")
     analitico = paths["analitico"].read_text(encoding="utf-8")
-    assert 'id="an-nomes"' in analitico and ">Senado</a>" in analitico and "Texto a" in analitico
+    assert 'id="an-nomes"' in analitico and "<b>Senado</b>" in analitico and "Texto a" in analitico
     busca = paths["pesquisa"].read_text(encoding="utf-8")
     assert 'href="pesquisa.html?q=Senado&amp;de=' in busca and 'id="midia"' in busca
 

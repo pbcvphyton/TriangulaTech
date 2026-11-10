@@ -1,12 +1,15 @@
-{#- Aba "Analítico Político": todo o histórico do termômetro.
-    Variáveis: a (AnaliticoView), brand, home_href, archive_href, base_url, repo_url. -#}
+{#- Aba "Analítico Político": como a imprensa cobre a política. A página se organiza pelo
+    que os dados têm a dizer: a leitura (manchete e achados), as três lentes (manchetes,
+    enquadramento, texto) e, recolhida, a base completa do termômetro.
+    Variáveis: a (AnaliticoView), nm (DestaquesView ou none), brand, home_href, archive_href,
+    base_url, repo_url. Blocos em analitico_lentes.html.j2; estilos em analitico.css.j2. -#}
 {% extends "layout.html.j2" %}
 {% import "termometro.html.j2" as tm %}
 {% import "macros.html.j2" as m %}
-{% import "midia.html.j2" as md %}
+{% import "analitico_lentes.html.j2" as an %}
 
 {% block title %}{{ brand.name }} — Analítico Político{% endblock %}
-{% block description %}Todo o histórico do Termômetro de Viés Editorial: média, tendência, desvio, rankings por veículo e editoria e cada texto analisado.{% endblock %}
+{% block description %}Como a imprensa cobre a política: de quem fala e em que tom, onde os veículos racham e o que o Termômetro de Viés Editorial diz do texto, com a prova de cada achado.{% endblock %}
 {% block meta %}
 <link rel="canonical" href="{{ base_url }}edicoes/analitico.html">
 {% endblock %}
@@ -20,83 +23,199 @@
 
 {% block styles %}
 {% if nm %}{% include "midia.css.j2" %}{% endif %}
+{% include "analitico.css.j2" %}
 {% endblock %}
 
+{#- Um bloco da base completa: fechado, com o que tem dentro escrito no título. -#}
+{% macro base(id, titulo, resumo, aberto=False) -%}
+<details class="az-base" id="{{ id }}"{% if aberto %} open{% endif %}>
+  <summary><span class="az-base-t">{{ titulo }}</span>{% if resumo %}<span class="az-base-r">{{ resumo }}</span>{% endif %}</summary>
+  <div class="az-base-in">
+{{ caller() }}
+  </div>
+</details>
+{%- endmacro %}
+
 {% block content %}
-<section class="an" id="analitico" aria-labelledby="an-h">
+<section class="an az" id="analitico" aria-labelledby="an-h">
   <div class="arch-top">
     <h2 class="kicker" id="an-h">Analítico Político</h2>
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
-  <p class="an-intro">{{ a.intro }}</p>
-  <nav class="an-nav" aria-label="Nesta página">
-    <span>Nesta página:</span>
-    {% if a.em_resumo %}<a href="#an-resumo">Em resumo</a>{% endif %}
-    {% if nm %}<a href="#an-nomes">Nomes em destaque</a><a href="#an-quem">Quem fala de quem</a>{% endif %}
-    {% if not a.vazio %}<a href="#an-onde">Onde estamos</a><a href="#an-indo">Para onde vamos</a><a href="#an-series">Semana a semana</a><a href="#an-dias">Dia a dia</a><a href="#an-todas">Todas as análises</a>{% endif %}
-    <a href="#an-metodo">Método</a>
+  <nav class="az-nav" id="azNav" aria-label="Nesta página">
+    <ul>
+      {% if a.leitura %}<li><a href="#an-leitura">A leitura</a></li>{% endif %}
+      {% if nm %}<li><a href="#an-nomes"><b>{{ a.ordens.manchetes }}</b>Manchetes</a></li>{% endif %}
+      {% if a.lados %}<li><a href="#an-lados"><b>{{ a.ordens.lados }}</b>Enquadramento</a></li>{% endif %}
+      <li><a href="#an-texto"><b>{{ a.ordens.texto }}</b>Texto</a></li>
+      {% if not a.vazio %}<li><a href="#an-base">Base completa</a></li>{% endif %}
+      <li><a href="#an-metodo">Como ler</a></li>
+    </ul>
   </nav>
 
-  {% if a.em_resumo %}{% set r = a.em_resumo %}
-  <div class="an-blk an-res" id="an-resumo">
-    <h3 class="an-h">Em resumo · o que o termômetro diz</h3>
-    <p class="an-res-t">{{ r.titulo }}</p>
-    <ul class="an-res-l">
-      {% for f in r.frases %}<li>{{ f }}</li>{% endfor %}
-    </ul>
-    {% if not a.vazio %}<p class="an-res-mais"><a href="#an-sinais">Onde estão os sinais, por critério e por veículo &darr;</a></p>{% endif %}
-  </div>
+  {% if a.leitura %}{{ an.leitura(a.leitura, a.placar) }}{% endif %}
+
+  {% if nm %}
+  <section class="az-sec" aria-labelledby="an-nomes-h">
+    <header class="az-lh" id="an-nomes">
+      <p class="az-ln"><b>{{ a.ordens.manchetes }}</b>Manchetes</p>
+      <h3 class="az-lt" id="an-nomes-h">De quem a imprensa fala, e em que tom</h3>
+      <p class="az-ld">Os nomes mais citados nas {{ "{:,}".format(nm.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} das edições de {{ nm.periodo }} ({{ nm.edicoes }} {{ "edição" if nm.edicoes == 1 else "edições" }}): quanto espaço cada um ocupa, se sobe ou cai, em que contexto aparece e que veículo destoa.</p>
+    </header>
+    {{ an.placar(a.placar, nm) }}
+    {% if a.matriz %}{{ an.matriz(a.matriz) }}{% endif %}
+  </section>
   {% endif %}
 
-  {% if nm %}{{ md.nomes(nm) }}{{ md.dossie(nm) }}{% endif %}
+  {% if a.lados %}{% set ld = a.lados %}
+  <section class="az-sec" aria-labelledby="an-lados-h">
+    <header class="az-lh" id="an-lados">
+      <p class="az-ln"><b>{{ a.ordens.lados }}</b>Enquadramento</p>
+      <h3 class="az-lt" id="an-lados-h">Onde a imprensa rachou</h3>
+      <p class="az-ld">O mesmo fato, dois enfoques. Nos {{ "{:,}".format(ld.comparados).replace(",", ".") }} assuntos de {{ ld.secao_titulo }} que dois ou mais veículos cobriram nas edições de {{ ld.periodo }}: onde eles tomaram lados diferentes, quem fica com quem e quem destoa.</p>
+    </header>
+    {{ an.lados(ld) }}
+  </section>
+  {% endif %}
 
-  {% if not a.vazio %}
-  <div class="an-blk">
-    <h3 class="an-h" id="an-onde">Onde estamos</h3>
-    <p class="tm-dek">{{ a.resumo }}.</p>
-    {% if a.gauge %}{{ tm.placar(a.gauge, "T médio de todo o histórico", a.base) }}{% endif %}
-    {{ tm.indicadores(a.tiles) }}
+  <section class="az-sec" aria-labelledby="an-texto-h">
+    <header class="az-lh" id="an-texto">
+      <p class="az-ln"><b>{{ a.ordens.texto }}</b>Texto</p>
+      <h3 class="az-lt" id="an-texto-h">Como as reportagens escrevem: o termômetro</h3>
+      <p class="az-ld">{{ a.intro }}</p>
+    </header>
+    {% if not a.vazio %}
     {% set r = a.em_resumo %}
-    {% if a.distribuicao or r %}
-    <div class="tm-panels">
-      {% if a.distribuicao %}
-      <section class="tm-panel" aria-labelledby="an-dist">
-        <h4 class="tm-ph" id="an-dist">Distribuição das notícias</h4>
-        <p class="tm-pd">Quantas notícias de todo o histórico caíram em cada faixa do termômetro.</p>
-        {{ tm.dist(a.distribuicao) }}
-      </section>
+    {% if r %}
+    <div class="az-blk an-res" id="an-resumo">
+      <h4 class="az-h">O que o termômetro diz</h4>
+      <p class="an-res-t">{{ r.titulo }}</p>
+      <ul class="an-res-l">
+        {% for f in r.frases %}<li>{{ f }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="az-blk">
+      <h4 class="az-h" id="an-onde">Onde estamos</h4>
+      {% if a.gauge %}{{ tm.placar(a.gauge, "T médio de todo o histórico", a.base) }}{% else %}<p class="tm-dek">{{ a.resumo }}.</p>{% endif %}
+      {{ tm.indicadores(a.tiles) }}
+      {% if a.indo.resumo %}<p class="az-indo"><b>Para onde vamos.</b> {{ a.indo.resumo }} <a href="#an-indo">Ver a tendência e a janela recente <span aria-hidden="true">&darr;</span></a></p>{% endif %}
+    </div>
+
+    {#- À esquerda, o padrão (os desvios, os sinais por critério e por veículo); à direita, a
+        prova (os textos mais inclinados, com a citação que pesou). -#}
+    <div class="az-2c az-2c-t">
+      <div class="az-col">
+        {% if a.desvios %}{% set d = a.desvios %}
+        <div class="az-blk" id="an-desvios">
+          <h4 class="az-h">Os desvios <span>as {{ d.esq + d.dir }} {{ "notícia que saiu" if d.esq + d.dir == 1 else "notícias que saíram" }} do zero</span></h4>
+          <p class="az-ph">{{ d.titulo }}.</p>
+          {{ an.desvios(d) }}
+          <p class="az-dek">{{ d.leitura }}</p>
+        </div>
+        {% endif %}
+        {% if r %}
+        <div class="az-blk">
+          <h4 class="az-h" id="an-sinais">Onde aparecem os sinais <span>por critério e lado</span></h4>
+          <p class="az-dek">Sinais confirmados no texto de todas as notícias do histórico, por critério e lado favorecido.</p>
+          <div class="az-sg">{{ tm.sinais(r.sinais) }}</div>
+        </div>
+        {% if r.veiculos %}
+        <div class="az-blk">
+          <h4 class="az-h" id="an-desig">Tratamento desigual, por veículo</h4>
+          <p class="az-dek">Parte das notícias de cada veículo com algum sinal à esquerda ou à direita (veículos com 10 ou mais notícias analisadas).</p>
+          <ol class="an-crit">
+            {% for v in r.veiculos %}
+            <li><span class="an-cn">{{ v.nome }}</span><span class="an-cb" aria-hidden="true"><i class="neu" style="width:{{ v.barra }}%"></i></span><span class="an-cv"><b>{{ v.pct }}</b> · {{ v.com_sinal }} de {{ v.textos }}</span></li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+      <div class="az-col">
+        {% if a.inclinados %}
+        <div class="az-blk" id="an-pendeu">
+          <h4 class="az-h">{{ a.inclinados_titulo }} <span>com o sinal que mais pesou</span></h4>
+          <ol class="az-incs">
+            {% for i in a.inclinados %}{{ an.inclinado(i) }}{% endfor %}
+          </ol>
+          {% if a.recordes %}
+          <h5 class="az-h5">Os mais inclinados de todo o histórico</h5>
+          <ol class="az-recs">
+            {% for x in a.recordes %}{{ an.curto(x) }}{% endfor %}
+          </ol>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% if a.opiniao %}
+        <div class="az-blk" id="an-opiniao">
+          <h4 class="az-h">Opinião, à parte <span>colunas, editoriais e análises não entram na média</span></h4>
+          <ol class="az-recs">
+            {% for x in a.opiniao %}{{ an.curto(x) }}{% endfor %}
+          </ol>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="az-blk" id="an-q">
+      <h4 class="az-h">Qualidade da apuração <span>de 0 a 100, pelo que o texto mostra</span></h4>
+      {% if a.q_partes %}{% set q = a.q_partes %}
+      <div class="az-qp">
+        <div class="az-qp-bar" role="img" aria-label="{{ q.aria }}">{% for classe, rotulo, n, largura, parcela in q.partes %}<span class="az-q-{{ classe }}" style="width:{{ largura }}%" title="{{ rotulo }}: {{ n }} {{ "notícia" if n == 1 else "notícias" }} ({{ parcela }})"></span>{% endfor %}</div>
+        <ul class="az-qp-k">{% for classe, rotulo, n, largura, parcela in q.partes %}<li><i class="az-q-{{ classe }}" aria-hidden="true"></i>{{ rotulo }} <b>{{ parcela }}</b> <span>{{ n }} {{ "notícia" if n == 1 else "notícias" }}</span></li>{% endfor %}</ul>
+      </div>
       {% endif %}
-      {% if r %}
-      <section class="tm-panel" aria-labelledby="an-sinais">
-        <h4 class="tm-ph" id="an-sinais">Onde estão os sinais</h4>
-        <p class="tm-pd">Sinais confirmados no texto de todas as notícias do histórico, por critério e lado favorecido.</p>
-        {{ tm.sinais(r.sinais) }}
-      </section>
-      {% if r.veiculos %}
-      <section class="tm-panel" aria-labelledby="an-desig">
-        <h4 class="tm-ph" id="an-desig">Tratamento desigual, por veículo</h4>
-        <p class="tm-pd">Parte das notícias de cada veículo com algum sinal à esquerda ou à direita (veículos com 10 ou mais notícias analisadas).</p>
-        <ol class="an-crit">
-          {% for v in r.veiculos %}
-          <li><span class="an-cn">{{ v.nome }}</span><span class="an-cb" aria-hidden="true"><i class="neu" style="width:{{ v.barra }}%"></i></span><span class="an-cv"><b>{{ v.pct }}</b> · {{ v.com_sinal }} de {{ v.textos }}</span></li>
+      {% if a.qualidade %}
+      {% if a.q_firmes %}
+      <p class="az-dek">Veículos com {{ a.q_minimo }} ou mais notícias com T (a nota ajustada puxa os grupos pequenos para a média geral).</p>
+      <ol class="qb">
+        {% for q in a.q_firmes %}
+        <li><span class="rk-n">{{ q.nome }}</span><span class="qb-bar" aria-hidden="true"><span style="width:{{ q.pct }}%"></span></span><span class="rk-v"><b>{{ q.valor }}</b> {{ q.rotulo }}<span class="rk-x">{{ q.detalhe }}</span></span></li>
+        {% endfor %}
+      </ol>
+      {% endif %}
+      {% if a.q_pequenas %}
+      <details class="az-more"{% if not a.q_firmes %} open{% endif %}>
+        <summary>{{ "Ver" if a.q_firmes else "Só há" }} {{ "o veículo" if a.q_pequenas|length == 1 else "os " ~ a.q_pequenas|length ~ " veículos" }} com amostra pequena (menos de {{ a.q_minimo }} notícias)</summary>
+        <ol class="qb">
+          {% for q in a.q_pequenas %}
+          <li class="rk-pq"><span class="rk-n">{{ q.nome }}</span><span class="qb-bar" aria-hidden="true"><span style="width:{{ q.pct }}%"></span></span><span class="rk-v"><b>{{ q.valor }}</b> {{ q.rotulo }}<span class="rk-x">{{ q.detalhe }}</span></span></li>
           {% endfor %}
         </ol>
-      </section>
+      </details>
       {% endif %}
-      {% if r.checklist %}
-      <section class="tm-panel" aria-labelledby="an-check">
-        <h4 class="tm-ph" id="an-check">Qualidade da apuração, item a item</h4>
-        <p class="tm-pd">Em quantas notícias cada item foi cumprido, entre as que guardam o checklist ({{ r.checklist.textos }}).</p>
+      {% else %}
+      <p class="term-note">{{ a.qualidade_fora }}</p>
+      {% endif %}
+      {% if r and r.checklist %}
+      <div class="az-ck">
+        <h5 class="az-h5" id="an-check">Item a item <span>em quantas notícias cada boa prática aparece, entre as {{ r.checklist.textos }} que guardam o checklist</span></h5>
         {{ tm.checklist(r.checklist) }}
-      </section>
-      {% endif %}
+      </div>
       {% endif %}
     </div>
     {% endif %}
-  </div>
+  </section>
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-indo">Para onde estamos indo</h3>
+  {% if not a.vazio %}
+  <section class="az-sec az-bases" aria-labelledby="an-base-h">
+    <header class="az-lh" id="an-base">
+      <p class="az-ln">Para conferir</p>
+      <h3 class="az-lt" id="an-base-h">Base completa do termômetro</h3>
+      <p class="az-ld">Tudo o que sustenta a lente do texto, bloco a bloco: abra o que quiser conferir. Os números usam todo o histórico ({{ a.periodo }}).</p>
+    </header>
+
+    {% if a.distribuicao %}
+    {% call base("an-dist", "Distribuição por faixa", a.bases.faixas) %}
+    <p class="term-note">Quantas notícias de todo o histórico caíram em cada faixa do termômetro.</p>
+    <div class="az-dist">{{ tm.dist(a.distribuicao) }}</div>
+    {% endcall %}
+    {% endif %}
+
+    {% call base("an-indo", "Para onde estamos indo", a.indo.resumo, a.indo.aberto) %}
     <ul class="an-reads">
       {% for r in a.leituras %}
       <li class="rd-{{ r.classe }}"><span class="an-tl">{{ r.titulo }}</span><b>{{ r.leitura }}</b><p>{{ r.texto }}</p></li>
@@ -119,10 +238,9 @@
       {% endfor %}
     </div>
     {% endif %}
-  </div>
+    {% endcall %}
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-series">Semana a semana</h3>
+    {% call base("an-series", "Semana a semana", a.bases.series) %}
     {% if a.series_msg %}<p class="term-note">{{ a.series_msg }}</p>{% endif %}
     {% for s in a.series %}
     <figure class="ts">
@@ -139,11 +257,10 @@
       <div class="ts-x" aria-hidden="true">{% for left, rot in s.eixo_x %}<span style="left:{{ left }}%">{{ rot }}</span>{% endfor %}</div>
     </figure>
     {% endfor %}
-  </div>
+    {% endcall %}
 
-  {% for r in a.rankings %}
-  <div class="an-blk">
-    <h3 class="an-h" id="an-rk-{{ loop.index }}">Ranking · {{ r.titulo }}</h3>
+    {% for r in a.rankings %}
+    {% call base("an-rk-" ~ loop.index, "Ranking · " ~ r.titulo, a.bases.veiculos if loop.first else a.bases.editorias) %}
     {% if r.itens %}
     {% if r.nota %}<p class="term-note rk-nota">{{ r.nota }}</p>{% endif %}
     <ol class="rk">
@@ -158,25 +275,11 @@
     <div class="rk-axis" aria-hidden="true"><span class="rk-n"></span><span class="rk-p">{% for left, rot in r.escala %}<i style="left:{{ left }}%">{{ rot }}</i>{% endfor %}</span><span class="rk-v"></span></div>
     {% endif %}
     {% if r.fora %}<p class="term-note">{{ r.fora }}</p>{% elif not r.itens %}<p class="term-note">Sem grupos no ranking ainda.</p>{% endif %}
-  </div>
-  {% endfor %}
+    {% endcall %}
+    {% endfor %}
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-q">Qualidade da apuração · Veículos</h3>
-    {% if a.qualidade %}
-    <ol class="qb">
-      {% for q in a.qualidade %}
-      <li{% if q.pequena %} class="rk-pq"{% endif %}><span class="rk-n">{{ q.nome }}</span><span class="qb-bar" aria-hidden="true"><span style="width:{{ q.pct }}%"></span></span><span class="rk-v"><b>{{ q.valor }}</b> {{ q.rotulo }}<span class="rk-x">{{ q.detalhe }}</span></span></li>
-      {% endfor %}
-    </ol>
-    {% else %}
-    <p class="term-note">{{ a.qualidade_fora }}</p>
-    {% endif %}
-  </div>
-
-  {% if a.eixos %}
-  <div class="an-blk">
-    <h3 class="an-h" id="an-eixos">Por eixo</h3>
+    {% if a.eixos %}
+    {% call base("an-eixos", "Por eixo", a.bases.eixos) %}
     <div class="an-tbl-wrap">
       <table class="an-tbl">
         <thead><tr><th scope="col">Eixo</th><th scope="col">Textos</th><th scope="col">Com T</th><th scope="col">T médio</th><th scope="col" class="an-l">Rótulo</th><th scope="col">Qualidade</th></tr></thead>
@@ -187,11 +290,10 @@
         </tbody>
       </table>
     </div>
-  </div>
-  {% endif %}
+    {% endcall %}
+    {% endif %}
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-dias">Dia a dia</h3>
+    {% call base("an-dias", "Dia a dia", a.bases.dias) %}
     <p class="term-note">Por data de publicação dos textos; o link abre a edição em que eles foram analisados.</p>
     <div class="an-tbl-wrap">
       <table class="an-tbl">
@@ -203,16 +305,21 @@
         </tbody>
       </table>
     </div>
-  </div>
+    {% endcall %}
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-todas">Todas as análises</h3>
+    {% call base("an-todas", "Todas as análises", a.bases.todas) %}
     <p class="term-note">Uma linha por texto, do mais recente para o mais antigo. Clique na linha para abrir o texto original (em nova aba) e conferir; o resumo do cálculo e os sinais de cada texto ficam no Termômetro do dia da edição.</p>
-    {% for m in a.meses %}
-    <details class="term-det"{% if m.aberto %} open{% endif %}>
-      <summary>{{ m.rotulo }}</summary>
+    <div class="az-fil" id="azFil" hidden>
+      <label class="sr-only" for="azQ">Filtrar as análises por veículo, título ou rótulo</label>
+      <input class="az-fil-in" id="azQ" type="search" autocomplete="off" spellcheck="false" placeholder="Filtrar: veículo, palavra do título, rótulo…">
+      <label class="az-fil-ck"><input type="checkbox" id="azNz"> só com T diferente de zero</label>
+      <span class="az-fil-n" id="azN" role="status"></span>
+    </div>
+    {% for mes in a.meses %}
+    <details class="term-det"{% if mes.aberto %} open{% endif %}>
+      <summary>{{ mes.rotulo }}</summary>
       <ol class="tl-list">
-        {% for x in m.analises %}
+        {% for x in mes.analises %}
         {{ tm.linha(x) }}
         {% endfor %}
       </ol>
@@ -221,13 +328,21 @@
     {% if a.lista_fora %}
     <p class="term-note tl-fora">A lista mostra as {{ a.lista_total - a.lista_fora }} análises mais recentes de {{ a.lista_total }}. As {{ a.lista_fora }} análises mais antigas estão na <a href="{{ a.pesquisa_href }}">Pesquisa analítica</a> (tipo Termômetro), com busca, filtros e CSV; os números desta página usam todo o histórico.</p>
     {% endif %}
-  </div>
+    {% endcall %}
+  </section>
   {% endif %}
 
-  <div class="an-blk">
-    <h3 class="an-h" id="an-metodo">Método</h3>
-    {% for p in a.metodo %}<p class="term-note">{{ p }}</p>{% endfor %}
-  </div>
+  <section class="az-sec az-met" aria-labelledby="an-metodo-h">
+    <header class="az-lh" id="an-metodo">
+      <p class="az-ln">Método</p>
+      <h3 class="az-lt" id="an-metodo-h">Como ler</h3>
+    </header>
+    <dl class="az-dl">
+      {% for titulo, texto in a.metodo %}
+      <div><dt>{{ titulo }}</dt><dd>{{ texto }}</dd></div>
+      {% endfor %}
+    </dl>
+  </section>
 </section>
 {% endblock %}
 
@@ -236,4 +351,10 @@
   <p><strong>{{ brand.name }}</strong> · Analítico Político · cálculo v{{ a.versao }}{% if a.periodo %} · {{ a.periodo }}{% endif %}</p>
   <p class="ft-links"><a href="{{ home_href }}">Edição mais recente</a> · <a href="{{ archive_href }}">Edições anteriores</a>{% if repo_url %} · <a href="{{ repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
 </footer>
+{% endblock %}
+
+{% block after %}
+<script>
+{% include "analitico.js.j2" %}
+</script>
 {% endblock %}

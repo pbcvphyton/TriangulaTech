@@ -1,0 +1,290 @@
+{#- Blocos da aba Analítico Político (só ela usa este arquivo): a leitura (manchete e
+    achados), a lente das manchetes (placar dos nomes com o dossiê de cada um, matriz
+    veículo × nome), a lente do enquadramento (assuntos divididos, pares, quem destoa) e os
+    desvios do termômetro. As views saem de qijournal/render/achados.py, lados.py e
+    analitico.py; os estilos, de analitico.css.j2 (classes az-…). -#}
+{% import "termometro.html.j2" as tm %}
+{% import "macros.html.j2" as m %}
+
+{#- A leitura (l: LeituraView): a manchete é o achado de maior peso; os demais vêm numerados,
+    como o "Mais para ler" da primeira página. Cada achado leva à prova na própria página. -#}
+{% macro leitura(l, pl=none) -%}
+<div class="az-lead" id="an-leitura">
+  <div class="az-box">
+    <p class="az-chapeu">{{ l.chapeu }}</p>
+    <h3 class="az-manchete">{{ l.manchete }}</h3>
+    <p class="az-prova"><span class="az-selo">{{ l.principal.selo }}</span><span>{{ l.principal.texto }} <a href="{{ l.principal.href }}">Ver a prova<span aria-hidden="true"> &darr;</span></a></span></p>
+    {% if l.linha_fina %}<p class="az-fina">{{ l.linha_fina }}</p>{% endif %}
+    {% if l.achados %}
+    <div class="az-mais">
+      <h4 class="az-lbl">Mais achados <span class="az-lbl-n">{{ l.achados|length }}</span></h4>
+      <ol class="az-achados">
+        {% for a in l.achados %}
+        <li class="az-a">
+          <div class="az-a-tx">
+            <p class="az-a-k"><span class="az-selo">{{ a.selo }}</span><b class="az-a-num">{{ a.numero }}</b></p>
+            <h5 class="az-a-t"><a class="hit" href="{{ a.href }}">{{ a.titulo }}</a></h5>
+            <p class="az-a-x">{{ a.texto }}</p>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endif %}
+  </div>
+  <aside class="az-rail" aria-labelledby="az-lentes-h">
+    <h4 class="az-lbl" id="az-lentes-h">{{ "Uma lente" if l.lentes|length == 1 else ("Duas lentes" if l.lentes|length == 2 else "Três lentes") }} <span class="az-lbl-n">de onde saem os achados</span></h4>
+    <ol class="az-lentes">
+      {% for x in l.lentes %}
+      <li class="az-l">
+        <p class="az-l-k"><b>{{ x.ordem }}</b>{{ x.nome }}</p>
+        <p class="az-l-p"><a class="hit" href="{{ x.href }}">{{ x.pergunta }}</a></p>
+        <p class="az-l-v"><b>{{ x.numero }}</b> <span>{{ x.unidade }}</span></p>
+        <p class="az-l-b">{{ x.base }}</p>
+      </li>
+      {% endfor %}
+    </ol>
+    {% if pl %}
+    <h4 class="az-lbl az-lbl-2">O que mudou em sete edições <span class="az-lbl-n">{% if pl.mudancas %}{{ pl.mudancas|length }} {{ "mudança" if pl.mudancas|length == 1 else "mudanças" }} além do acaso{% else %}nada além do acaso{% endif %}</span></h4>
+    {% if pl.mudancas %}
+    <ol class="az-mud">
+      {% for x in pl.mudancas %}
+      <li><a class="hit" href="{{ x.href }}"><b>{{ x.nome }}</b></a><span class="az-mud-t">{{ x.tipo }}</span><span class="az-ba">{{ x.antes }}<span aria-hidden="true"> → </span><span class="sr-only"> para </span><b>{{ x.agora }}</b></span><span class="az-chip on{% if x.classe %} {{ x.classe }}{% endif %}">{{ x.selo }}</span></li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="az-mud-0">Nenhum nome ganhou ou perdeu espaço, nem mudou de tom, além do que o acaso explica nas últimas 7 edições contra as 7 anteriores.</p>
+    {% endif %}
+    {% endif %}
+  </aside>
+</div>
+{%- endmacro %}
+
+{#- Barra do saldo do tom (−50 a +50), a mesma do dossiê. -#}
+{% macro saldo_barra(left, width, valor) -%}
+<span class="tom-bar" aria-hidden="true"><i class="{{ 'neg' if (valor or 0) < 0 else 'pos' }}" style="left:{{ left }}%;width:{{ width }}%"></i></span>
+{%- endmacro %}
+
+{#- O dossiê de um nome (n: NomeView com tom): quem fala dele, em que tom e se isso se repete. -#}
+{% macro dossie(n) -%}
+{% set t = n.tom %}
+<p class="az-dn">{{ "{:,}".format(t.manchetes).replace(",", ".") }} manchetes brasileiras · {{ saldo_barra(t.barra_left, t.barra_width, t.saldo_valor) }}<b class="tom-{{ t.classe }}">saldo {{ t.saldo }}</b> · {{ t.desfavoraveis }} desfavoráveis · {{ t.favoraveis }} favoráveis · {{ t.neutras }} sem tom{% if n.debates %} · {{ n.debates }} {{ "assunto dividiu" if n.debates == 1 else "assuntos dividiram" }} os veículos (divergência média {{ n.divergencia }}){% endif %}</p>
+<ul class="qf-lei">
+  {% for f in t.leitura %}<li>{{ f }}</li>{% endfor %}
+</ul>
+<div class="an-tbl-wrap">
+  <table class="md-tbl qf-tbl">
+    <thead><tr><th scope="col">Veículo · o assunto que mais rendeu</th><th scope="col" title="Manchetes do veículo que citam o nome">Manchetes</th><th scope="col" title="Manchetes do veículo sobre o nome ÷ as esperadas pelo que ele publica na editoria (1× = o esperado)">vs. esperado</th><th scope="col" title="Manchetes em contexto desfavorável (escândalo, derrota, crítica recebida…)">Desfav.</th><th scope="col" title="Manchetes em contexto favorável (vitória, apoio, aprovação…)">Fav.</th><th scope="col" title="Favoráveis menos desfavoráveis, em pontos (−100 a +100); entre parênteses, o dos demais veículos">Saldo · demais</th><th scope="col" title="Manchetes em que o nome é alvo de crítica, acusação ou punição">É alvo</th><th scope="col" title="Semanas com 3+ manchetes do veículo: de que lado dos demais ele fica">Padrão semanal</th></tr></thead>
+    <tbody>
+      {% for v in t.veiculos %}
+      <tr{% if v.pequena %} class="md-pq" title="Amostra pequena: menos de 10 manchetes (sem comparação de tom)"{% endif %}>
+        <th scope="row">{{ v.nome }}{% if v.destaque %} <span class="qf-tag qf-{{ v.classe }}">{{ v.destaque }}</span>{% endif %}{% if v.assunto %}<span class="qf-as">{{ v.assunto }}</span>{% endif %}</th>
+        <td>{{ v.manchetes }}<span class="qf-pr">{{ v.presenca }} ed.</span></td>
+        <td class="md-ix{% if v.esperado_classe %} md-{{ v.esperado_classe }}{% endif %}">{{ v.esperado }}</td>
+        <td>{{ v.desfavoraveis }}</td>
+        <td>{{ v.favoraveis }}</td>
+        <td class="qf-sd">{{ saldo_barra(v.barra_left, v.barra_width, v.saldo_valor) }}<b class="tom-{{ v.classe or 'est' }}">{{ v.saldo }}</b> <small>({{ v.demais }})</small></td>
+        <td>{{ v.alvo }}</td>
+        <td class="qf-pd">{{ v.padrao or "—" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if t.veiculos_fora %}<p class="md-note">E mais {{ t.veiculos_fora }} {{ "veículo" if t.veiculos_fora == 1 else "veículos" }} com menos manchetes (todos na Pesquisa).</p>{% endif %}
+{% if t.exemplos %}
+<ul class="qf-ex">
+  {% for e in t.exemplos %}
+  <li class="qf-{{ e.tipo }}"><span class="qf-et">{{ "A manchete mais desfavorável" if e.tipo == "neg" else "A manchete mais favorável" }}</span><a href="{{ e.href }}" target="_blank" rel="noopener noreferrer">{{ e.titulo }}<span class="sr-only"> (abre a notícia em nova aba)</span></a><small>{{ e.veiculo }} · {{ e.data }} · por: {{ e.gatilhos }}</small></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{%- endmacro %}
+
+{#- O placar dos nomes (pl: PlacarView; nm: DestaquesView). Uma linha por nome: espaço, a curva
+    das edições, o que mudou em sete edições, o tom e quem destoa; a linha abre o dossiê. -#}
+{% macro placar(pl, nm) -%}
+<div class="az-blk" id="an-quem">
+  <h4 class="az-h">Placar dos nomes <span>quem fala de quem, e como</span></h4>
+  <p class="az-dek">Os {{ pl.linhas|length }} nomes mais citados. As marcas escuras são as mudanças das últimas 7 edições contra as 7 anteriores que passam do acaso{% if pl.mudaram %} ({{ pl.mudaram }} {{ "nome" if pl.mudaram == 1 else "nomes" }}){% endif %}; as demais variações cabem no que o acaso explica. Clique em um nome para abrir o dossiê dele.</p>
+  <div class="az-pl">
+    <div class="az-hd" aria-hidden="true">
+      <span></span><span>Nome</span><span>Espaço nas manchetes</span><span>{{ nm.edicoes }} edições</span><span>7 anteriores → últimas 7</span><span>Tom <i>← desfavorável · favorável →</i></span><span>Tom, 7 anteriores → últimas 7</span><span>Quem destoa</span><span></span>
+    </div>
+    <ol class="az-rows">
+      {% for l in pl.linhas %}{% set n = l.n %}{% set t = n.tom %}
+      <li class="az-row">
+        <details class="az-n" id="{{ l.id }}">
+          <summary class="az-s">
+            <span class="az-c-o" aria-hidden="true">{{ l.ordem }}</span>
+            <span class="az-c-nm"><b>{{ n.nome }}</b>{% if n.tambem %}<small>também “{{ n.tambem }}”</small>{% endif %}</span>
+            <span class="az-c-es" title="{{ n.participacao }} das {{ "{:,}".format(nm.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} citam {{ n.nome }}, em {{ n.veiculos }} veículos"><span class="az-bar" aria-hidden="true"><i style="width:{{ l.barra }}%"></i></span><b>{{ n.participacao }}</b><small><span class="sr-only">das manchetes; </span>{{ "{:,}".format(n.manchetes).replace(",", ".") }}<span class="sr-only"> manchetes</span></small></span>
+            <span class="az-c-cv"{% if l.curva %} title="{{ l.curva.title }}"{% endif %}>
+              {%- if l.curva %}<span class="az-sp" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path class="az-sp-l" d="{{ l.curva.linha }}" vector-effect="non-scaling-stroke"/>{% if l.curva.recente %}<path class="az-sp-r" d="{{ l.curva.recente }}" vector-effect="non-scaling-stroke"/>{% endif %}</svg><i style="top:{{ l.curva.fim }}%"></i></span>{% endif -%}
+            </span>
+            <span class="az-c-e7" title="{{ l.esp_title }}">
+              {%- if l.esp_antes %}<span class="az-ba"><span class="sr-only">espaço nas 7 edições anteriores </span>{{ l.esp_antes }}<span aria-hidden="true"> → </span><span class="sr-only">, nas últimas 7 </span><b>{{ l.esp_agora }}</b></span><span class="az-chip{% if l.esp_forte %} on{% endif %}">{{ n.tendencia }}</span>
+              {%- else %}<span class="az-nd">—</span>{% endif -%}
+            </span>
+            <span class="az-c-tm"{% if t %} title="{{ t.desfavoraveis }} das {{ "{:,}".format(t.manchetes).replace(",", ".") }} manchetes brasileiras em contexto desfavorável, {{ t.favoraveis }} em favorável: saldo {{ t.saldo }}"{% else %} title="Menos de 20 manchetes brasileiras para dizer o tom"{% endif %}>
+              {%- if t %}<span class="az-tb" aria-hidden="true"><span class="az-tb-n"><i style="width:{{ l.tom_neg }}%"></i></span><span class="az-tb-p"><i style="width:{{ l.tom_pos }}%"></i></span></span><span class="sr-only">tom: saldo </span><b class="tom-{{ t.classe }}">{{ t.saldo }}</b>
+              {%- else %}<span class="az-nd">—</span>{% endif -%}
+            </span>
+            <span class="az-c-t7"{% if t %} title="{{ t.tendencia_titulo }}"{% endif %}>
+              {%- if t and l.tom_antes %}<span class="az-db" aria-hidden="true"><i class="az-db-l" style="left:{{ l.tom_de }}%;width:{{ l.tom_larg }}%"></i><i class="az-db-a" style="left:{{ l.tom_antes_x }}%"></i><i class="az-db-b{% if l.tom_forte %} {{ "neg" if t.tendencia == "piorou" else "pos" }}{% endif %}" style="left:{{ l.tom_agora_x }}%"></i></span><span class="az-ba"><span class="sr-only">saldo do tom nas 7 edições anteriores </span>{{ l.tom_antes }}<span aria-hidden="true"> → </span><span class="sr-only">, nas últimas 7 </span><b>{{ l.tom_agora }}</b></span>{% if l.tom_forte %}<span class="az-chip on {{ "neg" if t.tendencia == "piorou" else "pos" }}">{{ t.tendencia }}</span>{% endif %}
+              {%- else %}<span class="az-nd"{% if t %} title="Menos de 20 manchetes em cada janela para comparar"{% endif %}>—</span>{% endif -%}
+            </span>
+            <span class="az-c-dq">
+              {%- for veiculo, destaque, classe in l.destoam[:3] %}<span class="az-dq {{ classe }}"><b>{{ veiculo }}</b> {{ destaque }}</span>{% endfor -%}
+            </span>
+            <span class="az-c-ch" aria-hidden="true"></span>
+          </summary>
+          <div class="az-dossie">
+            {% if t %}{{ dossie(n) }}{% else %}<p class="md-note">Menos de 20 manchetes brasileiras sobre {{ n.nome }} no período: ainda sem leitura de tom. {{ n.veiculos }} veículos citaram o nome{% if n.debates %}; {{ n.debates }} {{ "assunto dividiu" if n.debates == 1 else "assuntos dividiram" }} os veículos (divergência média {{ n.divergencia }}){% endif %}.</p>{% endif %}
+            <p class="qf-mais"><a href="{{ n.href }}" title="Abrir o analítico de {{ n.consulta }} na Pesquisa">Analítico completo de {{ n.nome }} na Pesquisa: atenção, picos, pauta, vocabulário, lados e o tom por veículo &rarr;</a></p>
+          </div>
+        </details>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  <p class="az-note">Curva: a parte das manchetes de cada edição que cita o nome, na escala dele, com as últimas 7 em destaque. Tom: cada meia barra vai até {{ pl.tom_escala }}% das manchetes; no antes e agora, o círculo vazado é o saldo das 7 edições anteriores e o cheio, o das últimas 7 (de −50 a +50). <a href="#an-metodo">Como ler <span aria-hidden="true">&darr;</span></a></p>
+  <form class="nm-form" action="{{ nm.pesquisa_href }}#midia" method="get" role="search">
+    <label class="sr-only" for="nmQ">Analisar outro nome ou assunto</label>
+    <input class="nm-in" id="nmQ" name="q" type="search" required pattern=".*\S.*" title="Digite um nome ou assunto" autocomplete="off" spellcheck="false" placeholder="Analisar outro nome ou assunto: Haddad, &quot;Banco Central&quot;, STF…">
+    <button class="nm-go" type="submit">Analisar</button>
+  </form>
+</div>
+{%- endmacro %}
+
+{#- Matriz veículo × nome (mz: MatrizView): o saldo do tom de cada veículo sobre cada nome. -#}
+{% macro matriz(mz) -%}
+<div class="az-blk" id="an-matriz">
+  <h4 class="az-h">Veículo por veículo <span>o tom de cada um sobre cada nome</span></h4>
+  <p class="az-dek">Saldo do tom das manchetes de cada veículo sobre cada nome (favoráveis menos desfavoráveis, em pontos). A cor acompanha o saldo; o contorno marca o veículo que difere dos demais além do acaso{% if mz.destaques %} ({{ mz.destaques }} {{ "caso" if mz.destaques == 1 else "casos" }}){% endif %}.</p>
+  <div class="az-mx-wrap" tabindex="0" role="group" aria-label="Matriz do tom das manchetes: veículo por nome (role para o lado para ver todos os nomes)">
+    <table class="az-mx">
+      <thead>
+        <tr><th scope="col" class="az-mx-v">Veículo <small>manchetes</small></th>{% for nome, id in mz.nomes %}<th scope="col"><a href="#{{ id }}" title="Abrir o dossiê de {{ nome }}">{{ nome }}</a></th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+        <tr class="az-mx-g"><th scope="row">Todos os veículos</th>{% for c in mz.geral %}<td class="az-c az-{{ c.nivel }}" title="{{ c.title }}">{{ c.valor }}</td>{% endfor %}</tr>
+        {% for l in mz.linhas %}
+        <tr><th scope="row">{{ l.veiculo }} <small>{{ "{:,}".format(l.manchetes).replace(",", ".") }}</small></th>
+          {%- for c in l.celulas %}<td class="az-c{% if c.nivel %} az-{{ c.nivel }}{% endif %}{% if c.pequena %} az-pq{% endif %}{% if c.destaque %} az-on{% endif %}"{% if c.title %} title="{{ c.title }}"{% endif %}>{{ c.valor }}{% if c.destaque %}<span class="sr-only"> ({{ c.destaque }}, além do acaso)</span>{% endif %}</td>{% endfor -%}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="az-note az-mx-k" aria-hidden="true"><span class="az-key"><i class="az-c az-n3"></i>−20 ou menos</span><span class="az-key"><i class="az-c az-n2"></i>−10</span><span class="az-key"><i class="az-c az-n1"></i>−5</span><span class="az-key"><i class="az-c az-z"></i>perto de zero</span><span class="az-key"><i class="az-c az-p1"></i>+5</span><span class="az-key"><i class="az-c az-p2"></i>+10</span><span class="az-key"><i class="az-c az-p3"></i>+20 ou mais</span><span class="az-key"><i class="az-c az-z az-on"></i>difere dos demais além do acaso</span><span class="az-key"><i class="az-c az-pq">·</i>menos de 10 manchetes</span></p>
+  <ul class="az-lei">
+    {% for f in mz.leitura %}<li>{{ f }}</li>{% endfor %}
+  </ul>
+  {% if mz.fora %}<p class="az-note">E mais {{ mz.fora }} {{ "veículo" if mz.fora == 1 else "veículos" }} com poucas manchetes sobre estes nomes (todos no dossiê de cada nome e na Pesquisa).</p>{% endif %}
+</div>
+{%- endmacro %}
+
+{#- Um assunto que rachou os veículos (x: AssuntoView). -#}
+{% macro assunto(x) -%}
+<li class="az-rx">
+  <p class="az-rx-m">{{ x.data }} · {{ "matéria da edição" if x.materia else "cobertura comparada" }} · <span title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = meio a meio">divergência {{ x.divergencia }}</span></p>
+  <h5 class="az-rx-t">{% if x.href %}<a href="{{ x.href }}">{{ x.titulo }}</a>{% else %}{{ x.titulo }}{% endif %}</h5>
+  {{ m.bar(x) }}
+  <div class="az-rx-l">
+    <div class="az-rx-a"><p class="az-rx-s"><b>{{ x.a|length }}</b>{{ x.lado_a }}</p><p class="az-rx-v">{{ x.a|join(", ") }}</p></div>
+    <div class="az-rx-b"><p class="az-rx-s"><b>{{ x.b|length }}</b>{{ x.lado_b }}</p><p class="az-rx-v">{{ x.b|join(", ") }}</p></div>
+  </div>
+  {% if x.neutros %}<p class="az-rx-n">{{ x.neutros }} {{ "veículo relatou" if x.neutros == 1 else "veículos relataram" }} sem tomar lado.</p>{% endif %}
+  {% if x.conclusao %}<p class="az-rx-c">{{ x.conclusao }}</p>{% endif %}
+</li>
+{%- endmacro %}
+
+{#- A lente do enquadramento (ld: LadosView). -#}
+{% macro lados(ld) -%}
+<ul class="az-lei">
+  {% for f in ld.leitura %}<li>{{ f }}</li>{% endfor %}
+</ul>
+{% if ld.recentes or ld.demais %}
+<div class="az-blk" id="an-racha">
+  <h4 class="az-h">{% if ld.recentes %}Os assuntos que mais dividiram nas últimas 7 edições <span>{{ ld.recentes|length }} de {{ ld.recentes_n }}</span>{% else %}Os assuntos que mais dividiram no período{% endif %}</h4>
+  <p class="az-dek">Cada barra é um assunto: os veículos de um enfoque à esquerda, os do outro à direita e, no meio, os que relataram sem tomar lado. Os lados são enfoques do assunto, não posições a favor ou contra alguém.</p>
+  {% if ld.recentes %}
+  <ol class="az-rxs">
+    {% for x in ld.recentes %}{{ assunto(x) }}{% endfor %}
+  </ol>
+  {% endif %}
+  {% if ld.demais %}
+  <details class="az-more"{% if not ld.recentes %} open{% endif %}>
+    <summary>Os {{ ld.demais|length }} mais divididos do {{ "resto do " if ld.recentes else "" }}período</summary>
+    <ol class="az-rxs">
+      {% for x in ld.demais %}{{ assunto(x) }}{% endfor %}
+    </ol>
+  </details>
+  {% endif %}
+</div>
+{% endif %}
+{% if ld.pares or ld.destoam %}
+<div class="az-2c">
+  {% if ld.pares %}
+  <div class="az-blk" id="an-pares">
+    <h4 class="az-h">Quem fica com quem</h4>
+    <p class="az-dek">Nos assuntos divididos em que os dois veículos tomaram lado, em quantos ficaram do mesmo. O traço é o que o acaso daria, dado o placar de cada assunto (num 2 × 2, dois veículos só caem juntos 1 vez em 3).</p>
+    <ol class="az-pr">
+      {% for p in ld.pares %}
+      <li{% if p.classe %} class="az-on"{% endif %} title="{{ p.title }}"><span class="az-pr-n">{{ p.a }} <i aria-hidden="true">×</i> {{ p.b }}</span><span class="az-mt" aria-hidden="true"><i style="width:{{ p.barra }}%"></i><u style="left:{{ p.marca }}%"></u></span><span class="az-pr-v"><b>{{ p.juntos }} de {{ p.total }}</b> <span>acaso {{ p.esperado }}</span></span>{% if p.classe %}<span class="az-chip on">{{ "juntos" if p.classe == "ju" else "opostos" }} além do acaso</span>{% endif %}</li>
+      {% endfor %}
+    </ol>
+    {% if ld.pares_fora or ld.pares_mais %}<p class="az-note">Só entram pares com {{ ld.min_par }} ou mais assuntos em comum, os mais longe do acaso primeiro{% if ld.pares_mais %} (outros {{ ld.pares_mais }} ficaram fora da lista){% endif %}{% if ld.pares_fora %}; {{ ld.pares_fora }} {{ "par ainda não chegou" if ld.pares_fora == 1 else "pares ainda não chegaram" }} a {{ ld.min_par }}{% endif %}.</p>{% endif %}
+  </div>
+  {% endif %}
+  {% if ld.destoam %}
+  <div class="az-blk" id="an-destoa">
+    <h4 class="az-h">Quem destoa da maioria</h4>
+    <p class="az-dek">Nos assuntos com maioria (um lado com mais veículos), em quantos o veículo ficou no lado menor. O traço é o que o acaso daria.</p>
+    <ol class="az-pr">
+      {% for d in ld.destoam %}
+      <li{% if d.classe %} class="az-on"{% endif %} title="{{ d.title }}"><span class="az-pr-n">{{ d.nome }}</span><span class="az-mt" aria-hidden="true"><i style="width:{{ d.barra }}%"></i><u style="left:{{ d.marca }}%"></u></span><span class="az-pr-v"><b>{{ d.minoria }} de {{ d.total }}</b> <span>acaso {{ d.esperado }}</span></span>{% if d.classe %}<span class="az-chip on">{{ "destoa" if d.classe == "mais" else "acompanha a maioria" }} além do acaso</span>{% endif %}</li>
+      {% endfor %}
+    </ol>
+    {% if not ld.destoam|selectattr("classe")|list %}<p class="az-note">Nenhum veículo fica no lado menor mais (ou menos) do que o acaso explica.</p>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{%- endmacro %}
+
+{#- Os desvios (d: DesviosView): o histograma dos T diferentes de zero das notícias. -#}
+{% macro desvios(d) -%}
+<figure class="az-dv" style="--f:{{ d.faixa }}%">
+  <div class="az-dv-plot" role="img" aria-label="{{ d.aria }}">
+    <div class="az-dv-arm az-dv-e">{% for c in d.esquerda %}<span class="az-dv-c"{% if c.n %} title="{{ c.title }}"{% endif %}>{% if c.n %}<i style="height:{{ c.altura }}%">{% if c.rotulo %}<b>{{ c.rotulo }}</b>{% endif %}</i>{% endif %}</span>{% endfor %}</div>
+    <div class="az-dv-z" title="{{ d.zeros }} notícias com T exatamente em zero (fora do gráfico)"><b>{{ "{:,}".format(d.zeros).replace(",", ".") }}</b><span>em zero</span></div>
+    <div class="az-dv-arm az-dv-d">{% for c in d.direita %}<span class="az-dv-c"{% if c.n %} title="{{ c.title }}"{% endif %}>{% if c.n %}<i style="height:{{ c.altura }}%">{% if c.rotulo %}<b>{{ c.rotulo }}</b>{% endif %}</i>{% endif %}</span>{% endfor %}</div>
+  </div>
+  <div class="az-dv-ax" aria-hidden="true">
+    <span class="az-dv-xe"><i>−{{ d.dominio }}</i><i class="az-dv-f">−{{ d.f1 }}</i></span>
+    <span class="az-dv-x0">0</span>
+    <span class="az-dv-xd"><i class="az-dv-f">+{{ d.f1 }}</i><i>+{{ d.dominio }}</i></span>
+  </div>
+  <figcaption class="az-dv-k"><span>&larr; à esquerda: <b>{{ d.esq }}</b></span><span class="az-dv-kf"><i></i>faixa de equilíbrio</span><span>à direita: <b>{{ d.dir }}</b> &rarr;</span></figcaption>
+</figure>
+{%- endmacro %}
+
+{#- Um texto entre os mais inclinados (i: InclinadoView), com o sinal que mais pesou. -#}
+{% macro inclinado(i) -%}
+{% set a = i.a %}
+<li class="az-inc">
+  <p class="az-inc-h"><span class="az-inc-v"><i class="sw t-{{ a.classe }}" aria-hidden="true"></i>T {{ a.valor }}</span><span class="az-inc-r">{{ a.rotulo }}</span><span class="az-inc-m">{{ a.veiculo }} · {{ a.editoria }} · {{ a.data }}{% if a.q != "—" %} · apuração {{ a.q }}{% endif %}</span></p>
+  <h5 class="az-inc-t">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener noreferrer" title="Abrir o texto original ({{ a.dominio }})">{{ a.titulo }}<span class="az-go" aria-hidden="true"> &#8599;</span><span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ a.titulo }}{% endif %}</h5>
+  {% if i.sinal %}
+  <ol class="tev">{{ tm.evidencia(i.sinal) }}</ol>
+  {% if i.outros %}<p class="az-inc-o">e mais {{ i.outros }} {{ "sinal" if i.outros == 1 else "sinais" }} neste texto</p>{% endif %}
+  {% endif %}
+</li>
+{%- endmacro %}
+
+{#- Um texto em uma linha, sem abrir (recordes do histórico e opinião à parte). -#}
+{% macro curto(a) -%}
+<li class="az-rec"><span class="az-inc-v"><i class="sw t-{{ a.classe }}" aria-hidden="true"></i>T {{ a.valor }}</span><span class="az-rec-t">{% if a.url %}<a href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.titulo }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ a.titulo }}{% endif %}</span><span class="az-rec-m">{{ a.veiculo }} · {{ a.data }}</span></li>
+{%- endmacro %}

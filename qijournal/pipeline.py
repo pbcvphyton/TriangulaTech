@@ -49,7 +49,7 @@ from qijournal.deliver.smtp import send_email as deliver_email
 from qijournal.edit import ContextoTermometro, make_edition
 from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
-from qijournal.render import midia, pesquisa
+from qijournal.render import lados, midia, pesquisa
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
 from qijournal.render.web import index_page_name, render_archive_index, render_edition_page, render_index_page
@@ -444,6 +444,44 @@ def _nomes_em_destaque(corpora: list[midia.CorpusDia | None], fim: str, config: 
         return None
 
 
+def _lados_do_dia(day: date, data_dir: Path) -> lados.DiaLados | None:
+    """Os assuntos de Política com cobertura comparada de uma edição anterior, lidos de
+    ``data/<data>.json``; ``None`` sem o arquivo ou se ele estiver fora do formato."""
+    json_path = data_dir / f"{day.isoformat()}.json"
+    if not json_path.is_file():
+        return None
+    try:
+        return lados.do_dia(Edition.from_dict(_read_json(json_path)))
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Enquadramento: edição %s ignorada (%s)", day.isoformat(), exc)
+        return None
+
+
+def _enquadramento(
+    edition: Edition, data_dir: Path, kept_days: list[date], inicio: date, config: Config
+) -> lados.LadosView | None:
+    """A lente do enquadramento do Analítico Político: onde os veículos racharam e quem fica
+    com quem, nas edições da janela dos nomes em destaque. O bloco é adicional: ``None`` sem a
+    editoria, sem assunto comparado ou se o cálculo falhar (a página sai sem ele)."""
+    secao = next((s for s in config.sections if s.id == lados.SECAO), None)
+    if secao is None:
+        return None
+    try:
+        today = date.fromisoformat(edition.date)
+        dias = [lados.do_dia(edition)]
+        dias += [_lados_do_dia(day, data_dir) for day in kept_days if day != today and day >= inicio]
+        return lados.lados(
+            [d for d in dias if d is not None],
+            fim=edition.date,
+            secao=secao.id,
+            secao_titulo=secao.title,
+            edicoes=[day.isoformat() for day in kept_days],
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Enquadramento: %s — Analítico sem o bloco", exc)
+        return None
+
+
 def _raw_base(repo_url: str) -> str | None:
     """``https://github.com/dono/repo`` → ``https://raw.githubusercontent.com/dono/repo/main/``."""
     match = re.match(r"^https://github\.com/([^/\s]+)/([^/\s]+?)(?:\.git)?/?$", (repo_url or "").strip())
@@ -603,6 +641,7 @@ def publish(
             edition_date=edition.date,
             edicoes=[day.isoformat() for day in kept_days],
             destaques=destaques,
+            enquadramento=_enquadramento(edition, data_dir, kept_days, inicio_nomes, config),
         )
     home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/")
     archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
