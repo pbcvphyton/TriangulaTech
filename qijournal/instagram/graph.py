@@ -79,7 +79,7 @@ def urllib_transport(method: str, url: str, params: dict[str, str], token: str) 
     else:
         req = urllib.request.Request(url, data=data, method=method)
         req.add_header("Content-Type", "application/x-www-form-urlencoded")
-    req.add_header("User-Agent", "TriangulaBot/1.0 (+https://github.com/pbcvphyton/qi-journal)")
+    req.add_header("User-Agent", "TriangulaBot/1.0 (+https://github.com/pbcvphyton/TriangulaTech)")
     if token:
         req.add_header("Authorization", f"Bearer {token}")
     try:

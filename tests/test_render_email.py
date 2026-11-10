@@ -11,7 +11,7 @@ from qijournal import text
 from qijournal.render.email import render_email, story_url
 from tests.fixtures.render.helpers import LEAD_ID, MALICIOUS_ID, load_edition, parse, pbcv_config, default_config
 
-BASE = "https://pbcvphyton.github.io/qi-journal/"
+BASE = "https://pbcvphyton.github.io/TriangulaTech/"
 PAGE = BASE + "edicoes/2026-09-29.html"  # links das matérias: cópia arquivada da edição
 
 

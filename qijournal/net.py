@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/126.0 Safari/537.36 QIJournalBot/2.0 (+https://github.com/pbcvphyton/qi-journal)"
+    "Chrome/126.0 Safari/537.36 QIJournalBot/2.0 (+https://github.com/pbcvphyton/TriangulaTech)"
 )
 DEFAULT_HEADERS = {
     "User-Agent": USER_AGENT,

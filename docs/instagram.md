@@ -88,13 +88,13 @@ O token do Instagram vence em 60 dias se não for renovado. O workflow renova to
 2. Preencha:
    - **Token name**: `triangula-segredos`
    - **Expiration**: *No expiration*
-   - **Repository access**: *Only select repositories* › `qi-journal`
+   - **Repository access**: *Only select repositories* › `TriangulaTech`
    - **Permissions** › **Repository permissions** › **Secrets**: *Read and write*. Nada mais.
 3. Clique em **Generate token** e copie.
 
 ### 4. Segredos no GitHub
 
-Em **github.com/pbcvphyton/qi-journal** › **Settings** › **Secrets and variables** › **Actions** › **New repository secret**, crie:
+Em **github.com/pbcvphyton/TriangulaTech** › **Settings** › **Secrets and variables** › **Actions** › **New repository secret**, crie:
 
 | Segredo | Valor |
 |---|---|
@@ -161,7 +161,7 @@ python -m qijournal instagram gerar --dir . --media-dir /tmp/instagram --date 20
 - **@**, nesta ordem de preferência: `@triangula`, `@triangula.jornal`, `@triangulajornal`, `@triangula.br`
 - **Categoria**: Site de notícias e mídia. Sem botões de contato: ninguém atende.
 - **Bio**: MESMO FATO, VÁRIAS VERSÕES. ▲ ~1.500 notícias por dia (média), de dezenas de veículos: o fato, o mercado e como cada um contou. Por IA, com fontes ↓
-- **Link**: https://pbcvphyton.github.io/qi-journal/ (sempre a edição de hoje)
+- **Link**: https://pbcvphyton.github.io/TriangulaTech/ (sempre a edição de hoje)
 - **Foto do perfil**: `assets/instagram/avatar.png`
 - **Destaques** (capas em `assets/instagram/destaques/`): Comece aqui · Raio-X · Método
 - **Fixado**: o Manifesto (sai uma vez, no primeiro dia com a conta conectada); "Como ler um Raio-X" e "Nossos números" chegam na Onda 2.

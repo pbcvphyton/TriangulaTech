@@ -11,7 +11,7 @@ from qijournal.instagram.graph import GraphError
 from qijournal.instagram.publicar import TokenInvalido, publish_due
 
 BRT = timezone(timedelta(hours=-3))
-BASE = "https://raw.githubusercontent.com/pbcvphyton/qi-journal/instagram/"
+BASE = "https://raw.githubusercontent.com/pbcvphyton/TriangulaTech/instagram/"
 
 
 def post(pid="2026-10-20-carrossel", kind="carousel", due="2026-10-20T07:30:00-03:00", expires="2026-10-20T23:00:00-03:00", **kw):

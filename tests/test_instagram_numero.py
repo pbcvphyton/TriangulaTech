@@ -239,7 +239,7 @@ def test_templates_renderizam_com_o_contexto_da_peca(dia, raiox):
         html = env.get_template(f"{s.template}.html.j2").render(
             brand=brand, s=conteudo.polish(s.ctx), page=i, pages=len(p.slides), kind=p.kind, slot=p.slot
         )
-        assert "triangula" in html and "<svg" in html
+        assert (brand["handle"] or "triangula") in html and "<svg" in html  # assinatura "▲ @handle" ou "▲ triangula"
         assert ("t-orange v2" if i == 1 else "t-paper v2") in html
     capa = env.get_template("numero_capa.html.j2").render(
         brand=brand, s=conteudo.polish(p.slides[0].ctx), page=1, pages=3, kind="carousel", slot="numero"

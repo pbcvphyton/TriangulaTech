@@ -78,7 +78,7 @@ def test_meta_and_open_graph(page, edition):
     description = re.search(r'<meta name="description" content="([^"]*)"', page).group(1)
     assert description.startswith("A cinco dias do primeiro turno, o mercado embute prêmio eleitoral")
     assert re.search(r'<meta property="og:description" content="A cinco dias', page)
-    assert '<link rel="canonical" href="https://pbcvphyton.github.io/qi-journal/edicoes/2026-09-29.html">' in page
+    assert '<link rel="canonical" href="https://pbcvphyton.github.io/TriangulaTech/edicoes/2026-09-29.html">' in page
     assert '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,' in page
 
 
@@ -259,7 +259,7 @@ def test_footer(page):
     assert "64 fontes consultadas" in footer
     assert "Edição gerada por IA (claude-opus-5-5)" in footer
     assert '<a href="edicoes/">Edições anteriores</a>' in footer
-    assert '<a href="https://github.com/pbcvphyton/qi-journal" rel="noopener">Código-fonte</a>' in footer
+    assert '<a href="https://github.com/pbcvphyton/TriangulaTech" rel="noopener">Código-fonte</a>' in footer
     assert "<details>" in footer and "59 de 64 feeds ok" in footer
     assert "Bloomberg Línea: <em>XML inválido</em>" in footer
     assert 'class="st-parcial"><span class="dot" aria-hidden="true"></span>South China Morning Post' in footer

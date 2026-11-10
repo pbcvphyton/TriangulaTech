@@ -6,8 +6,8 @@ geopolítica, tecnologia, mercado imobiliário, esporte, natureza e meio ambient
 e cultura — com cotações, clima, um resumo "Em 1 minuto", a análise de como cada
 veículo cobriu cada assunto e a lista completa de todas as notícias do dia.
 
-- **Edição do dia:** <https://pbcvphyton.github.io/qi-journal/>
-- **Edições anteriores:** <https://pbcvphyton.github.io/qi-journal/edicoes/>
+- **Edição do dia:** <https://pbcvphyton.github.io/TriangulaTech/>
+- **Edições anteriores:** <https://pbcvphyton.github.io/TriangulaTech/edicoes/>
 - **Instagram:** posts e stories gerados da edição e publicados sozinhos ([guia](docs/instagram.md))
 
 Nada precisa ser feito à mão: o GitHub gera a edição sozinho a partir das
@@ -68,12 +68,12 @@ Garantias importantes:
 
 | O quê | Endereço |
 |---|---|
-| Edição do dia | <https://pbcvphyton.github.io/qi-journal/> |
-| Arquivo (edições anteriores) | <https://pbcvphyton.github.io/qi-journal/edicoes/> |
-| Uma edição específica | `https://pbcvphyton.github.io/qi-journal/edicoes/AAAA-MM-DD.html` |
-| Todas as notícias de um dia | `https://pbcvphyton.github.io/qi-journal/edicoes/AAAA-MM-DD-todas.html` |
-| Analítico Político (todo o histórico do termômetro) | <https://pbcvphyton.github.io/qi-journal/edicoes/analitico.html> |
-| Pesquisa analítica (busca em todas as edições) | <https://pbcvphyton.github.io/qi-journal/edicoes/pesquisa.html> |
+| Edição do dia | <https://pbcvphyton.github.io/TriangulaTech/> |
+| Arquivo (edições anteriores) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/> |
+| Uma edição específica | `https://pbcvphyton.github.io/TriangulaTech/edicoes/AAAA-MM-DD.html` |
+| Todas as notícias de um dia | `https://pbcvphyton.github.io/TriangulaTech/edicoes/AAAA-MM-DD-todas.html` |
+| Analítico Político (todo o histórico do termômetro) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/analitico.html> |
+| Pesquisa analítica (busca em todas as edições) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/pesquisa.html> |
 
 Cada matéria tem endereço próprio (`…#s-<id>`) e, clicada, abre na tela inteira
 (no computador, no tablet e no celular). Os links do e-mail apontam para a
@@ -491,7 +491,7 @@ Ela usa os arquivos que o próprio jornal gera:
 O que a rotina faz:
 
 1. Lê `latest.json` em
-   `https://raw.githubusercontent.com/pbcvphyton/qi-journal/main/edicoes/latest.json`
+   `https://raw.githubusercontent.com/pbcvphyton/TriangulaTech/main/edicoes/latest.json`
    (os campos `email_html_raw_url` e `email_text_raw_url` apontam para o e-mail
    no mesmo lugar; `email_html_url` é a cópia no GitHub Pages).
 2. Se `date` for a data de hoje em `America/Sao_Paulo`: não envia se

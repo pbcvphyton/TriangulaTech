@@ -451,7 +451,7 @@ def test_step_summary_and_annotations(
     assert "| Feeds ok | 5/6 |" in md
     assert "| Tokens (entrada / saída) | 123.456 / 7.890 |" in md
     assert "**Manchete:** Juros \\| câmbio em foco" in md
-    assert "(https://pbcvphyton.github.io/qi-journal/edicoes/2026-09-29.html)" in md
+    assert "(https://pbcvphyton.github.io/TriangulaTech/edicoes/2026-09-29.html)" in md
     assert "| quebrada0 | XML inválido \\| linha 3 quebrada | https://quebrada0.example/rss |" in md
     assert "- Cotações indisponíveis:" in md
     out = capsys.readouterr().out

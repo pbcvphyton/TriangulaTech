@@ -212,7 +212,8 @@ def test_template_renderiza_nos_dois_temas(tema, classe):
     s = M.mercado_slide(edicao("21"), historia("21"), tema=tema)
     html = _render(s, "carousel")
     assert classe in html and '<em class="hl">+13,8%</em>' in html
-    assert html.count("graf graf-linha") == 4 and "triangula" in html
+    assinatura = (load_config(ROOT).instagram.handle or "triangula").lstrip("@")  # "▲ @handle" ou "▲ triangula"
+    assert html.count("graf graf-linha") == 4 and assinatura in html
     s.ctx.update(selo="EM 1 MINUTO Nº 031", contador=True)  # como slide 7 do Em 1 minuto
     assert '<span class="cnt">07/08</span>' in _render(s, "carousel")
 
