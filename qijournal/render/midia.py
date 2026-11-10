@@ -475,6 +475,7 @@ class VeiculoTomView:
     pequena: bool  # menos de MIN_TOM_VEICULO manchetes: tom sem comparação
     excesso: bool = False  # fala mais do nome do que o esperado, além do acaso
     demais_valor: float | None = None  # o saldo dos demais veículos, em número
+    z: float | None = None  # o z do veículo contra os demais (o teste do destaque); None com amostra pequena
 
 
 @dataclass
@@ -520,6 +521,7 @@ class TomView:
     saldo_anterior: float | None = None
     n_recente: int = 0
     n_anterior: int = 0
+    z_tendencia: float | None = None  # o z das últimas SEMANA edições contra as anteriores (o teste da tendência)
 
 
 BARRA_TOM = 50  # a barra do saldo vai de −50 a +50 (saldos de manchetes raramente passam disso)
@@ -565,7 +567,7 @@ def tom_do_nome(
 
     # Tendência do tom: as últimas SEMANA edições contra as SEMANA anteriores.
     tendencia, t_classe, t_titulo = "", "ins", f"O tom muda quando as últimas {SEMANA} edições diferem das {SEMANA} anteriores."
-    saldo_recente = saldo_anterior = None
+    saldo_recente = saldo_anterior = z_tendencia = None
     n_recente = n_anterior = 0
     if len(dias) >= 2 * SEMANA:
         recente, anterior = set(dias[-SEMANA:]), set(dias[-2 * SEMANA : -SEMANA])
@@ -574,6 +576,7 @@ def tom_do_nome(
         if len(nr) >= MIN_TOM_SEMANA and len(na) >= MIN_TOM_SEMANA:
             z = comparar(nr, na)
             saldo_recente, saldo_anterior, n_recente, n_anterior = _saldo_de(nr), _saldo_de(na), len(nr), len(na)
+            z_tendencia = z
             t_titulo = (
                 f"Saldo {_saldo(_saldo_de(nr))} em {len(nr)} manchetes nas últimas {SEMANA} edições, "
                 f"{_saldo(_saldo_de(na))} em {len(na)} nas {SEMANA} anteriores"
@@ -599,8 +602,9 @@ def tom_do_nome(
         s_v, s_o = _saldo_de(minhas), _saldo_de(outras)
         pequena = k < MIN_TOM_VEICULO
         destaque = classe = padrao = ""
+        z_veiculo = None
         if not pequena and outras:
-            z = comparar(minhas, outras)
+            z = z_veiculo = comparar(minhas, outras)
             if z is not None and z <= -Z_VEICULO:
                 destaque, classe = "mais crítico", "neg"
             elif z is not None and z >= Z_VEICULO:
@@ -656,6 +660,7 @@ def tom_do_nome(
                 pequena=pequena,
                 excesso=excesso,
                 demais_valor=s_o,
+                z=z_veiculo,
             )
         )
 
@@ -700,6 +705,7 @@ def tom_do_nome(
         saldo_anterior=saldo_anterior,
         n_recente=n_recente,
         n_anterior=n_anterior,
+        z_tendencia=z_tendencia,
     )
     view.leitura = _leitura_tom(view, veiculos, tendencia, t_titulo)
     return view

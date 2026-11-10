@@ -260,7 +260,9 @@ A aba **Analítico Político** (`edicoes/analitico.html`) responde a uma pergunt
 **como a imprensa cobre a política**. Ela se organiza pelo que os dados têm a dizer, não
 pela ordem em que foram calculados: abre com a leitura, desce pelas três lentes e guarda
 a base completa do termômetro, recolhida, no fim. Só vira afirmação o que passa do
-acaso; o resto aparece, mas quieto.
+acaso contando todas as comparações do mesmo tipo feitas na página (correção de Holm:
+com 12 nomes ou dezenas de pares, uma ou outra diferença passaria do acaso só por
+sorte); o resto aparece, mas quieto.
 
 **A leitura** (`qijournal/render/achados.py`). A manchete é o achado de maior peso; logo
 abaixo vêm a prova dela (os números e o link para onde ela está na página), a linha fina
@@ -268,23 +270,23 @@ abaixo vêm a prova dela (os números e o link para onde ela está na página), 
 
 | Achado | Entra quando | De onde sai |
 |---|---|---|
-| Tom | o tom das manchetes sobre um nome piorou ou melhorou nas últimas 7 edições (95%) | manchetes |
-| Espaço | um nome ganhou ou perdeu espaço nas manchetes além do acaso (duas proporções, 99%) | manchetes |
-| Veículos | um veículo é mais crítico ou mais favorável a um nome que os demais (99%) | manchetes |
+| Tom | o tom das manchetes sobre um nome piorou ou melhorou nas últimas 7 edições (95%, contando todos os nomes comparados) | manchetes |
+| Espaço | um nome ganhou ou perdeu espaço nas manchetes além do acaso (duas proporções, 99%, contando todos os nomes comparados) | manchetes |
+| Veículos | um veículo é mais crítico ou mais favorável a um nome que os demais (99%, contando todos os pares veículo × nome) | manchetes |
 | Distância | o tom dos dois nomes mais citados difere além do acaso (99%) | manchetes |
 | Presença | sempre que há nomes: quem domina as manchetes (o que sobra quando nada passa do acaso) | manchetes |
-| Lados | um par de veículos fica do mesmo lado, ou em lados opostos, além do acaso (99%); senão, quantos assuntos racharam | enquadramento |
+| Lados | um par de veículos fica do mesmo lado, ou em lados opostos, além do acaso (99%, contando todos os pares); senão, quantos assuntos racharam | enquadramento |
 | Texto | sempre: o veredito do termômetro (vai para a linha fina) | texto |
 | Texto, os desvios | as notícias que saem do zero pendem para um lado além do acaso (teste de sinal, 99%) | texto |
 | Texto, o mais inclinado | há texto fora de "Equilibrado" nas últimas 7 edições | texto |
-| Tendência | a tendência mensal ou a janela recente do termômetro passou do acaso | base completa |
+| Tendência | a tendência mensal ou a janela recente do termômetro passou do acaso (95%, contando todos os testes de tendência) | base completa |
 | Apuração | sempre que há nota de qualidade | texto |
 
 O peso de cada achado é a força do efeito vezes a importância do nome (a raiz da parte
 das manchetes dele sobre a do nome mais citado), sobre uma base por tipo; dá para refazer
 a ordem à mão com os números mostrados. Ao lado ficam **as lentes** (com a base de cada
 uma) e **o que mudou em sete edições**: todas as mudanças de espaço e de tom que
-passaram do acaso, da maior para a menor.
+passaram do acaso contando todos os nomes comparados, da maior para a menor.
 
 **1 · Manchetes — de quem a imprensa fala, e em que tom** (`qijournal/render/midia.py`):
 
@@ -295,7 +297,8 @@ passaram do acaso, da maior para a menor.
   destaque), a variação (últimas 7 edições contra as 7 anteriores), o tom (quanto das
   manchetes brasileiras o põe em contexto desfavorável e favorável, e o saldo), o tom
   antes e agora e quem destoa. A variação de espaço e a de tom só ganham a marca escura
-  quando passam do acaso. Os números são contados como no analítico do nome na Pesquisa
+  quando passam do acaso contando todos os nomes comparados; a mudança de tom que passa
+  só na comparação isolada fica com o selo claro. Os números são contados como no analítico do nome na Pesquisa
   (mesma regra de busca, todos os veículos, a notícia uma vez).
 - **Dossiê do nome**: clicar na linha abre **quem fala de quem, e como**: por que um
   veículo fala tanto dele (manchetes do veículo contra as esperadas pelo que ele publica
@@ -309,7 +312,9 @@ passaram do acaso, da maior para a menor.
   nome" leva qualquer termo para lá.
 - **Veículo por veículo**: a matriz veículo × nome, com o saldo do tom de cada veículo
   sobre cada nome; a cor acompanha o saldo, o contorno marca o veículo que difere dos
-  demais além do acaso e o ponto, o que tem menos de 10 manchetes.
+  demais na comparação isolada (99%, como na Pesquisa) e o ponto, o que tem menos de 10
+  manchetes. Logo abaixo, a página diz o que continua de pé contando todas as
+  comparações da tabela.
 
 **2 · Enquadramento — onde a imprensa rachou** (`qijournal/render/lados.py`). Entram os
 assuntos de Política que dois ou mais veículos cobriram, nas matérias da edição e nos
@@ -327,7 +332,8 @@ demais assuntos da cobertura comparada, das mesmas 30 edições (lidos de
 O acaso não é "metade das vezes": num assunto rachado em 2 × 2, dois veículos só caem do
 mesmo lado 1 vez em 3. Cada contagem é comparada com a esperada dado o placar de cada
 assunto (os lados embaralhados entre os veículos que tomaram lado) e só vira afirmação
-quando passa de 99%. Os lados são os enfoques de cada assunto, não "a favor" ou "contra"
+quando passa de 99% contando todos os pares (ou todos os veículos) comparados. Um
+assunto acompanhado em várias edições conta uma vez por edição. Os lados são os enfoques de cada assunto, não "a favor" ou "contra"
 alguém.
 
 **3 · Texto — como as reportagens escrevem** (o termômetro):

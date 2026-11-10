@@ -16,10 +16,12 @@ lados** — nas matérias da edição e nos demais assuntos comparados — e res
 O acaso não é "metade das vezes": num assunto rachado em 2 × 2, dois veículos sorteados
 só caem do mesmo lado 1 vez em 3. Por isso cada contagem é comparada com a esperada
 **dado o placar de cada assunto** (os lados embaralhados entre os veículos que tomaram
-lado), e só vira afirmação quando a chance de uma contagem tão extrema é menor que
-``ALFA`` (99%, porque muitos pares são comparados de uma vez). A conta é exata (a
-distribuição da soma dos sorteios de cada assunto), não uma aproximação: com poucos
-assuntos em comum, a curva normal erraria justamente nas pontas.
+lado). A conta é exata (a distribuição da soma dos sorteios de cada assunto), não uma
+aproximação: com poucos assuntos em comum, a curva normal erraria justamente nas pontas.
+E como muitos pares (e veículos) são comparados de uma vez, um deles passaria do acaso
+só por sorte: a afirmação só sai quando a contagem passa de 99% **contando todas as
+comparações feitas** (correção de Holm, :func:`holm`). Limite: um assunto acompanhado
+em várias edições conta uma vez por edição, e assuntos parecidos não são independentes.
 
 Os lados são os enfoques de cada assunto, não "a favor" ou "contra" alguém: ficar do
 mesmo lado quer dizer enquadrar o assunto do mesmo jeito.
@@ -49,7 +51,7 @@ PERIODO = 8  # os mais divididos do resto do período (num "ver mais")
 MIN_PAR = 8  # assuntos divididos em que os dois veículos tomaram lado, para o par entrar
 MIN_DESTOA = 8  # assuntos com maioria em que o veículo tomou lado, para entrar em "quem destoa"
 PARES = 10  # pares na lista (os mais longe do acaso primeiro)
-ALFA = 0.01  # 99% (dois lados): muitos pares e veículos comparados de uma vez
+ALFA = 0.01  # 99% (dois lados), para o conjunto das comparações da mesma família (Holm)
 
 
 # ── um dia ───────────────────────────────────────────────────────────────────
@@ -160,6 +162,7 @@ class ParView:
     juntos: int
     total: int
     esperado: str  # "6,5": quantos assuntos o acaso daria do mesmo lado
+    opostos: str  # quantos o acaso daria em lados opostos (total − esperado)
     pct: str  # "18%"
     barra: float  # % do mesmo lado (0 a 100)
     marca: float  # % esperado pelo acaso (o traço na barra)
@@ -245,6 +248,20 @@ def _p(observado: int, probabilidades: list[float]) -> float:
     return min(1.0, 2 * min(sum(dist[observado:]), sum(dist[: observado + 1])))
 
 
+def holm(pvalores: dict, alfa: float, m: int | None = None) -> set:
+    """As chaves que passam do acaso contando todas as ``m`` comparações da família (Holm:
+    a menor chance contra ``alfa / m``, a seguinte contra ``alfa / (m − 1)``… até a primeira
+    que não passa). ``m``: o tamanho da família, quando ela tem comparações sem chance
+    calculada (que não passariam de qualquer jeito); padrão, as de ``pvalores``."""
+    m = len(pvalores) if m is None else max(m, len(pvalores))
+    passam = set()
+    for i, (chave, p) in enumerate(sorted(pvalores.items(), key=lambda kv: kv[1])):
+        if p > alfa / (m - i):
+            break
+        passam.add(chave)
+    return passam
+
+
 def _ordem(a: Assunto) -> tuple:
     """Mais disputados primeiro: mais veículos no lado menor (um 1 × 1 não vale um 3 × 4),
     depois o mais perto de meio a meio, o com mais veículos e o mais recente."""
@@ -292,20 +309,20 @@ def _pares(assuntos: list[Assunto]) -> tuple[list[ParView], int]:
         lados_ = assunto.lados
         na = sum(1 for lado in lados_.values() if lado == "a")
         nb = len(lados_) - na
-        if na + nb < 2:
-            continue
+        if not na or not nb:
+            continue  # tirado quem ficou nos dois lados, o assunto não divide mais os demais
         p = _acaso_par(na, nb)
         for x, y in combinations(sorted(lados_), 2):
             chances.setdefault((x, y), []).append(p)
             juntos[(x, y)] += lados_[x] == lados_[y]
+    testados = {par: ps for par, ps in chances.items() if len(ps) >= MIN_PAR}
+    passam = holm({par: _p(juntos[par], ps) for par, ps in testados.items()}, ALFA)
     pares = []
-    for par, ps in chances.items():
+    for par, ps in testados.items():
         total = len(ps)
-        if total < MIN_PAR:
-            continue
         k = juntos[par]
         esperado, z = _z(k, ps)
-        classe = ("ju" if k > esperado else "op") if _p(k, ps) < ALFA else ""
+        classe = ("ju" if k > esperado else "op") if par in passam else ""
         leitura = {
             "op": "em lados opostos além do acaso",
             "ju": "do mesmo lado além do acaso",
@@ -318,6 +335,7 @@ def _pares(assuntos: list[Assunto]) -> tuple[list[ParView], int]:
                 juntos=k,
                 total=total,
                 esperado=esperado_txt,
+                opostos=text.format_number_pt(total - esperado, 1),
                 pct=_pct(k, total),
                 barra=round(100 * k / total, 1),
                 marca=round(100 * esperado / total, 1),
@@ -350,14 +368,14 @@ def _destoam(assuntos: list[Assunto]) -> list[DestoaView]:
         for veiculo, lado in lados_.items():
             chances.setdefault(veiculo, []).append(p)
             minoria[veiculo] += lado == menor
+    testados = {veiculo: ps for veiculo, ps in chances.items() if len(ps) >= MIN_DESTOA}
+    passam = holm({veiculo: _p(minoria[veiculo], ps) for veiculo, ps in testados.items()}, ALFA)
     saida = []
-    for veiculo, ps in chances.items():
+    for veiculo, ps in testados.items():
         total = len(ps)
-        if total < MIN_DESTOA:
-            continue
         k = minoria[veiculo]
         esperado, _z_veiculo = _z(k, ps)
-        classe = ("mais" if k > esperado else "menos") if _p(k, ps) < ALFA else ""
+        classe = ("mais" if k > esperado else "menos") if veiculo in passam else ""
         esperado_txt = text.format_number_pt(esperado, 1)
         saida.append(
             DestoaView(
@@ -392,17 +410,20 @@ def _leitura(view: LadosView, mais: Assunto | None) -> list[str]:
             f"{', '.join(mais.a)} em “{mais.lado_a}”; {', '.join(mais.b)} em “{mais.lado_b}”."
         )
     par = view.par_destaque
+    contando = f", mesmo contando os {len(view.pares) + view.pares_mais} pares comparados" if len(view.pares) + view.pares_mais > 1 else ""
     if par is not None:
-        como = "em lados opostos" if par.classe == "op" else "do mesmo lado"
-        k = par.total - par.juntos if par.classe == "op" else par.juntos
+        if par.classe == "op":
+            como, k, acaso = "em lados opostos", par.total - par.juntos, f"{par.opostos} em lados opostos"
+        else:
+            como, k, acaso = "do mesmo lado", par.juntos, f"{par.esperado} do mesmo lado"
         frases.append(
             f"{par.a} e {par.b} ficaram {como} em {k} de {par.total} assuntos divididos em que os dois tomaram lado "
-            f"(o acaso daria {par.esperado} do mesmo lado): a diferença passa do acaso."
+            f"(o acaso daria {acaso}): a diferença passa do acaso{contando}."
         )
     elif view.pares:
         frases.append(
-            "Nenhum par de veículos fica do mesmo lado ou em lados opostos além do que o acaso explica: "
-            "os alinhamentos mudam de assunto para assunto."
+            "Nenhum par de veículos fica do mesmo lado ou em lados opostos além do que o acaso explica"
+            f"{contando}: os alinhamentos mudam de assunto para assunto."
         )
     destoa = next((d for d in view.destoam if d.classe == "mais"), None)
     if destoa is not None:

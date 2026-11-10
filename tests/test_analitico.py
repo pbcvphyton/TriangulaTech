@@ -136,9 +136,13 @@ def test_matriz_traz_o_saldo_de_cada_veiculo_e_contorna_quem_destoa():
     linhas = {l.veiculo: l for l in mz.linhas}
     folha = linhas["Folha"].celulas[0]
     assert folha.valor == "−100" and folha.nivel == "n3" and folha.destaque == "mais crítico"
-    assert "Folha sobre Fulano de Tal: saldo −100 em 21 manchetes" in folha.title and "além do acaso" in folha.title
+    assert "Folha sobre Fulano de Tal: saldo −100 em 21 manchetes" in folha.title and "comparação isolada (99%)" in folha.title
     assert linhas["Folha"].celulas[1].valor == "" and linhas["Folha"].celulas[1].title == ""  # sem manchete: vazio
-    assert mz.destaques == 1 and any(f.startswith("Além do acaso: Folha mais crítico a Fulano de Tal") for f in mz.leitura)
+    # a marca é a comparação isolada (99%); o que continua de pé contando as 8 comparações da tabela vem à parte
+    assert mz.destaques == 1 and mz.leitura[1].startswith(
+        "Marcados na tabela, cada um comparado sozinho com os demais veículos (99%): Folha mais crítico a Fulano de Tal"
+    )
+    assert mz.leitura[2] == "Contando todas as 8 comparações da tabela, continua de pé: Folha sobre Fulano de Tal."
     assert achados._nivel(4) == "z" and achados._nivel(-5) == "n1" and achados._nivel(10) == "p2" and achados._nivel(-33) == "n3"
 
 
@@ -243,7 +247,12 @@ def test_lados_aponta_os_pares_e_quem_destoa_alem_do_acaso():
     assert (juntos.juntos, juntos.total, juntos.classe) == (14, 14, "ju") and juntos.esperado == "4,7"  # 14 × 1/3
     opostos = pares[("Folha", "Valor")]  # opostos nos 2 × 2 e juntos nos 3 × 1: metade das vezes
     assert (opostos.juntos, opostos.total) == (14, 28) and opostos.classe == ""
-    assert pares[("Estadão", "Valor")].classe == "op" and pares[("Estadão", "Valor")].juntos == 0
+    assert pares[("CNN", "Folha")].classe == "op" and pares[("CNN", "Folha")].juntos == 0  # 0 de 14, com 7 esperados
+    # 0 de 14 com 4,7 esperados passaria sozinho (p < 1%), mas não contando os 9 pares testados (Holm); com 21 edições, passa
+    assert (pares[("Estadão", "Valor")].juntos, pares[("Estadão", "Valor")].classe) == (0, "")
+    assert lados._p(0, [1 / 3] * 14) < lados.ALFA
+    mais = {(p.a, p.b): p for p in lados.lados(_dias_de_lados(21), fim=FIM).pares}
+    assert mais[("Estadão", "Valor")].classe == "op"
     assert view.par_destaque is not None and view.par_destaque.classe in ("ju", "op")
     cnn = next(d for d in view.destoam if d.nome == "CNN")
     assert (cnn.minoria, cnn.total, cnn.classe) == (14, 14, "mais") and cnn.esperado == "3,5"  # 14 × 1/4
@@ -257,6 +266,23 @@ def test_lados_aponta_os_pares_e_quem_destoa_alem_do_acaso():
     assert len(view.demais) == lados.PERIODO and not {a.titulo for a in view.demais} & {a.titulo for a in view.recentes}
     fora = lados.lados(_dias_de_lados(), fim=FIM)  # sem a edição no arquivo, o assunto fica sem link
     assert all(a.href == "" for a in fora.recentes)
+
+
+def test_holm_conta_todas_as_comparacoes_da_familia():
+    # a menor chance contra 1%/3, a seguinte contra 1%/2, a última contra 1%; para na primeira que não passa
+    assert lados.holm({"a": 0.004, "b": 0.03, "c": 0.001}, 0.01) == {"a", "c"}
+    assert lados.holm({"a": 0.004, "b": 0.0045, "c": 0.004}, 0.01) == set()  # cada uma passaria sozinha a 1%
+    assert lados.holm({"a": 0.004, "b": 0.001}, 0.01, m=5) == {"b"}  # a família tem 5: 0,4% não passa de 0,25%
+    assert lados.holm({}, 0.01) == set()
+
+
+def test_significancia_conta_os_nomes_e_os_pares_comparados():
+    sig = achados.significancia(_destaques())
+    # Fulano: o tom, o espaço e a Folha passam contando as comparações; os Veículos 2 a 6 (z 2,4) nem sozinhos, a 99%
+    assert sig.tom == {"Fulano de Tal"} and sig.espaco == {"Fulano de Tal"} and sig.veiculos == {("Fulano de Tal", "Folha")}
+    assert (sig.n_tom, sig.n_espaco, sig.n_veiculos) == (1, 2, 8)
+    assert achados._contando(8, "pares veículo × nome") == ", mesmo contando os 8 pares veículo × nome comparados"
+    assert achados._contando(1, "nomes") == ""
 
 
 def test_lados_sem_nada_alem_do_acaso_diz_isso():
@@ -360,7 +386,7 @@ def test_leitura_poe_no_alto_o_achado_de_maior_peso_e_o_termometro_na_linha_fina
     # o par mais longe do acaso: Valor e g1 ficam juntos nos 2 × 2 e nos 3 × 1
     assert l.achados[1].titulo == "Valor e g1 enquadram do mesmo jeito: mesmo lado em 28 de 28 assuntos divididos"
     veiculos = next(a for a in l.achados if a.tipo == "veiculos")
-    assert veiculos.titulo == "Folha é o veículo mais crítico a Fulano de Tal nas manchetes" and veiculos.href == "#an-matriz"
+    assert veiculos.titulo == "Folha tem manchetes mais críticas a Fulano de Tal que os demais veículos" and veiculos.href == "#an-matriz"
     assert [(x.ordem, x.nome, x.href) for x in l.lentes] == [
         (1, "Manchetes", "#an-nomes"), (2, "Enquadramento", "#an-lados"), (3, "Texto", "#an-texto"),
     ]
@@ -495,7 +521,8 @@ def test_mudanca_do_termometro_vira_frase_e_pesa_pelo_tamanho():
     assert view.indo.aberto and view.indo.resumo == "A qualidade da apuração piorou nos últimos 20 dias: 81 de 100, contra 91 antes."
     achado = view.leitura.principal  # 10 pontos: força máxima, acima do veredito do texto em equilíbrio
     assert achado.tipo == "tendencia" and achado.selo == "Apuração" and achado.numero == "91 → 81" and achado.href == "#an-indo"
-    assert achado.peso == pytest.approx(88.0) and achado.texto.endswith("A diferença passa do acaso.")
+    assert achado.peso == pytest.approx(88.0)
+    assert achado.texto.endswith("A diferença passa do acaso, mesmo contando os 2 testes de tendência feitos.")
     assert not any(a.tipo == "apuracao" for a in view.leitura.achados)  # a média sai: a mudança já está na leitura
     # os números saem inteiros, como no resto da página, salvo quando os inteiros seriam iguais
     assert analitico._par(87.0, 84.0, "Q") == ("87", "84") and analitico._par(84.4, 84.1, "Q") == ("84,4", "84,1")

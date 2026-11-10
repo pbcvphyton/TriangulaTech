@@ -106,10 +106,10 @@
 {% macro placar(pl, nm) -%}
 <div class="az-blk" id="an-quem">
   <h4 class="az-h">Placar dos nomes <span>quem fala de quem, e como</span></h4>
-  <p class="az-dek">Os {{ pl.linhas|length }} nomes mais citados. As marcas escuras são as mudanças das últimas 7 edições contra as 7 anteriores que passam do acaso{% if pl.mudaram %} ({{ pl.mudaram }} {{ "nome" if pl.mudaram == 1 else "nomes" }}){% endif %}; as demais variações cabem no que o acaso explica. Clique em um nome para abrir o dossiê dele.</p>
+  <p class="az-dek">{{ "O nome mais citado." if pl.linhas|length == 1 else "Os " ~ pl.linhas|length ~ " nomes mais citados." }} As marcas escuras são as mudanças das últimas 7 edições contra as 7 anteriores que passam do acaso mesmo contando os nomes comparados{% if pl.mudaram %} ({{ pl.mudaram }} {{ "nome" if pl.mudaram == 1 else "nomes" }}){% endif %}; as demais variações são pequenas ou cabem no que o acaso explica. Clique em um nome para abrir o dossiê dele.</p>
   <div class="az-pl">
     <div class="az-hd" aria-hidden="true">
-      <span></span><span>Nome</span><span>Espaço nas manchetes</span><span>{{ nm.edicoes }} edições</span><span>7 anteriores → últimas 7</span><span>Tom <i>← desfavorável · favorável →</i></span><span>Tom, 7 anteriores → últimas 7</span><span>Quem destoa</span><span></span>
+      <span></span><span>Nome</span><span>Espaço nas manchetes</span><span>{{ nm.edicoes }} {{ "edição" if nm.edicoes == 1 else "edições" }}</span><span>7 anteriores → últimas 7</span><span>Tom <i>← desfavorável · favorável →</i></span><span>Tom, 7 anteriores → últimas 7</span><span>Quem destoa</span><span></span>
     </div>
     <ol class="az-rows">
       {% for l in pl.linhas %}{% set n = l.n %}{% set t = n.tom %}
@@ -118,7 +118,7 @@
           <summary class="az-s">
             <span class="az-c-o" aria-hidden="true">{{ l.ordem }}</span>
             <span class="az-c-nm"><b>{{ n.nome }}</b>{% if n.tambem %}<small>também “{{ n.tambem }}”</small>{% endif %}</span>
-            <span class="az-c-es" title="{{ n.participacao }} das {{ "{:,}".format(nm.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} citam {{ n.nome }}, em {{ n.veiculos }} veículos"><span class="az-bar" aria-hidden="true"><i style="width:{{ l.barra }}%"></i></span><b>{{ n.participacao }}</b><small><span class="sr-only">das manchetes; </span>{{ "{:,}".format(n.manchetes).replace(",", ".") }}<span class="sr-only"> manchetes</span></small></span>
+            <span class="az-c-es" title="{{ n.participacao }} das {{ "{:,}".format(nm.manchetes).replace(",", ".") }} manchetes de {{ nm.secao_titulo }} citam {{ n.nome }}, em {{ n.veiculos }} {{ "veículo" if n.veiculos == 1 else "veículos" }}"><span class="az-bar" aria-hidden="true"><i style="width:{{ l.barra }}%"></i></span><b>{{ n.participacao }}</b><small><span class="sr-only">das manchetes; </span>{{ "{:,}".format(n.manchetes).replace(",", ".") }}<span class="sr-only"> manchetes</span></small></span>
             <span class="az-c-cv"{% if l.curva %} title="{{ l.curva.title }}"{% endif %}>
               {%- if l.curva %}<span class="az-sp" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path class="az-sp-l" d="{{ l.curva.linha }}" vector-effect="non-scaling-stroke"/>{% if l.curva.recente %}<path class="az-sp-r" d="{{ l.curva.recente }}" vector-effect="non-scaling-stroke"/>{% endif %}</svg><i style="top:{{ l.curva.fim }}%"></i></span>{% endif -%}
             </span>
@@ -131,7 +131,7 @@
               {%- else %}<span class="az-nd">—</span>{% endif -%}
             </span>
             <span class="az-c-t7"{% if t %} title="{{ t.tendencia_titulo }}"{% endif %}>
-              {%- if t and l.tom_antes %}<span class="az-db" aria-hidden="true"><i class="az-db-l" style="left:{{ l.tom_de }}%;width:{{ l.tom_larg }}%"></i><i class="az-db-a" style="left:{{ l.tom_antes_x }}%"></i><i class="az-db-b{% if l.tom_forte %} {{ "neg" if t.tendencia == "piorou" else "pos" }}{% endif %}" style="left:{{ l.tom_agora_x }}%"></i></span><span class="az-ba"><span class="sr-only">saldo do tom nas 7 edições anteriores </span>{{ l.tom_antes }}<span aria-hidden="true"> → </span><span class="sr-only">, nas últimas 7 </span><b>{{ l.tom_agora }}</b></span>{% if l.tom_forte %}<span class="az-chip on {{ "neg" if t.tendencia == "piorou" else "pos" }}">{{ t.tendencia }}</span>{% endif %}
+              {%- if t and l.tom_antes %}<span class="az-db" aria-hidden="true"><i class="az-db-l" style="left:{{ l.tom_de }}%;width:{{ l.tom_larg }}%"></i><i class="az-db-a" style="left:{{ l.tom_antes_x }}%"></i><i class="az-db-b{% if l.tom_forte %} {{ "neg" if t.tendencia == "piorou" else "pos" }}{% endif %}" style="left:{{ l.tom_agora_x }}%"></i></span><span class="az-ba"><span class="sr-only">saldo do tom nas 7 edições anteriores </span>{{ l.tom_antes }}<span aria-hidden="true"> → </span><span class="sr-only">, nas últimas 7 </span><b>{{ l.tom_agora }}</b></span>{% if l.tom_mudou %}<span class="az-chip{% if l.tom_forte %} on {{ "neg" if t.tendencia == "piorou" else "pos" }}{% endif %}">{{ t.tendencia }}</span>{% endif %}
               {%- else %}<span class="az-nd"{% if t %} title="Menos de 20 manchetes em cada janela para comparar"{% endif %}>—</span>{% endif -%}
             </span>
             <span class="az-c-dq">
@@ -140,7 +140,7 @@
             <span class="az-c-ch" aria-hidden="true"></span>
           </summary>
           <div class="az-dossie">
-            {% if t %}{{ dossie(n) }}{% else %}<p class="md-note">Menos de 20 manchetes brasileiras sobre {{ n.nome }} no período: ainda sem leitura de tom. {{ n.veiculos }} veículos citaram o nome{% if n.debates %}; {{ n.debates }} {{ "assunto dividiu" if n.debates == 1 else "assuntos dividiram" }} os veículos (divergência média {{ n.divergencia }}){% endif %}.</p>{% endif %}
+            {% if t %}{{ dossie(n) }}{% else %}<p class="md-note">Menos de 20 manchetes brasileiras sobre {{ n.nome }} no período: ainda sem leitura de tom. {{ n.veiculos }} {{ "veículo citou" if n.veiculos == 1 else "veículos citaram" }} o nome{% if n.debates %}; {{ n.debates }} {{ "assunto dividiu" if n.debates == 1 else "assuntos dividiram" }} os veículos (divergência média {{ n.divergencia }}){% endif %}.</p>{% endif %}
             <p class="qf-mais"><a href="{{ n.href }}" title="Abrir o analítico de {{ n.consulta }} na Pesquisa">Analítico completo de {{ n.nome }} na Pesquisa: atenção, picos, pauta, vocabulário, lados e o tom por veículo &rarr;</a></p>
           </div>
         </details>
@@ -161,7 +161,7 @@
 {% macro matriz(mz) -%}
 <div class="az-blk" id="an-matriz">
   <h4 class="az-h">Veículo por veículo <span>o tom de cada um sobre cada nome</span></h4>
-  <p class="az-dek">Saldo do tom das manchetes de cada veículo sobre cada nome (favoráveis menos desfavoráveis, em pontos). A cor acompanha o saldo; o contorno marca o veículo que difere dos demais além do acaso{% if mz.destaques %} ({{ mz.destaques }} {{ "caso" if mz.destaques == 1 else "casos" }}){% endif %}.</p>
+  <p class="az-dek">Saldo do tom das manchetes de cada veículo sobre cada nome (favoráveis menos desfavoráveis, em pontos). A cor acompanha o saldo; o contorno marca o veículo que difere dos demais naquela comparação, a 99%{% if mz.destaques %} ({{ mz.destaques }} {{ "caso" if mz.destaques == 1 else "casos" }}){% endif %}.</p>
   <div class="az-mx-wrap" tabindex="0" role="group" aria-label="Matriz do tom das manchetes: veículo por nome (role para o lado para ver todos os nomes)">
     <table class="az-mx">
       <thead>
@@ -171,13 +171,13 @@
         <tr class="az-mx-g"><th scope="row">Todos os veículos</th>{% for c in mz.geral %}<td class="az-c az-{{ c.nivel }}" title="{{ c.title }}">{{ c.valor }}</td>{% endfor %}</tr>
         {% for l in mz.linhas %}
         <tr><th scope="row">{{ l.veiculo }} <small>{{ "{:,}".format(l.manchetes).replace(",", ".") }}</small></th>
-          {%- for c in l.celulas %}<td class="az-c{% if c.nivel %} az-{{ c.nivel }}{% endif %}{% if c.pequena %} az-pq{% endif %}{% if c.destaque %} az-on{% endif %}"{% if c.title %} title="{{ c.title }}"{% endif %}>{{ c.valor }}{% if c.destaque %}<span class="sr-only"> ({{ c.destaque }}, além do acaso)</span>{% endif %}</td>{% endfor -%}
+          {%- for c in l.celulas %}<td class="az-c{% if c.nivel %} az-{{ c.nivel }}{% endif %}{% if c.pequena %} az-pq{% endif %}{% if c.destaque %} az-on{% endif %}"{% if c.title %} title="{{ c.title }}"{% endif %}>{{ c.valor }}{% if c.destaque %}<span class="sr-only"> ({{ c.destaque }} que os demais, na comparação isolada)</span>{% endif %}</td>{% endfor -%}
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <p class="az-note az-mx-k" aria-hidden="true"><span class="az-key"><i class="az-c az-n3"></i>−20 ou menos</span><span class="az-key"><i class="az-c az-n2"></i>−10</span><span class="az-key"><i class="az-c az-n1"></i>−5</span><span class="az-key"><i class="az-c az-z"></i>perto de zero</span><span class="az-key"><i class="az-c az-p1"></i>+5</span><span class="az-key"><i class="az-c az-p2"></i>+10</span><span class="az-key"><i class="az-c az-p3"></i>+20 ou mais</span><span class="az-key"><i class="az-c az-z az-on"></i>difere dos demais além do acaso</span><span class="az-key"><i class="az-c az-pq">·</i>menos de 10 manchetes</span></p>
+  <p class="az-note az-mx-k" aria-hidden="true"><span class="az-key"><i class="az-c az-n3"></i>−20 ou menos</span><span class="az-key"><i class="az-c az-n2"></i>−10</span><span class="az-key"><i class="az-c az-n1"></i>−5</span><span class="az-key"><i class="az-c az-z"></i>perto de zero</span><span class="az-key"><i class="az-c az-p1"></i>+5</span><span class="az-key"><i class="az-c az-p2"></i>+10</span><span class="az-key"><i class="az-c az-p3"></i>+20 ou mais</span><span class="az-key"><i class="az-c az-z az-on"></i>difere dos demais (comparação isolada, 99%)</span><span class="az-key"><i class="az-c az-pq">·</i>menos de 10 manchetes</span></p>
   <ul class="az-lei">
     {% for f in mz.leitura %}<li>{{ f }}</li>{% endfor %}
   </ul>
@@ -216,7 +216,7 @@
   {% endif %}
   {% if ld.demais %}
   <details class="az-more"{% if not ld.recentes %} open{% endif %}>
-    <summary>Os {{ ld.demais|length }} mais divididos do {{ "resto do " if ld.recentes else "" }}período</summary>
+    <summary>{{ "O mais dividido" if ld.demais|length == 1 else "Os " ~ ld.demais|length ~ " mais divididos" }} do {{ "resto do " if ld.recentes else "" }}período</summary>
     <ol class="az-rxs">
       {% for x in ld.demais %}{{ assunto(x) }}{% endfor %}
     </ol>

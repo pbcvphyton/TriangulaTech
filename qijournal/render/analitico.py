@@ -34,6 +34,7 @@ from collections import Counter
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date, timedelta
+from math import erfc, sqrt
 from typing import Any
 
 from .. import text
@@ -42,7 +43,7 @@ from ..termometro import agregacao
 from ..termometro.referencia import PARAMETROS, arredondar
 from . import achados, filters
 from .achados import InclinadoResumo, MatrizView, MudancaTexto, PlacarView, TextoResumo
-from .lados import LadosView
+from .lados import LadosView, holm
 from .midia import DestaquesView
 from .termometro import (
     ANALITICO_PAGINA,
@@ -114,6 +115,7 @@ class LeituraView:
     texto: str
     classe: str  # "esq" | "dir" | "est" | "ins" | "melhor" | "pior"
     mudanca: MudancaTexto | None = None
+    p: float | None = None  # a chance do resultado sob o acaso (do intervalo de 95%); None sem dados
 
 
 @dataclass
@@ -399,6 +401,8 @@ def _tendencias(linhas: list[dict[str, Any]], inicio: str, fim: str) -> list[Lei
                 f"em {contagem(r['meses'], 'mês', 'meses')}."
             )
         view = LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"]))
+        if r["leitura"] != "dados insuficientes":
+            view.p = _p_do_intervalo(r["por_mes"], r["ic95"])
         if view.classe in MUDOU:
             quem = "O texto das notícias anda" if chave == "T" else "A qualidade da apuração está"
             meses = f"de {_mes_label(r['de']).lower()} a {_mes_label(r['ate']).lower()}"
@@ -408,6 +412,7 @@ def _tendencias(linhas: list[dict[str, Any]], inicio: str, fim: str) -> list[Lei
                 numero=f"{fmt_dec(r['por_mes'])}/mês",
                 forca=abs(r["variacao_no_periodo"]),
                 medida=chave,
+                p=view.p if view.p is not None else 1.0,
             )
         leituras.append(view)
     return leituras
@@ -428,20 +433,23 @@ def _desvio(linhas: list[dict[str, Any]], inicio: str, fim: str) -> tuple[list[L
                 f"a comparação pede {P['min_n']} em cada janela."
             )
         else:
+            antes, agora = _par(r["base"], r["recente"], chave)
             texto = (
-                f"{janela}: {fmt_val(r['recente'])}; {base_txt}: {fmt_val(r['base'])}. Diferença de "
+                f"{janela}: {agora}; {base_txt}: {antes}. Diferença de "
                 f"{fmt_dec(r['diferenca'])} (intervalo de 95%: {fmt_ic(r['ic95'], fmt_dec)})."
             )
         view = LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"]))
+        if r["leitura"] != "dados insuficientes":
+            view.p = _p_do_intervalo(r["diferenca"], r["ic95"])
         if view.classe in MUDOU:
             dias = (date.fromisoformat(recente[1]) - date.fromisoformat(recente[0])).days + 1
-            antes, agora = _par(r["base"], r["recente"], chave)
             if chave == "T":
                 frase = f"O texto das notícias {r['leitura']} nos últimos {dias} dias: T {agora}, contra {antes} antes"
             else:
                 frase = f"A qualidade da apuração {r['leitura']} nos últimos {dias} dias: {agora} de 100, contra {antes} antes"
             view.mudanca = MudancaTexto(
-                frase=frase, texto=texto, numero=f"{antes} → {agora}", forca=abs(r["diferenca"]), medida=chave
+                frase=frase, texto=texto, numero=f"{antes} → {agora}", forca=abs(r["diferenca"]), medida=chave,
+                p=view.p if view.p is not None else 1.0,
             )
         leituras.append(view)
     return leituras, recente, base, tem_dados
@@ -456,13 +464,23 @@ def _pontos(valor: float) -> str:
 
 
 def _par(antes: float, agora: float, medida: str) -> tuple[str, str]:
-    """Os dois valores de uma comparação, inteiros como no resto da página; com uma casa
-    quando os inteiros sairiam iguais (uma diferença real não pode aparecer como "84 contra 84")."""
+    """Os dois valores de uma comparação, inteiros como no resto da página, salvo quando a
+    distância entre os inteiros não seria a diferença arredondada ("87 → 84" ao lado de uma
+    diferença de −2,3, ou "84 contra 84" para uma diferença real): aí, com uma casa."""
     inteiro = fmt_t if medida == "T" else fmt_q
-    if inteiro(antes) != inteiro(agora):
+    if arredondar(agora) - arredondar(antes) == arredondar(agora - antes) and inteiro(antes) != inteiro(agora):
         return inteiro(antes), inteiro(agora)
     sinal = medida == "T"
     return fmt_dec(antes, sinal=sinal), fmt_dec(agora, sinal=sinal)
+
+
+def _p_do_intervalo(estimativa: float, ic: list[float] | None) -> float | None:
+    """A chance (dois lados) de uma estimativa tão longe de zero sob o acaso, tirada do
+    intervalo de 95% da agregação (o erro padrão é a meia largura ÷ 1,96)."""
+    if not ic:
+        return None
+    erro = (ic[1] - ic[0]) / (2 * P["z"])
+    return 1.0 if erro <= 0 else erfc(abs(estimativa) / erro / sqrt(2))
 
 
 def _puxadores(linhas: list[dict[str, Any]], recente: tuple, base: tuple) -> list[tuple[str, list[PuxadorView]]]:
@@ -650,7 +668,9 @@ def _linha_tabela(nome: str, s: Mapping[str, Any], href: str | None = None) -> L
 MIN_TEXTOS_VEICULO = 10  # textos do veículo para a lista de "onde aparecem os sinais"
 
 
-def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> ResumoView | None:
+def _em_resumo(
+    analises: list[Mapping[str, Any]], geral: Mapping[str, Any], *, outras_lentes: bool = True
+) -> ResumoView | None:
     """O que o termômetro diz, sem jargão: a resposta, o que ela quer dizer e onde
     estão os sinais (das notícias com T; opinião à parte). Os sinais são contados como
     no Termômetro do dia: as evidências conferidas no texto, à esquerda, à direita ou
@@ -683,8 +703,10 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
             "foram fracos ou não apareceram."
         )
     else:
-        lado = "à esquerda" if (media or 0) < 0 else "à direita"
-        titulo = f"O termômetro encontra viés editorial em parte das notícias, em média {lado}."
+        lado = _lado(media)
+        titulo = "O termômetro encontra viés editorial em parte das notícias, " + (
+            f"em média {lado}." if lado else "sem lado na média."
+        )
         frases.append(
             f"{text.format_number_pt(n - equilibrado, 0)} das {text.format_number_pt(n, 0)} notícias analisadas "
             f"({porcento_txt(n - equilibrado, n)}) saíram fora de “Equilibrado”; a média é T {fmt_t(media or 0)}."
@@ -713,12 +735,13 @@ def _em_resumo(analises: list[Mapping[str, Any]], geral: Mapping[str, Any]) -> R
                 + f" somam {porcento_txt(soma, n)} das notícias, porque só entram textos com o corpo completo da "
                 "matéria disponível (150 palavras ou mais); comparações entre veículos menores ainda pedem cautela."
             )
-    frases.append(
-        "O que isso quer dizer: medido pelo texto, os veículos relatam de forma parecida e neutra. As diferenças "
-        "entre eles aparecem antes do texto — no que cada um escolhe cobrir, quanto espaço dá a cada nome, em que "
-        "contexto o nome aparece nas manchetes e que enfoque cada assunto ganha. É o que mostram as lentes das "
-        "manchetes e do enquadramento."
-    )
+    if equilibrado >= 0.8 * n:
+        frases.append(
+            "O que isso quer dizer: medido pelo texto, os veículos relatam de forma parecida e neutra. Se há "
+            "diferença entre eles, ela está antes do texto — no que cada um escolhe cobrir, quanto espaço dá a cada "
+            "nome, em que contexto o nome aparece nas manchetes e que enfoque cada assunto ganha"
+            + (": é o que as outras lentes desta página medem." if outras_lentes else ".")
+        )
 
     com_sinal_v = Counter(a.get("veiculo") or "" for a in noticias if desigual(a))
     veiculos = [
@@ -801,8 +824,9 @@ def _desvios(noticias: list[Mapping[str, Any]]) -> DesviosView | None:
         f"ficaram exatamente em zero. Das {text.format_number_pt(k, 0)} que saíram do zero, "
         f"{text.format_number_pt(esq, 0)} penderam à esquerda e {text.format_number_pt(dir_, 0)} à direita"
         + (": a diferença passa do acaso (99%)." if alem else ": diferença dentro do que o acaso explica.")
-        + f" Os desvios são pequenos: {text.format_number_pt(dentro, 0)} "
-        f"{'fica' if dentro == 1 else 'ficam'} dentro da faixa de equilíbrio (até ±{f1})."
+        + (" Os desvios são pequenos: " if 2 * dentro >= k else " Só ")
+        + f"{text.format_number_pt(dentro, 0)} {'fica' if dentro == 1 else 'ficam'} dentro da faixa de equilíbrio "
+        f"(até ±{f1})."
     )
     return DesviosView(
         esquerda=[coluna(k_, -1) for k_ in range(25, 0, -1)],
@@ -935,9 +959,12 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
     itens = [
         (
             "A leitura",
-            "A manchete e os achados saem dos números das lentes. Só entra o que passa do acaso pelo critério de "
-            "cada lente; a ordem é a força do efeito vezes o peso do nome nas manchetes, um achado por tipo. A linha "
-            "fina é sempre o que o termômetro diz do texto.",
+            "A manchete e os achados saem dos números das lentes, um achado por tipo. Só entra o que passa do acaso "
+            "contando todas as comparações do mesmo tipo feitas na página (correção de Holm): com 12 nomes ou dezenas "
+            "de pares veículo × nome, uma ou outra diferença passaria do acaso só por sorte. Cada tipo parte de um "
+            "peso fixo e ganha peso com o tamanho do efeito (pontos de tom ou de espaço, distância do acaso) e, nos "
+            "achados sobre um nome, com o espaço dele nas manchetes; o de maior peso vira a manchete. A linha fina é "
+            "sempre o que o termômetro diz do texto.",
         )
     ]
     if nm is not None:
@@ -949,7 +976,8 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
                 "conta “senador”), e a notícia coletada em mais de uma edição conta uma vez. Um nome pode reunir "
                 "pessoas diferentes (“Bolsonaro”). Espaço: a parte das manchetes da editoria que cita o nome. A "
                 "variação compara as últimas 7 edições com as 7 anteriores (com 10 ou mais manchetes do nome nas "
-                "duas); a marca escura aparece quando a diferença passa do acaso (duas proporções, 99%).",
+                "duas); a marca escura aparece quando a diferença passa do acaso (duas proporções, 99%) mesmo contando "
+                "os nomes comparados, e a variação passa de 15%.",
             ),
             (
                 "Manchetes · tom",
@@ -964,13 +992,16 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
             ),
             (
                 "Manchetes · veículos",
-                "“Mais crítico” e “mais favorável” só aparecem quando a diferença para os demais veículos passa do "
-                "que o acaso explica (99%; 10+ manchetes do veículo). Na matriz, o ponto marca menos de 10 manchetes. "
+                "“Mais crítico” e “mais favorável” aparecem quando a diferença para os demais veículos passa do que o "
+                "acaso explica naquela comparação (99%; 10+ manchetes do veículo), como na Pesquisa; na leitura, só "
+                "entram as que passam também contando todas as comparações veículo × nome. Na matriz, o ponto marca "
+                "menos de 10 manchetes. "
                 "“vs. esperado”: manchetes do veículo sobre o nome ÷ as que ele teria se desse ao nome o mesmo espaço "
                 "que o conjunto dá, pelo que publica na editoria. Padrão semanal: semanas (de 7 dias, até a última "
                 "edição) com 3+ manchetes do veículo e 10+ dos demais; “padrão” quando o veículo fica do mesmo lado em "
                 "3 de cada 4 delas. O tom “piorou” ou “melhorou” quando as últimas 7 edições diferem das 7 anteriores "
-                "além do acaso (95%; 20+ manchetes em cada).",
+                "além do acaso (95%; 20+ manchetes em cada); a marca escura, quando isso vale contando os nomes "
+                "comparados.",
             ),
         ]
     if ld is not None:
@@ -982,7 +1013,8 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
                 "favor” ou “contra” alguém; um assunto rachou quando teve veículos nos dois. Divergência = 2 × o lado "
                 "menor ÷ (A + B): 100 = meio a meio. Em “quem fica com quem” e “quem destoa”, a contagem é comparada "
                 "com a que o acaso daria dado o placar de cada assunto (os lados embaralhados entre os veículos que "
-                "tomaram lado) e só vira afirmação quando passa de 99%.",
+                "tomaram lado) e só vira afirmação quando passa de 99% contando todos os pares (ou veículos) "
+                "comparados. Um assunto acompanhado em várias edições conta uma vez por edição.",
             )
         )
     itens += [
@@ -1028,6 +1060,29 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
     return itens
 
 
+def _mudancas(leituras: list[LeituraView]) -> list[MudancaTexto]:
+    """As tendências e desvios que passaram do acaso, da maior mudança para a menor; ``forte``
+    quando passam também contando todos os testes de tendência e de janela feitos (Holm, 95%)."""
+    familia = {i: r.p for i, r in enumerate(leituras) if r.p is not None}
+    fortes = holm(familia, 1 - P_CONFIANCA)
+    saida = []
+    for i, r in enumerate(leituras):
+        if r.mudanca is not None:
+            r.mudanca.forte = i in fortes
+            saida.append(r.mudanca)
+    return sorted(saida, key=lambda m: -m.forca)
+
+
+P_CONFIANCA = 0.95  # o nível dos intervalos da agregação (P["z"] = 1,96)
+
+
+def _lado(media: float | None) -> str:
+    """O lado da média, como ela aparece escrita: sem lado quando, arredondada, é zero."""
+    if media is None or arredondar(media) == 0:
+        return ""
+    return "à esquerda" if media < 0 else "à direita"
+
+
 def _texto_resumo(
     analises: list[Mapping[str, Any]],
     noticias: list[Mapping[str, Any]],
@@ -1054,10 +1109,11 @@ def _texto_resumo(
         dir=resumo.sinais.dir if resumo else 0,
         media=fmt_t(media),
         rotulo=str(geral.get("rotulo") or ""),
-        lado="à esquerda" if (media or 0) < 0 else "à direita",
+        lado=_lado(media),
         q=fmt_q(geral.get("media_Q")),
         q_rotulo=str(geral.get("rotulo_Q") or ""),
-        mudancas=sorted((r.mudanca for r in leituras if r.mudanca is not None), key=lambda m: -m.forca),
+        mudancas=_mudancas(leituras),
+        n_mudancas=sum(1 for r in leituras if r.p is not None),
         q_veiculos=[(q.nome, q.valor) for q in qualidade if not q.pequena],
         concentracao=_concentracao(noticias),
     )
@@ -1198,7 +1254,7 @@ def analitico_view(
     ]
 
     noticias = _noticias_com_t(analises)
-    em_resumo = _em_resumo(analises, geral)
+    em_resumo = _em_resumo(analises, geral, outras_lentes=nm is not None or enquadramento is not None)
     desvios = _desvios(noticias)
     qualidade = _qualidade(r_v)
     inclinados, inclinados_titulo, recordes, opiniao_top, inclinado = _inclinados(analises, noticias, fim)
