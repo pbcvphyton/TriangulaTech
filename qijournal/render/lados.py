@@ -27,7 +27,6 @@ mesmo lado quer dizer enquadrar o assunto do mesmo jeito.
 
 from __future__ import annotations
 
-import logging
 from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -41,8 +40,6 @@ from . import filters
 from .web import coverage_view
 
 __all__ = ["SECAO", "Assunto", "DiaLados", "LadosView", "do_dia", "lados"]
-
-log = logging.getLogger(__name__)
 
 SECAO = "politica"  # a editoria dos nomes em destaque (qijournal/render/midia.py)
 JANELA_DIAS = 30  # as mesmas edições dos nomes em destaque
