@@ -940,7 +940,9 @@ def _metodo(nm: DestaquesView | None, ld: LadosView | None) -> list[tuple[str, s
                 "favor” ou “contra” alguém; um assunto rachou quando teve veículos nos dois. Divergência = 2 × o lado "
                 "menor ÷ (A + B): 100 = meio a meio. Em “quem fica com quem” e “quem destoa”, a contagem é comparada "
                 "com a que o acaso daria dado o placar de cada assunto (os lados embaralhados entre os veículos que "
-                "tomaram lado) e só vira afirmação quando passa de 99%.",
+                "tomaram lado) e só vira afirmação quando passa de 99%. O dossiê de cada nome conta, entre estes "
+                "assuntos, os que dividiram os veículos e citam o nome (a mesma conta do analítico do nome na "
+                "Pesquisa).",
             )
         )
     itens += [

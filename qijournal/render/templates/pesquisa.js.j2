@@ -84,10 +84,12 @@
       // A notícia casa pelo próprio título; o assunto (agrupamento da edição) só aparece como contexto.
       add({ k: 'n', si: n[0], w: momento(dia, n[5]), f: V[n[2]] ? [V[n[2]]] : [], t: n[3], u: link(n[4]), as: assunto, x: titulo }, '');
     });
+    // Cobertura comparada: as matérias da edição com análise da cobertura (c.m, o id da
+    // matéria) e os demais assuntos comparados, cada assunto uma vez.
     (dados.comparadas || []).forEach(function (c) {
       var veiculos = (c.f || []).map(function (o) { return { n: V[o[0]], lado: o[1], foco: o[2], u: link(o[3]) }; })
         .filter(function (o) { return o.n; });
-      add({ k: 'c', si: c.s, w: momento(dia, c.h), f: veiculos.map(function (o) { return o.n; }), t: c.t, x: c.c, c: c, vs: veiculos, u: link(c.u) },
+      add({ k: 'c', si: c.s, w: momento(dia, c.h), f: veiculos.map(function (o) { return o.n; }), t: c.t, x: c.c, c: c, vs: veiculos, u: link(c.u), id: c.m || '' },
         [c.c, c.a, c.b].concat(veiculos.map(function (o) { return o.foco; })).join('\n'));
     });
     (dados.analises || []).forEach(function (a) {
@@ -435,6 +437,8 @@
     return lista.slice(0, 4).join(', ') + ' e mais ' + (lista.length - 4);
   }
   function edicao(dia) { return dia + '.html'; }
+  // Um assunto da cobertura comparada na edição: a matéria (que traz a análise da cobertura) ou a seção.
+  function naEdicao(r) { return edicao(r.d) + (r.id ? '#s-' + encodeURIComponent(r.id) : '#cobertura'); }
   function item(x, ts) {
     var r = x.r, f = estado.f;
     var hora = r.w == null ? dataLonga(r.d) : r.soData ? dataLonga(isoDe(r.w)) : dataHora(r.w);
@@ -466,8 +470,9 @@
       if (dia.t) acoes.push('<a href="' + esc(r.d + '-todas.html') + '">Todas as notícias do dia</a>');
     } else if (r.k === 'c') {
       meta.push(plural(r.f.length, 'veículo', 'veículos'));
+      if (r.id) meta.push('matéria da edição');
       h += '<p class="pq-m">' + meta.join(' · ') + '</p>';
-      h += '<h3 class="pq-t"><a href="' + esc(edicao(r.d) + '#cobertura') + '">' + titulo + '</a></h3>';
+      h += '<h3 class="pq-t"><a href="' + esc(naEdicao(r)) + '">' + titulo + '</a></h3>';
       if (r.c.p) h += '<p class="pq-v">' + esc(r.c.p) + '</p>';
       if (r.x && !f.tit) h += '<p class="pq-x">' + marcar(trecho(r.x, ts), ts) + '</p>';
       if (r.vs.length) {
@@ -477,7 +482,7 @@
           return nome + ' (' + lado + ')';
         }).join(' · ') + (r.vs.length > 8 ? ' · e mais ' + (r.vs.length - 8) : '') + '</p>';
       }
-      acoes.push('<a href="' + esc(edicao(r.d) + '#cobertura') + '">Ver na edição de ' + dataCurta(r.d) + '</a>');
+      acoes.push('<a href="' + esc(naEdicao(r)) + '">' + (r.id ? 'Abrir a matéria (edição de ' + dataCurta(r.d) + ')' : 'Ver na edição de ' + dataCurta(r.d)) + '</a>');
       if (r.u) acoes.push('<a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">Fonte principal &#8599;</a>');
     } else if (r.k === 'a') {
       var a = r.a;
@@ -528,7 +533,7 @@
     var linhas = [['tipo', 'edição', 'data e hora', 'editoria', 'veículos', 'título', 'link', 'detalhe', 'T', 'rótulo', 'qualidade']];
     e.res.forEach(function (x) {
       var r = x.r, a = r.a || {};
-      var url = r.k === 'm' ? absoluto(edicao(r.d) + '#s-' + encodeURIComponent(r.id)) : r.k === 'c' ? absoluto(edicao(r.d) + '#cobertura') : r.u;
+      var url = r.k === 'm' ? absoluto(edicao(r.d) + '#s-' + encodeURIComponent(r.id)) : r.k === 'c' ? absoluto(naEdicao(r)) : r.u;
       var detalhe = r.k === 'm' ? r.l : r.k === 'c' ? r.x : r.k === 'a' ? r.x : r.as && r.as[0] !== r.t ? r.as[0] : '';
       var hora = r.w == null ? '' : r.soData ? dataLonga(isoDe(r.w)) : dataHora(r.w);
       linhas.push([

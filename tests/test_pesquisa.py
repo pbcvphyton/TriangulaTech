@@ -11,7 +11,7 @@ import pytest
 
 from qijournal import pipeline
 from qijournal.config import load_config
-from qijournal.models import Edition, IndexItem, IndexTopic
+from qijournal.models import Coverage, CoverageOutlet, Edition, IndexItem, IndexTopic
 from qijournal.render import pesquisa
 from tests.fixtures.pipeline.factory import make_edition
 
@@ -85,9 +85,14 @@ def test_arquivo_do_dia_tem_tudo_o_que_a_edicao_publicou(config):
     # assunto que virou matéria fica; assunto com uma notícia de mesmo título, não
     assert dados["assuntos"] == [[edition.stories[0].headline, edition.stories[0].id, 0]]
     assert [n[1] for n in noticias] == [0, 0, -1]
-    # cobertura comparada: assunto, conclusão, rótulo do medidor e o foco de cada veículo
-    assert len(dados["comparadas"]) == len(edition.compared)
-    c = dados["comparadas"][0]
+    # cobertura comparada, como na seção da edição: as matérias com análise da cobertura (com o id
+    # e o título delas) e depois os demais assuntos; assunto, conclusão, rótulo do medidor e o foco
+    # de cada veículo
+    comparadas = dados["comparadas"]
+    com_cobertura = [s for s in edition.stories if s.coverage]
+    assert [c.get("m") for c in comparadas] == [s.id for s in com_cobertura] + [None] * len(edition.compared)
+    assert comparadas[0]["t"] == com_cobertura[0].headline and comparadas[0]["c"] == com_cobertura[0].coverage.conclusion
+    c = comparadas[len(com_cobertura)]
     assert c["t"] == edition.compared[0].topic and c["c"] == edition.compared[0].conclusion and c["p"]
     assert {veiculos[o[0]] for o in c["f"]} == {o.name for o in edition.compared[0].outlets}
     # análises do termômetro feitas no dia, com a origem
@@ -98,10 +103,51 @@ def test_arquivo_do_dia_tem_tudo_o_que_a_edicao_publicou(config):
     assert "\n" not in texto.rstrip("\n") and json.loads(texto) == dados
 
 
+def _cobertura(topico: str, a: list[str], b: list[str], neutros: list[str] = (), **extra) -> Coverage:
+    outlets = [CoverageOutlet(name=v, stance="a", framing=f"Foco de {v}", url=f"https://{i}.example/a") for i, v in enumerate(a)]
+    outlets += [CoverageOutlet(name=v, stance="b", framing=f"Foco de {v}") for v in b]
+    outlets += [CoverageOutlet(name=v, stance="neutro", framing="") for v in neutros]
+    return Coverage(
+        topic=topico, conclusion="A cobertura pendeu para o risco.", outlets=outlets,
+        side_a="Destaca o risco", side_b="Destaca o alívio", **extra,
+    )
+
+
+def test_materia_com_cobertura_dividida_entra_na_cobertura_comparada(config):
+    edition = make_edition("2026-10-20")
+    materia = edition.story("materia-2")
+    materia.coverage = _cobertura(
+        materia.headline, ["Folha de S.Paulo", "g1"], ["Valor Econômico"], ["CNN Brasil"], article_ids=list(materia.article_ids)
+    )
+    edition.compared = [
+        # a mesma matéria de novo entre os demais assuntos (notícia em comum): não entra duas vezes
+        _cobertura("A matéria vista de novo", ["Folha de S.Paulo"], ["g1"], article_ids=list(materia.article_ids)),
+        _cobertura("Outro assunto do dia", ["Estadão"], ["g1"], section="politica", article_ids=["outra"]),
+    ]
+    dados = pesquisa.dados_do_dia(edition, config, None)
+    veiculos, secoes = dados["veiculos"], dados["secoes"]
+    assert [c["t"] for c in dados["comparadas"]] == [materia.headline, "Outro assunto do dia"]
+    c = dados["comparadas"][0]
+    # o id da matéria leva o resultado a ela (#s-<id>); os demais assuntos não têm id
+    assert c["m"] == "materia-2" and "m" not in dados["comparadas"][1]
+    assert secoes[c["s"]][0] == materia.section and c["h"] == next(m["h"] for m in dados["materias"] if m["id"] == "materia-2")
+    # os dois lados, o medidor, a conclusão e o foco de cada veículo, como nos demais assuntos
+    assert (c["a"], c["b"], c["k"], c["c"]) == ("Destaca o risco", "Destaca o alívio", "a", "A cobertura pendeu para o risco.")
+    assert c["p"] == "Pende para: Destaca o risco · 2 de 4 veículos" and c["u"] == ""
+    assert [[veiculos[o[0]], o[1], o[2], o[3]] for o in c["f"]] == [
+        ["Folha de S.Paulo", "a", "Foco de Folha de S.Paulo", "0.example/a"],
+        ["g1", "a", "Foco de g1", "1.example/a"],
+        ["Valor Econômico", "b", "Foco de Valor Econômico", ""],
+        ["CNN Brasil", "neutro", "", ""],
+    ]
+    assert pesquisa.resumo_do_dia(dados)["n"][2] == 2  # a página conta os dois assuntos
+
+
 def test_resumo_e_versao_do_arquivo(tmp_path, config):
     dados = pesquisa.dados_do_dia(edicao_com_indice(), config, None)
     resumo = pesquisa.resumo_do_dia(dados)
-    assert resumo["d"] == "2026-10-20" and resumo["n"] == [24, 3, 3, 0] and resumo["t"] is True
+    # 24 matérias, 3 notícias e 26 assuntos comparados (23 matérias com análise + 3 demais)
+    assert resumo["d"] == "2026-10-20" and resumo["n"] == [24, 3, 26, 0] and resumo["t"] is True
     assert resumo["veiculos"]["Folha de S.Paulo"] >= 1
     caminho = pesquisa.caminho_do_dia(tmp_path, "2026-10-20")
     caminho.parent.mkdir(parents=True)
@@ -168,6 +214,26 @@ def test_publish_nao_reescreve_a_busca_das_edicoes_anteriores(tmp_path, config):
     ontem.write_bytes(antes.replace(b'"data":"2026-09-28"', b'"data":"2026-09-28","marca":1'))
     _publicar(make_edition("2026-09-29"), config, tmp_path)
     assert b'"marca":1' in ontem.read_bytes()  # arquivo válido do dia anterior fica como está
+
+
+def test_publish_refaz_a_busca_gravada_em_outro_formato(tmp_path, config):
+    # Um arquivo de antes da mudança de formato (sem a cobertura das matérias) é refeito
+    # de data/AAAA-MM-DD.json no publish seguinte.
+    ontem = make_edition("2026-09-28")
+    materia = ontem.stories[0]
+    materia.coverage = _cobertura(materia.headline, ["Folha de S.Paulo"], ["g1"], article_ids=list(materia.article_ids))
+    _publicar(ontem, config, tmp_path)
+    caminho = pesquisa.caminho_do_dia(tmp_path / "data", "2026-09-28")
+    antigo = json.loads(caminho.read_text(encoding="utf-8"))
+    antigo.update(v=pesquisa.VERSAO - 1, comparadas=[])
+    caminho.write_text(pesquisa.serializar(antigo), encoding="utf-8")
+
+    paths = _publicar(make_edition("2026-09-29"), config, tmp_path)
+
+    refeito = json.loads(caminho.read_text(encoding="utf-8"))
+    assert refeito["v"] == pesquisa.VERSAO and [c.get("m") for c in refeito["comparadas"]] == [materia.id]
+    indice = json.loads(re.search(r'id="pqDados">(.*?)</script>', paths["pesquisa"].read_text(encoding="utf-8"), re.S).group(1))
+    assert next(d["n"] for d in indice["dias"] if d["d"] == "2026-09-28")[2] == 1  # e a página já conta o assunto
 
 
 def test_capa_e_edicoes_levam_a_busca_para_a_pesquisa(tmp_path, config):

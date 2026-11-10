@@ -5,12 +5,15 @@ Cada edição ganha um arquivo de busca compacto, ``data/busca/AAAA-MM-DD.json``
 
 - as **matérias** (título, linha fina, texto, "por que importa" e veículos);
 - **todas as notícias** do dia (título, veículo, link, horário e assunto);
-- a **cobertura comparada** (assunto, conclusão, lados e o foco de cada veículo);
+- a **cobertura comparada** (assunto, conclusão, lados e o foco de cada veículo),
+  como na seção da edição: as matérias com análise da cobertura e os demais
+  assuntos comparados, cada assunto uma vez;
 - as **análises do Termômetro** feitas no dia (T, rótulo, qualidade e resumo).
 
 O ``publish`` grava o arquivo do dia e cria os que faltam a partir de
-``data/AAAA-MM-DD.json`` (edições anteriores à pesquisa); eles expiram com as
-edições. A página traz só o índice das edições (:func:`resumo_do_dia`) e os
+``data/AAAA-MM-DD.json`` (edições anteriores à pesquisa), assim como refaz os
+gravados em outro formato (:data:`VERSAO`); eles expiram com as edições. A
+página traz só o índice das edições (:func:`resumo_do_dia`) e os
 filtros; o navegador carrega os arquivos dos dias do período pedido, busca neles
 (sem acento e sem diferenciar maiúsculas) e mostra os resultados, com links para
 a matéria na edição ou para a notícia original, e as contagens por dia, veículo e
@@ -35,13 +38,16 @@ from ..termometro.referencia import PARAMETROS
 from . import filters, midia, tom
 from .midia import DestaquesView
 from .termometro import ANALITICO_PAGINA, CLASSE, analises_validas
-from .web import DEFAULT_COLORS, brand_view, coverage_view
+from .web import DEFAULT_COLORS, brand_view, compared_topics, coverage_view
 
 log = logging.getLogger(__name__)
 
 PAGINA = "pesquisa.html"
 PASTA = "busca"  # data/busca/AAAA-MM-DD.json
-VERSAO = 1  # formato do arquivo de busca: outro número refaz os arquivos a partir de data/AAAA-MM-DD.json
+# Formato do arquivo de busca: um arquivo gravado com outro número é refeito no publish a
+# partir de data/AAAA-MM-DD.json (ler_dia o recusa). 2: a cobertura das matérias da edição
+# entra em "comparadas" (antes, só a dos demais assuntos).
+VERSAO = 2
 
 TIPOS = (
     ("m", "Matérias"),
@@ -111,7 +117,10 @@ def dados_do_dia(edition: Edition, config: Config, termometro: Mapping[str, Any]
       assuntos que dizem algo além do título da notícia;
       ``noticias``: ``[seção, assunto (-1: nenhum), veículo, título, link, h]``.
     - ``comparadas``: ``{s, t (assunto), c (conclusão), a/b (lados), p (rótulo do
-      medidor), k (lado), h, u (link), f: [[veículo, lado, foco, link]…]}``.
+      medidor), k (lado), h, u (link), f: [[veículo, lado, foco, link]…], m}``: as
+      matérias com análise da cobertura (``m``: id da matéria, só nelas; ``t`` é o
+      título dela) e depois os demais assuntos, cada assunto uma vez
+      (:func:`qijournal.render.web.compared_topics`).
     - ``analises`` (Termômetro): ``{id, s, f, t, u, e (editoria), d (publicação),
       T, r (rótulo), q (qualidade), x (selo), z (resumo), o (origem)}``.
 
@@ -177,8 +186,10 @@ def dados_do_dia(edition: Edition, config: Config, termometro: Mapping[str, Any]
         s = secao(topic.section)
         noticias += [[s, a, *item] for item in itens]
 
+    # Cobertura comparada: a lista da seção da edição e da lente do enquadramento
+    # (as matérias com análise da cobertura, depois os demais assuntos; cada assunto uma vez).
     comparadas = []
-    for coverage in edition.compared:
+    for coverage, story in compared_topics(edition):
         view = coverage_view(coverage)
         if view is None or not view.topic:
             continue
@@ -188,20 +199,26 @@ def dados_do_dia(edition: Edition, config: Config, termometro: Mapping[str, Any]
                 fonte = veiculo(o.name)
                 if fonte is not None:
                     outlets.append([fonte, lado, o.framing, _url(o.url)])
-        comparadas.append(
-            {
-                "s": secao(coverage.section),
-                "t": view.topic,
-                "c": view.conclusion,
-                "a": view.side_a,
-                "b": view.side_b,
-                "p": view.lean_label,
-                "k": view.lean,
-                "h": _hora(coverage.published, tz, dia),
-                "u": _url(view.url),
-                "f": outlets,
-            }
-        )
+        if story is not None:  # matéria da edição: a editoria, o título e o horário dela
+            sid, titulo = story.section, _limpo(story.headline) or view.topic
+            quando = story.published or coverage.published
+        else:
+            sid, titulo, quando = coverage.section, view.topic, coverage.published
+        item = {
+            "s": secao(sid),
+            "t": titulo,
+            "c": view.conclusion,
+            "a": view.side_a,
+            "b": view.side_b,
+            "p": view.lean_label,
+            "k": view.lean,
+            "h": _hora(quando, tz, dia),
+            "u": _url(view.url),
+            "f": outlets,
+        }
+        if story is not None:
+            item["m"] = story.id  # o link vai à matéria (#s-<id>), que traz a análise da cobertura
+        comparadas.append(item)
 
     analises = []
     for a in analises_validas(termometro):

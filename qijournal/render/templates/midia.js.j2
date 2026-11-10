@@ -7,8 +7,9 @@
     - pauta: com quem e com que temas o termo aparece; os assuntos que mais renderam;
     - o que cada veículo enfatiza: vocabulário distintivo (log-odds com prior de Dirichlet
       informativo, Monroe, Colaresi e Quinn, 2008);
-    - lados e divergência na cobertura comparada (a análise da IA de cada edição): quão
-      dividida ficou, quem destoa da maioria e quais veículos andam juntos ou se opõem;
+    - lados e divergência na cobertura comparada (a análise da IA de cada edição, nas
+      matérias e nos demais assuntos, como na seção da edição): quão dividida ficou, quem
+      destoa da maioria e quais veículos andam juntos ou se opõem;
     - tom das manchetes (tom.js.j2, a regra de qijournal/render/tom.py): em que contexto o
       termo aparece — desfavorável ou favorável —, veículo por veículo contra os demais, e
       se isso se repete semana a semana (os mesmos números do Analítico Político).
@@ -746,8 +747,8 @@
     h += '<h5>Assuntos mais divididos</h5><ol class="md-div">';
     ld.itens.slice(0, 5).forEach(function (x) {
       var r = x.r, total = x.a + x.b + x.n;
-      h += '<li><a class="md-dt" href="' + esc(edicao(r.d) + '#cobertura') + '">' + esc(r.t) + '</a>' +
-        '<span class="md-dm">' + dataCurta(r.d) + ' · ' + plural(total, 'veículo', 'veículos') + ' · divergência ' + dec(x.dv * 100, 0) + '</span>' +
+      h += '<li><a class="md-dt" href="' + esc(naEdicao(r)) + '">' + esc(r.t) + '</a>' +
+        '<span class="md-dm">' + dataCurta(r.d) + (r.id ? ' · matéria da edição' : '') + ' · ' + plural(total, 'veículo', 'veículos') + ' · divergência ' + dec(x.dv * 100, 0) + '</span>' +
         '<span class="cov-bar" aria-hidden="true">' + (x.a ? '<span class="cov-a" style="width:' + (100 * x.a / total) + '%"></span>' : '') +
         (x.n ? '<span class="cov-n" style="width:' + (100 * x.n / total) + '%"></span>' : '') +
         (x.b ? '<span class="cov-b" style="width:' + (100 * x.b / total) + '%"></span>' : '') + '</span>' +
@@ -783,11 +784,11 @@
 
   function blocoComoLer() {
     return '<details class="md-como" id="md-como"><summary>Como ler</summary>' +
-      '<p><b>O que entra:</b> as notícias cujo título casa com a busca e os assuntos da cobertura comparada que citam o termo, com os mesmos filtros de período, editoria e veículo. A mesma notícia em mais de uma edição conta uma vez.</p>' +
+      '<p><b>O que entra:</b> as notícias cujo título casa com a busca e os assuntos da cobertura comparada que citam o termo (as matérias da edição com análise da cobertura e os demais assuntos comparados, como na seção da edição), com os mesmos filtros de período, editoria e veículo. A mesma notícia em mais de uma edição conta uma vez.</p>' +
       '<p><b>Atenção:</b> a parte das manchetes de cada veículo no período que cita o termo; “× o esperado” compara as manchetes do veículo sobre o termo com as que ele teria se desse ao termo, em cada editoria em que publica, o mesmo espaço que o conjunto dá (1× = o esperado; um site de esporte não “deveria” citar um político como um de política), só para veículos com ' + MD.base + '+ manchetes no período. Quem mais e quem menos dá espaço saem dos veículos que deveriam ter citado o termo 3+ vezes; quem mais dá precisa de 3+ manchetes sobre ele, e quem menos dá pode não citar nenhuma. Exterior: veículos de fora do Brasil. Tendência: as últimas ' + MD.semana + ' edições do período contra as ' + MD.semana + ' anteriores, pela participação, com ' + MD.minTend + '+ manchetes do termo nas duas.</p>' +
       '<p><b>Pauta:</b> nomes (palavras com inicial maiúscula) e palavras mais frequentes nas manchetes de veículos brasileiros, fora o próprio termo. Os assuntos são os agrupamentos de cada edição.</p>' +
       '<p><b>O que cada veículo enfatiza:</b> vocabulário distintivo — log-odds com prior de Dirichlet informativo (Monroe, Colaresi e Quinn, 2008): palavras que o veículo usa mais que os demais veículos brasileiros nas manchetes sobre o termo, com z &gt; ' + dec(MD.z, 1) + ' (limiar alto porque cada veículo testa muitas palavras de uma vez) e 3+ usos; veículos com ' + MD.voc + '+ manchetes.</p>' +
-      '<p><b>Lados:</b> da análise da cobertura feita pela IA em cada edição (o mesmo medidor das matérias): em cada assunto, os dois enfoques e o lado de cada veículo. Um assunto tem dois lados quando há veículos nos dois enfoques; se todos os que tomaram lado ficaram no mesmo, conta como sem divergência. Divergência = 2 × o lado menor ÷ (lado A + lado B), nos assuntos com dois lados: perto de 0 = quase todos de um lado; 100 = meio a meio. “Contra a maioria” = no lado com menos veículos (empates à parte); amostras com menos de ' + MD.pequena + ' assuntos com maioria definida ficam esmaecidas.</p>' +
+      '<p><b>Lados:</b> da análise da cobertura feita pela IA em cada edição (o mesmo medidor das matérias), nas matérias e nos demais assuntos comparados, cada assunto uma vez (a mesma regra da lente do enquadramento no Analítico Político): em cada assunto, os dois enfoques e o lado de cada veículo. Um assunto tem dois lados quando há veículos nos dois enfoques; se todos os que tomaram lado ficaram no mesmo, conta como sem divergência. Divergência = 2 × o lado menor ÷ (lado A + lado B), nos assuntos com dois lados: perto de 0 = quase todos de um lado; 100 = meio a meio. “Contra a maioria” = no lado com menos veículos (empates à parte); amostras com menos de ' + MD.pequena + ' assuntos com maioria definida ficam esmaecidas.</p>' +
       '<p><b>Tom:</b> lido por palavras, sem IA, em cada manchete brasileira com o termo: palavras de contexto desfavorável (escândalo, investigação, derrota, crise, crítica recebida…) ou favorável (vitória, apoio, aprovação, liderança…) contam para o nome mais próximo delas no título (até ' + (M.tom && M.tom.janela || 6) + ' palavras); ações contra alguém (“critica”, “acusa”, “condena”, “investiga”…) põem o nome que vem depois como alvo, e o que vem antes como quem age. A manchete é desfavorável ao termo com mais palavras negativas que positivas, favorável no contrário. Saldo = favoráveis − desfavoráveis, em pontos (−100 a +100; a barra vai de −' + TP.barra + ' a +' + TP.barra + '). “Mais crítico” e “mais favorável”: o veículo difere dos demais além do que o acaso explica (99%; ' + TP.minV + '+ manchetes). Padrão semanal: semanas de 7 dias até a última edição, com ' + TP.semV + '+ manchetes do veículo e ' + TP.semD + '+ dos demais; “padrão” quando ele fica do mesmo lado em 3 de cada 4. São os mesmos números da tabela “Quem fala de quem” do Analítico Político.</p>' +
       '<p><b>Limites:</b> o tom mede o contexto em que o termo aparece nas manchetes, não a opinião do veículo, e a leitura por palavras erra em parte delas (ironia, negação, o nome errado na frase) — por isso as manchetes de exemplo mostram as palavras que pesaram, e o que diz algo é a comparação entre veículos sobre o mesmo termo. Os lados são os enfoques de cada assunto, não “a favor” ou “contra” a pessoa; nomes iguais de pessoas diferentes se somam (“Bolsonaro”).</p></details>';
   }

@@ -37,7 +37,7 @@ from math import comb
 from .. import text
 from ..models import Coverage, Edition
 from . import filters
-from .web import coverage_view
+from .web import compared_topics, coverage_view
 
 __all__ = ["SECAO", "Assunto", "DiaLados", "LadosView", "do_dia", "lados"]
 
@@ -118,12 +118,14 @@ def _assunto(data: str, coverage: Coverage | None, *, titulo: str = "", materia:
 
 def do_dia(edition: Edition, secao: str = SECAO) -> DiaLados:
     """Os assuntos da editoria ``secao`` com cobertura comparada numa edição: as matérias
-    com análise da cobertura e os demais assuntos comparados (como na seção Cobertura
-    comparada da edição)."""
+    com análise da cobertura e os demais assuntos comparados, cada um uma vez — a lista da
+    seção Cobertura comparada da edição, que a Pesquisa analítica também lê
+    (:func:`qijournal.render.web.compared_topics`)."""
     dia = DiaLados(data=str(edition.date or "")[:10])
-    itens = [(s.coverage, s.headline, s.id) for s in edition.stories if s.coverage is not None and s.section == secao]
-    itens += [(c, "", "") for c in edition.compared if c.section == secao]
-    for coverage, titulo, materia in itens:
+    for coverage, story in compared_topics(edition):
+        if (story.section if story is not None else coverage.section) != secao:
+            continue
+        titulo, materia = (story.headline, story.id) if story is not None else ("", "")
         conta, assunto = _assunto(dia.data, coverage, titulo=titulo, materia=materia)
         dia.comparados += conta
         if assunto is not None:

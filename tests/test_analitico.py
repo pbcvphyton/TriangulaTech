@@ -13,7 +13,14 @@ import pytest
 
 from qijournal import pipeline
 from qijournal.config import load_config
-from qijournal.models import Coverage, CoverageOutlet, SourceRef, Story
+from qijournal.models import (
+    Coverage,
+    CoverageOutlet,
+    IndexItem,
+    IndexTopic,
+    SourceRef,
+    Story,
+)
 from qijournal.render import achados, analitico, lados, midia, pesquisa
 from qijournal.render.analitico import analitico_view, render_analitico_page
 from qijournal.termometro import agregacao, analise
@@ -271,6 +278,39 @@ def test_lados_sem_nada_alem_do_acaso_diz_isso():
     assert lados.lados([lados.do_dia(_edicao(FIM, [_cobertura("Esporte", ["a"], ["b"], secao="esporte")]))], fim=FIM) is None
     link = lados.lados([lados.do_dia(_edicao(FIM, [], materias=[_cobertura("t", ["Folha"], ["g1"])]))], fim=FIM, edicoes=[FIM])
     assert link.materias == 1 and link.recentes[0].href == f"{FIM}.html#s-pol-0" and link.recentes[0].materia
+
+
+def test_conta_do_nome_e_lente_veem_os_mesmos_assuntos(config):
+    # A conta de assuntos divididos de cada nome (do arquivo de busca) e a lente do enquadramento
+    # (de data/AAAA-MM-DD.json) leem a mesma lista de cada edição: as matérias com análise da
+    # cobertura e os demais assuntos comparados, cada assunto uma vez.
+    edition = _edicao(
+        FIM,
+        [_cobertura("Senado adia a votação", ["Folha", "Valor"], ["g1"]), _cobertura("Senado sem racha", [], [], ["Folha", "g1"])],
+        materias=[_cobertura("Senado aprova a PEC", ["Folha"], ["g1", "Valor"])],
+    )
+    materia = edition.story("pol-0")
+    materia.headline, materia.article_ids = "Senado aprova a PEC", ["n1"]
+    repetido = _cobertura("Senado aprova a PEC, de novo", ["Folha"], ["g1"])
+    repetido.article_ids = ["n1"]  # a mesma notícia da matéria: não entra em nenhuma das contas
+    edition.compared.append(repetido)
+    edition.index = [
+        IndexTopic(section="politica", title="Senado", items=[
+            IndexItem(source="Folha", title=f"Hoje o Senado vota a PEC {i}", url=f"https://x.com/{i}") for i in range(6)
+        ])
+    ]
+    lente = lados.do_dia(edition)
+    corpus = midia.corpus_do_dia(pesquisa.dados_do_dia(edition, config, None))
+    assert [a.titulo for a in lente.divididos] == ["Senado aprova a PEC", "Senado adia a votação"] and lente.comparados == 3
+    assert len(corpus.comparadas) == len(lente.divididos)  # antes, a busca só via o assunto que não virou matéria
+    view = midia.destaques([corpus], fim=FIM)
+    senado = _nome(view, "Senado")
+    assert senado.debates == 2 and senado.divergencia == "67"  # 2 × 1 ÷ 3 nos dois
+    # o dossiê diz de onde vem a conta: os mesmos assuntos da lente (matérias e demais assuntos)
+    html = render_analitico_page([], config, home_href="../", archive_href="./", destaques=view)
+    dossie = html[html.index('<div class="az-dossie">') :]
+    assert "2 assuntos dividiram os veículos (divergência média 67)" in dossie and "assuntos comparados dividiram" not in dossie
+    assert "nas matérias da edição e nos demais assuntos comparados: os mesmos da lente do enquadramento" in dossie
 
 
 # ── termômetro: os desvios ───────────────────────────────────────────────────

@@ -173,7 +173,9 @@ conclusão. A análise usa só o que os veículos publicaram; quando o trecho n�
 permite dizer, o veículo fica como neutro.
 
 A seção **Cobertura comparada** reúne todos os assuntos do dia vistos por dois ou
-mais veículos — as matérias da edição com análise e os demais assuntos — em
+mais veículos — as matérias da edição com análise e os demais assuntos, cada
+assunto uma vez (um demais assunto com notícia em comum com uma matéria fica só
+nela) — em
 **abas por editoria**, no mesmo desenho das abas das matérias (Brasil · Economia,
 Mercados & Finanças, Política, Esporte…, e "Todas"): cada assunto entra na aba da
 editoria dele, e cada aba mostra quantos assuntos tem e quantos dividiram os
@@ -303,8 +305,9 @@ passaram do acaso, da maior para a menor.
   fala bem ou mal (desfavoráveis, favoráveis, o saldo do veículo contra o dos demais e
   quantas vezes o nome é alvo de crítica, acusação ou punição) e se há padrão (semana a
   semana, de que lado dos demais o veículo fica); frases automáticas com o que importa,
-  as manchetes mais desfavorável e mais favorável com as palavras que pesaram, os
-  assuntos da cobertura comparada que dividiram os veículos e o link para o analítico
+  as manchetes mais desfavorável e mais favorável com as palavras que pesaram, quantos
+  assuntos que citam o nome dividiram os veículos (os mesmos da lente do enquadramento:
+  as matérias da edição e os demais assuntos comparados) e o link para o analítico
   completo do nome na Pesquisa, com a mesma editoria e período. A caixa "Analisar outro
   nome" leva qualquer termo para lá.
 - **Veículo por veículo**: a matriz veículo × nome, com o saldo do tom de cada veículo
@@ -313,8 +316,9 @@ passaram do acaso, da maior para a menor.
 
 **2 · Enquadramento — onde a imprensa rachou** (`qijournal/render/lados.py`). Entram os
 assuntos de Política que dois ou mais veículos cobriram, nas matérias da edição e nos
-demais assuntos da cobertura comparada, das mesmas 30 edições (lidos de
-`data/AAAA-MM-DD.json`):
+demais assuntos da cobertura comparada, cada assunto uma vez, das mesmas 30 edições
+(lidos de `data/AAAA-MM-DD.json`). A Pesquisa analítica lê a mesma lista de cada
+edição, então a conta de assuntos divididos do dossiê de cada nome sai destes assuntos:
 
 - **os assuntos que mais dividiram** nas últimas 7 edições e no período: os dois
   enfoques, os veículos de cada um e a divergência, com o link para a matéria ou para a
@@ -429,8 +433,10 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
 
 - **O que entra**: as matérias (título, linha fina, texto e "por que importa"),
   todas as notícias coletadas (título, veículo e link), a cobertura comparada
-  (assunto, conclusão e o foco de cada veículo) e as análises do Termômetro, de
-  todas as edições do arquivo.
+  (assunto, conclusão, os dois lados e o foco de cada veículo) e as análises do
+  Termômetro, de todas as edições do arquivo. A cobertura comparada é a da seção
+  da edição: as matérias com análise da cobertura (o resultado leva à matéria) e
+  os demais assuntos comparados, cada assunto uma vez.
 - **Como busca**: sem acento e sem diferenciar maiúsculas; todas as palavras
   precisam aparecer; `"frase exata"`; `-palavra` exclui; palavras de até 3 letras
   (STF, PT, IA) valem só inteiras, e as demais casam no começo da palavra ("juro"
@@ -446,9 +452,12 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
   pode ser guardado ou enviado; **Baixar CSV** exporta todos os resultados.
 - **Dados**: cada edição ganha `data/busca/AAAA-MM-DD.json`, compacto, gravado no
   `publish` (os dias que ainda não têm o arquivo são criados a partir de
-  `data/AAAA-MM-DD.json`) e apagado junto com a edição (`archive_keep_days`). A
-  página carrega só os dias do período pedido, das edições mais recentes para as
-  mais antigas, e busca no próprio navegador.
+  `data/AAAA-MM-DD.json`) e apagado junto com a edição (`archive_keep_days`). O
+  arquivo guarda o número do formato (`VERSAO` em `qijournal/render/pesquisa.py`):
+  quando ele muda, o `publish` seguinte refaz os arquivos de todas as edições do
+  arquivo a partir de `data/AAAA-MM-DD.json`. A página carrega só os dias do
+  período pedido, das edições mais recentes para as mais antigas, e busca no
+  próprio navegador.
 
 #### Como a mídia cobre (o analítico da busca)
 
@@ -490,12 +499,15 @@ calculada logo depois e não muda com a ordem escolhida para a lista:
   desfavoráveis e mais favoráveis, com as palavras que pesaram (a regra está em
   "Tom das manchetes", acima; com a editoria e o período do placar, os números são
   os do dossiê do nome no Analítico Político).
-- **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
-  quantos tiveram dois lados (veículos nos dois enfoques; se todos ficaram no
-  mesmo, conta como sem divergência) e quão dividida ficou cada um (divergência =
-  2 × o lado menor ÷ (A + B): 100 = meio a meio); os mais divididos, com os dois
-  enfoques e, por escrito, os veículos de cada lado; **quem destoa da maioria**; e
-  os pares de veículos que mais ficam do mesmo lado ou em lados opostos.
+- **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo
+  (as matérias da edição com análise da cobertura e os demais assuntos, cada
+  assunto uma vez, a mesma regra da lente do enquadramento), quantos tiveram dois
+  lados (veículos nos dois enfoques; se todos ficaram no mesmo, conta como sem
+  divergência) e quão dividida ficou cada um (divergência = 2 × o lado menor ÷
+  (A + B): 100 = meio a meio); os mais divididos, com os dois enfoques e, por
+  escrito, os veículos de cada lado (o link leva à matéria, quando o assunto é
+  dela); **quem destoa da maioria**; e os pares de veículos que mais ficam do
+  mesmo lado ou em lados opostos.
 
 Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
 nem na IA). **Limites**: o tom é lido por palavras (veja acima) e mede o contexto,

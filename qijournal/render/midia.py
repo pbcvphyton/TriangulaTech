@@ -215,7 +215,9 @@ def nomes_do_titulo(titulo: str, proprios: set[str]) -> set[str]:
 def corpus_do_dia(dados: Mapping[str, Any], estrangeiros: Iterable[str] = (), secao: str = SECAO) -> CorpusDia:
     """As manchetes de uma editoria (``secao``), os nomes das manchetes em português
     e os assuntos da cobertura comparada da editoria com os dois lados, de um arquivo
-    de busca (:func:`qijournal.render.pesquisa.dados_do_dia`)."""
+    de busca (:func:`qijournal.render.pesquisa.dados_do_dia`). Os assuntos são os da
+    seção Cobertura comparada da edição (as matérias com análise da cobertura e os demais
+    assuntos, cada um uma vez): os mesmos da lente do enquadramento (``lados.py``)."""
     fora = set(estrangeiros)
     veiculos = dados.get("veiculos") or []
     secoes = dados.get("secoes") or []

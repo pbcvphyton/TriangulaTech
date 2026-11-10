@@ -490,6 +490,37 @@ def coverage_view(
     )
 
 
+def compared_topics(edition: Edition) -> list[tuple[Coverage, Story | None]]:
+    """Os assuntos da seção Cobertura comparada de uma edição, cada um uma vez: as matérias
+    com análise da cobertura, na ordem da edição (``(cobertura, matéria)``), e depois os
+    demais assuntos comparados (``(cobertura, None)``).
+
+    Fica de fora o que a seção não mostra (cobertura sem veículo, assunto sem título e,
+    como em :func:`build_view`, matéria sem título ou de id repetido) e o demais assunto
+    que repete uma dessas matérias: o que tem alguma notícia em comum com ela, o mesmo
+    critério com que o editor tira da cobertura comparada os assuntos que viraram matéria.
+    A lente do enquadramento (``lados.py``) e a Pesquisa analítica (``pesquisa.py``) leem
+    esta mesma lista."""
+    topics: list[tuple[Coverage, Story | None]] = []
+    shown: set[str] = set()  # ids das matérias que a página mostra (a primeira com título de cada id)
+    articles: set[str] = set()  # notícias das matérias da lista
+    for story in edition.stories:
+        if story.id in shown or not filters.plain(story.headline):
+            continue
+        shown.add(story.id)
+        if story.coverage is None or coverage_view(story.coverage) is None:
+            continue
+        topics.append((story.coverage, story))
+        articles.update(story.article_ids)
+        articles.update(story.coverage.article_ids)
+    for coverage in edition.compared:
+        view = coverage_view(coverage)
+        if view is None or not view.topic or articles.intersection(coverage.article_ids):
+            continue
+        topics.append((coverage, None))
+    return topics
+
+
 # ── matérias ─────────────────────────────────────────────────────────────────
 
 
@@ -720,9 +751,11 @@ def _compared_pairs(
     edition: Edition, lookup: dict[str, tuple[str, str]], default_color: str, tz: str
 ) -> list[tuple[str, CoverageView]]:
     """Demais assuntos com cobertura comparada (``(editoria, view)``), na ordem da edição
-    (mais veículos primeiro)."""
+    (mais veículos primeiro), sem os que repetem uma matéria (:func:`compared_topics`)."""
     pares = []
-    for coverage in edition.compared:
+    for coverage, story in compared_topics(edition):
+        if story is not None:
+            continue
         section = lookup.get(coverage.section or "", ("", default_color))
         view = coverage_view(coverage, section=section, tz=tz, now_iso=edition.generated_at)
         if view is not None and view.topic:

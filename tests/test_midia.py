@@ -60,6 +60,18 @@ def test_js_usa_a_mesma_regra_de_busca_e_de_nomes():
     assert "(p.n === 'vivo' && k > 0 && ps[k - 1].n === 'ao')" in md
 
 
+def test_js_leva_o_assunto_comparado_da_materia_a_materia():
+    # No arquivo de busca, o assunto comparado que é matéria da edição traz o id dela (c.m): o
+    # resultado, o CSV e "Lados e divergência" levam à matéria (que traz a análise da cobertura);
+    # os demais assuntos, à seção Cobertura comparada da edição.
+    js = (TEMPLATES / "pesquisa.js.j2").read_text(encoding="utf-8")
+    assert "vs: veiculos, u: link(c.u), id: c.m || '' }" in js
+    assert "function naEdicao(r) { return edicao(r.d) + (r.id ? '#s-' + encodeURIComponent(r.id) : '#cobertura'); }" in js
+    assert "'<h3 class=\"pq-t\"><a href=\"' + esc(naEdicao(r)) + '\">'" in js and "r.k === 'c' ? absoluto(naEdicao(r))" in js
+    md = (TEMPLATES / "midia.js.j2").read_text(encoding="utf-8")
+    assert "'<li><a class=\"md-dt\" href=\"' + esc(naEdicao(r)) + '\">'" in md and "(r.id ? ' · matéria da edição' : '')" in md
+
+
 @pytest.mark.parametrize(
     ("titulo", "proprios", "esperado"),
     [
