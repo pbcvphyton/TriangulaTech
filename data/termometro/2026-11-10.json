@@ -1,0 +1,6492 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-10",
+ "analises": [
+  {
+   "id": "c6dad60ef9d7",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/09/governo-vai-prorrogar-desonerao-da-gasolina-e-etanol-por-30-dias-dizem-fontes.ghtml",
+   "titulo": "Governo vai prorrogar desoneração da gasolina e etanol por 30 dias, dizem fontes",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "governo-prorroga-desoneracao-da-gasolina-e-do-et",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a prorrogação da desoneração de combustíveis pelo governo federal e os impactos fiscais e políticos da medida."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 318,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Custo elevado dos combustíveis e pressão inflacionária.",
+    "causa": "Tributos federais e flutuação de preços.",
+    "vitima": "Consumidores.",
+    "culpado": "Nenhum explicitado.",
+    "solucao": "Prorrogação da desoneração de tributos e subvenção ao etanol.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o governo fosse de outro espectro político, o texto manteria a descrição técnica do decreto e o registro da defesa contra o uso eleitoral.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Dario Durigan",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fontes",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro da Fazenda, Dario Durigan",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "terá validade até 9 de dezembro e custará cerca de R$ 3,6 bilhões aos cofres públicos",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta o custo estimado da medida com base nos cálculos do governo.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a375326fe8d9",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/imposto-de-importacao-de-pneus-de-passeio-sobre-para-30-apos-pedido-da-industria.shtml",
+   "titulo": "Imposto de importação de pneus de passeio sobe para 30% após pedido da indústria",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-eleva-imposto-de-importacao-de-pneus-de",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de decisão governamental sobre imposto de importação de pneus e o conflito de interesses entre fabricantes e importadores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 587,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concorrência desleal e custos elevados para o setor de pneus.",
+    "causa": "Importações a preços baixos e tributação inadequada.",
+    "vitima": "Indústria nacional ou consumidores.",
+    "culpado": "Concorrência estrangeira.",
+    "solucao": "Elevação da alíquota do imposto de importação.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto relata a medida governamental e traz argumentos contrários e favoráveis com simetria de espaço.",
+   "atores": [
+    {
+     "nome": "Anip",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Abidip",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a entidade",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": false
+    },
+    {
+     "rotulo": "Abidip",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rodrigo Navarro",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 54,
+     "ultima": false
+    },
+    {
+     "rotulo": "a entidade",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "80fb07cfb1d4",
+   "url": "https://g1.globo.com/mundo/ucrania-russia/noticia/2026/11/10/russia-e-ucrania-se-reunem-eua-tentar-negociar-paz.ghtml",
+   "titulo": "Rússia e Ucrânia se reúnem com autoridades dos EUA para tentar negociar paz",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Cobre negociações de paz internacionais sobre a guerra na Ucrânia com mediação dos Estados Unidos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 867,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Guerra e destruição de infraestrutura na Ucrânia.",
+    "causa": "Conflito armado e invasão russa.",
+    "vitima": "População civil ucraniana.",
+    "culpado": "Rússia.",
+    "solucao": "Negociações de paz mediadas pelos EUA.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A cobertura de negociações de paz internacionais segue padrões jornalísticos usuais de registro de declarações de múltiplos lados.",
+   "atores": [
+    {
+     "nome": "Governo dos EUA",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ucrânia",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Rússia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Steve Witkoff",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kushner",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 60,
+     "ultima": false
+    },
+    {
+     "rotulo": "uma fonte ouvida pela agência de notícias Reuters",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 35,
+     "ultima": false
+    },
+    {
+     "rotulo": "Volodymyr Zelensky",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 13,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "36 mísseis balísticos e 172 drones - dos quais 149 foram abatidos",
+     "paragrafo": "P22",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados quantitativos oficiais sobre ataques informados pelas autoridades.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "823c00380bc0",
+   "url": "https://www.moneytimes.com.br/fundo-imobiliario-sofre-novo-calote-semanas-apos-inquilina-regularizar-debitos-igdl/",
+   "titulo": "Fundo imobiliário sofre novo calote semanas após inquilina regularizar débitos",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia sobre inadimplência de fundo imobiliário e locatária sem repercussão política direta."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 285 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 285,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atraso no pagamento de aluguel de fundo imobiliário.",
+    "causa": "Inadimplência da locatária.",
+    "vitima": "Investidores do fundo.",
+    "culpado": "BM Varejo Empreendimentos.",
+    "solucao": "Cobrança com multa e encargos.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto relata fatos objetivos de mercado financeiro e seria redigido da mesma forma para qualquer ativo.",
+   "atores": [
+    {
+     "nome": "Torre Rio Claro Offices (TRCO11)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "BM Varejo Empreendimentos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ouribank Banco Múltiplo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "multa de 5% e juros de 1% ao mês",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Informação objetiva baseada em fato relevante divulgado ao mercado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "383a19ade577",
+   "url": "https://umsoplaneta.globo.com/biodiversidade/noticia/2026/11/09/noruega-anuncia-r-350-milhoes-ao-fundo-amazonia-apos-queda-historica-do-desmatamento.ghtml",
+   "titulo": "Noruega anuncia R$ 350 milhões ao Fundo Amazônia após queda histórica do desmatamento",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "noruega-anuncia-doacao-de-r-350-milhoes-para-o-f",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de repasse financeiro internacional ao Fundo Amazônia condicionado a resultados ambientais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 609,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desmatamento e emissão de gases de efeito estufa na Amazônia.",
+    "causa": "Atividades ilegais e pressão sobre o bioma.",
+    "vitima": "Meio ambiente e populações locais.",
+    "culpado": "Atividades de extração ilegal e garimpo.",
+    "solucao": "Financiamento internacional e políticas de fiscalização.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A notícia sobre repasse internacional e dados ambientais oficiais seria publicada de forma idêntica independentemente da administração.",
+   "atores": [
+    {
+     "nome": "Governo da Noruega",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Brasileiro",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Sigrun Aasland",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "queda de 41,8% no desmatamento da Amazônia no período",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados oficiais do Inpe para contextualizar a premiação e repasse.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a81f40214bf8",
+   "url": "https://www.poder360.com.br/poder-justica/presidente-do-tst-defende-fim-imediato-da-escala-6-x-1/",
+   "titulo": "Presidente do TST defende fim imediato da escala 6 X 1",
+   "veiculo": "Poder360",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a defesa da aplicação imediata da escala 6x1 pelo presidente do TST e a repercussão político-institucional no STF e Congresso."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 78,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 521,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Assimetria nas negociações trabalhistas e necessidade de aplicação imediata da escala reduzida.",
+    "causa": "Poder econômico concentrado nos empregadores.",
+    "vitima": "Trabalhadores, especialmente mulheres.",
+    "culpado": "Resistência empresarial à redução da jornada.",
+    "solucao": "Aplicação imediata da jornada reduzida com regulamentação específica.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se os papéis estivessem invertidos, o destaque seria dado aos argumentos empresariais sobre os impactos na economia em vez da defesa da antecipação da jornada.",
+   "atores": [
+    {
+     "nome": "Luiz Philippe Vieira de Mello Filho",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Entidades empresariais (CNC, CNI)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Luiz Philippe Vieira de Mello Filho",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 88,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 88,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "defendeu nesta 2ª feira",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "Usa verbo assertivo para relatar a posição favorável à mudança.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Luiz Philippe Vieira de Mello Filho"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3ebd7a7d86ca",
+   "url": "https://www.cnnbrasil.com.br/internacional/negociacoes-entre-eua-ucrania-e-russia-comecam-em-abu-dhabi-diz-moscou/",
+   "titulo": "Negociações entre EUA, Ucrânia e Rússia começam em Abu Dhabi, diz Moscou",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de negociações internacionais de paz envolvendo EUA, Ucrânia e Rússia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 244 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 67,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 244,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Conflito prolongado entre Rússia e Ucrânia.",
+    "causa": "Invasão e hostilidades contínuas.",
+    "vitima": "Ucrânia.",
+    "culpado": "Rússia.",
+    "solucao": "Negociações trilaterais de paz mediadas pelos EUA.",
+    "motor_moral": "paz"
+   },
+   "teste_inversao": "O texto mantém tom estritamente informativo sobre negociações diplomáticas.",
+   "atores": [
+    {
+     "nome": "Governo dos Estados Unidos",
+     "campo": "centro"
+    },
+    {
+     "nome": "Ucrânia",
+     "campo": "centro"
+    },
+    {
+     "nome": "Rússia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rustem Umerov",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3c0114589abd",
+   "url": "https://www.suno.com.br/noticias/fundo-imobiliario-trco11-novo-atraso-aluguel/",
+   "titulo": "TRCO11: fundo imobiliário tem novo atraso em pagamento de aluguel",
+   "veiculo": "Suno Notícias",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda atraso de aluguel em fundo imobiliário específico."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 259 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 259,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atraso no pagamento de aluguel de fundo imobiliário.",
+    "causa": "Inadimplência da locatária.",
+    "vitima": "Cotistas do fundo.",
+    "culpado": "BM Varejo Empreendimentos.",
+    "solucao": "Cobrança de multa e encargos contratuais.",
+    "motor_moral": "responsabilidade_contratual"
+   },
+   "teste_inversao": "O texto é estritamente factual e econômico, sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "TRCO11",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "BM Varejo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ouribank",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "6ca02e9ff2b3",
+   "url": "https://climainfo.org.br/2026/11/09/noruega-anuncia-doacao-de-r-350-milhoes-ao-fundo-amazonia/",
+   "titulo": "Noruega anuncia doação de R$ 350 milhões ao Fundo Amazônia",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "noruega-anuncia-doacao-de-r-350-milhoes-para-o-f",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Envolve repasses internacionais para o Fundo Amazônia e faz juízo político sobre governos passados e atuais."
+   },
+   "estado": "ok",
+   "T": -10,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 393,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -9.8,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -9.8
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desmatamento e emissões de carbono na Amazônia.",
+    "causa": "Políticas ambientais de governos anteriores versus esforços atuais.",
+    "vitima": "Clima global e biodiversidade.",
+    "culpado": "Gestão anterior de Jair Bolsonaro.",
+    "solucao": "Doações internacionais e manutenção da transição ecológica.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o tratamento fosse neutro, os termos depreciativos na descrição do governo anterior seriam omitidos.",
+   "atores": [
+    {
+     "nome": "Governo da Noruega",
+     "campo": "centro"
+    },
+    {
+     "nome": "Governo brasileiro (Lula)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Sigrun Aasland",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "(des)governo do (atual presidiário) Jair Bolsonaro",
+     "paragrafo": "P6",
+     "direcao": "esquerda",
+     "contribuicao": -9.8,
+     "explicacao": "Uso de termos pejorativos na voz da redação para qualificar a gestão de um ex-presidente.",
+     "intensidade": 3,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Jair Bolsonaro"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "cfbdd11c5305",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/bc-passa-divulgar-lista-de-empresas-aptas-operar-com-criptoativos",
+   "titulo": "BC passa a divulgar lista de empresas aptas a operar com criptoativos",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre medida regulatória do Banco Central relacionada a criptoativos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 285 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 64,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 285,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de transparência no mercado de criptoativos.",
+    "causa": "Ausência de listagem centralizada prévia.",
+    "vitima": "Cidadãos e consumidores.",
+    "culpado": "Nenhum.",
+    "solucao": "Divulgação de lista de empresas aptas pelo Banco Central.",
+    "motor_moral": "transparencia"
+   },
+   "teste_inversao": "O texto é puramente informativo sobre regulação estatal.",
+   "atores": [
+    {
+     "nome": "Banco Central",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "48c584d387dd",
+   "url": "https://www.gazetaesportiva.com/mais-esportes/lutas/chefe-do-ufc-rejeita-cargo-de-porta-voz-da-casa-branca-oferecido-por-trump/",
+   "titulo": "Chefe do UFC rejeita cargo de porta-voz da Casa Branca oferecido por Trump",
+   "veiculo": "Gazeta Esportiva",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de uma recusa descontraída de cargo público por figura ligada a evento desportivo e político nos EUA, sem maior profundidade ideológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 244 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 244,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Vago cargo de secretário de imprensa da Casa Branca.",
+    "causa": "Saída da porta-voz anterior após uma semana.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Manter o posto vago após recusa de Dana White.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, o tom da reportagem é estritamente descritivo e relatado com base nas falas públicas dos envolvidos, independentemente da orientação política.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Dana White",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    },
+    {
+     "rotulo": "Dana White",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 14,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 23
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "99f4ea01edda",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/por-que-os-frigorificos-sobem-na-bolsa-mesmo-com-a-suspensao-das-importacoes-de-carne-suina-pelas-filipinas-pads/",
+   "titulo": "Por que os frigoríficos sobem na Bolsa mesmo com a suspensão das importações de carne suína pelas Filipinas?",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "filipinas-suspendem-importacao-de-carne-suina-po",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda o impacto de medidas econômicas internacionais e ações do governo brasileiro sobre ações de frigoríficos na bolsa."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 660,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspensão temporária de importações de carne suína pelas Filipinas.",
+    "causa": "Investigação de salvaguarda sobre impactos na produção local.",
+    "vitima": "Frigoríficos brasileiros.",
+    "culpado": "Autoridades filipinas.",
+    "solucao": "Diálogo diplomático e técnico liderado pela ABPA e pelo governo.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, a matéria relata o comportamento das ações e explica os motivos com base em analistas e associações setoriais de forma impessoal.",
+   "atores": [
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "ABPA",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ABPA",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": false
+    },
+    {
+     "rotulo": "analista de proteína animal da Safras & Mercado, Fernando Iglesias",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 70,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f57f3526b692",
+   "url": "https://neofeed.com.br/negocios/o-risco-jensen-huang-como-o-caso-com-uma-suposta-espia-chinesa-abala-a-nvidia/",
+   "titulo": "O “risco Jensen Huang”: como o caso com uma suposta espiã chinesa abala a Nvidia",
+   "veiculo": "NeoFeed",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "nvidia-perde-us-200-bilhoes-apos-conselho-abrir",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Envolve investigações de segurança nacional dos EUA, relativas a empresas de tecnologia de ponta (Nvidia), geopolítica e laços com a China."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1164,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investigação sobre o CEO da Nvidia por relacionamento com suposta espiã chinesa.",
+    "causa": "Relação pessoal e comercial de Jensen Huang com Alice Huang e laços com a Megaspeed.",
+    "vitima": "Investidores e acionistas da Nvidia.",
+    "culpado": "Jensen Huang / Alice Huang.",
+    "solucao": "Investigação interna por comitê independente.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, o texto relata os fatos sobre a investigação e a queda das ações de maneira direta, citando as notas oficiais e analistas imparcialmente.",
+   "atores": [
+    {
+     "nome": "Jensen Huang",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Democratas",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jensen Huang",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 67,
+     "ultima": false
+    },
+    {
+     "rotulo": "Nvidia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 26,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente dos EUA",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "analistas da Bernstein",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    },
+    {
+     "rotulo": "analistas",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 17,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 85
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "cfaa0e771b32",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/09/entidades-pedem-que-governo-e-congresso-priorizem-combate-a-supersalarios-no-funcionalismo-publico.ghtml",
+   "titulo": "Entidades pedem que governo e Congresso priorizem combate a supersalários no funcionalismo público",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "organizacoes-lancam-manifesto-por-prioridade-no",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Discute propostas de organizações da sociedade civil para combater supersalários e privilégios no setor público brasileiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 74,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 893,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Pagamento de supersalários e penduricalhos no serviço público brasileiro.",
+    "causa": "Falta de regulamentação estrita do teto constitucional e criação de verbas indenizatórias.",
+    "vitima": "Contribuinte brasileiro e credibilidade do Estado.",
+    "culpado": "Órgãos que autorizam pagamentos elevados (magistratura, MP).",
+    "solucao": "Aprovação de legislação nacional limitando verbas indenizatórias e aplicando o teto constitucional rigorosamente.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Sim, a matéria expõe as reivindicações de um manifesto de forma padronizada, dando voz a diversos diretores de ONGs signatárias.",
+   "atores": [
+    {
+     "nome": "Organizações da sociedade civil",
+     "campo": "centro"
+    },
+    {
+     "nome": "Supremo Tribunal Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Congresso Nacional",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Isadora Modesto, diretora-executiva da República.org",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": false
+    },
+    {
+     "rotulo": "diretora executiva do Movimento Pessoas à Frente, Jessika Moreira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": false
+    },
+    {
+     "rotulo": "diretor-presidente do Centro de Liderança Pública, Tadeu Barros",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": false
+    },
+    {
+     "rotulo": "Magno Karl, cientista político e diretor executivo do Livres",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 40,
+     "ultima": false
+    },
+    {
+     "rotulo": "Juliana Sakai, diretora executiva da Transparência Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": false
+    },
+    {
+     "rotulo": "Bruno Morassutti, cofundador e diretor de advocacy da Fiquem Sabendo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 65,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2f4d2faef1ad",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/noruega-anuncia-doacao-de-r-350-milhoes-para-o-fundo-amazonia.shtml",
+   "titulo": "Noruega anuncia doação de R$ 350 milhões para o Fundo Amazônia",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "noruega-anuncia-doacao-de-r-350-milhoes-para-o-f",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de doação internacional para o Fundo Amazônia e políticas de preservação ambiental."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 621,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de financiamento e preservação da floresta amazônica.",
+    "causa": "Emissões e desmatamento global.",
+    "vitima": "Clima global e biodiversidade.",
+    "culpado": "Desmatamento e gestões anteriores omissas.",
+    "solucao": "Doações internacionais atreladas a resultados de redução do desmatamento.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Sim, o texto descreve a doação e menciona tanto o governo atual quanto a suspensão ocorrida sob a gestão Bolsonaro sem juízos de valor além dos dados oficiais.",
+   "atores": [
+    {
+     "nome": "Governo da Noruega",
+     "campo": "centro"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Administração Jair Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Embaixada do país nórdico",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 30,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministra do Clima e Meio Ambiente da Noruega, Sigrun Aasland",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "70a4d829bbe3",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/10/eua-retiram-avioes-de-base-no-reino-unido-apos-ameaca-do-ira-diz-jornal.ghtml",
+   "titulo": "EUA retiram aviões de base no Reino Unido após ameaça do Irã, diz jornal",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Cobertura de tensões geopolíticas envolvendo os Estados Unidos, o Reino Unido e o Irã."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 67,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 358,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ameaças de segurança a bases militares americanas no Reino Unido ligadas ao Irã.",
+    "causa": "Conflito geopolítico e ações coordenadas supostamente ligadas a inteligência iraniana.",
+    "vitima": "Militares dos EUA e segurança britânica.",
+    "culpado": "Irã e suspeitos de espionagem.",
+    "solucao": "Retirada de aeronaves militares das bases vulneráveis.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve movimentações militares padrão sem tomar partido político direto na disputa geopolítica subjacente.",
+   "atores": [
+    {
+     "nome": "Estados Unidos",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Irã",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo do Reino Unido",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Wall Street Journal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "porta-voz do Ministério da Defesa britânico",
+     "campo": "centro",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    },
+    {
+     "rotulo": "Andy Burnham",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "informou o Wall Street Journal, citando pessoas familiarizadas com o assunto.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de fontes de imprensa internacional com transparência na atribuição.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3be2207f4c50",
+   "url": "https://www.cnnbrasil.com.br/internacional/eua-retiram-avioes-de-base-no-reino-unido-apos-ameaca-do-ira-diz-jornal/",
+   "titulo": "EUA retiram aviões de base no Reino Unido após ameaça do Irã, diz jornal",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Relato de desdobramentos de segurança internacional e tensões entre EUA, Reino Unido e Irã."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 513,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Elevação de alerta de segurança em bases aéreas devido a ameaças.",
+    "causa": "Contencioso militar decorrente do conflito entre EUA e Irã.",
+    "vitima": "Pessoal militar americano no exterior.",
+    "culpado": "Irã e grupos associados.",
+    "solucao": "Redistribuição de aeronaves e aumento do nível de alerta (FPCON Charlie).",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A abordagem factual e o registro de múltiplas negativas e versões mantêm o texto equilibrado.",
+   "atores": [
+    {
+     "nome": "Estados Unidos",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Irã",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "porta-voz do Ministério da Defesa britânico",
+     "campo": "centro",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "informou o WSJ, citando um funcionário americano familiarizado com o assunto.",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Atribuição clara de informações de bastidor a jornal de referência.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "131ecc070deb",
+   "url": "https://www.poder360.com.br/poder-economia/governo-aumenta-imposto-para-pneus-importados-de-16-para-30/",
+   "titulo": "Governo aumenta imposto para pneus importados de 16% para 30%",
+   "veiculo": "Poder360",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-eleva-imposto-de-importacao-de-pneus-de",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Decisão do governo federal de alteração em alíquota de imposto de importação."
+   },
+   "estado": "ok",
+   "T": 2,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 239 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 239,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.35,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 2.35
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concorrência desleal e perda de mercado da indústria nacional de pneus.",
+    "causa": "Entrada massiva de produtos importados asiáticos mais baratos.",
+    "vitima": "Fabricantes nacionais e trabalhadores do setor.",
+    "culpado": "Importações desreguladas e concorrentes estrangeiros.",
+    "solucao": "Aumento do imposto de importação de 16% para 30%.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o tom fosse crítico à medida, destacaria o impacto inflacionário sobre os consumidores em vez de enfatizar os argumentos da indústria.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Indústria Nacional de Pneumáticos (Anip)",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Associação Nacional da Indústria de Pneumáticos (Anip)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 74,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "reúne 19 fábricas, gera 35 mil empregos diretos e mais de 500 mil indiretos",
+     "paragrafo": "P7",
+     "direcao": "direita",
+     "contribuicao": 2.35,
+     "explicacao": "Uso de estatísticas fornecidas pelo setor beneficiado sem contraponto de importadores ou consumidores.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Indústria Nacional de Pneumáticos (Anip)",
+     "ressalva": "Dados apresentados como declaração da associação."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ae9c7690a66d",
+   "url": "https://climainfo.org.br/2026/11/09/2026-caminha-para-ser-um-dos-quatro-anos-mais-quentes-ja-registrados/",
+   "titulo": "2026 caminha para ser um dos quatro anos mais quentes já registrados",
+   "veiculo": "ClimaInfo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relatório climático global divulgado durante a COP31."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 405,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento extremo das temperaturas globais e mudanças climáticas.",
+    "causa": "Acumulação de gases de efeito estufa na atmosfera e fenômeno El Niño.",
+    "vitima": "População global e ecossistemas marinhos.",
+    "culpado": "Emissões antropogênicas de carbono.",
+    "solucao": "Mitigação das mudanças climáticas e reduções de emissões.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O tratamento de relatórios científicos globais tende a seguir padrões padronizados de divulgação de agências da ONU.",
+   "atores": [
+    {
+     "nome": "Organização Meteorológica Mundial (OMM)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "John Kennedy, chefe de informações climáticas da OMM",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "temperatura média global ficou 1,47°C acima dos níveis pré-industriais",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados científicos com base e período bem definidos.",
+     "intensidade": 1,
+     "certeza": 0.95,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5f7b076b9361",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/filipinas-suspendem-importacao-de-carne-suina-brasileira-por-60-dias",
+   "titulo": "Filipinas suspendem importação de carne suína brasileira por 60 dias",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "filipinas-suspendem-importacao-de-carne-suina-po",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Suspensão temporária de exportações agrícolas brasileiras e articulação diplomática presidencial."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 339,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Restrição comercial de 60 dias à importação de carne suína brasileira pelas Filipinas.",
+    "causa": "Investigação preliminar sobre impactos na produção local filipina.",
+    "vitima": "Exportadores brasileiros de carne suína.",
+    "culpado": "Barreiras comerciais protecionistas.",
+    "solucao": "Missão diplomática e defesa técnica liderada pelo presidente Lula.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata os fatos focando na resposta institucional do governo e do setor produtivo sem viés partidário evidente.",
+   "atores": [
+    {
+     "nome": "Governo das Filipinas",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo brasileiro (Mapa / Lula)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Associação Brasileira de Proteína Animal (ABPA)",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério da Agricultura e Pecuária (Mapa)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": false
+    },
+    {
+     "rotulo": "Associação Brasileira de Proteína Animal (ABPA)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 24,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "vendas de US$ 530,9 milhões e 222,7 mil toneladas entre janeiro e setembro de 2026",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Contextualização clara do peso econômico das exportações com dados oficiais.",
+     "intensidade": 1,
+     "certeza": 0.95,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0b7542df30c5",
+   "url": "https://www.moneytimes.com.br/marco-rubio-diz-que-eua-vao-dialogar-com-brasil-e-cobra-aprovacao-de-embaixador-fets/",
+   "titulo": "Marco Rubio diz que EUA vão dialogar com Brasil e cobra aprovação de embaixador",
+   "veiculo": "Money Times",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "rubio-diz-que-eua-manterao-dialogo-com-brasil-ma",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda declarações do secretário de Estado dos EUA sobre relações diplomáticas com o Brasil e a pendência na aprovação de um embaixador."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 184 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 61,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 184,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atraso na aceitação de um embaixador dos EUA pelo Brasil",
+    "causa": "Decisão do governo brasileiro em não permitir a entrada do indicado",
+    "vitima": "Governo dos EUA",
+    "culpado": "Governo brasileiro",
+    "solucao": "Resolução do impasse pelo governo brasileiro",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se os papéis estivessem invertidos, um jornal brasileiro cobraria o governo norte-americano com o mesmo tom assertivo.",
+   "atores": [
+    {
+     "nome": "Marco Rubio",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "O secretário de Estado dos Estados Unidos, Marco Rubio",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 74,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 74
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Marco Rubio diz que EUA vão dialogar com Brasil e cobra aprovação de embaixador",
+     "paragrafo": "P0",
+     "direcao": "direita",
+     "contribuicao": 2.94,
+     "explicacao": "O verbo 'cobra' confere autoridade ao ator dos EUA em relação às decisões soberanas do Brasil.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Marco Rubio",
+     "desfavorece": "Governo brasileiro"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "afea34a7e23a",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/09/lula-embarca-para-cop31-com-comitiva-de-ministros-e-janones.ghtml",
+   "titulo": "Lula embarca para COP31 com comitiva de ministros e Janones",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-desembarca-na-turquia-para-a-cop31-e-transm",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata de viagem internacional do presidente e comitiva ministerial para cúpulas de clima e comércio."
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 421,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.35,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": -2.35
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mudanças climáticas e articulação internacional",
+    "causa": "Necessidade de cooperação e compromissos globais",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Participação em cúpulas internacionais e apresentação de resultados",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apenas relata a agenda oficial da comitiva presidencial sem juízos de valor próprios da redação.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 37,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 37,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "reduzimos em 71,2% o desmatamento na Amazônia Legal e em 48,4% no Cerrado",
+     "paragrafo": "P5",
+     "direcao": "esquerda",
+     "contribuicao": -2.35,
+     "explicacao": "Os dados oficiais do Prodes/Inpe são citados diretamente com base e período, configurando um número contextualizado.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral",
+     "favorece": "Luiz Inácio Lula da Silva"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5127332285b1",
+   "url": "https://valor.globo.com/impresso/noticia/2026/11/10/presidente-do-stf-arquiva-inquerito-das-fake-news.ghtml",
+   "titulo": "Presidente do STF arquiva inquérito das ‘fake news’",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "presidente-do-stf-edson-fachin-arquiva-o-inqueri",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Relata o arquivamento de inquérito de grande repercussão no STF após manifestação da PGR."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 160 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 160,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investigações de longa duração e questionadas no STF",
+    "causa": "Abertura do inquérito em 2019 e desdobramentos de crise institucional",
+    "vitima": "Integrantes do Supremo",
+    "culpado": "Nenhum apontado diretamente",
+    "solucao": "Arquivamento determinado pelo presidente do STF",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia de caráter puramente institucional seria escrita da mesma forma independentemente de quem estivesse na presidência do STF.",
+   "atores": [
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Procuradoria-Geral da República (PGR)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Procuradoria-Geral da República (PGR)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O procedimento era alvo de críticas por diversos juristas, tanto por seu tempo de duração quanto pelo escopo amplo de suas investigações.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto traz a contextualização das críticas que o inquérito recebia por parte de juristas.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1ccbe327bf85",
+   "url": "https://c-level.folha.uol.com.br/ia/2026/11/anthropic-lanca-novos-modelos-fable-e-mythos-antes-de-ipo.shtml",
+   "titulo": "Anthropic lança novos modelos Fable e Mythos antes de IPO",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "anthropic-revela-novos-modelos-claude-em-meio-ao",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre lançamento de novos produtos de inteligência artificial por empresa privada."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 201 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 201,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mercado de inteligência artificial e oferta de modelos",
+    "causa": "Inovação tecnológica e preparação para IPO",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Lançamento de novas ferramentas e modelos",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto de cunho mercadológico seria mantido idêntico para qualquer outra empresa do setor.",
+   "atores": [
+    {
+     "nome": "Anthropic",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "A Anthropic",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "A Anthropic disse que o acesso ao Claude Mythos 5.2 é restrito",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utilização de verbos neutros de atribuição para relatar o anúncio da empresa.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "28cbc1e058a1",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/09/vinte-migrantes-morrem-durante-tentativa-de-chegar-a-grecia.ghtml",
+   "titulo": "Pelo menos 21 migrantes morrem ao tentar chegar à Europa; mais de 100 são resgatados",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "costumes"
+    ],
+    "justificativa": "Aborda a tragédia humanitária envolvendo migrantes tentando chegar à Europa e políticas de fronteira."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 563,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mortes de migrantes em travessias marítimas arriscadas",
+    "causa": "Conflitos, pobreza e condições climáticas adversas",
+    "vitima": "Migrantes",
+    "culpado": "Redes de tráfico e precariedade das rotas",
+    "solucao": "Operações de resgate e controle de fronteiras",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A notícia humanitária de naufrágio e resgate seria redigida com a mesma sobriedade por qualquer veículo de imprensa.",
+   "atores": [
+    {
+     "nome": "Migrantes",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Autoridades gregas e Frontex",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Guarda Costeira grega",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "cerca de 31,8 mil travessias irregulares das fronteiras da União Europeia foram registradas nos primeiros nove meses de 2026",
+     "paragrafo": "P19",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os dados estatísticos sobre migração são fornecidos com base oficial (Frontex) e período especificado.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "224b93d351d3",
+   "url": "https://www.poder360.com.br/poder-justica/judiciario-e-mpu-querem-r-533-milhoes-para-pagar-penduricalhos/",
+   "titulo": "Judiciário e MPU querem R$ 533 milhões para pagar penduricalhos",
+   "veiculo": "Poder360",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de pedido do Judiciário e MPU por recursos adicionais para pagamento de penduricalhos, envolvendo orçamento público."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 403,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insuficiência de dotação orçamentária para pagar penduricalhos do Judiciário e MPU.",
+    "causa": "Validação de verbas indenizatórias sem previsão no Orçamento de 2026.",
+    "vitima": "Integrantes do Judiciário e MPU com risco de atraso em benefícios.",
+    "culpado": "Incompatibilidade orçamentária.",
+    "solucao": "STF decidir procedimento para cumprir a decisão.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Sim, o texto apenas relata o pedido oficial da AGU ao STF com base em dados orçamentários.",
+   "atores": [
+    {
+     "nome": "Judiciário e MPU",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "AGU",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "AGU",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 72,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "informaram ao Supremo Tribunal Federal que precisam",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição neutro.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ffedeab46233",
+   "url": "https://www.cnnbrasil.com.br/politica/stf-promove-audiencia-nesta-terca-10-para-discutir-fim-da-escala-6x1/",
+   "titulo": "STF promove audiência nesta terça (10) para discutir fim da escala 6×1",
+   "veiculo": "CNN Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico",
+     "costumes"
+    ],
+    "justificativa": "Aborda audiência no STF sobre a escala 6x1 e medidas do governo federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 757,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Contgências e pedidos de adiamento sobre a transição do fim da escala 6x1.",
+    "causa": "Prazos curtos para reorganização empresarial apontados por confederações.",
+    "vitima": "Empresas e comércio com dificuldades operacionais.",
+    "culpado": "Cronograma acelerado da emenda constitucional.",
+    "solucao": "Audiência de conciliação no STF convocada por Flávio Dino.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, a matéria descreve com neutralidade os argumentos das entidades empresariais e a condução de Dino.",
+   "atores": [
+    {
+     "nome": "Ministro Flávio Dino",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "CNC e CNI",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 32,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "escreveu o ministro",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Atribuição neutra de fala ao magistrado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0ad0efcd466a",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/judiciario-e-mpu-querem-r-533-milhoes-para-pagar-penduricalhos",
+   "titulo": "Judiciário e MPU querem R$ 533 milhões para pagar penduricalhos",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Notícia institucional sobre pedido de verbas extras para o Judiciário e MPU."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 364,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de recursos no orçamento para pagar penduricalhos.",
+    "causa": "Decisão do STF validando verbas indenizatórias.",
+    "vitima": "Servidores do Judiciário e MPU.",
+    "culpado": "Ausência de previsão orçamentária prévia.",
+    "solucao": "Orientação do STF sobre o cumprimento da decisão.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Sim, o texto é estritamente informativo e reproduz dados oficiais.",
+   "atores": [
+    {
+     "nome": "Poder Judiciário e MPU",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "AGU",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "AGU",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 71,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "relatou a AGU",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro para relatar a manifestação da AGU.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f14118fbfb9e",
+   "url": "https://climainfo.org.br/2026/11/09/brasil-encerra-presidencia-da-cop30-e-passa-comando-da-conferencia-do-clima-para-a-turquia/",
+   "titulo": "Brasil encerra presidência da COP30 e passa comando da conferência do clima para a Turquia",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-desembarca-na-turquia-para-a-cop31-e-transm",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "economico"
+    ],
+    "justificativa": "Cobre a transição da presidência da COP30 para a COP31 e discursos oficiais sobre clima e desenvolvimento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 668,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise climática e necessidade de transição justa.",
+    "causa": "Emissões e vulnerabilidades socioambientais.",
+    "vitima": "Populações vulneráveis.",
+    "culpado": "Falta de ação coordenada global.",
+    "solucao": "Implementação de agendas de ação e financiamento climático.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o evento envolvesse uma cúpula com lideranças de oposição, a seleção de trechos laudatórios seria avaliada com maior escrutínio de contraponto.",
+   "atores": [
+    {
+     "nome": "André Corrêa do Lago",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "embaixador André Corrêa do Lago",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 158,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ana Toni",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 60,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 218,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "0f8f22da28c9",
+   "url": "https://www.moneytimes.com.br/grupo-sbf-sbfg3-dono-da-centauro-tem-recuo-de-45-no-lucro-do-3o-trimestre-fets/",
+   "titulo": "Grupo SBF (SBFG3), dono da Centauro, tem recuo de 45% no lucro do 3º trimestre",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro e resultados trimestrais de empresa privada."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 198 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 198,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Queda no lucro líquido da companhia no período.",
+    "causa": "Efeitos não recorrentes e comparações com bases anteriores.",
+    "vitima": "Acionistas e investidores.",
+    "culpado": "Fatores de mercado e contábeis.",
+    "solucao": "Ajustes operacionais e divulgação de relatórios.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, o padrão de reporte financeiro de mercado é neutro e baseado em balanços oficiais.",
+   "atores": [
+    {
+     "nome": "Grupo SBF",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "lucro líquido ajustado de R$ 53,6 milhões no terceiro trimestre, queda de 44,6%",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação transparente de dados financeiros com base e período claros.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a578eec32f25",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/09/justica-suspende-parte-das-regras-sobre-vale-alimentacao-e-vale-refeicao.ghtml",
+   "titulo": "Justiça suspende parte das regras sobre vale-alimentação e vale-refeição",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "justica-federal-suspende-em-carater-liminar-trec",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão judicial que suspende decreto do governo federal sobre regras do vale-alimentação e vale-refeição, envolvendo disputa entre o Executivo, o Judiciário e empresas do setor."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 498,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Decreto do Executivo impõe regras e limites de taxas considerados abusivos ou irregulares ao setor de vale-alimentação.",
+    "causa": "Excesso de poder regulamentar do Executivo na visão das empresas, ou tentativa de aumentar concorrência e reduzir preços na visão do governo.",
+    "vitima": "Empresas de benefícios e estabelecimentos comerciais afetados pelas novas tarifas.",
+    "culpado": "Governo federal, por editar decreto contestado judicialmente.",
+    "solucao": "Suspensão liminar de parte dos dispositivos do decreto pela Justiça Federal.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto seria escrito da mesma forma se a decisão fosse contrária às empresas, pois relata os argumentos de ambas as partes e a decisão judicial de maneira impessoal.",
+   "atores": [
+    {
+     "nome": "Governo de Luiz Inácio Lula da Silva (PT)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Associação Brasileira das Empresas de Benefícios ao Trabalhador (Abbt)",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Frederico Botelho de Barros Viana (Juiz Federal)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Associação Brasileira das Empresas de Benefícios ao Trabalhador (Abbt)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "juiz",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Advocacia-Geral da União (AGU)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "governo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro do Trabalho, Luiz Marinho",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "defendeu a medida e disse que a atividade",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Usa verbo neutro para registrar a manifestação da AGU, mantendo o equilíbrio na atribuição de falas.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "desfavorece": "Governo de Luiz Inácio Lula da Silva (PT)"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1c238ed9caff",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/chuvas-na-faixa-de-gaza-inundam-campos-de-deslocados-deixam-mortos-e-afetam-cerca-de-70-mil-pessoas.shtml",
+   "titulo": "Chuvas na Faixa de Gaza inundam campos de deslocados, deixam mortos e afetam cerca de 70 mil pessoas",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Reportagem sobre impacto de fortes chuvas na Faixa de Gaza, envolvendo crise humanitária e referências ao conflito geopolítico e autoridades locais."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 675,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.27,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": 3.27
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "População deslocada em Gaza sofre com inundações decorrentes de chuvas fortes em abrigos precários.",
+    "causa": "Guerra prolongada, destruição de infraestruturas e falta de materiais de abrigo.",
+    "vitima": "Moradores deslocados e palestinos em abrigos provisórios.",
+    "culpado": "Guerra e condições decorrentes do conflito com Israel.",
+    "solucao": "Fornecimento de equipamentos de emergência e atuação da comunidade internacional.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata tragédia humanitária e mantém o foco nas condições dos civis afetados pelas intempéries, o que ocorreria de forma idêntica em qualquer cenário de desastre humanitário.",
+   "atores": [
+    {
+     "nome": "Autoridades locais e serviços de emergência de Gaza (Hamas)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Autoridade Palestina",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Israel",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "autoridades locais",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "serviços de emergência",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "gabinete de imprensa do governo controlado pelo grupo terrorista Hamas",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Raed Almaquousi",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Saoud Almaqousi",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mahmoud Alhaheel",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 42,
+     "ultima": true
+    },
+    {
+     "rotulo": "Autoridade Palestina",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "governo controlado pelo grupo terrorista Hamas",
+     "paragrafo": "P4",
+     "direcao": "direita",
+     "contribuicao": 3.27,
+     "explicacao": "Utiliza o rótulo oficial de 'grupo terrorista' para qualificar o governo local citado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Autoridades locais e serviços de emergência de Gaza (Hamas)",
+     "ressalva": "Classificação amplamente adotada por governos ocidentais e adotada editorialmente pelo veículo."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9e84593850f9",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/09/densa-camada-de-fumaca-encobre-capital-da-india-poluicao-e-58-vezes-maior-que-o-limite-recomendado.ghtml",
+   "titulo": "Densa camada de fumaça encobre capital da Índia; poluição é 58 vezes maior que o limite recomendado",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Notícia sobre poluição severa em Nova Déli após o Diwali, abordando falhas na aplicação de restrições judiciais/governamentais ao uso de fogos de artifício."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 498,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Níveis extremos de poluição atmosférica em Nova Déli durante o festival de Diwali.",
+    "causa": "Uso de fogos de artifício, condições meteorológicas de inverno e queima de resíduos agrícolas.",
+    "vitima": "População da capital indiana exposta ao ar tóxico.",
+    "culpado": "Desrespeito às restrições de fogos de artifício e fatores sazonais.",
+    "solucao": "Restrições judiciais e uso de alternativas menos poluentes, embora ineficazes na prática.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve um fato ambiental e de saúde pública mensurado por dados científicos e órgãos de monitoramento, sendo redigido de forma puramente descritiva.",
+   "atores": [
+    {
+     "nome": "Suprema Corte da Índia",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "organização de monitoramento da qualidade do ar IQAir",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "turista ouvido pela agência de notícias Reuters",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 48,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "dd7e8375a0f5",
+   "url": "https://www.poder360.com.br/poder-governo/governo-prorroga-desoneracao-de-gasolina-e-etanol-por-mais-30-dias/",
+   "titulo": "Governo prorroga desoneração de gasolina e etanol por mais 30 dias",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "governo-prorroga-desoneracao-da-gasolina-e-do-et",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre prorrogação de desoneração de tributos sobre combustíveis e subsídios pelo governo federal, com impactos fiscais e econômicos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "10 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 76,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 422,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 10,
+   "enquadramento": {
+    "problema": "Preços elevados dos combustíveis e riscos de pressão inflacionária.",
+    "causa": "Cotações internacionais do petróleo afetadas por conflitos geopolíticos.",
+    "vitima": "Consumidores e setores econômicos impactados pelo custo de transporte.",
+    "culpado": "Fatores externos como a guerra no Oriente Médio e conflito na Ucrânia.",
+    "solucao": "Prorrogação temporária da desoneração de tributos e subvenções aos combustíveis.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta dados objetivos sobre impactos fiscais e atos oficiais publicados no Diário Oficial, mantendo tom neutro independentemente de qual administração estivesse no poder.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "o governo justificou a medida pela alta",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utiliza verbo neutro ('justificou') para relatar a motivação apresentada pelo governo para a desoneração.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "desfavorece": "Governo federal"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c364a47b7cdb",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/bc-divulga-empresas-liberadas-a-operar-cripto-no-brasil-veja-lista/",
+   "titulo": "BC divulga empresas liberadas a operar cripto no Brasil; veja lista",
+   "veiculo": "CNN Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Informa a divulgação pelo Banco Central de listas de empresas autorizadas ou em processo de autorização para operar com criptoativos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 277 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 277,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de transparência e identificação de prestadores de serviços de criptoativos.",
+    "causa": "Crescimento e formalização do mercado de ativos virtuais.",
+    "vitima": "Cidadãos e investidores que buscam segurança no mercado regulado.",
+    "culpado": "Nenhum culpado apontado.",
+    "solucao": "Divulgação de listas públicas de empresas autorizadas e em análise pelo Banco Central.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata um procedimento institucional e informativo padrão do Banco Central, sem juízos de valor ou viés político.",
+   "atores": [
+    {
+     "nome": "Banco Central (BC)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f26e49625a05",
+   "url": "https://agenciabrasil.ebc.com.br/internacional/noticia/2026-11/onu-diz-que-2026-sera-um-dos-anos-mais-quentes-ja-registrados",
+   "titulo": "ONU diz que 2026 será um dos anos mais quentes já registrados",
+   "veiculo": "Agência Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Texto informativo sobre relatório da ONU a respeito de temperaturas globais e mudanças climáticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 322,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aquecimento global recorde e retenção de calor.",
+    "causa": "Gases de efeito estufa e fenômeno El Niño.",
+    "vitima": "Planeta Terra.",
+    "culpado": "Emissões de gases poluentes.",
+    "solucao": "Negociações e acordos climáticos.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é puramente factual e baseado em relatórios internacionais, sem viés editorial detectável.",
+   "atores": [
+    {
+     "nome": "Organização Meteorológica Mundial (OMM)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "chefe de Informações Climáticas da OMM, John Kennedy",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a27e00d72f4e",
+   "url": "https://www.moneytimes.com.br/ecorodovias-ecor3-tem-lucro-de-r-407-milhoes-no-3o-trimestre-queda-de-53-fets/",
+   "titulo": "Ecorodovias (ECOR3) tem lucro de R$ 407 milhões no 3º trimestre, queda de 5,3%",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro de empresa privada (Ecorodovias)."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 235,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Queda no lucro líquido trimestral da empresa.",
+    "causa": "Fatores contábeis e ajustes de concessões.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta dados contábeis de forma estritamente neutra.",
+   "atores": [
+    {
+     "nome": "Ecorodovias",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "84286fd4b2da",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/09/fux-atende-pgr-e-suspende-processos-de-bets-que-discutem-constitucionalidade-de-proibicao.ghtml",
+   "titulo": "Fux atende PGR e suspende processos de bets que discutem constitucionalidade de proibição",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "ministro-luiz-fux-suspende-em-todo-o-pais-proces",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de decisão do STF suspendendo processos sobre bets e envolvendo medida provisória do governo federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 499,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insegurança jurídica com múltiplos processos sobre a proibição de bets.",
+    "causa": "Controvérsias constitucionais em torno da MP do governo.",
+    "vitima": "Sociedade exposta a risco social.",
+    "culpado": "Multiplicidade de ações divergentes nas instâncias ordinárias.",
+    "solucao": "Suspensão dos processos até julgamento definitivo pelo STF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia relata uma decisão judicial oficial e traz o contexto institucional sem viés partidário evidente.",
+   "atores": [
+    {
+     "nome": "Luiz Fux",
+     "campo": "centro"
+    },
+    {
+     "nome": "Governo Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Procuradoria-Geral da República (PGR)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro do Supremo Tribunal Federal (STF) Luiz Fux",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 143,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d947bd1a5ba5",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/governo-lula-vai-prorrogar-desoneracao-da-gasolina-e-do-etanol-por-mais-30-dias.shtml",
+   "titulo": "Governo Lula prorroga desoneração da gasolina e do etanol por mais 30 dias",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "governo-prorroga-desoneracao-da-gasolina-e-do-et",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda a prorrogação de desoneração de tributos federais sobre combustíveis pelo governo federal e seus impactos fiscais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 704,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Pressão sobre os preços dos combustíveis e impacto na inflação.",
+    "causa": "Conflitos internacionais e alta nos preços do petróleo.",
+    "vitima": "Consumidores sujeitos a alta de preços.",
+    "culpado": "Instabilidade geopolítica no Oriente Médio e Europa.",
+    "solucao": "Prorrogação temporária de desonerações e subvenções.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve medidas econômicas do governo e contextualiza os desafios fiscais de forma objetiva.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Geraldo Alckmin",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9163c9592230",
+   "url": "https://g1.globo.com/carros/noticia/2026/11/09/governo-eleva-tarifa-de-importacao-de-pneus-de-carros.ghtml",
+   "titulo": "Governo aumenta imposto para pneus importados; tarifa vai de 16% para 30%",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-eleva-imposto-de-importacao-de-pneus-de",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda aumento de imposto de importação para pneus pelo governo, gerando debate entre indústria nacional e importadores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 503,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concorrência externa e proteção à indústria nacional de pneus.",
+    "causa": "Crescimento de importações asiáticas e alegações de concorrência desleal.",
+    "vitima": "Indústria nacional e trabalhadores do setor.",
+    "culpado": "Produtos importados comercializados com supostas vantagens.",
+    "solucao": "Elevação da alíquota do imposto de importação.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta os argumentos tanto da associação dos fabricantes nacionais quanto da associação dos importadores de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Associação Nacional da Indústria de Pneus (Anip)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Associação Brasileira de Importadores e Distribuidores de Pneus (ABIDIP)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Anip",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Associação Brasileira de Importadores e Distribuidores de Pneus (ABIDIP)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3233d149495b",
+   "url": "https://www.poder360.com.br/poder-internacional/marco-rubio-diz-que-eua-continuarao-lidando-com-governo-lula/",
+   "titulo": "Marco Rubio diz que EUA continuarão “lidando” com governo Lula",
+   "veiculo": "Poder360",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "rubio-diz-que-eua-manterao-dialogo-com-brasil-ma",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de declarações do secretário de Estado dos EUA sobre relações diplomáticas com o governo brasileiro e impasses comerciais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 61,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 333,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atraso na concessão de agrément para o embaixador norte-americano e divergências comerciais.",
+    "causa": "Decisão do governo brasileiro de não dar o aval antes das eleições.",
+    "vitima": "Governo dos Estados Unidos",
+    "culpado": "Governo Lula",
+    "solucao": "Correção da situação pelo governo brasileiro.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata declarações oficiais de uma autoridade estrangeira de forma factual e direta, mantendo a mesma estrutura caso se tratasse de outra liderança.",
+   "atores": [
+    {
+     "nome": "Marco Rubio",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Marco Rubio",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 145,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 145
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Marco Rubio (Partido Republicano), declarou na 2ª feira",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro de atribuição para relatar as declarações da autoridade americana.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "19ae03f3b55a",
+   "url": "https://www.cnnbrasil.com.br/economia/money/macroeconomia/governo-prorroga-desoneracao-de-gasolina-e-etanol-por-30-dias/",
+   "titulo": "Governo prorroga desoneração de gasolina e etanol por 30 dias",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "governo-prorroga-desoneracao-da-gasolina-e-do-et",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Reporta medida de desoneração de tributos sobre combustíveis adotada pelo governo federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 261 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 261,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alta dos preços internacionais do petróleo e risco de inflação.",
+    "causa": "Conflito no Oriente Médio.",
+    "vitima": "Consumidores",
+    "culpado": "Fatores internacionais (preço do petróleo)",
+    "solucao": "Prorrogação da desoneração de tributos e subvenção aos biocombustíveis.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto tem tom estritamente informativo sobre um ato normativo do governo, sendo aplicável independentemente da gestão.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Geraldo Alckmin",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "governo",
+     "campo": "centro_esquerda",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Casa Civil",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "subvenção extraordinária de R$ 0,428 por litro de etanol hidratado",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados numéricos objetivos e específicos sobre a subvenção com base legal informada.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "57e16d9dd225",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/justica-suspende-regra-que-ampliou-aceitacao-de-vr-e-va-em-maquininhas",
+   "titulo": "Justiça suspende regra que ampliou aceitação de VR e VA em maquininhas",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "justica-federal-suspende-em-carater-liminar-trec",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de decisão judicial que suspende regra do governo federal sobre vale-refeição e vale-alimentação."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 191 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 191,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ampliação irregular da aceitação de VR e VA pelo Executivo.",
+    "causa": "Extrapolação de competência legal pelo governo federal.",
+    "vitima": "Empresas representadas pela ABBT",
+    "culpado": "Governo Federal",
+    "solucao": "Suspensão judicial da norma e retorno das regras anteriores.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia relata um ato processual e a decisão de um magistrado com imparcialidade descritiva.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Associação Brasileira das Empresas de Benefícios ao Trabalhador (ABBT)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Poder Judiciário",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Frederico Botelho de Barros Viana",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "entendeu que o governo federal extrapolou sua competência legal",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição adequado para relatar o entendimento do magistrado na decisão.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Governo Federal"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "16f04d778b12",
+   "url": "https://www.moneytimes.com.br/direcional-dirr3-tem-lucro-de-r-201-milhoes-no-3o-trimestre-queda-de-126-fets/",
+   "titulo": "Direcional (DIRR3) tem lucro de R$ 201 milhões no 3º trimestre, queda de 12,6%",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro trimestral de empresa privada do setor de construção."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 246 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 246,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Queda no lucro líquido e no volume de lançamentos da empresa.",
+    "causa": "Menor velocidade de vendas dos lançamentos.",
+    "vitima": "Direcional",
+    "culpado": "Condições de mercado",
+    "solucao": "Ritmo forte de obras e vendas de estoque.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto segue o padrão técnico de relatórios econômicos corporativos.",
+   "atores": [
+    {
+     "nome": "Direcional",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "lucro líquido de R$ 200,7 milhões no terceiro trimestre, queda de 12,6%",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados financeiros fundamentados em balanço oficial e estimativas de mercado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1d90a46f79f4",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/09/preso-dono-do-ueno-bank-tem-9-veculos-de-luxo-dois-avies-e-um-iate-apreendidos-no-paraguai.ghtml",
+   "titulo": "Preso, dono do ueno bank tem 9 veículos de luxo, dois aviões e um iate apreendidos no Paraguai",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "novo-presidente-do-paraguai-pede-renuncia-de-min",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de escândalo financeiro internacional envolvendo autoridades políticas e o sistema bancário no Paraguai, com paralelos ao Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 287 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 287,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Escândalo financeiro e fraude em banco digital no Paraguai.",
+    "causa": "Má gestão ou fraudes financeiras atribuídas à diretoria do banco.",
+    "vitima": "Sistema financeiro e correntistas",
+    "culpado": "Dirigentes do banco e autoridades envolvidas",
+    "solucao": "Apreensão de bens e prisão dos investigados.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia relata fatos policiais e judiciais de forma objetiva, mantendo o padrão independentemente dos envolvidos.",
+   "atores": [
+    {
+     "nome": "Federico Miguel Vázquez Villasanti",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Santiago Peña",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "imprensa paraguaia",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "site paraguaio ABC Color",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "bens apreendidos em diligências no fim da semana passada somam cerca de US$ 10 milhões",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de valores financeiros detalhados obtidos de investigações e fontes jornalísticas locais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "7ae4897ba19e",
+   "url": "https://c-level.folha.uol.com.br/agro/2026/11/filipinas-impoem-restricao-de-60-dias-as-importacoes-de-carne-de-porco-pais-e-o-maior-cliente-do-brasil.shtml",
+   "titulo": "Filipinas impõem restrição de 60 dias às importações de carne de porco; país é o maior cliente do Brasil",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "filipinas-suspendem-importacao-de-carne-suina-po",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de restrição comercial internacional afetando a exportação de carne suína do Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 164 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 164,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Pressão de importações sobre produtores locais de carne suína nas Filipinas.",
+    "causa": "Aumento nas importações de carne suína.",
+    "vitima": "Produtores locais filipinos.",
+    "culpado": "Importações elevadas.",
+    "solucao": "Restrição temporária de 60 dias às importações.",
+    "motor_moral": "protecao_local"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre um ato de governo estrangeiro e seria redigido da mesma forma independentemente do país envolvido.",
+   "atores": [
+    {
+     "nome": "Ministério da Agricultura das Filipinas",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério da Agricultura das Filipinas",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro da Agricultura, Francisco Tiu Laurel",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Os produtores locais tiveram prejuízo de US$ 441,25 milhões (R$ 2,43 bilhões) nos primeiros sete meses do ano",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados numéricos com fonte oficial declarada.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ad81534ff403",
+   "url": "https://g1.globo.com/tecnologia/noticia/2026/11/09/anthropic-lanca-ia-bolsa.ghtml",
+   "titulo": "Anthropic, criadora do Claude, lança IA mais potente e barata a uma semana de possível estreia na bolsa",
+   "veiculo": "g1",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "anthropic-revela-novos-modelos-claude-em-meio-ao",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Lançamento corporativo de produto tecnológico e preparação para abertura de capital na bolsa."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 64,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 396,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Competição acirrada no mercado de inteligência artificial.",
+    "causa": "Evolução tecnológica rápida.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Lançamento de modelos mais potentes e baratos e abertura de capital.",
+    "motor_moral": "inovacao"
+   },
+   "teste_inversao": "Notícia corporativa padrão sobre lançamento de tecnologia, sem viés ideológico identificável.",
+   "atores": [
+    {
+     "nome": "Anthropic",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "636f50fea7b6",
+   "url": "https://www.cnnbrasil.com.br/internacional/arabia-saudita-intercepta-misseis-e-drone-lancados-por-houthis/",
+   "titulo": "Arábia Saudita intercepta mísseis e drone lançados por houthis",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "arabia-saudita-intercepta-missil-contra-riad-apo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "Conflito geopolítico internacional envolvendo ataques armados, mísseis, drones e infraestrutura petrolífera."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 471,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques com mísseis e drones contra território e infraestrutura da Arábia Saudita.",
+    "causa": "Escalada das hostilidades no conflito do Iêmen.",
+    "vitima": "População e instalações da Arábia Saudita.",
+    "culpado": "Grupo houthis alinhado ao Irã.",
+    "solucao": "Interceptação de ataques e bombardeios de retaliação.",
+    "motor_moral": "seguranca_nacional"
+   },
+   "teste_inversao": "O relato de agência internacional sobre conflito armado externo mantém simetria ao reloger versões de ambos os contendores.",
+   "atores": [
+    {
+     "nome": "Coalizão liderada pela Arábia Saudita",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Houthis",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "coalizão liderada pela Arábia Saudita",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Defesa Civil da Arábia Saudita",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "agência de notícias Saba, controlada pelos houthis",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "As autoridades sauditas não confirmaram imediatamente os ataques relatados, enquanto os houthis não reivindicaram de imediato a autoria",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto expõe de forma equilibrada a falta de confirmação imediata de ambos os lados envolvidos no conflito.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "b30ef542ab54",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/fux-suspende-afastamento-de-juiza-da-lava-jato-punida-pelo-cnj",
+   "titulo": "Fux suspende afastamento de juíza da Lava Jato punida pelo CNJ",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Decisão do STF suspendendo punição do CNJ a juíza da Operação Lava Jato."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 544,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Punição a magistrada por irregularidades administrativas em acordo judicial.",
+    "causa": "Estouro do prazo prescricional e ausência de dolo comprovado.",
+    "vitima": "Juíza Gabriela Hardt.",
+    "culpado": "CNJ (por falha de prazo processual segundo a defesa/decisão).",
+    "solucao": "Suspensão do afastamento e restauração de vencimentos pelo STF.",
+    "motor_moral": "legalidade"
+   },
+   "teste_inversao": "A reportagem relata uma decisão liminar do STF detalhando seus fundamentos legais sem tomar partido editorial na controvérsia política da Lava Jato.",
+   "atores": [
+    {
+     "nome": "Ministro Luiz Fux",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Juíza Gabriela Hardt",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Conselho Nacional de Justiça (CNJ)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro Luiz Fux, do Supremo Tribunal Federal (STF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O ministro apontou que o CNJ estourou o prazo de cinco anos",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utiliza verbo de atribuição neutro/técnico para fundamentar a decisão judicial questionada.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Juíza Gabriela Hardt",
+     "desfavorece": "Conselho Nacional de Justiça (CNJ)",
+     "ressalva": "Reflete estritamente os fundamentos jurídicos da decisão relatada."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c9040c8ec243",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/09/governo-prorroga-gs-do-povo-para-at-19-de-novembro-de-2031.ghtml",
+   "titulo": "Governo prorroga Gás do Povo para até 19 de novembro de 2031",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-prorroga-o-programa-auxilio-gas-do-povo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Prorrogação de programa social de auxílio gás pelo governo federal por meio de medida provisória."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 178 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 178,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Término iminente da vigência do programa de auxílio gás para famílias carentes.",
+    "causa": "Prazo de validade original do benefício.",
+    "vitima": "Famílias de baixa renda inscritas no CadÚnico.",
+    "culpado": "Nenhum.",
+    "solucao": "Prorrogação do programa por meio de medida provisória até 2031.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve ato normativo oficial do governo de forma factual e direta, aplicável a qualquer gestão.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Congresso Nacional",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "governo",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "distribuir de forma gratuita botijões de gás de cozinha para 15 milhões de famílias inscritas no Cadastro Único (CadÚnico), beneficiando cerca de 50 milhões de pessoas",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados de alcance do programa social com base oficial.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "favorece": "Governo federal"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "09791329173f",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/camara-dos-eua-abre-processo-de-impeachment-contra-secretario-de-defesa.shtml",
+   "titulo": "Câmara dos EUA abre processo de impeachment contra secretário de Defesa",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "deputado-republicano-apresenta-mocao-de-impeachm",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "O texto aborda o processo de impeachment do secretário de Defesa dos EUA e as repercussões políticas no Congresso."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1191,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Secretário de Defesa dos EUA enfrenta processo de impeachment por acusações de crimes de guerra e abuso de poder.",
+    "causa": "Conflitos internacionais e desmonte de regras de proteção a civis.",
+    "vitima": "Civis atingidos em conflitos e parlamentares opositores.",
+    "culpado": "Pete Hegseth e o governo Trump.",
+    "solucao": "Votação do impeachment na Câmara e possível afastamento pelo Congresso.",
+    "motor_moral": "responsabilidade_publica"
+   },
+   "teste_inversao": "O texto descreve um processo institucional padrão com ampla cobertura de ambos os lados, mantendo a simetria na apuração.",
+   "atores": [
+    {
+     "nome": "Pete Hegseth",
+     "campo": "direita"
+    },
+    {
+     "nome": "Thomas Massie",
+     "campo": "direita"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Hakeem Jeffries",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Thomas Massie",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 72,
+     "ultima": false
+    },
+    {
+     "rotulo": "Pete Hegseth",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 79,
+     "ultima": false
+    },
+    {
+     "rotulo": "Marco Rubio",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": false
+    },
+    {
+     "rotulo": "Hakeem Jeffries",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 35,
+    "direita": 166
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "ataque contra a escola em Minab que matou 156 pessoas, incluindo 120 crianças",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta dados específicos sobre as vítimas do ataque sem viés na apuração.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca",
+     "desfavorece": "Pete Hegseth"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "dc00eca9cc97",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/09/pgr-e-judiciario-querem-r-533-milhoes-extras-para-pagar-penduricalhos-agu-pediu-analise-stf.ghtml",
+   "titulo": "PGR e Judiciário querem R$ 533 milhões extras para pagar penduricalhos; AGU pediu análise ao STF",
+   "veiculo": "g1",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de pedidos de suplementação orçamentária por parte de órgãos do Judiciário e da PGR."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 790,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de recursos no Orçamento para pagamento de benefícios a magistrados e membros do Ministério Público.",
+    "causa": "Decisões do STF que geraram novos impactos financeiros não previstos inicialmente.",
+    "vitima": "Orçamento federal e órgãos do Judiciário/MPU.",
+    "culpado": "Insuficiência orçamentária.",
+    "solucao": "Acionar o STF via AGU para esclarecer o cumprimento das decisões.",
+    "motor_moral": "responsabilidade_publica"
+   },
+   "teste_inversao": "A notícia relata um fato administrativo e jurídico de forma neutra.",
+   "atores": [
+    {
+     "nome": "PGR e Judiciário",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministério do Planejamento",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Procuradoria-Geral da República (PGR) e o Conselho da Justiça Federal (CJF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "R$ 533 milhões adicionais em 2026",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os valores são detalhados com base em documentos oficiais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "65f85371ff6f",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/gas-do-povo-governo-prorroga-vigencia-do-programa-ate-2031",
+   "titulo": "Gás do Povo: governo prorroga vigência do auxílio até 2031",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-prorroga-o-programa-auxilio-gas-do-povo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto divulga a prorrogação de um programa social de auxílio a gás pelo governo federal."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 355,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Vulnerabilidade socioeconômica e pobreza energética das famílias de baixa renda.",
+    "causa": "Alto custo do gás de cozinha para famílias vulneráveis.",
+    "vitima": "Famílias de baixa renda.",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Prorrogação do auxílio Gás do Povo até 2031.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto segue o padrão de divulgação de atos do governo federal.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Secretaria de Comunicação Social (Secom)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 57,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 57,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "3,1 milhões de vales para recarga gratuita",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Divulgação de dados oficiais de programa social sem contraponto crítico.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "favorece": "Governo Federal",
+     "ressalva": "Trata-se de matéria informativa institucional da agência pública."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "20e78bb97617",
+   "url": "https://www.cnnbrasil.com.br/internacional/rubio-diz-que-eua-vao-manter-dialogo-com-o-brasil-e-cobra-aval-a-embaixador/",
+   "titulo": "Rubio diz que EUA vão manter diálogo com o Brasil e cobra aval a embaixador",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "rubio-diz-que-eua-manterao-dialogo-com-brasil-ma",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda a relação diplomática entre EUA e Brasil e a exigência de aprovação de embaixador."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 420,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impasse diplomático sobre a nomeação de embaixador americano no Brasil e vistos de diplomatas.",
+    "causa": "Divergências políticas e não concessão de agrément.",
+    "vitima": "Relações diplomáticas entre os dois países.",
+    "culpado": "Governo brasileiro (segundo a posição americana).",
+    "solucao": "Resolução da questão pelo governo do Brasil.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A matéria relata posições diplomáticas de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "Governo dos EUA",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Marco Rubio",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 78,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 78
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "87932da24956",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/09/deputado-republicano-apresenta-pedido-de-impeachment-de-hegseth.ghtml",
+   "titulo": "Chefe do Pentágono é alvo de pedido de impeachment",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "deputado-republicano-apresenta-mocao-de-impeachm",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "Trata do processo de impeachment contra o secretário de Defesa dos EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 636,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Pedido de impeachment contra o secretário de Defesa dos EUA.",
+    "causa": "Desgaste político gerado pela guerra no Irã e decisões militares.",
+    "vitima": "Constituição e civis atingidos.",
+    "culpado": "Pete Hegseth.",
+    "solucao": "Votação do impeachment na Câmara dos Deputados.",
+    "motor_moral": "responsabilidade_publica"
+   },
+   "teste_inversao": "A notícia apresenta os fatos sem viés ideológico na condução da narrativa.",
+   "atores": [
+    {
+     "nome": "Pete Hegseth",
+     "campo": "direita"
+    },
+    {
+     "nome": "Thomas Massie",
+     "campo": "direita"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Thomas Massie",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": false
+    },
+    {
+     "rotulo": "Pete Hegseth",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 40,
+     "ultima": true
+    },
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 69
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "cd50a59cd384",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/marco-rubio-diz-que-eua-vao-manter-dialogo-com-governo-lula.shtml",
+   "titulo": "Marco Rubio diz que EUA vão manter diálogo com governo Lula",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "rubio-diz-que-eua-manterao-dialogo-com-brasil-ma",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "O texto aborda a relação diplomática e política entre os governos do Brasil e dos EUA, incluindo declarações do secretário de Estado americano sobre impasses políticos e comerciais."
+   },
+   "estado": "ok",
+   "T": 7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 61,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 594,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 7.06,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 7.06
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A falta de concessão de agrément para o embaixador indicado pelos EUA no Brasil e desentendimentos comerciais.",
+    "causa": "Retardamento por parte do governo brasileiro na liberação da credencial diplomática e divergências de tarifas.",
+    "vitima": "A relação diplomática bilateral.",
+    "culpado": "Governo brasileiro, apontado por reter a autorização do embaixador.",
+    "solucao": "O Brasil conceder o agrément e resolver questões comerciais.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se os papéis estivessem invertidos e um ministro brasileiro cobrasse publicamente o governo dos EUA em termos semelhantes, o foco da cobertura provavelmente enfatizaria a soberania nacional em vez das demandas estrangeiras.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Marco Rubio",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "O secretário de Estado americano, Marco Rubio",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 130,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 130
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O secretário de Estado americano, Marco Rubio, disse nesta segunda-feira (9), que os Estados Unidos vão continuar \"trabalhando\" com o governo Lula e cobrou o agrément do indicado para a embaixada em Brasília",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 7.06,
+     "explicacao": "O texto prioriza integralmente as cobranças e a perspectiva da diplomacia norte-americana em relação ao Brasil.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Marco Rubio",
+     "desfavorece": "Governo Lula",
+     "ressalva": "Trata-se de cobertura de declaração oficial dada em evento internacional."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e8406bcaf4fa",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/09/grecia-encontra-barco-com-imigrantes-mortos-perto-da-ilha-de-creta.ghtml",
+   "titulo": "Grécia encontra barco com imigrantes mortos perto da ilha de Creta",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto relata um resgate marítimo de migrantes na Grécia, sem embate político-partidário direto."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 217 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 217,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Naufrágio e mortes de migrantes na tentativa de travessia marítima para a Europa.",
+    "causa": "Fluxo migratório perigoso a partir do norte da África.",
+    "vitima": "Migrantes",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Resgate e acolhimento pelas autoridades gregas.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é estritamente factual e descritivo, mantendo o mesmo tom independentemente de vieses políticos.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "guarda costeira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "6d81840ded6b",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/bolsa-sobe-222-e-registra-maior-alta-diaria-desde-outubro",
+   "titulo": "Bolsa sobe 2,22% e registra maior alta diária desde outubro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "ibovespa-sobe-2-22-puxado-por-vale-e-bancos-em-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto resume o desempenho do mercado financeiro, da bolsa, do dólar e expectativas econômicas influenciadas por declarações governamentais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 701,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Oscilações e incertezas nos mercados financeiros globais e domésticos.",
+    "causa": "Fatores internacionais como cotação do petróleo e tensões geopolíticas, somados a indicadores econômicos internos.",
+    "vitima": "Investidores e economia afetados pela volatilidade.",
+    "culpado": "Nenhum.",
+    "solucao": "Ajustes de expectativas e política fiscal.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O relato de boletins econômicos e oscilação de mercado é puramente técnico e não sofreria alteração substancial de viés.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d026962f90a9",
+   "url": "https://www.cnnbrasil.com.br/internacional/lula-desembarca-na-turquia-para-participar-da-cop-31/",
+   "titulo": "Lula desembarca na Turquia para participar da COP 31",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-desembarca-na-turquia-para-a-cop31-e-transm",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de viagem internacional do presidente da República para cúpula ambiental e acordos bilaterais."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 248 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 61,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 248,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desafios climáticos globais e necessidade de projeção internacional do Brasil.",
+    "causa": "Mudanças climáticas e compromissos de transição energética.",
+    "vitima": "Ambiente global.",
+    "culpado": "Nenhum.",
+    "solucao": "Participação em cúpulas internacionais e financiamento verde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura de viagens presidenciais costuma seguir o mesmo formato descritivo institucional para qualquer ocupante do cargo.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "perfil oficial do presidente",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 16,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O presidente Lula deve discursar na abertura do evento, junto aos líderes da Turquia e da Austrália",
+     "paragrafo": "P4",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Utiliza verbos de atribuição neutros e descreve a agenda institucional sem contrapontos críticos.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes",
+     "favorece": "Luiz Inácio Lula da Silva",
+     "ressalva": "Trata-se de cobertura padrão de agenda oficial de chefe de Estado."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "00e116f9e1e5",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/09/rubio-diz-que-eua-vo-lidar-com-brasil-sob-lula-mas-cobra-aval-para-embaixador-americano.ghtml",
+   "titulo": "Rubio diz que EUA vão ‘lidar’ com Brasil sob Lula, mas cobra aval para embaixador americano",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "rubio-diz-que-eua-manterao-dialogo-com-brasil-ma",
+   "origem": "materia",
+   "data_publicacao": "2026-11-09",
+   "analisado_em": "2026-11-10",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Aborda o posicionamento diplomático dos EUA em relação ao governo brasileiro, mencionando atritos políticos e comerciais."
+   },
+   "estado": "ok",
+   "T": 7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 78,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 472,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 6.67,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 6.67
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tensão nas relações diplomáticas e comerciais entre Brasil e Estados Unidos.",
+    "causa": "Retenção de agrément diplomático e recusa de entrada de autoridades americanas pelo Brasil, seguidas por retaliações dos EUA.",
+    "vitima": "Relação bilateral.",
+    "culpado": "Ambos os governos, por medidas recíprocas de atrito.",
+    "solucao": "Resolução de impasses comerciais e diplomáticos.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Caso a ênfase fosse invertida, o foco estaria nas razões de soberania nacional alegadas pelo Brasil para barrar autoridades estrangeiras.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Marco Rubio",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "secretário de Estado dos Estados Unidos, Marco Rubio",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 145,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 145
+   },
+   "falas": 15,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Em agosto, em um ato inusitado, os EUA revogaram o visto da embaixadora do Brasil em Washington, Maria Luiza Viotti, como retaliação ao que consideravam lentidão na análise do agrément",
+     "paragrafo": "P11",
+     "direcao": "direita",
+     "contribuicao": 6.67,
+     "explicacao": "O texto contextualiza os motivos e as retaliações sob a perspectiva e a justificativa do governo norte-americano.",
+     "intensidade": 2,
+     "certeza": 0.85,
+     "eixo": "instituicoes",
+     "favorece": "Marco Rubio",
+     "desfavorece": "Governo Lula",
+     "ressalva": "O parágrafo também menciona a recusa brasileira a autoridades americanas por tentarem colocar a eleição em suspeição."
+    }
+   ],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-10T10:17:46+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 80,
+   "textos_curtos": 20,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 76312,
+    "saida": 44783
+   },
+   "analises": [
+    "c6dad60ef9d7",
+    "a375326fe8d9",
+    "80fb07cfb1d4",
+    "823c00380bc0",
+    "383a19ade577",
+    "a81f40214bf8",
+    "3ebd7a7d86ca",
+    "3c0114589abd",
+    "6ca02e9ff2b3",
+    "cfbdd11c5305",
+    "48c584d387dd",
+    "99f4ea01edda",
+    "f57f3526b692",
+    "cfaa0e771b32",
+    "2f4d2faef1ad",
+    "70a4d829bbe3",
+    "3be2207f4c50",
+    "131ecc070deb",
+    "ae9c7690a66d",
+    "5f7b076b9361",
+    "0b7542df30c5",
+    "afea34a7e23a",
+    "5127332285b1",
+    "1ccbe327bf85",
+    "28cbc1e058a1",
+    "224b93d351d3",
+    "ffedeab46233",
+    "0ad0efcd466a",
+    "f14118fbfb9e",
+    "0f8f22da28c9",
+    "a578eec32f25",
+    "1c238ed9caff",
+    "9e84593850f9",
+    "dd7e8375a0f5",
+    "c364a47b7cdb",
+    "f26e49625a05",
+    "a27e00d72f4e",
+    "84286fd4b2da",
+    "d947bd1a5ba5",
+    "9163c9592230",
+    "3233d149495b",
+    "19ae03f3b55a",
+    "57e16d9dd225",
+    "16f04d778b12",
+    "1d90a46f79f4",
+    "7ae4897ba19e",
+    "ad81534ff403",
+    "636f50fea7b6",
+    "b30ef542ab54",
+    "c9040c8ec243",
+    "09791329173f",
+    "dc00eca9cc97",
+    "65f85371ff6f",
+    "20e78bb97617",
+    "87932da24956",
+    "cd50a59cd384",
+    "e8406bcaf4fa",
+    "6d81840ded6b",
+    "d026962f90a9",
+    "00e116f9e1e5"
+   ]
+  }
+ ]
+}
