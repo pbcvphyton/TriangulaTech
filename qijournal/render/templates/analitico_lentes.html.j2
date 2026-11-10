@@ -68,7 +68,7 @@
 {#- O dossiê de um nome (n: NomeView com tom): quem fala dele, em que tom e se isso se repete. -#}
 {% macro dossie(n) -%}
 {% set t = n.tom %}
-<p class="az-dn">{{ "{:,}".format(t.manchetes).replace(",", ".") }} manchetes brasileiras · {{ saldo_barra(t.barra_left, t.barra_width, t.saldo_valor) }}<b class="tom-{{ t.classe }}">saldo {{ t.saldo }}</b> · {{ t.desfavoraveis }} desfavoráveis · {{ t.favoraveis }} favoráveis · {{ t.neutras }} sem tom{% if n.debates %} · {{ n.debates }} {{ "assunto dividiu" if n.debates == 1 else "assuntos dividiram" }} os veículos (divergência média {{ n.divergencia }}){% endif %}</p>
+<p class="az-dn">{{ "{:,}".format(t.manchetes).replace(",", ".") }} manchetes brasileiras · {{ saldo_barra(t.barra_left, t.barra_width, t.saldo_valor) }}<b class="tom-{{ t.classe }}">saldo {{ t.saldo }}</b> · {{ t.desfavoraveis }} desfavoráveis · {{ t.favoraveis }} favoráveis · {{ t.neutras }} sem tom{% if n.debates %} · <span title="Assuntos da cobertura comparada que citam o nome e tiveram veículos dos dois lados (os mesmos do analítico do nome na Pesquisa); divergência: 100 = meio a meio">{{ n.debates }} {{ "assunto comparado dividiu" if n.debates == 1 else "assuntos comparados dividiram" }} os veículos (divergência média {{ n.divergencia }})</span>{% endif %}</p>
 <ul class="qf-lei">
   {% for f in t.leitura %}<li>{{ f }}</li>{% endfor %}
 </ul>
