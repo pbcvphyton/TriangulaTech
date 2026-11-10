@@ -22,7 +22,9 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Ubuntu 24.04 fixo: o ubuntu-latest passou a 26.04 (nov/2026) e o Playwright
+    # 1.55.0 não instala o Chromium nele ("does not support chromium on ubuntu26.04").
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Baixar o repositório
