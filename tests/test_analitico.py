@@ -484,6 +484,25 @@ def test_tendencia_que_passa_do_acaso_abre_o_bloco_e_sobe_para_a_leitura(config)
     assert '<details class="az-base" id="an-indo" open>' in html
 
 
+def test_mudanca_do_termometro_vira_frase_e_pesa_pelo_tamanho():
+    # 40 dias: a qualidade cai de 91 para 81 nos últimos 20 (a janela recente é metade do histórico)
+    registros = []
+    for i, dia in enumerate(_dias(40)):
+        q = 90 if i < 20 else 80
+        analises = [_analise(f"{i}-{k}", dia, T=0, qualidade_apuracao={"Q": q + k % 3, "rotulo": "Boa"}) for k in range(5)]
+        registros.append({"data": dia, "analises": analises})
+    view = analitico_view(registros, edition_date=FIM)
+    assert view.indo.aberto and view.indo.resumo == "A qualidade da apuração piorou nos últimos 20 dias: 81 de 100, contra 91 antes."
+    achado = view.leitura.principal  # 10 pontos: força máxima, acima do veredito do texto em equilíbrio
+    assert achado.tipo == "tendencia" and achado.selo == "Apuração" and achado.numero == "91 → 81" and achado.href == "#an-indo"
+    assert achado.peso == pytest.approx(88.0) and achado.texto.endswith("A diferença passa do acaso.")
+    assert not any(a.tipo == "apuracao" for a in view.leitura.achados)  # a média sai: a mudança já está na leitura
+    # os números saem inteiros, como no resto da página, salvo quando os inteiros seriam iguais
+    assert analitico._par(87.0, 84.0, "Q") == ("87", "84") and analitico._par(84.4, 84.1, "Q") == ("84,4", "84,1")
+    assert analitico._par(0.3, -0.4, "T") == ("+0,3", "−0,4")
+    assert analitico._pontos(-0.8) == "−0,8 ponto" and analitico._pontos(2.4) == "+2,4 pontos"
+
+
 # ── publicação ───────────────────────────────────────────────────────────────
 
 

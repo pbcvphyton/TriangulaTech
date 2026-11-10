@@ -41,7 +41,7 @@ from ..config import Config
 from ..termometro import agregacao
 from ..termometro.referencia import PARAMETROS, arredondar
 from . import achados, filters
-from .achados import InclinadoResumo, LeituraView, MatrizView, PlacarView, TextoResumo
+from .achados import InclinadoResumo, MatrizView, MudancaTexto, PlacarView, TextoResumo
 from .lados import LadosView
 from .midia import DestaquesView
 from .termometro import (
@@ -106,12 +106,14 @@ class TileView:
 
 @dataclass
 class LeituraView:
-    """Uma leitura de "para onde estamos indo" (tendência ou desvio)."""
+    """Uma leitura de "para onde estamos indo" (tendência ou desvio). Quando passa do acaso,
+    ganha ``mudanca``: a mesma conta numa frase, para a leitura da página e o resumo do bloco."""
 
     titulo: str
     leitura: str
     texto: str
     classe: str  # "esq" | "dir" | "est" | "ins" | "melhor" | "pior"
+    mudanca: MudancaTexto | None = None
 
 
 @dataclass
@@ -307,7 +309,7 @@ class AnaliticoView:
     pesquisa_href: str = PESQUISA_ANALISES
     base: str = ""  # "média de 373 notícias com dimensão política" (no placar)
     # A leitura e as três lentes
-    leitura: LeituraView | None = None
+    leitura: achados.LeituraView | None = None
     placar: PlacarView | None = None
     matriz: MatrizView | None = None
     lados: LadosView | None = None
@@ -396,7 +398,18 @@ def _tendencias(linhas: list[dict[str, Any]], inicio: str, fim: str) -> list[Lei
                 f"{fmt_val(r['variacao_no_periodo'])} de {_mes_label(r['de']).lower()} a {_mes_label(r['ate']).lower()}, "
                 f"em {contagem(r['meses'], 'mês', 'meses')}."
             )
-        leituras.append(LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"])))
+        view = LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"]))
+        if view.classe in MUDOU:
+            quem = "O texto das notícias anda" if chave == "T" else "A qualidade da apuração está"
+            meses = f"de {_mes_label(r['de']).lower()} a {_mes_label(r['ate']).lower()}"
+            view.mudanca = MudancaTexto(
+                frase=f"{quem} {r['leitura']}: {_pontos(r['por_mes'])} por mês, {meses}",
+                texto=texto,
+                numero=f"{fmt_dec(r['por_mes'])}/mês",
+                forca=abs(r["variacao_no_periodo"]),
+                medida=chave,
+            )
+        leituras.append(view)
     return leituras
 
 
@@ -419,8 +432,37 @@ def _desvio(linhas: list[dict[str, Any]], inicio: str, fim: str) -> tuple[list[L
                 f"{janela}: {fmt_val(r['recente'])}; {base_txt}: {fmt_val(r['base'])}. Diferença de "
                 f"{fmt_dec(r['diferenca'])} (intervalo de 95%: {fmt_ic(r['ic95'], fmt_dec)})."
             )
-        leituras.append(LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"])))
+        view = LeituraView(titulo, r["leitura"].capitalize(), texto, _classe_t(r["leitura"]))
+        if view.classe in MUDOU:
+            dias = (date.fromisoformat(recente[1]) - date.fromisoformat(recente[0])).days + 1
+            antes, agora = _par(r["base"], r["recente"], chave)
+            if chave == "T":
+                frase = f"O texto das notícias {r['leitura']} nos últimos {dias} dias: T {agora}, contra {antes} antes"
+            else:
+                frase = f"A qualidade da apuração {r['leitura']} nos últimos {dias} dias: {agora} de 100, contra {antes} antes"
+            view.mudanca = MudancaTexto(
+                frase=frase, texto=texto, numero=f"{antes} → {agora}", forca=abs(r["diferenca"]), medida=chave
+            )
+        leituras.append(view)
     return leituras, recente, base, tem_dados
+
+
+MUDOU = ("esq", "dir", "melhor", "pior")  # as leituras que passam do acaso
+
+
+def _pontos(valor: float) -> str:
+    """"+0,8 ponto", "−2,4 pontos" (plural a partir de 2, como se escreve em português)."""
+    return f"{fmt_dec(valor)} {'ponto' if abs(round(valor, 1)) < 2 else 'pontos'}"
+
+
+def _par(antes: float, agora: float, medida: str) -> tuple[str, str]:
+    """Os dois valores de uma comparação, inteiros como no resto da página; com uma casa
+    quando os inteiros sairiam iguais (uma diferença real não pode aparecer como "84 contra 84")."""
+    inteiro = fmt_t if medida == "T" else fmt_q
+    if inteiro(antes) != inteiro(agora):
+        return inteiro(antes), inteiro(agora)
+    sinal = medida == "T"
+    return fmt_dec(antes, sinal=sinal), fmt_dec(agora, sinal=sinal)
 
 
 def _puxadores(linhas: list[dict[str, Any]], recente: tuple, base: tuple) -> list[tuple[str, list[PuxadorView]]]:
@@ -851,9 +893,9 @@ def _q_partes(noticias_q: list[float]) -> PartesView | None:
 
 def _indo(leituras: list[LeituraView]) -> BaseView:
     """Para onde estamos indo, em uma linha; o bloco abre sozinho quando algo passou do acaso."""
-    mudou = [r for r in leituras if r.classe in ("esq", "dir", "melhor", "pior")]
+    mudou = [r.mudanca for r in leituras if r.mudanca is not None]
     if mudou:
-        return BaseView("; ".join(f"{r.titulo.lower()}: {r.leitura.lower()}" for r in mudou), aberto=True)
+        return BaseView(" ".join(f"{m.frase}." for m in sorted(mudou, key=lambda m: -m.forca)), aberto=True)
     partes = []
     tendencia = [r for r in leituras if r.titulo.startswith("Tendência")]
     janela = [r for r in leituras if not r.titulo.startswith("Tendência")]
@@ -1015,7 +1057,7 @@ def _texto_resumo(
         lado="à esquerda" if (media or 0) < 0 else "à direita",
         q=fmt_q(geral.get("media_Q")),
         q_rotulo=str(geral.get("rotulo_Q") or ""),
-        mudancas=[(r.titulo, r.leitura, r.texto) for r in leituras if r.classe in ("esq", "dir", "melhor", "pior")],
+        mudancas=sorted((r.mudanca for r in leituras if r.mudanca is not None), key=lambda m: -m.forca),
         q_veiculos=[(q.nome, q.valor) for q in qualidade if not q.pequena],
         concentracao=_concentracao(noticias),
     )

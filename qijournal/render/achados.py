@@ -36,6 +36,7 @@ __all__ = [
     "LeituraView",
     "LenteView",
     "MatrizView",
+    "MudancaTexto",
     "PlacarView",
     "TextoResumo",
     "leitura",
@@ -440,6 +441,18 @@ def matriz(nm: DestaquesView) -> MatrizView | None:
 
 
 @dataclass
+class MudancaTexto:
+    """Uma tendência ou um desvio do termômetro que passou do acaso, numa frase (quem
+    preenche é :mod:`qijournal.render.analitico`, com os números da agregação)."""
+
+    frase: str  # "A qualidade da apuração piorou nos últimos 14 dias: 84 de 100, contra 87 antes"
+    texto: str  # a conta completa, com o intervalo de 95%
+    numero: str  # "87 → 84"
+    forca: float  # o tamanho da mudança, em pontos (de T ou de Q)
+    medida: str  # "T" | "Q"
+
+
+@dataclass
 class InclinadoResumo:
     t: float
     valor: str  # "+14"
@@ -469,8 +482,8 @@ class TextoResumo:
     lado: str  # "à esquerda" | "à direita" (da média, quando não é equilíbrio)
     q: str  # "86" | "—"
     q_rotulo: str
-    # leituras de tendência e de janela recente que passaram do acaso: (título, leitura, texto)
-    mudancas: list[tuple[str, str, str]] = field(default_factory=list)
+    # tendências e desvios da janela recente que passaram do acaso, da maior mudança para a menor
+    mudancas: list[MudancaTexto] = field(default_factory=list)
     inclinado: InclinadoResumo | None = None  # o texto mais inclinado das últimas edições, fora de "Equilibrado"
     q_veiculos: list[tuple[str, str]] = field(default_factory=list)  # (veículo, Q) com amostra, do melhor ao pior
     # Os desvios: notícias com T diferente de zero, à esquerda e à direita; quantas dentro da faixa de
@@ -818,18 +831,21 @@ def _achado_assimetria(tx: TextoResumo) -> AchadoView | None:
 
 
 def _achado_tendencia(tx: TextoResumo) -> AchadoView | None:
+    """A maior mudança do termômetro que passou do acaso. O peso cresce com o tamanho dela
+    (10 pontos de T ou de Q = força máxima) e fica abaixo do viés no texto (90), que é a
+    notícia maior quando existe."""
     if not tx.mudancas:
         return None
-    titulo, leitura_, texto = tx.mudancas[0]
+    m = max(tx.mudancas, key=lambda m: m.forca)
     return AchadoView(
         tipo="tendencia",
-        selo="Tendência",
+        selo="Apuração" if m.medida == "Q" else "Texto",
         lente=3,
-        titulo=f"{titulo}: {leitura_[:1].lower() + leitura_[1:]}",
-        texto=texto,
-        numero=leitura_,
+        titulo=m.frase,
+        texto=f"{m.texto} A diferença passa do acaso.",
+        numero=m.numero,
         href="#an-indo",
-        peso=88.0,
+        peso=45 + 43 * min(1.0, m.forca / 10),
     )
 
 
@@ -948,12 +964,14 @@ def leitura(
     if ld is not None:
         candidatos.append(_achado_lados(ld))
     if tx is not None:
+        tendencia = _achado_tendencia(tx)
         candidatos += [
             _achado_texto(tx),
             _achado_assimetria(tx),
-            _achado_tendencia(tx),
+            tendencia,
             _achado_inclinado(tx),
-            _achado_apuracao(tx),
+            # a média da apuração sai quando a mudança dela já está na leitura
+            None if tendencia is not None and tendencia.selo == "Apuração" else _achado_apuracao(tx),
         ]
     achados = sorted((a for a in candidatos if a is not None), key=lambda a: (-a.peso, a.lente, a.tipo))
     lentes = _lentes(nm, ld, tx)
