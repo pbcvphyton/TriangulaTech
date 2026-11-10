@@ -184,7 +184,7 @@
 .az .nm-form{margin-top:18px}
 
 /* Matriz veículo × nome: uma tabela em que o fundo acompanha o saldo e o contorno marca o que passa do acaso */
-.az-mx-wrap{max-width:1180px;margin-top:14px;overflow-x:auto}
+.az-mx-wrap{position:relative;max-width:1180px;margin-top:14px;overflow-x:auto}
 .az-mx{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-family:var(--mn);font-size:12px;color:var(--ink)}
 .az-mx th,.az-mx td{text-align:center;white-space:nowrap}
 .az-mx thead th{padding:0 2px 6px;vertical-align:bottom;font-family:var(--ss);font-size:12px;font-weight:700;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
@@ -342,6 +342,24 @@
   .az-2c,.az-2c-t{grid-template-columns:minmax(0,1fr)}
   .az-dl{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:899.98px){
+  /* placar: cada nome vira um cartão de três linhas (nome; espaço e tom; o que mudou) */
+  .az-hd{display:none}
+  .az-s{grid-template-columns:18px minmax(0,1fr) minmax(0,1fr) 14px;gap:7px 16px;padding:12px 2px}
+  .az-s>.az-c-nm{grid-column:2/4;grid-row:1}
+  .az-s>.az-c-ch{grid-column:4;grid-row:1}
+  .az-s>.az-c-es{grid-column:2;grid-row:2}
+  .az-s>.az-c-tm{grid-column:3;grid-row:2}
+  .az-s>.az-c-e7{grid-column:2;grid-row:3;flex-wrap:wrap;gap:2px 6px}
+  .az-s>.az-c-t7{grid-column:3;grid-row:3;flex-wrap:wrap;gap:2px 6px}
+  .az-s>.az-c-es::before,.az-s>.az-c-tm::before,.az-s>.az-c-e7::before,.az-s>.az-c-t7::before{flex:0 0 100%;font-family:var(--ss);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
+  .az-s>.az-c-es,.az-s>.az-c-tm{flex-wrap:wrap;gap:2px 8px}
+  .az-s>.az-c-es::before{content:"Espaço"}
+  .az-s>.az-c-tm::before{content:"Tom"}
+  .az-s>.az-c-e7::before{content:"Espaço: 7 ant. → últ. 7"}
+  .az-s>.az-c-t7::before{content:"Tom: 7 ant. → últ. 7"}
+  .az-dossie{padding:6px 2px 18px 34px}
+}
 @media (max-width:760px){
   .az-sec{margin-top:34px;padding-top:16px}
   .az-nav{margin-left:-16px;margin-right:-16px;padding:0 16px}
@@ -357,21 +375,6 @@
   .az-l-v b{font-size:26px}
   .az-lei{padding:10px 12px}
   .az-lei li{font-size:14px}
-  /* placar: cada nome vira um cartão de três linhas (nome; espaço e tom; o que mudou) */
-  .az-hd{display:none}
-  .az-s{grid-template-columns:18px minmax(0,1fr) minmax(0,1fr) 14px;gap:7px 10px;padding:12px 2px}
-  .az-s>.az-c-nm{grid-column:2/4;grid-row:1}
-  .az-s>.az-c-ch{grid-column:4;grid-row:1}
-  .az-s>.az-c-es{grid-column:2;grid-row:2}
-  .az-s>.az-c-tm{grid-column:3;grid-row:2}
-  .az-s>.az-c-e7{grid-column:2;grid-row:3;flex-wrap:wrap;gap:2px 6px}
-  .az-s>.az-c-t7{grid-column:3;grid-row:3;flex-wrap:wrap;gap:2px 6px}
-  .az-s>.az-c-es::before,.az-s>.az-c-tm::before,.az-s>.az-c-e7::before,.az-s>.az-c-t7::before{flex:0 0 100%;font-family:var(--ss);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
-  .az-s>.az-c-es,.az-s>.az-c-tm{flex-wrap:wrap;gap:2px 8px}
-  .az-s>.az-c-es::before{content:"Espaço"}
-  .az-s>.az-c-tm::before{content:"Tom"}
-  .az-s>.az-c-e7::before{content:"Espaço: 7 ant. → últ. 7"}
-  .az-s>.az-c-t7::before{content:"Tom: 7 ant. → últ. 7"}
   .az-c-es small,.az-db{display:none}
   .az-bar{max-width:64px}
   .az-tb{max-width:72px}
