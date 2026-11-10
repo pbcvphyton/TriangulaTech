@@ -158,7 +158,7 @@ python -m qijournal instagram gerar --dir . --media-dir /tmp/instagram --date 20
 ## Kit do perfil
 
 - **Nome** (aparece na busca): `Triangula | Notícias e Mercado`
-- **@**, nesta ordem de preferência: `@triangula`, `@triangula.jornal`, `@triangulajornal`, `@triangula.br`
+- **@**: `@triangulatech` (em `instagram.handle`, no `config/site.yaml`)
 - **Categoria**: Site de notícias e mídia. Sem botões de contato: ninguém atende.
 - **Bio**: MESMO FATO, VÁRIAS VERSÕES. ▲ ~1.500 notícias por dia (média), de dezenas de veículos: o fato, o mercado e como cada um contou. Por IA, com fontes ↓
 - **Link**: https://pbcvphyton.github.io/TriangulaTech/ (sempre a edição de hoje)

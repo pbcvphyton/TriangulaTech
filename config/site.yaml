@@ -267,7 +267,7 @@ instagram:
   # @ do perfil, sem o @ (ex.: triangula): vai na assinatura de toda arte ("▲ @triangula") e vira
   # "Siga no Instagram" no site e no e-mail. Enquanto a conta não existe, fica null: a assinatura
   # sai "▲ triangula" (sem @) e a geração não falha.
-  handle: "tringula.jornal"
+  handle: "triangulatech"
   election_until: "2026-10-27"  # 2º turno em 25/10: até aqui vale o filtro eleitoral por conteúdo (§4.0.1)
   eleicao:
     nomes: ["Lula", "Flávio Bolsonaro", "Bolsonaro"]   # o dono revisa a cada eleição; nunca "Flávio" sozinho (pega Flávio Dino, do STF)
