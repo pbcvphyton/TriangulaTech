@@ -32,7 +32,7 @@ from .. import text
 from ..config import Config
 from ..models import Edition
 from ..termometro.referencia import PARAMETROS
-from . import filters, midia, tom
+from . import achados, filters, lados, midia, tom
 from .midia import DestaquesView
 from .termometro import ANALITICO_PAGINA, CLASSE, analises_validas
 from .web import DEFAULT_COLORS, brand_view, coverage_view
@@ -308,6 +308,32 @@ def _data_label(iso: str) -> str:
         return iso
 
 
+def _vereditos_do_analitico(destaques: DestaquesView | None) -> dict[str, Any] | None:
+    """O que a aba Analítico afirma de cada nome em destaque (o tom, o espaço e os veículos que
+    passam do acaso contando as comparações dela): quando a busca reproduz a base de um desses
+    nomes (mesmo termo, editoria e período), a leitura da Pesquisa usa estes vereditos."""
+    if destaques is None or not destaques.nomes:
+        return None
+    sig = achados.significancia(destaques)
+    nomes = {}
+    for i, n in enumerate(destaques.nomes, 1):
+        nomes[midia.consulta(n.nome)] = {
+            "i": i,
+            "tom": n.nome in sig.tom,
+            "esp": n.nome in sig.espaco,
+            "vei": sorted(v for nome, v in sig.veiculos if nome == n.nome),
+        }
+    return {
+        "de": destaques.inicio,
+        "ate": destaques.fim,
+        "ed": destaques.secao,
+        "mTom": sig.n_tom,
+        "mEsp": sig.n_espaco,
+        "mVei": sig.n_veiculos,
+        "nomes": nomes,
+    }
+
+
 def pesquisa_view(
     resumos: Iterable[Mapping[str, Any]],
     config: Config,
@@ -359,6 +385,19 @@ def pesquisa_view(
             "padF": midia.PADRAO_FRACAO,
             "barra": midia.BARRA_TOM,
         },
+        # A leitura da busca: os limites da aba Analítico (achados.py, lados.py) e a régua
+        # da qualidade da apuração, para a Pesquisa afirmar só o que o Analítico afirmaria.
+        "lz": {
+            "alfaTom": achados.ALFA_TOM,
+            "alfaEsp": achados.ALFA_ESPACO,
+            "alfaVei": achados.ALFA_VEICULO,
+            "alfaLados": lados.ALFA,
+            "minPar": lados.MIN_PAR,
+            "minDestoa": lados.MIN_DESTOA,
+            "achados": achados.ACHADOS,
+            "qualidade": list(PARAMETROS["qualidade_faixas"]),
+        },
+        "az": _vereditos_do_analitico(destaques),
     }
     if dias:
         primeira, ultima = str(dias[-1]["d"]), str(dias[0]["d"])

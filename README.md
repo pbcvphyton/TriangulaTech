@@ -444,9 +444,10 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
   edição aparece uma vez.
 - **Filtros**: tipo, período das edições (com atalhos de 7 e 30 dias), editoria,
   veículo, ordem (recentes, relevantes, antigas) e "só nos títulos".
-- **Contagens**: resultados, edições e veículos; uma barra por edição (clicar
-  filtra o dia), os veículos e as editorias com mais resultados (clicar filtra) e,
-  nas análises encontradas, o T médio, os rótulos e a qualidade da apuração.
+- **Resultados**: o cabeçalho diz quantos resultados de cada tipo; **as histórias**
+  (os assuntos com mais veículos nos resultados, com as manchetes de cada um) vêm
+  antes da lista; as contagens por edição, veículo e editoria (clicar filtra) ficam
+  em "Refinar", recolhido.
 - **Na prática**: cada resultado leva à matéria na edição (abre na tela inteira)
   ou à notícia original; a busca fica no endereço (`pesquisa.html?q=…&de=…`), que
   pode ser guardado ou enviado; **Baixar CSV** exporta todos os resultados.
@@ -456,57 +457,59 @@ edição continua filtrando as matérias do dia enquanto se digita; **Enter** (o
   página carrega só os dias do período pedido, das edições mais recentes para as
   mais antigas, e busca no próprio navegador.
 
-#### Como a mídia cobre (o analítico da busca)
+#### A leitura da busca (o padrão do Analítico)
 
-Ao fim de cada busca, a Pesquisa ganha, **além** dos resultados e das contagens
-(que não mudam e continuam no mesmo lugar), a seção **Como a mídia cobre "termo"**,
-depois da lista, com um atalho acima dela (`#midia`; `pesquisa.html?q=Lula#midia`
-abre direto nela). Ela lê os mesmos resultados, com os mesmos filtros, e usa como
-base todas as notícias das edições do período (precisa de todas: se alguma não
-carregar, pede para buscar de novo). A lista aparece primeiro; a leitura é
-calculada logo depois e não muda com a ordem escolhida para a lista:
+Ao fim de cada busca, a Pesquisa abre com **a leitura**, no mesmo padrão da aba
+Analítico: a manchete é o achado de maior peso, com a prova (os números e o link
+para onde ela está na página); a linha fina diz quanto o termo aparece e o que o
+termômetro diz do texto; logo abaixo vêm os demais achados, numerados, um por tipo;
+ao lado, as lentes e **o que mudou em sete edições** (espaço e tom). Depois vêm os
+resultados e as três lentes; a base completa (as tabelas) e o **Como ler** ficam no
+fim. `#midia` (`pesquisa.html?q=Lula#midia`) abre direto na leitura. Ela usa os
+mesmos resultados e filtros e, como base, todas as notícias das edições do período
+(precisa de todas: se alguma não carregar, pede para tentar de novo); a lista não
+espera por ela.
 
-- **Leitura**: frases automáticas com o que importa: volume, quem dá mais e menos
-  espaço, Brasil × exterior, o pico e o assunto que o puxou, a tendência, a
-  divergência na cobertura comparada, quem destoa da maioria, quais veículos
-  ficam em lados opostos e com quem o termo aparece.
-- **Atenção**: por veículo, quantas manchetes citam o termo, que parte do que o
-  veículo publicou isso representa e quanto acima ou abaixo **do esperado** ele
-  está: as manchetes que ele teria se desse ao termo, em cada editoria em que
-  publica, o mesmo espaço que o conjunto dá (um site de esporte não "deveria"
-  citar um político como um de política; só com 30+ manchetes do veículo no
-  período). Quem mais e quem menos dá espaço saem dos veículos que deveriam ter
-  citado o termo 3+ vezes (e quem não cita nenhuma vez aparece). Brasil × exterior
-  (feeds em outra língua); as últimas 7 edições contra as 7 anteriores (com 10+
-  manchetes do termo nas duas).
-- **Picos**: os três dias com mais manchetes e o assunto que puxou cada um.
-- **Pauta**: os nomes ("Quem aparece junto") e as palavras ("Temas") mais
-  frequentes nas manchetes brasileiras dos resultados (clicar refina a busca) e os
-  assuntos que mais renderam (link para a matéria ou a cobertura comparada).
-- **O que cada veículo enfatiza**: vocabulário distintivo de cada veículo
-  brasileiro com 15+ manchetes sobre o termo, contra os demais (log-odds com prior
-  de Dirichlet informativo, Monroe, Colaresi e Quinn, 2008; z > 3,3, um limiar
-  alto porque cada veículo testa muitas palavras de uma vez).
-- **Tom · fala bem ou mal?**: das manchetes brasileiras com o termo, quantas o
-  põem em contexto desfavorável e favorável, o saldo, se o tom piorou ou melhorou
-  nas últimas 7 edições, o saldo semana a semana e, veículo a veículo, o tom de
-  cada um contra o dos demais (com "mais crítico" e "mais favorável" quando a
-  diferença passa do acaso), quantas vezes o termo é alvo, o padrão semanal, o
-  espaço contra o esperado e o assunto que mais rendeu; e as manchetes mais
-  desfavoráveis e mais favoráveis, com as palavras que pesaram (a regra está em
-  "Tom das manchetes", acima; com a editoria e o período do placar, os números são
-  os do dossiê do nome no Analítico Político).
-- **Lados e divergência**: dos assuntos da cobertura comparada que citam o termo,
-  quantos tiveram dois lados (veículos nos dois enfoques; se todos ficaram no
-  mesmo, conta como sem divergência) e quão dividida ficou cada um (divergência =
-  2 × o lado menor ÷ (A + B): 100 = meio a meio); os mais divididos, com os dois
-  enfoques e, por escrito, os veículos de cada lado; **quem destoa da maioria**; e
-  os pares de veículos que mais ficam do mesmo lado ou em lados opostos.
+Só vira afirmação o que passa do acaso contando as comparações da mesma família
+(correção de Holm), com os limites da aba Analítico (`achados.py` e `lados.py`, no
+manifesto da página):
+
+| Achado | Entra quando |
+|---|---|
+| Tom | o tom das manchetes sobre o termo piorou ou melhorou nas últimas 7 edições (95%; um termo só e 20+ manchetes brasileiras com palavra de tom) |
+| Espaço | a parte das manchetes que citam o termo mudou nas últimas 7 edições contra as 7 anteriores (duas proporções, 99%, e mais de 15%) |
+| Pico | um dia tem uma parte das manchetes acima da dos outros dias do período (binomial, Holm a 99% sobre todas as edições; 5+ manchetes e 1,5 vez a parte dos outros dias); a história do dia vai junto |
+| Veículos | um veículo põe o termo em contexto mais crítico ou mais favorável que os demais (99%, Holm sobre os veículos comparados) |
+| Atenção | um veículo cita o termo bem mais ou bem menos que o esperado pelas editorias em que publica (Poisson exato, Holm a 99%; 1,5 vez o esperado, ou metade) |
+| Exterior | os veículos de fora do Brasil dão ao termo uma parte bem diferente da dos brasileiros (99%) |
+| Lados | um par de veículos fica do mesmo lado, ou em lados opostos, além do acaso (teste exato, Holm a 99%); senão, quantos assuntos racharam |
+| Texto | as notícias com o termo que saem do zero no termômetro pendem para um lado (teste de sinal, 99%) |
+| História, pauta e presença | contagem: a história com mais veículos, o nome que mais acompanha o termo e quanto ele aparece |
+
+Com até 10 resultados, a página só descreve o que achou (e avisa quando eles se
+espalham por editorias diferentes). Num período de 7 a 13 edições, as edições logo
+antes dele completam as duas janelas de sete. Quando a busca reproduz a base de um
+nome do placar do Analítico (mesmo termo, editoria e período, sem outros filtros),
+valem os vereditos de lá: a Pesquisa nunca afirma o que o Analítico não afirma.
+
+- **1 · Manchetes**: o espaço edição a edição (com os picos marcados), o tom (o
+  saldo, antes e agora, e as manchetes que pesaram), o **placar dos veículos**
+  (espaço no que cada um publicou, contra o esperado, o tom e o tom contra o dos
+  demais; clicar abre as manchetes do veículo) e **com quem aparece** (clicar
+  refina a busca; "só" troca o termo).
+- **2 · Enquadramento**: os assuntos da cobertura comparada que citam o termo no
+  título ou na conclusão e mais dividiram (os dois enfoques e os veículos de cada
+  lado), **quem fica com quem** e **quem destoa**, contra o acaso de cada placar.
+- **3 · Texto**: os desvios do zero no termômetro, os textos mais inclinados e a
+  qualidade da apuração das análises encontradas.
 
 Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
-nem na IA). **Limites**: o tom é lido por palavras (veja acima) e mede o contexto,
-não a opinião do veículo; os lados são os enfoques de cada assunto, não "a favor"
-ou "contra" a pessoa.
+nem na IA): os fatos em `midia.js.j2`, os testes em `pesquisa_estat.js.j2`, o texto
+em `pesquisa_achados.js.j2` e o desenho em `pesquisa_leitura.js.j2`. **Limites**: o
+tom é lido por palavras (veja acima) e mede o contexto, não a opinião do veículo;
+manchetes vêm em ondas (um assunto puxa outras) e os testes supõem manchetes
+independentes; os lados são os enfoques de cada assunto, não "a favor" ou "contra"
+a pessoa.
 
 Embaixo da caixa de busca, os **nomes em destaque** da Política (os do placar do
 Analítico) viram atalhos para o analítico de cada um (com a editoria e o período do

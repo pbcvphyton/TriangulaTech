@@ -1,0 +1,680 @@
+{#- A leitura da busca, desenhada no padrão da aba Analítico (dentro do IIFE de
+    pesquisa.js.j2, depois de midia.js.j2): a caixa da leitura (chapéu, manchete, prova,
+    linha fina, mais achados) com o trilho das lentes e "O que mudou"; as histórias e o
+    cabeçalho dos resultados; as três lentes (Manchetes, Enquadramento, Texto); a base
+    completa recolhida e o "Como ler". As classes az-… vêm de analitico.css.j2 (incluído
+    sem mudança); o que só a Pesquisa precisa está em pesquisa_leitura.css.j2. Todo texto
+    que vem da busca ou dos dados passa por esc(). -#}
+  /* ── A leitura da busca: o desenho ──────────────────────────────────── */
+  var ACH = achadosCriar(LZ, ST);
+  var navEl = $('pqNav'), lentesEl = $('pqLentes'), histEl = $('pqHist'), tiposEl = $('pqTipos'), refinarEl = $('pq-refinar');
+  var BARRA = 50;
+
+  function r2(x) { return Math.round(x * 100) / 100; }
+  function w1(x) { return (Math.round(Math.max(0, Math.min(100, x)) * 10) / 10).toFixed(1) + '%'; }
+  function xTom(s) { return s === null || s === undefined ? 50 : r2(50 + Math.max(-BARRA, Math.min(BARRA, s)) * 50 / BARRA); }
+  function ba(antes, agora, srAntes, srAgora) {
+    return '<span class="az-ba">' + (srAntes ? '<span class="sr-only">' + esc(srAntes) + ' </span>' : '') + esc(antes) +
+      '<span aria-hidden="true"> → </span><span class="sr-only">' + (srAgora ? ', ' + esc(srAgora) + ' ' : ' para ') + '</span><b>' + esc(agora) + '</b></span>';
+  }
+  function chip(texto, forte, lado) {
+    return '<span class="az-chip' + (forte ? ' on' + (lado ? ' ' + lado : '') : '') + '">' + esc(texto) + '</span>';
+  }
+  function tb(pctNeg, pctPos, escala) {
+    return '<span class="az-tb" aria-hidden="true"><span class="az-tb-n"><i style="width:' + w1(100 * pctNeg / escala) + '"></i></span>' +
+      '<span class="az-tb-p"><i style="width:' + w1(100 * pctPos / escala) + '"></i></span></span>';
+  }
+  function db(antes, agora, forte, lado) {
+    var a = xTom(antes), b = xTom(agora);
+    return '<span class="az-db" aria-hidden="true"><i class="az-db-l" style="left:' + Math.min(a, b) + '%;width:' + r2(Math.abs(a - b)) + '%"></i>' +
+      '<i class="az-db-a" style="left:' + a + '%"></i><i class="az-db-b' + (forte && lado ? ' ' + lado : '') + '" style="left:' + b + '%"></i></span>';
+  }
+  function tomClasse(s) { return s === null || s === undefined ? 'est' : s <= -10 ? 'neg' : s >= 10 ? 'pos' : 'est'; }
+  function dataIso(d) { return DATA_ISO.test(d || '') ? d : ''; }
+  function hrefEdicao(d, ancora) { d = dataIso(d); return d ? edicao(d) + (ancora || '') : ''; }
+  function dmTxt(d) { return d ? dataCurta(d) : ''; }
+  function periodoTxt(a, b) { return a === b ? dataCurta(a) : dataCurta(a) + '–' + dataCurta(b); }
+
+  /* ── a caixa da leitura e o trilho ─────────────────────────────────── */
+  function achadoHTML(a) {
+    return '<li class="az-a"><div class="az-a-tx"><p class="az-a-k"><span class="az-selo">' + esc(a.selo) + '</span><b class="az-a-num">' + esc(a.numero) + '</b></p>' +
+      '<h5 class="az-a-t"><a class="hit" href="' + esc(a.href) + '">' + esc(a.titulo) + '</a></h5><p class="az-a-x">' + esc(a.texto) + '</p></div></li>';
+  }
+  function lenteHTML(x) {
+    return '<li class="az-l"><p class="az-l-k"><b>' + x.ordem + '</b>' + esc(x.nome) + '</p><p class="az-l-p"><a class="hit" href="' + esc(x.href) + '">' + esc(x.pergunta) +
+      '</a></p><p class="az-l-v"><b>' + esc(x.numero) + '</b> <span>' + esc(x.unidade) + '</span></p><p class="az-l-b">' + esc(x.base) + '</p></li>';
+  }
+  function mudancaHTML(m) {
+    return '<li><a class="hit" href="' + esc(m.href) + '"><b>' + esc(m.nome) + '</b></a><span class="az-mud-t">' + esc(m.tipo) + '</span>' +
+      (m.antes ? ba(m.antes, m.agora) : '<span class="az-nd">—</span>') + chip(m.selo, m.forte, m.classe) + '</li>';
+  }
+  var LENTES_N = ['Uma lente', 'Duas lentes', 'Três lentes'];
+  function leituraHTML(L, F) {
+    var p = L.principal;
+    if (L.curta) {
+      var eds = F.editorias.filter(function (x) { return x.s; });
+      return '<div class="az-lead pq-so"><div class="az-box"><p class="az-chapeu">' + esc(L.chapeu) + '</p><h3 class="az-manchete" id="pqLzH">' + esc(p.titulo) + '</h3>' +
+        '<p class="az-fina">' + esc(L.fina) + '</p>' +
+        (L.espalha ? '<p class="az-note">Os resultados se espalham por editorias diferentes: confira se falam todos do mesmo ' + esc(F.q.rot) + '.</p>' +
+          '<p class="pq-eds">' + eds.map(function (x) {
+            return '<button type="button" data-ed="' + esc(x.s) + '">Só ' + esc(x.t) + ' <b>' + num(x.k) + '</b></button>';
+          }).join('') + '</p>' : '') + '</div></div>';
+    }
+    var caixa = '<div class="az-box"><p class="az-chapeu">' + esc(L.chapeu) + '</p><h3 class="az-manchete" id="pqLzH">' + esc(p.titulo) + '</h3>' +
+      '<p class="az-prova"><span class="az-selo">' + esc(p.selo) + '</span><span>' + esc(p.texto) + ' <a href="' + esc(p.href) + '">Ver a prova<span aria-hidden="true"> ↓</span></a></span></p>' +
+      (L.fina ? '<p class="az-fina">' + esc(L.fina) + '</p>' : '') +
+      (L.achados.length ? '<div class="az-mais"><h4 class="az-lbl">Mais achados <span class="az-lbl-n">' + L.achados.length + '</span></h4><ol class="az-achados">' +
+        L.achados.map(achadoHTML).join('') + '</ol></div>' : '') + '</div>';
+    var trilho = '';
+    if (L.lentes.length) {
+      trilho = '<aside class="az-rail" aria-labelledby="pqLentesH"><h4 class="az-lbl" id="pqLentesH">' + LENTES_N[L.lentes.length - 1] +
+        ' <span class="az-lbl-n">de onde saem os achados</span></h4><ol class="az-lentes">' + L.lentes.map(lenteHTML).join('') + '</ol>';
+      if (L.mudancas) {
+        trilho += '<h4 class="az-lbl az-lbl-2">O que mudou em sete edições <span class="az-lbl-n">' +
+          (L.fortes ? L.fortes + ' de 2 além do acaso' : 'nada além do acaso') + '</span></h4><ol class="az-mud">' + L.mudancas.map(mudancaHTML).join('') + '</ol>';
+      } else if (L.mud0) {
+        trilho += '<h4 class="az-lbl az-lbl-2">O que mudou em sete edições</h4><p class="az-mud-0">' + esc(L.mud0) + '</p>';
+      }
+      if (F.az && M.analitico) {
+        trilho += '<p class="pq-az-link"><a href="' + esc(M.analitico + '#qf-' + F.az.i) + '">' + esc(F.q.T) + ' no Analítico Político <span aria-hidden="true">→</span></a></p>';
+      }
+      trilho += '</aside>';
+    }
+    return '<div class="az-lead' + (trilho ? '' : ' pq-so') + '">' + caixa + trilho + '</div>';
+  }
+  function esqueletoHTML(texto) {
+    return '<div class="az-lead pq-so"><div class="az-box pq-sk" aria-busy="true"><p class="az-chapeu">' + esc(texto) + '</p>' +
+      '<p class="pq-sk-l"><i></i><i></i><i></i></p></div></div>';
+  }
+
+  /* ── as histórias (entre o cabeçalho dos resultados e a lista) ─────── */
+  function historiasHTML(F) {
+    var hs = (F.hist || []).slice(0, 3);
+    if (hs.length < 2) return '';
+    return '<div class="az-blk" id="pq-historias"><h4 class="az-h">As histórias <span>os assuntos com mais veículos nos resultados</span></h4><ol class="pq-hs">' +
+      hs.map(function (h, i) {
+        var meta = [periodoTxt(h.d0, h.d1), plural(h.nv, 'veículo', 'veículos'), plural(h.n, 'manchete', 'manchetes')];
+        if (h.mat) meta.push('virou matéria');
+        if (h.comp) meta.push('cobertura comparada');
+        var vs = h.veiculos.slice(0, 6).join(', ') + (h.veiculos.length > 6 ? ' e mais ' + (h.veiculos.length - 6) : '');
+        var itens = h.itens.slice().sort(function (a, b) { return cmp(b.d, a.d) || cmp(a.f[0] || '', b.f[0] || ''); }).slice(0, 25);
+        return '<li class="az-rx pq-h" id="pq-h-' + (i + 1) + '"><p class="az-rx-m">' + esc(meta.join(' · ')) + '</p>' +
+          '<h5 class="az-rx-t"><a href="' + esc(h.href) + '">' + esc(h.titulo) + '</a></h5><p class="pq-h-v">' + esc(vs) + '</p>' +
+          '<details class="az-more"><summary>Ver ' + (h.n === 1 ? 'a manchete' : (h.n > itens.length ? 'as ' + itens.length + ' mais recentes' : 'as ' + num(h.n) + ' manchetes')) + '</summary><ul class="pq-h-l">' +
+          itens.map(function (r) {
+            return '<li><a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">' + esc(r.t) + '<span aria-hidden="true"> ↗</span><span class="sr-only"> (abre a notícia em nova aba)</span></a>' +
+              '<small>' + esc((r.f[0] || '') + ' · ' + dataCurta(r.d)) + '</small></li>';
+          }).join('') + '</ul></details></li>';
+      }).join('') + '</ol></div>';
+  }
+
+  /* ── seções e blocos ───────────────────────────────────────────────── */
+  function secaoHTML(id, n, nome, titulo, dek, corpo) {
+    return '<section class="az-sec" aria-labelledby="' + id + '-h"><header class="az-lh" id="' + id + '"><p class="az-ln">' + (n ? '<b>' + n + '</b>' : '') + esc(nome) + '</p>' +
+      '<h3 class="az-lt" id="' + id + '-h">' + esc(titulo) + '</h3>' + (dek ? '<p class="az-ld">' + esc(dek) + '</p>' : '') + '</header>' + corpo + '</section>';
+  }
+  function blocoHTML(id, titulo, sub, dek, corpo, nota) {
+    return '<div class="az-blk"' + (id ? ' id="' + id + '"' : '') + '><h4 class="az-h">' + esc(titulo) + (sub ? ' <span>' + esc(sub) + '</span>' : '') + '</h4>' +
+      (dek ? '<p class="az-dek">' + dek + '</p>' : '') + corpo + (nota ? '<p class="az-note">' + nota + '</p>' : '') + '</div>';
+  }
+
+  /* ── lente 1: manchetes ────────────────────────────────────────────── */
+  function curvaHTML(F, T) {
+    var serie = F.serie || [];
+    if (serie.length < 2) return '';
+    var vals = serie.map(function (s) { return s.k / s.b; });
+    var topo = Math.max.apply(null, vals) || 1, u = serie.length - 1;  // na escala do próprio termo
+    var pts = vals.map(function (v, i) { return [r2(100 * i / u), r2(94 - 88 * v / topo)]; });
+    function d(ps) { return ps.map(function (p, i) { return (i ? 'L' : 'M') + p[0] + ',' + p[1]; }).join(' '); }
+    var picos = {};
+    (F.picos ? F.picos.dias : []).forEach(function (x) { if (x.passa) picos[x.d] = x; });
+    var marcas = '';
+    serie.forEach(function (s, i) {
+      if (picos[s.d]) marcas += '<i class="pq-pk" style="left:' + pts[i][0] + '%;top:' + pts[i][1] + '%"></i>';
+    });
+    var maior = serie[vals.indexOf(Math.max.apply(null, vals))];
+    var aria = 'Parte das manchetes que citam ' + T + ' por edição, de ' + dataCurta(serie[0].d) + ' a ' + dataCurta(serie[u].d) +
+      ': máximo de ' + pct(maior.k, maior.b) + ' em ' + dataCurta(maior.d) + '; última edição, ' + pct(serie[u].k, serie[u].b) + '.';
+    return '<figure class="pq-cv"><div class="pq-cv-in" role="img" aria-label="' + esc(aria) + '"><span class="az-sp"><svg viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" aria-hidden="true">' +
+      '<path class="az-sp-l" d="' + d(pts) + '" vector-effect="non-scaling-stroke"/>' +
+      (serie.length >= 14 ? '<path class="az-sp-r" d="' + d(pts.slice(-7)) + '" vector-effect="non-scaling-stroke"/>' : '') +
+      '</svg><i style="top:' + pts[u][1] + '%"></i></span>' + marcas + '</div>' +
+      '<figcaption class="pq-cv-ax"><span>' + dataCurta(serie[0].d) + '</span><span>' + (serie.length >= 14 ? 'em destaque, as últimas 7 edições' : '') + '</span><span>' + dataCurta(serie[u].d) + '</span></figcaption></figure>';
+  }
+  function espacoLado(F, T) {
+    var h = '', e = F.tend;
+    if (e) {
+      var sel = ACH.variacao(e.ka / e.ba, e.kr / e.br);
+      h += '<p class="pq-7"><span class="pq-7-k">7 anteriores → últimas 7</span>' + ba(pct(e.ka, e.ba), pct(e.kr, e.br), 'parte das manchetes nas 7 edições anteriores', 'nas últimas 7') +
+        chip(sel, e.passa, '') + '</p><p class="az-note">' + num(e.ka) + ' de ' + num(e.ba) + ' manchetes, contra ' + num(e.kr) + ' de ' + num(e.br) + '. ' +
+        (e.passa ? 'A diferença passa do acaso (99%).' : 'Diferença dentro do que o acaso explica.') + '</p>';
+    } else if (F.jan === null) {
+      h += '<p class="az-note">Com ' + plural(F.f.D, 'edição', 'edições') + ' no período, não há sete contra sete para comparar.</p>';
+    }
+    var pks = (F.picos ? F.picos.dias : []).filter(function (x) { return x.passa; }).sort(function (a, b) { return b.R - a.R; }).slice(0, 3);
+    if (pks.length) {
+      h += '<h5 class="az-h5">Picos <span>dias acima do acaso</span></h5><ol class="pq-pks">' + pks.map(function (x) {
+        var hd = null;
+        (F.hist || []).forEach(function (s) { if (s.nv >= 3 && x.d >= s.d0 && x.d <= s.d1 && (!hd || s.nv > hd.nv)) hd = s; });
+        return '<li><button type="button" data-dia="' + esc(x.d) + '" title="Ver só a edição de ' + esc(dataLonga(x.d)) + '"><b>' + dataCurta(x.d) + '</b></button>' +
+          '<span>' + plural(x.k, 'manchete', 'manchetes') + ' · ' + pct(x.k, x.b) + ' do dia · ' + ACH.dec(x.R, 1) + '× os outros dias</span>' +
+          (hd ? '<small>' + esc('“' + hd.titulo + '”') + '</small>' : '') + '</li>';
+      }).join('') + '</ol>';
+    } else if (F.picos) {
+      h += '<p class="az-note">Nenhum dia fica acima do acaso contando as ' + num(F.picos.m) + ' edições do período.</p>';
+    }
+    return h;
+  }
+  function tomBlocoHTML(F, T, x) {
+    var t = F.tom;
+    if (!t) return '';
+    if (!t.aplica) {
+      return blocoHTML('pq-tom', 'Tom das manchetes', '', 'O tom não se aplica a ' + esc(T) + ': ' + esc(t.motivo) + '.', '', '');
+    }
+    var tm = x.tm, escala = Math.max(20, 5 * Math.ceil(Math.max(100 * t.desf / t.n, 100 * t.fav / t.n) / 5));
+    var h = '<p class="az-dn pq-dn">' + num(t.n) + ' manchetes brasileiras · ' + tb(100 * t.desf / t.n, 100 * t.fav / t.n, escala) +
+      '<b class="tom-' + tomClasse(t.saldo) + '">saldo ' + esc(ACH.saldo(t.saldo)) + '</b> · ' + pct(t.desf, t.n) + ' desfavoráveis · ' + pct(t.fav, t.n) + ' favoráveis · ' +
+      pct(t.n - t.desf - t.fav, t.n) + ' sem tom</p>';
+    if (t.tend) {
+      var v = t.tend.passa ? (t.tend.sr < t.tend.sa ? 'piorou' : 'melhorou') : 'estável', lado = t.tend.sr < t.tend.sa ? 'neg' : 'pos';
+      h += '<p class="pq-7"><span class="pq-7-k">7 anteriores → últimas 7</span>' + db(t.tend.sa, t.tend.sr, t.tend.passa, lado) +
+        ba(ACH.saldo(t.tend.sa), ACH.saldo(t.tend.sr), 'saldo nas 7 edições anteriores', 'nas últimas 7') + chip(v, t.tend.passa, lado) + '</p>' +
+        '<p class="az-note">' + num(t.tend.na) + ' manchetes nas 7 edições anteriores e ' + num(t.tend.nr) + ' nas últimas 7. ' +
+        (t.tend.passa ? 'A diferença passa do acaso (95%).' : 'Diferença dentro do que o acaso explica.') + '</p>';
+    }
+    if (tm && (tm.exNeg.length || tm.exPos.length)) {
+      var ex = function (i, tipo) {
+        return '<li class="qf-' + tipo + '"><span class="qf-et">' + (tipo === 'neg' ? 'Desfavorável' : 'Favorável') + '</span><a href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">' + esc(i.t) +
+          '</a><small>' + esc(i.o) + ' · ' + dataCurta(i.d) + ' · por: ' + esc(i.tom.gatilhos.join(', ')) + '</small></li>';
+      };
+      h += '<details class="az-more"><summary>Ver as manchetes que pesaram</summary><div class="az-2c"><ul class="qf-ex">' + tm.exNeg.map(function (i) { return ex(i, 'neg'); }).join('') +
+        '</ul><ul class="qf-ex">' + tm.exPos.map(function (i) { return ex(i, 'pos'); }).join('') + '</ul></div></details>';
+    }
+    return blocoHTML('pq-tom', 'Tom das manchetes', 'em que contexto ' + T + ' aparece', '', h,
+      'Leitura por palavras do título, sem IA: serve melhor para nomes de pessoas; para instituições e temas, confira os exemplos. <a href="#pq-como">Como ler</a>');
+  }
+  function linhaVeiculoHTML(v, F, x, escala, maiorS) {
+    var tv = v.tv, aplica = F.tom && F.tom.aplica && tv && !tv.pequena, T = F.q.T;
+    var s = v.b ? v.k / v.b : 0;
+    var tipEs = v.o + ': ' + num(v.k) + ' de ' + num(v.b) + ' manchetes do veículo citam ' + T + ' (' + pct(v.k, v.b) + ')';
+    var ix = v.esp >= 3 && v.i !== null ? ACH.dec(v.i, 1) + '×' : '';
+    var tipIx = ix ? 'Esperado: umas ' + num(Math.max(1, ST.arred(v.esp, 0))) + ' manchetes, pela parte de ' + T + ' em cada editoria em que o veículo publica; ' +
+      (v.atForte ? 'a diferença passa do acaso, mesmo contando os ' + num(F.mAt) + ' veículos comparados' : 'diferença dentro do que o acaso explica, contando os veículos comparados') : '';
+    var cls = aplica ? tomClasse(v.sv) : 'est';
+    var tipTm = aplica ? v.o + ': ' + v.desf + ' desfavoráveis e ' + v.fav + ' favoráveis em ' + v.kTom + ' manchetes; saldo ' + ACH.saldo(v.sv) : '';
+    var lado = v.sv !== null && v.so !== null && v.sv < v.so ? 'neg' : 'pos';
+    var isolado = !!v.tomIsolado, forte = v.tomForte;
+    var tipT7 = aplica ? 'Saldo de ' + v.o + ' ' + ACH.saldo(v.sv) + ' contra ' + ACH.saldo(v.so) + ' nos demais veículos: ' +
+      (forte ? 'passa do acaso, mesmo contando os ' + num(F.mVei) + ' veículos comparados' : isolado ? 'difere na comparação isolada (99%), mas não contando os ' + num(F.mVei) + ' veículos comparados' : 'dentro do que o acaso explica') : '';
+    var recentes = (x.nots || []).filter(function (r) { return r.f[0] === v.o; }).sort(function (a, b) { return cmp(b.d, a.d) || cmp(a.t, b.t); }).slice(0, 3);
+    var dossie = '<p class="az-dn">' + esc(v.o) + ': ' + plural(v.k, 'manchete', 'manchetes') + ' com ' + esc(T) + ' entre as ' + num(v.b) + ' do veículo no período (' + pct(v.k, v.b) + ')' +
+      (ix ? '; o esperado seria umas ' + num(Math.max(1, ST.arred(v.esp, 0))) : '') + (tv && tv.assunto ? '; o assunto que mais rendeu: ' + esc('“' + tv.assunto + '”') + ' (' + tv.assuntoN + ')' : '') + '.</p>';
+    if (recentes.length) {
+      dossie += '<h5 class="az-h5">As mais recentes</h5><ul class="pq-h-l">' + recentes.map(function (r) {
+        return '<li><a href="' + esc(r.u) + '" target="_blank" rel="noopener noreferrer">' + esc(r.t) + '<span aria-hidden="true"> ↗</span><span class="sr-only"> (abre a notícia em nova aba)</span></a><small>' + dataCurta(r.d) + '</small></li>';
+      }).join('') + '</ul>';
+    }
+    if (aplica && (tv.exNeg.length || tv.exPos.length)) {
+      dossie += '<ul class="qf-ex">' + tv.exNeg.concat(tv.exPos).map(function (i) {
+        var tipo = i.tom.tom === 'neg' ? 'neg' : 'pos';
+        return '<li class="qf-' + tipo + '"><span class="qf-et">' + (tipo === 'neg' ? 'Desfavorável' : 'Favorável') + '</span><a href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">' + esc(i.t) +
+          '</a><small>' + dataCurta(i.d) + ' · por: ' + esc(i.tom.gatilhos.join(', ')) + '</small></li>';
+      }).join('') + '</ul>';
+    }
+    dossie += '<p class="qf-mais"><button type="button" class="pq-lk" data-v="' + esc(v.o) + '">Filtrar a busca por ' + esc(v.o) + ' →</button></p>';
+    return '<li class="az-row' + (aplica || !F.tom || !F.tom.aplica ? '' : ' pq-pq') + '"><details class="az-n" id="pq-v-' + v.idx + '"><summary class="az-s">' +
+      '<span class="az-c-o" aria-hidden="true">' + v.idx + '</span>' +
+      '<span class="az-c-nm"><b>' + esc(v.o) + '</b>' + (tv && tv.assunto ? '<small>' + esc(tv.assunto) + '</small>' : '') + '</span>' +
+      '<span class="az-c-es" data-tip="' + esc(tipEs) + '"><span class="az-bar" aria-hidden="true"><i style="width:' + w1(maiorS ? 100 * s / maiorS : 0) + '"></i></span><b>' + esc(pct(v.k, v.b)) + '</b>' +
+        '<small><span class="sr-only">do que publicou; </span>' + num(v.k) + '<span class="sr-only"> manchetes</span></small></span>' +
+      '<span class="az-c-ix">' + (ix ? '<span class="pq-ix' + (v.atForte ? ' pq-on' : '') + '" data-tip="' + esc(tipIx) + '"><span class="sr-only">vs. esperado: </span>' + esc(ix) + '</span>' : '<span class="az-nd" title="Menos de 3 manchetes esperadas: sem comparação">—</span>') + '</span>' +
+      '<span class="az-c-tm"' + (tipTm ? ' data-tip="' + esc(tipTm) + '"' : '') + '>' + (aplica ? tb(100 * v.desf / v.kTom, 100 * v.fav / v.kTom, escala) + '<span class="sr-only">tom: saldo </span><b class="tom-' + cls + '">' + esc(ACH.saldo(v.sv)) + '</b>' : '<span class="az-nd">—</span>') + '</span>' +
+      '<span class="az-c-t7"' + (tipT7 ? ' data-tip="' + esc(tipT7) + '"' : '') + '>' + (aplica ? db(v.so, v.sv, forte, lado) + ba(ACH.saldo(v.so), ACH.saldo(v.sv), 'saldo dos demais veículos', 'o do veículo') +
+        (isolado ? chip(v.tomIsolado === 'neg' ? 'mais crítico' : 'mais favorável', forte, v.tomIsolado) : '') : '<span class="az-nd">—</span>') + '</span>' +
+      '<span class="az-c-ch" aria-hidden="true"></span></summary><div class="az-dossie">' + dossie + '</div></details></li>';
+  }
+  function placarHTML(F, x) {
+    var linhas = F.veic.filter(function (v) { return v.idx; });
+    if (!linhas.length) return '';
+    var T = F.q.T, aplica = F.tom && F.tom.aplica;
+    var maiorS = 0, maiorTom = 0;
+    linhas.forEach(function (v) {
+      if (v.b) maiorS = Math.max(maiorS, v.k / v.b);
+      if (v.tv && v.kTom && !v.tv.pequena) maiorTom = Math.max(maiorTom, 100 * v.desf / v.kTom, 100 * v.fav / v.kTom);
+    });
+    var escala = Math.max(20, 5 * Math.ceil(maiorTom / 5));
+    var visiveis = linhas.slice(0, MD.topo), resto = linhas.slice(MD.topo);
+    var cab = '<div class="az-hd" aria-hidden="true"><span></span><span>Veículo</span><span>Espaço no que publicou</span><span>vs. esperado</span>' +
+      '<span>Tom' + (aplica ? ' <i>← desfavorável · favorável →</i>' : ' <i>não se aplica</i>') + '</span><span>Tom: demais → o veículo</span><span></span></div>';
+    var corpo = '<div class="az-pl pq-pv">' + cab + '<ol class="az-rows">' + visiveis.map(function (v) { return linhaVeiculoHTML(v, F, x, escala, maiorS); }).join('') + '</ol>' +
+      (resto.length ? '<details class="az-more"><summary>E mais ' + plural(resto.length, 'veículo', 'veículos') + ' com 3 ou mais manchetes</summary><ol class="az-rows">' +
+        resto.map(function (v) { return linhaVeiculoHTML(v, F, x, escala, maiorS); }).join('') + '</ol></details>' : '') + '</div>';
+    if (F.ext && F.ext.ke) {
+      corpo += '<p class="az-note">Exterior: ' + plural(F.ext.ke, 'manchete', 'manchetes') + ' de ' + plural(F.ext.nE, 'veículo', 'veículos') + ' de fora do Brasil (' + pct(F.ext.ke, F.ext.be) + ' do que publicaram).</p>';
+    }
+    return blocoHTML('pq-placar', 'Placar dos veículos', 'quem dá espaço a ' + T + ', e em que tom',
+      'Os veículos brasileiros com 3 ou mais manchetes sobre ' + esc(T) + ', do que mais cita ao que menos. Clique em um veículo para ver as manchetes dele.', corpo,
+      'Barra: parte das manchetes do veículo que citam ' + esc(T) + '. Esperado: a parte de ' + esc(T) + ' em cada editoria aplicada ao que o veículo publica nela. ' +
+      'Contorno escuro e selo escuro: passa do acaso mesmo contando todos os veículos comparados (Holm, 99%); selo claro: só na comparação isolada (99%). <a href="#pq-como">Como ler</a>');
+  }
+  function juntoHTML(F) {
+    var pz = F.pauta;
+    if (!pz || (!pz.grupos.length && !pz.temas.length)) return '';
+    var h = '';
+    if (pz.grupos.length) {
+      h += '<p class="md-chips pq-chips">' + pz.grupos.slice(0, 10).map(function (g) {
+        var tambem = g.formas.length > 1 ? ' (também ' + g.formas.slice(1, 3).map(function (f) { return '“' + f + '”'; }).join(', ') + ')' : '';
+        return '<span class="pq-ch"><button type="button" data-q="' + esc(g.f) + '" title="' + esc('Refinar: ' + F.q.T + ' junto de ' + g.f + tambem) + '">' + esc(g.f) + ' <b>' + num(g.co) + '</b></button>' +
+          '<button type="button" class="pq-so-b" data-q-novo="' + esc(g.f) + '" title="' + esc('Buscar só ' + g.f) + '" aria-label="' + esc('Buscar só ' + g.f) + '">só</button></span>';
+      }).join('') + '</p>';
+    }
+    if (pz.temas.length) {
+      h += '<h5 class="az-h5">Temas</h5><p class="md-chips">' + pz.temas.slice(0, 8).map(function (t) {
+        return '<button type="button" data-q="' + esc(t.f) + '" title="Refinar: ' + esc(F.q.T) + ' com ' + esc(t.f) + '">' + esc(t.f) + ' <b>' + num(t.n) + '</b></button>';
+      }).join('') + '</p>';
+    }
+    return blocoHTML('pq-junto', 'Com quem aparece', 'nas manchetes brasileiras', '', h,
+      'O número é de manchetes. Clique para refinar a busca; “só” troca o termo. É contagem, sem comparação com o resto do noticiário.');
+  }
+  function lente1HTML(F, x, n) {
+    var T = F.q.T, corpo = '';
+    if (F.f.v) {
+      corpo += '<p class="az-note pq-aviso">Com o filtro de veículo, a leitura descreve só ' + esc(F.f.v) + ': não há com quem comparar espaço nem tom. ' +
+        '<button type="button" class="pq-lk" data-limpa="v">Comparar ' + esc(F.f.v) + ' com os demais</button></p>';
+    } else if (F.n < 20) {
+      corpo += '<p class="az-note pq-aviso">Com ' + plural(F.n, 'manchete', 'manchetes') + ', a página não lê o tom nem compara veículos: o acaso dominaria.</p>';
+    }
+    var cv = curvaHTML(F, T);
+    if (cv) corpo += blocoHTML('pq-curva', 'Espaço por edição', 'parte das manchetes que citam ' + T, '', '<div class="az-2c az-2c-t pq-cv-2c"><div>' + cv + '</div><div>' + espacoLado(F, T) + '</div></div>', '');
+    corpo += tomBlocoHTML(F, T, x);
+    if (!F.f.v && F.n >= 20) corpo += placarHTML(F, x);
+    corpo += juntoHTML(F);
+    var dek = 'As ' + num(F.n) + ' manchetes que citam ' + T + ' entre as ' + num(F.B) + ' coletadas' + (F.f.edTit ? ' de ' + F.f.edTit : '') + ' em ' + plural(F.f.D, 'edição', 'edições') +
+      ': o espaço a cada edição, quem dá esse espaço e em que tom.';
+    return secaoHTML('pq-manchetes', n, 'Manchetes', 'Quanto espaço ' + T + ' ganha, quando, quem dá e em que tom', dek, corpo);
+  }
+
+  /* ── lente 2: enquadramento ────────────────────────────────────────── */
+  function assuntoHTML(it) {
+    var t = it.a.length + it.b.length + it.n, larg = function (k) { return r2(100 * k / t); };
+    var href = hrefEdicao(it.d, '#cobertura');
+    return '<li class="az-rx"><p class="az-rx-m">' + esc(dataCurta(it.d)) + ' · cobertura comparada · <span data-tip="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = meio a meio">divergência ' +
+      ACH.num(100 * it.dv) + '</span></p><h5 class="az-rx-t">' + (href ? '<a href="' + esc(href) + '">' + esc(it.t) + '</a>' : esc(it.t)) + '</h5>' +
+      '<div class="cov-bar" role="img" aria-label="' + esc(it.la + ': ' + it.a.length + (it.n ? '; neutros: ' + it.n : '') + '; ' + it.lb + ': ' + it.b.length) + '">' +
+      '<span class="cov-a" style="width:' + larg(it.a.length) + '%"></span>' + (it.n ? '<span class="cov-n" style="width:' + larg(it.n) + '%"></span>' : '') +
+      '<span class="cov-b" style="width:' + larg(it.b.length) + '%"></span></div>' +
+      '<div class="az-rx-l"><div class="az-rx-a"><p class="az-rx-s"><b>' + it.a.length + '</b>' + esc(it.la) + '</p><p class="az-rx-v">' + esc(it.a.join(', ')) + '</p></div>' +
+      '<div class="az-rx-b"><p class="az-rx-s"><b>' + it.b.length + '</b>' + esc(it.lb) + '</p><p class="az-rx-v">' + esc(it.b.join(', ')) + '</p></div></div>' +
+      (it.n ? '<p class="az-rx-n">' + (it.n === 1 ? '1 veículo relatou' : it.n + ' veículos relataram') + ' sem tomar lado.</p>' : '') +
+      (it.c ? '<p class="az-rx-c">' + esc(it.c) + '</p>' : '') + '</li>';
+  }
+  function parHTML(p, tip, chipTxt) {
+    return '<li' + (p.classe ? ' class="az-on"' : '') + ' data-tip="' + esc(tip) + '"><span class="az-pr-n">' + esc(p.a) + (p.b ? ' <i aria-hidden="true">×</i> ' + esc(p.b) : '') + '</span>' +
+      '<span class="az-mt" aria-hidden="true"><i style="width:' + w1(p.barra) + '"></i><u style="left:' + r2(p.marca) + '%"></u></span>' +
+      '<span class="az-pr-v"><b>' + p.k + ' de ' + p.total + '</b> <span>acaso ' + esc(p.esperado) + '</span></span>' + (p.classe ? chip(chipTxt, true, '') : '') + '</li>';
+  }
+  function lente2HTML(F, n) {
+    var ld = F.lados, T = F.q.T, corpo = '';
+    if (ld.d) {
+      var primeiros = ld.itens.slice(0, 4), resto = ld.itens.slice(4);
+      corpo += blocoHTML('pq-lados', 'Os assuntos que mais dividiram', 'mais veículos no lado menor primeiro', '',
+        '<ol class="az-rxs">' + primeiros.map(assuntoHTML).join('') + '</ol>' +
+        (resto.length ? '<details class="az-more"><summary>Mais ' + plural(resto.length, 'assunto dividido', 'assuntos divididos') + '</summary><ol class="az-rxs">' +
+          resto.slice(0, 30).map(assuntoHTML).join('') + '</ol></details>' : ''), '');
+    }
+    if (!F.f.v && (ld.pares.length || ld.destoa.length)) {
+      var c1 = '', c2 = '';
+      if (ld.pares.length) {
+        c1 = blocoHTML('pq-pares', 'Quem fica com quem', 'do mesmo lado, contra o acaso', '', '<ol class="az-pr">' + ld.pares.slice(0, MD.pares).map(function (p) {
+          var tip = p.a + ' e ' + p.b + ': do mesmo lado em ' + p.juntos + ' de ' + p.total + ' assuntos divididos em que os dois tomaram lado; o acaso daria ' + p.esperado +
+            (p.classe ? ' (passa do acaso, mesmo contando os ' + ld.mP + ' pares comparados)' : ' (dentro do que o acaso explica)');
+          return parHTML({ a: p.a, b: p.b, k: p.juntos, total: p.total, esperado: p.esperado, barra: p.barra, marca: p.marca, classe: p.classe }, tip,
+            p.classe === 'ju' ? 'juntos além do acaso' : 'separados além do acaso');
+        }).join('') + '</ol>', ld.pares.length > MD.pares ? 'Os ' + MD.pares + ' pares mais longe do acaso, de ' + num(ld.pares.length) + ' com ' + LZ.minPar + ' ou mais assuntos em comum.' : '');
+      }
+      if (ld.destoa.length) {
+        c2 = blocoHTML('pq-destoa', 'Quem destoa', 'no lado menor, contra o acaso', '', '<ol class="az-pr">' + ld.destoa.slice(0, MD.pares).map(function (d) {
+          var tip = d.nome + ': no lado com menos veículos em ' + d.minoria + ' de ' + d.total + ' assuntos com maioria; o acaso daria ' + d.esperado +
+            (d.classe ? ' (passa do acaso, mesmo contando os ' + ld.mD + ' veículos comparados)' : ' (dentro do que o acaso explica)');
+          return parHTML({ a: d.nome, b: '', k: d.minoria, total: d.total, esperado: d.esperado, barra: d.barra, marca: d.marca, classe: d.classe }, tip,
+            d.classe === 'mais' ? 'contra a maioria além do acaso' : 'com a maioria além do acaso');
+        }).join('') + '</ol>', '');
+      }
+      corpo += '<div class="az-2c">' + c1 + c2 + '</div>';
+    } else if (!F.f.v && ld.d) {
+      corpo += '<p class="az-note">Nenhum par de veículos dividiu ' + LZ.minPar + ' ou mais desses assuntos: poucos para comparar com o acaso.</p>';
+    }
+    if (!ld.d) corpo += '<p class="az-note">Nenhum desses assuntos teve veículos dos dois lados.</p>';
+    var dek = 'Dos ' + plural(ld.c, 'assunto da cobertura comparada', 'assuntos da cobertura comparada') + ' que citam ' + T + ' no título ou na conclusão, ' + num(ld.d) +
+      (ld.d === 1 ? ' teve' : ' tiveram') + ' veículos dos dois lados' + (ld.c - ld.d ? '; nos outros ' + num(ld.c - ld.d) + ', os veículos relataram de forma semelhante.' : '.');
+    return secaoHTML('pq-enquadramento', n, 'Enquadramento', 'Onde os veículos racham sobre ' + T + ', e quem fica com quem', dek, corpo);
+  }
+
+  /* ── lente 3: texto ────────────────────────────────────────────────── */
+  function desviosHTML(tx) {
+    var fora = tx.vals.filter(function (v) { return v; });
+    if (tx.nT < 20 || !fora.length) return '';
+    var f1 = FAIXAS[0], maxAbs = Math.max.apply(null, fora.map(Math.abs));
+    var dominio = maxAbs <= 25 ? 25 : maxAbs <= 50 ? 50 : 100, passo = dominio / 25, col = {};
+    fora.forEach(function (v) { var k = Math.ceil(Math.abs(v) / passo); col[v > 0 ? k : -k] = (col[v > 0 ? k : -k] || 0) + 1; });
+    var topo = Math.max.apply(null, Object.keys(col).map(function (k) { return col[k]; }));
+    function coluna(k, lado) {
+      var n = col[lado * k] || 0, de = (k - 1) * passo + 1, ate = k * passo;
+      var faixa = passo === 1 ? fmtT(lado * ate) : fmtT(lado * de) + ' a ' + fmtT(lado * ate);
+      var maisAlta = n && n === Math.max.apply(null, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25].map(function (j) { return col[lado * j] || 0; }));
+      return '<span class="az-dv-c"' + (n ? ' title="' + esc('T ' + faixa + ': ' + plural(n, 'notícia', 'notícias')) + '"' : '') + '>' +
+        (n ? '<i style="height:' + r2(100 * n / topo) + '%">' + (maisAlta ? '<b>' + n + '</b>' : '') + '</i>' : '') + '</span>';
+    }
+    var esqH = '', dirH = '';
+    for (var k = 25; k >= 1; k--) esqH += coluna(k, -1);
+    for (k = 1; k <= 25; k++) dirH += coluna(k, 1);
+    var zeros = tx.vals.length - fora.length;
+    return '<figure class="az-dv" style="--f:' + r2(100 * f1 / dominio) + '%"><div class="az-dv-plot" role="img" aria-label="' +
+      esc('Notícias com T diferente de zero: ' + tx.esq + ' à esquerda e ' + tx.dir + ' à direita') + '">' +
+      '<div class="az-dv-arm az-dv-e">' + esqH + '</div><div class="az-dv-z" title="' + zeros + ' notícias com T exatamente em zero (fora do gráfico)"><b>' + num(zeros) + '</b><span>em zero</span></div>' +
+      '<div class="az-dv-arm az-dv-d">' + dirH + '</div></div><div class="az-dv-ax" aria-hidden="true"><span class="az-dv-xe"><i>−' + dominio + '</i><i class="az-dv-f">−' + f1 + '</i></span>' +
+      '<span class="az-dv-x0">0</span><span class="az-dv-xd"><i class="az-dv-f">+' + f1 + '</i><i>+' + dominio + '</i></span></div>' +
+      '<figcaption class="az-dv-k"><span>← à esquerda: <b>' + tx.esq + '</b></span><span class="az-dv-kf"><i></i>faixa de equilíbrio</span><span>à direita: <b>' + tx.dir + '</b> →</span></figcaption></figure>';
+  }
+  function lente3HTML(F, n) {
+    var tx = F.texto, T = F.q.T, corpo = '';
+    var dv = desviosHTML(tx);
+    var fora = tx.esq + tx.dir;
+    var leit = 'Das ' + plural(tx.nT, 'notícia com T', 'notícias com T') + ', ' + num(tx.nT - fora) + ' ficaram exatamente em zero' +
+      (fora ? '; das ' + num(fora) + ' que saíram do zero, ' + num(tx.esq) + ' penderam à esquerda e ' + num(tx.dir) + ' à direita' +
+        (fora >= 10 ? (tx.passa ? ': a diferença passa do acaso (99%).' : ': diferença dentro do que o acaso explica.') : ': poucas para comparar com o acaso.') : '.');
+    corpo += blocoHTML('pq-desvios', 'Os desvios do zero', 'o termômetro nas notícias encontradas', '', dv + '<ul class="az-lei"><li>' + esc(leit) + '</li></ul>', '');
+    if (tx.recs.length) {
+      corpo += blocoHTML('pq-recs', 'Os textos mais inclinados', 'entre os resultados', '', '<ol class="az-recs">' + tx.recs.map(function (r) {
+        var a = r.a, url = r.u, cls = CLASSES[a.r] || 'na';
+        return '<li class="az-rec"><span class="az-inc-v"><i class="sw t-' + esc(cls) + '" aria-hidden="true"></i>T ' + fmtT(a.T) + '</span><span class="az-rec-t">' +
+          (url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(r.t) + '<span class="sr-only"> (abre a fonte em nova aba)</span></a>' : esc(r.t)) +
+          '</span><span class="az-rec-m">' + esc((r.f[0] || '') + ' · ' + dataCurta(r.d)) + (POR_DATA[r.d] ? ' · <a href="' + esc(edicao(r.d) + '#termometro') + '">sinais</a>' : '') + '</span></li>';
+      }).join('') + '</ol>', '');
+    }
+    if (tx.nQ) {
+      var faixas = LZ.qualidade || [50, 80], partes = [['boa', 'Boa (' + faixas[1] + '+)', tx.qual.boa], ['regular', 'Regular', tx.qual.regular], ['fraca', 'Fraca (abaixo de ' + faixas[0] + ')', tx.qual.fraca]]
+        .filter(function (p) { return p[2]; });
+      corpo += blocoHTML('pq-qp', 'Qualidade da apuração', 'de 0 a 100, pelo que o texto mostra', '',
+        '<div class="az-qp"><div class="az-qp-bar" role="img" aria-label="' + esc(partes.map(function (p) { return p[1] + ': ' + p[2]; }).join('; ')) + '">' + partes.map(function (p) {
+          return '<span class="az-q-' + p[0] + '" style="width:' + r2(100 * p[2] / tx.nQ) + '%" title="' + esc(p[1] + ': ' + plural(p[2], 'notícia', 'notícias')) + '"></span>';
+        }).join('') + '</div><ul class="az-qp-k">' + partes.map(function (p) {
+          return '<li><i class="az-q-' + p[0] + '" aria-hidden="true"></i>' + esc(p[1]) + ' <b>' + pct(p[2], tx.nQ) + '</b> <span>' + plural(p[2], 'notícia', 'notícias') + '</span></li>';
+        }).join('') + '</ul></div>', 'Média: ' + num(tx.Q) + ' de 100, em ' + plural(tx.nQ, 'análise', 'análises') + '.');
+    }
+    var dek = plural(tx.nA, 'análise do Termômetro', 'análises do Termômetro') + ' entre os resultados (' + plural(tx.nT, 'com T', 'com T') + '; opinião fora).';
+    return secaoHTML('pq-texto', n, 'Texto', 'Como as reportagens sobre ' + T + ' escrevem', dek, corpo);
+  }
+
+  /* ── base completa e Como ler ──────────────────────────────────────── */
+  function baseItem(id, titulo, resumo, corpo) {
+    return '<details class="az-base" id="' + id + '"><summary><span class="az-base-t">' + esc(titulo) + '</span>' + (resumo ? '<span class="az-base-r">' + esc(resumo) + '</span>' : '') +
+      '</summary><div class="az-base-in"><div class="md">' + corpo + '</div></div></details>';
+  }
+  function baseHTML(F, x) {
+    var h = '', T = F.q.T, at = x.at, tm = x.tm;
+    if (at) h += baseItem('pq-b-atencao', 'Atenção por veículo, tabela completa', plural(at.veiculos.length, 'veículo', 'veículos') + ' · ' + plural(at.n, 'manchete', 'manchetes'), blocoAtencao(at));
+    if (tm && !tm.falta && F.tom && F.tom.aplica) h += baseItem('pq-b-tom', 'Tom por veículo e semana a semana', plural(tm.veiculos.filter(function (v) { return !v.pequena; }).length, 'veículo', 'veículos') + ' com ' + TP.minV + '+ manchetes', blocoTom(tm));
+    if (F.picos) {
+      var dias = F.picos.dias.slice().sort(function (a, b) { return cmp(b.d, a.d); });
+      h += baseItem('pq-b-dias', 'Edição a edição', plural(dias.filter(function (d) { return d.passa; }).length, 'dia acima do acaso', 'dias acima do acaso'),
+        '<div class="an-tbl-wrap"><table class="md-tbl"><thead><tr><th scope="col">Edição</th><th scope="col">Manchetes com o termo</th><th scope="col">Coletadas</th><th scope="col">Parte</th><th scope="col" title="Parte do dia ÷ a dos outros dias do período">× outros dias</th></tr></thead><tbody>' +
+        dias.map(function (d) {
+          return '<tr><th scope="row"><button type="button" data-dia="' + esc(d.d) + '" title="Ver só esta edição">' + dataCurta(d.d) + '</button>' + (d.passa ? ' <span class="qf-tag">pico</span>' : '') + '</th><td>' + num(d.k) + '</td><td>' + num(d.b) + '</td><td>' + pct(d.k, d.b) + '</td><td>' +
+            (d.R !== null && d.k ? ACH.dec(d.R, 1) + '×' : '—') + '</td></tr>';
+        }).join('') + '</tbody></table></div>');
+    }
+    if (F.hist.length) {
+      h += baseItem('pq-b-hist', 'As histórias, todas', plural(F.hist.length, 'história', 'histórias') + ' com 2+ veículos', '<ol class="md-as">' + F.hist.slice(0, 40).map(function (s) {
+        return '<li><a href="' + esc(s.href) + '">' + esc(s.titulo) + '</a><span>' + esc(periodoTxt(s.d0, s.d1)) + ' · ' + plural(s.nv, 'veículo', 'veículos') + ' · ' + plural(s.n, 'manchete', 'manchetes') +
+          (s.mat ? ' · virou matéria' : s.comp ? ' · na cobertura comparada' : '') + '</span></li>';
+      }).join('') + '</ol>');
+    }
+    if (x.pz && (x.pz.nomes.length || x.pz.temas.length)) h += baseItem('pq-b-pauta', 'Nomes e temas que acompanham', x.pz.nomes.slice(0, 3).map(function (n) { return n.f; }).join(', '), blocoPauta(x.pz));
+    if (F.texto && F.texto.nT) {
+      var rot = {};
+      (estado ? estado.res : []).forEach(function (r) { r = r.r; if (r.k === 'a' && r.a.x !== 'Opinião' && typeof r.a.T === 'number') rot[r.a.r] = (rot[r.a.r] || 0) + 1; });
+      h += baseItem('pq-b-faixas', 'Termômetro por faixa', plural(rot.Equilibrado || 0, 'em Equilibrado', 'em Equilibrado'),
+        '<p class="md-note">' + Object.keys(rot).sort(function (a, b) { return rot[b] - rot[a]; }).map(function (k) { return esc(k) + ' <b>' + num(rot[k]) + '</b>'; }).join(' · ') + '</p>');
+    }
+    if (!h) return '';
+    return '<section class="az-sec" id="pq-base" aria-labelledby="pq-base-h"><header class="az-lh"><p class="az-ln">Base completa</p><h3 class="az-lt" id="pq-base-h">As tabelas por trás da leitura</h3>' +
+      '<p class="az-ld">Como a mídia cobre ' + esc(F.q.rot) + ': tudo o que a leitura usa, recolhido. Abra o que quiser conferir.</p></header>' + h + '</section>';
+  }
+  function comoLerHTML(F) {
+    var itens = [
+      ['A leitura', 'A manchete e os achados saem dos números das lentes, um achado por tipo, do maior peso para o menor (o tamanho do efeito). Só vira afirmação o que passa do acaso contando todas as comparações do mesmo tipo feitas na busca (correção de Holm): com dezenas de veículos ou de edições, uma ou outra diferença passaria do acaso só por sorte. Histórias, pauta e presença são contagem e dizem isso. Com até 10 resultados, a página só descreve o que achou.'],
+      ['O que entra', 'As notícias cujo título casa com a busca (a mesma notícia em mais de uma edição conta uma vez), as matérias, os assuntos da cobertura comparada e as análises do Termômetro, com os filtros escolhidos. A base do espaço são todas as manchetes coletadas nas mesmas edições e com os mesmos filtros.'],
+      ['Espaço e picos', 'A parte das manchetes que citam o termo, edição a edição. "O que mudou": as últimas 7 edições contra as 7 anteriores (duas proporções, 99%, e a variação precisa passar de 15%), como no Analítico. Pico: a parte do dia contra a dos outros dias do período (binomial, Holm a 99% sobre todas as edições), com 5 ou mais manchetes e 1,5 vez a parte dos outros dias.'],
+      ['Atenção por veículo', 'O esperado aplica a parte do termo em cada editoria ao que o veículo publica nela (um site de esporte não "deveria" citar um político como um de política). A diferença é testada com Poisson exato e Holm a 99% sobre todos os veículos brasileiros com 3 ou mais manchetes esperadas; para virar achado, precisa também ser grande (1,5 vez o esperado, ou metade).'],
+      ['Tom', 'Lido por palavras, sem IA, em cada manchete brasileira com o termo: palavras de contexto desfavorável (escândalo, investigação, derrota, crítica recebida…) ou favorável (vitória, apoio, aprovação…) contam para o nome mais próximo delas no título. Saldo = favoráveis − desfavoráveis, em pontos. Só se lê com um termo e 20 ou mais manchetes com palavra de tom. A mudança em sete edições é testada a 95%; cada veículo contra os demais, a 99%, com Holm sobre os veículos comparados. Os mesmos números do Analítico Político.'],
+      ['Chegando do Analítico', 'Quando a busca é a mesma de um nome do placar do Analítico (mesmo termo, editoria e período, sem outros filtros), a leitura usa os vereditos de lá, que contam as comparações de todos os nomes: a Pesquisa nunca afirma o que o Analítico não afirma.'],
+      ['Histórias e pauta', 'Histórias: as manchetes de um mesmo assunto da edição (ou da mesma matéria) juntas, com quantos veículos e quantas manchetes. Com quem aparece: nomes e temas mais frequentes nas manchetes brasileiras com o termo; nomes em que um contém o outro ("Flávio" e "Flávio Bolsonaro") contam juntos.'],
+      ['Enquadramento', 'Os assuntos da cobertura comparada que citam o termo no título ou na conclusão. Os lados são os dois enfoques de cada assunto, não "a favor" ou "contra" alguém. Em "quem fica com quem" e "quem destoa", a contagem é comparada com a que o acaso daria dado o placar de cada assunto (teste exato, Holm a 99%), com 8 ou mais assuntos em comum; quem fica nos dois lados de um assunto sai da conta dele.'],
+      ['Texto', 'O Termômetro de Viés nas análises encontradas (opinião fora). O teste de sinal compara os desvios do zero à esquerda e à direita (99%, com 10 ou mais desvios).'],
+      ['Limites', 'O tom mede o contexto em que o termo aparece nas manchetes, não a opinião do veículo, e a leitura por palavras erra em parte delas (ironia, negação, o nome errado na frase). Manchetes vêm em ondas (um assunto puxa outras), e os testes supõem manchetes independentes: "passa do acaso" não prova nada sozinho. Nomes iguais de pessoas diferentes se somam; a busca acha o começo das palavras.']
+    ];
+    if (F.f.tit) itens.push(['Só nos títulos', 'O filtro vale para matérias, comparadas e análises; nas notícias a busca já olha só o título.']);
+    return '<section class="az-sec az-met" aria-labelledby="pq-como-h"><header class="az-lh" id="pq-como"><p class="az-ln">Método</p><h3 class="az-lt" id="pq-como-h">Como ler</h3></header>' +
+      '<dl class="az-dl">' + itens.map(function (x) { return '<div><dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('') + '</dl></section>';
+  }
+
+  /* ── navegação "Nesta busca" ───────────────────────────────────────── */
+  function navHTML(itens) {
+    return '<ul>' + itens.map(function (x) {
+      return '<li><a href="' + x.href + '">' + (x.n ? '<b>' + x.n + '</b>' : '') + esc(x.rotulo) + (x.extra ? ' <small>' + esc(x.extra) + '</small>' : '') + '</a></li>';
+    }).join('') + '</ul>';
+  }
+  function navItens(e, L) {
+    var itens = [{ href: '#midia', rotulo: 'A leitura' }, { href: '#pq-res', rotulo: 'Resultados', extra: e ? num(e.res.length) : '' }];
+    if (L && !L.curta) {
+      L.lentes.forEach(function (x) { itens.push({ href: x.href, rotulo: x.nome, n: x.ordem }); });
+      if ($('pq-base')) itens.push({ href: '#pq-base', rotulo: 'Base completa' });
+      itens.push({ href: '#pq-como', rotulo: 'Como ler' });
+    }
+    return itens;
+  }
+
+  /* ── o desenho ─────────────────────────────────────────────────────── */
+  function esconderLeitura() {
+    mdEl.hidden = true;
+    mdEl.innerHTML = '';
+    if (navEl) { navEl.hidden = true; navEl.innerHTML = ''; }
+    if (lentesEl) lentesEl.innerHTML = '';
+    if (histEl) histEl.innerHTML = '';
+  }
+  function midia(e) {
+    if (!mdEl) return;
+    var ts = e.ts.filter(function (t) { return !t.neg; });
+    if (!ts.length || !e.res.length) {
+      esconderLeitura();
+      if (e.fim) irParaMidia = false;
+      return;
+    }
+    mdEl.hidden = false;
+    if (navEl) navEl.hidden = false;
+    if (!e.fim) {
+      mdEl.innerHTML = esqueletoHTML('A leitura · lendo ' + num(e.feitos) + ' de ' + plural(e.dias.length, 'edição', 'edições') + '…');
+      if (navEl && !navEl.innerHTML) { navEl.innerHTML = navHTML(navItens(e, null)); navMontar(); }
+      return;
+    }
+    // A leitura precisa de todas as edições do período (sem as que falharam, picos e tendência mentem).
+    var faltam = e.dias.filter(function (x) { return falhas[x.d]; }).length;
+    if (faltam) {
+      mdEl.innerHTML = '<div class="az-lead pq-so"><div class="az-box"><p class="az-chapeu">A leitura</p><p class="az-fina">A leitura precisa de todas as ' + plural(e.dias.length, 'edição', 'edições') +
+        ' do período: ' + plural(faltam, 'não carregou', 'não carregaram') + '. A lista abaixo está incompleta.</p><p><button type="button" class="pq-retry">Tentar de novo</button></p></div></div>';
+      if (lentesEl) lentesEl.innerHTML = '';
+      if (histEl) histEl.innerHTML = '';
+      irParaMidia = false;
+      return;
+    }
+    if (!e.lz) {
+      if (!e.lzAgendada) {
+        e.lzAgendada = true;
+        var calcular = function () {
+          w.requestAnimationFrame(function () {
+            w.setTimeout(function () {
+              if (estado !== e) return;  // outra busca começou
+              var x = leituraMidia(e, ts);
+              x.L = ACH.leitura(x.F);
+              e.lz = x;
+              midia(e);
+            }, 0);
+          });
+        };
+        // De 7 a 13 edições, as anteriores ao período completam "o que mudou" (uma carga a mais, depois da lista).
+        var extras = edicoesExtras(e);
+        if (extras.length) {
+          mdEl.innerHTML = esqueletoHTML('A leitura · carregando ' + plural(extras.length, 'edição anterior', 'edições anteriores') + ' para comparar…');
+          Promise.all(extras.map(function (x) { return carregar(x.d); })).then(function () {
+            if (estado !== e) return;
+            e.extras = extras.filter(function (x) { return !falhas[x.d]; }).length === extras.length ? extras : [];
+            calcular();
+          });
+        } else {
+          mdEl.innerHTML = esqueletoHTML('A leitura · calculando…');
+          calcular();
+        }
+      }
+      return;
+    }
+    var x = e.lz, F = x.F, L = x.L, alturaAntes = mdEl.offsetHeight, yAntes = w.pageYOffset || 0, topoAntes = mdEl.getBoundingClientRect().top + yAntes;
+    mdEl.innerHTML = leituraHTML(L, F);
+    if (histEl) histEl.innerHTML = L.curta ? '' : historiasHTML(F);
+    var h = '';
+    if (!L.curta) {
+      L.lentes.forEach(function (l) {
+        if (l.chave === 'manchetes') h += lente1HTML(F, x, l.ordem);
+        else if (l.chave === 'enquadramento') h += lente2HTML(F, l.ordem);
+        else if (l.chave === 'texto') h += lente3HTML(F, l.ordem);
+      });
+      h += baseHTML(F, x) + comoLerHTML(F);
+    }
+    if (lentesEl) lentesEl.innerHTML = h;
+    if (navEl) navEl.innerHTML = navHTML(navItens(e, L));
+    navMontar();
+    // Quem já rolou para baixo da leitura não pula quando ela cresce (o Safari não ancora sozinho).
+    if (yAntes > topoAntes + 10 && !irParaMidia) w.scrollBy(0, mdEl.offsetHeight - alturaAntes);
+    var pronta = 'A leitura da busca está pronta.';
+    status(pronta);
+    w.setTimeout(function () { if (statusEl.textContent === pronta) status(''); }, 4000);
+    if (irParaMidia) {
+      irParaMidia = false;
+      // Não puxa de volta quem já rolou a página enquanto a busca corria.
+      if (Math.abs((w.pageYOffset || 0) - mdY0) < 40) irPara(alvoInicial || '#midia', false);
+    }
+  }
+
+  /* ── comportamento: âncoras que abrem <details>, dicas e a seção da vez ─ */
+  var reduz = w.matchMedia ? w.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  function alvoHash(hash) {
+    if (!hash || hash.length < 2 || hash.charAt(0) !== '#') return null;
+    try { return d.getElementById(decodeURIComponent(hash.slice(1))); } catch (erro) { return null; }
+  }
+  function abrirAte(el) { for (var no = el; no && no !== outEl; no = no.parentNode) if (no.tagName === 'DETAILS') no.open = true; }
+  function irPara(hash, suave) {
+    var el = alvoHash(hash);
+    if (!el || !outEl.contains(el)) return false;
+    abrirAte(el);
+    el.scrollIntoView({ block: 'start', behavior: suave && !reduz.matches ? 'smooth' : 'auto' });
+    return true;
+  }
+  var dica = d.createElement('div');
+  dica.className = 'az-tip';
+  dica.hidden = true;
+  dica.setAttribute('role', 'tooltip');
+  d.body.appendChild(dica);
+  var donoDica = null;
+  function marcaDe(no) { var el = no && no.closest ? no.closest('[data-tip]') : null; return el && outEl.contains(el) ? el : null; }
+  function esconderDica() { if (donoDica) { donoDica = null; dica.hidden = true; } }
+  function mostrarDica(el) {
+    if (el === donoDica) return;
+    donoDica = el;
+    dica.textContent = el.getAttribute('data-tip');
+    dica.hidden = false;
+    var r = el.getBoundingClientRect(), largura = dica.offsetWidth, altura = dica.offsetHeight, pagina = d.documentElement.clientWidth;
+    var x = Math.min(Math.max(8, r.left + r.width / 2 - largura / 2), Math.max(8, pagina - largura - 8));
+    var y = r.top - altura - 8 >= 8 ? r.top - altura - 8 : r.bottom + 8;
+    dica.style.left = (x + (w.pageXOffset || 0)) + 'px';
+    dica.style.top = (y + (w.pageYOffset || 0)) + 'px';
+  }
+  outEl.addEventListener('pointerover', function (event) {
+    if (event.pointerType === 'touch') return;
+    var el = marcaDe(event.target);
+    if (el) mostrarDica(el); else esconderDica();
+  });
+  outEl.addEventListener('pointerleave', esconderDica);
+  w.addEventListener('scroll', esconderDica, { passive: true });
+  d.addEventListener('keydown', function (event) { if (event.key === 'Escape') esconderDica(); });
+
+  var navLinks = [], navAlvos = [], navAtual = -2, navPedido = 0;
+  function navMarcar() {
+    navPedido = 0;
+    if (!navLinks.length || !navEl || navEl.hidden) return;
+    var limite = navEl.offsetHeight + 28, vez = -1;
+    navAlvos.forEach(function (el, i) { if (el && el.isConnected && el.getBoundingClientRect().top <= limite) vez = i; });
+    if (vez === navAtual) return;
+    navAtual = vez;
+    navLinks.forEach(function (a, i) { if (i === vez) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    var ativo = navLinks[vez], faixa = navEl.querySelector('ul');
+    if (ativo && faixa && faixa.scrollWidth > faixa.clientWidth) faixa.scrollLeft = Math.max(0, ativo.offsetLeft - (faixa.clientWidth - ativo.offsetWidth) / 2);
+  }
+  function navMontar() {
+    esconderDica();
+    navLinks = navEl ? Array.prototype.slice.call(navEl.querySelectorAll('a[href^="#"]')) : [];
+    navAlvos = navLinks.map(function (a) { return alvoHash(a.getAttribute('href')); });
+    navAtual = -2;
+    navMarcar();
+  }
+  function navAgendar() { if (!navPedido) navPedido = w.requestAnimationFrame ? w.requestAnimationFrame(navMarcar) : w.setTimeout(navMarcar, 60); }
+  w.addEventListener('scroll', navAgendar, { passive: true });
+  w.addEventListener('resize', navAgendar);
+
+  // Um clique só para tudo o que a busca desenha: âncoras, dicas e os botões que refinam a busca.
+  outEl.addEventListener('click', function (event) {
+    var marca = marcaDe(event.target);
+    if (marca && !marca.closest('summary') && !(event.target.closest && event.target.closest('a,button'))) {
+      if (marca === donoDica) esconderDica(); else mostrarDica(marca);
+    } else {
+      esconderDica();
+    }
+    var a = event.target.closest ? event.target.closest('a[href^="#"]') : null;
+    if (a && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+      var hash = a.getAttribute('href');
+      if (irPara(hash, true)) {
+        event.preventDefault();
+        try { w.history.pushState(null, '', w.location.search + hash); } catch (erro) { /* file:// */ }
+      }
+      return;
+    }
+    var alvo = event.target.closest ? event.target.closest('button') : null;
+    if (!alvo || alvo === moreBtn || alvo === csvBtn) return;
+    if (alvo.classList.contains('pq-retry')) {
+      buscar();
+      return;
+    }
+    if (alvo.hasAttribute('data-q')) {
+      // Refina a busca que gerou a leitura (não o que estiver na caixa), fechando aspas abertas.
+      var extra = alvo.getAttribute('data-q'), atual = estado && estado.f ? estado.f.q : qIn.value.trim();
+      if ((atual.match(/"/g) || []).length % 2) atual += '"';
+      qIn.value = (atual + ' ' + (/\s/.test(extra) ? '"' + extra + '"' : extra)).trim();
+      if (alvo.hasAttribute('data-v')) opcao(vIn, alvo.getAttribute('data-v'));
+    } else if (alvo.hasAttribute('data-q-novo')) {
+      var novo = alvo.getAttribute('data-q-novo');
+      qIn.value = /\s/.test(novo) ? '"' + novo + '"' : novo;
+    } else if (alvo.hasAttribute('data-v')) {
+      var v = alvo.getAttribute('data-v');
+      opcao(vIn, vIn.value === v ? '' : v);
+    } else if (alvo.hasAttribute('data-dia')) {
+      deIn.value = ateIn.value = alvo.getAttribute('data-dia');
+    } else if (alvo.hasAttribute('data-ed')) {
+      var ed = alvo.getAttribute('data-ed');
+      opcao(edIn, edIn.value === ed ? '' : ed);
+    } else if (alvo.hasAttribute('data-limpa')) {
+      limparFiltro(alvo.getAttribute('data-limpa'));
+    } else {
+      return;
+    }
+    buscar();
+    form.scrollIntoView({ block: 'start', behavior: reduz.matches ? 'auto' : 'smooth' });
+  });

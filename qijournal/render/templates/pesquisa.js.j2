@@ -4,7 +4,9 @@
     diferenciar maiúsculas, todas as palavras; "frase exata"; -excluir) e mostra
     os resultados, as contagens por edição, veículo e editoria e o CSV. O estado
     da busca fica no endereço (?q=…&de=…), que pode ser guardado ou enviado. Ao fim
-    da busca, "Como a mídia cobre" o termo (midia.js.j2). -#}
+    da busca, a leitura no padrão da aba Analítico: os fatos (midia.js.j2, com os testes
+    de pesquisa_estat.js.j2), os achados (pesquisa_achados.js.j2) e o desenho
+    (pesquisa_leitura.js.j2). -#}
 (function () {
   'use strict';
   var d = document, w = window;
@@ -29,6 +31,7 @@
   var qIn = $('pqQ'), deIn = $('pqDe'), ateIn = $('pqAte'), edIn = $('pqEd'), vIn = $('pqV'), ordIn = $('pqOrd'), titIn = $('pqTit');
   var tipoIns = Array.prototype.slice.call(form.querySelectorAll('input[name="tipo"]'));
   var statusEl = $('pqStatus'), outEl = $('pqOut'), anEl = $('pqAn'), countEl = $('pqCount'), listEl = $('pqList'), moreBtn = $('pqMore'), csvBtn = $('pqCsv');
+  var secaoEl = $('pesquisa'), filtrosEl = form.querySelector('.pq-sum'), refREl = $('pqRefR');
 
   /* ── texto ─────────────────────────────────────────────────────────── */
   var MARCAS = /[̀-ͯ]/g;
@@ -288,9 +291,32 @@
     if (!e.fim) status('Buscando… ' + e.feitos + ' de ' + plural(e.dias.length, 'edição', 'edições') + ' (resultados parciais)');
     else if (faltam) status(plural(faltam, 'edição não carregou', 'edições não carregaram') + '; tente buscar de novo.', true);
     else status('');
+    secaoEl.classList.toggle('pq-com', !!(e.res.length && e.f.q));
+    mostrarFiltros(resumoFiltros(e.f, e));
     analitica(e);
     lista(e);
     midia(e);
+  }
+  function mostrarFiltros(texto) { if (filtrosEl) filtrosEl.innerHTML = '<span class="pq-sum-t">' + esc(texto) + '</span>'; }
+  // O resumo dos filtros (no título de "Filtros", que fica fechado durante a busca).
+  function resumoFiltros(f, e) {
+    var partes = [];
+    var marcados = tipoIns.filter(function (i) { return i.checked; });
+    partes.push(marcados.length === tipoIns.length ? 'todos os tipos' : marcados.map(function (i) { return NOMES[i.value] || i.value; }).join(', '));
+    partes.push(f.ed ? edIn.options[edIn.selectedIndex].text : 'todas as editorias');
+    if (f.v) partes.push(f.v);
+    var dias = e ? e.dias : DIAS;
+    if (dias.length) partes.push(dias.length === 1 ? 'edição de ' + dataCurta(dias[0].d) : num(dias.length) + ' edições, de ' + dataCurta(dias[dias.length - 1].d) + ' a ' + dataCurta(dias[0].d));
+    if (f.tit) partes.push('só nos títulos');
+    return 'Filtros · ' + partes.join(' · ');
+  }
+  function limparFiltro(k) {
+    if (k === 'v' || k === 'tudo') opcao(vIn, '');
+    if (k === 'ed' || k === 'tudo') opcao(edIn, '');
+    if (k === 'de' || k === 'tudo') deIn.value = '';
+    if (k === 'ate' || k === 'tudo') ateIn.value = '';
+    if (k === 'tit' || k === 'tudo') titIn.checked = false;
+    if (k === 'tipo' || k === 'tudo') tipoIns.forEach(function (i) { i.checked = true; });
   }
 
   /* ── contagens ─────────────────────────────────────────────────────── */
@@ -327,12 +353,7 @@
   function analitica(e) {
     if (!e.res.length) { anEl.innerHTML = ''; return; }
     var c = contar(e), h = '';
-    h += '<div class="pq-kpis"><p class="pq-kpi"><b>' + num(e.res.length) + '</b>' + (e.res.length === 1 ? 'resultado' : 'resultados') + '</p>' +
-      '<p class="pq-kpi"><b>' + num(c.edicoes) + '</b>' + (c.edicoes === 1 ? 'edição' : 'edições') + '</p>' +
-      '<p class="pq-kpi"><b>' + num(c.nveiculos) + '</b>' + (c.nveiculos === 1 ? 'veículo' : 'veículos') + '</p></div>';
-    h += '<p class="pq-tps">' + (M.tipos || []).filter(function (t) { return c.tipos[t[0]]; }).map(function (t) {
-      return '<span>' + esc(t[1]) + ' <b>' + num(c.tipos[t[0]]) + '</b></span>';
-    }).join('') + '</p>';
+    if (refREl) refREl.textContent = plural(c.edicoes, 'edição', 'edições') + ' · ' + plural(c.nveiculos, 'veículo', 'veículos') + ' · ' + plural(Object.keys(c.secoes).length, 'editoria', 'editorias');
     // Por edição: uma barra por edição do período, da mais antiga para a mais recente.
     var dias = e.dias.slice().reverse(), maior = 0;
     dias.forEach(function (x) { maior = Math.max(maior, c.dias[x.d] || 0); });
@@ -359,21 +380,6 @@
       return '<li><button type="button" data-ed="' + esc(s[0]) + '"' + (e.f.ed === s[0] ? ' class="on"' : '') + ' title="Filtrar por ' + esc(c.nomesSecao[s[0]]) + '"><span>' +
         esc(c.nomesSecao[s[0]] || s[0]) + '</span><b>' + num(s[1]) + '</b><i style="--w:' + Math.round(s[1] / maxS * 100) + '%"></i></button></li>';
     }).join('') + '</ol></section>';
-    if (c.tipos.a) {
-      var t = media(c.T), q = media(c.Q);
-      h += '<section class="pq-term"><h4>Termômetro nos textos encontrados</h4>';
-      if (t != null) {
-        var rot = rotuloT(t);
-        h += '<p><i class="sw t-' + esc(CLASSES[rot] || 'eq') + '" aria-hidden="true"></i><b>T ' + fmtT(t) + '</b> · ' + esc(rot) + ', na média simples de ' +
-          plural(c.T.length, 'notícia com T', 'notícias com T') + ' (opinião fora).</p>';
-        h += '<p>' + topo(c.rotulos, 8).map(function (x) { return esc(x[0]) + ' <b>' + num(x[1]) + '</b>'; }).join(' · ') + '</p>';
-      } else {
-        h += '<p>Nenhuma notícia com T entre os textos encontrados.</p>';
-      }
-      if (q != null) h += '<p>Qualidade da apuração: <b>' + Math.round(q) + '</b> de 100, em média.</p>';
-      if (M.analitico) h += '<p><a href="' + esc(M.analitico) + '">Ver o Analítico Político completo &rarr;</a></p>';
-      h += '</section>';
-    }
     h += '</div>';
     anEl.innerHTML = h;
   }
@@ -493,20 +499,41 @@
     if (acoes.length) h += '<p class="pq-act">' + acoes.join('') + '</p>';
     return h + '</li>';
   }
+  function rotuloBusca(q) {
+    var pos = [];
+    termosBrutos(q).forEach(function (t) { if (!t.neg) pos.push('“' + t.bruto + '”'); });
+    return pos.join(' e ');
+  }
+  function vazio(e) {
+    var f = e.f, rot = rotuloBusca(f.q), filtro = f.ed || f.v || f.de || f.ate || f.tit || tipoIns.some(function (i) { return !i.checked; });
+    if (filtro) {
+      return '<li class="pq-empty">Nenhum resultado' + (rot ? ' para ' + esc(rot) : '') + ' com os filtros: ' + esc(resumoFiltros(f, e).replace(/^Filtros · /, '')) + '. ' +
+        '<button type="button" class="pq-lk" data-limpa="tudo">Buscar sem os filtros</button></li>';
+    }
+    return '<li class="pq-empty">Nenhum resultado' + (rot ? ' para ' + esc(rot) : '') + (e.dias.length === 1 ? ' na edição de ' + dataCurta(e.dias[0].d) : ' nas ' + num(e.dias.length) + ' edições, de ' +
+      dataCurta(e.dias[e.dias.length - 1].d) + ' a ' + dataCurta(e.dias[0].d)) + '. A busca acha o começo das palavras, sem acento (“juro” acha “juros”), e todas as palavras ' +
+      'precisam aparecer: tente outra grafia, menos palavras ou um dos nomes em destaque acima.</li>';
+  }
   function lista(e) {
     var total = e.res.length;
     if (!total) {
-      countEl.innerHTML = '';
+      countEl.innerHTML = e.fim ? 'Nenhum resultado' : '';
+      if (tiposEl) tiposEl.textContent = '';
       csvBtn.hidden = true;
       moreBtn.hidden = true;
-      listEl.innerHTML = e.fim ? '<li class="pq-empty">Nada encontrado' + (e.f.q ? ' para <b>' + esc(e.f.q) + '</b>' : '') +
-        ' com esses filtros. Tente menos palavras, outra grafia, todos os tipos ou um período maior.</li>' : '';
+      if (refinarEl) refinarEl.hidden = true;
+      listEl.innerHTML = e.fim && e.dias.length ? vazio(e) : e.fim ? '<li class="pq-empty">Nenhuma edição no período escolhido.</li>' : '';
       return;
     }
-    var mostrar = Math.min(e.mostrar, total);
-    countEl.innerHTML = esc(plural(total, 'resultado', 'resultados')) + (e.f.q ? ' para “' + esc(e.f.q) + '”' : '') +
-      ' <span>· ' + (e.f.ord === 'rel' ? 'mais relevantes primeiro' : e.f.ord === 'ant' ? 'mais antigos primeiro' : 'mais recentes primeiro') +
-      (mostrar < total ? ' · mostrando ' + num(mostrar) : '') + '</span>';
+    if (refinarEl) refinarEl.hidden = false;
+    var mostrar = Math.min(e.mostrar, total), c = contar(e), rot = rotuloBusca(e.f.q);
+    countEl.innerHTML = esc(plural(total, 'resultado', 'resultados')) + (rot ? ' para ' + esc(rot) : '');
+    if (tiposEl) {
+      var tps = [['m', 'matéria', 'matérias'], ['n', 'notícia', 'notícias'], ['c', 'assunto comparado', 'assuntos comparados'], ['a', 'análise', 'análises']]
+        .filter(function (t) { return c.tipos[t[0]]; }).map(function (t) { return plural(c.tipos[t[0]], t[1], t[2]); });
+      tiposEl.textContent = tps.concat([e.f.ord === 'rel' ? 'mais relevantes primeiro' : e.f.ord === 'ant' ? 'mais antigos primeiro' : 'mais recentes primeiro'])
+        .concat(mostrar < total ? ['mostrando ' + num(mostrar)] : []).join(' · ');
+    }
     csvBtn.hidden = false;
     var html = '';
     for (var i = 0; i < mostrar; i++) html += item(e.res[i], e.ts);
@@ -548,7 +575,10 @@
   });
 
 {% include "tom.js.j2" %}
+{% include "pesquisa_estat.js.j2" %}
 {% include "midia.js.j2" %}
+{% include "pesquisa_achados.js.j2" %}
+{% include "pesquisa_leitura.js.j2" %}
 
   /* ── eventos ───────────────────────────────────────────────────────── */
   form.addEventListener('submit', function (event) {
@@ -587,26 +617,12 @@
     edIn.selectedIndex = vIn.selectedIndex = ordIn.selectedIndex = 0;
     titIn.checked = false;
     outEl.hidden = true;
+    esconderLeitura();
+    secaoEl.classList.remove('pq-com');
+    mostrarFiltros('Filtros');
     status('');
     gravarEndereco(lerFiltros());
     qIn.focus();
-  });
-  anEl.addEventListener('click', function (event) {
-    var alvo = event.target.closest ? event.target.closest('button') : null;
-    if (!alvo) return;
-    if (alvo.hasAttribute('data-dia')) {
-      deIn.value = ateIn.value = alvo.getAttribute('data-dia');
-    } else if (alvo.hasAttribute('data-v')) {
-      var v = alvo.getAttribute('data-v');
-      opcao(vIn, vIn.value === v ? '' : v);
-    } else if (alvo.hasAttribute('data-ed')) {
-      var ed = alvo.getAttribute('data-ed');
-      opcao(edIn, edIn.value === ed ? '' : ed);
-    } else {
-      return;
-    }
-    buscar();
-    form.scrollIntoView({ block: 'start', behavior: 'smooth' });
   });
   moreBtn.addEventListener('click', function () {
     if (!estado) return;
@@ -614,15 +630,13 @@
     lista(estado);
   });
 
-  // Celular: filtros recolhidos em "Filtros", salvo quando o endereço já traz algum.
-  var det = $('pqDet'), celular = w.matchMedia ? w.matchMedia('(max-width:760px)') : null;
+  // Filtros: recolhidos em "Filtros · …" (o título resume o que vale) sempre que há busca, e no
+  // celular; abertos só sem busca, com mouse.
+  var det = $('pqDet'), fino = w.matchMedia ? w.matchMedia('(pointer: fine) and (min-width:761px)') : null;
   var temEndereco = lerEndereco();
-  if (det && celular) {
-    var f0 = lerFiltros();
-    var usaFiltro = f0.de || f0.ate || f0.ed || f0.v || f0.tit || f0.ord !== 'rec' || tipoIns.some(function (i) { return !i.checked; });
-    if (celular.matches && !usaFiltro) det.open = false;
-    var abrir = function () { if (!celular.matches) det.open = true; };
-    if (celular.addEventListener) celular.addEventListener('change', abrir);
+  if (det) {
+    det.open = !temEndereco && !!(fino && fino.matches);
+    if (temEndereco) mostrarFiltros(resumoFiltros(lerFiltros(), null));
   }
   if (temEndereco) buscar();
   else if (w.matchMedia && w.matchMedia('(pointer: fine)').matches) qIn.focus({ preventScroll: true });

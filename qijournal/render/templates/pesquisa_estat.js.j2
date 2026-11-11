@@ -1,0 +1,146 @@
+{#- Estatística da Pesquisa analítica: as contas da aba Analítico (qijournal/render/achados.py,
+    lados.py, analitico.py e midia.py) no navegador, para as duas abas darem os mesmos
+    números e vereditos — chance de um z sob o acaso, caudas da Poisson e da binomial (em
+    log, sem estourar), teste de sinal, duas proporções, Holm, soma de sorteios de chances
+    diferentes, e o arredondamento e a porcentagem do Python. Autocontido (ES5), para ser
+    incluído em pesquisa.js.j2 e testado sozinho (tests/test_pesquisa_estat.py). -#}
+  function estatCriar() {
+    // Complementar da função erro (Numerical Recipes, erfcc): erro relativo < 1,2e-7; para
+    // x negativo, 2 − erfc(−x).
+    function erfc(x) {
+      var z = Math.abs(x), t = 1 / (1 + 0.5 * z);
+      var r = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+        t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 +
+        t * (-0.82215223 + t * 0.17087277)))))))));
+      return x >= 0 ? r : 2 - r;
+    }
+    // A chance (dois lados) de um z tão extremo sob o acaso (achados._p_normal); sem z, 1.
+    function pNormal(z) { return z == null || z !== z ? 1 : erfc(Math.abs(z) / Math.SQRT2); }
+
+    // log Γ(x), x > 0 (Lanczos, g = 7, 9 coeficientes; reflexão abaixo de 0,5).
+    var LANCZOS = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+      -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    function lgamma(x) {
+      if (x < 0.5) return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - lgamma(1 - x);
+      x -= 1;
+      var a = LANCZOS[0], t = x + 7.5;
+      for (var i = 1; i < 9; i++) a += LANCZOS[i] / (x + i);
+      return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+    }
+
+    // Caudas da Poisson e da binomial, em log (sem e^−mu, que some, nem mu^k, que estoura): lk é o
+    // log da chance de k; r, a soma das chances seguintes, de k para longe da média, em proporção
+    // à de k (somadas até ficarem < 1e-17 da soma). A cauda longe da média sai direto, precisa
+    // mesmo quando é minúscula; a do lado da média passa de meio e sai por complemento.
+    function caudas(lk, r, deCima) {
+      var longe = Math.min(1, Math.exp(lk + Math.log(1 + r))), perto = 1 - Math.exp(lk + Math.log(r));
+      return deCima ? { acima: longe, abaixo: perto } : { acima: perto, abaixo: longe };
+    }
+    // P(X ≥ k) e P(X ≤ k), X ~ Poisson(mu), k inteiro ≥ 0.
+    function poisCaudas(k, mu) {
+      if (!(mu > 0)) return { acima: k > 0 ? 0 : 1, abaixo: 1 };
+      var lk = k * Math.log(mu) - mu - lgamma(k + 1), cima = k >= mu, r = 0, t = 1, j;
+      if (cima) for (j = k + 1; t >= 1e-17 * (1 + r); j++) { t *= mu / j; r += t; }
+      else for (j = k; j > 0 && t >= 1e-17 * (1 + r); j--) { t *= j / mu; r += t; }
+      return caudas(lk, r, cima);
+    }
+    // Poisson, dois lados: o dobro da cauda menor.
+    function pPoisson2(k, mu) { var c = poisCaudas(k, mu); return Math.min(1, 2 * Math.min(c.acima, c.abaixo)); }
+    // P(X ≥ k), X ~ Binomial(n, p).
+    function binAcima(k, n, p) {
+      if (k <= 0) return 1;
+      if (k > n || p <= 0) return 0;
+      if (p >= 1) return 1;
+      var q = 1 - p, razao = p / q, cima = k >= n * p, r = 0, t = 1, j,
+        lk = lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1) + k * Math.log(p) + (n - k) * Math.log(q);
+      if (cima) for (j = k; j < n && t >= 1e-17 * (1 + r); j++) { t *= (n - j) / (j + 1) * razao; r += t; }
+      else for (j = k; j > 0 && t >= 1e-17 * (1 + r); j--) { t *= j / ((n - j + 1) * razao); r += t; }
+      return caudas(lk, r, cima).acima;
+    }
+    // Teste de sinal (dois lados): a + b desvios, max(a, b) ou mais de um lado só, se cada um
+    // fosse cara ou coroa. É a conta exata do _passa_do_acaso do Analítico (analitico.py: passa
+    // a 1% quando 2 × a cauda de cima < 0,01), lá usada até mil desvios; acima de mil o Analítico
+    // troca pela aproximação normal ((2 × maior − total) / √total ≥ 2,58), um tico mais frouxa, e
+    // no total limítrofe os vereditos podem diferir (aqui a conta segue exata).
+    function pSinal(a, b) { return a + b > 0 ? Math.min(1, 2 * binAcima(Math.max(a, b), a + b, 0.5)) : 1; }
+
+    // z de duas proporções, k1/n1 contra k2/n2, com a proporção das duas juntas (o z do espaço,
+    // midia._espaco); null sem amostra ou sem variação.
+    function zProp(k1, n1, k2, n2) {
+      if (!n1 || !n2) return null;
+      var p = (k1 + k2) / (n1 + n2), v = p * (1 - p) * (1 / n1 + 1 / n2);
+      return v > 0 ? (k1 / n1 - k2 / n2) / Math.sqrt(v) : null;
+    }
+    // Holm (lados.holm): as chaves de mapa (chave → p) que passam do acaso contando as M
+    // comparações da família (M: o maior entre m e o número de chaves): a menor chance contra
+    // alfa / M, a seguinte contra alfa / (M − 1)… até a primeira que não passa. Empates na ordem
+    // das chaves, como o sorted() estável do Python (o resultado nem depende dela).
+    function holm(mapa, alfa, m) {
+      var chaves = Object.keys(mapa), M = Math.max(m == null ? 0 : m, chaves.length), passam = {}, i;
+      var ordem = chaves.map(function (c, j) { return { c: c, p: mapa[c], j: j }; });
+      ordem.sort(function (a, b) { return a.p - b.p || a.j - b.j; });
+      for (i = 0; i < ordem.length && !(ordem[i].p > alfa / (M - i)); i++) passam[ordem[i].c] = true;
+      return passam;
+    }
+    // Chance de dois veículos sorteados entre os na + nb que tomaram lado caírem do mesmo
+    // (lados._acaso_par: a mesma fração, o mesmo número).
+    function acasoPar(na, nb) { return (na * (na - 1) + nb * (nb - 1)) / ((na + nb) * (na + nb - 1)); }
+    // A chance (dois lados) de uma contagem tão extrema quanto obs na soma de sorteios
+    // independentes de chances probs (lados._p): a distribuição exata, por convolução. As caudas
+    // são somadas em ordem (o sum() do Python 3.12+ compensa o arredondamento: poucos ulps).
+    function pPB(obs, probs) {
+      var dist = [1], nova, i, j, cima = 0, baixo = 0;
+      for (i = 0; i < probs.length; i++) {
+        nova = [];
+        for (j = 0; j <= dist.length; j++) nova.push(0);
+        for (j = 0; j < dist.length; j++) { nova[j] += dist[j] * (1 - probs[i]); nova[j + 1] += dist[j] * probs[i]; }
+        dist = nova;
+      }
+      for (j = 0; j < dist.length; j++) { if (j >= obs) cima += dist[j]; if (j <= obs) baixo += dist[j]; }
+      return Math.min(1, 2 * Math.min(cima, baixo));
+    }
+
+    // Arredonda como o round() do Python: o valor binário exato de x, metade para o par.
+    // Multiplica por 10^casas e aplica a regra; quando o produto cai bem no meio (1,115 × 100 dá
+    // 111,5 em ponto flutuante), o erro exato da multiplicação (Dekker) diz de que lado está o
+    // número de verdade, que é o que o Python olha (1,1149999…: round(1.115, 2) = 1.11; a conta
+    // ingênua daria 1,12, e erraria também 2.675, 0.995, 9.95…). Igual ao Python enquanto
+    // |x × 10^casas| < 2^52.
+    function arred(x, casas) {
+      for (var f = 1, i = 0; i < (casas || 0); i++) f *= 10;
+      var y = x * f, b = Math.floor(y), d = y - b, e;
+      if (d !== 0.5) return (d > 0.5 ? b + 1 : b) / f;
+      e = erroProduto(x, f, y);
+      return (e > 0 || (e === 0 && b % 2 !== 0) ? b + 1 : b) / f;
+    }
+    function erroProduto(x, f, y) {  // x × f − y, exato, com y = x × f arredondado (Dekker)
+      var c = 134217729 * x, xa = c - (c - x), xb = x - xa;
+      c = 134217729 * f;
+      var fa = c - (c - f), fb = f - fa;
+      return ((xa * fa - y) + xa * fb + xb * fa) + xb * fb;
+    }
+    // Número com casas fixas no padrão brasileiro, como text.format_number_pt ("1.234,5").
+    function numPt(x, casas) {
+      var r = arred(Math.abs(x), casas), s = r.toFixed(casas).split('.');
+      return (x < 0 && r !== 0 ? '-' : '') + s[0].replace(/\B(?=(\d{3})+$)/g, '.') + (s[1] ? ',' + s[1] : '');
+    }
+    // Percentual de parte em todo: inteiro a partir de 10% ("26%"), uma casa de 1% a 10% ("6,4%"),
+    // duas abaixo de 1% ("0,68%"), "<0,01%" para o que não chega lá, "—" sem total. De 1% para
+    // cima, o texto de achados._pct(parte / todo), com a mesma conta (a fração antes:
+    // lados._pct e midia._pct fazem 100 × parte / todo, que num empate exato pode cair do outro
+    // lado, como 23/40: "57%" aqui e no achados, "58%" lá). Abaixo de 1% o achados dá uma casa
+    // ("0,7%"); aqui são duas, de propósito.
+    function pct(parte, todo) {
+      var v = 100 * (parte / todo);
+      if (!todo || !isFinite(v)) return '—';
+      if (v === 0) return '0%';
+      if (v > 0 && v < 0.01) return '<0,01%';
+      return numPt(v, Math.abs(v) >= 10 ? 0 : Math.abs(v) >= 1 ? 1 : 2) + '%';
+    }
+
+    return {
+      erfc: erfc, pNormal: pNormal, lgamma: lgamma, poisCaudas: poisCaudas, pPoisson2: pPoisson2,
+      binAcima: binAcima, pSinal: pSinal, zProp: zProp, holm: holm, acasoPar: acasoPar, pPB: pPB,
+      arred: arred, pct: pct
+    };
+  }

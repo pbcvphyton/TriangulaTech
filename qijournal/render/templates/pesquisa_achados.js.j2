@@ -1,0 +1,431 @@
+{#- A leitura da busca (Pesquisa analítica): a mesma política da aba Analítico
+    (qijournal/render/achados.py). Puro, sem DOM: recebe os fatos da busca já calculados e
+    testados (F, montados em midia.js.j2) e devolve o chapéu, a manchete, a prova, a linha
+    fina, os achados numerados (um por tipo, do maior peso para o menor), as lentes e "O que
+    mudou". Só vira afirmação o que passa do acaso (os testes e a correção de Holm ficam em
+    midia.js.j2, com pesquisa_estat.js.j2); o resto é contagem e diz isso. Testado no Node
+    (tests/test_pesquisa_achados.py). -#}
+  function achadosCriar(P, ST) {
+    var SEMANA = 7;
+    var MAX = P.achados || 6;
+
+    /* ── números e datas em português ─────────────────────────────────── */
+    function milhar(s) { return s.replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+    function num(n) {
+      var r = ST.arred(n, 0), neg = r < 0;
+      return (neg ? '−' : '') + milhar(String(Math.abs(r)));
+    }
+    function dec(v, casas) {
+      var r = ST.arred(v, casas), s = Math.abs(r).toFixed(casas).split('.');
+      return (r < 0 ? '−' : '') + milhar(s[0]) + (s[1] ? ',' + s[1] : '');
+    }
+    function pct(parte, todo) { return ST.pct(parte, todo); }
+    function saldo(v) {
+      if (v === null || v === undefined) return '—';
+      var r = ST.arred(v, 0);
+      return r < 0 ? '−' + Math.abs(r) : r > 0 ? '+' + r : '0';
+    }
+    function dm(iso) { var p = String(iso).split('-'); return p[2] + '/' + p[1]; }
+    function dma(iso) { var p = String(iso).split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+    function plural(n, um, varios) { return num(n) + ' ' + (n === 1 ? um : varios); }
+    function juntar(lista) {
+      if (lista.length < 2) return lista.join('');
+      return lista.slice(0, -1).join(', ') + ' e ' + lista[lista.length - 1];
+    }
+    function aspas(s) { return /[“”"]/.test(s) ? '‘' + s + '’' : '“' + s + '”'; }
+    function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+    function lim(x) { return Math.max(0, Math.min(1, x)); }
+    function periodo(de, ate) { return de === ate ? dm(de) : dm(de) + ' a ' + dm(ate); }
+
+    // "Passa do acaso…": família de 1 → simples; m > 1 → contando as comparações (como achados._contando)
+    function veredito(m, coisas, az) {
+      if (az) return 'Passa do acaso, mesmo contando ' + az + '.';
+      return m > 1 ? 'Passa do acaso, mesmo contando os ' + num(m) + ' ' + coisas + ' comparados.' : 'A diferença passa do acaso.';
+    }
+    function variacao(antes, agora) {
+      // o selo da variação (as mesmas regras do placar do Analítico)
+      if (!antes && !agora) return 'estável';
+      if (!antes) return 'novo';
+      if (!agora) return 'zerou';
+      var v = (agora - antes) / antes;
+      if (Math.abs(v) <= 0.15) return 'estável';
+      if (v >= 1) return '▲ ' + dec(agora / antes, 1) + '×';
+      return (v > 0 ? '▲ ' : '▼ ') + dec(Math.abs(v) * 100, 0) + '%';
+    }
+
+    /* ── os achados ────────────────────────────────────────────────────── */
+    function achado(tipo, selo, lente, titulo, texto, numero, href, peso) {
+      return { tipo: tipo, selo: selo, lente: lente, titulo: titulo, texto: texto, numero: numero, href: href, peso: Math.round(peso * 10) / 10 };
+    }
+    function deEd(F) { return F.f.edTit ? ' de ' + F.f.edTit : ''; }
+    function janela(F, qual) {
+      var j = F.jan;
+      if (!j) return '';
+      return qual === 'r' ? ' (' + periodo(j.r0, j.r1) + ')' : ' (' + periodo(j.a0, j.a1) + ')';
+    }
+
+    function aTom(F, T) {
+      var tm = F.tom;
+      if (!tm || !tm.aplica || !tm.tend || !tm.tend.passa) return null;
+      var t = tm.tend, verbo = t.sr < t.sa ? 'piorou' : 'melhorou';
+      var az = F.az ? (F.az.mTom > 1 ? 'os ' + num(F.az.mTom) + ' nomes comparados no Analítico' : 'a comparação do Analítico') : '';
+      return achado('tom', 'Tom', 1,
+        'O tom das manchetes' + deEd(F) + ' sobre ' + T + ' ' + verbo + ': saldo de ' + saldo(t.sa) + ' para ' + saldo(t.sr) + ' em sete edições',
+        'Favoráveis menos desfavoráveis, em pontos: ' + saldo(t.sa) + ' nas ' + plural(t.na, 'manchete brasileira', 'manchetes brasileiras') +
+          ' das 7 edições anteriores' + janela(F, 'a') + ', ' + saldo(t.sr) + ' nas ' + num(t.nr) + ' das últimas 7' + janela(F, 'r') + '. ' + veredito(1, '', az),
+        saldo(t.sa) + ' → ' + saldo(t.sr), '#pq-tom', 60 + 40 * lim(Math.abs(t.sr - t.sa) / 30));
+    }
+
+    function aEspaco(F, T) {
+      var e = F.tend;
+      if (!e || !e.passa) return null;
+      var pa = e.ka / e.ba, pr = e.kr / e.br, titulo, peso;
+      if (!e.ka) {
+        titulo = cap(T) + (F.antes ? ' volta às manchetes' : ' aparece nas manchetes') + ': ' + plural(e.kr, 'manchete', 'manchetes') + ' nas últimas 7 edições, nenhuma nas 7 anteriores';
+        peso = 70;
+      } else if (!e.kr) {
+        titulo = cap(T) + ' sai das manchetes nas últimas 7 edições (eram ' + num(e.ka) + ' nas 7 anteriores)';
+        peso = 70;
+      } else {
+        titulo = cap(T) + ' ' + (pr > pa ? 'ganha' : 'perde') + ' espaço: de ' + pct(e.ka, e.ba) + ' para ' + pct(e.kr, e.br) + ' das manchetes' + deEd(F) + ' em sete edições';
+        peso = 50 + 40 * lim(Math.abs(Math.log(pr / pa)) / Math.LN2);
+      }
+      var texto = num(e.ka) + ' entre as ' + num(e.ba) + ' manchetes coletadas nas 7 edições anteriores' + janela(F, 'a') + '; ' + num(e.kr) + ' entre as ' +
+        num(e.br) + ' das últimas 7' + janela(F, 'r') + '.';
+      if (e.ka && e.kr && (e.kr - e.ka) * (pr - pa) < 0) {
+        var subiu = e.kr > e.ka;
+        texto += ' O número de manchetes ' + (subiu ? 'subiu' : 'caiu') + ', mas o total coletado ' + (subiu ? 'subiu' : 'caiu') + ' mais: o que conta é a parte.';
+      }
+      var az = F.az ? (F.az.mEsp > 1 ? 'os ' + num(F.az.mEsp) + ' nomes comparados no Analítico' : 'a comparação do Analítico') : '';
+      return achado('espaco', 'Espaço', 1, titulo, texto + ' ' + veredito(1, '', az), pct(e.ka, e.ba) + ' → ' + pct(e.kr, e.br), '#pq-curva', peso);
+    }
+
+    function historiaDoDia(F, dia) {
+      var melhor = null;
+      (F.hist || []).forEach(function (h) {
+        if (h.nv < 3 || dia < h.d0 || dia > h.d1) return;
+        if (!melhor || h.nv > melhor.nv || (h.nv === melhor.nv && h.n > melhor.n)) melhor = h;
+      });
+      return melhor;
+    }
+
+    function aPico(F, T, fundida) {
+      var pk = F.picos;
+      if (!pk) return null;
+      var passam = pk.dias.filter(function (x) { return x.passa; }).sort(function (a, b) { return b.R - a.R || (a.d < b.d ? 1 : -1); });
+      if (!passam.length) return null;
+      var x = passam[0], outros = passam.slice(1);
+      var texto = num(x.k) + ' de ' + num(x.b) + ' manchetes do dia, contra ' + pct(x.p0 * 1e6, 1e6) + ' nos demais; ' +
+        (pk.m > 1 ? 'passa do acaso, mesmo contando as ' + num(pk.m) + ' edições comparadas' : 'passa do acaso');
+      if (outros.length === 1) texto += '; outro dia também: ' + dm(outros[0].d);
+      else if (outros.length > 1) texto += '; outros ' + num(outros.length) + ' dias também';
+      texto += '.';
+      var h = historiaDoDia(F, x.d);
+      if (h) {
+        texto += ' A história do dia: ' + aspas(h.titulo) + ' (' + plural(h.nv, 'veículo', 'veículos') + ', ' + plural(h.n, 'manchete', 'manchetes') + ').';
+        fundida.h = h;
+      }
+      return achado('pico', 'Pico', 1,
+        'Pico em ' + dm(x.d) + ': ' + T + ' em ' + pct(x.k, x.b) + ' das manchetes do dia, ' + dec(x.R, 1) + ' vezes a parte dos outros dias',
+        texto, pct(x.k, x.b) + ' do dia', '#pq-curva', 40 + 30 * lim(Math.log(x.R) / Math.log(4)));
+    }
+
+    function hrefVeiculo(v) { return v.idx ? '#pq-v-' + v.idx : '#pq-placar'; }
+
+    function aVeiculos(F, T) {
+      if (F.f.v || !F.tom || !F.tom.aplica) return null;
+      var fortes = (F.veic || []).filter(function (v) { return v.tomForte; });
+      if (!fortes.length) return null;
+      var dist = function (v) { return Math.abs(v.sv - v.so); };
+      var crit = fortes.filter(function (v) { return v.sv < v.so; }).sort(function (a, b) { return dist(b) - dist(a) || b.k - a.k; });
+      var fav = fortes.filter(function (v) { return v.sv > v.so; }).sort(function (a, b) { return dist(b) - dist(a) || b.k - a.k; });
+      var titulo, citados;
+      if (crit.length && fav.length) {
+        titulo = 'Sobre ' + T + ', ' + fav[0].o + ' tem manchetes mais favoráveis que os demais veículos, e ' + crit[0].o + ', mais críticas';
+        citados = [fav[0], crit[0]];
+      } else if (crit.length) {
+        titulo = crit[0].o + ' tem manchetes mais críticas a ' + T + ' que os demais veículos';
+        citados = [crit[0]];
+      } else {
+        titulo = fav[0].o + ' tem manchetes mais favoráveis a ' + T + ' que os demais veículos';
+        citados = [fav[0]];
+      }
+      var partes = citados.map(function (v) {
+        return v.o + ': saldo ' + saldo(v.sv) + ' em ' + plural(v.k, 'manchete', 'manchetes') + ', contra ' + saldo(v.so) + ' nos demais veículos';
+      });
+      var az = F.az ? (F.az.mVei > 1 ? 'as ' + num(F.az.mVei) + ' comparações veículo × nome do Analítico' : 'a comparação do Analítico') : '';
+      var maior = Math.max.apply(null, citados.map(dist));
+      return achado('veiculos', 'Veículos', 1, titulo, partes.join('; ') + '. ' + veredito(F.mVei, 'veículos', az),
+        saldo(citados[0].sv) + ' × ' + saldo(citados[0].so), hrefVeiculo(citados[0]), 40 + 40 * lim(maior / 20));
+    }
+
+    function aAtencao(F, T) {
+      if (F.f.v) return null;
+      var cands = (F.veic || []).filter(function (v) {
+        return v.atForte && v.i !== null && ((v.i >= 1.5 && v.k >= 5) || v.i <= 0.5);
+      });
+      if (!cands.length) return null;
+      cands.sort(function (a, b) { return Math.abs(Math.log(Math.max(b.i, 1e-3))) - Math.abs(Math.log(Math.max(a.i, 1e-3))) || b.k - a.k; });
+      var v = cands[0], acima = v.i >= 1.5, esperado = F.f.ed ? 'na editoria' : 'pelas editorias que cobre';
+      var umas = num(Math.max(1, ST.arred(v.esp, 0)));
+      var titulo = acima
+        ? v.o + ' cita ' + T + ' ' + dec(v.i, 1) + ' vezes o esperado ' + esperado + ': ' + plural(v.k, 'manchete', 'manchetes') + ', onde seriam umas ' + umas
+        : v.o + (v.k ? ' quase não cita ' + T + ': ' + plural(v.k, 'manchete', 'manchetes') : ' não cita ' + T + ': nenhuma manchete') +
+          ', onde o que publica faria esperar umas ' + umas;
+      var texto = plural(v.k, 'manchete', 'manchetes') + ' entre as ' + num(v.b) + ' do veículo (' + pct(v.k, v.b) + '); o esperado aplica a parte de ' + T +
+        (F.f.ed ? ' na editoria' : ' em cada editoria') + ' ao que ' + v.o + ' publica nela. ' + veredito(F.mAt, 'veículos', '');
+      var peso = acima ? 40 + 40 * lim(Math.log(v.i) / Math.log(3)) : 30 + 15 * lim(Math.log(1 / Math.max(v.i, 1e-3)) / Math.log(3));
+      return achado('atencao', 'Atenção', 1, titulo, texto, dec(v.i, 1) + '×', hrefVeiculo(v), peso);
+    }
+
+    function aExterior(F, T) {
+      var x = F.ext;
+      if (F.f.v || !x || !x.passa) return null;
+      var pe = x.ke / x.be, pb = x.kb / x.bb;
+      if (x.ke < 10 || x.kb < 10 || x.be < 30 || x.bb < 30 || Math.abs(Math.log(pe / pb)) < Math.log(1.5)) return null;
+      return achado('exterior', 'Exterior', 1,
+        'Fora do Brasil, ' + T + ' ocupa ' + pct(x.ke, x.be) + ' das manchetes, contra ' + pct(x.kb, x.bb) + ' na imprensa brasileira',
+        num(x.ke) + ' de ' + num(x.be) + ' manchetes de ' + plural(x.nE, 'veículo do exterior', 'veículos do exterior') + '; ' + num(x.kb) + ' de ' + num(x.bb) +
+          ' dos brasileiros. A diferença passa do acaso. Lá fora se escreve em outra língua: um termo pode ter outra grafia.',
+        pct(x.ke, x.be) + ' × ' + pct(x.kb, x.bb), '#pq-placar', 25 + 15 * lim(Math.abs(Math.log(pe / pb)) / Math.log(4)));
+    }
+
+    function aHistoria(F, T, fundida) {
+      var lista = (F.hist || []).filter(function (h) { return h.nv >= 3 && h.n >= 3 && h !== fundida.h; });
+      if (!lista.length) return null;
+      var h = lista[0], i = (F.hist || []).indexOf(h) + 1;
+      var extras = (h.mat ? '; virou matéria do Triangula' : '') + (h.comp ? '; está na cobertura comparada' : '');
+      return achado('historia', 'História', 1, h.titulo,
+        periodo(h.d0, h.d1) + ': ' + plural(h.n, 'manchete', 'manchetes') + ' de ' + plural(h.nv, 'veículo', 'veículos') + ' citam ' + T + extras + '.',
+        plural(h.nv, 'veículo', 'veículos'), i <= 3 ? '#pq-h-' + i : '#pq-historias', 40 + 30 * lim((h.nv - 2) / 9));
+    }
+
+    function aPauta(F, T) {
+      var pz = F.pauta;
+      if (!pz || !pz.grupos.length || F.nBr < 20) return null;
+      var g = pz.grupos[0];
+      if (g.co < 5 || g.co / F.nBr < 0.2) return null;
+      var texto = '';
+      if (g.formas.length > 1) texto += 'Também ' + juntar(g.formas.slice(1, 3).map(aspas)) + '. ';
+      var seguintes = pz.grupos.slice(1, 3).map(function (x) { return x.f + ' (' + num(x.co) + ')'; });
+      if (seguintes.length) texto += 'Depois ' + (seguintes.length === 1 ? 'vem ' : 'vêm ') + juntar(seguintes) + '. ';
+      var temas = pz.temas.slice(0, 3).map(function (x) { return x.f; });
+      if (temas.length) texto += 'Temas: ' + juntar(temas) + '. ';
+      texto += 'É contagem, sem comparação com o resto do noticiário.';
+      return achado('pauta', 'Pauta', 1,
+        cap(T) + ' aparece ao lado de ' + g.f + ' em ' + num(g.co) + ' das ' + num(F.nBr) + ' manchetes brasileiras',
+        texto, pct(g.co, F.nBr), '#pq-junto', 25 + 25 * lim(g.co / F.nBr / 0.5));
+    }
+
+    function aLados(F, T) {
+      var ld = F.lados;
+      if (!ld || !ld.c) return null;
+      var par = null;
+      (ld.pares || []).forEach(function (p) { if (p.classe && (!par || Math.abs(p.z || 0) > Math.abs(par.z || 0))) par = p; });
+      var testados = ld.mP || 0;
+      var contando = testados > 1 ? ', mesmo contando os ' + num(testados) + ' pares comparados' : '';
+      var racha = num(ld.d) + ' dos ' + plural(ld.c, 'assunto comparado', 'assuntos comparados') + ' que citam ' + T + ' tiveram veículos nos dois lados.';
+      if (par) {
+        var op = par.classe === 'op', k = op ? par.total - par.juntos : par.juntos;
+        return achado('lados', 'Lados', 2,
+          op ? par.a + ' e ' + par.b + ' ficam em lados opostos: ' + k + ' de ' + par.total + ' assuntos divididos'
+            : par.a + ' e ' + par.b + ' enquadram do mesmo jeito: mesmo lado em ' + k + ' de ' + par.total + ' assuntos divididos',
+          'O acaso daria ' + (op ? par.opostos + ' em lados opostos' : par.esperado + ' do mesmo lado') + '; a diferença passa dele' + contando + '. ' + racha,
+          k + ' de ' + par.total, '#pq-pares', 55 + 30 * lim(Math.abs(par.z || 0) / 4));
+      }
+      var des = null;
+      (ld.destoa || []).forEach(function (x) { if (x.classe === 'mais' && (!des || x.minoria / x.total > des.minoria / des.total)) des = x; });
+      if (des) {
+        var mD = ld.mD || 0;
+        return achado('lados', 'Lados', 2,
+          des.nome + ' fica contra a maioria em ' + des.minoria + ' de ' + des.total + ' assuntos divididos sobre ' + T,
+          'O acaso daria ' + des.esperado + '; a diferença passa dele' + (mD > 1 ? ', mesmo contando os ' + num(mD) + ' veículos comparados' : '') + '. ' + racha,
+          des.minoria + ' de ' + des.total, '#pq-destoa', 55);
+      }
+      if (ld.d < 2) return null;
+      var texto = ld.mais ? 'O mais dividido: ' + aspas(ld.mais.titulo) + ' (' + ld.mais.a + ' × ' + ld.mais.b + ').' + (F.f.v ? '' : ' ') : '';
+      if (!F.f.v) texto += testados
+        ? 'Nenhum par de veículos fica do mesmo lado ou em lados opostos além do que o acaso explica' + contando + '.'
+        : 'Nenhum par de veículos tem ainda ' + num(P.minPar || 8) + ' assuntos divididos em comum para comparar com o acaso.';
+      return achado('lados', 'Lados', 2,
+        'Os veículos racharam em ' + num(ld.d) + ' dos ' + plural(ld.c, 'assunto comparado', 'assuntos comparados') + ' que citam ' + T,
+        texto, pct(ld.d, ld.c), '#pq-lados', ld.d >= 5 ? 45 : 35);
+    }
+
+    function aTexto(F, T) {
+      var tx = F.texto;
+      if (!tx || !tx.passa) return null;
+      var esq = tx.esq > tx.dir, maior = Math.max(tx.esq, tx.dir), menor = Math.min(tx.esq, tx.dir);
+      return achado('texto', 'Texto', 3,
+        'Quando o texto sobre ' + T + ' sai do zero, pende mais à ' + (esq ? 'esquerda' : 'direita') + ': ' + num(maior) + ' notícias contra ' + num(menor),
+        'Das ' + plural(tx.nT, 'notícia com o termo lida', 'notícias com o termo lidas') + ' pelo termômetro, ' + num(tx.eq) + ' ficam em “Equilibrado”; nas ' +
+          num(tx.esq + tx.dir) + ' que saem do zero, ' + num(tx.esq) + ' pendem à esquerda e ' + num(tx.dir) + ' à direita. A diferença passa do acaso.',
+        num(tx.esq) + ' × ' + num(tx.dir), '#pq-texto', 45 + 25 * lim((maior - menor) / Math.max(1, menor) / 2));
+    }
+
+    function presenca(F, T) {
+      if (!F.n) {
+        var partes = [];
+        if (F.tipos.m) partes.push(plural(F.tipos.m, 'matéria', 'matérias'));
+        if (F.tipos.c) partes.push(plural(F.tipos.c, 'assunto da cobertura comparada', 'assuntos da cobertura comparada'));
+        if (F.tipos.a) partes.push(plural(F.tipos.a, 'análise do Termômetro', 'análises do Termômetro'));
+        return achado('presenca', 'Presença', 1, cap(T) + ' não está em nenhuma manchete coletada' + (partes.length ? '; aparece em ' + juntar(partes) : ''),
+          'A busca olha as manchetes coletadas, as matérias do Triangula, a cobertura comparada e as análises do Termômetro.', num(F.res), '#pq-res', 20);
+      }
+      if (!F.nBr) {
+        return achado('presenca', 'Presença', 1,
+          cap(T) + ' só aparece em veículos do exterior: ' + plural(F.n, 'manchete', 'manchetes') + ' de ' + plural(F.nveic, 'veículo estrangeiro', 'veículos estrangeiros') + ', nenhuma brasileira',
+          'A imprensa brasileira escreve em português: busque também a grafia daqui.', num(F.n), '#pq-manchetes', 25);
+      }
+      var p = F.B ? F.n / F.B : 0;
+      return achado('presenca', 'Presença', 1,
+        cap(T) + ' está em ' + pct(F.n, F.B) + ' das manchetes' + deEd(F) + ': ' + num(F.n) + ' de ' + num(F.B) + ', de ' + plural(F.nveic, 'veículo', 'veículos') +
+          (F.f.D > 1 ? ', em ' + num(F.diasCom) + ' das ' + num(F.f.D) + ' edições' : ''),
+        'É contagem: quanto o termo aparece nas manchetes coletadas no período.', pct(F.n, F.B), '#pq-curva', 20 + 15 * lim(p / 0.05));
+    }
+
+    /* ── as frases de cima ─────────────────────────────────────────────── */
+    function chapeu(F, curta) {
+      var f = F.f, partes = [(curta ? 'A busca' : 'A leitura') + ' · ' + F.q.rot + (F.q.excl.length ? ' (sem ' + juntar(F.q.excl.map(aspas)) + ')' : '')];
+      partes.push(f.D === 1 ? 'edição de ' + dma(f.de) : num(f.D) + ' edições, de ' + dm(f.de) + ' a ' + dma(f.ate));
+      if (f.edTit) partes.push(f.edTit);
+      if (f.v) partes.push('só ' + f.v);
+      if (f.tit) partes.push('só nos títulos');
+      if (f.parcial) partes.push(f.tiposTxt);
+      if (f.extra) partes.push('comparado às ' + plural(f.extra, 'edição anterior', 'edições anteriores'));
+      if (F.az) partes.push('mesma base do Analítico');
+      return partes.join(' · ');
+    }
+
+    function fina(F, T, principal, comTexto) {
+      var f = F.f, s = '';
+      if (F.n && F.nBr && principal.tipo !== 'presenca') {
+        var onde = f.D > 1 ? ' em ' + num(f.D) + ' edições' : ' na edição';
+        s = f.v
+          ? cap(T) + ' está em ' + num(F.n) + ' das ' + num(F.B) + ' manchetes coletadas de ' + f.v + deEd(F) + onde + ' (' + pct(F.n, F.B) + ').'
+          : cap(T) + ' está em ' + plural(F.n, 'manchete', 'manchetes') + ' de ' + plural(F.nveic, 'veículo', 'veículos') + ': ' + pct(F.n, F.B) + ' das ' + num(F.B) +
+            ' coletadas' + deEd(F) + onde + '.';
+      }
+      var tx = F.texto;
+      if (tx && tx.nT >= 10 && !comTexto) {
+        var q = tx.Q !== null && tx.Q !== undefined ? '; apuração média ' + num(tx.Q) + ' de 100.' : '.';
+        s += (s ? ' ' : '') + 'No texto, ' + (tx.eq === tx.nT
+          ? 'as ' + num(tx.nT) + ' notícias lidas pelo termômetro ficam todas em “Equilibrado”'
+          : num(tx.eq) + ' das ' + num(tx.nT) + ' notícias lidas pelo termômetro ficam em “Equilibrado”') + q;
+      } else if (F.tipos.m >= 3 && F.n) {
+        s += (s ? ' ' : '') + 'Há também ' + num(F.tipos.m) + ' matérias do Triangula sobre o tema.';
+      }
+      return s;
+    }
+
+    /* ── o trilho: as lentes e "O que mudou" ───────────────────────────── */
+    function lentes(F, T) {
+      var saida = [], tx = F.texto, ld = F.lados;
+      if (F.n && F.f.tipos.n) {
+        saida.push({ chave: 'manchetes', nome: 'Manchetes', pergunta: 'Quanto espaço ' + T + ' ganha, quando, quem dá e em que tom', numero: num(F.n),
+          unidade: F.n === 1 ? 'manchete' : 'manchetes',
+          base: pct(F.n, F.B) + ' das coletadas · ' + plural(F.nveic, 'veículo', 'veículos') + ' · ' + plural(F.f.D, 'edição', 'edições'), href: '#pq-manchetes' });
+      }
+      if (ld && ld.c && F.f.tipos.c) {
+        saida.push({ chave: 'enquadramento', nome: 'Enquadramento', pergunta: 'Onde os veículos racham sobre ' + T + ', e quem fica com quem', numero: num(ld.d),
+          unidade: ld.d === 1 ? 'assunto rachou' : 'assuntos racharam', base: 'de ' + plural(ld.c, 'comparado', 'comparados') + ' na cobertura comparada', href: '#pq-enquadramento' });
+      }
+      if (tx && tx.nT >= 5 && F.f.tipos.a) {
+        saida.push({ chave: 'texto', nome: 'Texto', pergunta: 'Como as reportagens sobre ' + T + ' escrevem', numero: num(tx.nT),
+          unidade: tx.nT === 1 ? 'notícia com T' : 'notícias com T',
+          base: (tx.eq === tx.nT ? 'todas em Equilibrado' : num(tx.eq) + ' em Equilibrado') + (tx.Q !== null && tx.Q !== undefined ? ' · apuração ' + num(tx.Q) : ''), href: '#pq-texto' });
+      }
+      saida.forEach(function (x, i) { x.ordem = i + 1; });
+      return saida;
+    }
+
+    function mudancas(F) {
+      if (!F.n || !F.f.tipos.n) return { linhas: null, zero: '' };
+      if (!F.jan) {
+        return { linhas: null, zero: F.f.D < 2 * SEMANA
+          ? 'Com ' + plural(F.f.D, 'edição', 'edições') + ' no período, não há sete contra sete para comparar.'
+          : 'Sem manchetes bastantes nas duas janelas de sete edições para comparar.' };
+      }
+      var e = F.tend, tm = F.tom, linhas = [], forte = 0;
+      if (e) {
+        var vE = variacao(e.ka / e.ba, e.kr / e.br);
+        linhas.push({ nome: 'Espaço', href: '#pq-curva', tipo: 'manchetes', antes: pct(e.ka, e.ba), agora: pct(e.kr, e.br), selo: vE, forte: !!e.passa, classe: '' });
+        if (e.passa) forte++;
+      } else {
+        linhas.push({ nome: 'Espaço', href: '#pq-curva', tipo: 'manchetes', antes: '', agora: '', selo: 'amostra pequena', forte: false, classe: '' });
+      }
+      if (tm && tm.aplica && tm.tend) {
+        var t = tm.tend, v = t.passa ? (t.sr < t.sa ? 'piorou' : 'melhorou') : 'estável';
+        linhas.push({ nome: 'Tom', href: '#pq-tom', tipo: 'saldo', antes: saldo(t.sa), agora: saldo(t.sr), selo: v, forte: !!t.passa, classe: t.passa ? (t.sr < t.sa ? 'neg' : 'pos') : '' });
+        if (t.passa) forte++;
+      } else {
+        linhas.push({ nome: 'Tom', href: '#pq-tom', tipo: 'saldo', antes: '', agora: '', selo: tm && tm.aplica ? 'amostra pequena' : 'não se aplica', forte: false, classe: '' });
+      }
+      return { linhas: linhas, fortes: forte };
+    }
+
+    /* ── modo curto (até 10 resultados) ────────────────────────────────── */
+    function curta(F, T) {
+      var eds = F.editorias || [], dias = F.diasRes || 0;
+      var titulo = plural(F.res, 'resultado', 'resultados') + ' para ' + T + (F.f.D > 1 ? ' em ' + plural(dias, 'edição', 'edições') : '');
+      if (eds.length) {
+        var partes = eds.slice(0, 3).map(function (x) { return num(x.k) + ' de ' + x.t; });
+        if (eds.length > 3) partes.push('o resto em outras editorias');
+        titulo += ': ' + juntar(partes);
+      }
+      return {
+        curta: true, chapeu: chapeu(F, true),
+        principal: achado('curta', 'Busca', 0, titulo, '', num(F.res), '#pq-res', 0),
+        fina: 'Com tão poucos resultados, a página não lê espaço, tom nem lados: o acaso dominaria. Os resultados estão logo abaixo.',
+        espalha: eds.length >= 2, achados: [], lentes: [], mudancas: null, mud0: '', nada: false
+      };
+    }
+
+    /* ── a leitura ─────────────────────────────────────────────────────── */
+    function leitura(F) {
+      var T = F.q.T;
+      if (F.res <= 10) return curta(F, T);
+      var fundida = { h: null };
+      var pico = aPico(F, T, fundida);
+      var testados = [aTom(F, T), aEspaco(F, T), pico, aVeiculos(F, T), aAtencao(F, T), aExterior(F, T), aLados(F, T), aTexto(F, T)];
+      var descritivos = [aHistoria(F, T, fundida), aPauta(F, T)];
+      var todos = testados.concat(descritivos).filter(Boolean);
+      var passou = todos.some(function (a) {
+        return a.tipo !== 'historia' && a.tipo !== 'pauta' && !(a.tipo === 'lados' && a.href === '#pq-lados');
+      });
+      var pres = presenca(F, T);
+      if (!F.n || !F.nBr) todos = todos.filter(function (a) { return a.tipo === 'lados' || a.tipo === 'texto' || a.tipo === 'historia' || a.tipo === 'pico'; });
+      todos.push(pres);
+      todos.sort(function (a, b) { return b.peso - a.peso || a.lente - b.lente || (a.tipo < b.tipo ? -1 : 1); });
+      var principal = todos[0];
+      if (!F.n || !F.nBr) {
+        // sem manchete brasileira, a manchete é a presença (salvo um racha nos lados)
+        var lados = todos.filter(function (a) { return a.tipo === 'lados'; })[0];
+        principal = !F.n && lados ? lados : pres;
+      }
+      var resto = todos.filter(function (a) { return a !== principal && a.tipo !== 'presenca'; }).slice(0, MAX);
+      var prova = principal.texto;
+      var nada = !passou && F.n >= 20 && F.nBr > 0;
+      if (nada) {
+        // só o que a busca de fato comparou (com menos de 14 edições não há sete contra sete)
+        var nem = [];
+        if (F.picos) nem.push('nem um dia de pico');
+        if (F.tend) nem.push('nem a mudança em sete edições');
+        if (F.tom && F.tom.aplica && F.tom.tend) nem.push('nem a do tom');
+        if (F.mVei && !F.f.v) nem.push('nem a diferença entre veículos');
+        if (nem.length) prova += ' Nas manchetes, nada passa do acaso: ' + juntar(nem).replace(/ e nem /, ', nem ') + '.';
+      }
+      var principalFinal = { tipo: principal.tipo, selo: principal.selo, lente: principal.lente, titulo: principal.titulo, texto: prova,
+        numero: principal.numero, href: principal.href, peso: principal.peso };
+      var comTexto = principal.tipo === 'texto' || resto.some(function (a) { return a.tipo === 'texto'; });
+      var md = mudancas(F);
+      var finaTxt = fina(F, T, principalFinal, comTexto);
+      if (!F.nBr && F.n) finaTxt = '';
+      return {
+        curta: false, chapeu: chapeu(F, false), principal: principalFinal, fina: finaTxt, achados: resto, lentes: lentes(F, T),
+        mudancas: md.linhas, fortes: md.fortes || 0, mud0: md.zero || '', nada: nada, fundida: fundida.h
+      };
+    }
+
+    return { leitura: leitura, variacao: variacao, saldo: saldo, num: num, dec: dec, dm: dm, dma: dma, plural: plural, juntar: juntar, aspas: aspas, cap: cap };
+  }

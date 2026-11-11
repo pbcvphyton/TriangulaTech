@@ -248,17 +248,23 @@ def _destaques() -> midia.DestaquesView:
 def test_pesquisa_traz_o_analitico_e_as_sugestoes(config):
     dados = pesquisa.dados_do_dia(make_edition("2026-10-30"), config, None)
     html = pesquisa.render_pesquisa_page([pesquisa.resumo_do_dia(dados)], config, home_href="../", archive_href="./", destaques=_destaques())
-    assert '<section class="md" id="midia" aria-labelledby="mdH" hidden></section>' in html and 'id="mdIr" hidden' in html
+    assert '<section class="pq-lz" id="midia" aria-labelledby="pqLzH" hidden></section>' in html and 'id="mdIr"' not in html
     assert "Como a mídia cobre " in html and "function leituraMidia(e, ts)" in html and "midia(e);" in html
     # as sugestões abrem a busca com a editoria e o período dos números (como no Analítico)
     assert 'class="md-sug"' in html and 'href="pesquisa.html?q=Senado&amp;de=2026-' in html and "&amp;ed=politica#midia" in html
-    # o analítico vem depois da lista (os resultados ficam onde estavam), com um atalho acima
-    assert html.index('id="pqMore"') < html.index('id="midia"') and html.index('id="mdIr"') < html.index('id="pqList"')
+    # a leitura da busca abre a página; depois vêm os resultados e, por fim, as lentes
+    assert html.index('id="midia"') < html.index('id="pq-res"') < html.index('id="pqList"') < html.index('id="pqLentes"')
     manifesto = json.loads(re.search(r'id="pqDados">(.*?)</script>', html, re.S).group(1))
+    # os limites e os vereditos do Analítico vão no manifesto (a busca de um nome do placar não o contradiz)
+    assert manifesto["lz"]["alfaTom"] == 0.05 and manifesto["lz"]["minPar"] == 8 and manifesto["lz"]["achados"] == 6
+    az = manifesto["az"]
+    assert az["ed"] == "politica" and az["mTom"] >= 0 and set(az["nomes"]) == {midia.consulta(n.nome) for n in _destaques().nomes}
+    assert sorted(x["i"] for x in az["nomes"].values()) == list(range(1, len(az["nomes"]) + 1))
     assert "The Guardian" in manifesto["exterior"] and "veja" in manifesto["fora"] and "sp" in manifesto["foraNomes"]
     assert "marco" in manifesto["calendario"] and "marco" in manifesto["fora"]
     sem = pesquisa.render_pesquisa_page([pesquisa.resumo_do_dia(dados)], config, home_href="../", archive_href="./")
     assert 'class="md-sug"' not in sem and 'id="midia"' in sem  # sem nomes, o analítico da busca continua
+    assert json.loads(re.search(r'id="pqDados">(.*?)</script>', sem, re.S).group(1))["az"] is None
 
 
 def test_analitico_traz_os_nomes_em_destaque(config):

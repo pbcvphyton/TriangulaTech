@@ -1,6 +1,9 @@
 {#- Pesquisa analítica: busca em todas as edições. O navegador carrega os arquivos
     de busca de cada edição (data/busca/AAAA-MM-DD.json) do período pedido, busca
-    neles e mostra os resultados com as contagens (pesquisa.js.j2).
+    neles e mostra, no padrão da aba Analítico, a leitura da busca (o que os resultados
+    têm a dizer, só o que passa do acaso), os resultados e as lentes (pesquisa.js.j2).
+    Os estilos az-… são os de analitico.css.j2 (incluído sem mudança), mais os da
+    Pesquisa (pesquisa_leitura.css.j2).
     Variáveis: p (PesquisaView), brand, home_href, archive_href, base_url, repo_url. -#}
 {% extends "layout.html.j2" %}
 {% import "midia.html.j2" as md %}
@@ -23,6 +26,8 @@
 {% block styles %}
 {% include "pesquisa.css.j2" %}
 {% include "midia.css.j2" %}
+{% include "analitico.css.j2" %}
+{% include "pesquisa_leitura.css.j2" %}
 {% endblock %}
 
 {% block content %}
@@ -76,16 +81,18 @@
   </form>
 
   <p class="pq-st" id="pqStatus" role="status" aria-live="polite"></p>
-  <div class="pq-out" id="pqOut" hidden>
-    <div class="pq-an" id="pqAn"></div>
-    <p class="md-ir" id="mdIr" hidden></p>
-    <div class="pq-head">
-      <h3 class="pq-count" id="pqCount"></h3>
-      <button class="pq-csv" type="button" id="pqCsv" title="Baixar todos os resultados em planilha (CSV)">Baixar CSV</button>
-    </div>
-    <ol class="pq-list" id="pqList"></ol>
-    <button class="pq-more" type="button" id="pqMore" hidden></button>
-    <section class="md" id="midia" aria-labelledby="mdH" hidden></section>
+  <div class="pq-out az" id="pqOut" hidden>
+    <nav class="az-nav" id="pqNav" aria-label="Nesta busca" hidden></nav>
+    <section class="pq-lz" id="midia" aria-labelledby="pqLzH" hidden></section>
+    <section class="az-sec pq-res" id="pq-res" aria-labelledby="pqCount">
+      <header class="az-lh"><p class="az-ln">Resultados</p><h3 class="az-lt" id="pqCount"></h3><p class="az-ld" id="pqTipos"></p></header>
+      <div id="pqHist"></div>
+      <details class="az-base pq-ref" id="pq-refinar"><summary><span class="az-base-t">Refinar por edição, veículo e editoria</span><span class="az-base-r" id="pqRefR"></span></summary><div class="az-base-in"><div class="pq-an" id="pqAn"></div></div></details>
+      <div class="pq-head"><button class="pq-csv" type="button" id="pqCsv" title="Baixar todos os resultados em planilha (CSV)">Baixar CSV</button></div>
+      <ol class="pq-list" id="pqList"></ol>
+      <button class="pq-more" type="button" id="pqMore" hidden></button>
+    </section>
+    <div id="pqLentes"></div>
   </div>
   <noscript><p class="pq-intro">A pesquisa roda no próprio navegador e precisa do JavaScript ligado.</p></noscript>
 </section>

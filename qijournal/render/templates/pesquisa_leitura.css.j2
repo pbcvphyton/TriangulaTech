@@ -1,0 +1,111 @@
+{#- A leitura da busca (só a Pesquisa inclui este arquivo, depois de analitico.css.j2): o
+    que os componentes az-… do Analítico precisam a mais quando saem numa busca — a curva
+    larga do espaço, o placar de veículos (7 colunas), as histórias em cartões, o estado de
+    carregamento, a caixa curta e os ajustes do celular. -#}
+/* A leitura da busca: o padrão do Analítico na Pesquisa */
+.pq .az{padding-bottom:0}
+#pqOut [id]{scroll-margin-top:58px}
+.pq-out[hidden],.pq-lz[hidden],.az-nav[hidden]{display:none}
+.pq.pq-com .pq-intro,.pq.pq-com .pq-tip,.pq.pq-com .md-sug{display:none}
+.pq-lz .az-lead{margin-top:14px}
+.az-lead.pq-so{grid-template-columns:minmax(0,1fr)}
+.pq-so .az-box{padding-bottom:16px}
+.pq-so .az-manchete{max-width:900px}
+.pq-az-link{margin-top:16px;font-family:var(--ss);font-size:12.5px;font-weight:700}
+.pq-az-link a{color:var(--link)}
+.pq-az-link a:hover{text-decoration:underline}
+.pq-eds{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pq-eds button,.pq-retry{padding:5px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-family:var(--ss);font-size:12px;color:var(--ink);cursor:pointer}
+.pq-eds button:hover,.pq-retry:hover{border-color:var(--link);color:var(--link)}
+.pq-eds b{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.pq-lk{padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--link);cursor:pointer}
+.pq-lk:hover{text-decoration:underline}
+.pq-aviso{margin-top:16px}
+
+/* carregando: a caixa guarda o lugar da leitura */
+.pq-sk{min-height:220px}
+.pq-sk-l{display:grid;gap:12px;margin-top:18px}
+.pq-sk-l i{display:block;height:14px;border-radius:7px;background:var(--rl)}
+.pq-sk-l i:nth-child(1){height:30px;width:82%}
+.pq-sk-l i:nth-child(2){width:64%}
+.pq-sk-l i:nth-child(3){width:72%}
+@media (prefers-reduced-motion:no-preference){
+  .pq-sk-l i{animation:pq-pulsa 1.4s ease-in-out infinite}
+  @keyframes pq-pulsa{50%{opacity:.45}}
+}
+
+/* resultados: o cabeçalho de lente e as histórias */
+.pq-res{margin-top:36px}
+.pq-res .az-lt{font-size:clamp(19px,calc(12px + .6vw),24px)}
+.pq-res .pq-head{margin-top:14px}
+.pq-ref{margin-top:18px;border-top:1px solid var(--rl)}
+.pq-ref .pq-an{padding-top:6px;border-top:0}
+.pq-hs{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 32px;margin-top:4px}
+.pq-h .az-rx-t{font-size:15.5px}
+.pq-h-v{margin-top:6px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.pq-h .az-more{margin-top:8px}
+.pq-h-l{list-style:none;margin-top:6px}
+.pq-h-l li{padding:6px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;line-height:1.45}
+.pq-h-l li:last-child{border-bottom:0}
+.pq-h-l a{color:var(--ink)}
+.pq-h-l a:hover{color:var(--link)}
+.pq-h-l small{display:block;margin-top:2px;font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+
+/* lente 1: a curva do espaço por edição, com os picos */
+.pq-cv-2c{align-items:start;gap:0 40px}
+.pq-cv{--bg:var(--paper);margin:10px 0 0}
+.pq-cv-in{position:relative;height:150px;padding:0 6px 0 0;border-bottom:1px solid var(--rule)}
+.pq-cv .az-sp{width:100%;max-width:none;height:100%;margin:0}
+.pq-cv .az-sp-l{stroke:var(--mute2);stroke-width:1.6}
+.pq-pk{position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border:2px solid var(--az-mark);border-radius:50%;background:var(--paper)}
+.pq-cv-ax{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--mn);font-size:10.5px;color:var(--faint)}
+.pq-7{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:12px}
+.pq-7-k{flex:0 0 100%;font-family:var(--ss);font-size:10px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--muted)}
+.pq-7 .az-db{width:150px}
+.pq-pks{list-style:none;margin-top:4px}
+.pq-pks li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;padding:7px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--muted)}
+.pq-pks button{padding:0;border:0;background:none;font-family:var(--mn);font-size:13px;color:var(--link);cursor:pointer}
+.pq-pks button:hover{text-decoration:underline}
+.pq-pks small{flex:0 0 100%;font-size:12px;line-height:1.45;color:var(--ink)}
+
+/* lente 1: o tom e o placar dos veículos (7 colunas) */
+.pq-dn{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.pq-dn .az-tb{flex:0 0 150px}
+#pq-tom .az-2c{margin-top:8px}
+.pq-pv .az-hd,.pq-pv .az-s{grid-template-columns:18px minmax(120px,1.2fr) minmax(170px,1.3fr) minmax(70px,.5fr) minmax(150px,1.1fr) minmax(230px,1.6fr) 14px}
+.pq-pv .az-c-ix{font-family:var(--mn);font-size:12px;color:var(--ink)}
+.pq-ix{display:inline-block;padding:1px 6px;border:1.5px solid transparent;border-radius:4px}
+.pq-ix.pq-on,.md-ix.pq-on{border-color:var(--ink);font-weight:700}
+.pq-pq .az-s{opacity:.62}
+.pq-pv .az-more{margin-top:6px}
+.pq-pv .az-dossie .qf-ex{margin-top:10px}
+
+/* lente 1: com quem aparece (o nome refina a busca; "só" troca o termo) */
+.pq-chips{display:flex;flex-wrap:wrap;gap:8px}
+.pq-ch{display:inline-flex;align-items:stretch}
+.md-chips .pq-ch button:first-child{border-radius:15px 0 0 15px}
+.md-chips .pq-ch .pq-so-b{margin-left:-1.5px;padding:3px 9px;border-radius:0 15px 15px 0;font-size:10.5px;color:var(--muted)}
+.pq-pv .az-c-nm small{max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* base completa: as tabelas antigas dentro das caixas recolhidas */
+.az-base-in>.md{margin:0;padding:0;border:0}
+.az-base-in>.md .md-blk:first-child{margin-top:0}
+
+@media (max-width:1099.98px){
+  .pq-pv .az-hd,.pq-pv .az-s{grid-template-columns:18px minmax(100px,1fr) minmax(150px,1.3fr) minmax(64px,.5fr) minmax(130px,1.1fr) minmax(200px,1.5fr) 14px;gap:0 14px}
+  .pq-pv .az-hd>span:nth-child(4){display:block}
+  .pq-hs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:899.98px){
+  .pq-pv .az-s{grid-template-columns:18px minmax(0,1fr) minmax(0,1fr) 14px;gap:7px 16px;padding:12px 2px}
+  .pq-pv .az-s>.az-c-ix{grid-column:2;grid-row:3;flex-wrap:wrap;gap:2px 6px}
+  .pq-pv .az-s>.az-c-ix::before{content:"vs. esperado";flex:0 0 100%;font-family:var(--ss);font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--faint)}
+  .pq-pv .az-s>.az-c-es::before{content:"Espaço no que publicou"}
+  .pq-pv .az-s>.az-c-t7::before{content:"Tom: demais → o veículo"}
+  .pq-cv-2c{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:760px){
+  .pq-hs{grid-template-columns:minmax(0,1fr)}
+  .pq-cv-in{height:120px}
+  .pq-res{margin-top:28px}
+}
