@@ -31,7 +31,7 @@
   var qIn = $('pqQ'), deIn = $('pqDe'), ateIn = $('pqAte'), edIn = $('pqEd'), vIn = $('pqV'), ordIn = $('pqOrd'), titIn = $('pqTit');
   var tipoIns = Array.prototype.slice.call(form.querySelectorAll('input[name="tipo"]'));
   var statusEl = $('pqStatus'), outEl = $('pqOut'), anEl = $('pqAn'), countEl = $('pqCount'), listEl = $('pqList'), moreBtn = $('pqMore'), csvBtn = $('pqCsv');
-  var secaoEl = $('pesquisa'), filtrosEl = form.querySelector('.pq-sum'), refREl = $('pqRefR');
+  var secaoEl = $('pesquisa'), filtrosEl = form.querySelector('.pq-sum'), refREl = $('pqRefR'), resEl = $('pq-res'), det = $('pqDet');
 
   /* ── texto ─────────────────────────────────────────────────────────── */
   var MARCAS = /[̀-ͯ]/g;
@@ -65,6 +65,7 @@
   /* ── registros de uma edição ───────────────────────────────────────── */
   function montar(dados) {
     var dia = dados.data, V = dados.veiculos || [], S = dados.secoes || [], A = dados.assuntos || [], saida = [];
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dia || '')) return saida;
     function secao(i) { return S[i] || ['', '', '']; }
     function nomes(lista) { return (lista || []).map(function (i) { return V[i]; }).filter(Boolean); }
     function add(r, extra) {
@@ -112,6 +113,7 @@
         .then(function (dados) {
           cache[dia] = montar(dados);
           delete falhas[dia];
+          w.setTimeout(function () { propriosDoDia(dia); }, 0);
           return cache[dia];
         }, function () {
           falhas[dia] = true;
@@ -214,6 +216,13 @@
     gravarEndereco(f);
     outEl.hidden = false;
     listEl.innerHTML = '';
+    // nada da busca anterior fica na tela; com termo, a página já se arruma para a leitura
+    limparLeitura();
+    var comTermo = ts.some(function (t) { return !t.neg; });
+    secaoEl.classList.toggle('pq-com', comTermo);
+    if (comTermo && det) det.open = false;
+    if (resEl) resEl.hidden = true;
+    if (refinarEl) refinarEl.open = !comTermo;
     if (!dias.length) {
       estado.fim = true;
       desenhar();
@@ -291,7 +300,8 @@
     if (!e.fim) status('Buscando… ' + e.feitos + ' de ' + plural(e.dias.length, 'edição', 'edições') + ' (resultados parciais)');
     else if (faltam) status(plural(faltam, 'edição não carregou', 'edições não carregaram') + '; tente buscar de novo.', true);
     else status('');
-    secaoEl.classList.toggle('pq-com', !!(e.res.length && e.f.q));
+    secaoEl.classList.toggle('pq-com', e.ts.some(function (t) { return !t.neg; }) && !(e.fim && !e.res.length));
+    if (resEl) resEl.hidden = !e.res.length && !e.fim;
     mostrarFiltros(resumoFiltros(e.f, e));
     analitica(e);
     lista(e);
@@ -301,13 +311,13 @@
   // O resumo dos filtros (no título de "Filtros", que fica fechado durante a busca).
   function resumoFiltros(f, e) {
     var partes = [];
-    var marcados = tipoIns.filter(function (i) { return i.checked; });
-    partes.push(marcados.length === tipoIns.length ? 'todos os tipos' : marcados.map(function (i) { return NOMES[i.value] || i.value; }).join(', '));
-    partes.push(f.ed ? edIn.options[edIn.selectedIndex].text : 'todas as editorias');
     if (f.v) partes.push(f.v);
+    if (f.ed) partes.push(edIn.options[edIn.selectedIndex].text);
     var dias = e ? e.dias : DIAS;
-    if (dias.length) partes.push(dias.length === 1 ? 'edição de ' + dataCurta(dias[0].d) : num(dias.length) + ' edições, de ' + dataCurta(dias[dias.length - 1].d) + ' a ' + dataCurta(dias[0].d));
-    if (f.tit) partes.push('só nos títulos');
+    if (dias.length) partes.push(dias.length === 1 ? 'edição de ' + dataCurta(dias[0].d) : num(dias.length) + ' edições, ' + dataCurta(dias[dias.length - 1].d) + '–' + dataCurta(dias[0].d));
+    if (f.tit) partes.push('só títulos');
+    var marcados = tipoIns.filter(function (i) { return i.checked; });
+    if (marcados.length < tipoIns.length) partes.push(marcados.map(function (i) { return NOMES[i.value] || i.value; }).join(', '));
     return 'Filtros · ' + partes.join(' · ');
   }
   function limparFiltro(k) {
@@ -506,18 +516,24 @@
   }
   function vazio(e) {
     var f = e.f, rot = rotuloBusca(f.q), filtro = f.ed || f.v || f.de || f.ate || f.tit || tipoIns.some(function (i) { return !i.checked; });
+    var faltam = e.dias.filter(function (x) { return falhas[x.d]; }).length;
+    if (faltam) {
+      return '<li class="pq-empty">' + plural(faltam, 'edição não carregou', 'edições não carregaram') + ': a busca está incompleta. ' +
+        '<button type="button" class="pq-lk pq-retry">Tentar de novo</button></li>';
+    }
     if (filtro) {
-      return '<li class="pq-empty">Nenhum resultado' + (rot ? ' para ' + esc(rot) : '') + ' com os filtros: ' + esc(resumoFiltros(f, e).replace(/^Filtros · /, '')) + '. ' +
+      return '<li class="pq-empty">Nada encontrado com os filtros: ' + esc(resumoFiltros(f, e).replace(/^Filtros · /, '')) + '. ' +
         '<button type="button" class="pq-lk" data-limpa="tudo">Buscar sem os filtros</button></li>';
     }
-    return '<li class="pq-empty">Nenhum resultado' + (rot ? ' para ' + esc(rot) : '') + (e.dias.length === 1 ? ' na edição de ' + dataCurta(e.dias[0].d) : ' nas ' + num(e.dias.length) + ' edições, de ' +
+    return '<li class="pq-empty">Nada encontrado' + (e.dias.length === 1 ? ' na edição de ' + dataCurta(e.dias[0].d) : ' nas ' + num(e.dias.length) + ' edições, de ' +
       dataCurta(e.dias[e.dias.length - 1].d) + ' a ' + dataCurta(e.dias[0].d)) + '. A busca acha o começo das palavras, sem acento (“juro” acha “juros”), e todas as palavras ' +
       'precisam aparecer: tente outra grafia, menos palavras ou um dos nomes em destaque acima.</li>';
   }
   function lista(e) {
     var total = e.res.length;
     if (!total) {
-      countEl.innerHTML = e.fim ? 'Nenhum resultado' : '';
+      var rot0 = rotuloBusca(e.f.q);
+      countEl.innerHTML = e.fim ? 'Nenhum resultado' + (rot0 ? ' para ' + esc(rot0) : '') : '';
       if (tiposEl) tiposEl.textContent = '';
       csvBtn.hidden = true;
       moreBtn.hidden = true;
@@ -632,7 +648,7 @@
 
   // Filtros: recolhidos em "Filtros · …" (o título resume o que vale) sempre que há busca, e no
   // celular; abertos só sem busca, com mouse.
-  var det = $('pqDet'), fino = w.matchMedia ? w.matchMedia('(pointer: fine) and (min-width:761px)') : null;
+  var fino = w.matchMedia ? w.matchMedia('(pointer: fine) and (min-width:761px)') : null;
   var temEndereco = lerEndereco();
   if (det) {
     det.open = !temEndereco && !!(fino && fino.matches);

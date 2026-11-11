@@ -135,7 +135,7 @@ def test_lula_a_manchete_e_o_tom_e_os_achados_vao_do_maior_peso_ao_menor(tmp_pat
     assert veiculos["texto"].endswith("Passa do acaso, mesmo contando os 15 veículos comparados.") and veiculos["href"] == "#pq-v-4"
     # a Folha passa do acaso na atenção, mas 1,16 vez o esperado é pouco para virar achado
     assert atencao["titulo"] == "Agência Senado quase não cita Lula: 9 manchetes, onde o que publica faria esperar umas 62"
-    assert atencao["href"] == "#pq-placar"  # sem lugar no placar (menos de 3 manchetes… ou fora dele): vai ao placar
+    assert atencao["href"] == "#pq-b-atencao"  # sem lugar no placar: a prova é a tabela completa da atenção (a página abre o bloco)
     assert L["fina"] == (
         "Lula está em 3.153 manchetes de 38 veículos: 6,4% das 49.590 coletadas em 43 edições. No texto, as 71 notícias "
         "lidas pelo termômetro ficam todas em “Equilibrado”; apuração média 84 de 100."
@@ -177,12 +177,20 @@ def test_nada_passa_do_acaso_e_a_prova_diz_so_o_que_foi_comparado(tmp_path):
     L, C = _leituras(tmp_path, [_sem_testes(_lula()), curto])
     assert L["nada"] and L["principal"]["tipo"] == "historia"  # a história de maior peso, contagem
     assert L["principal"]["texto"].endswith(
-        "Nas manchetes, nada passa do acaso: nem um dia de pico, nem a mudança em sete edições, nem a do tom, nem a diferença entre veículos."
+        "Nas manchetes, nada passa do acaso: nem um dia de pico, nem a mudança em sete edições, nem a do tom, "
+        "nem o espaço de algum veículo contra o esperado, nem o tom de algum veículo contra os demais."
     )
     assert {a["tipo"] for a in L["achados"]} <= {"historia", "pauta", "lados"}
     assert [(m["selo"], m["forte"]) for m in L["mudancas"]] == [("estável", False), ("estável", False)] and L["fortes"] == 0
     # 5 edições: sem picos nem sete contra sete, a prova não fala do que não foi comparado
-    assert C["principal"]["texto"].endswith("Nas manchetes, nada passa do acaso: nem a diferença entre veículos.")
+    assert C["principal"]["texto"].endswith(
+        "Nas manchetes, nada passa do acaso: nem o espaço de algum veículo contra o esperado, nem o tom de algum veículo contra os demais."
+    )
+    # uma atenção que passa do acaso, mesmo sem virar achado (efeito pequeno), já impede o "nada passa"
+    com_folha = _sem_testes(_lula())
+    com_folha["veic"][0]["atForte"] = True
+    (D,) = _leituras(tmp_path, [com_folha])
+    assert not D["nada"] and "nada passa" not in D["principal"]["texto"]
     assert C["mudancas"] is None and C["mud0"] == "Com 5 edições no período, não há sete contra sete para comparar."
 
 
@@ -215,7 +223,7 @@ def test_filtro_de_veiculo_nao_compara_veiculos(tmp_path):
     tipos = {a["tipo"] for a in L["achados"]} | {L["principal"]["tipo"]}
     assert not tipos & {"veiculos", "atencao", "exterior"}
     assert L["chapeu"].endswith("· só Folha de S.Paulo")
-    assert L["fina"].startswith("Lula está em 782 das 5.197 manchetes coletadas de Folha de S.Paulo em 43 edições (15%).")
+    assert L["fina"].startswith("Lula está em 782 das 5.197 manchetes coletadas do veículo em 43 edições (15%).")
     lados_ = next(a for a in L["achados"] if a["tipo"] == "lados")
     assert "par" not in lados_["texto"]  # com o filtro, os pares não são comparados (e a frase não diz que foram)
 
@@ -239,3 +247,29 @@ def test_textos_sem_superlativo_sem_teste(tmp_path):
         for t in textos:
             assert not any(p in t for p in PROIBIDAS), t
             assert "  " not in t and " ." not in t and "undefined" not in t and "NaN" not in t, t
+
+
+def test_sem_as_noticias_a_leitura_nao_afirma_ausencia(tmp_path):
+    F = _com(_lula(), n=0, nBr=0, f__tipos={"m": True, "n": False, "c": False, "a": True}, f__parcial=True,
+             f__tiposTxt="só matérias e termômetro", tipos={"m": 142, "n": 0, "c": 0, "a": 79}, res=221, lados=None, veic=[], tom=None)
+    (L,) = _leituras(tmp_path, [F])
+    assert L["principal"]["titulo"] == "Lula em 142 matérias e 79 análises do Termômetro" and L["semNoticias"]
+    assert "não está" not in L["principal"]["titulo"] and "filtrada para matérias e termômetro" in L["principal"]["texto"]
+
+
+def test_concordancia_vez_e_o_que_volta(tmp_path):
+    dois = _com(_lula(), q={"rot": "“Lula” e “Haddad”", "excl": [], "umTermo": False, "T": "Lula e Haddad", "plural": True},
+                tom={"aplica": False, "motivo": "a busca tem mais de um termo", "n": 300, "comTom": 0, "saldo": None, "desf": 0, "fav": 0, "tend": None},
+                tend={"ka": 0, "ba": 8000, "kr": 40, "br": 7600, "v": None, "z": 6.0, "p": 1e-9, "passa": True}, antes=0)
+    volta = _com(dois, antes=12)
+    pouco = _com(_lula(), n=18, nBr=18)  # abaixo de 20 manchetes, a atenção não vira achado (a lente não compara)
+    A, B, C = _leituras(tmp_path, [dois, volta, pouco])
+    assert A["fina"].startswith("Lula e Haddad estão em 3.153 manchetes")
+    espaco = next(a for a in A["achados"] + [A["principal"]] if a["tipo"] == "espaco")
+    assert espaco["titulo"] == "Lula e Haddad entram nas manchetes: 40 manchetes nas últimas 7 edições, nenhuma nas 7 anteriores"
+    assert next(a for a in B["achados"] + [B["principal"]] if a["tipo"] == "espaco")["titulo"].startswith("Lula e Haddad voltam às manchetes")
+    assert [m["selo"] for m in A["mudancas"]] == ["entra", "não se aplica"] and A["comparadas"] == 1
+    assert "atencao" not in {a["tipo"] for a in C["achados"]}
+    pico = next(a for a in _leituras(tmp_path, [_com(_lula(), picos__dias=[
+        {"d": "2026-10-26", "k": 30, "b": 1000, "p0": 0.018, "R": 1.7, "p": 1e-9, "passa": True}])])[0]["achados"] if a["tipo"] == "pico")
+    assert pico["titulo"].endswith("1,7 vez a parte dos outros dias")

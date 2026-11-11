@@ -6,8 +6,9 @@
 .pq .az{padding-bottom:0}
 #pqOut [id]{scroll-margin-top:58px}
 .pq-out[hidden],.pq-lz[hidden],.az-nav[hidden]{display:none}
-.pq.pq-com .pq-intro,.pq.pq-com .pq-tip,.pq.pq-com .md-sug{display:none}
-.pq-lz .az-lead{margin-top:14px}
+.pq.pq-com .pq-intro,.pq.pq-com .pq-tip{display:none}
+.pq-lz .az-lead{margin-top:14px;align-items:start}
+.pq-mais-cel{display:none}
 .az-lead.pq-so{grid-template-columns:minmax(0,1fr)}
 .pq-so .az-box{padding-bottom:16px}
 .pq-so .az-manchete{max-width:900px}
@@ -15,6 +16,7 @@
 .pq-az-link a{color:var(--link)}
 .pq-az-link a:hover{text-decoration:underline}
 .pq-eds{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pq-eds{align-items:center}
 .pq-eds button,.pq-retry{padding:5px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-family:var(--ss);font-size:12px;color:var(--ink);cursor:pointer}
 .pq-eds button:hover,.pq-retry:hover{border-color:var(--link);color:var(--link)}
 .pq-eds b{margin-left:4px;font-family:var(--mn);font-size:11px;color:var(--muted)}
@@ -56,7 +58,8 @@
 .pq-cv{--bg:var(--paper);margin:10px 0 0}
 .pq-cv-in{position:relative;height:150px;padding:0 6px 0 0;border-bottom:1px solid var(--rule)}
 .pq-cv .az-sp{width:100%;max-width:none;height:100%;margin:0}
-.pq-cv .az-sp-l{stroke:var(--mute2);stroke-width:1.6}
+.pq-cv .az-sp-l{stroke:var(--faint);stroke-width:1.4}
+.pq-cv .az-sp-r{stroke-width:2.8}
 .pq-pk{position:absolute;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border:2px solid var(--az-mark);border-radius:50%;background:var(--paper)}
 .pq-cv-ax{display:flex;justify-content:space-between;gap:12px;margin-top:6px;font-family:var(--mn);font-size:10.5px;color:var(--faint)}
 .pq-7{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:12px}
@@ -76,7 +79,7 @@
 .pq-pv .az-c-ix{font-family:var(--mn);font-size:12px;color:var(--ink)}
 .pq-ix{display:inline-block;padding:1px 6px;border:1.5px solid transparent;border-radius:4px}
 .pq-ix.pq-on,.md-ix.pq-on{border-color:var(--ink);font-weight:700}
-.pq-pq .az-s{opacity:.62}
+.pq-pq .az-c-tm,.pq-pq .az-c-t7{opacity:.62}  /* amostra pequena só no tom; o espaço vale */
 .pq-pv .az-more{margin-top:6px}
 .pq-pv .az-dossie .qf-ex{margin-top:10px}
 
@@ -108,4 +111,14 @@
   .pq-hs{grid-template-columns:minmax(0,1fr)}
   .pq-cv-in{height:120px}
   .pq-res{margin-top:28px}
+  /* no celular, a resposta e a lista ficam perto: 3 achados, 1 história e as lentes compactas */
+  .pq-lz .az-achados>li:nth-child(n+4),#pq-historias .pq-hs>li:nth-child(n+2){display:none}
+  .pq-tudo .az-achados>li:nth-child(n+4),#pq-historias.pq-tudo .pq-hs>li:nth-child(n+2){display:block}
+  .pq-mais-cel{display:block;margin:10px 0 4px;padding:6px 14px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;color:var(--link);cursor:pointer}
+  .pq-tudo>.pq-mais-cel{display:none}
+  .pq-lz .az-lentes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px}
+  .pq-lz .az-l-p,.pq-lz .az-l-b{display:none}
+  .pq-lz .az-l-k{flex-wrap:wrap;gap:3px 5px;font-size:9.5px;letter-spacing:.8px}
+  .pq-lz .az-l{border-bottom:0}
+  .pq-lz .az-mud li{grid-template-columns:minmax(0,1fr) auto auto auto;column-gap:10px}
 }

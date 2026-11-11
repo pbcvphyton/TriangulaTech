@@ -46,7 +46,11 @@
     espMin: 3,       // atenção: o veículo entra na comparação com 3+ manchetes esperadas sobre o termo
     picoK: 5,        // pico: 5+ manchetes do termo no dia…
     picoR: 1.5,      // … e 1,5 vez a parte dos outros dias
-    pares: 10        // pares mostrados em "quem fica com quem" (os mais longe do acaso)
+    pares: 10,       // pares mostrados em "quem fica com quem" (os mais longe do acaso)
+    voc: 15,         // manchetes do veículo sobre o termo para o vocabulário distintivo (base completa)
+    termos: 6,       // palavras por veículo
+    // vocabulário: limiar alto porque cada veículo testa dezenas a centenas de palavras de uma vez
+    z: 3.3
   };
   // Os limites da aba Analítico (qijournal/render/achados.py e lados.py, via pesquisa.py).
   var LZ = M.lz || { alfaTom: 0.05, alfaEsp: 0.01, alfaVei: 0.01, alfaLados: 0.01, minPar: 8, minDestoa: 8, achados: 6, qualidade: [50, 80] };
@@ -129,41 +133,54 @@
   // Base: todas as notícias das edições do período com os mesmos filtros (sem o termo),
   // a mesma notícia uma vez: na edição em que entrou nos resultados (a mais antiga em que
   // casou com o termo) ou, se não casou, na mais antiga em que apareceu.
-  function mdBase(e) {
+  // ``extras`` (as edições logo antes do período, só para "o que mudou"): entram depois, só com as
+  // notícias que o período não tem — quem está no período fica na data dele, e os números das
+  // últimas 7 edições batem com os do resto da página.
+  function mdBase(e, extras, fExtras) {
     var porVeiculo = {}, porDia = {}, porSecao = {}, veiculoSecao = {}, total = 0, vistos = {}, dataDe = {};
     e.res.forEach(function (x) { if (x.r.k === 'n') dataDe[x.r.u] = x.r.d; });
-    e.dias.slice().reverse().forEach(function (x) {
-      (cache[x.d] || []).forEach(function (r) {
-        if (r.k !== 'n' || vistos[r.u] || !passa(r, e.f)) return;
-        vistos[r.u] = true;
-        total++;
-        var o = r.f[0] || '';
-        somar(porVeiculo, o);
-        somar(porDia, dataDe[r.u] || r.d);
-        somar(porSecao, r.s || '');
-        somar(veiculoSecao[o] || (veiculoSecao[o] = {}), r.s || '');
+    function conta(dias, f) {
+      dias.slice().reverse().forEach(function (x) {
+        (cache[x.d] || []).forEach(function (r) {
+          if (r.k !== 'n' || vistos[r.u] || !passa(r, f)) return;
+          vistos[r.u] = true;
+          total++;
+          var o = r.f[0] || '';
+          somar(porVeiculo, o);
+          somar(porDia, dataDe[r.u] || r.d);
+          somar(porSecao, r.s || '');
+          somar(veiculoSecao[o] || (veiculoSecao[o] = {}), r.s || '');
+        });
       });
-    });
+    }
+    conta(e.dias, e.f);
+    if (extras && extras.length) conta(extras, fExtras);
     return { total: total, veiculo: porVeiculo, dia: porDia, secao: porSecao, vs: veiculoSecao };
   }
 
   // Espaço, picos e atenção: as manchetes que citam o termo contra a base do período.
   function atencao(nots, base, e) {
-    var k = {}, kd = {}, ks = {}, br = { k: 0, b: 0 }, ex = { k: 0, b: 0 }, nE = 0;
-    nots.forEach(function (r) { somar(k, r.f[0] || ''); somar(kd, r.d); somar(ks, r.s || ''); });
+    var k = {}, kd = {}, br = { k: 0, b: 0 }, ex = { k: 0, b: 0 }, nE = 0, nEc = 0;
+    var ks = { br: {}, ex: {} }, bs = { br: {}, ex: {} };
+    nots.forEach(function (r) { var o = r.f[0] || ''; somar(k, o); somar(kd, r.d); somar(ks[EXTERIOR[o] ? 'ex' : 'br'], r.s || ''); });
+    Object.keys(base.vs).forEach(function (o) {
+      var g = EXTERIOR[o] ? 'ex' : 'br';
+      Object.keys(base.vs[o]).forEach(function (s) { somar(bs[g], s, base.vs[o][s]); });
+    });
     // Esperado: as manchetes que o veículo teria sobre o termo se desse a ele, em cada
-    // editoria em que publica, o mesmo espaço que o conjunto dá (um site de esporte não
-    // "deveria" citar um político como um de política). Com uma editoria só, é a média.
+    // editoria em que publica, o mesmo espaço que os veículos do mesmo grupo dão (os
+    // brasileiros contra a imprensa brasileira; lá fora se escreve em outra língua). Um site
+    // de esporte não "deveria" citar um político como um de política.
     function esperado(o) {
-      var por = base.vs[o] || {}, soma = 0;
-      Object.keys(por).forEach(function (s) { if (base.secao[s]) soma += por[s] * (ks[s] || 0) / base.secao[s]; });
+      var g = EXTERIOR[o] ? 'ex' : 'br', por = base.vs[o] || {}, soma = 0;
+      Object.keys(por).forEach(function (s) { if (bs[g][s]) soma += por[s] * (ks[g][s] || 0) / bs[g][s]; });
       return soma;
     }
     Object.keys(base.veiculo).forEach(function (o) {
       var g = EXTERIOR[o] ? ex : br;
       g.k += k[o] || 0;
       g.b += base.veiculo[o];
-      if (EXTERIOR[o]) nE++;
+      if (EXTERIOR[o]) { nE++; if (k[o]) nEc++; }
     });
     function veiculo(o) {
       var b = base.veiculo[o] || 0, n = k[o] || 0, esp = esperado(o);
@@ -181,6 +198,9 @@
     });
     var passamAt = ST.holm(fam, LZ.alfaVei);
     Object.keys(passamAt).forEach(function (o) { porV[o].atForte = true; });
+    var semCitar = Object.keys(passamAt).filter(function (o) { return !k[o]; }).sort().map(function (o) {
+      return { o: o, k: 0, b: base.veiculo[o] || 0, s: 0, esp: porV[o].esp, i: 0, ex: false };
+    });
 
     // Edição a edição (da mais antiga para a mais recente; só as que têm manchete coletada).
     var n = nots.length, B = base.total;
@@ -193,7 +213,7 @@
       var pp = {};
       var dias = serie.map(function (s) {
         var resto = n - s.k, baseResto = B - s.b, p0 = baseResto > 0 ? resto / baseResto : 0;
-        var x = { d: s.d, k: s.k, b: s.b, p0: p0, R: p0 > 0 ? (s.k / s.b) / p0 : null, p: 1, passa: false };
+        var x = { d: s.d, k: s.k, b: s.b, p0: p0, ko: resto, bo: baseResto, R: p0 > 0 ? (s.k / s.b) / p0 : null, p: 1, passa: false };
         if (s.k && resto >= 3 && p0 > 0) pp[s.d] = x.p = ST.binAcima(s.k, s.b, p0);
         return x;
       });
@@ -218,13 +238,13 @@
     var ext = null;
     if (ex.b && br.b) {
       var zx = ST.zProp(ex.k, ex.b, br.k, br.b), px = ST.pNormal(zx);
-      ext = { ke: ex.k, be: ex.b, kb: br.k, bb: br.b, nE: nE, z: zx, p: px, passa: zx !== null && px <= 0.01 };
+      ext = { ke: ex.k, be: ex.b, kb: br.k, bb: br.b, nE: nE, nEc: nEc, z: zx, p: px, passa: zx !== null && px <= 0.01 };
     }
     var com = 0;
     Object.keys(kd).forEach(function (d) { if (kd[d]) com++; });
     return {
       n: n, base: B, veiculos: veiculos, br: br, ex: ex, ext: ext, tend: tend, jan: jan, antes: antes, serie: serie, picos: picos,
-      porV: porV, mAt: Object.keys(fam).length, nveic: veiculos.length, k: k, diasCom: com
+      porV: porV, semCitar: semCitar, mAt: Object.keys(fam).length, nveic: veiculos.length, k: k, diasCom: com
     };
   }
 
@@ -321,20 +341,12 @@
     return lista;
   }
 
-  // Lados nos assuntos da cobertura comparada que citam o termo no título ou na conclusão
-  // (a conta de qijournal/render/lados.py: quem fica nos dois lados sai do par; o acaso é o
-  // placar de cada assunto; teste exato e Holm a 99%).
+  // Lados nos assuntos da cobertura comparada que a busca achou: os que tiveram veículos nos
+  // dois lados contam como no dossiê do nome no Analítico (qijournal/render/midia.py); os
+  // pares e quem destoa seguem qijournal/render/lados.py (quem fica nos dois lados sai do par;
+  // o acaso é o placar de cada assunto; teste exato e Holm a 99%).
   function ladosBusca(comps, e) {
-    var vistos = {}, lista = [];
-    comps.slice().sort(function (x, y) { return cmp(x.d, y.d); }).forEach(function (r) {
-      var chave = r.u || r.t;
-      if (vistos[chave]) return;
-      vistos[chave] = true;
-      if ((r.vs || []).length < 2) return;
-      if (!casa({ nt: r.nt, nx: r.nt + '\n' + norm(r.c.c || '') }, e.ts, false)) return;
-      lista.push(r);
-    });
-    var itens = [];
+    var lista = comps, itens = [];
     lista.forEach(function (r) {
       var a = [], b = [], n = [];
       r.vs.forEach(function (o) { var l = o.lado === 'a' ? a : o.lado === 'b' ? b : n; if (l.indexOf(o.n) < 0) l.push(o.n); });
@@ -376,9 +388,13 @@
         }
       });
     }
+    function soma(lista) {  // compensada (Neumaier), como o sum() do Python: o acaso escrito bate com lados.py
+      var s = 0, c = 0;
+      lista.forEach(function (x) { var t = s + x; c += Math.abs(s) >= Math.abs(x) ? (s - t) + x : (x - t) + s; s = t; });
+      return s + c;
+    }
     function esperadoZ(k, ps) {
-      var esp = 0, v = 0;
-      ps.forEach(function (p) { esp += p; v += p * (1 - p); });
+      var esp = soma(ps), v = soma(ps.map(function (p) { return p * (1 - p); }));
       return { esp: esp, z: v > 0 ? (k - esp) / Math.sqrt(v) : null };
     }
     function um(v) { return ST.arred(v, 1).toFixed(1).replace('.', ','); }
@@ -398,9 +414,11 @@
       return { nome: o, minoria: k, total: total, esp: ez.esp, esperado: um(ez.esp), p: pvD[o], classe: passaD[o] ? (k > ez.esp ? 'mais' : 'menos') : '',
         barra: 100 * k / total, marca: 100 * ez.esp / total };
     }).sort(function (x, y) { return y.barra - x.barra || y.total - x.total || cmp(x.nome, y.nome); });
-    var mais = itens[0];
+    var mais = itens[0], somaDv = 0;
+    itens.forEach(function (x) { somaDv += x.dv; });
     return {
       c: lista.length, d: itens.length, itens: itens, pares: pares, destoa: destoa, mP: pares.length, mD: destoa.length,
+      dvMedia: itens.length ? somaDv / itens.length : null,
       fora: Object.keys(chances).length - pares.length, mais: mais ? { titulo: mais.t, a: mais.a.length, b: mais.b.length } : null
     };
   }
@@ -448,6 +466,8 @@
       var m = t.re.exec(r.nt);
       if (!m) return;
       var ini = m.index + m[0].length - m[1].length, forma = r.t.substr(ini, m[1].length);
+      var antes = r.t.slice(0, ini).replace(/\s+$/, '');
+      if (!antes || PONTUACAO.test(antes.slice(-1))) return;  // no começo da frase a maiúscula não diz nada
       if (norm(forma).replace(/[^a-z0-9]+/g, ' ').trim() === t.n) somar(formas, forma);
     });
     return maisFrequente(formas);
@@ -599,8 +619,14 @@
     var s = (M.secoes || []).filter(function (x) { return x[0] === id; })[0];
     return s ? s[1] : id;
   }
+  function chaveDaBusca(q) { return termos(q).map(function (t) { return (t.neg ? '-' : '') + t.n; }).join('|'); }
+  var AZ_NOMES = {};
+  if (M.az && M.az.nomes) {
+    Object.keys(M.az.nomes).forEach(function (k) { AZ_NOMES['=' + chaveDaBusca(k)] = M.az.nomes[k]; });
+  }
   function modoAnalitico(f) {
-    var az = M.az, nome = az && az.nomes ? az.nomes[f.q.trim()] : null;
+    var az = M.az, chave = '=' + chaveDaBusca(f.q);
+    var nome = Object.prototype.hasOwnProperty.call(AZ_NOMES, chave) ? AZ_NOMES[chave] : null;
     if (!nome || f.ed !== az.ed || f.de !== az.de || (f.ate && f.ate !== az.ate) || f.v || f.tit || !f.tipos.n) return null;
     return { i: nome.i, tom: !!nome.tom, esp: !!nome.esp, vei: nome.vei || [], mTom: az.mTom, mEsp: az.mEsp, mVei: az.mVei };
   }
@@ -609,16 +635,20 @@
     var brutos = termosBrutos(f.q), pos = brutos.filter(function (t) { return !t.neg; }), excl = brutos.filter(function (t) { return t.neg; });
     var tsPos = e.ts.filter(function (t) { return !t.neg; }), umTermo = tsPos.length === 1;
     var formas = tsPos.map(function (t, i) { return (umTermo && formaDoTermo(x.nots, t)) || (pos[i] ? pos[i].bruto : t.n); });
+    var nome = formas.join(' e ');
     var c = contar(e), marcados = Object.keys(TIPO_TXT).filter(function (k) { return f.tipos[k]; });
     var az = modoAnalitico(f);
     var F = {
-      q: { rot: pos.map(function (t) { return '“' + t.bruto + '”'; }).join(' e '), excl: excl.map(function (t) { return t.bruto; }), umTermo: umTermo, T: formas.join(' e ') },
+      // T: o termo nas frases; com exclusão, ela vai junto ("Lula (sem “Flávio”)"), porque os números são dela
+      q: { rot: pos.map(function (t) { return '“' + t.bruto + '”'; }).join(' e '), excl: excl.map(function (t) { return t.bruto; }), umTermo: umTermo,
+        T: nome + (excl.length ? ' (sem ' + juntar(excl.map(function (t) { return '“' + t.bruto + '”'; })) + ')' : ''),
+        plural: tsPos.length > 1 || / e /.test(nome) },
       f: { ed: f.ed, edTit: f.ed ? tituloSecao(f.ed) : '', v: f.v, tit: f.tit, tipos: f.tipos, parcial: marcados.length < 4,
         tiposTxt: 'só ' + marcados.map(function (k) { return TIPO_TXT[k]; }).join(', ').replace(/, ([^,]*)$/, ' e $1'), D: dias.length, de: dias[0], ate: dias[dias.length - 1] },
       res: e.res.length, tipos: { m: c.tipos.m || 0, n: c.tipos.n || 0, c: c.tipos.c || 0, a: c.tipos.a || 0 }, diasRes: c.edicoes,
       editorias: Object.keys(c.secoes).map(function (s) { return { s: s, t: c.nomesSecao[s] || s, k: c.secoes[s] }; })
         .sort(function (a, b) { return b.k - a.k || cmp(a.t, b.t); }),
-      B: x.base.total, n: x.nots.length, nBr: at ? at.br.k : 0, nveic: at ? at.nveic : 0, diasCom: at ? at.diasCom : 0,
+      B: x.base.total, n: x.nots.length, nBr: at ? at.br.k : 0, nveic: at ? at.nveic : 0, diasCom: at ? at.diasCom : 0, dCom: at ? at.serie.length : 0,
       jan: at ? at.jan : null, antes: at ? at.antes : 0, tend: at ? at.tend : null, picos: at ? at.picos : null, serie: at ? at.serie : [],
       ext: at ? at.ext : null, mAt: at ? at.mAt : 0, mVei: tm && !tm.falta ? tm.mVei : 0,
       hist: x.hist, pauta: x.pz ? { grupos: x.pz.grupos, temas: x.pz.temas } : null, lados: x.ld, texto: x.tx, az: az, veic: []
@@ -657,8 +687,9 @@
       if (F.tend) F.tend.passa = az.esp && F.tend.v !== null && Math.abs(F.tend.v) > 0.15 || (az.esp && F.tend.v === null);
       if (F.tom && F.tom.tend) F.tom.tend.passa = az.tom;
       F.veic.forEach(function (v) { v.tomForte = az.vei.indexOf(v.o) >= 0; });
-      F.mVei = az.mVei;
+      if (tm && !tm.falta) tm.veiculos.forEach(function (v) { v.forte = az.vei.indexOf(v.o) >= 0; });
     }
+    if (tm && !tm.falta) tm.familia = az ? 'as ' + num(az.mVei) + ' comparações veículo × nome do Analítico' : 'os ' + num(tm.mVei) + ' veículos comparados';
     return F;
   }
 
@@ -666,7 +697,8 @@
   // ("o que mudou"); só para essas contas — nada entra na lista, no CSV ou nas outras lentes.
   function edicoesExtras(e) {
     var D = e.dias.length;
-    if (D < MD.semana || D >= 2 * MD.semana) return [];
+    if (D < MD.semana || D >= 2 * MD.semana || e.res.length <= 10 || !e.f.tipos.n) return [];
+    if (!e.res.some(function (x) { return x.r.k === 'n'; })) return [];
     var maisAntiga = e.dias[D - 1].d;
     return DIAS.filter(function (x) { return x.d < maisAntiga; }).slice(0, 2 * MD.semana - D);
   }
@@ -674,24 +706,20 @@
     var f = {}, k;
     for (k in e.f) if (Object.prototype.hasOwnProperty.call(e.f, k)) f[k] = e.f[k];
     f.de = extras[extras.length - 1].d;
-    var eX = { f: f, ts: e.ts, dias: e.dias.concat(extras), res: [] }, chave = {};
-    e.res.forEach(function (x) {
-      var novo = { r: x.r, n: x.n };
-      if (x.r.k === 'n') chave[x.r.u] = novo;
-      eX.res.push(novo);
-    });
-    extras.forEach(function (x) {
+    f.ate = extras[0].d;
+    // As notícias do período ficam onde estão; das edições anteriores entra só o que o período não tem.
+    var eX = { f: e.f, ts: e.ts, dias: e.dias.concat(extras), res: e.res.slice() }, links = {};
+    e.res.forEach(function (x) { if (x.r.k === 'n') links[x.r.u] = true; });
+    extras.slice().reverse().forEach(function (x) {
       (cache[x.d] || []).forEach(function (r) {
-        if (r.k !== 'n' || !passa(r, f) || !casa(r, e.ts, f.tit)) return;
-        var y = chave[r.u];
-        if (y) { if (r.d < y.r.d) y.r = r; return; }
-        chave[r.u] = { r: r, n: 1 };
-        eX.res.push(chave[r.u]);
+        if (r.k !== 'n' || links[r.u] || !passa(r, f) || !casa(r, e.ts, f.tit)) return;
+        links[r.u] = true;
+        eX.res.push({ r: r, n: 1 });
       });
     });
     var nots = eX.res.filter(function (x) { return x.r.k === 'n'; }).map(function (x) { return x.r; });
     if (!nots.length) return null;
-    var at = atencao(nots, mdBase(eX), eX), tm = tomDoTermo(nots, eX, ts, at);
+    var at = atencao(nots, mdBase(e, extras, f), eX), tm = tomDoTermo(nots, eX, ts, at);
     return { tend: at.tend, jan: at.jan, antes: at.antes, tomTend: tm && !tm.falta ? tm.tend : null };
   }
 
@@ -710,8 +738,10 @@
     x.hist = nots.length ? historias(nots) : [];
     x.ld = ladosBusca(comps, e);
     x.tx = textoBusca(e);
+    x.qs = qs;
     x.F = fatos(e, x);
     var extras = e.extras || [];
+    if (e.extrasFalharam) x.F.f.extraFalhou = true;
     if (extras.length && x.F.n && !x.F.jan) {
       var J = janelasEstendidas(e, ts, extras);
       if (J && J.jan) {
@@ -729,6 +759,69 @@
   }
 
   /* ── as tabelas da base completa (recolhidas) ───────────────────────── */
+  // O que cada veículo enfatiza: palavras que ele usa bem mais que os outros veículos
+  // brasileiros nas manchetes sobre o termo (log-odds com prior de Dirichlet informativo).
+  function vozes(nots, qs) {
+    var porVeiculo = {}, tudo = {}, total = 0, formas = {};
+    nots.forEach(function (r) {
+      var o = r.f[0];
+      if (!o || EXTERIOR[o]) return;
+      var ps = r.ps || (r.ps = palavras(r.t)), s = porVeiculo[o] || (porVeiculo[o] = { n: 0, c: {}, t: 0 });
+      s.n++;
+      ps.forEach(function (p, k) {
+        var n = p.n;
+        if (n.length < 3 || VAZIAS[n] || FORA[n] || /^\d+$/.test(n) || doTermo(n, qs)) return;
+        somar(s.c, n);
+        s.t++;
+        somar(tudo, n);
+        total++;
+        var f = formas[n] || (formas[n] = { meio: {}, inicio: {} });
+        if (inicioFrase(r.t, ps, k)) somar(f.inicio, p.p === p.p.toUpperCase() || maiuscula(p.p.slice(1)) ? p.p : p.p.toLowerCase());
+        else somar(f.meio, p.p);
+      });
+    });
+    var a0 = 0.1 * total;  // força do prior: 10% das palavras dos resultados, na proporção de cada uma
+    var veiculos = Object.keys(porVeiculo).filter(function (o) { return porVeiculo[o].n >= MD.voc; })
+      .sort(function (a, b) { return porVeiculo[b].n - porVeiculo[a].n || cmp(a, b); }).slice(0, 8);
+    if (veiculos.length < 2) return { veiculos: [], faltam: veiculos.length };
+    return {
+      veiculos: veiculos.map(function (o) {
+        var s = porVeiculo[o], ni = s.t, nj = total - ni, termos = [];
+        if (nj > 0) {
+          Object.keys(s.c).forEach(function (pal) {
+            var yi = s.c[pal];
+            if (yi < 3) return;
+            var yw = tudo[pal], aw = a0 * yw / total, yj = yw - yi;
+            var di = ni + a0 - yi - aw, dj = nj + a0 - yj - aw;
+            if (di <= 0 || dj <= 0) return;
+            var delta = Math.log((yi + aw) / di) - Math.log((yj + aw) / dj);
+            var z = delta / Math.sqrt(1 / (yi + aw) + 1 / (yj + aw));
+            if (z > MD.z) termos.push({ f: maisFrequente(Object.keys(formas[pal].meio).length ? formas[pal].meio : formas[pal].inicio), y: yi, z: z });
+          });
+        }
+        termos.sort(function (a, b) { return b.z - a.z || cmp(a.f, b.f); });
+        return { o: o, n: s.n, termos: termos.slice(0, MD.termos) };
+      }),
+      faltam: 0
+    };
+  }
+
+  function blocoVozes(vz) {
+    if (!vz) return '';
+    var h = '<div class="md-blk"><h4>O que cada veículo enfatiza</h4>';
+    if (!vz.veiculos.length) {
+      return h + '<p class="md-note">Para comparar o vocabulário, são precisos dois ou mais veículos brasileiros com ' + MD.voc + '+ manchetes sobre o termo.</p></div>';
+    }
+    h += '<p class="md-note">Palavras que o veículo usa bem mais que os outros veículos brasileiros nas manchetes sobre o termo — o ângulo de cada um.</p><ul class="md-voc">';
+    vz.veiculos.forEach(function (v) {
+      h += '<li><button type="button" class="md-vn" data-v="' + esc(v.o) + '" title="Filtrar por ' + esc(v.o) + '">' + esc(v.o) + '</button><span class="md-vc">' + plural(v.n, 'manchete', 'manchetes') + '</span>' +
+        (v.termos.length ? '<span class="md-chips">' + v.termos.map(function (t) {
+          return '<button type="button" data-q="' + esc(t.f) + '" data-v="' + esc(v.o) + '" title="' + esc(t.f) + ': ' + plural(t.y, 'vez', 'vezes') + ' (clique para ver essas manchetes)">' + esc(t.f) + ' <b>' + t.y + '</b></button>';
+        }).join('') + '</span>' : '<span class="md-vt">sem diferença clara de vocabulário</span>') + '</li>';
+    });
+    return h + '</ul></div>';
+  }
+
   function blocoAtencao(at) {
     var h = '<div class="md-blk"><ul class="md-tiles">';
     h += '<li><span>Participação nas manchetes</span><b>' + pct(at.n, at.base) + '</b><small>' + num(at.n) + ' de ' + num(at.base) + '</small></li>';
@@ -737,18 +830,25 @@
     }
     h += '<li><span>Veículos que citam</span><b>' + num(at.nveic) + '</b><small>' + plural(at.veiculos.filter(function (v) { return v.ex; }).length, 'do exterior', 'do exterior') + '</small></li>';
     h += '</ul>';
+    // vs. esperado: o da comparação (3+ manchetes esperadas) ou, sem ela, o da tabela (30+ manchetes do veículo)
+    function indice(v) {
+      var pv = at.porV[v.o];
+      if (pv && pv.esp >= MD.espMin) return v.k / pv.esp;
+      return v.i;
+    }
     var maior = 0;
-    at.veiculos.forEach(function (v) { if (v.i !== null) maior = Math.max(maior, v.i); });
+    at.veiculos.forEach(function (v) { var i = indice(v); if (i !== null && i !== undefined) maior = Math.max(maior, i); });
     h += '<div class="an-tbl-wrap"><table class="md-tbl"><thead><tr><th scope="col">Veículo</th><th scope="col">Manchetes</th>' +
       '<th scope="col" title="Parte das manchetes do veículo no período que cita o termo">% do que publicou</th>' +
       '<th scope="col" title="Manchetes do veículo sobre o termo ÷ as esperadas pelo espaço que o termo tem em cada editoria em que o veículo publica (1× = o esperado)">Espaço vs. esperado</th></tr></thead><tbody>';
-    at.veiculos.forEach(function (v) {
-      var pv = at.porV[v.o], forte = pv && pv.atForte;
+    at.veiculos.concat(at.semCitar || []).forEach(function (v) {
+      var pv = at.porV[v.o], forte = pv && pv.atForte, iv = indice(v);
       h += '<tr><th scope="row"><button type="button" data-v="' + esc(v.o) + '" title="Filtrar por ' + esc(v.o) + '">' + esc(v.o) + '</button>' +
         (v.ex ? '<span class="md-ex">exterior</span>' : '') + '</th><td>' + num(v.k) + '</td><td>' + (v.b ? pct(v.k, v.b) : '—') + '</td>' +
         '<td class="md-ix' + (forte ? ' pq-on' : '') + '"' + (forte ? ' title="Passa do acaso, mesmo contando os ' + num(at.mAt) + ' veículos comparados (99%)"' : '') + '>' +
-        (v.i === null ? '<span title="Menos de ' + MD.base + ' manchetes do veículo no período">—</span>' :
-          '<i style="--w:' + Math.round(v.i / (maior || 1) * 100) + '%" aria-hidden="true"></i>' + dec(v.i, 1) + '×') + '</td></tr>';
+        (iv === null || iv === undefined ? '<span title="Poucas manchetes do veículo no período para comparar">—</span>' :
+          !v.k ? '0× <small>(umas ' + num(Math.max(1, ST.arred(pv.esp, 0))) + ' esperadas)</small>' :
+          '<i style="--w:' + Math.round(iv / (maior || 1) * 100) + '%" aria-hidden="true"></i>' + dec(iv, 1) + '×') + '</td></tr>';
     });
     h += '</tbody></table></div>';
     return h + '<p class="md-note">Com o contorno: a diferença para o esperado passa do acaso, mesmo contando todos os veículos comparados (Poisson exato, Holm a 99%).</p></div>';
@@ -775,7 +875,7 @@
       '<th scope="col" title="Manchetes do veículo sobre o termo ÷ as esperadas pelo que ele publica (1× = o esperado)">vs. esperado</th><th scope="col">Desfav.</th><th scope="col">Fav.</th>' +
       '<th scope="col" title="Favoráveis menos desfavoráveis; entre parênteses, o dos demais veículos">Saldo · demais</th><th scope="col" title="Manchetes em que o termo é alvo de crítica, acusação ou punição">É alvo</th></tr></thead><tbody>';
     tm.veiculos.forEach(function (v) {
-      var tag = v.classe ? ' <span class="qf-tag qf-' + v.classe + '" title="' + (v.forte ? 'Passa do acaso, mesmo contando os ' + num(tm.mVei) + ' veículos comparados' : 'Comparação isolada (99%); não passa contando os ' + num(tm.mVei) + ' veículos comparados') + '">' +
+      var tag = v.classe ? ' <span class="qf-tag qf-' + v.classe + '" title="' + esc(v.forte ? 'Passa do acaso, mesmo contando ' + tm.familia : 'Comparação isolada (99%); não passa contando ' + tm.familia) + '">' +
         (v.classe === 'neg' ? 'mais crítico' : 'mais favorável') + (v.forte ? '' : ' · isolado') + '</span>' : '';
       h += '<tr' + (v.pequena ? ' class="md-pq" title="Amostra pequena: menos de ' + TP.minV + ' manchetes (sem comparação de tom)"' : '') + '><th scope="row"><button type="button" data-v="' + esc(v.o) + '" title="Filtrar por ' + esc(v.o) + '">' + esc(v.o) + '</button>' + tag +
         (v.assunto ? '<span class="qf-as">' + esc(v.assunto) + ' (' + v.assuntoN + ')</span>' : '') + '</th>' +

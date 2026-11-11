@@ -480,28 +480,36 @@ manifesto da página):
 | Espaço | a parte das manchetes que citam o termo mudou nas últimas 7 edições contra as 7 anteriores (duas proporções, 99%, e mais de 15%) |
 | Pico | um dia tem uma parte das manchetes acima da dos outros dias do período (binomial, Holm a 99% sobre todas as edições; 5+ manchetes e 1,5 vez a parte dos outros dias); a história do dia vai junto |
 | Veículos | um veículo põe o termo em contexto mais crítico ou mais favorável que os demais (99%, Holm sobre os veículos comparados) |
-| Atenção | um veículo cita o termo bem mais ou bem menos que o esperado pelas editorias em que publica (Poisson exato, Holm a 99%; 1,5 vez o esperado, ou metade) |
-| Exterior | os veículos de fora do Brasil dão ao termo uma parte bem diferente da dos brasileiros (99%) |
+| Atenção | um veículo cita o termo bem mais ou bem menos que o esperado pela parte do termo nas manchetes brasileiras de cada editoria em que ele publica (Poisson exato, Holm a 99%; 1,5 vez o esperado com 5+ manchetes, ou metade; só com 20+ manchetes) |
+| Exterior | os veículos de fora do Brasil dão ao termo uma parte bem diferente da dos brasileiros (99%; 10+ manchetes de cada lado e 1,5 vez de diferença) |
 | Lados | um par de veículos fica do mesmo lado, ou em lados opostos, além do acaso (teste exato, Holm a 99%); senão, quantos assuntos racharam |
 | Texto | as notícias com o termo que saem do zero no termômetro pendem para um lado (teste de sinal, 99%) |
 | História, pauta e presença | contagem: a história com mais veículos, o nome que mais acompanha o termo e quanto ele aparece |
 
 Com até 10 resultados, a página só descreve o que achou (e avisa quando eles se
 espalham por editorias diferentes). Num período de 7 a 13 edições, as edições logo
-antes dele completam as duas janelas de sete. Quando a busca reproduz a base de um
-nome do placar do Analítico (mesmo termo, editoria e período, sem outros filtros),
-valem os vereditos de lá: a Pesquisa nunca afirma o que o Analítico não afirma.
+antes dele completam as duas janelas de sete (só para essas contas). Quando a busca
+reproduz a base de um nome do placar do Analítico (mesmo termo, sem diferenciar
+maiúsculas e acentos, editoria e período, sem outros filtros), valem os vereditos de lá
+no espaço, no tom e no tom de cada veículo; os demais achados (picos, atenção, histórias,
+lados) são da Pesquisa, com as comparações dela. Com o tipo "Todas as notícias"
+desmarcado, a leitura diz que a busca está filtrada (e oferece incluí-las), em vez de
+medir espaço e tom.
 
 - **1 · Manchetes**: o espaço edição a edição (com os picos marcados), o tom (o
   saldo, antes e agora, e as manchetes que pesaram), o **placar dos veículos**
   (espaço no que cada um publicou, contra o esperado, o tom e o tom contra o dos
   demais; clicar abre as manchetes do veículo) e **com quem aparece** (clicar
   refina a busca; "só" troca o termo).
-- **2 · Enquadramento**: os assuntos da cobertura comparada que citam o termo no
-  título ou na conclusão e mais dividiram (os dois enfoques e os veículos de cada
-  lado), **quem fica com quem** e **quem destoa**, contra o acaso de cada placar.
+- **2 · Enquadramento**: os assuntos da cobertura comparada que a busca achou (os
+  mesmos do dossiê do nome no Analítico, com a divergência média) e os que mais
+  dividiram (os dois enfoques e os veículos de cada lado), **quem fica com quem** e
+  **quem destoa**, contra o acaso de cada placar.
 - **3 · Texto**: os desvios do zero no termômetro, os textos mais inclinados e a
   qualidade da apuração das análises encontradas.
+
+Na base completa ficam as tabelas por trás da leitura, inclusive **o que cada veículo
+enfatiza** (o vocabulário distintivo, calculado quando o bloco abre; descritivo).
 
 Tudo roda no navegador, sobre os arquivos de `data/busca/` (nada muda na edição
 nem na IA): os fatos em `midia.js.j2`, os testes em `pesquisa_estat.js.j2`, o texto
