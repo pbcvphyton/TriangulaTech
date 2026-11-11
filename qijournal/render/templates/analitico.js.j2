@@ -1,0 +1,164 @@
+{#- Aba Analítico Político (só esta página inclui este arquivo): a navegação marca a seção
+    da vez, as âncoras abrem o bloco de destino, as marcas dos gráficos ganham a dica ao
+    passar o mouse (ou tocar) e a lista de análises ganha um filtro. Tudo é reforço: sem
+    script a página continua completa (os blocos abrem com o clique, as dicas ficam no
+    title e a lista aparece inteira). -#}
+(function () {
+  'use strict';
+  var d = document, w = window;
+  var root = d.getElementById('analitico');
+  if (!root) return;
+  var reduz = w.matchMedia ? w.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  function lista(nos) { return Array.prototype.slice.call(nos); }
+  function alvo(hash) {
+    if (!hash || hash.length < 2 || hash.charAt(0) !== '#') return null;
+    try { return d.getElementById(decodeURIComponent(hash.slice(1))); } catch (erro) { return null; }
+  }
+
+  /* Âncoras: o destino pode estar fechado (dossiê de um nome, bloco da base completa). */
+  function abrir(el) {
+    for (var no = el; no && no !== root; no = no.parentNode) {
+      if (no.tagName === 'DETAILS') no.open = true;
+    }
+  }
+  function ir(hash, suave) {
+    var el = alvo(hash);
+    if (!el || !root.contains(el)) return false;
+    abrir(el);
+    el.scrollIntoView({ block: 'start', behavior: suave && !reduz.matches ? 'smooth' : 'auto' });
+    return true;
+  }
+  root.addEventListener('click', function (event) {
+    var link = event.target && event.target.closest ? event.target.closest('a[href^="#"]') : null;
+    if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    var hash = link.getAttribute('href');
+    if (!ir(hash, true)) return;
+    event.preventDefault();
+    if (w.history && w.history.pushState) w.history.pushState(null, '', hash);
+    else w.location.hash = hash;
+  });
+  w.addEventListener('hashchange', function () { ir(w.location.hash, false); });
+  if (w.location.hash) ir(w.location.hash, false);
+
+  /* Nesta página: a seção da vez. */
+  var nav = d.getElementById('azNav');
+  var links = nav ? lista(nav.querySelectorAll('a[href^="#"]')) : [];
+  var secoes = links.map(function (a) { return alvo(a.getAttribute('href')); });
+  var atual = -2, pedido = 0;
+  function marcar() {
+    pedido = 0;
+    var limite = (nav ? nav.offsetHeight : 0) + 28, vez = -1;
+    secoes.forEach(function (el, i) { if (el && el.getBoundingClientRect().top <= limite) vez = i; });
+    if (vez === atual) return;
+    atual = vez;
+    links.forEach(function (a, i) {
+      if (i === vez) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    var ativo = links[vez], faixa = nav ? nav.querySelector('ul') : null;
+    if (ativo && faixa && faixa.scrollWidth > faixa.clientWidth) {
+      faixa.scrollLeft = Math.max(0, ativo.offsetLeft - (faixa.clientWidth - ativo.offsetWidth) / 2);
+    }
+  }
+  function agendar() {
+    if (pedido) return;
+    pedido = w.requestAnimationFrame ? w.requestAnimationFrame(marcar) : w.setTimeout(marcar, 60);
+  }
+  if (links.length) {
+    w.addEventListener('scroll', agendar, { passive: true });
+    w.addEventListener('resize', agendar);
+    marcar();
+  }
+
+  /* Dicas: o texto do title, perto da marca; some ao sair, rolar ou apertar Esc. */
+  var MARCAS = '.az-mx td, .az-dv-c, .az-dv-z, .az-pr li, .az-s > span, .az-qp-bar span, .az-rx-m span';
+  var tip = d.createElement('div');
+  tip.className = 'az-tip';
+  tip.hidden = true;
+  tip.setAttribute('role', 'tooltip');
+  d.body.appendChild(tip);
+  var dono = null;
+  lista(root.querySelectorAll(MARCAS)).forEach(function (el) {
+    var texto = el.getAttribute('title');
+    if (!texto) return;
+    el.setAttribute('data-tip', texto);
+    el.removeAttribute('title');
+  });
+  function marca(no) {
+    var el = no && no.closest ? no.closest('[data-tip]') : null;
+    return el && root.contains(el) ? el : null;
+  }
+  function esconder() {
+    if (!dono) return;
+    dono = null;
+    tip.hidden = true;
+  }
+  function mostrar(el) {
+    if (el === dono) return;
+    dono = el;
+    tip.textContent = el.getAttribute('data-tip');
+    tip.hidden = false;
+    var r = el.getBoundingClientRect(), largura = tip.offsetWidth, altura = tip.offsetHeight;
+    var pagina = d.documentElement.clientWidth;
+    var x = Math.min(Math.max(8, r.left + r.width / 2 - largura / 2), Math.max(8, pagina - largura - 8));
+    var acima = r.top - altura - 8;
+    var y = acima >= 8 ? acima : r.bottom + 8;
+    tip.style.left = (x + (w.pageXOffset || 0)) + 'px';
+    tip.style.top = (y + (w.pageYOffset || 0)) + 'px';
+  }
+  root.addEventListener('pointerover', function (event) {
+    if (event.pointerType === 'touch') return;
+    var el = marca(event.target);
+    if (el) mostrar(el); else esconder();
+  });
+  root.addEventListener('pointerleave', esconder);
+  root.addEventListener('click', function (event) {
+    var el = marca(event.target);
+    if (!el || el.closest('summary')) { esconder(); return; }
+    if (el === dono) esconder(); else mostrar(el);
+  });
+  w.addEventListener('scroll', esconder, { passive: true });
+  d.addEventListener('keydown', function (event) { if (event.key === 'Escape') esconder(); });
+
+  /* Todas as análises: filtro por texto e por T diferente de zero. */
+  var bloco = d.getElementById('an-todas'), fil = d.getElementById('azFil');
+  var campo = d.getElementById('azQ'), soFora = d.getElementById('azNz'), conta = d.getElementById('azN');
+  if (bloco && fil && campo && soFora && conta) {
+    var linhas = lista(bloco.querySelectorAll('.tl')), meses = lista(bloco.querySelectorAll('details.term-det'));
+    var textos = null, zeros = null, abertos = null;
+    var norm = function (s) {
+      s = String(s || '');
+      return (s.normalize ? s.normalize('NFD').replace(/[̀-ͯ]/g, '') : s).toLowerCase();
+    };
+    var preparar = function () {
+      textos = linhas.map(function (li) { return norm(li.textContent); });
+      zeros = linhas.map(function (li) {
+        var v = li.querySelector('.ta-v');
+        var t = v ? v.textContent.replace(/\s/g, '') : '';
+        return t === '0' || t === '—' || t === '';
+      });
+      abertos = meses.map(function (m) { return m.open; });
+    };
+    var filtrar = function () {
+      if (!textos) preparar();
+      var termos = norm(campo.value).split(/\s+/).filter(Boolean), so = soFora.checked;
+      var ativo = termos.length > 0 || so, visiveis = 0;
+      linhas.forEach(function (li, i) {
+        var ok = (!so || !zeros[i]) && termos.every(function (t) { return textos[i].indexOf(t) !== -1; });
+        li.hidden = !ok;
+        if (ok) visiveis += 1;
+      });
+      meses.forEach(function (m, i) {
+        var tem = !!m.querySelector('.tl:not([hidden])');
+        m.hidden = ativo && !tem;
+        m.open = ativo ? tem : abertos[i];
+      });
+      conta.textContent = ativo
+        ? visiveis + ' de ' + linhas.length + (linhas.length === 1 ? ' análise' : ' análises')
+        : '';
+    };
+    fil.hidden = false;
+    campo.addEventListener('input', filtrar);
+    soFora.addEventListener('change', filtrar);
+  }
+})();

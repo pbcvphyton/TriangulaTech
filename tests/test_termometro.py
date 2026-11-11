@@ -476,7 +476,7 @@ def test_pagina_analitica_bem_formada_com_qualquer_historico(config, dias):
     estrutura = parse(html)
     assert estrutura.errors == [] and estrutura.stack == []
     assert all(n == 1 for n in estrutura.ids.values())
-    assert "*" not in visible_text(html) and html.count("<script") == 2
+    assert "*" not in visible_text(html) and html.count("<script") == 3  # os dois da página e o da aba
     assert ("Nenhuma análise no histórico ainda." in html) == (dias == 0)
     if dias == 40:
         assert "Ranking · Veículos" in html and 'class="rk-i"' in html and 'class="ts-plot"' in html
@@ -607,10 +607,12 @@ def test_ranking_de_veiculos_mostra_todos_e_marca_a_amostra_pequena(config):
     assert '<li class="rk-i" title="Folha: T ajustado' in veiculos
     assert '<li class="rk-i rk-pq" title="g1: T ajustado' in veiculos and "2 notícias · média bruta" in veiculos
     assert "amostra pequena" in veiculos and "Fora do ranking" not in veiculos
-    qualidade = html[html.index('id="an-q"') :]
-    assert '<li class="rk-pq"><span class="rk-n">g1</span>' in qualidade
-    editorias = html[html.index('id="an-rk-2"') : html.index('id="an-q"')]
-    assert "rk-pq" not in editorias  # editorias seguem o mínimo da especificação (30)
+    # qualidade: quem tem amostra fica à vista; os demais, num "ver os veículos com amostra pequena"
+    qualidade = html[html.index('id="an-q"') : html.index('id="an-base"')]
+    assert '<li><span class="rk-n">Folha</span>' in qualidade
+    assert '<li class="rk-pq"><span class="rk-n">g1</span>' in qualidade and "o veículo com amostra pequena" in qualidade
+    editorias = html[html.index('id="an-rk-2"') : html.index('id="an-dias"')]
+    assert "Ranking · Editorias" in editorias and "rk-pq" not in editorias  # editorias seguem o mínimo da especificação (30)
 
 
 def test_todas_as_analises_a_linha_inteira_abre_o_texto_original(config):
@@ -622,24 +624,30 @@ def test_todas_as_analises_a_linha_inteira_abre_o_texto_original(config):
     assert ".tl.tl-lk{position:relative;cursor:pointer" in html  # o link do título cobre a linha (.hit::after)
 
 
-def test_analitico_abre_com_o_resultado_em_linguagem_clara(config):
+def test_analitico_abre_com_a_leitura_e_o_termometro_em_linguagem_clara(config):
     evid = [{"id": "E1", "criterio": "ROTULOS", "citacao": "x", "paragrafo": "P1", "direcao": "esquerda", "contribuicao": -5.0}]
     analises = [_analise(f"a{i}", "2026-10-10", T=0, rotulo="Equilibrado", veiculo="Valor" if i % 3 else "Folha") for i in range(30)]
     analises[0] = {**analises[0], "evidencias": evid, "T": -6}
     analises[1] = {**analises[1], "evidencias": [{**evid[0], "criterio": "FONTES", "direcao": "direita", "contribuicao": 3.0}]}
     html = render_analitico_page([{"data": "2026-10-10", "analises": analises}], config, home_href="../", archive_href="./")
-    assert 'id="an-resumo"' in html and "Em resumo · o que o termômetro diz" in html
+    # sem nomes nem enquadramento, a leitura sai do termômetro: a manchete é o que ele diz do texto
+    assert 'id="an-leitura"' in html
+    assert '<h3 class="az-manchete">No texto das notícias, o termômetro não encontra viés editorial relevante</h3>' in html
+    assert 'id="an-resumo"' in html and "O que o termômetro diz" in html
     assert "O texto das notícias sai equilibrado" in html and "Em 30 das 30 notícias analisadas (100%)" in html
     assert (
         "Só 2 notícias (7%) tiveram sinal de tratamento desigual confirmado no texto: 1 sinal para a esquerda e "
         "1 para a direita." in html
     )
-    assert html.index('id="an-resumo"') < html.index('id="an-onde"')  # a resposta vem antes dos números
-    assert 'class="an-nav"' in html and 'href="#an-resumo"' in html
-    # Onde estão os sinais: o mesmo painel do Termômetro do dia, sobre todo o histórico
-    onde = html[html.index('id="an-onde"') : html.index('id="an-indo"')]
-    assert 'id="an-sinais"' in onde and "Rótulos e aspas" in onde and "Fontes e espaço" in onde
-    assert 'id="an-desig"' in onde and "Folha" in onde and 'href="#an-sinais"' in html
+    # a resposta vem antes dos números, e os números antes da base completa
+    assert html.index('id="an-leitura"') < html.index('id="an-resumo"') < html.index('id="an-onde"') < html.index('id="an-base"')
+    assert 'class="az-nav"' in html and 'href="#an-texto"' in html and 'href="#an-base"' in html
+    # Onde aparecem os sinais: o mesmo painel do Termômetro do dia, sobre todo o histórico, e os veículos
+    texto = html[html.index('id="an-texto"') : html.index('id="an-base"')]
+    assert 'id="an-sinais"' in texto and "Rótulos e aspas" in texto and "Fontes e espaço" in texto
+    assert 'id="an-desig"' in texto and "Folha" in texto
+    # os desvios: só um texto saiu do zero (não dá para falar em lado)
+    assert 'id="an-desvios"' in texto and "sem lado que passe do acaso: 1 à esquerda, 0 à direita" in texto
 
 
 def test_parcela_nao_arredonda_para_tudo_ou_nada():
@@ -708,8 +716,10 @@ def test_lista_do_analitico_mostra_as_mais_recentes_e_aponta_a_pesquisa(config, 
     monkeypatch.setattr(analitico, "LISTA_MAX", 5)
     analises = [_analise(f"a{i}", f"2026-10-{1 + i:02d}") for i in range(8)]
     html = render_analitico_page([{"data": "2026-10-09", "analises": analises}], config, home_href="../", archive_href="./")
-    assert html.count('class="tl ') == 5 and "Texto a7" in html and "Texto a0" not in html
-    assert 'href="pesquisa.html?tipo=a"' in html and "3 análises mais antigas" in html
+    lista = html[html.index('id="an-todas"') : html.index('id="an-metodo"')]
+    assert html.count('class="tl ') == 5 and "Texto a7" in lista and "Texto a0" not in lista
+    assert 'href="pesquisa.html?tipo=a"' in lista and "3 análises mais antigas" in lista
+    assert "8 textos · os 5 mais recentes aqui" in html  # o resumo do bloco diz quantos estão na lista
 
 
 def _registro_de_referencia() -> dict[str, Any]:

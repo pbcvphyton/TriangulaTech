@@ -4,12 +4,12 @@
 na Pesquisa analítica, sobre os mesmos arquivos de ``data/busca/``). Serve a duas
 páginas, sem mudar nada do que elas já mostravam:
 
-- **Analítico Político** (``edicoes/analitico.html``): a tabela "Nomes em
-  destaque", com os nomes mais citados nas manchetes de Política dos últimos 30
-  dias (pessoas, partidos, instituições), quanto espaço cada um ocupa, se a
-  atenção sobe ou cai, quantos veículos falam dele e quão dividida ficou a
-  cobertura comparada sobre ele; cada linha abre o analítico completo do nome na
-  Pesquisa;
+- **Analítico Político** (``edicoes/analitico.html``): a lente das manchetes, com
+  os nomes mais citados nas manchetes de Política dos últimos 30 dias (pessoas,
+  partidos, instituições), quanto espaço cada um ocupa, se a atenção sobe ou cai,
+  em que tom cada veículo o põe e quão dividida ficou a cobertura comparada sobre
+  ele. A página monta o placar e a matriz (:mod:`qijournal.render.achados`) com os
+  números daqui; o dossiê de cada nome leva ao analítico completo dele na Pesquisa;
 - **Pesquisa analítica** (``edicoes/pesquisa.html``): os mesmos nomes como
   sugestões de busca.
 
@@ -53,6 +53,7 @@ MIN_TOM = 20  # manchetes do nome para dizer o tom
 MIN_TOM_VEICULO = 10  # manchetes do veículo sobre o nome para comparar o tom dele com o dos demais
 Z_VEICULO = 2.58  # veículo × demais: 99% (cada nome compara muitos veículos de uma vez)
 Z_TENDENCIA = 1.96  # últimas 7 edições × 7 anteriores: 95%
+Z_ESPACO = 2.58  # espaço nas últimas 7 edições × 7 anteriores: 99% (uma comparação por nome da tabela)
 MIN_TOM_SEMANA = 20  # manchetes do nome em cada janela para dizer se o tom mudou
 SEMANA_VEICULO = 3  # manchetes do veículo numa semana para a semana contar no padrão
 SEMANA_DEMAIS = 10  # manchetes dos demais veículos na mesma semana
@@ -298,6 +299,28 @@ class NomeView:
     divergencia_valor: float | None
     barra: float  # % da maior contagem (barra da coluna de manchetes)
     tom: TomView | None = None  # tom das manchetes brasileiras e comparação entre veículos
+    # Os mesmos números sem formatar, para o placar e os achados do Analítico Político
+    # (qijournal/render/achados.py); a tabela e a Pesquisa não os usam.
+    participacao_valor: float = 0.0  # parte das manchetes da editoria no período (0 a 1)
+    serie: list[float] = field(default_factory=list)  # parte das manchetes em cada edição da janela (0 a 1)
+    espaco: EspacoView | None = None  # últimas SEMANA edições contra as SEMANA anteriores, em números
+
+
+@dataclass
+class EspacoView:
+    """O espaço de um nome nas últimas ``SEMANA`` edições contra as ``SEMANA`` anteriores:
+    a mesma conta da tendência (:func:`_tendencia`), em números, e se a diferença passa
+    do que o acaso explica."""
+
+    recente: float  # parte das manchetes da editoria (0 a 1)
+    anterior: float
+    manchetes_recente: int
+    manchetes_anterior: int
+    z: float | None  # duas proporções (None sem variação para comparar)
+
+    @property
+    def alem_do_acaso(self) -> bool:
+        return self.z is not None and abs(self.z) >= Z_ESPACO
 
 
 @dataclass
@@ -311,6 +334,8 @@ class DestaquesView:
     manchetes: int  # manchetes da editoria no período (base da participação)
     nomes: list[NomeView]
     pesquisa_href: str  # Pesquisa analítica (para buscar outro nome)
+    datas: list[str] = field(default_factory=list)  # as edições da janela (AAAA-MM-DD), em ordem
+    veiculos: int = 0  # veículos com manchete na editoria no período
 
 
 def _chave(nome: str) -> str:
@@ -358,6 +383,28 @@ def _tendencia(por_dia: Mapping[str, int], base_dia: Mapping[str, int], dias: li
         return f"▲ {text.format_number_pt(sr / sa, 1)}×", "sobe", titulo
     seta = "▲" if var > 0 else "▼"
     return f"{seta} {text.format_number_pt(abs(var) * 100, 0)}%", ("sobe" if var > 0 else "cai"), titulo
+
+
+def _espaco(por_dia: Mapping[str, int], base_dia: Mapping[str, int], dias: list[str]) -> EspacoView | None:
+    """Os números por trás de :func:`_tendencia` (mesmas janelas e mesmos mínimos), com o
+    z de duas proporções: a parte das manchetes da editoria que cita o nome mudou além do
+    acaso? ``None`` quando a tendência não é dita (poucas edições ou poucas manchetes)."""
+    if len(dias) < 2 * SEMANA:
+        return None
+    recente, anterior = dias[-SEMANA:], dias[-2 * SEMANA : -SEMANA]
+    br, ba = sum(base_dia.get(d, 0) for d in recente), sum(base_dia.get(d, 0) for d in anterior)
+    kr, ka = sum(por_dia.get(d, 0) for d in recente), sum(por_dia.get(d, 0) for d in anterior)
+    if br < MIN_BASE_SEMANA or ba < MIN_BASE_SEMANA or kr + ka < MIN_TENDENCIA:
+        return None
+    junta = (kr + ka) / (br + ba)
+    erro = (junta * (1 - junta) * (1 / br + 1 / ba)) ** 0.5
+    return EspacoView(
+        recente=kr / br,
+        anterior=ka / ba,
+        manchetes_recente=kr,
+        manchetes_anterior=ka,
+        z=None if erro == 0 else (kr / br - ka / ba) / erro,
+    )
 
 
 
@@ -427,6 +474,8 @@ class VeiculoTomView:
     barra_width: float
     pequena: bool  # menos de MIN_TOM_VEICULO manchetes: tom sem comparação
     excesso: bool = False  # fala mais do nome do que o esperado, além do acaso
+    demais_valor: float | None = None  # o saldo dos demais veículos, em número
+    z: float | None = None  # o z do veículo contra os demais (o teste do destaque); None com amostra pequena
 
 
 @dataclass
@@ -461,6 +510,18 @@ class TomView:
     criticos: int  # veículos mais críticos que os demais (com significância)
     favoraveis_n: int
     veiculos_fora: int = 0  # veículos com menos manchetes, fora da tabela
+    # Os mesmos números sem formatar, para o placar, a matriz e os achados do Analítico
+    # Político (qijournal/render/achados.py); a tabela e a Pesquisa não os usam.
+    n_desfavoraveis: int = 0
+    n_favoraveis: int = 0
+    todos: list[VeiculoTomView] = field(default_factory=list)  # todos os veículos (a tabela mostra os VEICULOS_TOM primeiros)
+    # Saldo nas últimas SEMANA edições e nas SEMANA anteriores; só quando a tendência do tom é dita
+    # (MIN_TOM_SEMANA manchetes em cada janela).
+    saldo_recente: float | None = None
+    saldo_anterior: float | None = None
+    n_recente: int = 0
+    n_anterior: int = 0
+    z_tendencia: float | None = None  # o z das últimas SEMANA edições contra as anteriores (o teste da tendência)
 
 
 BARRA_TOM = 50  # a barra do saldo vai de −50 a +50 (saldos de manchetes raramente passam disso)
@@ -506,12 +567,16 @@ def tom_do_nome(
 
     # Tendência do tom: as últimas SEMANA edições contra as SEMANA anteriores.
     tendencia, t_classe, t_titulo = "", "ins", f"O tom muda quando as últimas {SEMANA} edições diferem das {SEMANA} anteriores."
+    saldo_recente = saldo_anterior = z_tendencia = None
+    n_recente = n_anterior = 0
     if len(dias) >= 2 * SEMANA:
         recente, anterior = set(dias[-SEMANA:]), set(dias[-2 * SEMANA : -SEMANA])
         nr = [_nota(i.tom.tom) for i in itens if i.dia in recente]
         na = [_nota(i.tom.tom) for i in itens if i.dia in anterior]
         if len(nr) >= MIN_TOM_SEMANA and len(na) >= MIN_TOM_SEMANA:
             z = comparar(nr, na)
+            saldo_recente, saldo_anterior, n_recente, n_anterior = _saldo_de(nr), _saldo_de(na), len(nr), len(na)
+            z_tendencia = z
             t_titulo = (
                 f"Saldo {_saldo(_saldo_de(nr))} em {len(nr)} manchetes nas últimas {SEMANA} edições, "
                 f"{_saldo(_saldo_de(na))} em {len(na)} nas {SEMANA} anteriores"
@@ -537,8 +602,9 @@ def tom_do_nome(
         s_v, s_o = _saldo_de(minhas), _saldo_de(outras)
         pequena = k < MIN_TOM_VEICULO
         destaque = classe = padrao = ""
+        z_veiculo = None
         if not pequena and outras:
-            z = comparar(minhas, outras)
+            z = z_veiculo = comparar(minhas, outras)
             if z is not None and z <= -Z_VEICULO:
                 destaque, classe = "mais crítico", "neg"
             elif z is not None and z >= Z_VEICULO:
@@ -593,6 +659,8 @@ def tom_do_nome(
                 barra_width=width,
                 pequena=pequena,
                 excesso=excesso,
+                demais_valor=s_o,
+                z=z_veiculo,
             )
         )
 
@@ -630,6 +698,14 @@ def tom_do_nome(
         criticos=criticos,
         favoraveis_n=favoraveis,
         veiculos_fora=max(0, len(veiculos) - VEICULOS_TOM),
+        n_desfavoraveis=neg,
+        n_favoraveis=pos,
+        todos=veiculos,
+        saldo_recente=saldo_recente,
+        saldo_anterior=saldo_anterior,
+        n_recente=n_recente,
+        n_anterior=n_anterior,
+        z_tendencia=z_tendencia,
     )
     view.leitura = _leitura_tom(view, veiculos, tendencia, t_titulo)
     return view
@@ -790,6 +866,7 @@ def destaques(
                 base_nome[entrada[link]] -= 1
                 base_nome[dia] += 1
         tendencia, classe, titulo = _tendencia(por_dia, base_nome, datas)
+        serie = [round(por_dia.get(d, 0) / base_nome[d], 4) if base_nome.get(d, 0) > 0 else 0.0 for d in datas]
         splits = [2 * min(a, b) / (a + b) for texto, a, b in comparadas if regra is not None and regra.search(texto)]
         media = sum(splits) / len(splits) if splits else None
         # O analítico do nome abre com a mesma editoria e o mesmo período da tabela.
@@ -827,6 +904,9 @@ def destaques(
                 divergencia_valor=media,
                 barra=round(100 * n / maior, 1),
                 tom=tom_view,
+                participacao_valor=n / len(versoes),
+                serie=serie,
+                espaco=_espaco(por_dia, base_nome, datas),
             )
         )
     primeira, ultima = (text.pt_short_date(date.fromisoformat(c.data)) for c in (dias[0], dias[-1]))
@@ -841,4 +921,6 @@ def destaques(
         manchetes=len(versoes),
         nomes=nomes,
         pesquisa_href=pesquisa_href,
+        datas=datas,
+        veiculos=len(base_veiculo),
     )
