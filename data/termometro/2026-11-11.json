@@ -1,0 +1,2545 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-11",
+ "analises": [
+  {
+   "id": "27feb13086b2",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/11/tse-multa-meta-mas-nao-ve-interferencia-deliberada-na-eleicao.ghtml",
+   "titulo": "TSE multa Meta, mas não vê interferência deliberada na eleição",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "tse-multa-meta-em-r-7-5-mi-por-descumprir-ordens",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda decisão do TSE envolvendo multa à Meta e acusações de favorecimento a candidato à Presidência da República."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 612,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Descumprimento de ordens judiciais sobre tratamento igualitário entre candidatos por parte da Meta",
+    "causa": "Falhas técnicas e descumprimento de prazos e exigências da Justiça Eleitoral",
+    "vitima": "Candidatos e eleitores com potencial desequilíbrio no pleito",
+    "culpado": "Meta",
+    "solucao": "Aplicação de multa pecuniária e exigência de cumprimento das decisões",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto descreve uma decisão unânime do TSE e relata os argumentos de ambas as partes de forma neutra. Seria escrito da mesma forma se os papéis estivessem invertidos.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Meta",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro Marco Aurélio Bellizze",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 129,
+     "ultima": false
+    },
+    {
+     "rotulo": "Patrícia Helena Marta Martins",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "apontou, no entanto, que não há provas",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro/atribuição equilibrado para relatar a decisão unânime.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f921e73eae3c",
+   "url": "https://www.infomoney.com.br/onde-investir/fii-da-rio-bravo-e-processado-pelos-correios-em-acao-que-cobra-r-516-milhoes/",
+   "titulo": "FII da Rio Bravo é processado pelos Correios em ação que cobra R$ 51,6 milhões",
+   "veiculo": "InfoMoney",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata de disputa judicial entre um fundo imobiliário e os Correios por indenização."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 324,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Ação indenizatória bilionária movida pelos Correios contra fundo imobiliário",
+    "causa": "Encerramento de contrato de locação e divergências contratuais",
+    "vitima": "Fundo imobiliário / Correios",
+    "culpado": "Indefinido",
+    "solucao": "Resolução na esfera judicial",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Texto estritamente informativo sobre mercado imobiliário e processos judiciais, sem viés político.",
+   "atores": [
+    {
+     "nome": "TRBL11 (Tellus Rio Bravo Renda Logística)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Correios",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "49e6a1fed248",
+   "url": "https://www1.folha.uol.com.br/colunas/painelsa/2026/11/apos-ataque-hacker-agentes-portuarios-usaram-celulares-para-manter-o-porto-de-santos-funcionando.shtml",
+   "titulo": "Após ataque hacker, agentes portuários usaram celulares para manter o Porto de Santos funcionando",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda ataque hacker a infraestrutura crítica portuária e o uso de programa federal para contornar o problema."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 596,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Ataque hacker afeta centros de dados do Porto de Santos",
+    "causa": "Ataque cibernético com ransomware",
+    "vitima": "Porto de Santos e operações logísticas",
+    "culpado": "Hackers",
+    "solucao": "Uso de sistema federal alternativo (Porto Sem Papel) via celular",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Reportagem factual sobre infraestrutura e segurança cibernética sem viés partidário.",
+   "atores": [
+    {
+     "nome": "Autoridade Portuária de Santos (APS)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "617055b92839",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/10/ataque-de-ursos-pardos-mata-mae-e-filha-no-canada-4-animais-sao-abatidos.ghtml",
+   "titulo": "Ataque de ursos-pardos mata mãe e filha no Canadá; 4 animais são abatidos",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre ataque fatal de animais selvagens no Canadá, sem dimensão político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 57,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 221,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Ataque fatal de ursos-pardos a pessoas no Canadá",
+    "causa": "Comportamento predatório incomum dos animais em busca de gordura para hibernação",
+    "vitima": "Mãe e filha",
+    "culpado": "Animais selvagens",
+    "solucao": "Abate dos animais e alerta às autoridades",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Notícia internacional de cunho estritamente factual e policial/ambiental.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c462dd275300",
+   "url": "https://www.moneytimes.com.br/fundo-imobiliario-anuncia-saida-de-inquilina-de-galpao-em-guarulhos-ativo-representa-168-da-receita-do-fii-igdl/",
+   "titulo": "Fundo imobiliário anuncia saída de inquilina de galpão em Guarulhos; ativo representa 16,8% da receita do FII",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Texto informativo sobre fundo imobiliário e saída de inquilina, sem temática político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 184,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Não renovação de contrato de locação de galpão relevante para fundo imobiliário",
+    "causa": "Decisão da inquilina de desocupar o imóvel de forma gradual",
+    "vitima": "Fundo imobiliário",
+    "culpado": "Inquilina",
+    "solucao": "Contrato atípico que garante pagamento integral até o fim do prazo",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Nota de mercado financeiro padrão, sem qualquer viés político.",
+   "atores": [
+    {
+     "nome": "Zavit Real Estate (ZAVI11)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f9661355d5de",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/policia-investiga-homem-que-gravou-video-com-fernando-henrique-cardoso",
+   "titulo": "Polícia investiga homem que gravou vídeo com Fernando Henrique Cardoso",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "seguranca"
+    ],
+    "justificativa": "Notícia policial sobre exposição de imagem de ex-presidente; não há disputa político-ideológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 395,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Divulgação de vídeo que expõe a intimidade de FHC com saúde fragilizada.",
+    "causa": "Facilidade de acesso de Oliveira ao imóvel, sugerindo permissão prévia.",
+    "vitima": "Fernando Henrique Cardoso, ex-presidente com Alzheimer.",
+    "culpado": "Wesley Oliveira, autor do vídeo.",
+    "solucao": "Investigação policial com base no Estatuto da Pessoa Idosa.",
+    "motor_moral": "dignidade"
+   },
+   "teste_inversao": "Se a vítima fosse um ex-presidente de outro campo, o texto seria escrito igual, pois é factual e não toma partido. O que mudaria? Nada.",
+   "atores": [
+    {
+     "nome": "Fernando Henrique Cardoso",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Wesley Oliveira",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Patrícia Kundrát",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Wesley Oliveira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 15,
+     "ultima": true
+    },
+    {
+     "rotulo": "Patrícia Kundrát",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c5b6e196e7e5",
+   "url": "https://www.camara.leg.br/noticias/1317996-governo-defende-reducao-da-maioridade-penal-apenas-para-crimes-hediondos",
+   "titulo": "Governo defende redução da maioridade penal apenas para crimes hediondos",
+   "veiculo": "Agência Câmara",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Debate parlamentar sobre PEC de redução da maioridade penal, com posições de governo e oposição."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 820,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Redução da maioridade penal para crimes hediondos.",
+    "causa": "Crimes hediondos cometidos por adolescentes.",
+    "vitima": "Vítimas de crimes hediondos.",
+    "culpado": "Adolescentes que cometem crimes hediondos (no debate).",
+    "solucao": "Redução da maioridade para crimes hediondos com medidas complementares (educação, separação de presos).",
+    "motor_moral": "justica"
+   },
+   "teste_inversao": "Se o governo fosse contra a redução e a oposição a favor, o texto seria escrito igual, pois dá espaço proporcional a ambos os lados. O que mudaria? Nada.",
+   "atores": [
+    {
+     "nome": "Governo federal (Ministério da Justiça e Segurança Pública)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Paulo Modesto",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Chico Lucas",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Katy Braun do Prado",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Siro Darlan",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Juliana Cardoso",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Guilherme Derrite",
+     "campo": "direita"
+    },
+    {
+     "nome": "Mendonça Filho",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "secretário de Assuntos Legislativos do ministério, Paulo Modesto",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 79,
+     "ultima": false
+    },
+    {
+     "rotulo": "secretário nacional de Segurança Pública, Chico Lucas",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente da Associação Brasileira dos Magistrados da Infância e da Juventude, Katy Braun…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": false
+    },
+    {
+     "rotulo": "desembargador aposentado e vice-presidente da Academia Brasileira de Letras do Cárcere…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputada Juliana Cardoso (PT-SP)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Guilherme Derrite (PP-SP)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": false
+    },
+    {
+     "rotulo": "relator da proposta de redução da maioridade penal, deputado Mendonça Filho (PL-PE)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 18,
+    "direita": 55
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "4ba378beb501",
+   "url": "https://climainfo.org.br/2026/11/10/governo-prorroga-desoneracao-da-gasolina-e-do-etanol-por-mais-30-dias/",
+   "titulo": "Governo prorroga desoneração da gasolina e do etanol por mais 30 dias",
+   "veiculo": "ClimaInfo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Medida do governo federal de desoneração de combustíveis com impacto fiscal e inflacionário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 426,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alta dos preços internacionais do petróleo pressiona a inflação.",
+    "causa": "Conflito no Oriente Médio e ataques ao Irã.",
+    "vitima": "Consumidores brasileiros.",
+    "culpado": "Conflito geopolítico.",
+    "solucao": "Prorrogação da desoneração de tributos e subvenção ao diesel.",
+    "motor_moral": "estabilidade"
+   },
+   "teste_inversao": "Se o governo fosse de outro campo, o texto seria igual, pois é factual e baseado em notas oficiais. O que mudaria? Nada.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Presidência da República em nota",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "equipe econômica",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "InfoMoney",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "CNN Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Agência Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Poder 360",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Valor",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2382cbdb6a5b",
+   "url": "https://www.cnnbrasil.com.br/infra/ppsa-e-estatal-argentina-assinam-memorando-para-fornecer-gas-de-vaca-muerta/",
+   "titulo": "PPSA e estatal argentina assinam memorando para fornecer gás de Vaca Muerta",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Acordo entre estatais para fornecimento de gás; política energética, mas sem disputa ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 363,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de ampliar a oferta de gás natural a preços competitivos.",
+    "causa": "Dependência de fontes limitadas; busca por novas alternativas.",
+    "vitima": "Indústria nacional.",
+    "culpado": "Nenhum.",
+    "solucao": "Memorando de entendimento para avaliar fornecimento de gás de Vaca Muerta.",
+    "motor_moral": "competitividade"
+   },
+   "teste_inversao": "Se fosse um governo de outro campo, o texto seria igual, pois é factual. O que mudaria? Nada.",
+   "atores": [
+    {
+     "nome": "PPSA (Pré-Sal Petróleo S.A.)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Gas y Petróleo del Neuquén (GyP)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Luis Fernando Paroli",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "diretor-presidente da PPSA, Luis Fernando Paroli",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "07ff9b7e3c6b",
+   "url": "https://www.suno.com.br/noticias/fundo-imobiliario-zavi11-inquilino-guarulhos/",
+   "titulo": "Fundo imobiliário ZAVI11 perde inquilino em imóvel de Guarulhos",
+   "veiculo": "Suno Notícias",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [],
+    "justificativa": "Notícia de mercado imobiliário/fundos; sem dimensão político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 285,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Perda de inquilino em imóvel do fundo.",
+    "causa": "Não renovação do contrato de locação.",
+    "vitima": "Fundo imobiliário ZAVI11 e seus cotistas.",
+    "culpado": "Locatária (decisão de negócio).",
+    "solucao": "Contrato atípico garante aluguéis até 2028; região de baixa vacância.",
+    "motor_moral": "previsibilidade"
+   },
+   "teste_inversao": "Não se aplica, pois não há disputa política.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "45a09b171cee",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/10/2o-dia-da-cop31-brasil-apresenta-roteiro-para-a-saida-dos-combustiveis-fosseis-guterres-cobra-planos-nacionais-ate-2028-e-turquia-defende-35-ate-35.ghtml",
+   "titulo": "2º dia da COP31: Brasil apresenta roteiro para a saída dos combustíveis fósseis, Guterres cobra planos nacionais até 2028 e Turquia defende '35 até 35'",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "relatorio-aponta-possivel-queda-historica-em-emi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto cobre negociações climáticas internacionais na COP31, abordando transição energética, políticas públicas e impactos econômicos dos combustíveis fósseis."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1314,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A alta dependência global de combustíveis fósseis e o avanço das mudanças climáticas.",
+    "causa": "Emissões de gases de efeito estufa decorrentes da queima de carvão, petróleo e gás.",
+    "vitima": "Populações afetadas por eventos climáticos extremos e custos elevados de energia.",
+    "culpado": "Uso contínuo de fósseis e falta de planejamento estruturado para a transição.",
+    "solucao": "Adotar o roteiro voluntário de transição, planejar metas nacionais, cortar subsídios e investir em energias limpas.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata de forma factual e equilibrada as posições oficiais da ONU, do Brasil e da Turquia na COP31, sem adotar juízos de valor na voz da redação. Seria redigido da mesma forma independentemente da orientação política dos negociadores.",
+   "atores": [
+    {
+     "nome": "Presidência brasileira da COP30 / Governo brasileiro",
+     "campo": "centro"
+    },
+    {
+     "nome": "António Guterres (Secretário-geral da ONU)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Presidência turca da COP31",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "António Guterres",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 139,
+     "ultima": true
+    },
+    {
+     "rotulo": "Ana Toni",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 139,
+    "direita": 0
+   },
+   "falas": 15,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3b3f7a14be95",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/nem-chegada-da-shopee-encerrou-novela-correios-trbl11-travam-nova-disputa-milionaria-na-justica-igdl/",
+   "titulo": "Nem a Shopee encerrou o filme: Correios e TRBL11 travam nova disputa milionária na Justiça",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de uma disputa judicial de natureza cível e imobiliária entre Correios e um fundo de investimento imobiliário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 508,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Imbróglio judicial e cobranças cruzadas envolvendo rescisão de contrato de locação de galpão logístico.",
+    "causa": "Problemas estruturais anteriores no imóvel e rescisão unilateral do contrato de locação.",
+    "vitima": "Fundo imobiliário e cotistas afetados pela disputa.",
+    "culpado": "As partes divergentes do contrato de locação.",
+    "solucao": "Resolução da disputa por via judicial.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A reportagem relata os argumentos judiciais de ambas as partes de maneira neutra e descritiva. O texto não mudaria se a estatal estivesse em posição favorável ou desfavorável no processo.",
+   "atores": [
+    {
+     "nome": "Correios",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Tellus Rio Bravo Renda Logística (TRBL11)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rio Bravo Investimentos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 5,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "27c73a2b45e8",
+   "url": "https://www.poder360.com.br/poder-internacional/escolas-sao-esvaziadas-apos-ameacas-de-bomba-na-italia/",
+   "titulo": "Pelo menos 300 escolas são esvaziadas após ameaças de bomba na Itália",
+   "veiculo": "Poder360",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ameacas-falsas-de-bomba-provocam-esvaziamento-de",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de ameaças de bomba em escolas na Itália e das medidas de segurança adotadas pelo governo da premiê Giorgia Meloni."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 316,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Onda de falsas ameaças de bomba em escolas e voos na Itália e na Europa.",
+    "causa": "Ação coordenada ou estratégia deliberada para causar alarme.",
+    "vitima": "Alunos, professores e cidadãos afetados pelo esvaziamento de escolas e voos escoltados.",
+    "culpado": "Autores desconhecidos das mensagens falsas.",
+    "solucao": "Investigação minuciosa e monitoramento por agências de inteligência e cibersegurança.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A cobertura dos fatos policiais e institucionais segue padrões estritamente informativos. O tratamento dar-se-ia de forma idêntica independentemente da filiação partidária do chefe de governo.",
+   "atores": [
+    {
+     "nome": "Governo da Itália / Giorgia Meloni",
+     "campo": "direita"
+    },
+    {
+     "nome": "Giuseppe Valditara (Ministro da Educação)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Giorgia Meloni",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 61,
+     "ultima": true
+    },
+    {
+     "rotulo": "Giuseppe Valditara",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 86
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f21767934341",
+   "url": "https://neofeed.com.br/negocios/fleury-se-une-ao-bradesco-em-rede-de-clinicas-de-oncologia/",
+   "titulo": "Fleury se une ao Bradesco em rede de clínicas de oncologia",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Reportagem sobre acordo societário e fusões e aquisições entre empresas do setor de saúde (Fleury e Bradesco)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 535,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Necessidade de expansão no mercado de oncologia após o fracasso de negociações anteriores.",
+    "causa": "Estratégia de crescimento empresarial e busca por novos parceiros no setor de saúde.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Assinatura de memorando de entendimentos e criação de nova sociedade de propósito específico.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata um acordo corporativo com base em fatos relevantes e dados financeiros públicos, sem viés político. Seria escrito da mesma forma para qualquer outra empresa.",
+   "atores": [
+    {
+     "nome": "Grupo Fleury",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Bradesco / Atlântica Hospitais",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f4b3d280d81d",
+   "url": "https://www.bloomberglinea.com.br/negocios/petrobras-tem-alta-de-21-do-lucro-no-3-trimestre-e-eleva-projecao-de-producao/",
+   "titulo": "Petrobras tem alta de 21% do lucro no 3º trimestre e eleva projeção de produção",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "petrobras-lucra-r-39-75-bilhoes-no-3o-tri-eleva",
+   "origem": "materia",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro, lucro e projeções de produção da Petrobras, empresa estatal de grande relevância macroeconômica e política."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 262 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 262,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de informar ao mercado os resultados financeiros e operacionais trimestrais da principal estatal brasileira.",
+    "causa": "Avanço da eficiência operacional e investimentos realizados em anos anteriores.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Divulgação de balanço à CVM e distribuição de dividendos.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A notícia baseia-se em dados oficiais enviados à CVM e fatos relevantes, mantendo tom estritamente técnico e descritivo. O texto seria idêntico sob qualquer gestão governamental.",
+   "atores": [
+    {
+     "nome": "Petrobras / Administração da empresa",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a companhia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a0178f824114",
+   "url": "https://valor.globo.com/agronegocios/noticia/2026/11/11/valor-camara-aprova-projeto-que-amplia-alcance-de-renegociacao-de-dividas.ghtml",
+   "titulo": "VALOR: Câmara aprova projeto que amplia alcance de renegociação de dívidas",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-aprova-mp-que-amplia-renegociacao-de-divi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Projeto de lei sobre renegociação de dívidas rurais, com disputa entre governo e bancada ruralista e impacto fiscal; dimensão político-econômica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 76,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 733,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0,
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Produtores rurais endividados não conseguem se enquadrar na renegociação de dívidas.",
+    "causa": "Critérios rígidos da MP 1.376/2026 e prazo curto.",
+    "vitima": "Produtores rurais endividados, especialmente os gaúchos.",
+    "culpado": "Critérios de enquadramento da MP.",
+    "solucao": "Ampliar condições de enquadramento, estender prazos e incluir mais operações.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se os lados estivessem trocados (governo e ruralistas), o texto seria escrito de forma semelhante: a reportagem ouviria o relator, a bancada e a equipe econômica, mantendo o contraponto. A única diferença seria o destaque do título, que hoje enfatiza a ampliação do alcance, mas o corpo preserva as ressalvas.",
+   "atores": [
+    {
+     "nome": "Paulo Pimenta (PT-RS)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Frente Parlamentar da Agropecuária (FPA) / bancada ruralista",
+     "campo": "direita"
+    },
+    {
+     "nome": "Renan Calheiros (MDB-AL)",
+     "campo": "centro"
+    },
+    {
+     "nome": "Domingos Velho (Farsul)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Equipe econômica (fontes anônimas)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Paulo Pimenta (PT-RS), líder do governo na Câmara",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 57,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente da Frente Parlamentar da Agropecuária (FPA), deputado Pedro Lupion…",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": false
+    },
+    {
+     "rotulo": "senadora Tereza Cristina (PP-MS), vice-presidente da FPA",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 1,
+     "ultima": true
+    },
+    {
+     "rotulo": "senador Renan Calheiros (MDB-AL), presidente da Comissão Mista",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente da Federação da Agricultura do Rio Grande do Sul (Farsul), Domingos Velho",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "uma fonte da equipe econômica",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "outra fonte da equipe econômica",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ministério da Fazenda",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 57,
+    "direita": 10
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Porém, uma fonte da equipe econômica avalia que haverá pressão por mais recursos equalizados",
+     "paragrafo": "P11",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Após a fala do relator, a reportagem ouve fontes da equipe econômica que contestam a ausência de impacto fiscal, equilibrando a informação.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico"
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "Até agora, foram renegociados cerca de R$ 23 bilhões dos R$ 100 bilhões previstos pelo governo.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os números vêm do relatório e são contextualizados com o total previsto, permitindo ao leitor dimensionar o alcance.",
+     "intensidade": 1,
+     "certeza": 0.7,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "efc20525c2e4",
+   "url": "https://www1.folha.uol.com.br/esporte/2026/11/hamilton-visita-posto-de-fronteira-para-conhecer-esforcos-de-ajuda-a-gaza.shtml",
+   "titulo": "Hamilton visita posto de fronteira para conhecer esforços de ajuda a Gaza",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Texto factual sobre visita de piloto a esforços humanitários; menção a ataques de Israel é contexto, sem disputa político-ideológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 345,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ajuda humanitária precisa chegar à população de Gaza.",
+    "causa": "Ataques de Israel e restrições à passagem de Rafah.",
+    "vitima": "População de Gaza.",
+    "culpado": "Não atribuído no texto.",
+    "solucao": "Conhecer e apoiar os esforços de ajuda humanitária.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o texto fosse sobre um piloto visitando Israel para apoiar esforços militares, a estrutura seria a mesma: factual, sem tomar partido. A única menção política é 'área que é alvo de ataques de Israel', um fato, não uma acusação.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "A província do Sinai do Norte",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2dc3fa765a66",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/11/a-batalha-do-novo-parlamento-de-israel-que-pode-decidir-o-futuro-politico-de-netanyahu.ghtml",
+   "titulo": "A batalha do novo Parlamento de Israel que pode decidir o futuro político de Netanyahu",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Disputa pela formação de governo em Israel, envolvendo Parlamento, partidos e lideranças; dimensão político-institucional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 970,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Formação de novo governo em Israel após eleição sem maioria.",
+    "causa": "Nenhum bloco alcançou 61 cadeiras; partidos árabes e ultraortodoxos são decisivos.",
+    "vitima": "O processo político israelense.",
+    "culpado": "Nenhum.",
+    "solucao": "Eisenkot tenta formar coalizão com quatro princípios e governo de emergência.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os lados estivessem trocados (Eisenkot no governo e Netanyahu tentando voltar), o texto seria escrito de forma semelhante: ouviria os dois líderes, os partidos árabes e os ultraortodoxos, mantendo o equilíbrio. A única diferença seria o nome no título, mas o corpo preservaria as mesmas fontes e o mesmo tom.",
+   "atores": [
+    {
+     "nome": "Benjamin Netanyahu",
+     "campo": "direita"
+    },
+    {
+     "nome": "Gadi Eisenkot",
+     "campo": "centro"
+    },
+    {
+     "nome": "Partidos árabes (Lista Árabe Unida e Lista Conjunta)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Partidos ultraortodoxos (UTJ e Shas)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Avigdor Lieberman",
+     "campo": "direita"
+    },
+    {
+     "nome": "Isaac Herzog",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "primeiro-ministro interino, Benjamin Netanyahu",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": false
+    },
+    {
+     "rotulo": "líder da oposição, Gadi Eisenkot",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 60,
+     "ultima": true
+    },
+    {
+     "rotulo": "presidente Isaac Herzog",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "A Lista Árabe Unida",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "a Lista Conjunta",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Avigdor Lieberman",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Os partidos ultraortodoxos Judaísmo Unido da Torá (UTJ) e Shas",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 39
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Netanyahu e Eisenkot alertaram os parlamentares sobre os riscos de apoiar um governo liderado pelo adversário.",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A reportagem dá voz aos dois lados no mesmo parágrafo, sem privilegiar um.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "cc709472cc65",
+   "url": "https://www.moneytimes.com.br/dividendos-de-ate-12-btg-recomenda-6-fundos-imobiliarios-fiis-de-escritorios-igdl/",
+   "titulo": "FIIs de escritórios seguem descontados na bolsa, aponta BTG; veja os favoritos do banco",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [],
+    "justificativa": "Texto sobre recomendação de investimento em fundos imobiliários; sem dimensão político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1103,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Fundos imobiliários de escritórios negociados com desconto.",
+    "causa": "Vacância e recuperação lenta do mercado.",
+    "vitima": "Investidores.",
+    "culpado": "Nenhum.",
+    "solucao": "Recomendação de compra de seis FIIs.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se o texto fosse sobre um banco recomendando venda, seria escrito de forma semelhante; não há disputa política, apenas análise de mercado. A inversão não mudaria a estrutura.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d98e20bf9a03",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/saques-da-poupanca-superam-depositos-em-r-888-bilhoes-em-outubro",
+   "titulo": "Saques da poupança superam depósitos em R$ 8,88 bilhões em outubro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Texto sobre dados da poupança e política monetária (Selic), mas sem disputa político-ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 324,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Saques da poupança superam depósitos.",
+    "causa": "Juros elevados tornam outros investimentos mais atrativos.",
+    "vitima": "Poupadores.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se o texto fosse sobre depósitos superando saques, seria escrito de forma semelhante; não há disputa política, apenas dados econômicos. A inversão não mudaria a estrutura.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Comitê de Política Monetária (Copom)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Boletim Focus",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "28d674dce975",
+   "url": "https://www.infomoney.com.br/mundo/suprema-corte-libera-trump-para-retomar-muro-na-fronteira-em-regiao-do-texas-entenda/",
+   "titulo": "Suprema Corte libera Trump para retomar muro na fronteira em região do Texas; entenda",
+   "veiculo": "InfoMoney",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "O texto aborda decisão da Suprema Corte dos EUA sobre política migratória e construção de muro pelo governo Trump."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 603,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Controvérsia sobre a construção de muro na fronteira e autorizações especiais do Executivo.",
+    "causa": "Necessidade de segurança e controle de travessias ilegais na fronteira sul.",
+    "vitima": "Segurança e integridade fronteiriça dos EUA.",
+    "culpado": "Entradas ilegais e cartéis atuando na região.",
+    "solucao": "Retomada da construção de muros na fronteira autorizada pela Suprema Corte.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, o texto relata fatos judiciais de forma neutra e equilibrada sem viés evidente na condução da redação.",
+   "atores": [
+    {
+     "nome": "Governo Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Suprema Corte dos EUA",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Departamento de Justiça",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 1,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 1
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7a2b1db2870e",
+   "url": "https://www.cnnbrasil.com.br/economia/money/negocios/lucro-do-banco-pine-salta-para-r-1852-milhoes-no-3o-trimestre/",
+   "titulo": "Lucro do Banco Pine salta para R$ 185,2 milhões no 3º trimestre",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro e lucro trimestral de uma instituição bancária."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 158 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 158,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Nenhum problema político ou social central.",
+    "causa": "Crescimento das operações de crédito.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, a matéria é puramente informativa de resultados financeiros.",
+   "atores": [
+    {
+     "nome": "Banco Pine",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "companhia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c80bb7d26f01",
+   "url": "https://www.suno.com.br/noticias/fiis-de-escritorios-btg-recomenda-seis/",
+   "titulo": "BTG indica compra para FIIs de escritórios, exceto RECT11",
+   "veiculo": "Suno Notícias",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Relatório de recomendação de fundos imobiliários por banco de investimentos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 250 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 250,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Análise de investimentos imobiliários.",
+    "causa": "Obrigações financeiras e recuperação de ocupação.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Avaliação neutra ou recomendação de compra.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, o texto apenas relata recomendações de mercado financeiro.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "689e35975023",
+   "url": "https://www.camara.leg.br/noticias/1316864-comissao-especial-promove-novo-debate-reducao-da-maioridade-penal-nesta-quarta-feira",
+   "titulo": "Comissão especial promove novo debate redução da maioridade penal nesta quarta-feira",
+   "veiculo": "Agência Câmara",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura de debates parlamentares sobre a PEC da redução da maioridade penal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 323,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insuficiência da legislação penal atual diante de crimes envolvendo adolescentes.",
+    "causa": "Atuação de organizações criminosas que recrutam menores.",
+    "vitima": "Vítimas da criminalidade e adolescentes recrutados.",
+    "culpado": "Organizações criminosas.",
+    "solucao": "Possível alteração da maioridade penal e debate legislativo.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, o texto expõe o debate institucional ouvindo diferentes posições de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "Deputado Marcel van Hattem",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Marcel van Hattem (Novo-RS)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 44,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 44
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8680ccbac587",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/vale-a-pena-investir-no-exterior-sem-apostar-no-dolar-nova-geracao-de-etfs-da-nu-asset-separa-as-duas-coisas-mlim/",
+   "titulo": "Vale a pena investir no exterior sem apostar no dólar? Nova geração de ETFs da Nu Asset separa as duas coisas",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-10",
+   "analisado_em": "2026-11-11",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Lançamento de novos produtos financeiros e ETFs por gestora de investimentos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 958,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Volatilidade cambial em investimentos internacionais.",
+    "causa": "Oscilações do dólar frente ao real.",
+    "vitima": "Investidores expostos ao risco cambial.",
+    "culpado": "Volatilidade do câmbio.",
+    "solucao": "Criação de ETFs com proteção cambial (hedge).",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, o texto relata lançamento comercial de produtos financeiros sem juízo político.",
+   "atores": [
+    {
+     "nome": "Nu Asset",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Pedro Mota, gerente de portfólio da Nu Asset",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-11T14:57:04+00:00",
+   "provedor": "gemini_lite → sensenova",
+   "modelo": "gemini-flash-lite-latest + sensenova-6.8-flash-lite",
+   "candidatos": 80,
+   "textos_curtos": 15,
+   "falhas": 35,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 38705,
+    "saida": 51020
+   },
+   "analises": [
+    "27feb13086b2",
+    "f921e73eae3c",
+    "49e6a1fed248",
+    "617055b92839",
+    "c462dd275300",
+    "f9661355d5de",
+    "c5b6e196e7e5",
+    "4ba378beb501",
+    "2382cbdb6a5b",
+    "07ff9b7e3c6b",
+    "45a09b171cee",
+    "3b3f7a14be95",
+    "27c73a2b45e8",
+    "f21767934341",
+    "f4b3d280d81d",
+    "a0178f824114",
+    "efc20525c2e4",
+    "2dc3fa765a66",
+    "cc709472cc65",
+    "d98e20bf9a03",
+    "28d674dce975",
+    "7a2b1db2870e",
+    "c80bb7d26f01",
+    "689e35975023",
+    "8680ccbac587"
+   ]
+  }
+ ]
+}
