@@ -1,0 +1,5896 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-12",
+ "analises": [
+  {
+   "id": "4aca9256b1ef",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/11/ministro-da-justia-cobra-explicaes-da-pf-sobre-afastamento-de-delegados-dos-casos-master-e-inss.ghtml",
+   "titulo": "Ministro da Justiça cobra explicações da PF sobre afastamento de delegados dos casos Master e INSS",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "ministerio-da-justica-cobra-pf-sobre-troca-de-de",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de crise na Polícia Federal e atritos envolvendo o Ministério da Justiça, o STF e investigações de repercussão política."
+   },
+   "estado": "ok",
+   "T": -8,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 40,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 386,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -7.5,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -7.5
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Afastamento de delegados da PF após polêmica sobre relatórios de investigações.",
+    "causa": "Insatisfação da chefia da PF com relatórios que mencionavam ministros do STF.",
+    "vitima": "Delegados afastados da coordenação.",
+    "culpado": "Chefia da Polícia Federal.",
+    "solucao": "Cobrança de explicações pelo Ministério da Justiça.",
+    "motor_moral": "transparencia_institucional"
+   },
+   "teste_inversao": "Se os papéis estivessem invertidos, o texto manteria a mesma estrutura de apuração, mas a rotulação ideológica da associação de classe seria evitada ou tratada com maior distanciamento.",
+   "atores": [
+    {
+     "nome": "Wellington César Lima e Silva",
+     "campo": "centro"
+    },
+    {
+     "nome": "Andrei Rodrigues",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Associação Nacional dos Delegados da Polícia Federal",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "um grupo de extrema direita e defende pautas bolsonaristas",
+     "paragrafo": "P5",
+     "direcao": "esquerda",
+     "contribuicao": -7.5,
+     "explicacao": "A redação classifica a associação de delegados com termos político-ideológicos pejorativos baseando-se na alegação de interlocutores do diretor da PF.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Associação Nacional dos Delegados da Polícia Federal",
+     "ressalva": "Atribui a pecha a alegações de interlocutores, mas endossa o rótulo no corpo da narrativa."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "eae5138bb9d7",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/ataque-israelense-mata-seis-pessoas-em-hospital-no-sul-de-gaza-diz-defesa-civil.shtml",
+   "titulo": "Ataque israelense mata seis pessoas em hospital no sul de Gaza, diz Defesa Civil",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataque-aereo-de-israel-em-hospital-no-sul-de-gaz",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata baixas civis e ações militares em conflito geopolítico no Oriente Médio."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 568,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mortes de civis em ataques no sul de Gaza.",
+    "causa": "Conflito armado e acusações mútuas de violação de cessar-fogo.",
+    "vitima": "Civis palestinos e feridos no hospital.",
+    "culpado": "Israel e Hamas, mutuamente responsabilizados.",
+    "solucao": "Nenhuma apontada.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto seria escrito de forma idêntica, pois relata o incidente com base nas declarações de ambas as partes envolvidas no conflito.",
+   "atores": [
+    {
+     "nome": "Forças Armadas de Israel",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Hamas",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "autoridade da Defesa Civil",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "porta-voz da Defesa Civil, Mahmoud Bassal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": true
+    },
+    {
+     "rotulo": "porta-voz do Hamas, Hazem Qassem",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "informou uma autoridade da Defesa Civil nesta quinta-feira",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta versões de ambos os lados do conflito (Defesa Civil/Hamas e Forças Armadas de Israel) de maneira simétrica.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "adc1c39d6eda",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/monitor-do-el-nino-apenas-284-municipios-tem-planos-de-contingencia",
+   "titulo": "Monitor do El Niño: apenas 284 municípios têm planos de contingência",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "numero-de-municipios-brasileiros-em-seca-extrema",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "economico"
+    ],
+    "justificativa": "Aborda dados de monitoramento governamental e planejamento de municípios frente a desastres climáticos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 623,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Baixo nível de planejamento preventivo dos municípios frente ao El Niño.",
+    "causa": "Falta de planos de contingência disponíveis publicamente antes das emergências.",
+    "vitima": "População exposta a eventos climáticos extremos.",
+    "culpado": "Gestões municipais.",
+    "solucao": "Uso de ferramentas de monitoramento para qualificar a tomada de decisão.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é estritamente informativo e baseado em dados de plataforma científica, não sofrendo alterações com troca de lados políticos.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "pesquisadora responsável, Patrícia Ferrini Rodrigues",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "médica patologista e diretora do Instituto Ar, Evangelina Araújo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 49,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "apenas 284 dos 5.571 municípios têm planos de contingência disponíveis publicamente",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados quantitativos detalhados com fonte primária (plataforma MARÉ) e contexto adequado sobre decretos e recursos.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "23cd9c005525",
+   "url": "https://g1.globo.com/turismo-e-viagem/noticia/2026/11/11/transatlantico-e-afundado-em-frente-a-florida-para-criar-maior-recife-artificial-do-mundo.ghtml",
+   "titulo": "Transatlântico é afundado na costa da Flórida para criar maior recife artificial do mundo",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata do afundamento de um transatlântico histórico para a criação de um recife artificial, sem disputa político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 46,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 394,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Necessidade de destino final para navio histórico e fomento ao turismo marinho.",
+    "causa": "Aposentadoria de embarcação.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Transformação em recife artificial.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é puramente descritivo sobre um evento histórico e turístico, sem viés político aplicável.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ecdc4424a33a",
+   "url": "https://www.moneytimes.com.br/lotofacil-3827-quina-7165-outras-loterias-acumulam-resultados-rsgp/",
+   "titulo": "Lotofácil, Quina, +Milionária e outras loterias acumulam com bolas na trave impressionantes",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre resultados de loterias da Caixa Econômica Federal sem conteúdo político."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 729,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Acumulação de prêmios de loteria.",
+    "causa": "Ausência de acertadores nas faixas principais dos concursos.",
+    "vitima": "Apostadores.",
+    "culpado": "Nenhum.",
+    "solucao": "Novos sorteios e prêmios acumulados.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de apuração de resultados de loterias comerciais, sem qualquer viés político ou ideológico.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "39fb392e5ef2",
+   "url": "https://umsoplaneta.globo.com/clima/noticia/2026/11/11/desmatamento-e-mudancas-climaticas-ameacam-produtividade-da-soja-e-da-carne-brasileira-aponta-estudo-do-wri.ghtml",
+   "titulo": "Desmatamento e mudanças climáticas ameaçam produtividade da soja e da carne brasileira, aponta estudo do WRI",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto aborda impactos das mudanças climáticas no agronegócio brasileiro e propõe soluções de políticas públicas e cooperação internacional com a China."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1062,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O desmatamento e as mudanças climáticas encurtam a estação chuvosa e elevam temperaturas, ameaçando a produtividade do agronegócio.",
+    "causa": "Emissões globais e desmatamento na Amazônia e no Cerrado.",
+    "vitima": "Produtores rurais e cadeias de exportação para a China.",
+    "culpado": "Mudanças climáticas globais e perda de vegetação nativa.",
+    "solucao": "Fortalecer a fiscalização, rastreabilidade, restauração de áreas degradadas e cooperação com a China.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o estudo apontasse efeitos positivos do desmatamento, a estrutura da notícia seria mantida, pois o veículo relata as conclusões de uma pesquisa institucional.",
+   "atores": [
+    {
+     "nome": "WRI Brasil",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Emily Dionizio, pesquisadora do WRI Brasil e uma das autoras do estudo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 26,
+     "ultima": false
+    },
+    {
+     "rotulo": "Virginia Antonioli, gerente sênior de Sistemas Alimentares do WRI Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Nos últimos 30 anos, a estação chuvosa encurtou em até 75 dias em algumas áreas da Amazônia e em até 45 dias no Cerrado",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados climáticos com período e base definidos pelo estudo.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "36be640cdc17",
+   "url": "https://www.bloomberglinea.com.br/negocios/fleury-e-bradsaude-como-analistas-avaliam-a-nova-sociedade-das-empresas-em-oncologia/",
+   "titulo": "Fleury e Bradsaúde: como analistas avaliam a nova sociedade das empresas em oncologia",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda uma sociedade empresarial no setor de saúde privada e fusões/aquisições de mercado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 561,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldades financeiras de concorrentes no setor de oncologia criam oportunidades para novas parcerias.",
+    "causa": "Movimentos de mercado e reestruturação de operadoras e laboratórios.",
+    "vitima": "Empresas com balanços fragilizados.",
+    "culpado": "Nenhum",
+    "solucao": "Criação de novas sociedades e clínicas para absorção de demanda.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto descreve dados financeiros e análises de mercado de forma neutra, sendo aplicável a qualquer operação corporativa.",
+   "atores": [
+    {
+     "nome": "Fleury",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Bradsaúde",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Oncoclínicas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Joseph Giordano, analista do J.P. Morgan",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 31,
+     "ultima": false
+    },
+    {
+     "rotulo": "analistas do BTG Pactual",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A nova sociedade, chamada de FleuryOnco, prevê R$ 72 milhões até 2027 para abrir sete clínicas",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Valores e prazos devidamente explicitados com base em fatos relevantes das companhias.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4119e5c6a726",
+   "url": "https://www.cnnbrasil.com.br/internacional/g7-diz-que-acoes-da-china-perto-de-taiwan-ameacam-estabilidade-regional/",
+   "titulo": "G7 diz que ações da China perto de Taiwan ameaçam estabilidade regional",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "Trata de declarações geopolíticas do G7 sobre ações da China em relação a Taiwan e segurança internacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 454,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ações assertivas da China perto de Taiwan ameaçam a estabilidade regional e a liberdade de navegação.",
+    "causa": "Pressão militar e territorial exercida pela China sobre a ilha.",
+    "vitima": "Taiwan e segurança do transporte marítimo internacional.",
+    "culpado": "China",
+    "solucao": "Fortalecimento de capacidades de autodefesa e condenação conjunta pelo G7.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um comunicado oficial e a posição de Taiwan e do G7, mantendo o padrão usual de cobertura internacional sobre tensões geopolíticas.",
+   "atores": [
+    {
+     "nome": "G7",
+     "campo": "centro"
+    },
+    {
+     "nome": "China",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Taiwan",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministros das Relações Exteriores do G7",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": false
+    },
+    {
+     "rotulo": "porta-voz Karen Kuo",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro da Defesa de Taiwan, Wellington Koo",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 3
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O Ministério das Relações Exteriores da China não respondeu imediatamente a um pedido de comentário.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A redação registra que a China foi procurada para comentar as acusações, mantendo o padrão de equidade na apuração.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "China"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "00648d8ae4f1",
+   "url": "https://www.seudinheiro.com/2026/economia/375-apostadores-quase-lotofacil-3827-mais-milionaria-paga-premio-consolacao-loterias-rsgp/",
+   "titulo": "375 apostadores ficam no quase na Lotofácil 3827; +Milionária paga mais de R$ 100 mil por bolas na trave",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto divulga resultados de sorteios de loterias da Caixa Econômica Federal."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 830,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Apostadores não acertaram os prêmios principais das loterias acumuladas.",
+    "causa": "Probabilidade estatística dos jogos.",
+    "vitima": "Apostadores que quase ganharam.",
+    "culpado": "Nenhum",
+    "solucao": "Acumulação dos prêmios para os próximos sorteios.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Tratando-se de resultados de loteria, a inversão de lados não se aplica, pois o conteúdo é puramente utilitário e informativo.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f11244c67108",
+   "url": "https://oeco.org.br/noticias/guterres-pressiona-lideres-mundiais-por-urgencia-climatica-os-poluidores-devem-pagar/",
+   "titulo": "Guterres pressiona líderes mundiais por urgência climática: “os poluidores devem pagar”",
+   "veiculo": "((o))eco",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Discute o discurso do secretário-geral da ONU sobre financiamento climático, transição energética e taxação de combustíveis fósseis."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 843,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A crise climática está superando as respostas globais e o financiamento para países vulneráveis é insuficiente.",
+    "causa": "Inação e emissões de gases de efeito estufa por grandes poluidores e empresas de combustíveis fósseis.",
+    "vitima": "Populações vulneráveis e países em desenvolvimento.",
+    "culpado": "Empresas de combustíveis fósseis e governos lentos na transição ecológica.",
+    "solucao": "Novo Pacto Global de Justiça Climática e taxação de lucros extraordinários de petroleiras.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Caso o veículo cobrisse uma cúpula de ceticismo climático, a estrutura priorizando as falas principais das autoridades seria mantida de acordo com a linha editorial.",
+   "atores": [
+    {
+     "nome": "António Guterres",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Empresas petrolíferas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "António Guterres",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 101,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 101,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "as nove maiores companhias do setor registraram US$ 95 bilhões em lucros em apenas um trimestre",
+     "paragrafo": "P14",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta dados financeiros das companhias citadas no discurso de Guterres.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4875481e3b44",
+   "url": "https://climainfo.org.br/2026/11/11/pelo-menos-15-bilhao-de-mulheres-e-meninas-vivem-em-areas-sob-risco-climatico/",
+   "titulo": "Pelo menos 1,5 bilhão de mulheres e meninas vivem em áreas sob risco climático",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "estudo-na-cop31-aponta-que-1-5-bilhao-de-mulhere",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata do impacto das mudanças climáticas sobre mulheres e meninas com base em relatório da ONU."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 508,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mulheres e meninas sofrem de forma desproporcional os impactos das mudanças climáticas.",
+    "causa": "Desigualdade de gênero e responsabilidade histórica desigual na emissão de gases.",
+    "vitima": "Mulheres e meninas em áreas de risco climático.",
+    "culpado": "Países emissores e falta de políticas abrangentes.",
+    "solucao": "Garantir direitos iguais, recursos e liderança para mulheres.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta dados de um relatório oficial sem viés político partidário evidente.",
+   "atores": [
+    {
+     "nome": "ONU Mulheres",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Sima Bahous, diretora executiva da ONU Mulheres",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 58,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "054eb7f9a555",
+   "url": "https://www.poder360.com.br/poder-internacional/pib-no-reino-unido-cresceu-07-no-3o-trimestre/",
+   "titulo": "PIB no Reino Unido cresceu 0,7% no 3º trimestre",
+   "veiculo": "Poder360",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia econômica sobre o crescimento do PIB do Reino Unido."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 198 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 77,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 198,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Crescimento econômico do Reino Unido no terceiro trimestre.",
+    "causa": "Aumento do setor de serviços.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de uma notícia econômica descritiva baseada em dados oficiais.",
+   "atores": [
+    {
+     "nome": "Escritório Nacional de Estatísticas (ONS)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "21ee69afc435",
+   "url": "https://neofeed.com.br/negocios/btg-dribla-incerteza-eleitoral-lucra-r-53-bilhoes-e-anuncia-recompra-de-r-2-bilhoes-em-acoes/",
+   "titulo": "BTG dribla incerteza eleitoral, lucra R$ 5,3 bilhões e anuncia recompra de R$ 2 bilhões em ações",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "btg-pactual-registra-lucro-recorde-de-r-5-3-bilh",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Relato de resultados financeiros do BTG Pactual."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 884,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Cenário macroeconômico desafiador e incerteza eleitoral.",
+    "causa": "Turbulência de mercado.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Diversificação e gestão de risco.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Reportagem financeira padrão sobre balanço corporativo.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Roberto Sallouti, CEO do BTG Pactual",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 30,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3d6b5849068e",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/11/senado-aprova-mp-das-dvidas-rurais-e-texto-vai-sano-presidencial.ghtml",
+   "titulo": "Senado aprova MP das dívidas rurais e texto vai à sanção presidencial",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-aprova-mp-de-dividas-rurais-apos-concesso",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aprovação de medida provisória de renegociação de dívidas rurais pelo Senado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 62,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 455,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Endividamento de produtores rurais e vencimento iminente de prazos de renegociação.",
+    "causa": "Inadimplência e prazos curtos anteriores.",
+    "vitima": "Produtores rurais endividados.",
+    "culpado": "Nenhum explicitamente.",
+    "solucao": "Aprovação da MP com ampliação de prazos e condições.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata o trâmite legislativo de forma estritamente factual e processual.",
+   "atores": [
+    {
+     "nome": "Governo Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Senado Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Paulo Pimenta",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "cbff57b93c5c",
+   "url": "https://www1.folha.uol.com.br/colunas/eduardosodre/2026/11/fiat-divulga-primeiras-imagens-do-argo-x-irmao-gemeo-do-grande-panda-europeu.shtml",
+   "titulo": "Fiat divulga primeiras imagens do Argo X, irmão gêmeo do Grande Panda europeu",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Artigo ou nota sobre lançamento de veículo automotivo assinado por jornalista especializado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 456,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Nenhum.",
+    "causa": "Nenhuma.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Texto descritivo sobre produto industrial e lançamento automotivo.",
+   "atores": [
+    {
+     "nome": "Fiat",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "39c736851e6d",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/12/jovem-autista-e-resgatado-apos-passar-6-dias-perdido-na-mata-na-australia.ghtml",
+   "titulo": "Jovem autista é resgatado após passar 6 dias perdido na mata na Austrália",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata-se de uma notícia de resgate de um jovem perdido na Austrália, sem implicações político-ideológicas diretas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 311,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desaparecimento de jovem autista em área de mata na Austrália.",
+    "causa": "Jovem se perdeu durante acampamento.",
+    "vitima": "William e sua família.",
+    "culpado": "Nenhum.",
+    "solucao": "Resgate por equipe policial com helicóptero.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é estritamente factual e humanitário, não havendo viés político ou necessidade de inversão.",
+   "atores": [
+    {
+     "nome": "William",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Elizabeth",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "polícia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Elizabeth",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8ce05a355e5a",
+   "url": "https://umsoplaneta.globo.com/sociedade/noticia/2026/11/11/tres-em-cada-quatro-municipios-sofreram-impacto-ambiental-em-dois-anos.ghtml",
+   "titulo": "Três em cada quatro municípios sofreram impacto ambiental em dois anos",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Aborda dados do IBGE sobre impactos ambientais nos municípios brasileiros e ações de gestão pública."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 810,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento dos impactos ambientais extremos nos municípios brasileiros.",
+    "causa": "Mudanças climáticas e atividades humanas.",
+    "vitima": "População dos municípios afetados por secas, alagamentos e deslizamentos.",
+    "culpado": "Nenhum explícito.",
+    "solucao": "Implementação de planejamento urbano, monitoramento e adaptação climática pelas prefeituras.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta dados estatísticos oficiais de forma descritiva, sem tom político partidário.",
+   "atores": [
+    {
+     "nome": "IBGE",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Prefeituras municipais",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "autores do levantamento",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 42,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rosane Teixeira de Siqueira e Oliveira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Vânia Maria Pacheco",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "074d411241f0",
+   "url": "https://www.moneytimes.com.br/correios-cobram-r-516-milhoes-de-fundo-imobiliario-na-justica-ifix-aprofunda-perdas-igdl/",
+   "titulo": "Correios cobram R$ 51,6 milhões de fundo imobiliário na Justiça; IFIX aprofunda perdas",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "correios-cobram-r-51-6-milhoes-de-fundo-imobilia",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de disputa judicial entre fundo imobiliário e empresa estatal (Correios) e o impacto no mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 488,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disputa judicial e cobrança de indenização milionária entre fundo imobiliário e estatal.",
+    "causa": "Quebra de contrato de locação e problemas estruturais em imóvel.",
+    "vitima": "Cotistas do fundo e Correios.",
+    "culpado": "Nenhum definido judicialmente.",
+    "solucao": "Resolução do litígio na Justiça.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata fatos de mercado financeiro e processos judiciais ouvindo as partes de maneira neutra.",
+   "atores": [
+    {
+     "nome": "Correios",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Tellus Rio Bravo Renda Logística (TRBL11)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rio Bravo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f462448b084e",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/toffoli-vota-por-fim-da-imunidade-para-crime-patrimonial-contra-mulher",
+   "titulo": "Toffoli vota por fim da imunidade para crime patrimonial contra mulher",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "costumes",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda julgamento no STF sobre a validade de regra do Código Penal relacionada a crimes contra a mulher na família."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 67,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 376,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Manutenção de imunidade penal para crimes patrimoniais cometidos contra mulheres no âmbito doméstico.",
+    "causa": "Lei anacrônica de 1940 que protegia a indissolubilidade do casamento.",
+    "vitima": "Mulheres em relacionamentos abusivos.",
+    "culpado": "Regra desatualizada do Código Penal.",
+    "solucao": "Supender a imunidade por decisão do STF.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata um julgamento em andamento destacando os argumentos apresentados pelo relator e pelos autores das ações.",
+   "atores": [
+    {
+     "nome": "Dias Toffoli",
+     "campo": "centro"
+    },
+    {
+     "nome": "Conamp e Partido Verde",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Dias Toffoli",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "Aristides Junqueira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "Isadora Cartaxo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f93ee6d4ca98",
+   "url": "https://www.bloomberglinea.com.br/negocios/btg-pactual-supera-projecoes-com-lucro-recorde-no-3-tri-e-aprova-recompra-de-r-2-bi/",
+   "titulo": "BTG Pactual supera projeções com lucro recorde no 3º tri e aprova recompra de R$ 2 bi",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "btg-pactual-registra-lucro-recorde-de-r-5-3-bilh",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda o lucro recorde do BTG Pactual e declarações de seu dirigente sobre o cenário político-econômico nacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 551,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Volatilidade do mercado financeiro e desafios fiscais do país.",
+    "causa": "Expectativas exageradas em torno do cenário eleitoral e político.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Ajuste fiscal para permitir queda de juros.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata os resultados financeiros da instituição e traz a avaliação de seu dirigente sobre o cenário macroeconômico de forma padrão para o jornalismo econômico.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "André Esteves",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "André Esteves",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 28
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0b6f395c1d61",
+   "url": "https://www.infomoney.com.br/mercados/santander-aumenta-oferta-e-comprara-10-do-santander-brasil-por-19-bilhao-de-euros/",
+   "titulo": "Santander aumenta oferta e comprará 10% do Santander Brasil por 1,9 bilhão de euros",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "santander-eleva-em-5-oferta-de-r-11-7-bilhoes-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de uma operação financeira corporativa de aquisição de ações pelo banco Santander."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 227 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 227,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Oferta de aquisição de participação remanescente do Santander Brasil.",
+    "causa": "Estratégia corporativa do banco espanhol.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Assembleia geral para aprovação da operação financeira.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é puramente informativo sobre finanças corporativas, sem viés político.",
+   "atores": [
+    {
+     "nome": "Santander",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Santander",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "32c9d0222c5c",
+   "url": "https://www.cnnbrasil.com.br/agro/raizen-reduz-prejuizo-em-635-no-trimestre-para-r-8437-milhoes/",
+   "titulo": "Raízen reduz prejuízo em 63,5% no trimestre para R$ 843,7 milhões",
+   "veiculo": "CNN Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia sobre resultados financeiros trimestrais da empresa Raízen."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 626,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Prejuízo financeiro e desafios operacionais da empresa.",
+    "causa": "Condições climáticas adversas e preços de commodities.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Plano de recuperação extrajudicial e reestruturação.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de um relatório de resultados corporativos sem juízo de valor político.",
+   "atores": [
+    {
+     "nome": "Raízen",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "companhia",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1c0ada3f229d",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/ultrapar-ugpa3-pagara-mais-de-r-1-bilhao-em-dividendos-aos-acionistas-veja-quem-tem-direito/",
+   "titulo": "Ultrapar (UGPA3) pagará mais de R$ 1 bilhão em dividendos aos acionistas; veja quem tem direito",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informação sobre pagamento de dividendos de empresa aos acionistas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 304,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Distribuição de proventos aos acionistas.",
+    "causa": "Aprovação corporativa de pagamento de dividendos.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Pagamento programado para dezembro.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Texto estritamente utilitário para investidores.",
+   "atores": [
+    {
+     "nome": "Ultrapar",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ultrapar",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "5652becc5a57",
+   "url": "https://climainfo.org.br/2026/11/11/combustiveis-fosseis-devem-seguir-o-mesmo-caminho-dos-dinossauros-afirma-guterres-na-cop31/",
+   "titulo": "“Combustíveis fósseis devem seguir o mesmo caminho dos dinossauros”, afirma Guterres na COP31",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Discurso de autoridade internacional sobre financiamento climático e tributação de combustíveis fósseis."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 491,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise climática e falta de financiamento para países vulneráveis.",
+    "causa": "Lucros excessivos e ação de lobbies de combustíveis fósseis.",
+    "vitima": "Países vulneráveis e populações atingidas",
+    "culpado": "Grandes petrolíferas e países ricos",
+    "solucao": "Tributação de lucros extraordinários e aumento de financiamento climático.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata um discurso oficial da ONU, cobrindo os pontos principais colocados pelo orador.",
+   "atores": [
+    {
+     "nome": "António Guterres",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Empresas de combustíveis fósseis",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "António Guterres",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 185,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 185,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b1c0c1674ab4",
+   "url": "https://www.poder360.com.br/poder-internacional/casa-branca-ameaca-congressistas-democratas-com-investigacao/",
+   "titulo": "Casa Branca ameaça congressistas democratas com investigação",
+   "veiculo": "Poder360",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Conflito institucional entre a Casa Branca (governo Trump) e congressistas democratas nos EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 676,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ameaça de investigação mútua entre Executivo e Congresso nos EUA.",
+    "causa": "Disputa de controle político e planos de fiscalização da oposição.",
+    "vitima": "Nenhuma",
+    "culpado": "Ambos os lados acusam o outro de uso abusivo do poder.",
+    "solucao": "Nenhuma apontada",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta os argumentos da Casa Branca e abre amplo espaço para a resposta do deputado oposicionista.",
+   "atores": [
+    {
+     "nome": "Casa Branca / Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Congressistas democratas",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Will Scharf",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 87,
+     "ultima": false
+    },
+    {
+     "rotulo": "Robert Garcia",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 119,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 119,
+    "direita": 87
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "de26df9eef3a",
+   "url": "https://oeco.org.br/noticias/lula-critica-o-desaparecimento-da-pauta-climatica-em-discurso-na-cop31/",
+   "titulo": "Lula critica o desaparecimento da pauta climática em discurso na COP31",
+   "veiculo": "((o))eco",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-cobra-paises-ricos-na-cop31-por-financiamen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda o discurso de Lula na COP31 criticando a omissão de nações ricas frente à crise climática e ao multilateralismo."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1274,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O desaparecimento da pauta climática nas discussões globais e o descumprimento de acordos pelos países ricos.",
+    "causa": "Priorização de conflitos armados e disputas comerciais por potências globais.",
+    "vitima": "Populações afetadas por desastres climáticos e futuras gerações.",
+    "culpado": "Países desenvolvidos e forças reacionárias que atacam o multilateralismo.",
+    "solucao": "Fortalecimento do multilateralismo, cumprimento de metas e financiamento climático.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o discurso fosse de um líder de direita cobrando pautas econômicas liberais, o tom da redação manteria a estrutura de atribuição direta, mas com foco em reformas fiscais.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Países ricos",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 133,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 133,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "o presidente cobrou dos países ricos a implementação dos compromissos climáticos",
+     "paragrafo": "P1",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "Usa verbo ativo de cobrança atribuído a Lula contra os países ricos.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral",
+     "favorece": "Luiz Inácio Lula da Silva",
+     "desfavorece": "Países ricos"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "90dddc458714",
+   "url": "https://neofeed.com.br/economia/e-preciso-defender-o-obvio-galipolo-descarta-guidance-para-a-selic-e-rejeita-inventar-no-bc/",
+   "titulo": "“É preciso defender o óbvio”: Galípolo descarta guidance para a Selic e rejeita “inventar” no BC",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Discute a condução da política monetária do Banco Central e o rechace a pressões do mercado por guidance."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 789,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incerteza econômica e pressões por orientação antecipada da taxa Selic.",
+    "causa": "Deterioração do ambiente internacional e choques de oferta na economia doméstica.",
+    "vitima": "Agentes econômicos e sociedade expostos à volatilidade.",
+    "culpado": "Falta de obviedades e pressões especulativas sem embasamento global.",
+    "solucao": "Manutenção do framework internacional e recusa de guidance em ambiente incerto.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreveria os argumentos do Banco Central de forma similar independentemente da corrente política no comando, focando na defesa da autonomia técnica.",
+   "atores": [
+    {
+     "nome": "Gabriel Galípolo",
+     "campo": "centro"
+    },
+    {
+     "nome": "Mercado financeiro",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gabriel Galípolo",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 153,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "f7d0f8e01ffc",
+   "url": "https://valor.globo.com/legislacao/noticia/2026/11/11/stj-cancela-julgamento-de-recursos-repetitivos-sobre-valores-pagos-pelo-sus-a-hospitais-privados.ghtml",
+   "titulo": "STJ cancela julgamento de recursos repetitivos sobre valores pagos pelo SUS a hospitais privados",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "gilmar-suspende-acoes-nacionais-sobre-tabela-sus",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de decisão do STJ e STF sobre impacto financeiro multibilionário no SUS e remuneração de hospitais privados."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 390,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Contverseira judicial sobre a adoção de tabelas privadas para remuneração de serviços prestados ao SUS.",
+    "causa": "Divergência de entendimento entre tribunais federais e impacto orçamentário estimado.",
+    "vitima": "Orçamento do Ministério da Saúde",
+    "culpado": "Incerteza na aplicação de critérios de ressarcimento.",
+    "solucao": "Suspensão nacional das ações para julgamento de repercussão geral pelo STF.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "A notícia de caráter puramente processual e orçamentário não sofreria alterações substanciais em sua redação.",
+   "atores": [
+    {
+     "nome": "STF / STJ",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Hospitais privados",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "União",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "impacto de cerca de R$ 24 bilhões por ano no orçamento do Ministério da Saúde",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Número contextualizado com base em estimativa da União.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "União",
+     "desfavorece": "Hospitais privados"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "26048552b4dd",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/grupo-fleury-firma-acordo-com-bradsaude-para-criar-rede-oncologica.shtml",
+   "titulo": "Grupo Fleury firma acordo com Bradsaúde para criar rede oncológica",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Acordo comercial e societário entre empresas de saúde para criação de rede oncológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 292 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 292,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de expansão de serviços oncológicos ambulatoriais.",
+    "causa": "Demanda de mercado por tratamentos especializados.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Criação de joint venture com aporte de investimentos.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata um fato corporativo padrão, sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "Grupo Fleury",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Bradsaúde / Atlântica",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fato relevante publicado pelo Fleury na CVM",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 31,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 31
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3e7ec3543c78",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/11/bebe-de-11-meses-sobrevive-apos-passar-um-dia-enterrado-vivo-em-gaiola-nos-eua.ghtml",
+   "titulo": "Bebê de 11 meses sobrevive após passar um dia enterrado vivo em gaiola nos EUA",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "seguranca"
+    ],
+    "justificativa": "Caso policial de tentativa de homicídio e sequestro de bebê nos Estados Unidos."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 687,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Criança de 11 meses enterrada viva em gaiola por seu pai.",
+    "causa": "Histórico de violência doméstica e conflitos familiares.",
+    "vitima": "Bebê Koah Sharp",
+    "culpado": "Michael Comer",
+    "solucao": "Ação rápida de equipes de emergência e prisão do suspeito.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Tratando-se de um crime comum internacional, o relato factual de boletins policiais seria idêntico.",
+   "atores": [
+    {
+     "nome": "Michael Comer",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Autoridades policiais",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e927fc34fcd1",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/11/mulheres-que-vivem-em-areas-sob-risco-climatico-ja-sao-15-bilhao-diz-estudo.ghtml",
+   "titulo": "Mulheres que vivem em áreas sob risco climático já são 1,5 bilhão, diz estudo",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "estudo-na-cop31-aponta-que-1-5-bilhao-de-mulhere",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto aborda impactos socioeconômicos e de gênero das mudanças climáticas, discutidos em fórum internacional (COP31)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 659,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mulheres e meninas sofrem desproporcionalmente com os impactos da crise climática e desigualdades.",
+    "causa": "Aquecimento global, falta de financiamento com perspectiva de gênero e exclusão da tomada de decisões.",
+    "vitima": "Mulheres e meninas em áreas de risco climático.",
+    "culpado": "Falta de investimentos adequados e governos com compromissos climáticos limitados.",
+    "solucao": "Implementar e financiar planos de ação climática com foco em gênero e transição justa.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta um relatório internacional de direitos e clima; a estrutura relata dados técnicos e institucionais sem viés partidário direto no contexto brasileiro.",
+   "atores": [
+    {
+     "nome": "ONU Mulheres",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Sarah Hendriks, diretora da Divisão de Políticas, Programas e Relações Intergovernamentais…",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Em análise feita em 24 países, um aumento de 1°C na temperatura média está associado a uma perda de renda de 34% a mais da renda total das mulheres em relação aos homens.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O dado estatístico é apresentado com base em estudo e período específicos, fornecendo contexto quantitativo.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6acdfb020e3b",
+   "url": "https://www.moneytimes.com.br/lucro-da-ultrapar-ugpa3-mais-que-triplica-no-3o-trimestre-e-supera-expectativas-de-analistas-fets/",
+   "titulo": "Lucro da Ultrapar (UGPA3) mais que triplica no 3º trimestre e supera expectativas de analistas",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de resultados financeiros de uma empresa privada (Ultrapar), com menção genérica a ação de autoridades contra comércio clandestino."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 222 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 222,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Nenhum.",
+    "causa": "Nenhuma.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é um informe financeiro padrão de mercado e seria idêntico independentemente da linha editorial.",
+   "atores": [
+    {
+     "nome": "Ultrapar",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O grupo Ultrapar (UGPA3), que tem como principal ativo a rede de postos de combustível Ipiranga, teve lucro de R$ 2,7 bilhões no terceiro trimestre",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação estritamente factual e baseada em balanço financeiro publicado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "07e63309970d",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/cop-31-estudo-mostra-que-agro-pode-ter-prejuizo-com-desmatamento",
+   "titulo": "COP 31: estudo mostra que agro pode ter prejuízo com desmatamento",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Discute a relação entre desmatamento, mudanças climáticas e os impactos econômicos na produção agrícola de exportação."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 493,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O desmatamento encurta a estação chuvosa e ameaça a produtividade do agronegócio.",
+    "causa": "Perda de vegetação nativa na Amazônia e no Cerrado.",
+    "vitima": "Setor do agronegócio e ecossistemas.",
+    "culpado": "Desmatamento e falta de mitigação de riscos climáticos.",
+    "solucao": "Validar o Cadastro Ambiental Rural, fortalecer fiscalizações e restaurar a vegetação nativa.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata um estudo técnico ligando preservação ambiental e produtividade econômica, sem viés político partidário.",
+   "atores": [
+    {
+     "nome": "WRI Brasil",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Mariana Oliveira, diretora de Florestas e Uso da Terra do WRI Brasil",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": false
+    },
+    {
+     "rotulo": "Virginia Antonioli, gerente sênior de Sistemas Alimentares do WRI Brasil e uma das autoras…",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Os pesquisadores analisaram tendências climáticas observadas entre 1993 e 2023 e sua sobreposição com áreas produtivas",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O estudo baseia-se em série temporal longa (30 anos) com metodologia explicitada.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e01128e66871",
+   "url": "https://www.cnnbrasil.com.br/economia/money/tecnologia/analise-nvidia-e-ponta-do-iceberg-de-guerra-de-espionagem-das-big-techs/",
+   "titulo": "Análise: Nvidia é “ponta do iceberg” de guerra de espionagem das big techs",
+   "veiculo": "CNN Brasil",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de espionagem corporativa global, segurança de grandes empresas de tecnologia e geopolítica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 76,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1230,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Espionagem corporativa e roubo de segredos industriais no setor de inteligência artificial.",
+    "causa": "Valor econômico e estratégico extremo das informações detidas pelas Big Techs.",
+    "vitima": "Empresas americanas de tecnologia.",
+    "culpado": "Agentes estrangeiros, concorrentes e falhas de segurança humana.",
+    "solucao": "Maior rigor na segurança interna e denúncias judiciais.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A análise relata tendências globais de segurança corporativa com base em fatos e opiniões de especialistas acadêmicos e de segurança, mantendo tom analítico neutro.",
+   "atores": [
+    {
+     "nome": "Nvidia",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Matthew Waxman, professor de direito especializado em segurança cibernética da…",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Greg Pollock, diretor de pesquisa e análises da empresa de gerenciamento de riscos UpGuard",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 26,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Os tribunais federais dos Estados Unidos registraram um recorde de 1.500 processos relacionados a segredos comerciais no ano passado.",
+     "paragrafo": "P24",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O dado numérico é fundamentado em registros oficiais de tribunais federais dos EUA.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "14e8b5f0aa70",
+   "url": "https://www.bloomberglinea.com.br/negocios/bb-corta-pela-metade-previsao-de-lucro-e-reduz-dividendos-com-inadimplencia-no-agro/",
+   "titulo": "BB corta pela metade previsão de lucro e reduz dividendos com inadimplência no agro",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "lucro-liquido-ajustado-do-banco-do-brasil-despen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda a revisão de lucros e provisões de um banco estatal (Banco do Brasil) devido a inadimplência e renegociações no agro associadas a medida provisória."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 279 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 279,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda drástica no lucro e aumento da inadimplência no agronegócio.",
+    "causa": "Baixo nível de pagamentos em dia no agro e renegociações abaixo do esperado via Medida Provisória.",
+    "vitima": "Banco do Brasil e seus acionistas.",
+    "culpado": "Inadimplência no setor agrícola e desempenho de renegociações.",
+    "solucao": "Elevação de provisões e corte de projeções financeiras.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto noticiaria da mesma forma os resultados negativos de qualquer outra instituição financeira pública ou privada com base em seu balanço oficial.",
+   "atores": [
+    {
+     "nome": "Banco do Brasil",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco do Brasil (fato relevante)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Banco estatal lucrou R$ 1,27 bilhão no terceiro trimestre, um terço do resultado anterior, e prevê mais provisões até dezembro",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os dados financeiros do balanço trimestral são apresentados de forma detalhada e com comparativos temporais claros.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5ecee359e083",
+   "url": "https://www.poder360.com.br/poder-internacional/master-e-ueno-valeram-se-da-falencia-regulatoria-diz-schreiner/",
+   "titulo": "Master e Ueno valeram-se da falência regulatória, diz Schreiner",
+   "veiculo": "Poder360",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "O texto aborda crise política e institucional no Paraguai, envolvendo impeachment de presidente e escândalo bancário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 452,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise regulatória e bancária no Paraguai combinada com escândalos políticos",
+    "causa": "Mau uso de instrumentos financeiros e falhas regulatórias",
+    "vitima": "Clientes dos bancos e estabilidade institucional",
+    "culpado": "Ex-gestores e políticos envolvidos",
+    "solucao": "Ações rápidas de impeachment, prisões e reformas regulatórias",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve fatos e declarações oficiais sobre uma crise externa sem tomar partido em disputas ideológicas locais.",
+   "atores": [
+    {
+     "nome": "Jorge Schreiner",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Santiago Peña",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jorge Schreiner",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 103,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "35384eabe4f0",
+   "url": "https://www.seudinheiro.com/2026/empresas/apos-lucro-recorde-no-3t26-btg-pactual-bpac11-prepara-uma-nova-tacada-na-bolsa-recompra-de-units-pode-chegar-a-r-2-bilhoes-miql/",
+   "titulo": "Após lucro recorde no 3T26, BTG Pactual (BPAC11) prepara uma nova tacada na bolsa: recompra de units pode chegar a R$ 2 bilhões",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "btg-pactual-registra-lucro-recorde-de-r-5-3-bilh",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata plano de recompra de ações de banco privado após divulgação de resultados financeiros."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "10 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 623,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 10,
+   "enquadramento": {
+    "problema": "Necessidade de otimização de capital da empresa",
+    "causa": "Lucro recorde no trimestre",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Programa de recompra de units",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Reportagem puramente corporativa e de mercado financeiro, sem viés ideológico relevante.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "o banco informou que as Units compradas serão mantidas em tesouraria",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Atribuição neutra de informações repassadas pela companhia.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0f9316474cdd",
+   "url": "https://climainfo.org.br/2026/11/11/lula-na-cop31-brasil-esta-de-volta-para-defender-um-mundo-mais-saudavel/",
+   "titulo": "Lula na COP31: “Brasil está de volta para defender um mundo mais saudável”",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-cobra-paises-ricos-na-cop31-por-financiamen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Discurso do presidente Lula em cúpula internacional abordando temas globais, financiamento e políticas ambientais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 40,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 740,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise climática e injustiças globais decorrentes de ações dos países ricos",
+    "causa": "Falta de cumprimento de compromissos por nações desenvolvidas e priorização de gastos com defesa",
+    "vitima": "Países em desenvolvimento e futuras gerações",
+    "culpado": "Países ricos e forças reacionárias",
+    "solucao": "Multilateralismo, financiamento climático e cooperação internacional",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o governo fosse de outro campo político, os discursos internacionais seriam contextualizados com maior ênfase nas críticas fiscais internas.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Lula",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 376,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 376,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "0f2a8b9dbfb3",
+   "url": "https://neofeed.com.br/poder/governo-promete-pacote-fiscal-de-ate-r-60-bi-mas-divida-so-comeca-a-cair-no-ultimo-ano-do-lula-4/",
+   "titulo": "Governo promete pacote fiscal de até R$ 60 bi, mas dívida só começa a cair no último ano do Lula 4",
+   "veiculo": "NeoFeed",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-envia-ao-congresso-pacote-de-ajuste-fisc",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Detalha proposta de pacote fiscal do governo federal enviada ao Congresso, gerando debate econômico."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1177,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crescimento da dívida pública e necessidade de reequilíbrio fiscal",
+    "causa": "Descompasso entre receitas e despesas federais",
+    "vitima": "Sociedade e contribuintes",
+    "culpado": "Gastos excessivos anteriores",
+    "solucao": "Pacote fiscal com corte de privilégios e revisão de despesas",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto apresenta projeções técnicas e dados orçamentários, equilibrando a visão oficial com ponderações do mercado financeiro.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Bruno Moretti",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Bruno Moretti",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 224,
+     "ultima": true
+    },
+    {
+     "rotulo": "uma fonte do mercado financeiro",
+     "campo": "centro_direita",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 224,
+    "direita": 0
+   },
+   "falas": 14,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "reforçou o ministro",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "Uso de verbo com carga de firmeza para legitimar o argumento do ministro.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Bruno Moretti"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "dbe279c9ac35",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/11/moretti-projeto-de-lei-do-ajuste-fiscal-deve-ter-impacto-entre-r-50-e-r-60-bi-considerando-receitas-e-despesas.ghtml",
+   "titulo": "Moretti: Projeto de lei do ajuste fiscal deve ter impacto entre R$ 50 bilhões e R$ 60 bilhões em 2027",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-envia-ao-congresso-pacote-de-ajuste-fisc",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Cobertura de projeto de lei de ajuste fiscal do governo com foco em medidas de receitas e despesas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 392,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desajuste nas contas públicas federais para 2027",
+    "causa": "Déficit estrutural e rigidez orçamentária",
+    "vitima": "Contas públicas",
+    "culpado": "Dinamica anterior de gastos",
+    "solucao": "PLP com controle de despesas e limitação de créditos tributários",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Notícia econômica de caráter informativo e institucional, sem viés partidário ostensivo na redação.",
+   "atores": [
+    {
+     "nome": "Bruno Moretti",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Bruno Moretti",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 30,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 30,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "990526d1d20d",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/desabamento-de-predio-em-nova-york-mata-1-pessoa-e-fere-ao-menos-outras-10.shtml",
+   "titulo": "Desabamento de prédio em Nova York mata 1 pessoa e fere ao menos outras 10",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre o desabamento de um prédio em Nova York sem grande disputa político-ideológica nacional, com citação breve ao prefeito local."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 487,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desabamento de prédio em Nova York deixa mortos e feridos",
+    "causa": "Ainda não divulgada pelas autoridades",
+    "vitima": "Moradores e trabalhadores atingidos pelo desabamento",
+    "culpado": "Nenhum apontado",
+    "solucao": "Resgate e atendimento de emergência",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve um fato factual de acidente e resgate e seria escrito exatamente da mesma forma independentemente de vieses políticos.",
+   "atores": [
+    {
+     "nome": "Zohran Mamdani",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Corpo de Bombeiros da cidade de Nova York",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "prefeito Zohran Mamdani",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a8fc4adf1181",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/11/barcelona-tem-confrontos-entre-manifestantes-e-policia-durante-greve-geral.ghtml",
+   "titulo": "Barcelona tem confrontos entre manifestantes e polícia durante greve geral; veja FOTOS",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "espanha-enfrenta-primeira-greve-geral-em-14-anos",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de greve geral na Espanha motivada por crise de habitação e conflitos entre manifestantes, governo e sindicatos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1187,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise de habitação e alta dos aluguéis geram greve geral e confrontos na Espanha",
+    "causa": "Especulação imobiliária e falta de acesso a moradias dignas",
+    "vitima": "Trabalhadores e inquilinos sem acesso a imóveis",
+    "culpado": "Rentistas, especuladores e governos",
+    "solucao": "Regras mais rígidas para proteger inquilinos e ampliar moradia pública",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta de maneira equilibrada as estimativas divergentes de público e os balanços opostos de sindicatos e empresários sobre a greve.",
+   "atores": [
+    {
+     "nome": "Pedro Sanchez",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Sindicatos e ativistas por moradia",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Associação empresarial CEOE",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "polícia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Almudena López",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Valeria Racu",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "Unai Sordo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 7,
+     "ultima": true
+    },
+    {
+     "rotulo": "CEOE",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 36,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "A principal associação empresarial do país, a CEOE, classificou a greve como um fracasso.",
+     "paragrafo": "P30",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso neutro de verbos para registrar o posicionamento patronal em contraponto aos sindicatos.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Sindicatos e ativistas por moradia",
+     "desfavorece": "Associação empresarial CEOE"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1de306a99c44",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/11/fundo-tfff-recebe-aporte-de-us-88-mi-de-nove-organizacoes-privadas-e-filantropicas.ghtml",
+   "titulo": "Fundo TFFF recebe aporte de US$ 88 mi de nove organizações privadas e filantrópicas",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre aporte financeiro a fundo internacional de florestas liderado pelo Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 512,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de capitalização para preservação de florestas tropicais",
+    "causa": "Falta de recursos iniciais suficientes para o funcionamento pleno do fundo",
+    "vitima": "Países em desenvolvimento e comunidades locais",
+    "culpado": "Nenhum apontado",
+    "solucao": "Aportes de governos globais e setor privado via fundo TFFF",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Reportagem estritamente informativa sobre captação de recursos ambientais, redigida com neutralidade descritiva.",
+   "atores": [
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "governo brasileiro",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "849e03e661a0",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/tres-em-cada-quatro-municipios-sofreram-impacto-ambiental-em-dois-anos",
+   "titulo": "Três em cada quatro municípios sofreram impacto ambiental em dois anos",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Apresenta dados oficiais do IBGE sobre impactos ambientais nos municípios brasileiros e ações de prefeituras."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 817,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento dos impactos ambientais extremos e falta de monitoramento de emissões nas cidades",
+    "causa": "Mudanças climáticas e insuficiência de estruturas de gestão climática local",
+    "vitima": "População urbana afetada por secas, alagamentos e deslizamentos",
+    "culpado": "Nenhum apontado",
+    "solucao": "Implementação de planos diretores, monitoramento de emissões e ações de mitigação municipal",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Matéria baseada em dados estatísticos públicos do IBGE, sem juízos de valor político partidário.",
+   "atores": [
+    {
+     "nome": "IBGE",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "analista Rosane Teixeira de Siqueira e Oliveira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "analista do IBGE Vânia Maria Pacheco",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "81273a00858d",
+   "url": "https://www.cnnbrasil.com.br/internacional/ataque-israelense-a-hospital-em-gaza-mata-pessoas-diz-defesa-civil/",
+   "titulo": "Ataque israelense a hospital em Gaza deixa seis mortos, diz Defesa Civil",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataque-aereo-de-israel-em-hospital-no-sul-de-gaz",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Relata ataque militar israelense a hospital em Gaza e as justificativas e acusações cruzadas das partes envolvidas no conflito."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 352,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataque aéreo a hospital em Gaza resulta em mortes e feridos",
+    "causa": "Confronto armado entre Israel e Hamas",
+    "vitima": "Civis, pacientes e profissionais de saúde em Gaza",
+    "culpado": "Acusações mútuas entre Israel e Hamas",
+    "solucao": "Cessar-fogo e cumprimento de acordos",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta simetricamente as versões de Israel e do Hamas sobre o ataque, mantendo tom estritamente noticioso.",
+   "atores": [
+    {
+     "nome": "Exército israelense / governo de Israel",
+     "campo": "direita"
+    },
+    {
+     "nome": "Hamas / Defesa Civil de Gaza",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "porta-voz da Defesa Civil de Gaza",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "exército israelense",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "porta-voz do Hamas",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 7,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 7,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O exército israelense afirma ter atacado um membro sênior do Hamas",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso simétrico de verbos de atribuição ('afirma', 'diz') para relatar as posições de ambos os lados do conflito.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0c6af019ea69",
+   "url": "https://www.moneytimes.com.br/santander-melhora-em-5-oferta-para-comprar-acoes-de-minoritarios-do-santander-brasil-sanb11-veja-o-que-muda-miql/",
+   "titulo": "Santander melhora em 5% oferta para comprar ações de minoritários do Santander Brasil (SANB11); veja o que muda",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "santander-eleva-em-5-oferta-de-r-11-7-bilhoes-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda uma oferta pública de aquisição (OPA) de ações pelo Banco Santander, tratando de finanças corporativas sem debate político-partidário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 607,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A necessidade de reajustar os termos de uma OPA de ações para minoritários.",
+    "causa": "Movimentos de mercado e manifestações recebidas de partes interessadas.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Aumento de 5% na relação de troca proposta aos acionistas minoritários.",
+    "motor_moral": "eficiencia"
+   },
+   "teste_inversao": "Se o texto tratasse de outra empresa em situação análoga, a estrutura descritiva e financeira seria mantida.",
+   "atores": [
+    {
+     "nome": "Banco Santander",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "banco espanhol",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 75,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "diz o banco espanhol.",
+     "paragrafo": "P15",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro de atribuição para introduzir as declarações da empresa.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Banco Santander"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2ef1c8d46c98",
+   "url": "https://www.bloomberglinea.com.br/negocios/petrobras-defende-politica-de-precos-atual-diante-da-alta-volatilidade-do-brent/",
+   "titulo": "Petrobras defende política de preços atual diante da alta volatilidade do Brent",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda a política de preços da Petrobras, estatal cuja gestão é tema de debate político e econômico."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 235 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 235,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A alta volatilidade do preço do Brent e o questionamento de analistas sobre a política de preços.",
+    "causa": "Oscilações no mercado internacional de petróleo.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Manutenção de uma postura cautelosa na precificação de combustíveis.",
+    "motor_moral": "prudencia"
+   },
+   "teste_inversao": "O relato de questionamentos de analistas e respostas da diretoria seria aplicado da mesma forma a qualquer outra empresa.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 88,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "afirmou em teleconferência.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utilização de verbo de atribuição neutro para relatar as falas da presidente da estatal.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Petrobras"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2e850de95a21",
+   "url": "https://www.seudinheiro.com/2026/empresas/agronegocio-esta-cobrando-o-preco-no-banco-do-brasil-inadimplencia-dispara-lucro-encolhe-e-acionistas-ficam-sem-uma-parte-dos-dividendos-miql/",
+   "titulo": "Agronegócio cobra o preço no Banco do Brasil: inadimplência dispara, lucro desaba e dividendos entram na linha de corte",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "lucro-liquido-ajustado-do-banco-do-brasil-despen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata da crise de inadimplência no crédito rural do Banco do Brasil e seu impacto financeiro e nos dividendos."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1297,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.53,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.53
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A disparada da inadimplência e o risco moral no agronegócio que afetam os resultados do Banco do Brasil.",
+    "causa": "Inadimplência de parte dos produtores rurais e frustração com programas de renegociação.",
+    "vitima": "Banco do Brasil e acionistas.",
+    "culpado": "Parte dos produtores rurais.",
+    "solucao": "Redução da exposição ao setor, endurecimento de critérios e corte de dividendos.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "Se o conflito fosse entre um banco privado e devedores de outro setor, a ênfase nas declarações da diretoria sobre inadimplência seria mantida.",
+   "atores": [
+    {
+     "nome": "Banco do Brasil",
+     "campo": "centro"
+    },
+    {
+     "nome": "Produtores rurais",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Geovanne Tobias",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 103,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "\"Uma parte desse agro efetivamente não quer pagar o Banco do Brasil.\"",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -3.53,
+     "explicacao": "O texto reproduz fortemente a perspectiva e os diagnósticos da direção do banco sobre o comportamento do setor agrícola, sem trazer uma resposta direta das entidades do agronegócio no mesmo espaço.",
+     "intensidade": 2,
+     "certeza": 0.45,
+     "eixo": "economico",
+     "favorece": "Banco do Brasil",
+     "desfavorece": "Produtores rurais",
+     "ressalva": "O texto pondera que a grande maioria dos clientes está em dia, mas o foco principal recai nas acusações de risco moral feitas pelo executivo."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "08d76b213396",
+   "url": "https://climainfo.org.br/2026/11/11/lula-pede-mais-apoio-financeiro-ao-fundo-de-florestas-na-cop31/",
+   "titulo": "Lula pede mais apoio financeiro ao fundo de florestas na COP31",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-cobra-paises-ricos-na-cop31-por-financiamen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Envolve negociações diplomáticas e financeiras multilaterais na COP31 lideradas pelo presidente da República."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 545,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A necessidade de captação de recursos para tornar operacional o fundo de florestas tropicais.",
+    "causa": "Insuficiência temporária de aportes para atingir a meta estabelecida.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Apelo por novos investimentos públicos, filantrópicos e privados.",
+    "motor_moral": "sustentabilidade"
+   },
+   "teste_inversao": "A cobertura de anúncios de fundos ambientais e discursos presidenciais em cúpulas internacionais segue o mesmo padrão independente da vertente ideológica do governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo da Noruega",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jonas Gahr Støre",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "destacou que o TFFF não se trata de uma doação.",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbos neutros para relatar as declarações do presidente brasileiro.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Governo Lula"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "80ba8bd9fc3a",
+   "url": "https://www.poder360.com.br/poder-internacional/ceo-da-nvidia-teve-caso-com-vice-presidente-da-empresa-diz-nyt/",
+   "titulo": "CEO da Nvidia teve caso com vice-presidente da empresa, diz “NYT”",
+   "veiculo": "Poder360",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "conselho-da-nvidia-avalia-destituicao-de-jensen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de escândalo de conduta e investigação interna envolvendo o CEO de uma empresa de tecnologia privada."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 434,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Relacionamentos extraconjugais e potenciais conflitos de interesse na cúpula de uma empresa de tecnologia.",
+    "causa": "Descumprimento de diretrizes de conduta interna por executivos.",
+    "vitima": "Nenhuma.",
+    "culpado": "Jensen Huang e envolvidos.",
+    "solucao": "Abertura de investigação independente e possível destituição do cargo.",
+    "motor_moral": "etica_corporativa"
+   },
+   "teste_inversao": "A apuração de denúncias de conduta contra executivos de grandes corporações é noticiada com a mesma metodologia em qualquer veículo.",
+   "atores": [
+    {
+     "nome": "Jensen Huang",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Nvidia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jensen Huang",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "63ce056c18d0",
+   "url": "https://www.infomoney.com.br/mercados/nasdaq-futuro-recua-pressionado-pela-forte-queda-das-acoes-da-nvidia/",
+   "titulo": "Nasdaq Futuro recua pressionado pela forte queda das ações da Nvidia",
+   "veiculo": "InfoMoney",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "conselho-da-nvidia-avalia-destituicao-de-jensen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre o mercado financeiro e a queda das ações da Nvidia, com menção secundária a impacto político nos EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 436,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Crise na liderança da Nvidia e queda das ações",
+    "causa": "Notícias sobre conduta do CEO e investigações de regulação",
+    "vitima": "Investidores e setor de IA",
+    "culpado": "Nenhum especificado",
+    "solucao": "Nenhuma",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre mercados e finanças, não havendo viés político detectável.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "30b3cbd33015",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/11/bb-tem-lucro-ajustado-de-r-1270-bi-queda-de-675percent-no-trimestre-e-665percent-em-12-meses.ghtml",
+   "titulo": "Lucro do BB tomba 66,5% com alta de provisões no agro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "lucro-liquido-ajustado-do-banco-do-brasil-despen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda o resultado financeiro negativo do Banco do Brasil, inadimplência no agro, medidas provisórias e especulações sobre a presidência da estatal."
+   },
+   "estado": "ok",
+   "T": -5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1181,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.23,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -5.23
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda drástica no lucro do Banco do Brasil",
+    "causa": "Aumento da inadimplência no setor do agronegócio e provisões para devedores",
+    "vitima": "Banco do Brasil e acionistas",
+    "culpado": "Produtores rurais que deixaram de pagar dívidas",
+    "solucao": "Revisão de projeções, corte de dividendos e renegociação de dívidas",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto relata dados financeiros contábeis de forma detalhada, mantendo o foco em balanços e declarações oficiais.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Produtores Rurais",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Geovanne Tobias",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 62,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 11,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "uma parcela dos médios e grandes produtores de soja, milho e gado no Centro-Oeste deixou de pagar as dívidas especialmente em setembro, às vésperas da eleição.",
+     "paragrafo": "P9",
+     "direcao": "esquerda",
+     "contribuicao": -5.23,
+     "explicacao": "Associa o inadimplemento do setor agrícola diretamente ao contexto político eleitoral.",
+     "intensidade": 2,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "desfavorece": "Produtores Rurais"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4db767f293ac",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/quem-e-o-deputado-robert-garcia-democrata-que-pode-complicar-a-vida-de-trump.shtml",
+   "titulo": "Quem é o deputado Robert Garcia, democrata que pode complicar a vida de Trump",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Perfil político do deputado americano Robert Garcia e suas perspectivas de atuação contra Donald Trump e aliados."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 62,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1035,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "LEXICO": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possíveis abusos e corrupção no governo Trump",
+    "causa": "Atuação da administração republicana",
+    "vitima": "Trabalhadores imigrantes e instituições democráticas",
+    "culpado": "Donald Trump e aliados",
+    "solucao": "Investigações parlamentares lideradas por democratas",
+    "motor_moral": "justica_igualdade"
+   },
+   "teste_inversao": "Textos biográficos de opositores políticos adotam tons avaliativos semelhantes dependendo da linha editorial.",
+   "atores": [
+    {
+     "nome": "Robert Garcia",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Robert Garcia",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 59,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 59,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "LEXICO",
+     "citacao": "desmonte da Usaid",
+     "paragrafo": "P13",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "Usa o termo carregado 'desmonte' em vez de uma descrição neutra de alteração ou redução de agência.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Donald Trump"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "715dbe1ff7d7",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/12/vice-presidente-da-indonesia-renuncia-apos-justica-questionar-sua-formacao-academica.ghtml",
+   "titulo": "Vice-presidente da Indonésia renuncia após Justiça questionar sua formação acadêmica",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Renúncia do vice-presidente da Indonésia devido a questões acadêmicas e processo de impeachment."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 366,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Crise de legitimidade na vice-presidência da Indonésia",
+    "causa": "Invalidação de diplomas acadêmicos por tribunais",
+    "vitima": "Instituições democráticas do país",
+    "culpado": "Gibran Rakabuming Raka",
+    "solucao": "Renúncia do cargo e eleição de um substituto",
+    "motor_moral": "legalidade"
+   },
+   "teste_inversao": "O texto relata fatos institucionais internacionais de maneira estritamente descritiva.",
+   "atores": [
+    {
+     "nome": "Gibran Rakabuming Raka",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ee19980236dc",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/bndes-recebe-selo-diamante-de-transparencia-publica-pela-quarta-vez",
+   "titulo": "BNDES recebe selo Diamante de transparência pública pela quarta vez",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Premiação de transparência pública recebida pelo BNDES."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 395,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de controle social e transparência em órgãos públicos",
+    "causa": "Falta de dados abertos em gestões passadas",
+    "vitima": "Sociedade",
+    "culpado": "Nenhum",
+    "solucao": "Programas de avaliação e estímulo à transparência ativa",
+    "motor_moral": "transparencia"
+   },
+   "teste_inversao": "A notícia de premiação institucional segue padrão puramente informativo e descritivo.",
+   "atores": [
+    {
+     "nome": "BNDES",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Edilson Silva",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c1a7e7dbd8e2",
+   "url": "https://www.cnnbrasil.com.br/auto/baic-arcfox-t5-chega-por-r-219-990-com-252-cv-e-autonomia-de-362-km/",
+   "titulo": "BAIC Arcfox T5 chega por R$ 219.990 com 252 cv e autonomia de 362 km",
+   "veiculo": "CNN Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Texto descritivo de lançamento de veículo automotor elétrico, sem conteúdo político-ideológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 370,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Nenhum",
+    "causa": "Nenhum",
+    "vitima": "Nenhum",
+    "culpado": "Nenhum",
+    "solucao": "Nenhum",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é puramente técnico sobre um automóvel e não possui viés político.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0d794e3172dc",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/11/lula-leva-a-cop31-plano-brasileiro-para-combater-desmatamento-e-recuperar-florestas.ghtml",
+   "titulo": "Lula leva à COP31 plano brasileiro para combater desmatamento e recuperar florestas",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-cobra-paises-ricos-na-cop31-por-financiamen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Cobre a agenda e discursos do presidente Lula na COP31 sobre meio ambiente, desmatamento e financiamento climático."
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 999,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.35,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": -2.35
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mudanças climáticas, desmatamento e falta de financiamento para conservação",
+    "causa": "Pobreza, falta de recursos e ausência de liderança global",
+    "vitima": "Populações que vivem em territórios de florestas tropicais",
+    "culpado": "Exploração predatória anterior",
+    "solucao": "Fundo Florestas Tropicais para Sempre, bioeconomia e cooperação internacional",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Caso o evento fosse com um governante de outro espectro político, a estrutura de reportar os dados oficiais seria mantida, embora com leituras diferentes por analistas.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Luiz Inácio Lula da Silva",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 40,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 40,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "De acordo com os números apresentados pelo presidente, o desmatamento caiu 70% na Amazônia e quase 50% no Cerrado.",
+     "paragrafo": "P16",
+     "direcao": "esquerda",
+     "contribuicao": -2.35,
+     "explicacao": "O texto apresenta dados oficiais do governo sem contraponto de dados independentes ou de oposição.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral",
+     "favorece": "Luiz Inácio Lula da Silva",
+     "ressalva": "É uma matéria cobrando o discurso oficial, onde a apresentação dos dados fornecidos é praxe."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "04d4ce36bebe",
+   "url": "https://www.moneytimes.com.br/btg-pactual-bpac11-vai-as-compras-banco-aprova-programa-de-ate-r-2-bilhoes-em-units-miql/",
+   "titulo": "BTG Pactual (BPAC11) vai às compras: banco aprova programa de até R$ 2 bilhões em units",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "btg-pactual-registra-lucro-recorde-de-r-5-3-bilh",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Noticiário financeiro sobre programa de recompra de units do BTG Pactual após balanço trimestral."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 498,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de otimização de capital",
+    "causa": "Lucro líquido recorde e recursos disponíveis em caixa",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Programa de recompra de units",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata um fato corporativo padrão de mercado, aplicável a qualquer empresa de capital aberto.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o banco",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9481119a39d9",
+   "url": "https://www.seudinheiro.com/2026/empresas/banco-do-brasil-bbas3-corta-guidance-de-lucro-pela-metade-e-avisa-a-conta-do-agronegocio-ainda-nao-terminou-de-chegar-miql/",
+   "titulo": "Banco do Brasil (BBAS3) corta guidance de lucro pela metade — e avisa: a conta do agronegócio ainda não terminou de chegar",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "lucro-liquido-ajustado-do-banco-do-brasil-despen",
+   "origem": "materia",
+   "data_publicacao": "2026-11-11",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata da revisão de guidance de lucro do Banco do Brasil (estatal federal) em função da inadimplência no agronegócio."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 910,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Piora da inadimplência no agronegócio e corte de guidance do Banco do Brasil",
+    "causa": "Baixo nível de pontualidade dos produtores rurais e renegociações abaixo do esperado",
+    "vitima": "Banco do Brasil",
+    "culpado": "Inadimplência do setor de agronegócio",
+    "solucao": "Redução do ritmo de expansão da carteira e aumento da prudência",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A cobertura de resultados negativos de empresas estatais ou privadas segue os mesmos critérios de mercado e análise de risco.",
+   "atores": [
+    {
+     "nome": "Banco do Brasil",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco do Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "JP Morgan",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Citi",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3e166f50689d",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/12/btg-anuncia-lucro-recorde-de-r-53-bi-no-3o-tri-e-anuncia-recompra-de-acoes-de-ate-r-2-bi.ghtml",
+   "titulo": "BTG anuncia lucro recorde de R$ 5,3 bi no 3º tri e anuncia recompra de ações de até R$ 2 bi",
+   "veiculo": "Valor Econômico",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "btg-pactual-registra-lucro-recorde-de-r-5-3-bilh",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-12",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de balanço financeiro e lucro recorde do BTG Pactual."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 963,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda recente dos papéis na bolsa devido a estresse eleitoral",
+    "causa": "Aversão a risco no período eleitoral",
+    "vitima": "BTG Pactual",
+    "culpado": "Ambiente eleitoral e volatilidade de mercado",
+    "solucao": "Programa de recompra de ações e contínua expansão de crédito",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O relato de balanço trimestral e eventos corporativos segue padrão estritamente técnico e financeiro.",
+   "atores": [
+    {
+     "nome": "BTG Pactual",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o banco",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-12T11:24:10+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 120,
+   "textos_curtos": 23,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 94642,
+    "saida": 39210
+   },
+   "analises": [
+    "4aca9256b1ef",
+    "eae5138bb9d7",
+    "adc1c39d6eda",
+    "23cd9c005525",
+    "ecdc4424a33a",
+    "39fb392e5ef2",
+    "36be640cdc17",
+    "4119e5c6a726",
+    "00648d8ae4f1",
+    "f11244c67108",
+    "4875481e3b44",
+    "054eb7f9a555",
+    "21ee69afc435",
+    "3d6b5849068e",
+    "cbff57b93c5c",
+    "39c736851e6d",
+    "8ce05a355e5a",
+    "074d411241f0",
+    "f462448b084e",
+    "f93ee6d4ca98",
+    "0b6f395c1d61",
+    "32c9d0222c5c",
+    "1c0ada3f229d",
+    "5652becc5a57",
+    "b1c0c1674ab4",
+    "de26df9eef3a",
+    "90dddc458714",
+    "f7d0f8e01ffc",
+    "26048552b4dd",
+    "3e7ec3543c78",
+    "e927fc34fcd1",
+    "6acdfb020e3b",
+    "07e63309970d",
+    "e01128e66871",
+    "14e8b5f0aa70",
+    "5ecee359e083",
+    "35384eabe4f0",
+    "0f9316474cdd",
+    "0f2a8b9dbfb3",
+    "dbe279c9ac35",
+    "990526d1d20d",
+    "a8fc4adf1181",
+    "1de306a99c44",
+    "849e03e661a0",
+    "81273a00858d",
+    "0c6af019ea69",
+    "2ef1c8d46c98",
+    "2e850de95a21",
+    "08d76b213396",
+    "80ba8bd9fc3a",
+    "63ce056c18d0",
+    "30b3cbd33015",
+    "4db767f293ac",
+    "715dbe1ff7d7",
+    "ee19980236dc",
+    "c1a7e7dbd8e2",
+    "0d794e3172dc",
+    "04d4ce36bebe",
+    "9481119a39d9",
+    "3e166f50689d"
+   ]
+  }
+ ]
+}
