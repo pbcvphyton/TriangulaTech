@@ -12,7 +12,14 @@
 :root[data-theme="dark"] .pq-go:hover{background:var(--link);color:#0b0f17}
 .pq-tip{margin-top:8px;padding-left:20px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
 .pq-tip code{font-family:var(--mn);font-size:11px;color:var(--ink)}
-.pq-sum{display:none}
+/* Os filtros se recolhem em "Filtros · …" (o título resume o que vale) durante a busca e no celular */
+.pq-sum{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;border:1px solid var(--rl);border-radius:6px;background:var(--soft);font-family:var(--ss);font-size:13px;font-weight:700;color:var(--link);cursor:pointer;list-style:none}
+.pq-sum::-webkit-details-marker{display:none}
+.pq-sum::after{content:"\25BE";flex-shrink:0;margin-left:auto;color:var(--faint)}
+.pq-sum-t{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pq-det[open]>.pq-sum{border-radius:6px 6px 0 0;border-bottom:none}
+.pq-det[open]>.pq-sum::after{content:"\25B4"}
+.pq-det[open]>.pq-fs{margin-top:0;border-top:none;border-radius:0 0 6px 6px}
 .pq-fs{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 22px;margin-top:14px;padding:14px 16px;border:1px solid var(--rl);border-radius:6px;background:var(--soft)}
 .pq-f{display:flex;flex-direction:column;gap:5px;min-width:0}
 .pq-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
@@ -105,13 +112,6 @@
   .pq-go{height:44px;padding:0 18px}
   .pq-tip{padding-left:0}
   .pq-fs{flex-direction:column;align-items:stretch;padding:12px}
-  /* No celular os filtros se recolhem em "Filtros" (abertos quando a busca usa algum) */
-  .pq-sum{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;border:1px solid var(--rl);border-radius:6px;background:var(--soft);font-family:var(--ss);font-size:13px;font-weight:700;color:var(--link);cursor:pointer;list-style:none}
-  .pq-sum::-webkit-details-marker{display:none}
-  .pq-sum::after{content:"\25BE";margin-left:auto;color:var(--faint)}
-  .pq-det[open]>.pq-sum{border-radius:6px 6px 0 0;border-bottom:none}
-  .pq-det[open]>.pq-sum::after{content:"\25B4"}
-  .pq-det[open]>.pq-fs{margin-top:0;border-top:none;border-radius:0 0 6px 6px}
   .pq-f select{max-width:none;width:100%}
   .pq-tops{grid-template-columns:minmax(0,1fr)}
   .pq-t{font-size:16px}

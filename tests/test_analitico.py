@@ -580,5 +580,7 @@ def test_o_arquivo_de_busca_nao_muda_com_os_campos_novos(config):
     # os números a mais dos nomes não vão para a Pesquisa: as sugestões usam só o nome, o link e a contagem
     dados = pesquisa.dados_do_dia(make_edition(FIM), config, None)
     com = pesquisa.render_pesquisa_page([pesquisa.resumo_do_dia(dados)], config, home_href="../", archive_href="./", destaques=_destaques())
-    assert "az-" not in re.sub(r"<style>.*?</style>", "", com, flags=re.S) and "Fulano de Tal</a>" in com
+    # a Pesquisa usa o visual do Analítico (classes az-…), mas não leva a página dele: nem os blocos nem os números
+    estatico = re.sub(r"<(style|script)\b.*?</\1>", "", com, flags=re.S)
+    assert 'id="an-' not in estatico and 'id="qf-' not in estatico and "Fulano de Tal</a>" in com
     json.dumps(dados)  # serializável como estava
