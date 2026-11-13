@@ -1,0 +1,774 @@
+"""Aba "Congresso" (``edicoes/congresso.html``) e as fichas dentro das matérias.
+
+A página responde a uma pergunta: **o que faz quem está sentado lá**. Segue o
+desenho da aba Analítico: abre com a leitura (os achados, cada um com a prova),
+desce por quatro lentes e fecha com o método.
+
+1. **Com quem vota**: cada parlamentar entre os dois polos, partido a partido, e a
+   matriz partido × tema (onde o rótulo e o voto se separam);
+2. **A fila**: o que tramita, esperando o quê e com quem, e o que passou na frente;
+3. **O Plenário**: as últimas votações nominais, com quem votou contra o próprio partido;
+4. **Quem é quem**: as listas (quem falta, quem diverge, quem mudou) e a tabela de
+   todos; clicar num nome abre o **dossiê**, carregado de
+   ``data/congresso/fichas/<casa>-<id>.json``.
+
+Tudo o que é número sai pronto de :mod:`qijournal.congresso.dados`; aqui só se
+arruma para mostrar. Sem script a página continua inteira (o dossiê é o que
+depende dele).
+
+As **fichas nas matérias** (:func:`fichas_da_edicao`) são um retrato do dia: os
+parlamentares que a matéria cita, com o que os registros dizem de cada um, gravado
+na própria edição (``Edition.congresso``).
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+from collections import defaultdict
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from datetime import date
+from pathlib import Path
+from typing import Any
+
+from .. import text
+from ..config import Config
+from ..congresso import VERSAO, base, dados, jornal, projetos
+from ..models import Edition
+from . import filters
+from .web import brand_view
+
+log = logging.getLogger(__name__)
+
+PAGINA = "congresso.html"
+FAIXA_MIN = {"cd": 8, "sf": 3}  # parlamentares em exercício para o partido ganhar uma faixa
+PILHA_PX = 7  # distância vertical entre pontos empilhados na faixa
+PILHA_MAX = 9
+SELOS = {
+    "tema": "Por tema",
+    "fila": "Fila",
+    "pauta": "Pauta",
+    "furaram": "Passou na frente",
+    "relatoria": "Relatoria",
+    "presenca": "Presença",
+    "mudanca": "Mudança",
+    "destoa": "Fora da curva",
+}
+ORDEM_FILAS = (
+    projetos.F_RELATOR,
+    projetos.F_PARECER,
+    projetos.F_MESA,
+    projetos.F_PAUTA,
+    projetos.F_COMISSAO,
+    projetos.F_RECURSO,
+    projetos.F_OUTRA,
+)
+LADO = {"S": "Sim", "N": "Não", "L": "Liberado", "O": "Obstrução", "": "—"}
+
+
+# ── dados ────────────────────────────────────────────────────────────────────
+
+
+@dataclass
+class Dados:
+    meta: dict[str, Any]
+    resumo: dict[str, Any]
+    casas: dict[str, dict[str, Any]]
+    achados: list[dict[str, Any]]
+
+
+def carregar(data_dir: Path) -> Dados | None:
+    """O que ``congresso atualizar`` gravou em ``data/congresso/`` (``None`` se faltar
+    algum arquivo ou se o formato for de outra versão)."""
+    pasta = dados.pasta_de(data_dir)
+    meta = dados.ler_json(pasta / dados.META)
+    resumo = dados.ler_json(pasta / dados.RESUMO)
+    if not isinstance(meta, dict) or not isinstance(resumo, dict) or meta.get("v") != VERSAO or resumo.get("v") != VERSAO:
+        return None
+    casas = {}
+    for casa in ("cd", "sf"):
+        painel = dados.ler_json(pasta / f"casa-{casa}.json")
+        if isinstance(painel, dict):
+            casas[casa] = painel
+    if not casas:
+        return None
+    bruto = dados.ler_json(pasta / dados.ACHADOS)
+    achados = (bruto.get("achados") if isinstance(bruto, dict) else None) or []
+    return Dados(meta=meta, resumo=resumo, casas=casas, achados=[a for a in achados if isinstance(a, dict)])
+
+
+# ── utilitários de apresentação ──────────────────────────────────────────────
+
+
+def _num(valor: Any) -> str:
+    try:
+        return text.format_number_pt(int(valor), 0)
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _pct(valor: Any) -> str:
+    if valor is None:
+        return "—"
+    valor = float(valor)
+    if 99.5 <= valor < 100 or 0 < valor < 0.5:
+        return f"{text.format_number_pt(valor, 1)}%"
+    return f"{round(valor)}%"
+
+
+def _saldo(valor: Any) -> str:
+    return "—" if valor is None else f"{int(round(float(valor))):+d}".replace("-", "−")
+
+
+def classe_do_saldo(valor: Any, campos: list[dict[str, Any]] | None = None) -> str:
+    """A faixa do saldo como classe de cor (``e3 e2 m d2 d3``; ``na`` sem saldo)."""
+    if valor is None:
+        return "na"
+    valor = float(valor)
+    limites = [c.get("ate", 0) for c in campos] if campos else [-60, -20, 20, 60, 100]
+    for limite, classe in zip(limites, ("e3", "e2", "m", "d2", "d3"), strict=False):
+        if valor <= limite:
+            return classe
+    return "d3"
+
+
+def _barra(valor: Any) -> tuple[float, float]:
+    """``(left %, width %)`` da barra do saldo, que parte do centro (0) para o lado do sinal."""
+    if valor is None:
+        return 50.0, 0.0
+    valor = max(-100.0, min(100.0, float(valor)))
+    return (50.0 + valor / 2, -valor / 2) if valor < 0 else (50.0, valor / 2)
+
+
+def _data(iso: str | None, ano: bool = False) -> str:
+    try:
+        dia = date.fromisoformat(str(iso)[:10])
+    except (TypeError, ValueError):
+        return ""
+    return f"{dia.day:02d}/{dia.month:02d}/{dia.year}" if ano else f"{dia.day:02d}/{dia.month:02d}"
+
+
+def _tempo(dias: Any) -> str:
+    """Dias por extenso: "23 dias", "7 meses", "3 anos e 2 meses"."""
+    try:
+        dias = int(dias)
+    except (TypeError, ValueError):
+        return "—"
+    if dias < 60:
+        return f"{dias} {'dia' if dias == 1 else 'dias'}"
+    meses = dias // 30
+    if meses < 24:
+        return f"{meses} meses"
+    anos, resto = divmod(meses, 12)
+    return f"{anos} anos" + (f" e {resto} {'mês' if resto == 1 else 'meses'}" if resto else "")
+
+
+# ── views ────────────────────────────────────────────────────────────────────
+
+
+@dataclass
+class Ponto:
+    k: str
+    nome: str
+    left: float
+    top: int
+    classe: str
+    titulo: str
+
+
+@dataclass
+class Faixa:
+    sigla: str
+    membros: int
+    media: str
+    altura: int
+    pontos: list[Ponto] = field(default_factory=list)
+
+
+@dataclass
+class Celula:
+    valor: str
+    classe: str
+    titulo: str
+
+
+@dataclass
+class LinhaMatriz:
+    sigla: str
+    membros: int
+    geral: Celula
+    celulas: list[Celula]
+
+
+@dataclass
+class CasaView:
+    id: str
+    nome: str
+    curto: str
+    periodo: str
+    em_exercicio: int
+    estat: dict[str, Any]
+    resumo: str
+    faixas: list[Faixa]
+    bancadas: list[dict[str, Any]]
+    matriz_temas: list[dict[str, Any]]
+    matriz: list[LinhaMatriz]
+    matriz_base: int
+    fila: dict[str, Any] | None
+    furaram: dict[str, Any] | None
+    ultimas: list[dict[str, Any]]
+    listas: list[dict[str, Any]]
+
+
+@dataclass
+class CongressoView:
+    atualizado: str
+    periodo: str
+    governo: str
+    polos: dict[str, str]
+    leitura: dict[str, Any] | None
+    casas: list[CasaView]
+    pessoas: list[dict[str, Any]]
+    fora: int  # linhas de quem não está em exercício (escondidas até pedir)
+    metodo: list[tuple[str, str]]
+    manifesto: str
+    totais: dict[str, Any]
+
+
+def _faixas(casa: str, pessoas: list[dict[str, Any]], campos: list[dict[str, Any]]) -> list[Faixa]:
+    """Uma faixa por partido: cada ponto é um parlamentar em exercício, na posição do saldo dele."""
+    por: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for p in pessoas:
+        if p["k"].startswith(casa) and p.get("ex") and p.get("saldo") is not None and p.get("partido"):
+            por[p["partido"]].append(p)
+    faixas = []
+    for sigla, lista in por.items():
+        if len(lista) < FAIXA_MIN[casa]:
+            continue
+        pilha: dict[int, int] = defaultdict(int)
+        pontos = []
+        for p in sorted(lista, key=lambda p: p["saldo"]):
+            left = 50 + p["saldo"] / 2
+            casa_pilha = round(left / 1.25)
+            nivel = min(pilha[casa_pilha], PILHA_MAX)
+            pilha[casa_pilha] += 1
+            pontos.append(
+                Ponto(
+                    k=p["k"],
+                    nome=p["nome"],
+                    left=round(left, 2),
+                    top=nivel * PILHA_PX,
+                    classe=classe_do_saldo(p["saldo"], campos),
+                    titulo=f"{p['nome']} ({sigla}-{p.get('uf', '')}): saldo {_saldo(p['saldo'])} em {p.get('div', 0)} votações",
+                )
+            )
+        media = sum(p["saldo"] for p in lista) / len(lista)
+        faixas.append(
+            Faixa(
+                sigla=sigla,
+                membros=len(lista),
+                media=_saldo(media),
+                altura=(min(max(pilha.values()), PILHA_MAX + 1)) * PILHA_PX + 8,
+                pontos=pontos,
+            )
+        )
+    faixas.sort(key=lambda f: float(f.media.replace("−", "-")))
+    return faixas
+
+
+def _celula(par: list[int] | None, campos: list[dict[str, Any]], sigla: str, tema: str) -> Celula:
+    if not par:
+        return Celula("·", "na", f"{sigla} · {tema}: menos de 5 votações divisivas")
+    saldo, n = par
+    lado = "com a direita" if saldo > 0 else "com a esquerda" if saldo < 0 else "dividido"
+    return Celula(_saldo(saldo), classe_do_saldo(saldo, campos), f"{sigla} · {tema}: saldo {_saldo(saldo)} ({lado}) em {n} votações divisivas")
+
+
+def _votacao(v: Mapping[str, Any], casa: str) -> dict[str, Any]:
+    partidos = []
+    dissidentes = []
+    for p in v.get("partidos") or []:
+        partidos.append({"sigla": p["sigla"], "lado": LADO.get(p["lado"], p["lado"]), "classe": "s" if p["lado"] == "S" else "n", "coesao": p["coesao"], "votos": p["votos"]})
+        contra = p.get("contra")
+        if isinstance(contra, list) and contra:
+            dissidentes.append({"sigla": p["sigla"], "lado": LADO.get(p["lado"], ""), "nomes": [{"k": f"{casa}-{c['id']}", "nome": c["nome"]} for c in contra if c.get("nome")]})
+    aprovada = v.get("aprovada")
+    return {
+        "id": v.get("id"),
+        "data": _data(v.get("data")),
+        "hora": v.get("hora") or "",
+        "tipo": base.TIPOS.get(v.get("tipo") or "", "votação"),
+        "prop": v.get("prop") or "",
+        "descricao": v.get("descricao") or "",
+        "ementa": v.get("ementa") or "",
+        "resultado": "" if aprovada is None else ("Aprovada" if aprovada else "Rejeitada"),
+        "classe": "" if aprovada is None else ("ok" if aprovada else "no"),
+        "secreta": bool(v.get("secreta")),
+        "sim": v.get("sim") or 0,
+        "nao": v.get("nao") or 0,
+        "abstencao": v.get("abstencao") or 0,
+        "governo": LADO.get(v.get("governo") or "", ""),
+        "esquerda": LADO.get(v.get("esquerda") or "", ""),
+        "direita": LADO.get(v.get("direita") or "", ""),
+        "divisiva": bool(v.get("divisiva")),
+        "partidos": partidos,
+        "dissidentes": dissidentes,
+    }
+
+
+def _fila(fila: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
+    if not fila or not fila.get("tramitando"):
+        return None
+    total = fila["tramitando"]
+    blocos = []
+    for chave in ORDEM_FILAS:
+        b = (fila.get("filas") or {}).get(chave)
+        if not b or not b.get("n"):
+            continue
+        blocos.append(
+            {
+                "id": chave,
+                "nome": projetos.FILAS[chave],
+                "quem": projetos.QUEM_SEGURA.get(chave, ""),
+                "n": _num(b["n"]),
+                "largura": round(100 * b["n"] / total, 1),
+                "parte": _pct(100 * b["n"] / total) if b["n"] / total >= 0.005 else "menos de 1%",
+                "mediana": _tempo(b.get("mediana_dias")),
+                "parados": _num(b.get("parados") or 0),
+                "parados_parte": _pct(100 * (b.get("parados") or 0) / b["n"]),
+            }
+        )
+    return {
+        "tramitando": _num(total),
+        "apensadas": _num(fila.get("apensadas") or 0),
+        "blocos": blocos,
+        "orgaos": [
+            {
+                "orgao": o["orgao"],
+                "sem_relator": _num(o["sem_relator"]),
+                "pauta": _num(o["pauta"]),
+                "com_relator": _num(o.get("com_relator") or 0),
+                "mais_antiga": _tempo(o.get("mais_antiga_dias")),
+                "presidente": (o.get("presidente") or {}).get("nome") or "",
+                "presidente_k": f"{casa}-{o['presidente']['id']}" if o.get("presidente") else "",
+            }
+            for o in fila.get("orgaos") or []
+        ],
+        "sentados": [
+            {"k": f"{casa}-{s['id']}", "nome": s.get("nome") or "", "n": _num(s["n"]), "antigas": _num(s.get("antigas") or 0), "mais_antiga": _tempo(s.get("mais_antiga_dias"))}
+            for s in fila.get("sentados") or []
+            if s.get("nome")
+        ],
+        "prontas_n": _num(fila.get("prontas_plenario_n") or 0),
+        "prontas": [
+            {"t": i["t"], "e": i.get("e") or "", "u": filters.safe_url(i.get("u")) or "", "tempo": _tempo(i.get("dias")), "desde": _data(i.get("m") or i.get("d"), ano=True)}
+            for i in fila.get("prontas_plenario") or []
+        ],
+    }
+
+
+def _furaram(f: Mapping[str, Any]) -> dict[str, Any] | None:
+    if not f or not f.get("aprovadas"):
+        return None
+    return {
+        "desde": _data(f.get("desde"), ano=True),
+        "aprovadas": _num(f["aprovadas"]),
+        "rapidas_n": _num(f.get("rapidas_n") or 0),
+        "mediana": _tempo(f.get("mediana_dias")),
+        "com_urgencia": _num(f.get("com_urgencia") or 0),
+        "rapidas": [
+            {"p": i["p"], "e": i.get("e") or "", "tempo": _tempo(i["dias"]), "data": _data(i.get("d"), ano=True), "urg": bool(i.get("urg")), "autoria": i.get("autoria") or ""}
+            for i in f.get("rapidas") or []
+        ],
+    }
+
+
+_LISTAS = (
+    ("ausentes", "Quem menos vota", "A parte das votações nominais em que cada um podia votar e votou. É voto registrado, não comparecimento: quem estava na Casa e não votou também conta. Licenças do mandato e, no Senado, ausências justificadas ficam fora da conta.", "pct", "votou em"),
+    ("dissidentes", "Quem mais vota contra o próprio partido", "A parte das votações em que cada um votou com a maioria do partido do dia.", "pct", "com o partido em"),
+    ("destoam", "Quem vota longe da própria bancada", "O saldo de cada um contra a média do partido (−100 = sempre com a esquerda; +100 = sempre com a direita). De quem trocou de partido, só contam os votos dados no partido atual.", "saldo", ""),
+    ("mudaram", "Quem mudou em relação ao governo", "O último semestre contra os anteriores do mesmo governo: só entra quem mudou mais de 15 pontos, com 99% de confiança.", "mud", ""),
+    ("parados", "Quem tem mais propostas paradas", "Proposições de autoria principal que tramitam e não têm andamento há mais de um ano.", "n", ""),
+    ("citados", "Os mais citados no jornal", "Manchetes dos últimos 30 dias que citam o nome, e o que os registros dizem dele.", "n", ""),
+)
+
+
+def _listas(listas: Mapping[str, Any]) -> list[dict[str, Any]]:
+    saida = []
+    for chave, titulo, dek, tipo, prefixo in _LISTAS:
+        itens = listas.get(chave) or []
+        if not itens:
+            continue
+        linhas = []
+        for i in itens[:10]:
+            if tipo == "pct":
+                valor, extra = _pct(i.get("pct")), f"{_num(i.get('n'))} votações"
+            elif tipo == "saldo":
+                valor, extra = _saldo(i.get("saldo")), f"partido: {_saldo(i.get('partido_saldo'))}" + (" · desde que entrou" if i.get("no_partido") else "")
+            elif tipo == "mud":
+                antes, agora = (i.get("antes") or {}).get("pct"), (i.get("agora") or {}).get("pct")
+                valor, extra = f"{_pct(antes)} → {_pct(agora)}", f"semestre {str(i.get('semestre') or '').replace('-', '/')}"
+            elif chave == "parados":
+                valor, extra = _num(i.get("n")), f"de {_num(i.get('total'))} propostas"
+            else:
+                valor, extra = _num(i.get("n")), i.get("frase") or ""
+            linhas.append({"k": i["k"], "nome": i["nome"], "legenda": f"{i.get('partido', '')}-{i.get('uf', '')}".strip("-"), "valor": valor, "extra": extra})
+        saida.append({"id": chave, "titulo": titulo, "dek": dek, "prefixo": prefixo, "linhas": linhas})
+    return saida
+
+
+def _casa(casa: str, painel: Mapping[str, Any], pessoas: list[dict[str, Any]], campos: list[dict[str, Any]]) -> CasaView:
+    estat = painel.get("votacoes") or {}
+    matriz = painel.get("temas") or {}
+    temas_cols = (matriz.get("temas") or [])[:11]
+    membros = {b["sigla"]: b["membros"] for b in painel.get("bancadas") or []}
+    linhas = []
+    for sigla, por_tema in (matriz.get("partidos") or {}).items():
+        linhas.append(
+            LinhaMatriz(
+                sigla=sigla,
+                membros=membros.get(sigla, 0),
+                geral=_celula(por_tema.get("todas"), campos, sigla, "todas as votações de conteúdo"),
+                celulas=[_celula(por_tema.get(t["id"]), campos, sigla, t["nome"]) for t in temas_cols],
+            )
+        )
+    linhas.sort(key=lambda linha: float(linha.geral.valor.replace("−", "-")) if linha.geral.valor not in ("·", "—") else 0.0)
+    bancadas = []
+    for b in painel.get("bancadas") or []:
+        left, width = _barra(b.get("saldo"))
+        bancadas.append(
+            {
+                "sigla": b["sigla"],
+                "membros": b["membros"],
+                "saldo": _saldo(b.get("saldo")),
+                "classe": classe_do_saldo(b.get("saldo"), campos),
+                "left": round(left, 1),
+                "width": round(width, 1),
+                "gov": _pct(b.get("gov")),
+                "gov_w": round(float(b.get("gov") or 0), 1),
+                "coesao": _pct(b.get("coesao")),
+                "n": b.get("n") or 0,
+            }
+        )
+    curto = "Câmara" if casa == "cd" else "Senado"
+    resumo = (
+        f"{_num(painel.get('em_exercicio'))} {'deputados' if casa == 'cd' else 'senadores'} em exercício; "
+        f"{_num(estat.get('total'))} votações nominais de Plenário desde {_data(estat.get('primeira'), ano=True)}"
+        + (f" ({_num(estat.get('secretas'))} secretas)" if estat.get("secretas") else "")
+        + f"; {_num(estat.get('divisivas'))} votações de conteúdo dividiram os polos."
+    )
+    return CasaView(
+        id=casa,
+        nome=str(painel.get("nome") or curto),
+        curto=curto,
+        periodo=str(painel.get("periodo") or ""),
+        em_exercicio=int(painel.get("em_exercicio") or 0),
+        estat=dict(estat),
+        resumo=resumo,
+        faixas=_faixas(casa, pessoas, campos),
+        bancadas=bancadas,
+        matriz_temas=temas_cols,
+        matriz=linhas,
+        matriz_base=int(matriz.get("divisivas") or 0),
+        fila=_fila(painel.get("fila") or {}, casa),
+        furaram=_furaram(painel.get("furaram") or {}),
+        ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
+        listas=_listas(painel.get("listas") or {}),
+    )
+
+
+def _leitura(achados: list[dict[str, Any]], d: Dados) -> dict[str, Any] | None:
+    if not achados:
+        return None
+    principal, *demais = achados
+    casas = d.meta.get("casas") or {}
+    total = sum((casas.get(c) or {}).get("em_exercicio") or 0 for c in ("cd", "sf"))
+    votacoes = sum(((casas.get(c) or {}).get("votacoes") or {}).get("total") or 0 for c in ("cd", "sf"))
+    leg = d.meta.get("legislatura") or {}
+    return {
+        "chapeu": "A leitura",
+        "manchete": principal["titulo"],
+        "principal": {"selo": SELOS.get(principal.get("tipo"), "Achado"), "texto": principal.get("texto") or "", "href": principal.get("alvo") or "#cg-polos", "ficha": principal.get("ficha") or ""},
+        "linha_fina": (
+            f"Do registro oficial de {_num(total)} parlamentares em exercício e {_num(votacoes)} votações nominais da legislatura "
+            f"{leg.get('rotulo', '')}: o que cada um vota, propõe e deixa parado."
+        ),
+        "achados": [
+            {
+                "selo": SELOS.get(a.get("tipo"), "Achado"),
+                "numero": i,
+                "titulo": a["titulo"],
+                "texto": a.get("texto") or "",
+                "href": a.get("alvo") or "#cg-polos",
+                "ficha": a.get("ficha") or "",
+            }
+            for i, a in enumerate(demais[:9], 2)
+        ],
+    }
+
+
+def _pessoas(resumo: Mapping[str, Any], campos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    linhas = []
+    for p in resumo.get("pessoas") or []:
+        left, width = _barra(p.get("saldo"))
+        casa = p["k"].split("-", 1)[0]
+        linhas.append(
+            {
+                "k": p["k"],
+                "nome": p["nome"],
+                "casa": casa,
+                "casa_nome": "Câmara" if casa == "cd" else "Senado",
+                "partido": p.get("partido") or "",
+                "uf": p.get("uf") or "",
+                "ex": bool(p.get("ex")),
+                "saldo": p.get("saldo"),
+                "saldo_txt": _saldo(p.get("saldo")),
+                "classe": classe_do_saldo(p.get("saldo"), campos),
+                "left": round(left, 1),
+                "width": round(width, 1),
+                "gov": p.get("gov"),
+                "gov_txt": _pct(p.get("gov")),
+                "pres": p.get("pres"),
+                "pres_txt": _pct(p.get("pres")),
+                "fid": p.get("fid"),
+                "fid_txt": _pct(p.get("fid")),
+                "prop": p.get("prop") or 0,
+                "par": p.get("par") or 0,
+                "norma": p.get("norma") or 0,
+                "rel": p.get("rel_ant") or 0,
+                "jor": p.get("jor") or 0,
+                "busca": text.normalize(f"{p['nome']} {p.get('partido', '')} {p.get('uf', '')}"),
+            }
+        )
+    return linhas
+
+
+def _metodo(d: Dados) -> list[tuple[str, str]]:
+    m = d.meta
+    lim = m.get("limiares") or {}
+    polos = m.get("polos") or {}
+    esquerda, direita = ", ".join(polos.get("esquerda") or []), ", ".join(polos.get("direita") or [])
+    governos = "; ".join(
+        f"{g['nome']} ({g['inicio'][:4]}–{g['fim'][:4] if g.get('fim') else 'hoje'})" for g in m.get("governos") or []
+    )
+    jor = m.get("jornal") or {}
+    return [
+        (
+            "De onde vem",
+            "Dos dados abertos da Câmara dos Deputados (arquivos em lote e API) e do Senado Federal (API legislativa), "
+            "baixados todo dia antes da edição. São registros oficiais; nenhuma IA entra nas contas.",
+        ),
+        (
+            "Só votação nominal",
+            "Só as votações que registram o voto de cada um, no Plenário. A votação simbólica, que é a maioria, não diz quem "
+            "votou o quê. No Senado, as votações secretas (escolha de autoridades) contam para a presença, não para a posição.",
+        ),
+        (
+            "Com quem vota",
+            f"Entram só as votações de conteúdo (texto principal, destaques e emendas) em que a maioria do polo de esquerda "
+            f"({esquerda}) votou de um jeito e a do polo de direita ({direita}), de outro, com pelo menos "
+            f"{round(100 * float(lim.get('coesao_polo', 0.75)))}% de cada polo do mesmo lado. O saldo vai de −100 (sempre com a esquerda) a "
+            f"+100 (sempre com a direita) e só aparece com {lim.get('minimo_divisivas', 10)} votações ou mais. É comportamento, "
+            "não rótulo: diz com quem a pessoa vota, não o que ela diz ser.",
+        ),
+        (
+            "Por que só conteúdo",
+            "Requerimentos de retirada de pauta, adiamento e urgência são manobra de plenário: medem quem obstrui e quem toca a "
+            "pauta. Entram no governismo e na presença, mas não no saldo entre os polos.",
+        ),
+        (
+            "Governismo",
+            f"Nas votações em que a liderança do Governo orientou Sim ou Não, a parte em que a pessoa votou igual. Contado à parte "
+            f"em cada governo ({governos}): quem acompanha qualquer governo aparece assim. Obstrução conta como Não.",
+        ),
+        (
+            "Presença",
+            "A parte das votações nominais em que a pessoa podia votar e votou. Na Câmara, só contam os dias em que o deputado "
+            "estava em exercício (o histórico do mandato diz quando ele se licenciou ou quando o suplente assumiu); os dados "
+            "abertos da Câmara não dizem se uma ausência foi justificada. No Senado, a própria votação registra quem faltou e quem "
+            "tinha ausência justificada (licença, missão, atividade parlamentar): a justificada fica fora da conta e aparece à "
+            "parte na ficha. Quem preside a Casa só vota em caso de empate e não entra na lista de quem menos vota.",
+        ),
+        (
+            "Partido e dissidência",
+            f"A fidelidade é a parte dos votos iguais ao da maioria do partido do dia. Dissidência é votar diferente quando "
+            f"{round(100 * float(lim.get('coesao_partido', 0.8)))}% ou mais do partido votou junto. Surpresa é quem tem lado definido "
+            "(saldo além de ±60) e, numa votação divisiva, ficou com o outro polo.",
+        ),
+        (
+            "Temas",
+            "Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a "
+            "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml).",
+        ),
+        (
+            "A fila",
+            f"A situação oficial de cada proposição diz de quem ela está esperando: a designação de um relator (presidente da "
+            f"comissão), o parecer (relator), a pauta ou um despacho da Mesa. Parada é a que tramita sem andamento há mais de "
+            f"{lim.get('dias_parado', 365)} dias. Na Câmara entram as proposições apresentadas desde {m.get('projetos_desde', '')}; no "
+            "Senado, tudo o que tramita.",
+        ),
+        (
+            "Passaram na frente",
+            f"Das matérias aprovadas no Plenário nos últimos {dados.JANELA_FURARAM} dias, as que foram do protocolo ao voto em menos de "
+            f"{dados.RAPIDO} dias, com a urgência quando houve. A fila ao lado dá a medida do que ficou para trás.",
+        ),
+        (
+            "O jornal",
+            f"Os nomes parlamentares são procurados nas manchetes e nas matérias das últimas {_num(jor.get('edicoes'))} edições "
+            f"({_num(jor.get('manchetes'))} manchetes lidas). A regra é conservadora: nome inteiro, com as maiúsculas do registro; "
+            "nomes de uma palavra e homônimos só valem com o título (“deputado”, “senadora”) ou a legenda ao lado.",
+        ),
+        (
+            "O que isto não diz",
+            "Voto não é discurso, e a página não lê discurso: ela mostra o registro para ser posto ao lado do que cada um diz. "
+            "Voto com o governo não é ideologia; votação simbólica não aparece; ausência pode ter motivo que o registro não traz. "
+            "Os polos e os temas são escolhas editoriais, escritas aqui para poderem ser contestadas.",
+        ),
+    ]
+
+
+def congresso_view(d: Dados, config: Config) -> CongressoView:
+    campos = [c for c in d.meta.get("campos") or [] if isinstance(c, dict)]
+    pessoas = _pessoas(d.resumo, campos)
+    casas = [_casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos) for casa in ("cd", "sf") if casa in d.casas]
+    polos = d.meta.get("polos") or {}
+    leg = d.meta.get("legislatura") or {}
+    manifesto = {
+        "v": VERSAO,
+        "hoje": str(d.meta.get("hoje") or ""),
+        "base": f"../data/{dados.PASTA}/{dados.FICHAS}/",
+        "pesquisa": "pesquisa.html",
+        "edicoes": "./",
+        "legislatura": leg.get("numero"),
+        "periodo": leg.get("rotulo") or "",
+        "governo": d.meta.get("governo") or "",
+        "campos": campos,
+        "temas": {t["id"]: t["nome"] for t in d.meta.get("temas") or []},
+        "tipos": base.TIPOS,
+        "votos": {
+            "S": "Sim",
+            "N": "Não",
+            "A": "Abstenção",
+            "O": "Obstrução",
+            "P": "Presidia",
+            "E": "Presente, sem voto",
+            "V": "Votou (secreta)",
+            "J": "Ausência justificada",
+            "F": "Faltou",
+            "-": "Sem registro",
+        },
+        "filas": projetos.FILAS,
+        "estados": projetos.ESTADOS,
+        "limiares": d.meta.get("limiares") or {},
+    }
+    hoje = str(d.meta.get("hoje") or "")
+    return CongressoView(
+        atualizado=_data(hoje, ano=True),
+        periodo=str(leg.get("rotulo") or ""),
+        governo=str(d.meta.get("governo") or ""),
+        polos={"esquerda": ", ".join(polos.get("esquerda") or []), "direita": ", ".join(polos.get("direita") or [])},
+        leitura=_leitura(d.achados, d),
+        casas=casas,
+        pessoas=pessoas,
+        fora=sum(1 for p in pessoas if not p["ex"]),
+        metodo=_metodo(d),
+        manifesto=json.dumps(manifesto, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"),
+        totais={
+            "pessoas": sum(1 for p in pessoas if p["ex"]),
+            "votacoes": sum(c.estat.get("total") or 0 for c in casas),
+            "divisivas": sum(c.estat.get("divisivas") or 0 for c in casas),
+            "tramitando": sum((d.casas[c.id].get("fila") or {}).get("tramitando") or 0 for c in casas),
+        },
+    )
+
+
+def render_congresso_page(config: Config, data_dir: Path, *, home_href: str, archive_href: str) -> str | None:
+    """Página ``edicoes/congresso.html`` (``None`` sem dados em ``data/congresso/``)."""
+    d = carregar(data_dir)
+    if d is None:
+        return None
+    view = congresso_view(d, config)
+    config.congresso.publicado = True
+    template = filters.environment().get_template("congresso.html.j2")
+    html = template.render(
+        c=view,
+        brand=brand_view(config),
+        home_href=filters.safe_href(home_href) or "../",
+        archive_href=filters.safe_href(archive_href) or "./",
+        base_url=config.site.base_url,
+        repo_url=filters.safe_url(config.site.repo_url) or "",
+        analitico=config.termometro_ativo,
+    )
+    log.info("Aba Congresso renderizada: %d parlamentares, %d KB", len(view.pessoas), len(html.encode("utf-8")) // 1024)
+    return html
+
+
+# ── fichas nas matérias da edição ────────────────────────────────────────────
+
+
+@dataclass
+class Indice:
+    """O índice das pessoas (``resumo.json``) pronto para achar quem uma matéria cita."""
+
+    hoje: str
+    pessoas: dict[str, dict[str, Any]]
+    nomes: jornal.Nomes
+    campos: list[dict[str, Any]]
+
+
+def carregar_indice(data_dir: Path) -> Indice | None:
+    pasta = dados.pasta_de(data_dir)
+    resumo = dados.ler_json(pasta / dados.RESUMO)
+    meta = dados.ler_json(pasta / dados.META)
+    if not isinstance(resumo, dict) or resumo.get("v") != VERSAO or not isinstance(meta, dict):
+        return None
+    # Só quem está em exercício: um ex-senador que virou ministro do STF não é notícia "do Congresso".
+    pessoas = {
+        p["k"]: p for p in resumo.get("pessoas") or [] if isinstance(p, dict) and p.get("k") and p.get("nome") and p.get("ex")
+    }
+    if not pessoas:
+        return None
+    nomes = jornal.Nomes(jornal.Pessoa(k, k.split("-", 1)[0], p["nome"]) for k, p in pessoas.items())
+    return Indice(hoje=str(resumo.get("hoje") or ""), pessoas=pessoas, nomes=nomes, campos=[c for c in meta.get("campos") or [] if isinstance(c, dict)])
+
+
+def _nome_do_campo(campo_id: str | None, campos: list[dict[str, Any]]) -> str:
+    return next((str(c.get("nome")) for c in campos if c.get("id") == campo_id), "")
+
+
+def ficha_curta(p: Mapping[str, Any], campos: list[dict[str, Any]]) -> dict[str, Any]:
+    """O que a matéria mostra de um parlamentar citado (um retrato do dia, gravado na edição)."""
+    d: dict[str, Any] = {
+        "k": p["k"],
+        "nome": p["nome"],
+        "partido": p.get("partido") or "",
+        "uf": p.get("uf") or "",
+        "casa": "Câmara" if str(p["k"]).startswith("cd") else "Senado",
+        "ex": bool(p.get("ex")),
+    }
+    for origem, destino in (("saldo", "saldo"), ("gov", "gov"), ("pres", "pres"), ("prop", "prop"), ("par", "par"), ("rel_ant", "rel"), ("div", "div")):
+        if p.get(origem) is not None:
+            d[destino] = p[origem]
+    if p.get("campo"):
+        d["campo"] = _nome_do_campo(p["campo"], campos)
+    if p.get("preside"):
+        d["preside"] = True
+        d.pop("pres", None)  # quem preside só vota em caso de empate: a presença não diz nada
+    return d
+
+
+def fichas_da_edicao(edition: Edition, indice: Indice, limite: int = 4) -> dict[str, Any] | None:
+    """Os parlamentares citados em cada matéria da edição: ``{"hoje": …, "materias":
+    {id da matéria: [fichas curtas]}}`` (``None`` se nenhuma matéria cita alguém)."""
+    materias: dict[str, list[dict[str, Any]]] = {}
+    for story in edition.stories:
+        if story.section not in jornal.SECOES:
+            continue
+        corpo = " ".join([story.headline or "", story.dek or "", *[p or "" for p in story.body]])
+        achadas = indice.nomes.achar(filters.plain(corpo))
+        if achadas:
+            materias[story.id] = [ficha_curta(indice.pessoas[p.chave], indice.campos) for p in achadas[:limite]]
+    if not materias:
+        return None
+    return {"hoje": indice.hoje, "materias": materias}

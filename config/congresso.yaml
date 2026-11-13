@@ -1,0 +1,108 @@
+# Analítico do Congresso (aba "Congresso" e fichas nas matérias): as escolhas
+# editoriais que as contas usam. Tudo aqui é opinável e fica à vista na seção
+# "Como ler" da aba; mudar um valor muda a conta na atualização seguinte.
+
+# Legislaturas cobertas. As votações nominais de cada ano ficam em
+# data/congresso/base/ (os anos fechados nunca são refeitos).
+legislaturas:
+  - {numero: 56, inicio: "2019-02-01", fim: "2023-01-31"}
+  - {numero: 57, inicio: "2023-02-01", fim: "2027-01-31"}
+
+# Governos: quem a liderança "Governo" representa em cada período. O governismo de
+# um parlamentar é contado separadamente em cada governo (quem vota com qualquer
+# governo aparece assim). O dono revisa a cada eleição; sem "fim", vale até hoje.
+governos:
+  - {nome: "Bolsonaro", inicio: "2019-01-01", fim: "2022-12-31"}
+  - {nome: "Lula", inicio: "2023-01-01"}
+
+# Polos: as bancadas que definem os dois lados da conta "com quem vota". Entram só
+# as votações em que a maioria de um polo votou Sim e a do outro, Não (ou vice-versa).
+# "esquerda" e "direita" aqui são rótulos de comportamento: quem vota com o PT e
+# quem vota com o PL quando os dois discordam.
+polos:
+  - inicio: "2019-02-01"
+    fim: "2021-12-31"
+    esquerda: [PT, PSOL, PCdoB]
+    direita: [PSL, NOVO]          # o PSL era o partido do presidente; fundiu-se no UNIÃO em 2022
+  - inicio: "2022-01-01"
+    esquerda: [PT, PSOL, PCdoB]
+    direita: [PL, NOVO]
+
+# Limiares das contas (o que entra e o que vira afirmação).
+limiares:
+  coesao_polo: 0.75         # parte do polo do mesmo lado para a votação contar
+  minimo_polo: 3            # votos Sim/Não do polo na votação
+  minimo_divisivas: 10      # votações divisivas para dar o "campo" de alguém
+  coesao_partido: 0.8       # partido "fechado": a partir daqui, votar diferente é dissidência
+  minimo_partido: 4         # votos Sim/Não do partido na votação para ele ter posição
+  minimo_presenca: 20       # votações no exercício para mostrar a presença
+  dias_parado: 365          # projeto sem andamento há mais que isso está "parado"
+  dias_relatoria: 180       # relatoria sem parecer há mais que isso entra em "sentado em cima"
+
+# Faixas do "campo" (pelo saldo: −100 = sempre com a esquerda, +100 = sempre com a
+# direita). Os ids são os do Termômetro de Viés; os nomes dizem comportamento ("vota
+# com…"), não identidade: um partido que se diz de direita pode cair em "mais com a
+# esquerda", e é isso que a página mostra.
+campos:
+  - {id: esquerda, nome: "com a esquerda", ate: -60}
+  - {id: centro_esquerda, nome: "mais com a esquerda", ate: -20}
+  - {id: centro, nome: "dividido", ate: 20}
+  - {id: centro_direita, nome: "mais com a direita", ate: 60}
+  - {id: direita, nome: "com a direita", ate: 100}
+
+# Macrotemas: as 32 áreas temáticas da Câmara (códigos de /referencias/proposicoes/codTema)
+# e a classificação do Senado (/processo/classes, "Raiz / Filho") numa lista só.
+# No Senado vale o prefixo mais longo.
+temas:
+  - id: economia
+    nome: "Economia, tributos e orçamento"
+    camara: [40, 70, 66, 67, 60]
+    senado: ["Economia e Desenvolvimento", "Orçamento Público", "Jurídico / Direito do Consumidor", "Jurídico / Direito Empresarial e Econômico"]
+  - id: trabalho
+    nome: "Trabalho e previdência"
+    camara: [58, 52]
+    senado: ["Política Social / Trabalho e Emprego", "Política Social / Previdência Social"]
+  - id: saude
+    nome: "Saúde"
+    camara: [56]
+    senado: ["Política Social / Saúde"]
+  - id: educacao
+    nome: "Educação, cultura e esporte"
+    camara: [46, 35, 39, 86]
+    senado: ["Política Social / Educação", "Política Social / Cultura", "Política Social / Desporto e Lazer"]
+  - id: seguranca
+    nome: "Segurança e justiça penal"
+    camara: [43, 57]
+    senado: ["Jurídico / Direito Penal e Penitenciário", "Soberania, Defesa Nacional e Ordem Pública / Defesa do Estado e das Instituições Democráticas"]
+  - id: direitos
+    nome: "Direitos humanos e proteção social"
+    camara: [44]
+    senado: ["Política Social / Proteção Social", "Jurídico / Direitos e Garantias", "Política Social"]
+  - id: ambiente
+    nome: "Meio ambiente e energia"
+    camara: [48, 54, 85]
+    senado: ["Meio Ambiente", "Infraestrutura / Minas e Energia"]
+  - id: agro
+    nome: "Agro e terra"
+    camara: [64, 51]
+    senado: ["Economia e Desenvolvimento / Agropecuária e Abastecimento", "Economia e Desenvolvimento / Política Fundiária e Reforma Agrária"]
+  - id: cidades
+    nome: "Cidades, transporte e infraestrutura"
+    camara: [41, 61]
+    senado: ["Infraestrutura", "Política Social / Habitação", "Política Social / Desenvolvimento Urbano", "Jurídico / Direito de Trânsito"]
+  - id: politica
+    nome: "Política, Estado e Justiça"
+    camara: [34, 53, 68, 74, 76, 42]
+    senado: ["Administração Pública", "Organização do Estado", "Jurídico"]
+  - id: exterior
+    nome: "Relações exteriores e defesa"
+    camara: [55]
+    senado: ["Soberania, Defesa Nacional e Ordem Pública"]
+  - id: tecnologia
+    nome: "Ciência, tecnologia e comunicações"
+    camara: [62, 37]
+    senado: ["Economia e Desenvolvimento / Ciência, Tecnologia e Informática", "Infraestrutura / Comunicações"]
+  - id: homenagens
+    nome: "Homenagens e datas"
+    camara: [72]
+    senado: ["Honorífico"]

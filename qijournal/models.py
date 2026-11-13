@@ -406,6 +406,11 @@ class Edition:
     # as análises dos textos compilados e os dados da execução; None quando o
     # termômetro não rodou (marca sem termômetro, edições antigas).
     termometro: dict[str, Any] | None = None
+    # Fichas do Congresso (qijournal.render.congresso.fichas_da_edicao): os deputados e
+    # senadores que cada matéria cita, com o que os registros diziam deles no dia
+    # ({"hoje", "materias": {id da matéria: [fichas curtas]}}); None quando nenhuma matéria
+    # cita parlamentar, sem os dados do Congresso e em edições antigas.
+    congresso: dict[str, Any] | None = None
 
     def story(self, story_id: str) -> Story:
         for s in self.stories:
@@ -435,6 +440,7 @@ class Edition:
             "rationale": self.rationale.to_dict() if self.rationale else None,
             "index": [t.to_dict() for t in self.index],
             "termometro": copy.deepcopy(self.termometro) if self.termometro is not None else None,
+            "congresso": copy.deepcopy(self.congresso) if self.congresso is not None else None,
         }
 
     @classmethod
@@ -460,4 +466,5 @@ class Edition:
             rationale=Rationale.from_dict(data["rationale"]) if isinstance(data.get("rationale"), dict) else None,
             index=[IndexTopic.from_dict(t) for t in data.get("index") or [] if isinstance(t, dict)],
             termometro=copy.deepcopy(data["termometro"]) if isinstance(data.get("termometro"), dict) else None,
+            congresso=copy.deepcopy(data["congresso"]) if isinstance(data.get("congresso"), dict) else None,
         )

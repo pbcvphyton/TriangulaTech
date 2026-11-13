@@ -258,6 +258,18 @@ termometro:
   max_chamadas: 15            # teto de chamadas à IA por edição (60 textos = 12 lotes; folga para editores de saída menor)
   deadline_seconds: 720       # prazo da análise depois da edição (12 min; cabe no timeout do daily.yml)
 
+# Analítico do Congresso (qijournal/congresso): a aba "Congresso" (edicoes/congresso.html)
+# e as fichas dos deputados e senadores citados nas matérias da edição. Os dados vêm das
+# APIs públicas da Câmara e do Senado (`python -m qijournal congresso atualizar`) e ficam
+# em data/congresso/. As réguas das contas (polos, governos, temas, limiares) estão em
+# config/congresso.yaml. Desligar sem mexer no código: variável QIJ_NO_CONGRESSO=1.
+congresso:
+  enabled: true
+  marcas: [tech]
+  projetos_desde: 2011        # proposições da Câmara acompanhadas a partir deste ano
+  noticias_dias: 60           # edições do jornal lidas atrás dos nomes dos parlamentares
+  fichas_por_materia: 4       # parlamentares citados mostrados em cada matéria
+
 # Instagram (qijournal/instagram, workflow instagram.yml): imagens e legendas
 # geradas da edição do dia e publicadas pela API oficial. Horários em Brasília;
 # cada publicação sai na primeira execução depois do horário e só até o prazo

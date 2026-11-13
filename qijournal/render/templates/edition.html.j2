@@ -32,6 +32,7 @@
     {% if v.termometro and v.termometro.analitico_href %}
     <a class="tool tool-an" href="{{ v.termometro.analitico_href }}" title="Analítico Político: todo o histórico do termômetro" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
     {% endif %}
+    {% if brand.congresso %}{{ m.congresso_tool(archive_href) }}{% endif %}
     {{ m.search_tool(archive_href) }}
 {% endblock %}
 
@@ -528,7 +529,7 @@
 {% block after %}
 <div class="modals">
 {% for s in v.stories %}
-{{ m.modal(s, v.tz_label) }}
+{{ m.modal(s, v.tz_label, (archive_href ~ "congresso.html") if brand.congresso else "") }}
 {% endfor %}
 </div>
 {% endblock %}

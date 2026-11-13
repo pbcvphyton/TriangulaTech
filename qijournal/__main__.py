@@ -9,6 +9,8 @@ Comandos:
 - ``check-sources``: baixa cada feed de ``config/sources.yaml`` e mostra o estado.
 - ``instagram gerar``: gera as imagens e legendas do Instagram a partir da última edição e põe na fila.
 - ``instagram publicar``: publica pela API do Instagram o que já venceu na fila.
+- ``congresso atualizar``: baixa os dados da Câmara e do Senado, refaz as contas e a aba Congresso.
+- ``congresso pagina``: só refaz a aba Congresso a partir de ``data/congresso/``.
 
 Códigos de saída: 0 = sucesso; 1 = erro; 2 = dados insuficientes (a edição
 não foi publicada e a anterior continua no ar) ou argumentos inválidos.
@@ -30,6 +32,7 @@ from typing import Callable
 from qijournal import net, pipeline
 from qijournal.collect.feeds import collect_feeds
 from qijournal.config import Config, load_config
+from qijournal.congresso import cli as congresso_cli
 from qijournal.deliver.smtp import EmailDeliveryError
 from qijournal.instagram import cli as instagram_cli
 from qijournal.net import Fetcher
@@ -250,6 +253,7 @@ def build_parser() -> argparse.ArgumentParser:
     check.set_defaults(handler=_cmd_check_sources)
 
     instagram_cli.add_parser(commands, common, _iso_datetime)
+    congresso_cli.add_parser(commands, common, _iso_datetime)
     return parser
 
 

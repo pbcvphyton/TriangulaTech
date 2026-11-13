@@ -12,6 +12,12 @@
 <a class="tool" href="{{ base }}pesquisa.html" title="Pesquisa analítica: buscar em todas as edições"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Buscar</span></a>
 {%- endmacro %}
 
+{#- Botão "Congresso" do cabeçalho: a aba com o que faz quem está sentado na Câmara e no
+    Senado. base: caminho da pasta das edições, como em search_tool. -#}
+{% macro congresso_tool(base) -%}
+<a class="tool tool-cg" href="{{ base }}congresso.html" title="Congresso: com quem cada um vota, o que propõe e o que deixa parado" aria-label="Congresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M9.7 21V10M14.3 21V10M19 21V10M2.5 10 12 4l9.5 6z"/></svg><span>Congresso</span></a>
+{%- endmacro %}
+
 {#- Envia a caixa de busca da edição para a Pesquisa analítica. -#}
 {% macro search_all() -%}
 <button class="srch-all" type="submit" title="Buscar em todas as edições (Pesquisa analítica)"><span class="sr-only">Buscar em </span>Todas as edições<span aria-hidden="true"> &rarr;</span></button>
@@ -92,7 +98,8 @@
 </article>
 {%- endmacro %}
 
-{% macro modal(s, tz_label) -%}
+{#- cg_href: endereço da aba Congresso (as fichas dos parlamentares citados abrem o dossiê lá). -#}
+{% macro modal(s, tz_label, cg_href="") -%}
 <div class="mo" id="{{ s.anchor }}" role="dialog" aria-modal="true" aria-labelledby="t-{{ s.id }}" style="--sc:{{ s.color }}">
   <article class="ml" tabindex="-1"{{ lang(s) }}>
     <button class="mc" type="button" aria-label="Fechar matéria">&times;</button>
@@ -123,6 +130,21 @@
     <section class="mcov" aria-label="Análise da cobertura">
       <h3>Análise da cobertura</h3>
       {{ coverage(s.coverage, open=True) }}
+    </section>
+    {% endif %}
+    {% if s.congresso and cg_href %}
+    <section class="mcg" aria-label="No Congresso" lang="pt-BR">
+      <h3>No Congresso <span>o que os registros dizem de quem a matéria cita</span></h3>
+      <ul>
+        {% for p in s.congresso %}
+        <li>
+          <p class="mcg-n"><a href="{{ cg_href }}#p={{ p.k }}">{{ p.nome }}</a><span>{{ p.legenda }}</span></p>
+          {% if p.saldo_txt %}<p class="mcg-s"><span class="mcg-b" aria-hidden="true"><i class="mcg-{{ p.lado }}" style="left:{{ p.left }}%;width:{{ p.width }}%"></i></span><b>{{ p.saldo_txt }}</b> {{ p.campo }}</p>{% endif %}
+          <p class="mcg-x">{{ p.texto }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="mcg-f">Saldo: de −100 (sempre com a esquerda) a +100 (sempre com a direita), nas votações em que os polos divergem. <a href="{{ cg_href }}">Ver a aba Congresso<span aria-hidden="true"> &rarr;</span></a></p>
     </section>
     {% endif %}
     {% if s.sources %}
