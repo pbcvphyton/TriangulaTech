@@ -348,10 +348,12 @@
     sub.appendChild(h('a', { href: M.pesquisa + '?q=' + encodeURIComponent('"' + f.nome + '"'), text: 'Tudo o que o jornal publicou →' }));
     sub.appendChild(d.createTextNode(' · '));
     var outroSel = (escolhidos || []).filter(function (x) { return x !== f.k; }).pop();
-    sub.appendChild(h('button', { cls: 'cg-cp-add', type: 'button', 'data-cmp-add': f.k, text: outroSel ? '⇄ Comparar com ' + nomeDe(outroSel) : '⇄ Comparar com outro' }));
+    if (outroSel) sub.appendChild(h('button', { cls: 'cg-cp-add', type: 'button', 'data-cmp-add': f.k, text: '⇄ Comparar com ' + nomeDe(outroSel) }));
+    else sub.removeChild(sub.lastChild);  // o " · " que sobrou
     nos.push(h('div', { cls: 'cg-d-h' }, [foto, h('div', {}, [
       h('p', { cls: 'cg-d-k', text: casa + ' · ' + [f.partido, f.uf].filter(Boolean).join('-') + (f.condicao && f.condicao !== 'Titular' ? ' · ' + f.condicao : '') + (f.exercicio ? '' : ' · fora do exercício') }),
-      h('h2', { cls: 'cg-d-t', id: 'cgDossieT', text: f.nome }), sub
+      h('h2', { cls: 'cg-d-t', id: 'cgDossieT', text: f.nome }), sub,
+      formEscolha('cg-cp-com', 'cgCom-' + f.k, '⇄ Comparar com', 'Comparar ' + f.nome + ' com', 'outro deputado ou senador…', 'Comparar', { 'data-de': f.k })
     ])]));
     if (f.frases && f.frases.length) nos.push(h('ul', { cls: 'cg-d-fr' }, f.frases.map(function (x) { return h('li', { text: x }); })));
 
@@ -606,6 +608,7 @@
     desenharEscolha();
   }
   function irComparar(a, b) {
+    if (aberto === 'c:' + a + ',' + b) return;  // o mesmo comparativo já está aberto
     if (w.history && w.history.pushState) { w.history.pushState(null, '', '#c=' + a + ',' + b); abrirComparacao(a, b, true); }
     else w.location.hash = 'c=' + a + ',' + b;
   }
@@ -618,12 +621,80 @@
     if (!bt) return;
     var k = bt.getAttribute('data-cmp-add'), outro = escolhidos.filter(function (x) { return x !== k; }).pop();
     if (outro) { escolhidos = [outro, k]; desenharEscolha(); irComparar(outro, k); return; }
-    escolher(k, true);
-    bt.textContent = 'Escolhido: marque outro na tabela ou abra outro dossiê e clique em Comparar';
-    bt.disabled = true;
+    var campo = d.getElementById('cgCom-' + k);  // ninguém mais escolhido: o campo "Comparar com"
+    if (campo) campo.focus();
   });
   if (cmpIr) cmpIr.addEventListener('click', function () { if (escolhidos.length === 2) irComparar(escolhidos[0], escolhidos[1]); });
   if (cmpX) cmpX.addEventListener('click', function () { escolhidos = []; desenharEscolha(); });
+
+  /* Escolher pelo nome: a chave da ficha de quem tem esse nome (o nome inteiro primeiro). */
+  function chaveDoNome(texto, soExata) {
+    var alvo = semAcento(texto || '').trim(), exata = null, parcial = null;
+    if (!alvo) return null;
+    linhas.forEach(function (tr) {
+      var nome = semAcento(tr.getAttribute('data-nome') || '');
+      if (nome === alvo && !exata) exata = tr;
+      else if (!soExata && !parcial && nome.indexOf(alvo) >= 0) parcial = tr;
+    });
+    var tr = exata || parcial, ck = tr ? tr.querySelector('[data-cmp]') : null;
+    return ck ? ck.getAttribute('data-cmp') : null;
+  }
+  function formEscolha(cls, id, rotulo, rotuloSr, dica, botao, extra) {
+    var attrs = { cls: cls };
+    Object.keys(extra || {}).forEach(function (k) { attrs[k] = extra[k]; });
+    return h('form', attrs, [
+      rotulo ? h('label', { 'for': id, text: rotulo }) : h('label', { cls: 'sr-only', 'for': id, text: rotuloSr }),
+      h('input', { cls: 'az-fil-in', id: id, type: 'search', list: 'cgNomes', autocomplete: 'off', spellcheck: 'false', placeholder: dica, 'aria-label': rotulo ? rotuloSr : null }),
+      h('button', { cls: 'cg-cp-trb', type: 'submit', text: botao }),
+      h('span', { cls: 'cg-cp-st', role: 'status' })
+    ]);
+  }
+  function escolhaFeita(form, soExata) {
+    var input = form.querySelector('input'), st = form.querySelector('.cg-cp-st'), novo = chaveDoNome(input.value, soExata);
+    var outro = form.getAttribute('data-outro') || form.getAttribute('data-de');
+    if (!novo) { if (!soExata && st) st.textContent = input.value.trim() ? 'Não achei esse nome: escolha um da lista.' : 'Escreva um nome.'; return; }
+    if (novo === outro) { if (st) st.textContent = 'Essa pessoa já está aqui: escolha outra.'; return; }
+    var a = form.getAttribute('data-lado') === '1' ? outro : novo, b = form.getAttribute('data-lado') === '1' ? novo : outro;
+    if (form.classList.contains('cg-cp-com')) { a = outro; b = novo; }
+    escolhidos = [a, b];
+    desenharEscolha();
+    irComparar(a, b);
+  }
+  d.addEventListener('submit', function (event) {
+    var form = event.target;
+    if (!form || !form.classList || !(form.classList.contains('cg-cp-tr') || form.classList.contains('cg-cp-com'))) return;
+    event.preventDefault();
+    escolhaFeita(form, false);
+  });
+  d.addEventListener('change', function (event) {
+    var input = event.target, form = input && input.form;
+    if (form && form.classList && (form.classList.contains('cg-cp-tr') || form.classList.contains('cg-cp-com'))) escolhaFeita(form, true);
+  });
+  d.addEventListener('input', function (event) {  // voltou a escrever: o aviso anterior sai
+    var form = event.target && event.target.form, st = form ? form.querySelector('.cg-cp-st, .cg-cmpf-st') : null;
+    if (st) st.textContent = '';
+  });
+
+  /* Comparar dois, em Todos os parlamentares. */
+  var cmpF = d.getElementById('cgCmpF');
+  if (cmpF && tab) {
+    cmpF.hidden = false;
+    var cmpQa = d.getElementById('cgCmpQa'), cmpQb = d.getElementById('cgCmpQb'), cmpSt = cmpF.querySelector('.cg-cmpf-st');
+    cmpF.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var a = chaveDoNome(cmpQa.value), b = chaveDoNome(cmpQb.value), falta = !a ? cmpQa : (!b ? cmpQb : null);
+      if (falta) {
+        cmpSt.textContent = falta.value.trim() ? 'Não achei "' + falta.value.trim() + '": escolha um nome da lista.' : 'Escreva os dois nomes.';
+        falta.focus();
+        return;
+      }
+      if (a === b) { cmpSt.textContent = 'Escolha duas pessoas diferentes.'; cmpQb.focus(); return; }
+      cmpSt.textContent = '';
+      escolhidos = [a, b];
+      desenharEscolha();
+      irComparar(a, b);
+    });
+  }
 
   var POS = { S: 'S', N: 'N', O: 'N' };
   function juntos(vt, ka, kb) {
@@ -651,12 +722,13 @@
   function montarComparacao(fa, fb, vt) {
     var ps = [fa, fb], nos = [h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Comparativo: ' + fa.nome + ' e ' + fb.nome })];
     nos.push(h('p', { cls: 'cg-d-k cg-cp-k', text: 'Comparativo lado a lado' }));
-    nos.push(h('div', { cls: 'cg-cp-h' }, ps.map(function (f) {
+    nos.push(h('div', { cls: 'cg-cp-h' }, ps.map(function (f, i) {
       return h('div', { cls: 'cg-cp-p' }, [
         h('p', { cls: 'cg-d-k', text: (f.casa === 'cd' ? 'Câmara dos Deputados' : 'Senado Federal') + ' · ' + [f.partido, f.uf].filter(Boolean).join('-') + (f.exercicio ? '' : ' · fora do exercício') }),
         h('p', { cls: 'cg-cp-n' }, [h('a', { href: '#p=' + f.k, 'data-k': f.k, text: f.nome })]),
         f.campo ? h('div', { cls: 'cg-cp-b' }, [barra(f.campo.saldo), h('span', { text: saldo(f.campo.saldo) + ' · ' + f.campo.nome })]) : h('p', { cls: 'cg-d-n', text: 'Sem saldo: poucas votações divisivas.' }),
-        (f.frases || [])[0] ? h('p', { cls: 'cg-cp-f', text: f.frases[0] }) : null
+        (f.frases || [])[0] ? h('p', { cls: 'cg-cp-f', text: f.frases[0] }) : null,
+        formEscolha('cg-cp-tr', 'cgTroca' + i, null, 'Trocar ' + f.nome + ' por outro parlamentar', 'Trocar por…', 'Trocar', { 'data-lado': String(i), 'data-outro': ps[1 - i].k })
       ]);
     })));
 
@@ -788,16 +860,8 @@
   if (achar && acharQ && tab) {
     achar.hidden = false;
     var ir = function () {
-      var alvo = semAcento(acharQ.value).trim();
-      if (!alvo) return;
-      var exata = null, parcial = null;
-      linhas.forEach(function (tr) {
-        var nome = semAcento(tr.getAttribute('data-nome'));
-        if (nome === alvo && !exata) exata = tr;
-        else if (nome.indexOf(alvo) >= 0 && !parcial) parcial = tr;
-      });
-      var tr = exata || parcial, link = tr ? tr.querySelector('[data-k]') : null;
-      if (link) abrir(link.getAttribute('data-k'));
+      var k = chaveDoNome(acharQ.value);
+      if (k) abrir(k);
     };
     achar.addEventListener('submit', function (event) { event.preventDefault(); ir(); });
     acharQ.addEventListener('change', ir);

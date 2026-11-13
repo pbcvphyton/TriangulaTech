@@ -601,7 +601,11 @@ A página segue o padrão do Analítico (a leitura → as lentes → Como ler):
   últimos votos, **o que propõe** (por tema e por situação, com as paradas), **o
   que tem na mão** (relatorias sem parecer) e **no jornal** (as manchetes que o
   citam). Um botão leva ao comparativo.
-- **O comparativo** (`congresso.html#c=cd-204536,cd-209787`): os dois perfis lado a
+- **O comparativo** (`congresso.html#c=cd-204536,cd-209787`): quaisquer dois,
+  escolhidos de quatro jeitos: escrevendo os dois nomes em **Comparar dois** (em Todos
+  os parlamentares, com as sugestões da lista), marcando dois na coluna ⇄ da tabela,
+  pelo campo **Comparar com** do dossiê, ou trocando um dos lados (**Trocar por…**)
+  dentro do próprio comparativo. Mostra os dois perfis lado a
   lado, com a posição de cada um em cada ranking, o saldo por tema (e onde ficam de
   lados opostos), quanto **votam juntos** (a parte das votações de conteúdo em que os
   dois votaram igual, onde mais divergem e as últimas em que votaram diferente) e a

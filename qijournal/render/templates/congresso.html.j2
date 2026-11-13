@@ -94,7 +94,6 @@
       <form class="cg-achar" id="cgAchar" role="search" hidden>
         <label class="az-lbl az-lbl-2" for="cgAcharQ">Abrir o dossiê de alguém</label>
         <input class="az-fil-in" id="cgAcharQ" type="search" list="cgNomes" autocomplete="off" spellcheck="false" placeholder="Nome do deputado ou senador…">
-        <datalist id="cgNomes">{% for p in c.pessoas %}<option value="{{ p.nome }}" label="{{ p.partido }}-{{ p.uf }} · {{ p.casa_nome }}">{% endfor %}</datalist>
       </form>
     </aside>
   </div>
@@ -440,6 +439,18 @@
 
     <div class="az-blk" id="cg-todos">
       <h4 class="az-h">Todos os parlamentares <span>{{ c.totais.pessoas|num }} em exercício nas duas Casas</span></h4>
+      <form class="cg-cmpf" id="cgCmpF" hidden>
+        <p class="cg-cmpf-k"><b>Comparar dois, lado a lado</b> <span>quaisquer dois, deputados ou senadores: escreva os nomes ou marque dois na coluna ⇄ da tabela</span></p>
+        <div class="cg-cmpf-c">
+          <label class="sr-only" for="cgCmpQa">Primeiro parlamentar</label>
+          <input class="az-fil-in" id="cgCmpQa" type="search" list="cgNomes" autocomplete="off" spellcheck="false" placeholder="Um nome…">
+          <span class="cg-cmpf-x" aria-hidden="true">×</span>
+          <label class="sr-only" for="cgCmpQb">Segundo parlamentar</label>
+          <input class="az-fil-in" id="cgCmpQb" type="search" list="cgNomes" autocomplete="off" spellcheck="false" placeholder="Outro nome…">
+          <button class="cg-cp-ir" type="submit">Comparar</button>
+        </div>
+        <p class="cg-cmpf-st" role="status" aria-live="polite"></p>
+      </form>
       <div class="az-fil cg-fil" id="cgFil" hidden>
         <label class="sr-only" for="cgQ">Filtrar por nome, partido ou estado</label>
         <input class="az-fil-in" id="cgQ" type="search" autocomplete="off" spellcheck="false" placeholder="Filtrar: nome, partido, UF…">
@@ -500,6 +511,7 @@
 {% endblock %}
 
 {% block after %}
+<datalist id="cgNomes">{% for p in c.pessoas %}<option value="{{ p.nome }}" label="{{ p.partido }}-{{ p.uf }} · {{ p.casa_nome }}">{% endfor %}</datalist>
 <div class="cg-cp-bar" id="cgCmp" role="region" aria-label="Comparativo" hidden>
   <p class="cg-cp-sel"><b>Comparar</b> <span id="cgCmpA">escolha dois</span> <span aria-hidden="true">×</span> <span id="cgCmpB">—</span></p>
   <button class="cg-cp-ir" id="cgCmpIr" type="button" disabled>Comparar lado a lado</button>

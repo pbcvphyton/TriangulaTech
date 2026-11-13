@@ -527,6 +527,7 @@ def test_a_aba_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso,
         "PL 12/2026",  # passou na frente
         "Hugo Leal",  # quem preside a comissão que segura a fila
         "Como ler",
+        'id="cgCmpF"', 'list="cgNomes"', '<datalist id="cgNomes">',  # comparar quaisquer dois, escolhidos pelo nome
     ):
         assert trecho in html, trecho
     manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])

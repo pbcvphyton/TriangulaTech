@@ -893,7 +893,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         ),
         (
             "O comparativo",
-            "Votam juntos: nas votações de conteúdo da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não), "
+            "Compara quaisquer dois parlamentares, das duas Casas: pelos nomes em \"Comparar dois\", marcando dois na tabela, "
+            "pelo dossiê ou trocando um dos lados dentro do comparativo. Votam juntos: nas votações de conteúdo da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não), "
             "a parte em que votaram igual; ao lado, a mesma conta só nas que dividiram esquerda e direita. Num tema, os dois ficam "
             "de lados opostos quando cada um tem saldo de 20 ou mais, um para cada lado. Deputado e senador não têm votações em "
             "comum: as Casas votam em separado.",
