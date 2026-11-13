@@ -1,0 +1,3045 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-13",
+ "analises": [
+  {
+   "id": "90df3d6c709f",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/13/pf-faz-nova-operao-contra-suspeitas-de-desvios-envolvendo-produtora-do-dark-horse.ghtml",
+   "titulo": "PF faz nova operação contra suspeitas de desvios envolvendo produtora do Dark Horse",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "pf-cumpre-mandado-contra-ex-assessor-de-mario-fr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "O texto relata operação da Polícia Federal envolvendo emendas parlamentares de um deputado federal (Mário Frias)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 530,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspeita de desvios de recursos de emendas parlamentares por ONGs e ex-chefe de gabinete de deputado.",
+    "causa": "Falta de comprovação de serviços prestados e contratação com vínculos suspeitos.",
+    "vitima": "Os cofres públicos.",
+    "culpado": "Investigados envolvidos com as ONGs e as emendas.",
+    "solucao": "Investigação policial e judicialização no STF.",
+    "motor_moral": "lealdade"
+   },
+   "teste_inversao": "Sim, a matéria relata uma operação policial com base em dados de investigação sem juízo de valor prévio sobre a culpa dos investigados.",
+   "atores": [
+    {
+     "nome": "Mário Frias",
+     "campo": "direita"
+    },
+    {
+     "nome": "Polícia Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "PF",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 43,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mário Frias",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 31,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 31
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "apura a possível prática dos crimes",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo adequado para investigações em andamento.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "53a1f1129a90",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/lucros-exorbitantes-dos-combustiveis-fosseis-sao-moralmente-inaceitaveis-diz-guterres.shtml",
+   "titulo": "Lucros exorbitantes dos combustíveis fósseis são 'moralmente inaceitáveis', diz Guterres",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-defende-combustiveis-fosseis-na-cop31-e-ger",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Discute transição energética, lucros de combustíveis fósseis e declarações da ONU."
+   },
+   "estado": "ok",
+   "T": -5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 819,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.23,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ADJETIVOS": -5.23
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Lucros exorbitantes de empresas de fósseis e impacto na crise climática.",
+    "causa": "Dependência de combustíveis fósseis e falta de ação firme de governos.",
+    "vitima": "População comum e planeta",
+    "culpado": "Indústria de combustíveis fósseis e governos coniventes",
+    "solucao": "Aceleração da transição energética e abandono de combustíveis fósseis.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto foca fortemente na perspectiva crítica de Guterres, refletindo o alinhamento editorial com pautas ambientais da ONU.",
+   "atores": [
+    {
+     "nome": "António Guterres",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Empresas de combustíveis fósseis",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "António Guterres",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 146,
+     "ultima": true
+    },
+    {
+     "rotulo": "Al Gore",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 162,
+    "direita": 0
+   },
+   "falas": 14,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "lucros exorbitantes dos combustíveis fósseis são 'moralmente inaceitáveis'",
+     "paragrafo": "P0",
+     "direcao": "esquerda",
+     "contribuicao": -5.23,
+     "explicacao": "Incorpora um juízo de valor forte da fonte principal no título e na voz geral.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "desfavorece": "Empresas de combustíveis fósseis",
+     "ressalva": "Está atribuído a fala do chefe da ONU."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "41dd47f2d6a4",
+   "url": "https://www.poder360.com.br/poder-internacional/flavio-bolsonaro-rejeita-rotulo-de-fugitivo-e-mira-presidencia/",
+   "titulo": "Flávio Bolsonaro rejeita rótulo de fugitivo e mira Presidência",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Entrevista com o senador Flávio Bolsonaro tratando de eleições, investigações e relações internacionais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 498,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Conflitos políticos, investigações judiciais e contestações eleitorais.",
+    "causa": "Suposta perseguição judicial e disputas partidárias.",
+    "vitima": "Flávio Bolsonaro",
+    "culpado": "Governo atual e STF (segundo a narrativa do ator)",
+    "solucao": "Disputa eleitoral futura e resistência política.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto dá espaço para o senador expor sua visão, mas mantém o devido contraditório factual da imprensa.",
+   "atores": [
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Flávio Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 75,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 75
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "Flávio contestou a vitória de Lula sem apresentar provas de fraude.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A redação insere o alerta padrão de checagem para declarações sem provas do ator.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro",
+     "ressalva": "Facticidade necessária em reportagens políticas."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "976de0428b25",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/12/alertas-de-suposto-apagao-mundial-em-17-de-novembro-veja-perguntas-e-respostas.ghtml",
+   "titulo": "Alertas de suposto 'apagão mundial' em 17 de novembro: veja perguntas e respostas",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Checagem de fatos sobre boatos de apagão mundial e recomendações de Defesa Civil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 56,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1324,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disseminação de boatos e desinformação sobre um suposto apagão global nas redes sociais.",
+    "causa": "Distorção de testes de emergência oficiais e recomendações preventivas de rotina.",
+    "vitima": "População exposta à desinformação",
+    "culpado": "Propagadores de fake news e influenciadores nas redes",
+    "solucao": "Esclarecimento técnico e checagem de fatos.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Matéria puramente de checagem e esclarecimento informativo, aplicável a qualquer boato equivalente.",
+   "atores": [
+    {
+     "nome": "Defesa Civil",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Especialistas consultados pelo g1",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 16,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Especialistas consultados pelo g1 explicam",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de fontes especialistas para desmentir boatos virais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9ce74ee81a1b",
+   "url": "https://umsoplaneta.globo.com/sociedade/noticia/2026/11/13/otca-prepara-ipcc-da-amazonia-e-fundo-regional-para-financiar-a-floresta.ghtml",
+   "titulo": "OTCA prepara “IPCC da Amazônia” e fundo regional para financiar a floresta",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": "Entrevista",
+   "genero": "entrevista",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Entrevista com dirigente da OTCA sobre cooperação regional na Amazônia e financiamento climático."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1333,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desafios ambientais e de soberania na região amazônica.",
+    "causa": "Falta de integração e recursos insuficientes para conservação e prevenção.",
+    "vitima": "Bioma amazônico e países da região",
+    "culpado": "Falta de cooperação internacional robusta e conflitos globais",
+    "solucao": "Criação de painel científico regional, fundos específicos e alertas conjuntos.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A entrevista transcreve as propostas e visões da dirigente da OTCA e de especialista convidada, mantendo o padrão jornalístico usual para pautas de meio ambiente.",
+   "atores": [
+    {
+     "nome": "Vanessa Grazziotin",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Vanessa Grazziotin",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 231,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mercedes Bustamante",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 231,
+    "direita": 0
+   },
+   "falas": 14,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "a8ec01502800",
+   "url": "https://www.cnnbrasil.com.br/politica/flavio-rebate-rotulo-de-fugitivo-e-diz-que-eleicao-nao-foi-jogo-limpo/",
+   "titulo": "Flávio rebate rótulo de fugitivo e diz que eleição “não foi jogo limpo”",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda declarações de Flávio Bolsonaro sobre o resultado das eleições presidenciais, ataques ao TSE e o contexto de sua viagem ao exterior."
+   },
+   "estado": "ok",
+   "T": -7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 347,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -6.54,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -6.54
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O resultado da eleição presidencial é contestado pelo candidato derrotado sob acusações de falta de lisura e aparelhamento institucional.",
+    "causa": "Suposto viés e aparelhamento do Tribunal Superior Eleitoral.",
+    "vitima": "Flávio Bolsonaro e seu partido, apontados como prejudicados no pleito.",
+    "culpado": "O Tribunal Superior Eleitoral e o processo eleitoral conduzido no país.",
+    "solucao": "Novas eleições limpas, conforme pleiteado pelo partido do senador.",
+    "motor_moral": "democracia_transparencia"
+   },
+   "teste_inversao": "Se o ator principal fosse de esquerda contestando um pleito sob um tribunal nomeado por adversários, a imprensa manteria o uso de qualificações sobre a ausência de provas, destacando o tom golpista das manifestações.",
+   "atores": [
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Tribunal Superior Eleitoral (TSE)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Flávio Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 75,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente do TSE, Kassio Nunes Marques",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 13,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 75
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "sem apresentar provas",
+     "paragrafo": "P6",
+     "direcao": "esquerda",
+     "contribuicao": -6.54,
+     "explicacao": "A redação faz uso de qualificação crítica direta na fala de Flávio Bolsonaro.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "567652159b3c",
+   "url": "https://www.seudinheiro.com/2026/internacional/apagao-mundial-em-17-de-novembro-o-boato-os-alertas-para-ter-kits-de-emergencia-e-o-velho-habito-de-acreditar-nos-simpsons/",
+   "titulo": "Apagão mundial em 17 de novembro? O boato, os alertas para ter kits de emergência e o velho hábito de acreditar nos Simpsons",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto aborda um boato viral sobre um suposto apagão mundial associado a um desenho animado, sem envolver disputas político-ideológicas partidárias."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 56,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1265,
+   "cortado": true,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Disseminação de boatos e teorias da conspiração nas redes sociais sobre um suposto apagão global.",
+    "causa": "Combinação de coincidências de calendário, interpretações distorcidas de desenhos animados e recomendações preventivas de órgãos públicos.",
+    "vitima": "Usuários das redes sociais expostos à desinformação.",
+    "culpado": "Autores e propagadores de boatos e teorias da conspiração na internet.",
+    "solucao": "Esclarecimento factual sobre a origem e a falsidade dos boatos.",
+    "motor_moral": "verdade_factual"
+   },
+   "teste_inversao": "O texto adota um tom estritamente explicativo e desmentidor de fake news, aplicável a qualquer boato viral independente da temática.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f25177c40251",
+   "url": "https://neofeed.com.br/negocios/lucro-do-inter-cresce-26-e-inadimplencia-de-curto-prazo-recua-mas-roe-e-um-ponto-de-atencao/",
+   "titulo": "Lucro do Inter cresce 26% e inadimplência de curto prazo recua. Mas ROE é um ponto de atenção",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata os resultados financeiros trimestrais do Banco Inter, com foco em lucro, inadimplência e rentabilidade."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 536,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Flutuações no ROE e na inadimplência de curto e longo prazo do Banco Inter.",
+    "causa": "Dinâmicas de mercado, ambiente inflacionário e mudanças na política de crédito da instituição.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Adoção de políticas de crédito mais conservadoras e priorização de produtos com garantia.",
+    "motor_moral": "eficiencia_economica"
+   },
+   "teste_inversao": "O texto segue o padrão neutro e descritivo de reportagens de economia e negócios, detalhando balanços trimestrais e ouvindo executivos de forma simétrica.",
+   "atores": [
+    {
+     "nome": "Banco Inter",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Santiago Stel, CFO do Inter",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 71,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9cbbc6926443",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/operacao-mira-suspeitos-de-fraudar-concurso-de-2025-da-policia-federal",
+   "titulo": "Operação mira suspeitos de fraudar concurso de 2025 da Polícia Federal",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "O texto relata uma operação da Polícia Federal que investiga fraudes em concurso público da própria corporação."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 226 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 226,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Supostas fraudes ocorridas no concurso público da Polícia Federal em 2025.",
+    "causa": "Ação de suspeitos envolvidos em crimes de associação criminosa e lavagem de dinheiro.",
+    "vitima": "Candidatos do concurso e a lisura da instituição policial.",
+    "culpado": "Indivíduos alvos da operação policial.",
+    "solucao": "Cumprimento de mandados de prisão, busca e apreensão e medidas assecuratórias patrimoniais.",
+    "motor_moral": "aplicacao_da_lei"
+   },
+   "teste_inversao": "O texto adota um formato estritamente factual e policialesco padrão, relatando as ações da autoridade competente sem juízos de valor prévios sobre os investigados.",
+   "atores": [
+    {
+     "nome": "Polícia Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Investigados por fraude",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "PF",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 42,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c29c2e24bd2b",
+   "url": "https://www.infomoney.com.br/economia/ppi-inflacao-ao-produtor-nos-eua-sobe-em-outubro-abaixo-da-expectativa/",
+   "titulo": "PPI: inflação ao produtor nos EUA sobe em outubro abaixo da expectativa",
+   "veiculo": "InfoMoney",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "ipca-desacelera-para-0-14-em-outubro-mas-inflaca",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata indicadores macroeconômicos dos Estados Unidos, como a inflação ao produtor e dados de emprego."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 303,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento dos preços ao produtor e inflação nos Estados Unidos.",
+    "causa": "Pressões inflacionárias setoriais e alta nos custos de bens e serviços.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Possível ajuste nas taxas de juros pelo Federal Reserve.",
+    "motor_moral": "estabilidade_economica"
+   },
+   "teste_inversao": "O texto segue o padrão objetivo de cobertura de conjuntura econômica internacional, reportando dados oficiais e expectativas de analistas de forma imparcial.",
+   "atores": [
+    {
+     "nome": "Federal Reserve (Fed)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Escritório de Estatísticas do Trabalho do Ministério do Trabalho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2b1cf10c4462",
+   "url": "https://climainfo.org.br/2026/11/12/el-nino-deve-alcancar-intensidade-muito-forte-ate-marco-de-2027-diz-a-noaa/",
+   "titulo": "El Niño deve alcançar intensidade muito forte até março de 2027, diz a NOAA",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de previsões meteorológicas e decretos estaduais de emergência climática sem disputa político-partidária central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 332,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Intensificação do fenômeno El Niño e riscos associados de seca e incêndios.",
+    "causa": "Aquecimento do Pacífico Equatorial.",
+    "vitima": "Populações locais e áreas de floresta.",
+    "culpado": "Nenhum.",
+    "solucao": "Ações de prevenção e combate ao fogo autorizadas por decreto.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é estritamente informativo e técnico, baseado em dados científicos e relatórios de agências oficiais. Não há juízos de valor que mudariam com a troca de atores.",
+   "atores": [
+    {
+     "nome": "Governo do Pará",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "NOAA",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Exame",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c8a66010a6f9",
+   "url": "https://www.moneytimes.com.br/policia-federal-cumpre-mandato-de-dino-em-nova-investigacao-contra-produtora-da-dark-horse-rens/",
+   "titulo": "Polícia Federal cumpre ordem judicial de Dino em nova investigação contra produtora do Dark Horse",
+   "veiculo": "Money Times",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "pf-cumpre-mandado-contra-ex-assessor-de-mario-fr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Reporta operação da Polícia Federal e ordem judicial envolvendo desvio de emendas parlamentares ligadas a produtoras e políticos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 267 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 267,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspeita de desvio de recursos públicos de emendas parlamentares.",
+    "causa": "Ação de organização criminosa formada por agentes públicos e privados.",
+    "vitima": "Administração pública.",
+    "culpado": "Investigados envolvidos no esquema.",
+    "solucao": "Investigação da Polícia Federal e medidas cautelares do STF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O relato policial adota tom descritivo baseado em notas oficiais e relatórios sem emitir juízos subjetivos que variariam com o espectro político.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "PF",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    },
+    {
+     "rotulo": "CGU",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3e838a3f767f",
+   "url": "https://oeco.org.br/externo/lula-diz-que-brasil-tem-obrigacao-moral-de-sediar-conferencia-pelo-fim-dos-fosseis/",
+   "titulo": "Lula diz que Brasil tem obrigação moral de sediar conferência pelo fim dos fósseis",
+   "veiculo": "((o))eco",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-defende-combustiveis-fosseis-na-cop31-e-ger",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda compromissos climáticos internacionais assumidos pelo presidente Lula na COP31 e reações da sociedade civil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 827,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise climática e emissão de gases de efeito estufa por combustíveis fósseis.",
+    "causa": "Exploração e uso contínuo de carvão, petróleo e gás fóssil.",
+    "vitima": "População global afetada pelas mudanças climáticas.",
+    "culpado": "Países e indústrias poluidoras.",
+    "solucao": "Transição para longe dos combustíveis fósseis e controle do desmatamento.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura destaca as falas do presidente e de ONGs ambientais em tom elogioso sobre dados estatísticos oficiais, mantendo padrão aplicável a governos alinhados a pautas verdes.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Marcio Astrini",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": true
+    },
+    {
+     "rotulo": "SEEG",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 38,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c5ccad813de4",
+   "url": "https://valor.globo.com/legislacao/noticia/2026/11/12/fim-da-jornada-6x1-veja-os-principais-pontos-da-liminar-concedida-por-flavio-dino.ghtml",
+   "titulo": "Fim da jornada 6x1: Veja os principais pontos da liminar concedida por Flávio Dino",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "dino-mantem-fim-da-escala-6x1-em-dezembro-e-flex",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Reporta decisão judicial do STF sobre prazos e regras da liminar referente à jornada de trabalho e Ações Diretas de Inconstitucionalidade."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 288 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 288,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incerteza jurídica e operacional na aplicação das regras de transição de jornadas de trabalho.",
+    "causa": "Modificações constitucionais que exigem adaptação de acordos coletivos e contratos.",
+    "vitima": "Empregadores e trabalhadores afetados pelas mudanças.",
+    "culpado": "Nenhum.",
+    "solucao": "Decisão liminar do STF estabelecendo prazos e regras de transição.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto detalha tecnicamente os pontos da decisão judicial sobre prazos trabalhistas sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "CNC e CNI",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro Flávio Dino",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "4a2754043d58",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/china-quebra-expectativa-e-nao-organizara-cop33-em-2028.shtml",
+   "titulo": "China quebra expectativa e não organizará COP33",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Discute os rumos da diplomacia ambiental internacional e a desistência da China em sediar a COP33."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 717,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incertezas sobre a liderança diplomática da China em conferências climáticas globais.",
+    "causa": "Discrepância entre a atuação diplomática oficial e o avanço real na descarbonização interna.",
+    "vitima": "Esforço global de governança climática.",
+    "culpado": "Nenhum.",
+    "solucao": "Convergência entre a atuação econômica e a diplomacia internacional.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "A análise diplomática utiliza especialistas para ponderar as nuances da política externa chinesa de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "China",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Li Shuo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 135,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7ad41e90c680",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/13/ira-diz-ter-atacado-radar-dos-eua-no-bahrein.ghtml",
+   "titulo": "Irã diz ter atacado radar dos EUA no Bahrein",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ira-reivindica-ataque-a-sistema-de-radar-dos-eua",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca"
+    ],
+    "justificativa": "Texto factual sobre ataque militar entre Irã e EUA, com dimensão geopolítica, mas sem disputa político-ideológica interna."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 236 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 236,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataque iraniano a radar dos EUA no Bahrein ameaça trégua frágil.",
+    "causa": "Retaliação a ofensiva aérea em Sirik.",
+    "vitima": "A trégua entre Irã e EUA.",
+    "culpado": "Irã (Guarda Revolucionária).",
+    "solucao": "Não apresentada.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os papéis fossem invertidos (EUA atacando radar iraniano), o texto provavelmente seria similar, pois se limita a relatar a reivindicação de uma das partes e a ausência de resposta da outra. A diferença seria apenas o sujeito do ataque.",
+   "atores": [
+    {
+     "nome": "Irã (Guarda Revolucionária)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Estados Unidos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "A Guarda Revolucionária do Irã",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "agência de notícias Reuters",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "mídia estatal iraniana",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Até a última atualização, não havia manifestação oficial dos governos dos Estados Unidos ou do Bahrein sobre a declaração iraniana.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto informa que não houve manifestação oficial dos EUA ou do Bahrein, indicando que a reportagem buscou contraponto, mas não obteve resposta.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f4c18547fa69",
+   "url": "https://www.cnnbrasil.com.br/saude/capacidade-cognitiva-afeta-relacoes-de-mulheres-no-trabalho-aponta-estudo/",
+   "titulo": "Capacidade cognitiva afeta relações de mulheres no trabalho, aponta estudo",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "costumes",
+     "economico"
+    ],
+    "justificativa": "Reportagem sobre estudo acadêmico que aborda estereótipos de gênero no ambiente de trabalho, tema com dimensão político-ideológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1079,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mulheres com maior capacidade cognitiva enfrentam dificuldades nas relações interpessoais no trabalho.",
+    "causa": "Estereótipos de gênero que associam mulheres a cordialidade e homens a competência.",
+    "vitima": "Mulheres com alta capacidade cognitiva.",
+    "culpado": "Colegas de trabalho que reproduzem estereótipos de gênero.",
+    "solucao": "Empresas e gestores devem evitar avaliações baseadas em percepções subjetivas de cordialidade.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o estudo investigasse homens com alta capacidade cognitiva, o texto seria similar, mas o título e o foco seriam diferentes, pois o estudo é específico sobre mulheres. A redação não parece favorecer um lado, apenas relata os achados.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "pesquisadores de universidades dos Estados Unidos e da China",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "os autores",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "288757b01e66",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/12/cop30-fortaleceu-multilateralismo-diz-correa-do-lago.ghtml",
+   "titulo": "COP30 fortaleceu multilateralismo, diz Corrêa do Lago",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura de declarações sobre multilateralismo climático, com disputa entre a posição de permanecer no Acordo de Paris (defendida pelo presidente da COP) e a saída dos EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 54,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 471,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Saída dos EUA do Acordo de Paris enfraquece o multilateralismo climático.",
+    "causa": "Decisão do governo Trump de se retirar do acordo.",
+    "vitima": "A cooperação climática internacional e o meio ambiente.",
+    "culpado": "Estados Unidos (governo Trump).",
+    "solucao": "Fortalecimento do multilateralismo, com outros países permanecendo no acordo.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se um governo de esquerda tivesse saído do Acordo de Paris e um secretário da ONU o criticasse, o texto provavelmente daria mais espaço para a resposta do governo, ou o tom seria diferente. A cobertura atual concentra as críticas na saída dos EUA sem contraponto.",
+   "atores": [
+    {
+     "nome": "André Corrêa do Lago",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Estados Unidos (governo Trump)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "O presidente da 30ª Conferência das Nações Unidas sobre Mudança do Clima (COP30), André…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 43,
+     "ultima": false
+    },
+    {
+     "rotulo": "o secretário-executivo da Convenção do Clima da Organização das Nações Unidas (ONU), Simon…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 54,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "a456d87b9c71",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/agu-institui-exame-previo-para-ingresso-em-carreiras-juridicas",
+   "titulo": "AGU institui exame prévio para ingresso em carreiras jurídicas",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Notícia sobre portaria da AGU que institui exame prévio para carreiras jurídicas, com impacto no serviço público e na seleção de pessoal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 432,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldades administrativas no preenchimento de vagas devido a candidatos aprovados em múltiplas carreiras.",
+    "causa": "Ausência de um exame prévio que direcione a escolha dos candidatos.",
+    "vitima": "A administração pública e os candidatos.",
+    "culpado": "O modelo anterior de concursos.",
+    "solucao": "Instituição do Exame Nacional da Advocacia Pública (Enap).",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Se a medida fosse adotada por um governo de direita, o texto provavelmente seria similar, pois se limita a relatar a portaria e uma declaração de apoio. Não há elementos que indiquem favorecimento a um campo.",
+   "atores": [
+    {
+     "nome": "Advocacia-Geral da União (AGU)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Jorge Messias",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Esther Dweck",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o ministro Jorge Messias, advogado-geral da União",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "a ministra da Gestão e da Inovação em Serviços Públicos, Esther Dweck",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3fa2929b6599",
+   "url": "https://www.poder360.com.br/poder-economia/vendas-no-varejo-avancam-02-em-setembro-diz-ibge/",
+   "titulo": "Vendas no varejo avançam 0,2% em setembro, diz IBGE",
+   "veiculo": "Poder360",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Dados do varejo divulgados pelo IBGE, com impacto econômico, mas sem disputa político-ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 326,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desempenho do comércio varejista em setembro.",
+    "causa": "Fatores econômicos não especificados no texto.",
+    "vitima": "Não se aplica.",
+    "culpado": "Não se aplica.",
+    "solucao": "Não se aplica.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se as vendas tivessem caído, o texto seria similar, apenas com os números negativos. Não há elementos de viés.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "IBGE (Instituto Brasileiro de Geografia e Estatística)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "837c2b3aaa63",
+   "url": "https://climainfo.org.br/2026/11/12/lula-brasil-tem-obrigacao-moral-de-sediar-conferencia-pelo-fim-dos-combustiveis-fosseis/",
+   "titulo": "Lula: Brasil tem obrigação moral de sediar conferência pelo fim dos combustíveis fósseis",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "lula-defende-combustiveis-fosseis-na-cop31-e-ger",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a atuação do presidente Lula na COP31, suas propostas climáticas e críticas a líderes internacionais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 40,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 995,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de financiamento de países ricos para a preservação ambiental e transição energética.",
+    "causa": "Omissão histórica de potências globais como EUA e países europeus.",
+    "vitima": "Países em desenvolvimento e o futuro climático global.",
+    "culpado": "Países ricos e líderes negligentes com o meio ambiente.",
+    "solucao": "Adesão ao Fundo Florestas Tropicais para Sempre e abandono dos combustíveis fósseis.",
+    "motor_moral": "responsabilidade_ambiental"
+   },
+   "teste_inversao": "Se o texto fosse sobre um líder de direita aclamado com termos elogiosos e críticos a adversários da esquerda, o tom da redação seria considerado laudatório. O foco central valoriza amplamente a imagem de Lula.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Emmanuel Macron",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Marcio Astrini",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    },
+    {
+     "rotulo": "Américo Martins",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": false
+    },
+    {
+     "rotulo": "André Janones",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 74,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 110,
+    "direita": 0
+   },
+   "falas": 14,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "62b98b24a3fc",
+   "url": "https://www.moneytimes.com.br/vendas-no-varejo-do-brasil-surpreendem-com-alta-de-02-em-setembro-jcav/",
+   "titulo": "Vendas no varejo do Brasil surpreendem com alta de 0,2% em setembro",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Reportagem econômica sobre dados de vendas no varejo brasileiro divulgados pelo IBGE."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 397,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Variações reduzidas e estabilidade no setor varejista.",
+    "causa": "Arrefecimento geral da economia no terceiro trimestre.",
+    "vitima": "Setor de comércio e serviços.",
+    "culpado": "Nenhum",
+    "solucao": "Acompanhamento dos indicadores econômicos futuros.",
+    "motor_moral": "desenvolvimento_economico"
+   },
+   "teste_inversao": "O texto apresenta dados puramente estatísticos e informativos, mantendo neutralidade metodológica independentemente do governo vigente.",
+   "atores": [
+    {
+     "nome": "IBGE",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Banco Central",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Cristiano Santos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 13,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "13a3816e7d54",
+   "url": "https://www.seudinheiro.com/2026/economia/nova-ceo-da-nvidia-colette-kress-esta-ha-13-anos-na-companhia-e-ja-passou-pela-microsoft/",
+   "titulo": "Nova CEO da Nvidia, Colette Kress está há 13 anos na companhia e já passou pela Microsoft",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "jensen-huang-renuncia-a-presidencia-da-nvidia-ap",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Notícia sobre mudança na diretoria executiva da empresa Nvidia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "10 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 524,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 10,
+   "enquadramento": {
+    "problema": "Renúncia do antigo CEO da Nvidia devido a escândalo pessoal.",
+    "causa": "Relacionamento com empresária suspeita de espionagem.",
+    "vitima": "Reputação da governança corporativa.",
+    "culpado": "Jensen Huang",
+    "solucao": "Nomeação de Colette Kress como CEO interina.",
+    "motor_moral": "governanca_corporativa"
+   },
+   "teste_inversao": "Tratando-se de perfil corporativo sem viés ideológico, o texto seria redigido exatamente da mesma forma para qualquer executivo.",
+   "atores": [
+    {
+     "nome": "Colette Kress",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Jensen Huang",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Segundo a revista Fortune",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso consistente de fontes documentais e veículos de imprensa para fundamentar a trajetória da executiva.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5b467e083e8b",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/12/stf-acaba-com-iseno-de-pena-em-crimes-patrimoniais-em-caso-de-violncia-domstica-e-familiar.ghtml",
+   "titulo": "STF acaba com isenção de pena em crimes patrimoniais em caso de violência doméstica e familiar",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "stf-declara-inconstitucional-isencao-de-pena-em",
+   "origem": "materia",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Decisão do STF sobre imunidade penal em crimes patrimoniais no âmbito familiar."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 593,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Imunidade penal para crimes patrimoniais cometidos entre familiares.",
+    "causa": "Previsão em artigos antigos do Código Penal sob a justificativa de proteção à família.",
+    "vitima": "Familiares vulneráveis, incluindo mulheres e idosos alvos de violência patrimonial.",
+    "culpado": "Legislação anterior defasada.",
+    "solucao": "Declaração de inconstitucionalidade dos artigos pelo STF.",
+    "motor_moral": "justica_social"
+   },
+   "teste_inversao": "A notícia de caráter jurídico relata um julgamento unânime do STF, mantendo o mesmo padrão descritivo independentemente da orientação política dos magistrados.",
+   "atores": [
+    {
+     "nome": "Supremo Tribunal Federal (STF)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministro Alexandre de Moraes",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Alexandre de Moraes",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "Luiz Fux",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 48,
+     "ultima": false
+    },
+    {
+     "rotulo": "Cármen Lúcia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "destacou o aspecto feminino da questão",
+     "paragrafo": "P12",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso equilibrado de verbos de atribuição neutros para relatar as manifestações dos ministros da Corte.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f923690d0f10",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/defesa-de-nome-da-america-latina-para-chefiar-onu-une-lula-milei-delcy-e-keiko.shtml",
+   "titulo": "Defesa de nome da América Latina para chefiar ONU une Lula, Milei, Delcy e Keiko",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Articulação de líderes latino-americanos por um candidato regional para a chefia da ONU."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 956,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Falta de representatividade da América Latina no cargo de secretário-geral da ONU.",
+    "causa": "Ausência de consenso histórico e divisão geopolítica no Conselho de Segurança.",
+    "vitima": "Países da região desprovidos de liderança máxima na organização.",
+    "culpado": "Estrutura de poder da ONU e vetos dos P5.",
+    "solucao": "Envio de carta conjunta exigindo nome latino-americano.",
+    "motor_moral": "cooperacao_internacional"
+   },
+   "teste_inversao": "O texto destaca a pluralidade improvável de assinaturas na carta sem conferir juízo de valor partidário a nenhum dos líderes envolvidos.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Javier Milei",
+     "campo": "direita"
+    },
+    {
+     "nome": "Delcy Rodríguez",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "algo, no mínimo, improvável na atual conjuntura regional",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A redação aponta com clareza a inusitada convergência entre líderes de espectros políticos opostos (Lula, Milei e Delcy Rodríguez).",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "34375ea39db7",
+   "url": "https://www.poder360.com.br/poder-tech/outlook-e-outras-ferramentas-da-microsoft-seguem-com-instabilidade/",
+   "titulo": "Outlook e outras ferramentas da Microsoft seguem com instabilidade",
+   "veiculo": "Poder360",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "microsoft-enfrenta-pane-global-que-afeta-outlook",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre instabilidade técnica em ferramentas corporativas da Microsoft, sem disputa político-ideológica central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 348,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Instabilidade técnica em serviços da Microsoft.",
+    "causa": "Falha na infraestrutura de servidores e Exchange Online.",
+    "vitima": "Usuários e clientes corporativos da Microsoft.",
+    "culpado": "Nenhum (problema técnico sem indício de atividade maliciosa).",
+    "solucao": "Recuperação da infraestrutura e restauração gradual do tráfego.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente factual e informativo sobre um problema corporativo de tecnologia, aplicando-se de forma idêntica a qualquer outra empresa em situação semelhante.",
+   "atores": [
+    {
+     "nome": "Microsoft",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a empresa",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 162,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a9732c1963ee",
+   "url": "https://www.moneytimes.com.br/cni-e-fiesp-criticam-texto-do-ajuste-fiscal-aumento-de-imposto-na-veia-mlem/",
+   "titulo": "‘Aumento de imposto na veia’: CNI e Fiesp criticam texto do ajuste fiscal",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "senado-aprova-texto-base-de-pacote-fiscal-e-gera",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda críticas de entidades industriais (CNI e Fiesp) a projeto de ajuste fiscal aprovado no Senado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 79,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 868,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Projeto de ajuste fiscal eleva a carga tributária sobre o setor produtivo.",
+    "causa": "Foco do governo em aumentar receitas por impostos em vez de cortar gastos públicos.",
+    "vitima": "Empresas e consumidores.",
+    "culpado": "Governo Federal e Senado.",
+    "solucao": "Modificação do texto para focar na redução da despesa pública.",
+    "motor_moral": "responsabilidade fiscal e competitividade econômica"
+   },
+   "teste_inversao": "O texto relata criticamente as posições de entidades empresariais contra um projeto fiscal governamental, dando espaço adequado às reclamações do setor produtivo sem juízos de valor próprios da redação.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Jaques Wagner",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "CNI",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Fiesp",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "CNI",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 132,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ricardo Alban",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "Fiesp",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 122,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 277
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1ae9081aa1c1",
+   "url": "https://valor.globo.com/legislacao/noticia/2026/11/13/stf-nega-pedido-de-poupadores-sobre-expurgos.ghtml",
+   "titulo": "STF nega pedido de poupadores sobre expurgos",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "stf-nega-recursos-de-poupadores-e-encerra-acao-s",
+   "origem": "materia",
+   "data_publicacao": "2026-11-13",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de decisão do STF sobre planos econômicos e indenizações a poupadores, envolvendo entidades de classe e instituições financeiras."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 704,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade de ressarcimento a poupadores e litígios prolongados sobre planos econômicos.",
+    "causa": "Complexidade jurídica e obrigatoriedade de adesão voluntária aos acordos.",
+    "vitima": "Poupadores.",
+    "culpado": "Bancos e instâncias jurídicas históricas.",
+    "solucao": "Permitir prosseguimento de ações na justiça individualmente.",
+    "motor_moral": "segurança jurídica e direito de defesa"
+   },
+   "teste_inversao": "A cobertura do julgamento do STF é equilibrada, registrando a decisão da Corte, as posições dos ministros, a visão dos advogados e as reivindicações da entidade dos poupadores.",
+   "atores": [
+    {
+     "nome": "STF",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Febrapo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "André Mendonça",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": false
+    },
+    {
+     "rotulo": "Cristiano Zanin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": false
+    },
+    {
+     "rotulo": "Paulo Cavalcanti",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": false
+    },
+    {
+     "rotulo": "Febrapo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "211c0d260148",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/e-triste-a-mentalidade-machista-persistir-diz-papa-em-discurso-dedicado-as-mulheres.shtml",
+   "titulo": "É triste a mentalidade machista persistir, diz papa em discurso dedicado às mulheres",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "costumes",
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "Aborda discurso do papa Leão 14 no Peru sobre machismo, migração, criminalidade e papéis de gênero."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1189,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Violência contra as mulheres, desigualdade social e criminalidade associada à imigração.",
+    "causa": "Mentalidade machista e aumento da chegada de estrangeiros.",
+    "vitima": "Mulheres, crianças e cidadãos peruanos afetados pela insegurança.",
+    "culpado": "Agressores e imigrantes (segundo relatos populares).",
+    "solucao": "Respeito à dignidade humana, diálogo e políticas de segurança e proteção.",
+    "motor_moral": "dignidade humana e solidariedade"
+   },
+   "teste_inversao": "A reportagem relata os discursos papais e registra a perspectiva popular local (incluindo visões restritivas sobre imigrantes) de forma equilibrada e sem endosso institucional direto da redação.",
+   "atores": [
+    {
+     "nome": "Papa Leão 14",
+     "campo": "centro"
+    },
+    {
+     "nome": "Keiko Fujimori",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "papa Leão 14",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 277,
+     "ultima": true
+    },
+    {
+     "rotulo": "Corina Barreto",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 117,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 23,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "419a0bc20151",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/12/video-mostra-resgate-de-vitima-de-desabamento-de-predio-no-brooklyn-em-nova-york.ghtml",
+   "titulo": "Desabamento de prédio no Brooklyn: número de mortos sobe para 8; VÍDEO mostra resgate",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-12",
+   "analisado_em": "2026-11-13",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia factual sobre o desabamento de um prédio no Brooklyn e o trabalho de resgate."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 343,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Desabamento parcial de edifício residencial e comercial no Brooklyn.",
+    "causa": "Possível obra realizada ao lado do edifício.",
+    "vitima": "Moradores e pessoas atingidas pelo desabamento.",
+    "culpado": "Possivelmente associado a obras no local (em apuração).",
+    "solucao": "Trabalho de equipes de bombeiros e resgate de sobreviventes.",
+    "motor_moral": "preservação da vida humana"
+   },
+   "teste_inversao": "O texto é um relato jornalístico estritamente factual de um acidente urbano, aplicando-se com total neutralidade a qualquer evento análogo.",
+   "atores": [
+    {
+     "nome": "Zohran Mamdani",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-13T15:02:10+00:00",
+   "provedor": "gemini_lite → sensenova",
+   "modelo": "gemini-flash-lite-latest + sensenova-6.8-flash-lite",
+   "candidatos": 120,
+   "textos_curtos": 28,
+   "falhas": 30,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 51555,
+    "saida": 39406
+   },
+   "analises": [
+    "90df3d6c709f",
+    "53a1f1129a90",
+    "41dd47f2d6a4",
+    "976de0428b25",
+    "9ce74ee81a1b",
+    "a8ec01502800",
+    "567652159b3c",
+    "f25177c40251",
+    "9cbbc6926443",
+    "c29c2e24bd2b",
+    "2b1cf10c4462",
+    "c8a66010a6f9",
+    "3e838a3f767f",
+    "c5ccad813de4",
+    "4a2754043d58",
+    "7ad41e90c680",
+    "f4c18547fa69",
+    "288757b01e66",
+    "a456d87b9c71",
+    "3fa2929b6599",
+    "837c2b3aaa63",
+    "62b98b24a3fc",
+    "13a3816e7d54",
+    "5b467e083e8b",
+    "f923690d0f10",
+    "34375ea39db7",
+    "a9732c1963ee",
+    "1ae9081aa1c1",
+    "211c0d260148",
+    "419a0bc20151"
+   ]
+  }
+ ]
+}
