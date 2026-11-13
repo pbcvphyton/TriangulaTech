@@ -384,6 +384,9 @@ def test_a_edicao_mostra_as_fichas_e_o_botao_so_com_a_aba_publicada(publicado: t
     assert 'href="./congresso.html#p=cd-7"' in arquivada
     # a edição guarda o retrato do dia: ida e volta pelo JSON
     assert type(edition).from_dict(edition.to_dict()).congresso == edition.congresso
+    # sem fichas, o JSON da edição não ganha a chave (fica como antes, byte a byte)
+    edition.congresso = None
+    assert "congresso" not in edition.to_dict() and type(edition).from_dict(edition.to_dict()).congresso is None
 
 
 def test_anexar_congresso_nunca_derruba_a_edicao(tmp_path: Path, config: Config):

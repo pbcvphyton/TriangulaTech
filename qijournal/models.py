@@ -419,7 +419,7 @@ class Edition:
         raise KeyError(story_id)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        dados: dict[str, Any] = {
             "date": self.date,
             "date_label": self.date_label,
             "generated_at": self.generated_at,
@@ -440,8 +440,11 @@ class Edition:
             "rationale": self.rationale.to_dict() if self.rationale else None,
             "index": [t.to_dict() for t in self.index],
             "termometro": copy.deepcopy(self.termometro) if self.termometro is not None else None,
-            "congresso": copy.deepcopy(self.congresso) if self.congresso is not None else None,
         }
+        # Só quando há fichas: sem o Congresso, o JSON da edição fica como antes, byte a byte.
+        if self.congresso is not None:
+            dados["congresso"] = copy.deepcopy(self.congresso)
+        return dados
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Edition":
