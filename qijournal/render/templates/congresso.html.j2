@@ -112,7 +112,7 @@
     <header class="az-lh" id="cg-polos">
       <p class="az-ln"><b>1</b>Com quem vota</p>
       <h3 class="az-lt" id="cg-polos-h">Por baixo dos rótulos, de que lado cada um fica</h3>
-      <p class="az-ld">Só contam as votações de conteúdo em que a esquerda ({{ c.polos.esquerda }}) e a direita ({{ c.polos.direita }}) ficaram em lados opostos. O saldo de cada um vai de −100, sempre com a esquerda, a +100, sempre com a direita. Não é o que a pessoa diz ser: é com quem ela vota.</p>
+      <p class="az-ld">Só contam as votações de conteúdo em que a esquerda ({{ c.polos.esquerda }}) e a direita ({{ c.polos.direita }}) ficaram em lados opostos, sem nenhum partido de um polo votando com o outro. O saldo de cada um vai de −100, sempre com a esquerda, a +100, sempre com a direita. Não é o que a pessoa diz ser: é com quem ela vota.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -151,6 +151,27 @@
         </div>
         {{ legenda() }}
         <p class="az-dek">O número pequeno ao lado do tema é quantas votações divisivas ele teve; ao lado do partido, quantos parlamentares em exercício. Célula com ponto: menos de 5 votações, sem saldo.</p>
+      </div>
+      {% endif %}
+
+      {% if casa.rachas %}
+      <div class="az-blk" id="cg-rachas-{{ casa.id }}">
+        <h4 class="az-h">Onde cada polo racha <span>quando um partido de um lado vota com o outro</span></h4>
+        <p class="az-dek">Das {{ casa.rachas.opostas }} votações de conteúdo em que esquerda e direita se opuseram, estas tiveram um partido de um polo votando fechado com o outro. Ficam fora do saldo: quando o PSOL vota com o PL contra o PT, em geral os dois votam contra o governo por razões opostas, e a votação não diz quem é mais de esquerda ou de direita. A lista mostra onde está a divergência.</p>
+        {% for p in casa.rachas.partidos %}
+        <div class="cg-rc">
+          <p class="cg-rc-h"><b class="cg-rc-s cg-{{ p.classe }}">{{ p.sigla }}</b> votou com a <b>{{ p.com }}</b>, contra o resto da {{ p.polo }}, em <b>{{ p.n }}</b> {{ "votação" if p.n_int == 1 else "votações" }}{% if p.contra_governo != "0" %}; em {{ p.contra_governo }}, contra a orientação do governo{% endif %}.</p>
+          {% if p.temas %}<p class="cg-rc-t">{% for t in p.temas %}<span class="cg-chip">{{ t.nome }} <b>{{ t.n }}</b></span>{% endfor %}</p>{% endif %}
+          <ol class="cg-rc-l">
+            {% for i in p.itens %}
+            <li><p class="cg-rc-k"><time>{{ i.data }}</time><span class="az-selo">{{ i.tipo }}</span>{% if i.resultado %}<span>{{ i.resultado }}</span>{% endif %}</p>
+              <p class="cg-rc-e">{% if i.prop %}<b>{{ i.prop }}</b> {% endif %}{{ i.ementa }}</p>
+              <p class="cg-rc-v">{{ p.sigla }}: <b>{{ i.lado }}</b>{% if i.parte and i.parte < 100 %} ({{ i.parte }}%){% endif %} · resto da {{ p.polo }}: <b>{{ i.polo }}</b> · governo: <b>{{ i.gov or "—" }}</b>{% if i.temas %} · {{ i.temas|join(", ") }}{% endif %}</p></li>
+            {% endfor %}
+          </ol>
+          {% if p.mais %}<p class="az-dek">E mais {{ p.mais }}.</p>{% endif %}
+        </div>
+        {% endfor %}
       </div>
       {% endif %}
 
@@ -195,6 +216,66 @@
           {% endfor %}
         </ol>
       </div>
+      {% if casa.relevancia %}{% set rv = casa.relevancia %}{% set g = rv.grafico %}
+      <div class="az-blk cg-rv" id="cg-relev-{{ casa.id }}">
+        <h4 class="az-h">O que espera × o que passa <span>a mesma régua para as matérias prontas e para as aprovadas</span></h4>
+        <p class="az-dek">Cada ponto é uma matéria: as {{ rv.esperam_n }} prontas para o Plenário e fora da pauta (círculos vazios) e as {{ rv.passaram_n }} aprovadas pelo Plenário nos últimos 12 meses (pontos cheios). Na altura, a nota de relevância, de 0 a 100, feita de sinais que dá para medir nos registros: {% if rv.sem_demanda %}a origem, o alcance da norma e o apoio entre partidos (os dados do Senado não dizem quantos projetos parecidos tramitam juntos){% else %}os projetos parecidos anexados, a origem, o alcance da norma e o apoio entre partidos{% endif %}. Na largura, o tempo desde o protocolo. Em cima e à direita fica o que tem sinais fortes e espera há anos; embaixo e à esquerda, o que passou rápido com sinais fracos.</p>
+        <figure class="cg-gr" data-grafico>
+          <div class="cg-gr-w">
+            <svg viewBox="0 0 {{ g.w }} {{ g.h }}" role="img" aria-labelledby="cg-gr-t-{{ casa.id }}">
+              <title id="cg-gr-t-{{ casa.id }}">Nota de relevância por tempo desde o protocolo: {{ rv.esperam_n }} matérias esperando e {{ rv.passaram_n }} aprovadas. A tabela abaixo do gráfico tem todos os pontos.</title>
+              <rect class="cg-gr-faixa" x="{{ g.l }}" y="{{ g.t }}" width="{{ g.largura }}" height="{{ g.alta - g.t }}"></rect>
+              <rect class="cg-gr-faixa" x="{{ g.l }}" y="{{ g.baixa }}" width="{{ g.largura }}" height="{{ g.b - g.baixa }}"></rect>
+              <text class="cg-gr-fx" x="{{ g.l + 6 }}" y="{{ g.t + 12 }}">sinais fortes ({{ rv.alta }} ou mais)</text>
+              <text class="cg-gr-fx" x="{{ g.l + 6 }}" y="{{ g.b - 6 }}">sinais fracos (abaixo de {{ rv.baixa }})</text>
+              {% for t in g.yticks %}<line class="cg-gr-grade" x1="{{ g.l }}" x2="{{ g.r }}" y1="{{ t.y }}" y2="{{ t.y }}"></line><text class="cg-gr-ty" x="{{ g.l - 8 }}" y="{{ t.y + 4 }}">{{ t.rotulo }}</text>{% endfor %}
+              {% for t in g.xticks %}<text class="cg-gr-tx{% if t.fim %} cg-gr-tx-fim{% endif %}" x="{{ t.x }}" y="{{ g.b + 18 }}">{{ t.rotulo }}</text>{% endfor %}
+              <line class="cg-gr-guia" x1="{{ g.x_rapida }}" x2="{{ g.x_rapida }}" y1="{{ g.t }}" y2="{{ g.b }}"></line>
+              <text class="cg-gr-tg" x="{{ g.x_rapida - 4 }}" y="{{ g.t + 28 }}">120 dias</text>
+              <text class="cg-gr-ex" x="{{ (g.l + g.r) / 2 }}" y="{{ g.h - 4 }}">tempo desde o protocolo (escala logarítmica)</text>
+              <g class="cg-gr-pts">{% for p in g.pontos %}<circle class="cg-gr-{{ p.g }}" cx="{{ p.x }}" cy="{{ p.y }}" r="4" data-t="{{ p.t }}" data-n="{{ p.n }}" data-tempo="{{ p.tempo }}" data-s="{{ p.situacao }}"></circle>{% endfor %}</g>
+            </svg>
+          </div>
+          <div class="cg-gr-dica" role="status" hidden></div>
+          <figcaption class="cg-gr-leg"><span><i class="cg-gr-le" aria-hidden="true"></i>pronta para o Plenário, esperando</span><span><i class="cg-gr-la" aria-hidden="true"></i>aprovada pelo Plenário (12 meses)</span><span>linha: 120 dias do protocolo</span></figcaption>
+        </figure>
+        <div class="az-2c">
+          <div class="az-col">
+            <h5 class="cg-rv-h">Sinais fortes, esperando <span>{{ rv.fortes_paradas }} com nota {{ rv.alta }} ou mais estão sem andamento há mais de um ano</span></h5>
+            <ol class="cg-ls cg-rv-l">
+              {% for i in rv.esperam %}
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span class="cg-rv-n">nota {{ i.n }}</span></p>
+                <p class="cg-ls-x">{{ i.e }}</p>
+                <p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
+                <p class="cg-rv-q">último andamento em {{ i.pronta }} · protocolada há {{ i.idade }}{% if i.urg %} · em regime de urgência, e não votada{% endif %}</p></li>
+              {% endfor %}
+            </ol>
+          </div>
+          <div class="az-col">
+            <h5 class="cg-rv-h">Sinais fracos, aprovadas <span>{{ rv.fracas_rapidas }} com nota abaixo de {{ rv.baixa }} passaram em menos de 120 dias; da mais rápida</span></h5>
+            <ol class="cg-ls cg-rv-l">
+              {% for i in rv.passaram %}
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span class="cg-rv-n">nota {{ i.n }}</span></p>
+                <p class="cg-ls-x">{{ i.e }}</p>
+                {% if i.sinais %}<p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
+                <p class="cg-rv-q">aprovada em {{ i.aprovada }}, {{ i.tempo }} depois do protocolo{% if i.autoria %} · {{ i.autoria }}{% endif %}</p>
+                {% if i.passos %}<p class="cg-rv-c">Por que andou: {{ i.passos|join("; ") }}.</p>{% endif %}</li>
+              {% endfor %}
+            </ol>
+          </div>
+        </div>
+        <details class="cg-rv-tb">
+          <summary>Todos os pontos do gráfico, em tabela</summary>
+          <div class="an-tbl-wrap">
+            <table class="an-tbl cg-tb">
+              <thead><tr><th scope="col">Matéria</th><th scope="col">Situação</th><th scope="col">Nota</th><th scope="col">Desde o protocolo</th></tr></thead>
+              <tbody>{% for p in rv.tabela %}<tr><th scope="row">{{ p.t }}</th><td>{{ p.situacao }}</td><td>{{ p.n }}</td><td>{{ p.tempo }}</td></tr>{% endfor %}</tbody>
+            </table>
+          </div>
+        </details>
+        <p class="az-dek">A nota não diz se a matéria é boa ou ruim: diz quantos sinais de relevância pública ela tem nos registros oficiais. Os pesos estão no "Como ler" e são escolha editorial. Medidas provisórias ficam de fora, porque têm prazo na Constituição. Na Câmara, "por que andou" sai do histórico oficial de cada matéria.</p>
+      </div>
+      {% endif %}
       <div class="az-2c">
         <div class="az-col">
           {% if f.orgaos %}
@@ -275,7 +356,7 @@
         {% for v in casa.ultimas %}
         <li class="cg-v">
           <div class="cg-v-h">
-            <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
+            <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.racha %}<span class="cg-div cg-div-r">racha: {{ v.racha|join(", ") }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
             <h5 class="cg-v-t">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}{{ v.descricao }}</h5>
             {% if v.ementa %}<p class="cg-v-e">{{ v.ementa }}</p>{% endif %}
           </div>

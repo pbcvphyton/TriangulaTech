@@ -139,6 +139,41 @@
   try { casaInicial = w.sessionStorage.getItem('qij-casa'); } catch (erro) { casaInicial = null; }
   if (casas && !casas.hidden) verCasa(casaInicial === 'sf' ? 'sf' : 'cd'); else filtrar();
 
+  /* O gráfico "o que espera × o que passa": a dica do ponto mais próximo do ponteiro. */
+  lista(d.querySelectorAll('[data-grafico]')).forEach(function (fig) {
+    var svg = fig.querySelector('svg'), dica = fig.querySelector('.cg-gr-dica');
+    if (!svg || !dica || !svg.getScreenCTM) return;
+    var pontos = lista(svg.querySelectorAll('circle')), ativo = null;
+    function apagar() { if (ativo) ativo.classList.remove('on'); ativo = null; dica.hidden = true; }
+    svg.addEventListener('pointermove', function (ev) {
+      var m = svg.getScreenCTM();
+      if (!m) return;
+      var pt = svg.createSVGPoint();
+      pt.x = ev.clientX; pt.y = ev.clientY;
+      var p = pt.matrixTransform(m.inverse()), melhor = null, dist = 14 * 14;
+      pontos.forEach(function (c) {
+        var dx = c.cx.baseVal.value - p.x, dy = c.cy.baseVal.value - p.y, d2 = dx * dx + dy * dy;
+        if (d2 < dist) { dist = d2; melhor = c; }
+      });
+      if (!melhor) { apagar(); return; }
+      if (melhor !== ativo) {
+        if (ativo) ativo.classList.remove('on');
+        ativo = melhor;
+        ativo.classList.add('on');
+        while (dica.firstChild) dica.removeChild(dica.firstChild);
+        dica.appendChild(h('b', { text: 'nota ' + melhor.getAttribute('data-n') }));
+        dica.appendChild(h('span', { text: melhor.getAttribute('data-t') + ' · ' + melhor.getAttribute('data-s') + ' · ' + melhor.getAttribute('data-tempo') + ' desde o protocolo' }));
+      }
+      var caixa = fig.getBoundingClientRect(), q = ativo.getBoundingClientRect();
+      var x = q.left - caixa.left + 12, y = q.top - caixa.top - 8;
+      dica.hidden = false;
+      if (x + dica.offsetWidth > caixa.width) x = Math.max(0, q.left - caixa.left - dica.offsetWidth - 12);
+      dica.style.left = x + 'px';
+      dica.style.top = Math.max(0, y - dica.offsetHeight) + 'px';
+    });
+    svg.addEventListener('pointerleave', apagar);
+  });
+
   /* O dossiê. */
   var mo = d.getElementById('cgDossie'), dentro = d.getElementById('cgDossieIn');
   var cache = {}, foco = null, aberto = null;
@@ -147,7 +182,8 @@
     var k = h('p', { cls: 'cg-ms-k' }, [h('time', { text: dataBr(m.d) }), h('span', { text: (M.tipos || {})[m.t] || m.t }), h('span', { cls: 'cg-ms-v', text: voto(m) })]);
     if (extra) k.appendChild(h('span', { text: extra }));
     var t = h('p', { cls: 'cg-ms-t' }, [m.p ? h('b', { text: m.p + ' ' }) : null, m.x || '']);
-    return h('li', {}, [k, t, m.e ? h('p', { cls: 'cg-ms-e', text: m.e }) : null]);
+    var tm = (m.tm || []).length ? h('p', { cls: 'cg-ms-tm' }, m.tm.slice(0, 3).map(function (x) { return h('span', { cls: 'cg-chip', text: (M.temas || {})[x] || x }); })) : null;
+    return h('li', {}, [k, t, m.e ? h('p', { cls: 'cg-ms-e', text: m.e }) : null, tm]);
   }
   function listaDeMarcas(itens, fn) {
     return h('ol', { cls: 'cg-ms' }, itens.map(function (m) { return marcaItem(m, fn ? fn(m) : ''); }));
@@ -212,11 +248,13 @@
 
     /* Por tema. */
     var temas = (f.temas || []).filter(function (t) { return t.eixo || t.gov; });
+    var geral = f.campo ? f.campo.saldo : null;
     if (temas.length) {
       var corpo = temas.map(function (t) {
         var e = t.eixo, g = t.gov;
-        return h('tr', {}, [
-          h('th', { scope: 'row', text: t.nome }),
+        var vira = !!t.vira;  // do lado oposto ao geral, passando do acaso (Holm a 1% entre os temas da pessoa)
+        return h('tr', { cls: vira ? 'cg-vira' : null }, [
+          h('th', { scope: 'row' }, [t.nome, vira ? h('span', { cls: 'cg-vira-s', text: 'vira de lado' }) : null]),
           h('td', { cls: 'an-l' }, [e && e.n >= 5 ? barra(e.saldo) : null]),
           h('td', { text: e && e.n >= 5 ? saldo(e.saldo) : '—' }), h('td', { text: e ? num(e.n) : '—' }),
           h('td', { text: g ? pct(g.pct) : '—' }), h('td', { text: num(t.sim) + ' × ' + num(t.nao) })
@@ -227,7 +265,7 @@
           h('thead', {}, [h('tr', {}, ['Tema', 'Com quem vota', 'Saldo', 'Divisivas', 'Com o governo', 'Sim × Não'].map(function (x, i) { return h('th', { scope: 'col', cls: i === 1 ? 'an-l' : null, text: x }); }))]),
           h('tbody', {}, corpo)
         ])]),
-        h('p', { cls: 'cg-d-n', text: 'Saldo: −100 = sempre com a esquerda; +100 = sempre com a direita. Só aparece com 5 votações divisivas ou mais no tema.' })
+        h('p', { cls: 'cg-d-n', text: 'Saldo: −100 = sempre com a esquerda; +100 = sempre com a direita. Só aparece com 5 votações divisivas ou mais no tema. "Vira de lado": o tema fica do lado oposto ao do saldo geral, e a diferença passa do acaso contando os temas da pessoa (teste binomial, 99%).' })
       ]));
     }
 
@@ -243,6 +281,27 @@
       var trocas = (f.partidos || []).map(function (p) { return p[1] + ' (' + p[0].slice(0, 4) + ')'; }).join(' → ');
       nos.push(secao('Semestre a semestre', 'quanto votou com o governo da vez', [colunas, eixoX,
         h('p', { cls: 'cg-d-n', text: 'A altura é a parte dos votos iguais à orientação do governo em cada semestre (o governo muda em 2023).' + (trocas ? ' Partidos: ' + trocas + '.' : '') })]));
+    }
+
+    /* Onde sai da linha, por assunto. */
+    var ft = f.fora_tema || [], fo = f.fora || {};
+    if (ft.length) {
+      var outro = geral === null ? '' : (geral > 0 ? 'esquerda' : 'direita');
+      var cabecalho = ['Tema', 'Contra o próprio partido'].concat(Math.abs(geral || 0) >= 60 ? ['Com a ' + outro] : []);
+      var linhasFt = ft.slice(0, 10).map(function (t) {
+        var celulas = [h('th', { scope: 'row', text: t.nome }), h('td', { text: t.partido ? num(t.partido) : '—' })];
+        if (Math.abs(geral || 0) >= 60) celulas.push(h('td', { text: t.polo ? num(t.polo) : '—' }));
+        return h('tr', {}, celulas);
+      });
+      var resumo = 'Votou contra o próprio partido fechado em ' + num(fo.partido || 0) + (fo.partido === 1 ? ' votação' : ' votações');
+      if (Math.abs(geral || 0) >= 60) resumo += ' e com a ' + outro + ' em ' + num(fo.polo || 0) + ' das ' + num(f.campo.n) + ' votações em que esquerda e direita se opuseram';
+      nos.push(secao('Onde sai da linha, por assunto', 'os temas das votações fora do padrão', [
+        h('p', { cls: 'cg-d-n', text: resumo + '. Uma votação com dois temas conta nos dois.' }),
+        h('div', { cls: 'an-tbl-wrap' }, [h('table', { cls: 'an-tbl cg-tb' }, [
+          h('thead', {}, [h('tr', {}, cabecalho.map(function (x) { return h('th', { scope: 'col', text: x }); }))]),
+          h('tbody', {}, linhasFt)
+        ])])
+      ]));
     }
 
     /* Fora do padrão. */

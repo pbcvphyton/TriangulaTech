@@ -12,8 +12,12 @@ réguas de ``config/congresso.yaml`` (:mod:`.regras`):
   Não, quantas vezes votou igual; contado à parte em cada governo;
 - **campo** (com quem vota): só nas votações **de conteúdo** (texto principal,
   destaques e emendas) **divisivas**, em que a maioria do polo de esquerda votou de
-  um jeito e a do polo de direita, de outro. O saldo vai de −100 (sempre com a
-  esquerda) a +100 (sempre com a direita);
+  um jeito e a do polo de direita, de outro, e nenhum partido de um polo ficou com o
+  outro. O saldo vai de −100 (sempre com a esquerda) a +100 (sempre com a direita);
+- **rachas**: as votações em que os polos se opuseram mas um partido de um polo
+  ficou com o outro (o PSOL com o PL contra o PT, o NOVO com o PT contra o PL). Não
+  medem esquerda × direita (os dois extremos contra o governo, por razões opostas) e
+  ficam fora do saldo;
 - **fidelidade**: quantas vezes votou com a maioria do próprio partido (o partido
   do dia da votação); votar contra um partido fechado é **dissidência**;
 - **surpresas**: quem tem campo definido e, numa votação divisiva, ficou com o
@@ -108,10 +112,20 @@ class Leitura:
     esquerda: str = ""
     direita: str = ""
     partidos: dict[str, tuple[str, float, int]] = field(default_factory=dict)  # sigla → (lado, coesão, votos)
+    racha: dict[str, str] = field(default_factory=dict)  # partido de um polo → o polo com que votou (o outro)
+
+    @property
+    def opostos(self) -> bool:
+        """Os dois polos votaram em lados opostos, cada um com a coesão pedida."""
+        return bool(self.esquerda and self.direita and self.esquerda != self.direita)
 
     @property
     def divisiva(self) -> bool:
-        return bool(self.esquerda and self.direita and self.esquerda != self.direita)
+        """Esquerda contra direita: os polos se opuseram e nenhum partido de um polo ficou
+        com o outro. Quando o PSOL vota com o PL contra o PT (os dois extremos contra o
+        governo, por razões opostas), a votação não diz quem é de esquerda ou de direita:
+        vai para os rachas (``racha``)."""
+        return self.opostos and not self.racha
 
 
 @dataclass
@@ -145,6 +159,10 @@ class Perfil:
     recentes: list[Marca] = field(default_factory=list)  # votos em texto principal e urgência, do mais novo
     # legislatura → partido do dia → com que polo votou enquanto estava nele (para quem trocou de partido)
     eixos_por_partido: dict[int, dict[str, Eixo]] = field(default_factory=dict)
+    # Fora da linha, por legislatura: [votos contra o próprio partido fechado, votos com o outro
+    # polo] no total e em cada tema (uma votação com dois temas conta nos dois).
+    fora: dict[int, list[int]] = field(default_factory=dict)
+    fora_tema: dict[int, dict[str, list[int]]] = field(default_factory=dict)
     _divisivas: list[tuple[int, Votacao, str, str]] = field(default_factory=list, repr=False)  # (leg, votação, voto, polo)
 
 
@@ -178,6 +196,16 @@ def ler_votacao(v: Votacao, partidos: list[str], regras: Regras) -> Leitura:
             sim = sum(contagem[s][0] for s in siglas if s in contagem)
             nao = sum(contagem[s][1] for s in siglas if s in contagem)
             setattr(leitura, nome, _maioria(sim, nao, lim.minimo_polo, lim.coesao_polo)[0])
+        if leitura.opostos:
+            # Um partido de um polo que votou, fechado, com o outro polo: racha.
+            for siglas, outro in ((polos.esquerda, "direita"), (polos.direita, "esquerda")):
+                lado_do_outro = getattr(leitura, outro)
+                for s in sorted(siglas):
+                    if s not in contagem:
+                        continue
+                    lado, _parte = _maioria(*contagem[s], lim.minimo_partido, lim.coesao_polo)
+                    if lado and lado == lado_do_outro:
+                        leitura.racha[s] = outro
     return leitura
 
 
@@ -320,6 +348,10 @@ def calcular(
                     p.dissidencias.append(
                         Marca(votacao=v, voto=voto, partido=sigla, lado_partido=do_partido[0], coesao=do_partido[1])
                     )
+                    if leg is not None:
+                        p.fora.setdefault(leg.numero, [0, 0])[0] += 1
+                        for tema in v.temas:
+                            p.fora_tema.setdefault(leg.numero, {}).setdefault(tema, [0, 0])[0] += 1
                 if v.tipo in (base.MERITO, base.URGENCIA):
                     p.recentes.append(Marca(votacao=v, voto=voto, partido=sigla))
 
@@ -329,9 +361,13 @@ def calcular(
             if saldo is None or r.eixo.n < lim.minimo_divisivas or abs(saldo) < 60:
                 continue
             outro = "esquerda" if saldo > 0 else "direita"
-            p.surpresas += [
-                Marca(votacao=v, voto=voto, com=polo) for leg, v, voto, polo in p._divisivas if leg == numero and polo == outro
-            ]
+            cruzados = [(v, voto, polo) for leg, v, voto, polo in p._divisivas if leg == numero and polo == outro]
+            p.surpresas += [Marca(votacao=v, voto=voto, com=polo) for v, voto, polo in cruzados]
+            if cruzados:
+                p.fora.setdefault(numero, [0, 0])[1] += len(cruzados)
+            for v, _voto, _polo in cruzados:
+                for tema in v.temas:
+                    p.fora_tema.setdefault(numero, {}).setdefault(tema, [0, 0])[1] += 1
         chave = lambda m: (m.votacao.data, m.votacao.hora, m.votacao.id)  # noqa: E731
         peso = lambda m: (m.votacao.tipo == base.MERITO, *chave(m))  # noqa: E731
         p.dissidencias = sorted(p.dissidencias, key=peso, reverse=True)[:marcas]
@@ -473,6 +509,7 @@ def resumo_da_votacao(v: Votacao, ano: AnoVotos, indice: int, regras: Regras) ->
         "esquerda": leitura.esquerda,
         "direita": leitura.direita,
         "divisiva": leitura.divisiva,
+        "racha": dict(leitura.racha),
         "ori": v.ori,
         "partidos": por_partido,
     }

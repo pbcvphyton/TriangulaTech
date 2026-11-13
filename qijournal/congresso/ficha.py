@@ -108,6 +108,8 @@ def marca(m: Marca) -> dict[str, Any]:
         d["c"] = round(100 * m.coesao)
     if m.com:
         d["com"] = m.com
+    if v.temas:
+        d["tm"] = list(v.temas)
     return d
 
 
@@ -245,6 +247,14 @@ def montar(
             if cadastro.partido and set(por_partido) - {cadastro.partido}:
                 no_atual = por_partido.get(cadastro.partido) or Eixo()
                 ficha["campo"]["no_partido"] = {"saldo": pct(no_atual.saldo), "n": no_atual.n}
+        fora = perfil.fora.get(legislatura)
+        if fora and any(fora):
+            ficha["fora"] = {"partido": fora[0], "polo": fora[1]}
+            ficha["fora_tema"] = [
+                {"t": tema, "nome": regras.nome_do_tema(tema), "partido": a, "polo": b}
+                for tema, (a, b) in sorted(perfil.fora_tema.get(legislatura, {}).items(), key=lambda kv: (-(kv[1][0] + kv[1][1]), kv[0]))
+                if a or b
+            ]
         ficha["dissidencias"] = [marca(m) for m in perfil.dissidencias]
         ficha["surpresas"] = [marca(m) for m in perfil.surpresas]
         ficha["recentes"] = [marca(m) for m in perfil.recentes]

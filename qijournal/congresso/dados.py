@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import tempfile
 from collections import Counter, defaultdict
@@ -32,7 +33,7 @@ from typing import Any
 
 from .. import net, text
 from ..net import Fetcher
-from . import VERSAO, base, exercicio, ficha, fontes, jornal, perfil, projetos, regras as regras_mod, temas
+from . import VERSAO, base, exercicio, ficha, fontes, jornal, perfil, projetos, regras as regras_mod, relevancia, temas
 from .base import AnoVotos
 from .ficha import Cadastro
 from .fontes import Coletor
@@ -54,6 +55,10 @@ MINIMO_FIDELIDADE = 50  # votações com posição do partido para entrar nas li
 MINIMO_BANCADA = {"cd": 5, "sf": 3}  # parlamentares em exercício para o partido entrar na matriz de temas
 JANELA_FURARAM = 240  # dias em que uma votação de texto principal conta em "passaram na frente"
 RAPIDO = 120  # do protocolo ao voto em menos que isso: passou na frente
+RACHAS_LISTA = 10  # votações de cada partido na lista dos rachas
+TEMA_PESSOA = 10  # votações esquerda × direita num tema para comparar alguém com ele mesmo
+ALFA_TEMA = 0.01  # o desvio de um tema passa do acaso contando todas as comparações da Casa (Holm)
+MINIMO_RACHA = 5  # votações de um partido com o outro polo para virar achado
 
 
 @dataclass
@@ -311,6 +316,56 @@ def _matriz_de_temas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int,
     }
 
 
+def _rachas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int, lista: int = RACHAS_LISTA) -> dict[str, Any]:
+    """Onde cada polo racha: as votações de conteúdo em que os dois polos se opuseram,
+    mas um partido de um polo votou, fechado, com o outro (o PSOL com o PL contra o PT;
+    o NOVO com o PT contra o PL). Ficam fora do saldo e aparecem aqui, com o tema e a
+    orientação do governo de cada uma."""
+    por: dict[str, dict[str, Any]] = {}
+    opostas = 0
+    for ano in anos:
+        for k, v in enumerate(ano.votacoes):
+            leg = regras.legislatura_em(v.data)
+            if not v.plenario or v.secreta or leg is None or leg.numero != legislatura or v.tipo not in perfil.CONTEUDO:
+                continue
+            leitura = perfil.ler_votacao(v, [p.partido_em(k) for p in ano.pessoas], regras)
+            if not leitura.opostos:
+                continue
+            opostas += 1
+            for sigla, com in leitura.racha.items():
+                lado, parte, _n = leitura.partidos[sigla]
+                b = por.setdefault(
+                    sigla,
+                    {"sigla": sigla, "polo": "direita" if com == "esquerda" else "esquerda", "com": com, "n": 0, "contra_governo": 0, "com_governo": 0, "temas": Counter(), "itens": []},
+                )
+                b["n"] += 1
+                if leitura.governo:
+                    b["contra_governo" if lado != leitura.governo else "com_governo"] += 1
+                b["temas"].update(v.temas)
+                b["itens"].append(
+                    {
+                        "id": v.id,
+                        "d": v.data,
+                        "t": v.tipo,
+                        "p": v.prop,
+                        "e": text.truncate(v.ementa or v.descricao, 200),
+                        "tm": v.temas,
+                        "lado": lado,
+                        "parte": round(100 * parte),
+                        "polo": getattr(leitura, b["polo"]),
+                        "gov": leitura.governo,
+                        **({"ap": 1 if v.aprovada else 0} if v.aprovada is not None else {}),
+                    }
+                )
+    partidos = []
+    for b in sorted(por.values(), key=lambda b: (-b["n"], b["sigla"])):
+        b["itens"].sort(key=lambda i: (i["d"], i["id"]), reverse=True)
+        b["itens"] = b["itens"][:lista]
+        b["temas"] = [{"id": t, "nome": regras.nome_do_tema(t), "n": n} for t, n in b["temas"].most_common()]
+        partidos.append(b)
+    return {"opostas": opostas, "partidos": partidos}
+
+
 def _estatisticas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> dict[str, Any]:
     total = conteudo = divisivas = governo = secretas = 0
     datas: list[str] = []
@@ -396,6 +451,91 @@ def _furaram(anos: list[AnoVotos], props: Mapping[int, Proposicao], hoje: str) -
     }
 
 
+def _binomial_bicaudal(k: int, n: int, p: float) -> float:
+    """A chance, sob o acaso, de um resultado tão ou mais improvável que ``k`` em ``n``
+    sorteios de chance ``p`` (exata, dois lados: soma as chances que não passam a de ``k``)."""
+    if n <= 0:
+        return 1.0
+    chances = [math.comb(n, i) * p**i * (1 - p) ** (n - i) for i in range(n + 1)]
+    limite = chances[k] * (1 + 1e-9)
+    return min(1.0, sum(c for c in chances if c <= limite))
+
+
+def _holm(pvalores: Mapping[Any, float], alfa: float) -> set[Any]:
+    """As chaves que passam do acaso contando todas as comparações (Holm)."""
+    m = len(pvalores)
+    passam = set()
+    for i, (chave, p) in enumerate(sorted(pvalores.items(), key=lambda kv: kv[1])):
+        if p > alfa / (m - i):
+            break
+        passam.add(chave)
+    return passam
+
+
+def _temas_testados(f: Mapping[str, Any], leg: str) -> list[tuple[Mapping[str, Any], float, bool]]:
+    """Para quem tem lado definido (saldo além de ±60): cada tema com votações bastantes,
+    a chance de o voto naquele tema ser tão diferente do resto dos votos da pessoa só por
+    acaso (binomial exata) e se o tema fica do lado oposto ao geral (saldo além de ±20)."""
+    campo = f.get("campo") or {}
+    eixo = ((f.get("leg") or {}).get(leg) or {}).get("eixo") or {}
+    if campo.get("saldo") is None or abs(campo["saldo"]) < 60 or not eixo.get("n"):
+        return []
+    saida = []
+    for t in f.get("temas") or []:
+        et = t.get("eixo") or {}
+        n_t = et.get("n") or 0
+        fora_n = eixo["n"] - n_t
+        if n_t < TEMA_PESSOA or fora_n < TEMA_PESSOA or et.get("saldo") is None:
+            continue
+        p_fora = min(0.99, max(0.01, (eixo["dir"] - et["dir"]) / fora_n))  # chance de votar com a direita fora do tema
+        oposto = (et["saldo"] > 0) != (campo["saldo"] > 0) and abs(et["saldo"]) >= 20
+        saida.append((t, _binomial_bicaudal(et["dir"], n_t, p_fora), oposto))
+    return saida
+
+
+def marcar_temas_que_viram(fichas: Iterable[dict[str, Any]], legislatura: int) -> None:
+    """No dossiê, o tema em que a pessoa fica do lado oposto ao dela marca ``vira``: só o
+    que passa do acaso contando os temas dela (Holm a 1%)."""
+    leg = str(legislatura)
+    for f in fichas:
+        testes = _temas_testados(f, leg)
+        passam = _holm({t["t"]: p for t, p, _o in testes}, ALFA_TEMA)
+        for t, _p, oposto in testes:
+            if oposto and t["t"] in passam:
+                t["vira"] = 1
+
+
+def mudam_conforme_tema(fichas: Iterable[Mapping[str, Any]], legislatura: int) -> list[dict[str, Any]]:
+    """Quem vota de um lado em quase tudo e do outro num tema: o saldo do tema do lado
+    oposto ao geral, com o tema contra o resto dos votos da própria pessoa passando do
+    acaso (binomial exata, Holm a 1% sobre todas as pessoas × temas comparados)."""
+    leg = str(legislatura)
+    candidatos: dict[tuple[str, str], dict[str, Any]] = {}
+    pvalores: dict[tuple[str, str], float] = {}
+    for f in fichas:
+        if not f.get("exercicio"):
+            continue
+        campo = f.get("campo") or {}
+        for t, p, oposto in _temas_testados(f, leg):
+            chave = (f["k"], t["t"])
+            pvalores[chave] = p
+            if oposto:
+                et = t["eixo"]
+                candidatos[chave] = _linha_de_lista(
+                    f, saldo=campo["saldo"], tema=t["t"], tema_nome=t.get("nome") or t["t"], tema_saldo=et["saldo"], n=et["n"],
+                    com="esquerda" if et["saldo"] < 0 else "direita",
+                )
+    passam = _holm(pvalores, ALFA_TEMA)
+    saida = [dict(c, p=pvalores[chave]) for chave, c in candidatos.items() if chave in passam]
+    saida.sort(key=lambda c: (-abs(c["saldo"] - c["tema_saldo"]), c["p"], c["nome"]))
+    melhores, vistos = [], set()
+    for c in saida:  # uma linha por pessoa: o tema mais distante
+        if c["k"] not in vistos:
+            vistos.add(c["k"])
+            melhores.append(c)
+    return melhores
+
+
 def _linha_de_lista(f: Mapping[str, Any], **extra: Any) -> dict[str, Any]:
     return {"k": f["k"], "nome": f["nome"], "partido": f.get("partido") or "", "uf": f.get("uf") or "", **extra}
 
@@ -444,6 +584,7 @@ def _listas(fichas: list[Mapping[str, Any]], medias: Mapping[str, Mapping[str, A
         "mudaram": [_linha_de_lista(f, **f["mudanca"]) for f in mudaram[:LISTA]],
         "parados": [_linha_de_lista(f, n=f["autoria"]["paradas_n"], total=f["autoria"]["total"]) for f in parados[:LISTA]],
         "citados": [_linha_de_lista(f, n=f["jornal"]["n30"], frase=(f.get("frases") or [""])[0]) for f in citados[:LISTA]],
+        "mudam_tema": [{k: v for k, v in c.items() if k != "p"} for c in mudam_conforme_tema(fichas, legislatura)[:LISTA]],
     }
 
 
@@ -509,6 +650,31 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "alvo": f"#cg-temas-{casa}",
                 }
             )
+        # 1b. Onde um polo racha (o PSOL com a direita, o NOVO com a esquerda).
+        racha = next((r for r in (painel.get("rachas") or {}).get("partidos") or [] if r["n"] >= MINIMO_RACHA), None)
+        if racha:
+            temas_r = racha.get("temas") or []
+            principal = temas_r[0] if temas_r else None
+            governo_txt = ""
+            if racha.get("contra_governo"):
+                governo_txt = f" Em {_num(racha['contra_governo'])} delas, o {racha['sigla']} votou contra a orientação do governo."
+            saida.append(
+                {
+                    "tipo": "racha",
+                    "casa": casa,
+                    "peso": 85,
+                    "titulo": (
+                        f"{_na_casa(casa)}, o {racha['sigla']} votou com a {racha['com']}, contra o resto do polo, "
+                        f"em {_num(racha['n'])} votações de conteúdo"
+                    ),
+                    "texto": (
+                        (f"{_num(principal['n'])} delas foram de {principal['nome']}." if principal else "")
+                        + governo_txt
+                        + " Essas votações não medem esquerda × direita e ficam fora do saldo."
+                    ).strip(),
+                    "alvo": f"#cg-rachas-{casa}",
+                }
+            )
         # 2. A fila.
         fila = painel.get("fila") or {}
         filas = fila.get("filas") or {}
@@ -542,9 +708,40 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "alvo": f"#cg-fila-{casa}",
                 }
             )
-        # 3. O que passou na frente.
+        # 2b. O que espera × o que passou, pela mesma régua.
+        rel = painel.get("relevancia") or {}
+        relevancia_dita = bool(rel.get("fortes_paradas") and rel.get("fracas_rapidas"))
+        if relevancia_dita:
+            mais_forte = next(iter(rel.get("esperam") or []), None)
+            mais_rapida = next((i for i in rel.get("passaram") or [] if i["n"] < regras.relevancia.baixa), None)
+            partes = [
+                f"Enquanto isso, {_num(rel['fracas_rapidas'])} das {_num(rel.get('passaram_n') or 0)} aprovadas pelo Plenário em 12 meses "
+                f"tinham sinais fracos (nota abaixo de {round(regras.relevancia.baixa)}) e passaram em menos de {relevancia.RAPIDA} dias"
+            ]
+            if mais_rapida:
+                quando = {0: "no mesmo dia do protocolo", 1: "no dia seguinte ao protocolo"}.get(
+                    mais_rapida["dias"], f"{_num(mais_rapida['dias'])} dias depois do protocolo"
+                )
+                partes.append(f"A mais rápida, {mais_rapida['t']}, foi aprovada {quando}")
+            if mais_forte:
+                partes.append(f"A de nota mais alta que espera é {mais_forte['t']} (nota {mais_forte['n']})")
+            saida.append(
+                {
+                    "tipo": "relevancia",
+                    "casa": casa,
+                    "peso": 78,
+                    "titulo": (
+                        f"{nome}: {_num(rel.get('fortes_paradas') or 0)} matérias com sinais fortes de relevância estão prontas para o "
+                        "Plenário e sem andamento há mais de um ano"
+                    ),
+                    "texto": ". ".join(partes) + ".",
+                    "alvo": f"#cg-relev-{casa}",
+                }
+            )
+        # 3. O que passou na frente (só pelas votações nominais): quando o achado 2b não foi
+        # dito; com ele, a mesma coisa já está dita com todas as aprovadas.
         furaram = painel.get("furaram") or {}
-        if furaram.get("rapidas"):
+        if furaram.get("rapidas") and not relevancia_dita:
             primeira = furaram["rapidas"][0]
             saida.append(
                 {
@@ -630,6 +827,25 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     ),
                     "alvo": f"#cg-listas-{casa}",
                     "ficha": destoa["k"],
+                }
+            )
+        # 8. Quem vota de um lado em quase tudo e do outro num tema.
+        muda = next(iter(listas.get("mudam_tema") or []), None)
+        if muda:
+            lado_geral = "direita" if muda["saldo"] > 0 else "esquerda"
+            saida.append(
+                {
+                    "tipo": "tema_pessoa",
+                    "casa": casa,
+                    "peso": 68,
+                    "titulo": f"{nome}: {muda['nome']} ({muda['partido']}-{muda['uf']}) vota com a {lado_geral}, menos em {muda['tema_nome']}",
+                    "texto": (
+                        f"Saldo de {_sinal(muda['saldo'])} no geral e de {_sinal(muda['tema_saldo'])} em {muda['tema_nome']}, em "
+                        f"{_num(muda['n'])} votações em que esquerda e direita se opuseram. A diferença passa do acaso contando todas as "
+                        "pessoas e temas comparados."
+                    ),
+                    "alvo": f"#cg-listas-{casa}",
+                    "ficha": muda["k"],
                 }
             )
     saida.sort(key=lambda a: -a["peso"])
@@ -724,6 +940,22 @@ def atualizar(
     except Exception as exc:  # noqa: BLE001
         avisos.append(f"Senado: autoria e relatorias indisponíveis ({exc})")
 
+    # O que espera × o que passou: a mesma régua para as prontas e as aprovadas.
+    aprovadas: dict[str, list[relevancia.Aprovada]] = {"cd": [], "sf": []}
+    if props_cd:
+        try:
+            aprovadas["cd"], falhas = relevancia.camara_aprovadas(coletor, props_cd, hoje)
+            if falhas:
+                avisos.append(f"Câmara: {falhas} histórico(s) de matérias aprovadas indisponível(is); ficam fora da comparação")
+        except Exception as exc:  # noqa: BLE001
+            avisos.append(f"Câmara: matérias aprovadas indisponíveis ({exc})")
+    try:
+        aprovadas["sf"] = relevancia.senado_aprovadas(coletor, hoje, validade_h=opcoes.validade_h)
+    except Exception as exc:  # noqa: BLE001
+        avisos.append(f"Senado: matérias aprovadas indisponíveis ({exc})")
+    reguas = {"cd": relevancia.Regua(regras, relevancia.apensados(props_cd)), "sf": relevancia.Regua(regras, None)}
+    esperando = {"cd": relevancia.prontas(props_cd), "sf": relevancia.prontas(props_sf)}
+
     # O banco do jornal.
     nomes = jornal.Nomes(jornal.Pessoa(c.chave, c.casa, c.nome) for casa in cadastros.values() for c in casa.values())
     desde = (date.fromisoformat(hoje) - timedelta(days=opcoes.noticias_dias)).isoformat()
@@ -750,6 +982,9 @@ def atualizar(
             )
             if casa == "cd" and presidentes.get(pid):
                 fichas[casa][-1]["presidiu"] = [list(i) for i in presidentes[pid]]
+
+    for casa in ("cd", "sf"):
+        marcar_temas_que_viram(fichas[casa], legislatura.numero)
 
     # Painéis.
     paineis: dict[str, dict[str, Any]] = {}
@@ -809,6 +1044,10 @@ def atualizar(
             "votacoes": _estatisticas(votos[casa], regras, legislatura.numero),
             "bancadas": bancadas,
             "temas": _matriz_de_temas(votos[casa], regras, legislatura.numero, grandes),
+            "rachas": _rachas(votos[casa], regras, legislatura.numero),
+            "relevancia": relevancia.painel(esperando[casa], aprovadas[casa], reguas[casa], hoje)
+            if esperando[casa] or aprovadas[casa]
+            else {},
             "ultimas": _ultimas(votos[casa], regras, nomes_casa),
             "listas": _listas(fichas[casa], medias, legislatura.numero, regras),
             "fila": fila,
@@ -826,6 +1065,17 @@ def atualizar(
         "polos": {"esquerda": sorted(polos.esquerda), "direita": sorted(polos.direita)} if polos else {},
         "campos": [{"id": c.id, "nome": c.nome, "ate": c.ate} for c in regras.campos],
         "limiares": dict(regras.limiares.__dict__),
+        "relevancia": {
+            "pesos": dict(regras.relevancia.pesos),
+            "origem": dict(regras.relevancia.origem),
+            "alcance": dict(regras.relevancia.alcance),
+            "janela_demanda_anos": regras.relevancia.janela_demanda_anos,
+            "demanda_cheia": regras.relevancia.demanda_cheia,
+            "simbolica_teto": regras.relevancia.simbolica_teto,
+            "alta": regras.relevancia.alta,
+            "baixa": regras.relevancia.baixa,
+            "rapida": relevancia.RAPIDA,
+        },
         "temas": [{"id": t.id, "nome": t.nome} for t in regras.temas],
         "anos": regras.anos(),
         "projetos_desde": opcoes.projetos_desde,

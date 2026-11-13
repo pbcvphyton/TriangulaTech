@@ -106,3 +106,27 @@ temas:
     nome: "Homenagens e datas"
     camara: [72]
     senado: ["Honorífico"]
+
+# Índice de relevância (0 a 100) das matérias prontas para o Plenário e das aprovadas
+# nos últimos 12 meses: sinais de relevância pública que dá para medir nos registros
+# oficiais. NÃO diz se a matéria é boa ou ruim; diz quantos sinais ela tem. Cada nota
+# aparece decomposta na página, e os pesos são escolha editorial.
+relevancia:
+  pesos:
+    demanda: 40       # projetos parecidos anexados a ela (outros parlamentares pedindo o mesmo)
+    origem: 25        # de onde veio: já aprovada na outra Casa, do Executivo, de comissão...
+    alcance: 20       # o tipo de norma: PEC > lei complementar > lei
+    apoio: 15         # autores de partidos diferentes (e dos dois polos)
+  janela_demanda_anos: 0    # 0: contam todos os projetos parecidos anexados; N: só os apresentados nos N anos antes
+  demanda_cheia: 15         # 15 projetos parecidos na janela dão a nota cheia (escala logarítmica)
+  origem:                   # parte do peso de "origem" que cada origem recebe
+    outra_casa: 1.0         # já aprovada pela outra Casa
+    popular: 1.0            # iniciativa popular ou sugestão da sociedade
+    executivo: 0.8
+    comissao: 0.7           # comissões, CPIs e comissões mistas
+    judiciario: 0.6         # tribunais, Ministério Público, Tribunal de Contas, Defensoria
+    parlamentar: 0.0
+  alcance: {PEC: 1.0, PLP: 0.8, PL: 0.6, PLS: 0.6, PLC: 0.6, PDL: 0.3}
+  simbolica_teto: 10        # matéria simbólica (dia nacional, denominação, título) não passa disto
+  alta: 60                  # a partir daqui, sinais fortes
+  baixa: 30                 # abaixo daqui, sinais fracos

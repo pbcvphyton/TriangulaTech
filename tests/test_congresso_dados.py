@@ -6,6 +6,7 @@ Tudo contra o Congresso de mentira de ``tests/fixtures/congresso/fabrica.py``, s
 
 from __future__ import annotations
 
+import dataclasses
 import json
 from pathlib import Path
 
@@ -77,7 +78,7 @@ def props(coletor: fontes.Coletor, r: regras.Regras) -> list[projetos.Proposicao
 
 def test_camara_proposicoes_so_as_que_podem_virar_norma(props: list[projetos.Proposicao]):
     por = {p.id: p for p in props}
-    assert sorted(por) == [1010, 1011, 1012, 1013, 1014, 1015]  # o requerimento (1016) fica de fora
+    assert sorted(por) == [1010, 1011, 1012, 1013, 1014, 1015, 1017]  # o requerimento (1016) fica de fora
     pl10 = por[1010]
     assert (pl10.titulo, pl10.estado, pl10.fila, pl10.orgao, pl10.movimento, pl10.temas) == ("PL 10/2026", projetos.TRAMITANDO, projetos.F_RELATOR, "CCJC", "2026-01-10", ["economia"])
     assert (por[1011].fila, por[1011].relator) == (projetos.F_PARECER, 7)
@@ -85,6 +86,11 @@ def test_camara_proposicoes_so_as_que_podem_virar_norma(props: list[projetos.Pro
     assert (por[1013].autores, por[1013].primeiro) == ([4], 4)  # quem só apoia a PEC não é autor
     assert (por[1014].autores, por[1014].primeiro) == ([1, 2], 1)
     assert pl10.dias_sem_andar(HOJE) == 307
+    # origem, partidos dos autores, a matéria principal das apensadas e a apreciação
+    assert (por[1012].origem, por[1012].apreciacao) == ("executivo", "plenario")
+    assert (pl10.origem, pl10.partidos, pl10.apreciacao) == ("parlamentar", ["PT"], "")
+    assert (por[1013].partidos, por[1014].partidos) == (["PL"], ["PT"])  # na PEC, só o proponente
+    assert (por[1017].estado, por[1017].principal, por[1017].origem) == (projetos.APENSADA, 1015, "outra_casa")
 
 
 def test_resumo_de_autoria_separa_autoria_principal_de_coautoria(props: list[projetos.Proposicao], r: regras.Regras):
@@ -115,7 +121,9 @@ def test_relatorias_e_fila_da_camara(props: list[projetos.Proposicao], coletor: 
 
 def test_senado_autoria_relatorias_e_o_que_tramita(coletor: fontes.Coletor):
     tramitando = projetos.senado_tramitando(coletor)
-    assert [(p.titulo, p.fila) for p in tramitando] == [("PL 21/2026", projetos.F_RELATOR)]  # o requerimento (RQS) fica de fora
+    # o requerimento (RQS) fica de fora; "pronto para deliberação do Plenário" é do Plenário
+    assert [(p.titulo, p.fila, p.orgao) for p in tramitando] == [("PL 21/2026", projetos.F_RELATOR, ""), ("PL 22/2026", projetos.F_PAUTA, "PLEN")]
+    assert [(p.origem, p.partidos) for p in tramitando] == [("parlamentar", ["PT", "MDB"]), ("outra_casa", [])]
     autoria = projetos.senado_de_autoria(coletor, {101: "Rita Alves", 103: "Túlio Braga"})
     assert sorted(p.titulo for p in autoria[101]) == ["PL 20/2026", "PL 21/2026"]
     assert {p.titulo: p.estado for p in autoria[101]} == {"PL 20/2026": projetos.APROVADA, "PL 21/2026": projetos.TRAMITANDO}
@@ -225,6 +233,114 @@ def test_atualizar_grava_base_fichas_paineis_e_leitura(publicado: tuple[Path, fa
 def test_a_frase_do_campo_diz_o_mesmo_que_a_faixa(r: regras.Regras, esq: int, dir_: int, comeco: str):
     atual = perfil.Recorte(eixo=perfil.Eixo(esq=esq, dir=dir_))
     assert ficha.frase("cd", atual, {}, "Lula", None, None, r)[0].startswith(comeco)
+
+
+def test_quem_muda_de_lado_conforme_o_tema_so_com_o_que_passa_do_acaso():
+    def pessoa(k: str, dir_total: int, n_total: int, temas: list[tuple[str, int, int]], saldo: int) -> dict:
+        return {
+            "k": k, "nome": k, "partido": "PL", "uf": "SP", "exercicio": True,
+            "campo": {"saldo": saldo, "n": n_total},
+            "leg": {"57": {"eixo": {"esq": n_total - dir_total, "dir": dir_total, "n": n_total, "saldo": saldo}}},
+            "temas": [{"t": t, "nome": t.capitalize(), "eixo": {"esq": n - d, "dir": d, "n": n, "saldo": round(100 * (2 * d - n) / n)}} for t, d, n in temas],
+        }
+
+    fichas = [
+        pessoa("cd-1", 90, 100, [("trabalho", 2, 12), ("economia", 40, 44)], 80),  # vira de lado em trabalho
+        pessoa("cd-2", 90, 100, [("trabalho", 5, 10)], 80),  # 50%: do lado oposto? saldo 0, não chega a −20
+        pessoa("cd-3", 95, 100, [("saude", 4, 9)], 90),  # poucas votações no tema
+        pessoa("cd-4", 10, 100, [("seguranca", 10, 12)], -80),  # esquerda que vira em segurança
+    ]
+    saida = dados.mudam_conforme_tema(fichas, 57)
+    assert [(c["k"], c["tema"], c["com"]) for c in saida] == [("cd-4", "seguranca", "direita"), ("cd-1", "trabalho", "esquerda")]
+    assert saida[1]["tema_saldo"] == -67 and saida[1]["n"] == 12 and saida[1]["p"] < 1e-5
+    assert dados._binomial_bicaudal(5, 10, 0.5) == pytest.approx(1.0)
+    dados.marcar_temas_que_viram(fichas, 57)
+    assert [t["t"] for f in fichas for t in f["temas"] if t.get("vira")] == ["trabalho", "seguranca"]
+    assert dados._holm({"a": 0.001, "b": 0.02, "c": 0.5}, 0.05) == {"a", "b"}  # 0,02 ≤ 0,05/2
+    assert dados._holm({"a": 0.001, "b": 0.03, "c": 0.5}, 0.05) == {"a"}
+
+
+def test_o_caminho_de_uma_aprovada_sai_do_historico_oficial():
+    from qijournal.congresso import relevancia
+
+    data, caminho = relevancia.caminho_camara(fabrica.tramitacoes_do_pl_12(), "2025-11-13")
+    assert data == "2026-06-16"
+    assert caminho == {
+        "urgencia": {"d": "2026-06-09", "por": "Ana Lima e Davi Rocha"},
+        "parecer_plenario": {"d": "2026-06-16", "relator": "Hugo Leal (PP-PE)"},
+    }
+    assert relevancia.caminho_camara(fabrica.tramitacoes_do_pl_12(), "2026-07-01") is None  # aprovada antes da janela
+
+
+def test_a_nota_de_relevancia_soma_sinais_que_dao_para_medir(r: regras.Regras):
+    from qijournal.congresso import relevancia
+
+    def prop(pid: int, sigla: str, ementa: str, origem: str, partidos: list[str]) -> projetos.Proposicao:
+        return projetos.Proposicao(id=pid, casa="cd", sigla=sigla, numero=pid, ano=2020, ementa=ementa, apresentada="2020-01-01", origem=origem, partidos=partidos)
+
+    filhos = {1: ["2019-05-01", "2023-01-10", "2024-03-01", "2025-06-01", "2027-01-01"]}  # quatro até hoje; um depois
+    regua = relevancia.Regua(r, filhos)
+    nota = regua.nota(prop(1, "PL", "Altera o Código Penal.", "parlamentar", ["PT"]), HOJE)
+    assert (nota.demanda, nota.pontos, nota.valor) == (4, {"demanda": 23, "origem": 0, "alcance": 12, "apoio": 0}, 35)
+    # com a janela de quatro anos, o de 2019 sai
+    com_janela = dataclasses.replace(r, relevancia=regras.Relevancia(janela_demanda_anos=4))
+    assert relevancia.Regua(com_janela, filhos).nota(prop(1, "PL", "Altera o Código Penal.", "parlamentar", ["PT"]), HOJE).demanda == 3
+    pec = regua.nota(prop(2, "PEC", "Altera o art. 5º.", "outra_casa", ["PT", "PL"]), HOJE)
+    assert (pec.pontos, pec.valor) == ({"demanda": 0, "origem": 25, "alcance": 20, "apoio": 15}, 60)
+    simbolica = regua.nota(prop(3, "PL", "Institui o Dia Nacional do Ciclista.", "outra_casa", []), HOJE)
+    assert (simbolica.simbolica, simbolica.valor) == (True, 10)  # 37 pelos sinais, mas é simbólica: teto
+    # no Senado, sem a demanda: os outros pesos valem o todo
+    senado = relevancia.Regua(r, None).nota(prop(4, "PL", "Altera o imposto de renda.", "executivo", []), HOJE)
+    assert (senado.demanda, senado.valor) == (None, round(100 * (0.8 * 25 + 0.6 * 20) / 60))
+
+
+def test_o_que_espera_e_o_que_passou_no_painel(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado]):
+    data_dir, _fetch, _resultado = publicado
+    cd = json.loads((data_dir / "congresso" / "casa-cd.json").read_text(encoding="utf-8"))["relevancia"]
+    assert (cd["esperam_n"], cd["passaram_n"], cd["sem_demanda"]) == (1, 1, False)
+    (espera,) = cd["esperam"]
+    assert (espera["t"], espera["ap"], espera["n"], espera["pt"]) == ("PL 14/2026", 1, 22, {"demanda": 10, "origem": 0, "alcance": 12, "apoio": 0})
+    (passou,) = cd["passaram"]
+    assert (passou["t"], passou["dias"], passou["aprovada"], passou["o"], passou["n"]) == ("PL 12/2026", 15, "2026-06-16", "executivo", 32)
+    assert passou["caminho"]["urgencia"]["por"] == "Ana Lima e Davi Rocha"
+    assert sorted(ponto[2] for ponto in cd["pontos"]) == [0, 1]
+    sf = json.loads((data_dir / "congresso" / "casa-sf.json").read_text(encoding="utf-8"))["relevancia"]
+    assert (sf["sem_demanda"], [e["t"] for e in sf["esperam"]], [e.get("simb") for e in sf["esperam"]]) == (True, ["PL 22/2026"], [1])
+    assert [(x["t"], x["dias"], x["n"]) for x in sf["passaram"]] == [("PL 20/2026", 12, 20)]
+
+
+def test_rachas_por_partido_com_tema_e_governo():
+    """O PSOL vota com o PL contra o PT e o governo em cinco votações de economia, e com o
+    PT em uma: cinco rachas, todas contra o governo; viram achado da Casa."""
+    from qijournal.congresso import base, perfil as perfil_mod
+
+    r = regras.de_dict(
+        {
+            "legislaturas": [{"numero": 57, "inicio": "2026-01-01", "fim": "2027-01-31"}],
+            "polos": [{"inicio": "2019-01-01", "esquerda": ["PT", "PSOL"], "direita": ["PL"]}],
+            "limiares": {"coesao_polo": 0.75, "minimo_polo": 2, "minimo_partido": 2},
+            "temas": [{"id": "economia", "nome": "Economia", "camara": [40]}],
+        }
+    )
+    pessoas = [base.Pessoa(i, f"Deputado {i}", "SP", [(0, "PT" if i <= 8 else "PSOL" if i <= 10 else "PL")]) for i in range(1, 15)]
+    racha, junto = "S" * 8 + "NN" + "NNNN", "S" * 10 + "NNNN"
+    votacoes = [
+        base.Votacao(id=f"v{k}", data=f"2026-03-{k + 1:02d}", orgao=base.PLENARIO, descricao="Aprovado o Projeto.", tipo=base.MERITO,
+                     votos=votos, prop=f"PL {k}/2026", ementa="Regra fiscal.", temas=["economia"], ori={base.GOVERNO: "S"}, aprovada=True)
+        for k, votos in enumerate([racha] * 5 + [junto])
+    ]
+    ano = base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=votacoes)
+    rachas = dados._rachas([ano], r, 57)
+    assert rachas["opostas"] == 6
+    (psol,) = rachas["partidos"]
+    assert (psol["sigla"], psol["polo"], psol["com"], psol["n"], psol["contra_governo"]) == ("PSOL", "esquerda", "direita", 5, 5)
+    assert psol["temas"] == [{"id": "economia", "nome": "Economia", "n": 5}]
+    assert [i["d"] for i in psol["itens"]][:2] == ["2026-03-05", "2026-03-04"]  # do mais novo
+    assert (psol["itens"][0]["lado"], psol["itens"][0]["polo"], psol["itens"][0]["gov"]) == ("N", "S", "S")
+    achado = next(a for a in dados.achados({"cd": {"rachas": rachas}}, r) if a["tipo"] == "racha")
+    assert achado["titulo"] == "Na Câmara, o PSOL votou com a direita, contra o resto do polo, em 5 votações de conteúdo"
+    assert "contra a orientação do governo" in achado["texto"] and achado["alvo"] == "#cg-rachas-cd"
+    assert perfil_mod.ler_votacao(votacoes[5], [p.partido_em(5) for p in pessoas], r).divisiva
 
 
 def test_quem_trocou_de_partido_e_comparado_pelo_que_votou_no_partido_atual(r: regras.Regras):
