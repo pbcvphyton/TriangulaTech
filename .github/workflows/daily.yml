@@ -87,7 +87,8 @@ jobs:
     # estourar o limite, a seguinte da cadeia assume. Se nenhuma conseguir a
     # tempo, a edição sai em modo automático. Depois, o termômetro de viés
     # (termometro.deadline_seconds: 12 min; até 60 textos) analisa os textos compilados.
-    timeout-minutes: 70
+    # Antes de tudo, os dados do Congresso (até 15 min; passo acessório).
+    timeout-minutes: 85
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v5
@@ -106,6 +107,35 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
+      - name: Dia do cache do Congresso
+        id: cg
+        run: echo "dia=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache do que foi baixado do Congresso
+        # Os arquivos anuais de proposições da Câmara (cerca de 1,5 GB desde 2011) valem 8
+        # dias; no dia a dia, só os dois anos mais recentes são baixados de novo. A chave é
+        # do dia (o cache de uma chave não é regravado): cada execução parte do cache mais
+        # recente e guarda o que baixou, mesmo que não tenha terminado.
+        continue-on-error: true
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/congresso
+          key: congresso-${{ steps.cg.outputs.dia }}
+          restore-keys: congresso-
+
+      - name: Atualizar o Congresso
+        # Dados abertos da Câmara e do Senado (aba Congresso e fichas nas matérias). É
+        # acessório: se uma fonte estiver fora do ar ou demorar, a edição sai com o que já
+        # existe em data/congresso/. O que mudar entra no mesmo commit da edição.
+        continue-on-error: true
+        timeout-minutes: 15
+        env:
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: python -m qijournal congresso atualizar --dir . --cache "$RUNNER_TEMP/congresso"
+
       - name: Gerar a edição
         env:
           # Editores por IA, na ordem de llm.providers (config/site.yaml): cada um
@@ -118,6 +148,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           QIJ_BRAND: ${{ vars.QIJ_BRAND }}
           QIJ_NO_TERMOMETRO: ${{ vars.QIJ_NO_TERMOMETRO }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
           QIJ_MODEL: ${{ vars.QIJ_MODEL }}
           QIJ_GEMINI_MODEL: ${{ vars.QIJ_GEMINI_MODEL }}
           QIJ_GEMINI_LITE_MODEL: ${{ vars.QIJ_GEMINI_LITE_MODEL }}

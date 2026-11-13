@@ -104,6 +104,7 @@ class StoryView:
     lang: str | None = None  # idioma do texto quando não é português (atributo lang)
     coverage: CoverageView | None = None
     compiled: str = ""  # "Compilada de 7 notícias de 5 veículos · bloco Economia & Mercados"
+    congresso: list[dict[str, Any]] = field(default_factory=list)  # parlamentares citados (fichas curtas)
 
     @property
     def source_names(self) -> str:
@@ -258,6 +259,7 @@ class BrandView:
     email_logo_dark: EmailLogo | None = None  # só com email_logo
     email_header: EmailLogo | None = None  # faixa do topo do e-mail (modelo do TSA Tech)
     termometro: bool = False  # marca com Termômetro de Viés (estilos do bloco do dia e da aba Analítico Político)
+    congresso: bool = False  # aba Congresso publicada: botão no cabeçalho e fichas nas matérias
 
 
 @dataclass
@@ -394,6 +396,7 @@ def brand_view(config: Config) -> BrandView:
         email_logo_dark=_email_logo(brand.email_logo_dark, config.site.base_url) if email_logo else None,
         email_header=_email_logo(brand.email_header, config.site.base_url),
         termometro=config.termometro_ativo,
+        congresso=config.congresso_ativo and config.congresso.publicado,
     )
 
 
@@ -546,6 +549,53 @@ def _story_view(
         coverage=coverage_view(story.coverage),
         compiled=_compiled_label(story, sources),
     )
+
+
+def _fichas_do_congresso(edition: Edition) -> dict[str, list[dict[str, Any]]]:
+    """As fichas dos parlamentares citados em cada matéria (``Edition.congresso``), prontas
+    para o modelo: a legenda, a barra do saldo e uma linha com o que os registros dizem."""
+    materias = (edition.congresso or {}).get("materias") or {}
+    saida: dict[str, list[dict[str, Any]]] = {}
+    for story_id, lista in materias.items():
+        views = []
+        for p in lista if isinstance(lista, list) else []:
+            if not isinstance(p, dict) or not p.get("k") or not p.get("nome"):
+                continue
+            saldo = p.get("saldo")
+            partes = []
+            if p.get("preside"):
+                partes.append(f"Preside {'a Câmara' if p.get('casa') == 'Câmara' else 'o Senado'} (só vota em caso de empate)")
+            if p.get("gov") is not None:
+                partes.append(f"votou com o governo em {round(float(p['gov']))}% das vezes")
+            if p.get("pres") is not None:
+                partes.append(f"participou de {round(float(p['pres']))}% das votações nominais")
+            if p.get("par"):
+                partes.append(f"tem {p['par']} {'proposta parada' if p['par'] == 1 else 'propostas paradas'} há mais de um ano")
+            if p.get("rel"):
+                partes.append(f"segura {p['rel']} {'relatoria' if p['rel'] == 1 else 'relatorias'} há mais de seis meses")
+            texto = "; ".join(partes)
+            view = {
+                "k": str(p["k"]),
+                "nome": filters.plain(str(p["nome"])),
+                "legenda": " · ".join(x for x in ("-".join(y for y in (p.get("partido"), p.get("uf")) if y), p.get("casa")) if x)
+                + ("" if p.get("ex", True) else " · fora do exercício"),
+                "texto": (texto[:1].upper() + texto[1:] + ".") if texto else "",
+                "saldo_txt": "",
+                "campo": filters.plain(str(p.get("campo") or "")),
+                "lado": "c",
+                "left": 50.0,
+                "width": 0.0,
+            }
+            if isinstance(saldo, (int, float)):
+                valor = max(-100.0, min(100.0, float(saldo)))
+                view["saldo_txt"] = f"{round(valor):+d}".replace("-", "−")
+                view["lado"] = "d" if valor > 20 else "e" if valor < -20 else "c"
+                view["left"] = round(50 + valor / 2, 1) if valor < 0 else 50.0
+                view["width"] = round(abs(valor) / 2, 1)
+            views.append(view)
+        if views:
+            saida[str(story_id)] = views
+    return saida
 
 
 def _section_lookup(edition: Edition, config: Config, default_color: str) -> dict[str, tuple[str, str]]:
@@ -951,6 +1001,7 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
     default_color = brand.colors["primary"]
     lookup = _section_lookup(edition, config, default_color)
 
+    fichas = _fichas_do_congresso(edition) if brand.congresso else {}
     by_id: dict[str, StoryView] = {}
     for story in edition.stories:
         if story.id in by_id:
@@ -966,6 +1017,7 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
         if not view.headline:
             log.warning("Matéria sem título ignorada na renderização: %s", story.id)
             continue
+        view.congresso = fichas.get(story.id, [])
         by_id[story.id] = view
 
     sections = _build_sections(edition, by_id, lookup, default_color)

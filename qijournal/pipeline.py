@@ -10,6 +10,8 @@ Layout publicado (raiz do GitHub Pages)::
     edicoes/email.html|.txt    e-mail da última edição
     edicoes/analitico.html     aba "Analítico Político": todo o histórico do termômetro (marca com termômetro)
     edicoes/pesquisa.html      Pesquisa analítica: busca em todas as edições
+    edicoes/congresso.html     aba "Congresso" (gravada por ``congresso atualizar``, antes da edição)
+    data/congresso/            base de votos, fichas e painéis do Congresso (``qijournal.congresso``)
     data/AAAA-MM-DD.json       edição em JSON (``Edition.to_dict``)
     data/busca/AAAA-MM-DD.json  o que a edição publicou, compacto, para a Pesquisa analítica
     data/termometro/AAAA-MM-DD.json  análises do termômetro feitas no dia (nunca apagadas)
@@ -49,6 +51,7 @@ from qijournal.deliver.smtp import send_email as deliver_email
 from qijournal.edit import ContextoTermometro, make_edition
 from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
+from qijournal.render import congresso as congresso_pagina
 from qijournal.render import lados, midia, pesquisa
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
@@ -685,6 +688,30 @@ def publish(
     return paths
 
 
+def anexar_congresso(edition: Edition, config: Config, out_dir: Path) -> None:
+    """Põe na edição as fichas dos deputados e senadores que cada matéria cita
+    (``Edition.congresso``), lidas de ``data/congresso/resumo.json``, e marca na
+    configuração se a aba Congresso está publicada (o botão do cabeçalho).
+
+    O bloco é adicional: sem os dados (o Congresso ainda não foi atualizado, a marca
+    não usa) ou com qualquer erro, a edição sai sem ele."""
+    config.congresso.publicado = False
+    if not config.congresso_ativo:
+        return
+    try:
+        indice = congresso_pagina.carregar_indice(Path(out_dir) / DATA_DIR)
+        if indice is None:
+            return
+        config.congresso.publicado = (Path(out_dir) / ARCHIVE_DIR / congresso_pagina.PAGINA).is_file()
+        edition.congresso = congresso_pagina.fichas_da_edicao(edition, indice, config.congresso.fichas_por_materia)
+        if edition.congresso:
+            citados = {p["k"] for lista in edition.congresso["materias"].values() for p in lista}
+            log.info("Congresso: %d parlamentar(es) citado(s) em %d matéria(s)", len(citados), len(edition.congresso["materias"]))
+    except Exception as exc:  # noqa: BLE001 — nunca derruba a edição
+        log.warning("Congresso: fichas das matérias indisponíveis (%s) — edição sem o bloco", exc)
+        edition.congresso = None
+
+
 # ── E-mail ───────────────────────────────────────────────────────────────────
 
 
@@ -981,6 +1008,7 @@ def run(
             outputs["pages"] = save_pages(recorder.pages, pages_path)
         except (OSError, TypeError, ValueError) as exc:
             log.warning("Páginas enriquecidas não salvas (%s): %s", pages_path, exc)
+    anexar_congresso(edition, config, out_dir)
     subject, email_html, email_text = render_email(edition, config)
     previous = previous_manifest(out_dir)
     already_sent = previous.get("date") == edition.date and previous.get("email_sent") is True

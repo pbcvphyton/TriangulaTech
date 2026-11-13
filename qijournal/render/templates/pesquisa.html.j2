@@ -6,6 +6,7 @@
     Pesquisa (pesquisa_leitura.css.j2).
     Variáveis: p (PesquisaView), brand, home_href, archive_href, base_url, repo_url. -#}
 {% extends "layout.html.j2" %}
+{% import "macros.html.j2" as m %}
 {% import "midia.html.j2" as md %}
 
 {% block title %}{{ brand.name }} — Pesquisa analítica{% endblock %}
@@ -21,6 +22,7 @@
     {% if p.termometro %}
     <a class="tool tool-an" href="{{ archive_href }}analitico.html" title="Analítico Político: todo o histórico do termômetro" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
     {% endif %}
+    {% if brand.congresso %}{{ m.congresso_tool(archive_href) }}{% endif %}
 {% endblock %}
 
 {% block styles %}

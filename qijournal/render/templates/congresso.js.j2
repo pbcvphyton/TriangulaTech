@@ -1,0 +1,376 @@
+{#- Aba Congresso (só esta página inclui este arquivo). Reforços: a navegação marca a seção
+    da vez, as lentes mostram uma Casa por vez, a tabela de todos ganha filtro e ordem, e o
+    nome de cada parlamentar abre o dossiê, carregado de data/congresso/fichas/<casa>-<id>.json
+    e montado aqui (sempre com textContent: nada do arquivo vira HTML). O endereço guarda o
+    dossiê aberto (#p=cd-204536), então ele pode ser enviado; as fichas das matérias da
+    edição chegam por esse endereço. Sem script, a página continua inteira, sem o dossiê. -#}
+(function () {
+  'use strict';
+  var d = document, w = window;
+  var root = d.getElementById('congresso');
+  if (!root) return;
+  var M = {};
+  try { M = JSON.parse(d.getElementById('cgManifesto').textContent || '{}'); } catch (erro) { M = {}; }
+  function lista(nos) { return Array.prototype.slice.call(nos); }
+  function num(n) { return (n == null || isNaN(n)) ? '—' : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+  function pct(v) {
+    if (v == null) return '—';
+    if ((v >= 99.5 && v < 100) || (v > 0 && v < 0.5)) return String(Math.round(v * 10) / 10).replace('.', ',') + '%';
+    return Math.round(v) + '%';
+  }
+  function saldo(v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(Math.round(v)); }
+  function classe(v) {
+    if (v == null) return 'na';
+    var campos = M.campos || [], nomes = ['e3', 'e2', 'm', 'd2', 'd3'];
+    for (var i = 0; i < campos.length && i < 5; i++) if (v <= campos[i].ate) return nomes[i];
+    return 'd3';
+  }
+  function campo(v) {
+    var campos = M.campos || [];
+    for (var i = 0; i < campos.length; i++) if (v <= campos[i].ate) return campos[i].nome;
+    return campos.length ? campos[campos.length - 1].nome : '';
+  }
+  function dataBr(iso) { return iso && iso.length >= 10 ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
+  function dias(iso) {
+    if (!iso || !M.hoje) return null;
+    var a = Date.parse(iso.slice(0, 10) + 'T00:00:00Z'), b = Date.parse(M.hoje + 'T00:00:00Z');
+    return isNaN(a) || isNaN(b) ? null : Math.round((b - a) / 864e5);
+  }
+  function tempo(n) {
+    if (n == null) return '—';
+    if (n < 60) return n + (n === 1 ? ' dia' : ' dias');
+    var meses = Math.floor(n / 30);
+    if (meses < 24) return meses + ' meses';
+    var anos = Math.floor(meses / 12), resto = meses % 12;
+    return anos + ' anos' + (resto ? ' e ' + resto + (resto === 1 ? ' mês' : ' meses') : '');
+  }
+  function h(tag, attrs, filhos) {
+    var el = d.createElement(tag), k;
+    for (k in attrs || {}) {
+      if (attrs[k] == null || attrs[k] === false) continue;
+      if (k === 'text') el.textContent = attrs[k];
+      else if (k === 'cls') el.className = attrs[k];
+      else el.setAttribute(k, attrs[k]);
+    }
+    (filhos || []).forEach(function (f) { if (f != null) el.appendChild(typeof f === 'string' ? d.createTextNode(f) : f); });
+    return el;
+  }
+  function barra(v) {
+    var i = h('i', { cls: 'cg-' + classe(v) });
+    var x = v == null ? 0 : Math.max(-100, Math.min(100, v));
+    i.style.left = (x < 0 ? 50 + x / 2 : 50) + '%';
+    i.style.width = Math.abs(x) / 2 + '%';
+    return h('span', { cls: 'cg-bar', 'aria-hidden': 'true' }, [i]);
+  }
+
+  /* Nesta página: a seção da vez. */
+  var nav = d.getElementById('cgNav');
+  var links = nav ? lista(nav.querySelectorAll('a[href^="#"]')) : [];
+  var secoes = links.map(function (a) { return d.getElementById(a.getAttribute('href').slice(1)); });
+  var atual = -2, pedido = 0;
+  function marcar() {
+    pedido = 0;
+    var limite = (nav ? nav.offsetHeight : 0) + 70, vez = -1;
+    secoes.forEach(function (el, i) { if (el && el.getBoundingClientRect().top <= limite) vez = i; });
+    if (vez === atual) return;
+    atual = vez;
+    links.forEach(function (a, i) { if (i === vez) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+  }
+  if (links.length) {
+    w.addEventListener('scroll', function () { if (!pedido) pedido = w.requestAnimationFrame ? w.requestAnimationFrame(marcar) : w.setTimeout(marcar, 60); }, { passive: true });
+    marcar();
+  }
+
+  /* Uma Casa por vez. */
+  var casas = d.getElementById('cgCasas');
+  function verCasa(casa) {
+    root.setAttribute('data-ver', casa);
+    lista(casas.querySelectorAll('button')).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-casa') === casa ? 'true' : 'false'); });
+    try { w.sessionStorage.setItem('qij-casa', casa); } catch (erro) { /* sem armazenamento: vale só nesta página */ }
+    filtrar();
+  }
+  if (casas && casas.querySelectorAll('button').length > 1) {
+    casas.hidden = false;
+    casas.addEventListener('click', function (event) {
+      var b = event.target && event.target.closest ? event.target.closest('button[data-casa]') : null;
+      if (b) verCasa(b.getAttribute('data-casa'));
+    });
+  }
+
+  /* A tabela de todos: filtro, quem saiu e ordem. */
+  var tab = d.getElementById('cgTab'), fil = d.getElementById('cgFil');
+  var q = d.getElementById('cgQ'), fora = d.getElementById('cgFora'), conta = d.getElementById('cgN');
+  var linhas = tab ? lista(tab.tBodies[0].rows) : [];
+  function semAcento(s) { return (s || '').toLowerCase().normalize ? s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '') : (s || '').toLowerCase(); }
+  function filtrar() {
+    if (!tab) return;
+    var termos = semAcento(q ? q.value : '').split(/\s+/).filter(Boolean);
+    var comFora = fora && fora.checked, casa = root.getAttribute('data-ver'), visiveis = 0;
+    linhas.forEach(function (tr) {
+      var alvo = tr.getAttribute('data-b') || '';
+      var ok = (comFora || !tr.classList.contains('cg-fora')) && termos.every(function (t) { return alvo.indexOf(t) >= 0; });
+      tr.hidden = !ok;
+      if (ok && (!casa || tr.getAttribute('data-casa') === casa)) visiveis++;
+    });
+    if (conta) conta.textContent = visiveis + (visiveis === 1 ? ' parlamentar' : ' parlamentares');
+  }
+  if (tab && fil) {
+    fil.hidden = false;
+    q.addEventListener('input', filtrar);
+    fora.addEventListener('change', filtrar);
+    tab.tHead.addEventListener('click', function (event) {
+      var th = event.target && event.target.closest ? event.target.closest('th[data-ord]') : null;
+      if (!th) return;
+      var chave = th.getAttribute('data-ord'), texto = chave === 'nome' || chave === 'partido' || chave === 'uf';
+      var sobe = th.getAttribute('aria-sort') === (texto ? 'ascending' : 'descending') ? !texto : texto;
+      lista(tab.tHead.querySelectorAll('th')).forEach(function (x) { x.removeAttribute('aria-sort'); });
+      th.setAttribute('aria-sort', sobe ? 'ascending' : 'descending');
+      linhas.sort(function (a, b) {
+        var x = a.getAttribute('data-' + chave), y = b.getAttribute('data-' + chave);
+        if (texto) return (sobe ? 1 : -1) * semAcento(x).localeCompare(semAcento(y));
+        if (x === '' || y === '') return x === y ? 0 : (x === '' ? 1 : -1);
+        return (sobe ? 1 : -1) * (parseFloat(x) - parseFloat(y));
+      });
+      var corpo = tab.tBodies[0];
+      linhas.forEach(function (tr) { corpo.appendChild(tr); });
+    });
+  }
+  var casaInicial = null;
+  try { casaInicial = w.sessionStorage.getItem('qij-casa'); } catch (erro) { casaInicial = null; }
+  if (casas && !casas.hidden) verCasa(casaInicial === 'sf' ? 'sf' : 'cd'); else filtrar();
+
+  /* O dossiê. */
+  var mo = d.getElementById('cgDossie'), dentro = d.getElementById('cgDossieIn');
+  var cache = {}, foco = null, aberto = null;
+  function voto(m) { return (M.votos || {})[m.v] || m.v; }
+  function marcaItem(m, extra) {
+    var k = h('p', { cls: 'cg-ms-k' }, [h('time', { text: dataBr(m.d) }), h('span', { text: (M.tipos || {})[m.t] || m.t }), h('span', { cls: 'cg-ms-v', text: voto(m) })]);
+    if (extra) k.appendChild(h('span', { text: extra }));
+    var t = h('p', { cls: 'cg-ms-t' }, [m.p ? h('b', { text: m.p + ' ' }) : null, m.x || '']);
+    return h('li', {}, [k, t, m.e ? h('p', { cls: 'cg-ms-e', text: m.e }) : null]);
+  }
+  function listaDeMarcas(itens, fn) {
+    return h('ol', { cls: 'cg-ms' }, itens.map(function (m) { return marcaItem(m, fn ? fn(m) : ''); }));
+  }
+  function propItem(i, quando) {
+    var k = h('p', { cls: 'cg-ls-k' }, [h('b', {}, [i.u ? h('a', { href: i.u, target: '_blank', rel: 'noopener noreferrer', text: i.t }) : i.t]), h('span', { text: quando })]);
+    return h('li', {}, [k, h('p', { cls: 'cg-ls-x', text: (i.ap ? '“' + i.ap + '”. ' : '') + (i.e || '') })]);
+  }
+  // Quem trocou de partido na legislatura: o saldo só dos votos dados no partido atual.
+  function noPartido(f) {
+    var np = f.campo && f.campo.no_partido;
+    if (!np) return '';
+    if (!np.n) return ' Trocou de partido: ainda sem votações divisivas no ' + f.partido + '.';
+    return ' Desde que está no ' + f.partido + ': ' + saldo(np.saldo) + ' em ' + num(np.n) + (np.n === 1 ? ' votação.' : ' votações.');
+  }
+
+  function secao(titulo, sub, filhos) {
+    return h('section', { cls: 'cg-d-sec' }, [h('h3', {}, [titulo, sub ? h('span', { text: sub }) : null])].concat(filhos));
+  }
+  function tile(rotulo, valor, miudo, texto, extra) {
+    return h('div', { cls: 'cg-tile' }, [
+      h('p', { cls: 'cg-tile-k', text: rotulo }),
+      h('p', { cls: 'cg-tile-v' }, [valor, miudo ? h('small', { text: miudo }) : null]),
+      extra || null,
+      texto ? h('p', { cls: 'cg-tile-x', text: texto }) : null
+    ]);
+  }
+  function montar(f) {
+    var leg = (f.leg || {})[String(M.legislatura)] || {}, nos = [];
+    var casa = f.casa === 'cd' ? 'Câmara dos Deputados' : 'Senado Federal';
+    var foto = h('div', { cls: 'cg-d-f', 'data-img': '' }, f.foto ? [h('img', { src: f.foto, alt: '', loading: 'lazy', referrerpolicy: 'no-referrer' })] : []);
+    var sub = h('p', { cls: 'cg-d-s' }, []);
+    if (f.pagina) sub.appendChild(h('a', { href: f.pagina, target: '_blank', rel: 'noopener noreferrer', text: 'Página oficial ↗' }));
+    sub.appendChild(d.createTextNode(f.pagina ? ' · ' : ''));
+    sub.appendChild(h('a', { href: M.pesquisa + '?q=' + encodeURIComponent('"' + f.nome + '"'), text: 'Tudo o que o jornal publicou →' }));
+    nos.push(h('div', { cls: 'cg-d-h' }, [foto, h('div', {}, [
+      h('p', { cls: 'cg-d-k', text: casa + ' · ' + [f.partido, f.uf].filter(Boolean).join('-') + (f.condicao && f.condicao !== 'Titular' ? ' · ' + f.condicao : '') + (f.exercicio ? '' : ' · fora do exercício') }),
+      h('h2', { cls: 'cg-d-t', id: 'cgDossieT', text: f.nome }), sub
+    ])]));
+    if (f.frases && f.frases.length) nos.push(h('ul', { cls: 'cg-d-fr' }, f.frases.map(function (x) { return h('li', { text: x }); })));
+
+    /* Os quatro números. */
+    var eixo = leg.eixo, tiles = [], media = f.partido_media || {};
+    if (eixo && f.campo) {
+      var lado = eixo.saldo >= 0 ? 'direita' : 'esquerda', vezes = eixo.saldo >= 0 ? eixo.dir : eixo.esq;
+      tiles.push(tile('Com quem vota', saldo(eixo.saldo), f.campo.nome, 'Com a ' + lado + ' em ' + pct(100 * vezes / eixo.n) + ' das ' + num(eixo.n) + ' votações de conteúdo que dividiram os polos.' + noPartido(f) + (media.saldo != null ? ' Média do ' + f.partido + ': ' + saldo(media.saldo) + '.' : ''), barra(eixo.saldo)));
+    } else {
+      tiles.push(tile('Com quem vota', '—', '', 'Menos votações divisivas do que o mínimo para dizer de que lado fica' + (eixo ? ' (' + eixo.n + ').' : '.')));
+    }
+    var governos = f.gov || {}, nomes = Object.keys(governos), agora = governos[M.governo];
+    var outros = nomes.filter(function (n) { return n !== M.governo; }).map(function (n) { return 'Com o governo ' + n + ': ' + pct(governos[n].pct) + ' (' + num(governos[n].k) + ' de ' + num(governos[n].n) + ').'; });
+    tiles.push(tile('Com o governo ' + (M.governo || ''), agora ? pct(agora.pct) : '—', '', (agora ? num(agora.k) + ' de ' + num(agora.n) + ' votações com orientação do governo. ' : 'Sem votações com orientação do governo. ') + outros.join(' ') + (media.gov != null ? ' Média do ' + f.partido + ': ' + pct(media.gov) + '.' : '')));
+    var pres = leg.pres;
+    tiles.push(tile('Presença', pres ? pct(pres.pct) : '—', '', pres ? 'Votou em ' + num(pres.votou) + ' de ' + num(pres.n) + ' votações nominais em que podia votar' + (pres.faltas ? '; faltou a ' + num(pres.faltas) : '') + (pres.sem_voto ? '; em ' + num(pres.sem_voto) + ' estava presente e não votou' : '') + '.' + (pres.just ? ' Fora da conta: ' + num(pres.just) + (pres.just === 1 ? ' votação' : ' votações') + ' com ausência justificada (licença, missão ou atividade parlamentar).' : '') : 'Sem o registro dos períodos em exercício.'));
+    var fid = leg.fid;
+    tiles.push(tile('Com o partido', fid ? pct(fid.pct) : '—', '', fid ? 'Votou com a maioria do partido do dia em ' + num(fid.k) + ' de ' + num(fid.n) + ' votações.' : 'Sem votações com posição do partido.'));
+    nos.push(h('div', { cls: 'cg-tiles' }, tiles));
+    if (f.presidiu && f.presidiu.length) {
+      nos.push(h('p', { cls: 'cg-d-n', text: 'Presidiu a Câmara ' + f.presidiu.map(function (i) { return 'de ' + dataBr(i[0]) + (i[1] ? ' a ' + dataBr(i[1]) : ' até hoje'); }).join(' e ') + '. Quem preside só vota em caso de empate: as votações desse período não entram na presença.' }));
+    }
+    if (f.mudanca) nos.push(h('p', { cls: 'cg-d-n', text: 'Mudou: no semestre ' + f.mudanca.semestre.replace('-', '/') + ' votou com o governo em ' + pct(f.mudanca.agora.pct) + ' das vezes, contra ' + pct(f.mudanca.antes.pct) + ' nos semestres anteriores (' + Math.abs(f.mudanca.pontos) + ' pontos; passa de 99% no teste de duas proporções).' }));
+
+    /* Por tema. */
+    var temas = (f.temas || []).filter(function (t) { return t.eixo || t.gov; });
+    if (temas.length) {
+      var corpo = temas.map(function (t) {
+        var e = t.eixo, g = t.gov;
+        return h('tr', {}, [
+          h('th', { scope: 'row', text: t.nome }),
+          h('td', { cls: 'an-l' }, [e && e.n >= 5 ? barra(e.saldo) : null]),
+          h('td', { text: e && e.n >= 5 ? saldo(e.saldo) : '—' }), h('td', { text: e ? num(e.n) : '—' }),
+          h('td', { text: g ? pct(g.pct) : '—' }), h('td', { text: num(t.sim) + ' × ' + num(t.nao) })
+        ]);
+      });
+      nos.push(secao('Por tema', 'onde vota com quem, pelo assunto da matéria', [
+        h('div', { cls: 'an-tbl-wrap' }, [h('table', { cls: 'an-tbl cg-tb' }, [
+          h('thead', {}, [h('tr', {}, ['Tema', 'Com quem vota', 'Saldo', 'Divisivas', 'Com o governo', 'Sim × Não'].map(function (x, i) { return h('th', { scope: 'col', cls: i === 1 ? 'an-l' : null, text: x }); }))]),
+          h('tbody', {}, corpo)
+        ])]),
+        h('p', { cls: 'cg-d-n', text: 'Saldo: −100 = sempre com a esquerda; +100 = sempre com a direita. Só aparece com 5 votações divisivas ou mais no tema.' })
+      ]));
+    }
+
+    /* Semestre a semestre. */
+    var sem = (f.sem || []).filter(function (s) { return s.gov; });
+    if (sem.length > 1) {
+      var colunas = h('div', { cls: 'cg-sm', role: 'img', 'aria-label': 'Votos com o governo, semestre a semestre' }, sem.map(function (s) {
+        var c = h('span', { title: s.s.replace('-', '/') + ': com o governo em ' + pct(s.gov.pct) + ' de ' + s.gov.n + ' votações' });
+        c.style.height = Math.max(2, s.gov.pct) + '%';
+        return c;
+      }));
+      var eixoX = h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, sem.map(function (s) { return h('span', { text: s.s.slice(2, 4) + '/' + s.s.slice(5) }); }));
+      var trocas = (f.partidos || []).map(function (p) { return p[1] + ' (' + p[0].slice(0, 4) + ')'; }).join(' → ');
+      nos.push(secao('Semestre a semestre', 'quanto votou com o governo da vez', [colunas, eixoX,
+        h('p', { cls: 'cg-d-n', text: 'A altura é a parte dos votos iguais à orientação do governo em cada semestre (o governo muda em 2023).' + (trocas ? ' Partidos: ' + trocas + '.' : '') })]));
+    }
+
+    /* Fora do padrão. */
+    var dis = f.dissidencias || [], sur = f.surpresas || [];
+    if (dis.length || sur.length) {
+      nos.push(secao('Quando saiu da linha', 'os votos fora do padrão, do mais recente', [h('div', { cls: 'cg-d-2c' }, [
+        h('div', {}, [h('h4', { cls: 'az-h5', text: 'Contra o próprio partido' }), dis.length ? listaDeMarcas(dis, function (m) { return m.pt + ' votou ' + ((M.votos || {})[m.pm] || m.pm) + ' (' + m.c + '%)'; }) : h('p', { cls: 'cg-d-n', text: 'Nenhuma votação em que o partido votou fechado e ele votou diferente.' })]),
+        h('div', {}, [h('h4', { cls: 'az-h5', text: 'Com o outro polo' }), sur.length ? listaDeMarcas(sur, function (m) { return 'ficou com a ' + m.com; }) : h('p', { cls: 'cg-d-n', text: 'Nenhuma surpresa: ou não tem lado definido, ou nunca ficou com o outro polo numa votação divisiva.' })])
+      ])]));
+    }
+    if ((f.recentes || []).length) {
+      nos.push(secao('Os últimos votos', 'texto principal e urgência', [listaDeMarcas(f.recentes, function (m) { return m.g ? 'Governo: ' + ((M.votos || {})[m.g] || m.g) : ''; })]));
+    }
+
+    /* O que propõe e relata. */
+    var a = f.autoria;
+    if (a && a.total) {
+      var est = a.estados || {}, kv = [];
+      Object.keys(a.siglas || {}).forEach(function (s) { kv.push(h('span', {}, [h('b', { text: num(a.siglas[s]) }), ' ' + s])); });
+      var estados = h('div', { cls: 'cg-kv' }, Object.keys(est).map(function (e) { return h('span', {}, [h('b', { text: num(est[e]) }), ' ' + ((M.estados || {})[e] || e)]); }));
+      var porTema = Object.keys(a.temas || {}).slice(0, 6).map(function (t) { return ((M.temas || {})[t] || t) + ' (' + a.temas[t] + ')'; }).join(', ');
+      var blocos = [h('div', { cls: 'cg-kv' }, kv), estados];
+      if (porTema) blocos.push(h('p', { cls: 'cg-d-n', text: 'Do que tratam: ' + porTema + '.' + (a.coautorias ? ' Assina outras ' + num(a.coautorias) + ' como coautor.' : '') }));
+      var colA = [], colB = [];
+      if ((a.vingaram || []).length) colA.push(h('h4', { cls: 'az-h5', text: 'As que vingaram' }), h('ol', { cls: 'cg-ls' }, a.vingaram.map(function (i) { return propItem(i, ((M.estados || {})[i.est] || i.est) + ' · ' + dataBr(i.m || i.d)); })));
+      if ((a.andando || []).length) colA.push(h('h4', { cls: 'az-h5', text: 'As que andaram por último' }), h('ol', { cls: 'cg-ls' }, a.andando.map(function (i) { return propItem(i, (i.s || '') + ' · ' + dataBr(i.m || i.d)); })));
+      if ((a.paradas || []).length) colB.push(h('h4', { cls: 'az-h5', text: 'Paradas há mais tempo (' + num(a.paradas_n) + ' no total)' }), h('ol', { cls: 'cg-ls' }, a.paradas.map(function (i) { return propItem(i, 'parada há ' + tempo(dias(i.m || i.d)) + ' · ' + ((M.filas || {})[i.f] || i.s || '') + (i.o ? ' · ' + i.o : '')); })));
+      blocos.push(h('div', { cls: 'cg-d-2c' }, [h('div', {}, colA), h('div', {}, colB)]));
+      nos.push(secao('O que propõe', num(a.total) + ' proposições de autoria principal' + (a.desde ? ' desde ' + a.desde.slice(0, 4) : ''), blocos));
+    }
+    var r = f.relatorias;
+    if (r && r.total) {
+      nos.push(secao('O que tem na mão', num(r.total) + ' matérias esperando o seu parecer' + (r.antigas_n ? ', ' + num(r.antigas_n) + ' há mais de seis meses' : ''), [
+        h('ol', { cls: 'cg-ls' }, (r.lista || []).map(function (i) { return propItem(i, 'com ele há ' + tempo(dias(i.desde)) + (i.o ? ' · ' + i.o : '') + (i.a ? ' · de ' + i.a : '')); }))
+      ]));
+    }
+
+    /* No jornal. */
+    var j = f.jornal;
+    if (j && (j.n || (j.materias || []).length)) {
+      var itens = [];
+      if ((j.materias || []).length) itens.push(h('h4', { cls: 'az-h5', text: 'Nas matérias da edição' }), h('ol', { cls: 'cg-ls' }, j.materias.map(function (m) {
+        return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', {}, [h('a', { href: M.edicoes + m.d + '.html#s-' + encodeURIComponent(m.id), text: m.t })]), h('span', { text: dataBr(m.d) })])]);
+      })));
+      if ((j.manchetes || []).length) itens.push(h('h4', { cls: 'az-h5', text: 'Nas manchetes coletadas' }), h('ol', { cls: 'cg-ls' }, j.manchetes.map(function (m) {
+        return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', {}, [h('a', { href: m.u, target: '_blank', rel: 'noopener noreferrer', text: m.t })]), h('span', { text: m.v + ' · ' + dataBr(m.d) })])]);
+      })));
+      nos.push(secao('No jornal', num(j.n || 0) + ' manchetes no período lido' + (j.n30 != null ? ', ' + num(j.n30) + ' nos últimos 30 dias' : ''), itens));
+    }
+    nos.push(h('p', { cls: 'cg-d-n', text: (f.casa === 'cd' ? 'Registros oficiais da Câmara dos Deputados' : 'Registros oficiais do Senado Federal') + ', legislatura ' + (M.periodo || '') + ', atualizados em ' + dataBr(M.hoje) + '. Como cada número é contado está em “Como ler”.' }));
+    var voltar = h('button', { type: 'button', text: '← Voltar à página' });
+    voltar.addEventListener('click', function () { fechar(true); });
+    nos.push(h('p', { cls: 'cg-d-back' }, [voltar]));
+    return nos;
+  }
+  function mostrar(nos) {
+    while (dentro.firstChild) dentro.removeChild(dentro.firstChild);
+    nos.forEach(function (n) { dentro.appendChild(n); });
+  }
+  function abrir(k, semHistorico) {
+    if (!mo || !/^(cd|sf)-\d+$/.test(k)) return;
+    if (!aberto) foco = d.activeElement;
+    aberto = k;
+    mo.hidden = false;
+    d.body.classList.add('cg-aberto');
+    mo.scrollTop = 0;
+    if (!semHistorico && w.location.hash !== '#p=' + k) {
+      if (w.history && w.history.pushState) w.history.pushState(null, '', '#p=' + k); else w.location.hash = 'p=' + k;
+    }
+    if (cache[k]) { mostrar(montar(cache[k])); mo.querySelector('.cg-ml').focus(); return; }
+    mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Dossiê' }), h('p', { cls: 'cg-d-st', text: 'Carregando o dossiê…' })]);
+    var pedido = new XMLHttpRequest();
+    pedido.open('GET', M.base + k + '.json');
+    pedido.onload = function () {
+      if (aberto !== k) return;
+      try {
+        if (pedido.status !== 200) throw new Error('HTTP ' + pedido.status);
+        cache[k] = JSON.parse(pedido.responseText);
+        mostrar(montar(cache[k]));
+      } catch (erro) {
+        mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Dossiê' }), h('p', { cls: 'cg-d-st', text: 'Não foi possível abrir este dossiê agora. Tente de novo em instantes.' })]);
+      }
+      mo.querySelector('.cg-ml').focus();
+    };
+    pedido.onerror = pedido.onload;
+    pedido.send();
+  }
+  function fechar(comHistorico) {
+    if (!aberto) return;
+    aberto = null;
+    mo.hidden = true;
+    d.body.classList.remove('cg-aberto');
+    if (comHistorico && /^#p=/.test(w.location.hash)) {
+      if (w.history && w.history.pushState) w.history.pushState(null, '', w.location.pathname + w.location.search); else w.location.hash = '';
+    }
+    if (foco && foco.focus) foco.focus();
+  }
+  function doEndereco() {
+    var m = /^#p=((?:cd|sf)-\d+)$/.exec(w.location.hash || '');
+    if (m) abrir(m[1], true); else fechar(false);
+  }
+  d.addEventListener('click', function (event) {
+    var el = event.target && event.target.closest ? event.target.closest('[data-k]') : null;
+    if (el && !event.metaKey && !event.ctrlKey && !event.shiftKey) { event.preventDefault(); abrir(el.getAttribute('data-k')); return; }
+    if (aberto && (event.target === mo || (event.target.closest && event.target.closest('.cg-mc')))) fechar(true);
+  });
+  d.addEventListener('keydown', function (event) { if (event.key === 'Escape' && aberto) fechar(true); });
+  w.addEventListener('hashchange', doEndereco);
+  w.addEventListener('popstate', doEndereco);
+
+  /* Abrir o dossiê de alguém pelo nome. */
+  var achar = d.getElementById('cgAchar'), acharQ = d.getElementById('cgAcharQ');
+  if (achar && acharQ && tab) {
+    achar.hidden = false;
+    var ir = function () {
+      var alvo = semAcento(acharQ.value).trim();
+      if (!alvo) return;
+      var exata = null, parcial = null;
+      linhas.forEach(function (tr) {
+        var nome = semAcento(tr.getAttribute('data-nome'));
+        if (nome === alvo && !exata) exata = tr;
+        else if (nome.indexOf(alvo) >= 0 && !parcial) parcial = tr;
+      });
+      var tr = exata || parcial, link = tr ? tr.querySelector('[data-k]') : null;
+      if (link) abrir(link.getAttribute('data-k'));
+    };
+    achar.addEventListener('submit', function (event) { event.preventDefault(); ir(); });
+    acharQ.addEventListener('change', ir);
+  }
+  doEndereco();
+})();

@@ -406,6 +406,11 @@ class Edition:
     # as análises dos textos compilados e os dados da execução; None quando o
     # termômetro não rodou (marca sem termômetro, edições antigas).
     termometro: dict[str, Any] | None = None
+    # Fichas do Congresso (qijournal.render.congresso.fichas_da_edicao): os deputados e
+    # senadores que cada matéria cita, com o que os registros diziam deles no dia
+    # ({"hoje", "materias": {id da matéria: [fichas curtas]}}); None quando nenhuma matéria
+    # cita parlamentar, sem os dados do Congresso e em edições antigas.
+    congresso: dict[str, Any] | None = None
 
     def story(self, story_id: str) -> Story:
         for s in self.stories:
@@ -414,7 +419,7 @@ class Edition:
         raise KeyError(story_id)
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        dados: dict[str, Any] = {
             "date": self.date,
             "date_label": self.date_label,
             "generated_at": self.generated_at,
@@ -436,6 +441,10 @@ class Edition:
             "index": [t.to_dict() for t in self.index],
             "termometro": copy.deepcopy(self.termometro) if self.termometro is not None else None,
         }
+        # Só quando há fichas: sem o Congresso, o JSON da edição fica como antes, byte a byte.
+        if self.congresso is not None:
+            dados["congresso"] = copy.deepcopy(self.congresso)
+        return dados
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "Edition":
@@ -460,4 +469,5 @@ class Edition:
             rationale=Rationale.from_dict(data["rationale"]) if isinstance(data.get("rationale"), dict) else None,
             index=[IndexTopic.from_dict(t) for t in data.get("index") or [] if isinstance(t, dict)],
             termometro=copy.deepcopy(data["termometro"]) if isinstance(data.get("termometro"), dict) else None,
+            congresso=copy.deepcopy(data["congresso"]) if isinstance(data.get("congresso"), dict) else None,
         )

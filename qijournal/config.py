@@ -309,6 +309,22 @@ class TermometroConfig:
 
 
 @dataclass
+class CongressoConfig:
+    """Analítico do Congresso (``qijournal/congresso``): a aba "Congresso" e as fichas
+    dos parlamentares citados nas matérias. As réguas das contas (polos, governos,
+    temas, limiares) ficam em ``config/congresso.yaml``."""
+
+    enabled: bool = True
+    marcas: list[str] = field(default_factory=lambda: ["tech"])
+    projetos_desde: int = 2011  # ano das proposições mais antigas acompanhadas na Câmara
+    noticias_dias: int = 60  # janela do cruzamento com o banco do jornal (data/busca)
+    fichas_por_materia: int = 4  # parlamentares citados mostrados em cada matéria da edição
+    # Preenchido na publicação (não vem do YAML): há dados em data/congresso/ e a aba existe,
+    # então as páginas mostram o botão "Congresso" no cabeçalho.
+    publicado: bool = False
+
+
+@dataclass
 class InstagramSlot:
     """Horário-alvo de uma publicação diária (BRT) e até quando ela ainda pode sair."""
 
@@ -415,6 +431,7 @@ class Config:
     email: EmailConfig
     termometro: TermometroConfig = field(default_factory=TermometroConfig)
     instagram: InstagramConfig = field(default_factory=InstagramConfig)
+    congresso: CongressoConfig = field(default_factory=CongressoConfig)
 
     def section(self, section_id: str) -> SectionConfig:
         for s in self.sections:
@@ -430,6 +447,11 @@ class Config:
     def termometro_ativo(self) -> bool:
         """Termômetro e aba Analítico Político ligados para a marca ativa."""
         return self.termometro.enabled and self.brand.key in self.termometro.marcas
+
+    @property
+    def congresso_ativo(self) -> bool:
+        """Aba Congresso e fichas nas matérias ligadas para a marca ativa."""
+        return self.congresso.enabled and self.brand.key in self.congresso.marcas
 
 
 def _truthy(value: str | None) -> bool:
@@ -526,6 +548,10 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
     if _truthy(env.get("QIJ_NO_TERMOMETRO")):
         termometro.enabled = False
 
+    congresso = CongressoConfig(**_known(CongressoConfig, site_raw.get("congresso")))
+    if _truthy(env.get("QIJ_NO_CONGRESSO")):
+        congresso.enabled = False
+
     instagram_raw = dict(site_raw.get("instagram") or {})
     slots = _instagram_slots(instagram_raw.pop("slots", None))
     eleicao = EleicaoConfig(**_known(EleicaoConfig, instagram_raw.pop("eleicao", None)))
@@ -545,4 +571,5 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
         email=email,
         termometro=termometro,
         instagram=instagram,
+        congresso=congresso,
     )

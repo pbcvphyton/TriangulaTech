@@ -11,6 +11,7 @@
 {% block dateline %}Arquivo de edições{% endblock %}
 
 {% block tools %}
+    {% if brand.congresso %}{{ m.congresso_tool("") }}{% endif %}
     {{ m.search_tool("") }}
 {% endblock %}
 

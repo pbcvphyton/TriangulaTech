@@ -1,0 +1,402 @@
+{#- Aba "Congresso": o que faz quem está sentado na Câmara e no Senado. No desenho da aba
+    Analítico: a leitura (os achados, cada um com a prova), quatro lentes (com quem vota, a
+    fila, o Plenário, quem é quem) e o método. O dossiê de cada parlamentar é carregado de
+    data/congresso/fichas/ pelo script; sem script, todo o resto continua na página.
+    Variáveis: c (CongressoView), brand, home_href, archive_href, base_url, repo_url, analitico.
+    Estilos: analitico.css.j2 (az-…) e congresso.css.j2 (cg-…). -#}
+{% extends "layout.html.j2" %}
+{% import "macros.html.j2" as m %}
+
+{% block title %}{{ brand.name }} — Congresso{% endblock %}
+{% block description %}O que faz quem está sentado na Câmara e no Senado: com quem cada um vota, o que propõe, o que deixa parado e o que passa na frente, pelos registros oficiais.{% endblock %}
+{% block meta %}
+<link rel="canonical" href="{{ base_url }}edicoes/congresso.html">
+{% endblock %}
+{% block home_link %}{{ home_href }}{% endblock %}
+{% block dateline %}Congresso{% if c.atualizado %}&nbsp;· <span class="nw">atualizado em {{ c.atualizado }}</span>{% endif %}{% endblock %}
+
+{% block tools %}
+    <a class="tool" href="{{ archive_href }}" title="Edições anteriores"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Edições</span></a>
+    {% if analitico %}
+    <a class="tool tool-an" href="{{ archive_href }}analitico.html" title="Analítico Político: como a imprensa cobre a política" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
+    {% endif %}
+    {{ m.search_tool(archive_href) }}
+{% endblock %}
+
+{% block styles %}
+{% include "analitico.css.j2" %}
+{% include "congresso.css.j2" %}
+{% endblock %}
+
+{#- Nome que abre o dossiê (com script) ou a busca do nome no jornal (sem script). -#}
+{% macro pessoa(k, nome) -%}
+<a class="cg-p" href="#p={{ k }}" data-k="{{ k }}">{{ nome }}</a>
+{%- endmacro %}
+
+{#- A régua do saldo: −100 (com a esquerda) a +100 (com a direita). -#}
+{% macro regua() -%}
+<div class="cg-regua" aria-hidden="true"><span>−100<i>sempre com a esquerda</i></span><span>0</span><span>+100<i>sempre com a direita</i></span></div>
+{%- endmacro %}
+
+{% macro legenda() -%}
+<p class="cg-leg" aria-hidden="true"><span><i class="cg-e3"></i>com a esquerda</span><span><i class="cg-e2"></i>mais com a esquerda</span><span><i class="cg-m"></i>dividido</span><span><i class="cg-d2"></i>mais com a direita</span><span><i class="cg-d3"></i>com a direita</span></p>
+{%- endmacro %}
+
+{% block content %}
+<section class="an az cg" id="congresso" aria-labelledby="cg-h">
+  <div class="arch-top">
+    <h2 class="kicker" id="cg-h">Congresso</h2>
+    <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
+  </div>
+  <nav class="az-nav" id="cgNav" aria-label="Nesta página">
+    <ul>
+      {% if c.leitura %}<li><a href="#cg-leitura">A leitura</a></li>{% endif %}
+      <li><a href="#cg-polos"><b>1</b>Com quem vota</a></li>
+      <li><a href="#cg-fila"><b>2</b>A fila</a></li>
+      <li><a href="#cg-plenario"><b>3</b>O Plenário</a></li>
+      <li><a href="#cg-quem"><b>4</b>Quem é quem</a></li>
+      <li><a href="#cg-metodo">Como ler</a></li>
+    </ul>
+  </nav>
+
+  {% if c.leitura %}{% set l = c.leitura %}
+  <div class="az-lead" id="cg-leitura">
+    <div class="az-box">
+      <p class="az-chapeu">{{ l.chapeu }}</p>
+      <h3 class="az-manchete">{{ l.manchete }}</h3>
+      <p class="az-prova"><span class="az-selo">{{ l.principal.selo }}</span><span>{{ l.principal.texto }} <a href="{{ l.principal.href }}">Ver a prova<span aria-hidden="true"> &darr;</span></a></span></p>
+      <p class="az-fina">{{ l.linha_fina }}</p>
+      {% if l.achados %}
+      <div class="az-mais">
+        <h4 class="az-lbl">Mais achados <span class="az-lbl-n">{{ l.achados|length }}</span></h4>
+        <ol class="az-achados">
+          {% for a in l.achados %}
+          <li class="az-a">
+            <div class="az-a-tx">
+              <p class="az-a-k"><span class="az-selo">{{ a.selo }}</span><b class="az-a-num">{{ a.numero }}</b></p>
+              <h5 class="az-a-t"><a class="hit" href="{{ a.href }}">{{ a.titulo }}</a></h5>
+              <p class="az-a-x">{{ a.texto }}{% if a.ficha %} <a class="cg-p cg-abrir" href="#p={{ a.ficha }}" data-k="{{ a.ficha }}">Abrir o dossiê</a>{% endif %}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+    </div>
+    <aside class="az-rail" aria-labelledby="cg-lentes-h">
+      <h4 class="az-lbl" id="cg-lentes-h">Quatro lentes <span class="az-lbl-n">de onde saem os achados</span></h4>
+      <ol class="az-lentes">
+        <li class="az-l"><p class="az-l-k"><b>1</b>Com quem vota</p><p class="az-l-p"><a class="hit" href="#cg-polos">Por baixo dos rótulos, de que lado cada um fica?</a></p><p class="az-l-v"><b>{{ c.totais.divisivas|num }}</b> <span>votações de conteúdo dividiram os polos</span></p></li>
+        <li class="az-l"><p class="az-l-k"><b>2</b>A fila</p><p class="az-l-p"><a class="hit" href="#cg-fila">O que espera, com quem, e o que passou na frente?</a></p><p class="az-l-v"><b>{{ c.totais.tramitando|num }}</b> <span>matérias tramitando nas duas Casas</span></p></li>
+        <li class="az-l"><p class="az-l-k"><b>3</b>O Plenário</p><p class="az-l-p"><a class="hit" href="#cg-plenario">O que foi votado, e quem saiu da linha?</a></p><p class="az-l-v"><b>{{ c.totais.votacoes|num }}</b> <span>votações nominais desde 2023</span></p></li>
+        <li class="az-l"><p class="az-l-k"><b>4</b>Quem é quem</p><p class="az-l-p"><a class="hit" href="#cg-quem">O que cada um vota, propõe e deixa parado?</a></p><p class="az-l-v"><b>{{ c.totais.pessoas|num }}</b> <span>parlamentares em exercício, cada um com dossiê</span></p></li>
+      </ol>
+      <form class="cg-achar" id="cgAchar" role="search" hidden>
+        <label class="az-lbl az-lbl-2" for="cgAcharQ">Abrir o dossiê de alguém</label>
+        <input class="az-fil-in" id="cgAcharQ" type="search" list="cgNomes" autocomplete="off" spellcheck="false" placeholder="Nome do deputado ou senador…">
+        <datalist id="cgNomes">{% for p in c.pessoas %}<option value="{{ p.nome }}" label="{{ p.partido }}-{{ p.uf }} · {{ p.casa_nome }}">{% endfor %}</datalist>
+      </form>
+    </aside>
+  </div>
+  {% endif %}
+
+  <div class="cg-casas" id="cgCasas" role="group" aria-label="Casa" hidden>
+    {% for casa in c.casas %}
+    <button class="cg-casa-b" type="button" data-casa="{{ casa.id }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ casa.curto }} <span>{{ casa.em_exercicio }}</span></button>
+    {% endfor %}
+    <span class="cg-casas-n">As lentes abaixo mostram uma Casa por vez.</span>
+  </div>
+
+  {#- 1 · Com quem vota -#}
+  <section class="az-sec" aria-labelledby="cg-polos-h">
+    <header class="az-lh" id="cg-polos">
+      <p class="az-ln"><b>1</b>Com quem vota</p>
+      <h3 class="az-lt" id="cg-polos-h">Por baixo dos rótulos, de que lado cada um fica</h3>
+      <p class="az-ld">Só contam as votações de conteúdo em que a esquerda ({{ c.polos.esquerda }}) e a direita ({{ c.polos.direita }}) ficaram em lados opostos. O saldo de cada um vai de −100, sempre com a esquerda, a +100, sempre com a direita. Não é o que a pessoa diz ser: é com quem ela vota.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }} <span>{{ casa.resumo }}</span></h4>
+
+      {% if casa.faixas %}
+      <div class="az-blk" id="cg-faixas-{{ casa.id }}">
+        <h4 class="az-h">Onde cada um está <span>um ponto por parlamentar em exercício, partido a partido</span></h4>
+        {{ legenda() }}
+        <div class="cg-fx">
+          {{ regua() }}
+          {% for f in casa.faixas %}
+          <div class="cg-fx-l">
+            <p class="cg-fx-n"><b>{{ f.sigla }}</b><span>{{ f.membros }} · média {{ f.media }}</span></p>
+            <div class="cg-fx-p" style="height:{{ f.altura }}px">{% for p in f.pontos %}<a class="cg-pt cg-{{ p.classe }}" href="#p={{ p.k }}" data-k="{{ p.k }}" style="left:{{ p.left }}%;top:{{ p.top }}px" title="{{ p.titulo }}"><span class="sr-only">{{ p.titulo }}</span></a>{% endfor %}</div>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="az-dek">Partidos com poucos parlamentares em exercício ficam fora do desenho, mas estão na tabela de todos, mais abaixo. Um ponto longe dos colegas é quem vota diferente da bancada: clique para abrir o dossiê.</p>
+      </div>
+      {% endif %}
+
+      {% if casa.matriz %}
+      <div class="az-blk" id="cg-temas-{{ casa.id }}">
+        <h4 class="az-h">Partido por tema <span>onde o rótulo e o voto se separam</span></h4>
+        <p class="az-dek">O saldo de cada bancada nas {{ casa.matriz_base|num }} votações de conteúdo que dividiram os polos, separado pelo tema da matéria votada. Uma linha que troca de cor é um partido que muda de lado conforme o assunto.</p>
+        <div class="az-mx-wrap">
+          <table class="az-mx cg-mx">
+            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>{{ casa.matriz_base }}</small></th>{% for t in casa.matriz_temas %}<th scope="col">{{ t.nome }}<small>{{ t.n }}</small></th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for linha in casa.matriz %}
+              <tr><th scope="row">{{ linha.sigla }}<small>{{ linha.membros }}</small></th><td class="cg-{{ linha.geral.classe }} cg-mx-g" title="{{ linha.geral.titulo }}">{{ linha.geral.valor }}</td>{% for cel in linha.celulas %}<td class="cg-{{ cel.classe }}" title="{{ cel.titulo }}">{{ cel.valor }}</td>{% endfor %}</tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {{ legenda() }}
+        <p class="az-dek">O número pequeno ao lado do tema é quantas votações divisivas ele teve; ao lado do partido, quantos parlamentares em exercício. Célula com ponto: menos de 5 votações, sem saldo.</p>
+      </div>
+      {% endif %}
+
+      <div class="az-blk" id="cg-bancadas-{{ casa.id }}">
+        <h4 class="az-h">As bancadas <span>o saldo, o governo e a disciplina de cada partido</span></h4>
+        <div class="an-tbl-wrap">
+          <table class="an-tbl cg-tb">
+            <thead><tr><th scope="col">Partido</th><th scope="col">Em exercício</th><th scope="col" class="an-l">Com quem vota</th><th scope="col">Saldo</th><th scope="col">Com o governo {{ c.governo }}</th><th scope="col">Coesão</th></tr></thead>
+            <tbody>
+              {% for b in casa.bancadas %}
+              <tr><th scope="row">{{ b.sigla }}</th><td>{{ b.membros }}</td><td class="an-l"><span class="cg-bar" aria-hidden="true"><i class="cg-{{ b.classe }}" style="left:{{ b.left }}%;width:{{ b.width }}%"></i></span></td><td>{{ b.saldo }}</td><td>{{ b.gov }}</td><td>{{ b.coesao }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="az-dek">Coesão: em média, a parte do partido que vota com a maioria dele. Com o governo: nas votações em que a liderança do Governo orientou Sim ou Não, quantas vezes a maioria do partido votou igual.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- 2 · A fila -#}
+  <section class="az-sec" aria-labelledby="cg-fila-h">
+    <header class="az-lh" id="cg-fila">
+      <p class="az-ln"><b>2</b>A fila</p>
+      <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
+      <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.fila %}{% set f = casa.fila %}
+      <div class="az-blk" id="cg-fila-{{ casa.id }}">
+        <h4 class="az-h">Em que porta está parado <span>{{ f.tramitando }} matérias tramitando; outras {{ f.apensadas }} andam junto com alguma delas</span></h4>
+        <ol class="cg-fl">
+          {% for b in f.blocos %}
+          <li>
+            <p class="cg-fl-n"><b>{{ b.n }}</b> {{ b.nome }}{% if b.quem %} <span>quem segura: {{ b.quem }}</span>{% endif %}</p>
+            <span class="cg-fl-b" aria-hidden="true"><i style="width:{{ b.largura }}%"></i></span>
+            <p class="cg-fl-x">{{ b.parte }} do que tramita · metade sem andamento há mais de {{ b.mediana }} · <b>{{ b.parados }}</b> ({{ b.parados_parte }}) paradas há mais de um ano</p>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+      <div class="az-2c">
+        <div class="az-col">
+          {% if f.orgaos %}
+          <div class="az-blk">
+            <h4 class="az-h">Onde está represado <span>por comissão</span></h4>
+            <div class="an-tbl-wrap">
+              <table class="an-tbl cg-tb">
+                <thead><tr><th scope="col">Comissão</th><th scope="col">Sem relator</th><th scope="col">Prontas, sem pauta</th><th scope="col">A mais antiga</th>{% if casa.id == "cd" %}<th scope="col" class="an-l">Quem preside</th>{% endif %}</tr></thead>
+                <tbody>
+                  {% for o in f.orgaos %}
+                  <tr><th scope="row">{{ o.orgao }}</th><td>{{ o.sem_relator }}</td><td>{{ o.pauta }}</td><td>{{ o.mais_antiga }}</td>{% if casa.id == "cd" %}<td class="an-l">{% if o.presidente_k %}{{ pessoa(o.presidente_k, o.presidente) }}{% else %}—{% endif %}</td>{% endif %}</tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <p class="az-dek">Designar o relator e fazer a pauta são atos de quem preside a comissão.</p>
+          </div>
+          {% endif %}
+          {% if f.sentados %}
+          <div class="az-blk">
+            <h4 class="az-h">Com quem está <span>relatores com mais matérias esperando parecer</span></h4>
+            <div class="an-tbl-wrap">
+              <table class="an-tbl cg-tb">
+                <thead><tr><th scope="col">Relator</th><th scope="col">Esperando</th><th scope="col">Há mais de 6 meses</th><th scope="col">A mais antiga</th></tr></thead>
+                <tbody>
+                  {% for s in f.sentados %}
+                  <tr><th scope="row">{{ pessoa(s.k, s.nome) }}</th><td>{{ s.n }}</td><td>{{ s.antigas }}</td><td>{{ s.mais_antiga }}</td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="az-col">
+          {% if f.prontas %}
+          <div class="az-blk">
+            <h4 class="az-h">Prontas para o Plenário, fora da pauta <span>{{ f.prontas_n }} matérias; as que esperam há mais tempo</span></h4>
+            <ol class="cg-ls">
+              {% for i in f.prontas %}
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span>parada há {{ i.tempo }}</span></p><p class="cg-ls-x">{{ i.e }}</p></li>
+              {% endfor %}
+            </ol>
+          </div>
+          {% endif %}
+          {% if casa.furaram %}{% set r = casa.furaram %}
+          <div class="az-blk" id="cg-furaram-{{ casa.id }}">
+            <h4 class="az-h">Passaram na frente <span>do protocolo ao voto em menos de 120 dias</span></h4>
+            <p class="az-ph">{{ r.rapidas_n }} de {{ r.aprovadas }} matérias aprovadas no Plenário desde {{ r.desde }}; {{ r.com_urgencia }} tiveram a urgência votada.</p>
+            <ol class="cg-ls">
+              {% for i in r.rapidas %}
+              <li><p class="cg-ls-k"><b>{{ i.p }}</b><span>{{ i.tempo }}{% if i.urg %} · com urgência{% endif %} · votada em {{ i.data }}</span></p><p class="cg-ls-x">{{ i.e }}{% if i.autoria %} <i>Autoria: {{ i.autoria }}.</i>{% endif %}</p></li>
+              {% endfor %}
+            </ol>
+            <p class="az-dek">Metade das aprovadas levou menos de {{ r.mediana }} desde a apresentação. Só entram matérias com votação nominal do texto principal.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <p class="term-note">Sem os dados da fila nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- 3 · O Plenário -#}
+  <section class="az-sec" aria-labelledby="cg-plenario-h">
+    <header class="az-lh" id="cg-plenario">
+      <p class="az-ln"><b>3</b>O Plenário</p>
+      <h3 class="az-lt" id="cg-plenario-h">O que foi votado, e quem saiu da linha</h3>
+      <p class="az-ld">As últimas votações nominais de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      <ol class="cg-vs" id="cg-votacoes-{{ casa.id }}">
+        {% for v in casa.ultimas %}
+        <li class="cg-v">
+          <div class="cg-v-h">
+            <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
+            <h5 class="cg-v-t">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}{{ v.descricao }}</h5>
+            {% if v.ementa %}<p class="cg-v-e">{{ v.ementa }}</p>{% endif %}
+          </div>
+          <div class="cg-v-p">
+            {% if v.secreta %}
+            <p class="cg-v-n">Votação secreta: {{ v.sim }} Sim, {{ v.nao }} Não.</p>
+            {% else %}
+            <p class="cg-v-n"><b class="cg-s">{{ v.sim }}</b> Sim <span aria-hidden="true">×</span> <b class="cg-n">{{ v.nao }}</b> Não{% if v.abstencao %} · {{ v.abstencao }} abst.{% endif %}</p>
+            <p class="cg-v-o">Governo: <b>{{ v.governo or "—" }}</b> · Esquerda: <b>{{ v.esquerda or "—" }}</b> · Direita: <b>{{ v.direita or "—" }}</b></p>
+            {% endif %}
+          </div>
+          {% if v.partidos %}
+          <p class="cg-v-b">{% for p in v.partidos %}<span class="cg-pb cg-pb-{{ p.classe }}" title="{{ p.sigla }}: {{ p.coesao }}% votaram {{ p.lado }} ({{ p.votos }} votos)">{{ p.sigla }} <b>{{ p.lado }}</b>{% if p.coesao < 100 %} <i>{{ p.coesao }}%</i>{% endif %}</span>{% endfor %}</p>
+          {% endif %}
+          {% if v.dissidentes %}
+          <details class="cg-v-d">
+            <summary>Quem votou diferente do próprio partido</summary>
+            <ul>{% for g in v.dissidentes %}<li><b>{{ g.sigla }}</b> (a maioria votou {{ g.lado }}): {% for n in g.nomes %}{{ pessoa(n.k, n.nome) }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% endfor %}</ul>
+          </details>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- 4 · Quem é quem -#}
+  <section class="az-sec" aria-labelledby="cg-quem-h">
+    <header class="az-lh" id="cg-quem">
+      <p class="az-ln"><b>4</b>Quem é quem</p>
+      <h3 class="az-lt" id="cg-quem-h">O que cada um vota, propõe e deixa parado</h3>
+      <p class="az-ld">As listas do que salta aos olhos e, abaixo, todos os parlamentares. Clicar num nome abre o dossiê: com quem vota em cada tema, quando saiu da linha, o que propôs e o que o jornal publicou dele.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}" id="cg-listas-{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      <div class="cg-lts">
+        {% for lista in casa.listas %}
+        <div class="cg-lt">
+          <h4 class="az-h5">{{ lista.titulo }}</h4>
+          <p class="cg-lt-d">{{ lista.dek }}</p>
+          <ol>
+            {% for x in lista.linhas %}
+            <li><span class="cg-lt-n">{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b>{% if x.extra %} <small>{{ x.extra }}</small>{% endif %}</span></li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="az-blk" id="cg-todos">
+      <h4 class="az-h">Todos os parlamentares <span>{{ c.totais.pessoas|num }} em exercício nas duas Casas</span></h4>
+      <div class="az-fil cg-fil" id="cgFil" hidden>
+        <label class="sr-only" for="cgQ">Filtrar por nome, partido ou estado</label>
+        <input class="az-fil-in" id="cgQ" type="search" autocomplete="off" spellcheck="false" placeholder="Filtrar: nome, partido, UF…">
+        <label class="az-fil-ck"><input type="checkbox" id="cgFora"> incluir quem saiu ou está licenciado ({{ c.fora }})</label>
+        <span class="az-fil-n" id="cgN" role="status"></span>
+      </div>
+      <div class="an-tbl-wrap">
+        <table class="an-tbl cg-tb cg-todos" id="cgTab">
+          <thead><tr>
+            <th scope="col" data-ord="nome">Nome</th><th scope="col" data-ord="partido">Partido</th><th scope="col" data-ord="uf">UF</th>
+            <th scope="col" class="an-l" data-ord="saldo">Com quem vota</th><th scope="col" data-ord="saldo">Saldo</th>
+            <th scope="col" data-ord="gov" title="Votou com a orientação do governo {{ c.governo }}">Governo</th>
+            <th scope="col" data-ord="pres" title="Votações nominais em que podia votar e votou">Presença</th>
+            <th scope="col" data-ord="fid" title="Votou com a maioria do próprio partido">Partido</th>
+            <th scope="col" data-ord="prop" title="Proposições de autoria principal">Propostas</th>
+            <th scope="col" data-ord="par" title="Propostas sem andamento há mais de um ano">Paradas</th>
+            <th scope="col" data-ord="rel" title="Relatorias sem parecer há mais de seis meses">Relatorias</th>
+            <th scope="col" data-ord="jor" title="Manchetes do jornal nos últimos 30 dias">No jornal</th>
+          </tr></thead>
+          <tbody>
+            {% for p in c.pessoas %}
+            <tr{% if not p.ex %} class="cg-fora" hidden{% endif %} data-casa="{{ p.casa }}" data-b="{{ p.busca }}" data-nome="{{ p.nome }}" data-partido="{{ p.partido }}" data-uf="{{ p.uf }}" data-saldo="{{ p.saldo if p.saldo is not none else '' }}" data-gov="{{ p.gov if p.gov is not none else '' }}" data-pres="{{ p.pres if p.pres is not none else '' }}" data-fid="{{ p.fid if p.fid is not none else '' }}" data-prop="{{ p.prop }}" data-par="{{ p.par }}" data-rel="{{ p.rel }}" data-jor="{{ p.jor }}">
+              <th scope="row">{{ pessoa(p.k, p.nome) }}<small>{{ p.casa_nome }}{% if not p.ex %} · fora do exercício{% endif %}</small></th>
+              <td>{{ p.partido }}</td><td>{{ p.uf }}</td>
+              <td class="an-l"><span class="cg-bar" aria-hidden="true"><i class="cg-{{ p.classe }}" style="left:{{ p.left }}%;width:{{ p.width }}%"></i></span></td>
+              <td>{{ p.saldo_txt }}</td><td>{{ p.gov_txt }}</td><td>{{ p.pres_txt }}</td><td>{{ p.fid_txt }}</td>
+              <td>{{ p.prop or "—" }}</td><td>{{ p.par or "—" }}</td><td>{{ p.rel or "—" }}</td><td>{{ p.jor or "—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="az-dek">Saldo sem número: menos votações divisivas do que o mínimo para dizer algo. Propostas: só as de autoria principal (quem assina primeiro).</p>
+    </div>
+  </section>
+
+  <section class="az-sec az-met" aria-labelledby="cg-metodo-h">
+    <header class="az-lh" id="cg-metodo">
+      <p class="az-ln">Método</p>
+      <h3 class="az-lt" id="cg-metodo-h">Como ler</h3>
+    </header>
+    <dl class="az-dl">
+      {% for titulo, texto in c.metodo %}
+      <div><dt>{{ titulo }}</dt><dd>{{ texto }}</dd></div>
+      {% endfor %}
+    </dl>
+  </section>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="ft">
+  <p><strong>{{ brand.name }}</strong> · Congresso · legislatura {{ c.periodo }} · fontes: Dados Abertos da Câmara dos Deputados e do Senado Federal</p>
+  <p class="ft-links"><a href="{{ home_href }}">Edição mais recente</a> · <a href="{{ archive_href }}">Edições anteriores</a>{% if repo_url %} · <a href="{{ repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
+</footer>
+{% endblock %}
+
+{% block after %}
+<div class="cg-mo" id="cgDossie" role="dialog" aria-modal="true" aria-labelledby="cgDossieT" hidden>
+  <article class="cg-ml" tabindex="-1">
+    <button class="mc cg-mc" type="button" aria-label="Fechar o dossiê">&times;</button>
+    <div id="cgDossieIn"><h2 id="cgDossieT" class="sr-only">Dossiê</h2></div>
+  </article>
+</div>
+<script type="application/json" id="cgManifesto">{{ c.manifesto|safe }}</script>
+<script>
+{% include "congresso.js.j2" %}
+</script>
+{% endblock %}
