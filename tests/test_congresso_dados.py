@@ -211,6 +211,22 @@ def test_atualizar_grava_base_fichas_paineis_e_leitura(publicado: tuple[Path, fa
     assert meta["jornal"] == {"edicoes": 1, "de": "2026-11-12", "ate": "2026-11-12", "manchetes": 3}
 
 
+@pytest.mark.parametrize(
+    ("esq", "dir_", "comeco"),
+    [
+        (0, 20, "Vota quase sempre com a direita:"),  # +100
+        (3, 17, "Vota com a direita:"),  # +70: a faixa "com a direita"
+        (6, 14, "Vota mais com a direita:"),  # +40
+        (8, 12, "Divide-se entre os polos:"),  # +20: ainda "dividido"
+        (17, 3, "Vota com a esquerda:"),  # −70
+        (20, 0, "Vota quase sempre com a esquerda:"),  # −100
+    ],
+)
+def test_a_frase_do_campo_diz_o_mesmo_que_a_faixa(r: regras.Regras, esq: int, dir_: int, comeco: str):
+    atual = perfil.Recorte(eixo=perfil.Eixo(esq=esq, dir=dir_))
+    assert ficha.frase("cd", atual, {}, "Lula", None, None, r)[0].startswith(comeco)
+
+
 def test_quem_trocou_de_partido_e_comparado_pelo_que_votou_no_partido_atual(r: regras.Regras):
     """A distância da bancada usa só os votos dados no partido atual; com poucos, não compara."""
     p = perfil.Perfil(id=5, casa="cd")

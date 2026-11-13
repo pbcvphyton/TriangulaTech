@@ -138,14 +138,19 @@ def frase(
         saldo = atual.eixo.saldo or 0.0
         lado, vezes = ("direita", atual.eixo.dir) if saldo >= 0 else ("esquerda", atual.eixo.esq)
         parte = 100.0 * vezes / atual.eixo.n
-        if abs(saldo) < 20:
+        # A frase segue a faixa do campo (as mesmas de config/congresso.yaml), para dizer o
+        # mesmo que o rótulo ao lado: "dividido", "mais com a…", "com a…" e, além de ±80,
+        # "quase sempre com a…".
+        faixa = regras.campo(saldo).id
+        if faixa == "centro":
             frases.append(
                 f"Divide-se entre os polos: nas {_n(atual.eixo.n, 'votação', 'votações')} de conteúdo em que esquerda e "
                 f"direita divergiram, votou com a direita em {_p(100.0 * atual.eixo.dir / atual.eixo.n)}."
             )
         else:
             frases.append(
-                f"Vota {'quase sempre ' if abs(saldo) >= 80 else 'mais '}com a {lado}: ficou desse lado em {_p(parte)} das "
+                f"Vota {'quase sempre ' if abs(saldo) >= 80 else '' if faixa in ('esquerda', 'direita') else 'mais '}com a {lado}: "
+                f"ficou desse lado em {_p(parte)} das "
                 f"{_n(atual.eixo.n, 'votação', 'votações')} de conteúdo em que os polos divergiram."
             )
     do_governo = governos.get(governo_atual or "")
