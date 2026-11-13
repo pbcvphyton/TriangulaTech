@@ -72,6 +72,7 @@ class Tema:
     nome: str
     camara: frozenset[int] = frozenset()
     senado: tuple[str, ...] = ()  # prefixos de "Raiz / Filho", normalizados
+    senado_nomes: tuple[str, ...] = ()  # os mesmos, como estão escritos (para mostrar a definição do tema)
 
 
 @dataclass(frozen=True)
@@ -254,6 +255,7 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
                 nome=str(t.get("nome") or t["id"]),
                 camara=frozenset(int(c) for c in t.get("camara") or []),
                 senado=tuple(text.normalize(str(s)) for s in t.get("senado") or []),
+                senado_nomes=tuple(str(s).strip() for s in t.get("senado") or []),
             )
             for t in bruto.get("temas") or []
         ],

@@ -74,6 +74,9 @@ TIPOS = {
 }
 EMENTA_MAX = 240
 DESCRICAO_MAX = 320
+# Os campos de cada votação gravada. 2: "o que se votou" (``abertura``). Um ano fechado gravado
+# num formato mais antigo é refeito uma vez (:func:`qijournal.congresso.dados.atualizar_base`).
+FORMATO = 2
 
 # Siglas de proposição que são a matéria em si (e não o requerimento sobre ela).
 _PRINCIPAIS = ("PEC", "PLP", "PL", "MPV", "PLV", "PDL", "PRC", "PLN", "PDC", "PRS", "PLS", "PLC", "PDS", "VET", "MSF", "MSC")
@@ -108,6 +111,9 @@ class Votacao:
     tipo: str
     votos: str  # um caractere por pessoa
     hora: str = ""  # HH:MM
+    # Câmara: o que foi posto em votação, nas palavras da Mesa ("Votação do DTQ 5: PL: Emenda de
+    # Plenário nº 4", "Destaque para Votação em Separado do art. 9º"): diz quem pediu o destaque e qual trecho.
+    abertura: str = ""
     aprovada: bool | None = None
     secreta: bool = False
     prop: str = ""  # "PL 1234/2023": a matéria afetada
@@ -134,6 +140,7 @@ class AnoVotos:
     pessoas: list[Pessoa] = field(default_factory=list)
     votacoes: list[Votacao] = field(default_factory=list)
     atualizado: str = ""  # AAAA-MM-DD
+    formato: int = FORMATO  # o formato em que o ano foi gravado (ver FORMATO)
 
     def indice(self) -> dict[int, int]:
         return {p.id: i for i, p in enumerate(self.pessoas)}
@@ -258,6 +265,31 @@ def tipo_da_votacao(
     return padrao
 
 
+# "primeiro", "2º", "1°"... seguido de "turno" na mesma oração ("entre o primeiro e o segundo turno" dá os dois)
+_TURNO = re.compile(r"(?:\b(primeiro|segundo)\b|\b([12])\s*[º°o])(?=[^.;]{0,25}?\bturno\b)", re.IGNORECASE)
+
+
+def turno(descricao: str) -> int | None:
+    """O turno de uma votação de PEC, quando a descrição oficial diz um só ("Aprovada, em
+    primeiro turno, ...", "(2º turno)"). Quem cita os dois (a quebra de interstício "entre o
+    primeiro e o segundo turno") fica sem."""
+    achados = {1 if (m.group(1) or "").lower() == "primeiro" or m.group(2) == "1" else 2 for m in _TURNO.finditer(descricao or "")}
+    return achados.pop() if len(achados) == 1 else None
+
+
+_NOVA_EMENTA = re.compile(r"\s*NOVA EMENTA:\s*", re.IGNORECASE)
+
+
+def ementa_valida(texto: str | None) -> tuple[str, str]:
+    """``(a ementa que vale, a original)``: quando o texto muda no caminho, a Câmara anota a
+    "NOVA EMENTA" depois da original. Sem nova ementa, a original fica vazia."""
+    limpa = re.sub(r"\s+", " ", (texto or "").strip())
+    partes = _NOVA_EMENTA.split(limpa, maxsplit=1)
+    if len(partes) == 2 and partes[1].strip():
+        return partes[1].strip(), partes[0].strip()
+    return limpa, ""
+
+
 def _curto(valor: str | None, limite: int) -> str:
     return text.truncate(re.sub(r"\s+", " ", (valor or "").strip()), limite)
 
@@ -299,6 +331,7 @@ def _fechar(
                 hora=v.get("hora") or "",
                 orgao=v.get("orgao") or PLENARIO,
                 descricao=_curto(v.get("descricao"), DESCRICAO_MAX),
+                abertura=_curto(v.get("abertura"), DESCRICAO_MAX),
                 tipo=v["tipo"],
                 votos="".join(linha),
                 aprovada=v.get("aprovada"),
@@ -386,11 +419,12 @@ def camara_ano(coletor: Coletor, ano: int, *, temas: Temas | None = None, atuali
                 "hora": registro[11:16],
                 "orgao": (r.get("siglaOrgao") or "").strip() or PLENARIO,
                 "descricao": r.get("descricao") or "",
+                "abertura": r.get("ultimaAberturaVotacao_descricao") or "",
                 "tipo": tipo_da_votacao(r.get("descricao") or ""),
                 "aprovada": {"1": True, "0": False}.get(aprovacao),
                 "prop": _titulo(principal.get("proposicao_siglaTipo"), principal.get("proposicao_numero"), principal.get("proposicao_ano")) if principal else "",
                 "prop_id": prop_id,
-                "ementa": (principal.get("proposicao_ementa") if principal else "") or "",
+                "ementa": ementa_valida(principal.get("proposicao_ementa") if principal else "")[0],
                 "temas": temas(prop_id, prop_ano) if temas and prop_id else [],
                 "ori": orientacoes.get(vid, {}),
                 "votos": votos[vid],
@@ -533,6 +567,8 @@ def _votacao_dict(v: Votacao) -> dict[str, Any]:
     d: dict[str, Any] = {"id": v.id, "d": v.data, "o": v.orgao, "t": v.tipo, "x": v.descricao, "v": v.votos}
     if v.hora:
         d["h"] = v.hora
+    if v.abertura:
+        d["ab"] = v.abertura
     if v.aprovada is not None:
         d["ap"] = 1 if v.aprovada else 0
     if v.secreta:
@@ -556,7 +592,7 @@ def serializar(ano: AnoVotos) -> str:
     """JSON com uma pessoa e uma votação por linha (o git guarda só o que mudou)."""
     pessoas = ",\n".join(_compacto([p.id, p.nome, p.uf, [list(t) for t in p.partidos]]) for p in ano.pessoas)
     votacoes = ",\n".join(_compacto(_votacao_dict(v)) for v in ano.votacoes)
-    cabeca = _compacto({"v": VERSAO, "casa": ano.casa, "ano": ano.ano, "atualizado": ano.atualizado})[:-1]
+    cabeca = _compacto({"v": VERSAO, "f": FORMATO, "casa": ano.casa, "ano": ano.ano, "atualizado": ano.atualizado})[:-1]
     return f'{cabeca},\n"pessoas":[\n{pessoas}\n],\n"votacoes":[\n{votacoes}\n]}}\n'
 
 
@@ -574,6 +610,7 @@ def desserializar(dados: Mapping[str, Any]) -> AnoVotos:
             tipo=str(v.get("t") or OUTRO),
             votos=str(v.get("v") or ""),
             hora=str(v.get("h") or ""),
+            abertura=str(v.get("ab") or ""),
             aprovada=None if v.get("ap") is None else bool(v["ap"]),
             secreta=bool(v.get("sec")),
             prop=str(v.get("p") or ""),
@@ -591,6 +628,7 @@ def desserializar(dados: Mapping[str, Any]) -> AnoVotos:
         pessoas=pessoas,
         votacoes=votacoes,
         atualizado=str(dados.get("atualizado") or ""),
+        formato=int(dados.get("f") or 1),
     )
 
 

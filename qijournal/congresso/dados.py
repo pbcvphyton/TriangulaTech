@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import net, text
 from ..net import Fetcher
-from . import VERSAO, base, exercicio, ficha, fontes, jornal, perfil, projetos, regras as regras_mod, relevancia, temas
+from . import VERSAO, base, exercicio, ficha, fontes, jornal, materias, perfil, projetos, regras as regras_mod, relevancia, temas
 from .base import AnoVotos
 from .ficha import Cadastro
 from .fontes import Coletor
@@ -56,6 +56,7 @@ ULTIMAS = 14  # votações nominais mais recentes no painel de cada Casa
 LISTA = 15  # tamanho das listas do painel
 MINIMO_FIDELIDADE = 50  # votações com posição do partido para entrar nas listas de dissidência
 MINIMO_BANCADA = {"cd": 5, "sf": 3}  # parlamentares em exercício para o partido entrar na matriz de temas
+MINIMO_PAR = 20  # votações de conteúdo em que os dois partidos tiveram lado, para o par aparecer
 JANELA_FURARAM = 240  # dias em que uma votação de texto principal conta em "passaram na frente"
 RAPIDO = 120  # do protocolo ao voto em menos que isso: passou na frente
 RACHAS_LISTA = 10  # votações de cada partido na lista dos rachas
@@ -130,8 +131,9 @@ def ler_json(caminho: Path) -> Any | None:
 def atualizar_base(
     coletor: Coletor, regras: Regras, pasta: Path, opcoes: Opcoes, avisos: list[str]
 ) -> tuple[dict[str, list[AnoVotos]], int]:
-    """A base de votações das duas Casas, com o ano corrente refeito (e os fechados,
-    só se faltarem ou com ``opcoes.completo``). Devolve ``({casa: [anos]}, gravados)``."""
+    """A base de votações das duas Casas, com o ano corrente refeito (e os fechados, só
+    se faltarem, se foram gravados num formato mais antigo ou com ``opcoes.completo``).
+    Devolve ``({casa: [anos]}, gravados)``."""
     corrente = int(opcoes.hoje[:4])
     tc, ts = temas.TemasCamara(coletor, regras), temas.TemasSenado(coletor, regras)
     resultado: dict[str, list[AnoVotos]] = {"cd": [], "sf": []}
@@ -141,7 +143,7 @@ def atualizar_base(
             if ano > corrente:
                 continue
             existente = base.ler(pasta, casa, ano)
-            if existente is not None and ano < corrente and not opcoes.completo:
+            if existente is not None and ano < corrente and not opcoes.completo and existente.formato >= base.FORMATO:
                 resultado[casa].append(existente)
                 continue
             validade = opcoes.validade_h if ano == corrente else 24 * 30
@@ -318,6 +320,28 @@ def _matriz_de_temas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int,
         "divisivas": divisivas["todas"],
         "partidos": partidos,
     }
+
+
+def _convivencia(
+    anos: Iterable[AnoVotos], regras: Regras, legislatura: int, bancadas: list[Mapping[str, Any]], siglas: set[str]
+) -> dict[str, Any]:
+    """Partido × partido: em quantas das votações de conteúdo em que os dois tiveram lado os
+    dois ficaram do mesmo lado (:func:`perfil.convivencia`). Os partidos vão na ordem do
+    saldo (da esquerda para a direita); par com menos de ``MINIMO_PAR`` votações fica vazio."""
+    bruto = perfil.convivencia(anos, regras, legislatura)
+    saldos = {b["sigla"]: b.get("saldo") for b in bancadas}
+    ordem = sorted((s for s in siglas if s in saldos), key=lambda s: (saldos[s] is None, saldos[s] if saldos[s] is not None else 0, s))
+    pares = bruto.pop("pares")
+
+    def celula(a: str, b: str) -> list[int] | None:
+        if a == b:
+            return None
+        iguais, total = pares.get((a, b) if a < b else (b, a), (0, 0))
+        return [round(100 * iguais / total), total] if total >= MINIMO_PAR else None
+
+    # Partido sem nenhum par com votações suficientes (bancada pequena) não tem linha.
+    ordem = [a for a in ordem if any(celula(a, b) for b in ordem)]
+    return {**bruto, "partidos": ordem, "matriz": [[celula(a, b) for b in ordem] for a in ordem]}
 
 
 def _rachas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int, lista: int = RACHAS_LISTA) -> dict[str, Any]:
@@ -630,16 +654,7 @@ def votacoes_por_proposicao(anos: Iterable[AnoVotos], regras: Regras, legislatur
     return dict(por)
 
 
-# "primeiro", "2º", "1°"... seguido de "turno" na mesma oração ("entre o primeiro e o segundo turno" dá os dois)
-_TURNO = re.compile(r"(?:\b(primeiro|segundo)\b|\b([12])\s*[º°o])(?=[^.;]{0,25}?\bturno\b)", re.IGNORECASE)
-
-
-def turno(descricao: str) -> int | None:
-    """O turno de uma votação de PEC, quando a descrição oficial diz um só ("Aprovada, em
-    primeiro turno, ...", "(2º turno)"). Quem cita os dois (a quebra de interstício "entre o
-    primeiro e o segundo turno") fica sem."""
-    achados = {1 if (m.group(1) or "").lower() == "primeiro" or m.group(2) == "1" else 2 for m in _TURNO.finditer(descricao or "")}
-    return achados.pop() if len(achados) == 1 else None
+turno = base.turno  # o turno de uma votação de PEC, pela descrição oficial
 
 
 def jornal_e_voto(
@@ -1122,6 +1137,8 @@ def atualizar(
 
     # Fichas.
     por_prop = {casa: votacoes_por_proposicao(votos[casa], regras, legislatura.numero) for casa in ("cd", "sf")}
+    # Sobre o que cada um mais propõe: as palavras-chave do registro (só a Câmara as traz nas listas).
+    vocabularios = {"cd": projetos.Vocabulario(props_cd) if props_cd else None, "sf": None}
     fichas: dict[str, list[dict[str, Any]]] = {"cd": [], "sf": []}
     for casa in ("cd", "sf"):
         for pid, cadastro in cadastros[casa].items():
@@ -1134,7 +1151,7 @@ def atualizar(
                     regras,
                     legislatura=legislatura.numero,
                     governo_atual=governo.nome if governo else None,
-                    autoria=projetos.resumo_de_autoria(minhas, hoje, regras.limiares, pessoa=pid) if minhas else None,
+                    autoria=projetos.resumo_de_autoria(minhas, hoje, regras.limiares, pessoa=pid, vocabulario=vocabularios[casa]) if minhas else None,
                     relatorias=projetos.resumo_de_relatorias(relatorias[casa].get(pid) or [], hoje, regras.limiares) or None,
                     jornal=jornal.resumo_de_mencoes(cruzamento.de(cadastro.chave), hoje) or None,
                     mudanca=perfil.mudanca_recente(p, regras) if p else None,
@@ -1208,6 +1225,7 @@ def atualizar(
             "votacoes": _estatisticas(votos[casa], regras, legislatura.numero),
             "bancadas": bancadas,
             "temas": _matriz_de_temas(votos[casa], regras, legislatura.numero, grandes),
+            "convivencia": _convivencia(votos[casa], regras, legislatura.numero, bancadas, grandes),
             "rachas": _rachas(votos[casa], regras, legislatura.numero),
             "relevancia": relevancia.painel(esperando[casa], aprovadas[casa], reguas[casa], hoje, citadas=cruzamento.citadas)
             if esperando[casa] or aprovadas[casa]
@@ -1217,6 +1235,39 @@ def atualizar(
             "fila": fila,
             "furaram": furaram,
         }
+
+    # As fichas das matérias: as votadas no Plenário nesta legislatura e as de "o que espera × o que passa".
+    fichas_das_materias: dict[str, dict[str, Any]] = {}
+    for casa in ("cd", "sf"):
+        nomes_casa = {c.id: c.nome for c in cadastros[casa].values()}
+        for ano in votos[casa]:
+            for pessoa in ano.pessoas:
+                nomes_casa.setdefault(pessoa.id, pessoa.nome)
+        if casa == "cd":
+            conhecidas = dict(indice_props)
+
+            def detalhe(ids: Iterable[int]) -> dict[int, Proposicao]:
+                return projetos.camara_detalhes(coletor, ids)
+        else:
+            conhecidas = {p.processo: p for p in [*props_sf, *(a.prop for a in aprovadas["sf"])] if p.processo}
+
+            def detalhe(ids: Iterable[int]) -> dict[int, Proposicao]:
+                return projetos.senado_detalhes(coletor, ids)
+        fichas_das_materias[casa], paineis[casa]["cruzada"] = materias.montar(
+            casa,
+            votos[casa],
+            regras,
+            legislatura.numero,
+            hoje,
+            por_id=conhecidas,
+            esperando=esperando[casa],
+            aprovadas=aprovadas[casa],
+            regua=reguas[casa],
+            citadas=cruzamento.citadas,
+            nomes=nomes_casa,
+            fichas={pid: c.chave for pid, c in cadastros[casa].items()},
+            detalhe=detalhe,
+        )
 
     leitura = achados(paineis, regras)
     polos = regras.polos_em(hoje)
@@ -1240,7 +1291,7 @@ def atualizar(
             "baixa": regras.relevancia.baixa,
             "rapida": relevancia.RAPIDA,
         },
-        "temas": [{"id": t.id, "nome": t.nome} for t in regras.temas],
+        "temas": [{"id": t.id, "nome": t.nome, **temas.definicao(t)} for t in regras.temas],
         "anos": regras.anos(),
         "projetos_desde": opcoes.projetos_desde,
         "jornal": {"edicoes": len(cruzamento.edicoes), "de": cruzamento.edicoes[0] if cruzamento.edicoes else "", "ate": cruzamento.edicoes[-1] if cruzamento.edicoes else "", "manchetes": cruzamento.manchetes},
@@ -1275,6 +1326,7 @@ def atualizar(
         resultado.gravados += _gravar(
             pasta / VOTOS.format(casa=casa), _json_por_linha(votos_da_legislatura(votos[casa], regras, legislatura.numero, chaves, casa))
         )
+        resultado.gravados += _gravar(pasta / materias.ARQUIVO.format(casa=casa), materias.serializar(fichas_das_materias[casa]))
     resultado.gravados += _gravar(pasta / RESUMO, _json(resumo))
     resultado.gravados += _gravar(pasta / ACHADOS, _json({"v": VERSAO, "hoje": hoje, "achados": leitura}))
     resultado.gravados += _gravar(pasta / META, _json(meta))

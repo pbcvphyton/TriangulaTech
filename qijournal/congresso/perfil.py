@@ -177,14 +177,22 @@ def _maioria(sim: int, nao: int, minimo: int, coesao: float) -> tuple[str, float
     return (lado, parte) if parte >= coesao else ("", parte)
 
 
-def ler_votacao(v: Votacao, partidos: list[str], regras: Regras) -> Leitura:
-    """``partidos``: o partido de cada pessoa do ano na data da votação."""
-    lim = regras.limiares
+def contar(v: Votacao, partidos: list[str]) -> dict[str, list[int]]:
+    """Partido → ``[Sim, Não]`` numa votação (a obstrução conta como Não).
+    ``partidos``: o partido de cada pessoa do ano na data da votação."""
     contagem: dict[str, list[int]] = defaultdict(lambda: [0, 0])
     for voto, sigla in zip(v.votos, partidos, strict=False):
         lado = base.POSICAO.get(voto)
         if lado and sigla:
             contagem[sigla][0 if lado == base.SIM else 1] += 1
+    return contagem
+
+
+def ler_votacao(v: Votacao, partidos: list[str], regras: Regras, contagem: dict[str, list[int]] | None = None) -> Leitura:
+    """``partidos``: o partido de cada pessoa do ano na data da votação (``contagem``: a
+    de :func:`contar`, quando quem chama já a tem)."""
+    lim = regras.limiares
+    contagem = contar(v, partidos) if contagem is None else contagem
     leitura = Leitura(governo={"S": base.SIM, "N": base.NAO, "O": base.NAO}.get(v.ori.get(base.GOVERNO, ""), ""))
     for sigla, (sim, nao) in contagem.items():
         lado, parte = _maioria(sim, nao, lim.minimo_partido, 0.5)
@@ -475,6 +483,42 @@ def bancadas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> list
         b.membros = len(membros[sigla])
         b.coesao = 100.0 * soma[sigla] / b.votacoes if b.votacoes else None
     return sorted(por.values(), key=lambda b: (-b.membros, b.sigla))
+
+
+def convivencia(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> dict[str, Any]:
+    """Quanto os partidos votam juntos nas votações de conteúdo, sem passar pela régua dos polos.
+
+    O saldo esquerda × direita só olha as votações em que os polos se opõem: nele, os
+    partidos que definem os polos ficam nas pontas por construção. Aqui entram **todas** as
+    votações de conteúdo abertas de Plenário da legislatura: em cada uma, cada partido com
+    votos suficientes tem um lado (o da sua maioria), e dois partidos votaram juntos quando
+    o lado é o mesmo. Devolve também em quantas os polos ficaram do mesmo lado
+    (``juntos``), em lados opostos (``divisivas`` e ``rachas``) e em quantas um polo não
+    teve maioria clara (``sem_lado``), e os pares ``(a, b) → [votaram igual, votações]``."""
+    conta = {"conteudo": 0, "divisivas": 0, "rachas": 0, "juntos": 0, "sem_lado": 0}
+    pares: dict[tuple[str, str], list[int]] = defaultdict(lambda: [0, 0])
+    for ano in anos:
+        for k, v in enumerate(ano.votacoes):
+            leg = regras.legislatura_em(v.data)
+            if not v.plenario or v.secreta or leg is None or leg.numero != legislatura or v.tipo not in CONTEUDO:
+                continue
+            leitura = ler_votacao(v, [pessoa.partido_em(k) for pessoa in ano.pessoas], regras)
+            conta["conteudo"] += 1
+            if leitura.divisiva:
+                conta["divisivas"] += 1
+            elif leitura.opostos:
+                conta["rachas"] += 1
+            elif leitura.esquerda and leitura.direita:
+                conta["juntos"] += 1
+            else:
+                conta["sem_lado"] += 1
+            siglas = sorted(leitura.partidos)
+            for i, a in enumerate(siglas):
+                for b in siglas[i + 1 :]:
+                    par = pares[(a, b)]
+                    par[1] += 1
+                    par[0] += leitura.partidos[a][0] == leitura.partidos[b][0]
+    return {**conta, "pares": dict(pares)}
 
 
 def resumo_da_votacao(v: Votacao, ano: AnoVotos, indice: int, regras: Regras) -> dict[str, Any]:

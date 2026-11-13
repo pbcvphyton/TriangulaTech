@@ -73,6 +73,9 @@ VOTACOES: list[tuple[str, str, str, str, str, str, tuple[int, str, int], str, di
      {1: "Sim", 4: "Não", 7: "Sim"}),
 ]
 
+# O que a Mesa pôs em votação (só a Câmara diz): quem pediu o destaque e qual trecho.
+ABERTURAS = {"1010-2": "Votação do DTQ 1: PL: Destaque para Votação em Separado do art. 3º, apresentado ao PL 10/2026 (art. 161, I)."}
+
 # id, sigla, número, ementa, apresentação, situação, órgão, último andamento, relator, tema (código), autores [(deputado, ordem, proponente)], autoria de fora
 # Fora da tabela: a matéria principal de cada apensada (PRINCIPAL) e as sujeitas ao Plenário (PLENARIO).
 PROPOSICOES: list[tuple[int, str, int, str, str, str, str, str, int | None, int | None, list[tuple[int, int, int]], str]] = [
@@ -85,6 +88,15 @@ PROPOSICOES: list[tuple[int, str, int, str, str, str, str, str, int | None, int 
     (1016, "REQ", 5, "Requer audiência pública.", "2026-03-02", "", "CCJC", "2026-03-02", None, None, [(1, 1, 1)], ""),
     (1017, "PL", 15, "Também regula o trabalho por aplicativo.", "2026-04-01", "Tramitando em Conjunto", "PLEN", "2026-04-02", None, 58, [], "Senado Federal - Rita Alves"),
 ]
+# O que a Câmara registra além da ementa: a ementa detalhada, as palavras-chave e o texto integral.
+EXTRAS = {
+    1010: ("Corrige a tabela do imposto de renda pela inflação e isenta quem ganha até dois salários mínimos.",
+           "Alteração, Lei do Imposto de Renda, tabela progressiva, isenção, pessoa física.", "https://www.camara.example/teor/1010"),
+    1011: ("", "Alteração, Código Penal, aumento da pena, organização criminosa.", "https://www.camara.example/teor/1011"),
+    1013: ("", "Alteração, Constituição Federal, sistema eleitoral, voto distrital.", ""),
+    1014: ("", "Criação, data comemorativa, leitor.", ""),
+    1015: ("", "Regulamentação, trabalho por aplicativo, motorista, entregador.", ""),
+}
 PRINCIPAL = {1017: 1015}  # o PL 15/2026 anda junto com o PL 14/2026 (um projeto parecido anexado)
 PLENARIO = {1012, 1015}  # "Proposição Sujeita à Apreciação do Plenário"; as demais, sem a informação
 
@@ -137,7 +149,7 @@ def arquivos_da_camara() -> dict[str, bytes]:
     nomes = {d[0]: d for d in DEPUTADOS}
     votos, orientacoes, afetadas, votacoes = [], [], [], []
     for vid, data, hora, orgao, aprovacao, descricao, (pid, sigla, numero), governo, quem in VOTACOES:
-        votacoes.append([vid, data, f"{data}T{hora}:00", orgao, aprovacao, descricao])
+        votacoes.append([vid, data, f"{data}T{hora}:00", orgao, aprovacao, descricao, ABERTURAS.get(vid, "")])
         afetadas.append([vid, pid, sigla, numero, 2026, next(p[3] for p in PROPOSICOES if p[0] == pid)])
         if governo:
             orientacoes.append([vid, "GOV.", governo])
@@ -148,9 +160,10 @@ def arquivos_da_camara() -> dict[str, bytes]:
     proposicoes, autores, temas = [], [], []
     for pid, sigla, numero, ementa, apresentada, situacao, orgao, movimento, relator, tema, assinam, de_fora in PROPOSICOES:
         apreciacao = "Proposição Sujeita à Apreciação do Plenário" if pid in PLENARIO else ""
+        detalhada, chaves, teor = EXTRAS.get(pid, ("", "", ""))
         proposicoes.append(
             [pid, sigla, numero, 2026, ementa, f"{apresentada}T10:00:00", situacao, orgao, f"{movimento}T00:00:00", _uri("deputados", relator), "Ordinário",
-             _uri("proposicoes", PRINCIPAL.get(pid)), apreciacao]
+             _uri("proposicoes", PRINCIPAL.get(pid)), apreciacao, detalhada, chaves, teor]
         )
         if tema:
             temas.append([_uri("proposicoes", pid), tema])
@@ -161,7 +174,9 @@ def arquivos_da_camara() -> dict[str, bytes]:
             autores.append([pid, "", de_fora, 1, 1, tipo, ""])
     orgaos = [["CCJC", _uri("deputados", 8), "Hugo Leal", "Presidente", "2026-02-05", ""], ["CCJC", _uri("deputados", 1), "Ana Lima", "Titular", "2026-02-05", ""]]
     return {
-        "votacoes/csv/votacoes-2026.csv": csv_bytes(["id", "data", "dataHoraRegistro", "siglaOrgao", "aprovacao", "descricao"], votacoes),
+        "votacoes/csv/votacoes-2026.csv": csv_bytes(
+            ["id", "data", "dataHoraRegistro", "siglaOrgao", "aprovacao", "descricao", "ultimaAberturaVotacao_descricao"], votacoes
+        ),
         "votacoesVotos/csv/votacoesVotos-2026.csv": csv_bytes(["idVotacao", "voto", "deputado_id", "deputado_nome", "deputado_siglaPartido", "deputado_siglaUf"], votos),
         "votacoesOrientacoes/csv/votacoesOrientacoes-2026.csv": csv_bytes(["idVotacao", "siglaBancada", "orientacao"], orientacoes),
         "votacoesProposicoes/csv/votacoesProposicoes-2026.csv": csv_bytes(
@@ -169,7 +184,7 @@ def arquivos_da_camara() -> dict[str, bytes]:
         ),
         "proposicoes/csv/proposicoes-2026.csv": csv_bytes(
             ["id", "siglaTipo", "numero", "ano", "ementa", "dataApresentacao", "ultimoStatus_descricaoSituacao", "ultimoStatus_siglaOrgao", "ultimoStatus_dataHora", "ultimoStatus_uriRelator", "ultimoStatus_regime",
-             "uriPropPrincipal", "ultimoStatus_apreciacao"],
+             "uriPropPrincipal", "ultimoStatus_apreciacao", "ementaDetalhada", "keywords", "urlInteiroTeor"],
             proposicoes,
         ),
         "proposicoesAutores/csv/proposicoesAutores-2026.csv": csv_bytes(
@@ -235,6 +250,19 @@ def processos_do_senado() -> list[dict[str, Any]]:
     ]
 
 
+def detalhe_do_processo_7001() -> dict[str, Any]:
+    """O detalhe do PL 20/2026 do Senado (``/processo/7001``): a classificação (o tema) e o que
+    as listas não trazem: a explicação da ementa, a indexação e o texto."""
+    return {
+        "id": 7001, "codigoMateria": 160001, "identificacao": "PL 20/2026", "objetivo": "Iniciadora", "tramitando": "Não",
+        "situacaoAtual": "REMETIDA À CÂMARA DOS DEPUTADOS", "dataSituacaoAtual": "2026-05-20",
+        "conteudo": {"ementa": "Altera o imposto de renda.", "explicacaoEmenta": "Eleva a faixa de isenção do imposto de renda da pessoa física."},
+        "documento": {"dataApresentacao": "2026-04-30", "indexacao": "ALTERAÇÃO, IMPOSTO DE RENDA, ISENÇÃO, PESSOA FISICA.",
+                      "url": "https://legis.senado.example/documento/7001", "resumoAutoria": "Senadora Rita Alves (PT/BA)"},
+        "classificacoes": [{"descricaoHierarquia": "Economia e Desenvolvimento / Tributos"}],
+    }
+
+
 def deliberacoes_do_senado() -> list[dict[str, Any]]:
     """O que o Plenário do Senado aprovou: o PL 20/2026, em 12/05 (e um requerimento, que fica de fora)."""
     return [
@@ -282,7 +310,7 @@ def respostas() -> dict[str, bytes]:
     mapa[f"{s}/plenario/votacao/orientacaoBancada/20260101/{HOJE.replace('-', '')}"] = json.dumps(
         {"votacoes": [{"sequencialVotacao": 501, "dataInicioVotacao": "2026-05-12T17:10:00", "descricaoVotacao": "Projeto de Lei nº 20", "orientacoesLideranca": [{"partido": "Governo", "voto": "SIM"}, {"partido": "PL", "voto": "NÃO"}]}]}
     ).encode("utf-8")
-    mapa[f"{s}/processo/7001"] = json.dumps({"id": 7001, "classificacoes": [{"descricaoHierarquia": "Economia e Desenvolvimento / Tributos"}]}).encode("utf-8")
+    mapa[f"{s}/processo/7001"] = json.dumps(detalhe_do_processo_7001()).encode("utf-8")
     mapa[f"{s}/processo/7002"] = json.dumps({"id": 7002, "classificacoes": []}).encode("utf-8")
     mapa[f"{s}/senador/lista/atual"] = json.dumps(
         {"ListaParlamentarEmExercicio": {"Parlamentares": {"Parlamentar": [
