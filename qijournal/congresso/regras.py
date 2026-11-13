@@ -7,6 +7,7 @@ Por isso ficam num arquivo só, à vista, e vão escritas na seção "Como ler" 
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -134,12 +135,14 @@ class Regras:
     campos: tuple[Campo, ...] = CAMPOS_PADRAO
     temas: list[Tema] = field(default_factory=list)
     relevancia: Relevancia = field(default_factory=Relevancia)
+    apelidos: dict[str, list[str]] = field(default_factory=dict)  # "PL 2630/2020" → ["PL das Fake News", …]
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
         prefixos = [(prefixo, t.id) for t in self.temas for prefixo in t.senado]
         self._tema_senado = sorted(prefixos, key=lambda par: len(par[0]), reverse=True)
         self._nomes = {t.id: t.nome for t in self.temas}
+        self._busca_apelidos = {text.normalize(nome): titulo for titulo, nomes in self.apelidos.items() for nome in nomes if text.normalize(nome)}
 
     # ── períodos ─────────────────────────────────────────────────────────────
 
@@ -186,6 +189,17 @@ class Regras:
 
     def nome_do_tema(self, tema: str) -> str:
         return self._nomes.get(tema, tema)
+
+    # ── apelidos ─────────────────────────────────────────────────────────────
+
+    def apelidos_para_busca(self) -> dict[str, str]:
+        """Apelido (sem acento, minúsculo) → proposição, para achar no texto do jornal."""
+        return dict(self._busca_apelidos)
+
+    def apelido_de(self, titulo: str) -> str:
+        """O apelido que a página mostra ao lado do número (o primeiro da lista)."""
+        nomes = self.apelidos.get(titulo) or []
+        return nomes[0] if nomes else ""
 
 
 def _partidos(valores: Any) -> frozenset[str]:
@@ -244,6 +258,10 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             for t in bruto.get("temas") or []
         ],
         relevancia=_relevancia(bruto.get("relevancia")),
+        apelidos={
+            re.sub(r"\s+", " ", str(titulo)).strip(): [str(n).strip() for n in (nomes if isinstance(nomes, list) else [nomes]) if str(n).strip()]
+            for titulo, nomes in (bruto.get("apelidos") or {}).items()
+        },
     )
 
 

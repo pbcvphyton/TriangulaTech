@@ -130,3 +130,22 @@ relevancia:
   simbolica_teto: 10        # matéria simbólica (dia nacional, denominação, título) não passa disto
   alta: 60                  # a partir daqui, sinais fortes
   baixa: 30                 # abaixo daqui, sinais fracos
+
+# Apelidos de projetos, como o noticiário os chama: servem para achar o projeto quando o
+# jornal não cita o número, e aparecem ao lado do número na página (o primeiro da lista).
+# Cada um foi conferido contra a ementa oficial. Apelido que vale para mais de um projeto
+# (como "reforma tributária" ou "PL da Anistia") fica de fora.
+apelidos:
+  "PL 2630/2020": ["PL das Fake News", "PL da Censura"]
+  "PLP 93/2023": ["arcabouço fiscal"]
+  "PEC 3/2021": ["PEC da Blindagem", "PEC das Prerrogativas"]
+  "PL 1904/2024": ["PL do Aborto", "PL do Estupro"]
+  "PL 2159/2021": ["PL do Licenciamento Ambiental", "PL da Devastação", "Lei Geral do Licenciamento"]
+  "PL 914/2024": ["taxa das blusinhas", "taxação das blusinhas"]
+  "PEC 18/2025": ["PEC da Segurança Pública"]
+  "PEC 221/2019": ["PEC da escala 6x1", "escala 6x1"]
+  "PL 5582/2025": ["PL Antifacção", "Lei Antifacção"]
+  "PL 2162/2023": ["PL da Dosimetria", "Lei da Dosimetria"]
+  "PEC 45/2023": ["PEC das Drogas"]
+  "PL 2338/2023": ["PL da Inteligência Artificial", "PL da IA"]
+  "MPV 1303/2025": ["MP do IOF"]

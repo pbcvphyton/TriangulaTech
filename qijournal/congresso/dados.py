@@ -19,10 +19,12 @@ como estava e a falta vira aviso.
 
 from __future__ import annotations
 
+import bisect
 import json
 import logging
 import math
 import os
+import re
 import tempfile
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
@@ -49,6 +51,7 @@ FICHAS = "fichas"
 RESUMO = "resumo.json"
 META = "meta.json"
 ACHADOS = "achados.json"
+VOTOS = "votos-{casa}.json"  # os votos de cada um nas votações de conteúdo da legislatura (para o comparativo)
 ULTIMAS = 14  # votações nominais mais recentes no painel de cada Casa
 LISTA = 15  # tamanho das listas do painel
 MINIMO_FIDELIDADE = 50  # votações com posição do partido para entrar nas listas de dissidência
@@ -56,6 +59,7 @@ MINIMO_BANCADA = {"cd": 5, "sf": 3}  # parlamentares em exercício para o partid
 JANELA_FURARAM = 240  # dias em que uma votação de texto principal conta em "passaram na frente"
 RAPIDO = 120  # do protocolo ao voto em menos que isso: passou na frente
 RACHAS_LISTA = 10  # votações de cada partido na lista dos rachas
+JORNAL_VOTO = 8  # textos do jornal × votos, por pessoa
 TEMA_PESSOA = 10  # votações esquerda × direita num tema para comparar alguém com ele mesmo
 ALFA_TEMA = 0.01  # o desvio de um tema passa do acaso contando todas as comparações da Casa (Holm)
 MINIMO_RACHA = 5  # votações de um partido com o outro polo para virar achado
@@ -366,6 +370,43 @@ def _rachas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int, lista: i
     return {"opostas": opostas, "partidos": partidos}
 
 
+def votos_da_legislatura(anos: Iterable[AnoVotos], regras: Regras, legislatura: int, chaves: Mapping[int, str], casa: str) -> dict[str, Any]:
+    """Os votos de cada um nas votações de conteúdo (texto principal e destaques) da
+    legislatura, abertas e de Plenário, em ordem: um caractere por votação (os códigos da
+    base). É o que o comparativo usa para dizer quanto dois parlamentares votam juntos.
+    ``chaves``: id → chave da ficha (``cd-123``)."""
+    colunas: list[tuple[AnoVotos, int]] = []
+    for ano in anos:
+        for k, v in enumerate(ano.votacoes):
+            leg = regras.legislatura_em(v.data)
+            if v.plenario and not v.secreta and leg is not None and leg.numero == legislatura and v.tipo in perfil.CONTEUDO:
+                colunas.append((ano, k))
+    colunas.sort(key=lambda c: (c[0].votacoes[c[1]].data, c[0].votacoes[c[1]].hora, c[0].votacoes[c[1]].id))
+    votacoes = []
+    for ano, k in colunas:
+        v = ano.votacoes[k]
+        leitura = perfil.ler_votacao(v, [p.partido_em(k) for p in ano.pessoas], regras)
+        # [id, data, tipo, proposição, ementa, temas, dividiu esquerda e direita (1/0), turno da PEC (0: não diz)]
+        votacoes.append([v.id, v.data, v.tipo, v.prop, text.truncate(v.ementa or v.descricao, 140), list(v.temas), 1 if leitura.divisiva else 0, turno(v.descricao) or 0])
+    indices = {id(ano): ano.indice() for ano, _k in colunas}
+    votos = {}
+    for pid, chave in sorted(chaves.items(), key=lambda kv: kv[1]):
+        linha = "".join(
+            ano.votacoes[k].votos[indices[id(ano)][pid]] if pid in indices[id(ano)] else base.SEM_REGISTRO for ano, k in colunas
+        )
+        if linha.strip(base.SEM_REGISTRO):
+            votos[chave] = linha
+    return {"v": VERSAO, "casa": casa, "legislatura": legislatura, "votacoes": votacoes, "votos": votos}
+
+
+def _json_por_linha(dados: Mapping[str, Any]) -> str:
+    """O arquivo de votos com uma votação e uma pessoa por linha (diferenças pequenas no git)."""
+    votacoes = ",\n".join(json.dumps(v, ensure_ascii=False, separators=(",", ":")) for v in dados["votacoes"])
+    votos = ",\n".join(f"{json.dumps(k)}:{json.dumps(v)}" for k, v in dados["votos"].items())
+    cabeca = json.dumps({k: v for k, v in dados.items() if k not in ("votacoes", "votos")}, ensure_ascii=False, separators=(",", ":"))[:-1]
+    return f'{cabeca},"votacoes":[\n{votacoes}\n],"votos":{{\n{votos}\n}}}}\n'
+
+
 def _estatisticas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> dict[str, Any]:
     total = conteudo = divisivas = governo = secretas = 0
     datas: list[str] = []
@@ -408,6 +449,8 @@ def _ultimas(anos: list[AnoVotos], regras: Regras, nomes: Mapping[int, str], qua
         for p in r["partidos"]:
             p["contra"] = [{"id": pid, "nome": nomes.get(pid, "")} for pid in p["contra"][:12]] if p["coesao"] >= 80 else len(p["contra"])
         r["partidos"] = [p for p in r["partidos"] if p["votos"] >= 3][:14]
+        if v.prop and regras.apelido_de(v.prop):
+            r["apelido"] = regras.apelido_de(v.prop)
         saida.append(r)
     return saida
 
@@ -536,6 +579,113 @@ def mudam_conforme_tema(fichas: Iterable[Mapping[str, Any]], legislatura: int) -
     return melhores
 
 
+def _governo_atual(f: Mapping[str, Any], governo: str) -> float | None:
+    return ((f.get("gov") or {}).get(governo) or {}).get("pct")
+
+
+# Os rankings da ficha: chave → como ler o valor (None: fora do ranking). Entre os que estão
+# em exercício na Casa; o 1º é quem tem o maior valor.
+RANKINGS: tuple[tuple[str, Any], ...] = (
+    ("pres", lambda f, leg, gov: None if f.get("_preside") else ((f.get("leg") or {}).get(leg) or {}).get("pres", {}).get("pct")),
+    ("gov", lambda f, leg, gov: _governo_atual(f, gov)),
+    ("fid", lambda f, leg, gov: (((f.get("leg") or {}).get(leg) or {}).get("fid") or {}).get("pct")),
+    ("fora", lambda f, leg, gov: (f.get("fora") or {}).get("partido", 0)),
+    ("prop", lambda f, leg, gov: (f.get("autoria") or {}).get("total", 0)),
+    ("par", lambda f, leg, gov: (f.get("autoria") or {}).get("paradas_n", 0)),
+    ("norma", lambda f, leg, gov: ((f.get("autoria") or {}).get("estados") or {}).get("norma", 0)),
+    ("rel", lambda f, leg, gov: (f.get("relatorias") or {}).get("total", 0)),
+    ("jor", lambda f, leg, gov: (f.get("jornal") or {}).get("n30", 0)),
+)
+
+
+def rankings(fichas: Iterable[dict[str, Any]], legislatura: int, governo: str) -> None:
+    """Põe em cada ficha de quem está em exercício a posição dela em cada ranking da Casa:
+    ``ranks[chave] = [de cima, total, de baixo]`` (com empate, a mesma posição; "de
+    baixo" é a posição contando de quem tem o menor valor)."""
+    leg = str(legislatura)
+    ativos = [f for f in fichas if f.get("exercicio")]
+    for f in ativos:
+        f["_preside"] = any(not fim for _inicio, fim in f.get("presidiu") or [])
+    for chave, ler in RANKINGS:
+        valores = [(f, ler(f, leg, governo)) for f in ativos]
+        valores = [(f, v) for f, v in valores if v is not None]
+        numeros = sorted(v for _f, v in valores)
+        total = len(numeros)
+        for f, v in valores:
+            maiores = total - bisect.bisect_right(numeros, v)
+            menores = bisect.bisect_left(numeros, v)
+            f.setdefault("ranks", {})[chave] = [maiores + 1, total, menores + 1]
+    for f in ativos:
+        f.pop("_preside", None)
+
+
+def votacoes_por_proposicao(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> dict[str, list[tuple[AnoVotos, int]]]:
+    """Proposição ("PEC 3/2021") → as votações nominais abertas de Plenário dela na legislatura."""
+    por: dict[str, list[tuple[AnoVotos, int]]] = defaultdict(list)
+    for ano in anos:
+        for k, v in enumerate(ano.votacoes):
+            leg = regras.legislatura_em(v.data)
+            if v.plenario and not v.secreta and v.prop and leg is not None and leg.numero == legislatura:
+                por[v.prop].append((ano, k))
+    return dict(por)
+
+
+# "primeiro", "2º", "1°"... seguido de "turno" na mesma oração ("entre o primeiro e o segundo turno" dá os dois)
+_TURNO = re.compile(r"(?:\b(primeiro|segundo)\b|\b([12])\s*[º°o])(?=[^.;]{0,25}?\bturno\b)", re.IGNORECASE)
+
+
+def turno(descricao: str) -> int | None:
+    """O turno de uma votação de PEC, quando a descrição oficial diz um só ("Aprovada, em
+    primeiro turno, ...", "(2º turno)"). Quem cita os dois (a quebra de interstício "entre o
+    primeiro e o segundo turno") fica sem."""
+    achados = {1 if (m.group(1) or "").lower() == "primeiro" or m.group(2) == "1" else 2 for m in _TURNO.finditer(descricao or "")}
+    return achados.pop() if len(achados) == 1 else None
+
+
+def jornal_e_voto(
+    mencoes: Iterable[jornal.Mencao], pid: int, por_prop: Mapping[str, list[tuple[AnoVotos, int]]], regras: Regras, *, lista: int = JORNAL_VOTO
+) -> list[dict[str, Any]]:
+    """No jornal × no voto: cada texto do jornal que cita a pessoa e uma proposição em que
+    ela votou, com os votos dela nessa proposição (o texto principal primeiro). Põe o que
+    saiu no jornal ao lado do registro; não diz o que a pessoa defendeu."""
+    itens: list[dict[str, Any]] = []
+    vistos: set[tuple[str, str]] = set()
+    indices: dict[int, dict[int, int]] = {}
+    for m in mencoes:  # da mais nova para a mais antiga
+        for prop in m.props:
+            if (m.titulo, prop) in vistos:
+                continue
+            votos = []
+            for ano, k in por_prop.get(prop, []):
+                indice = indices.setdefault(id(ano), ano.indice())
+                if pid not in indice:
+                    continue
+                v = ano.votacoes[k]
+                voto = v.votos[indice[pid]]
+                if voto == base.SEM_REGISTRO:
+                    continue
+                tu = turno(v.descricao) if v.tipo in (base.MERITO, base.DESTAQUE) else None
+                votos.append(
+                    {"d": v.data, "t": v.tipo, "x": voto, **({"tu": tu} if tu else {}), **({"ap": 1 if v.aprovada else 0} if v.aprovada is not None else {})}
+                )
+            if not votos:
+                continue
+            vistos.add((m.titulo, prop))
+            votos.sort(key=lambda x: (x["t"] != base.MERITO, x["t"] != base.DESTAQUE, x["d"], x.get("tu", 0)))
+            item = {"d": m.data, "t": m.titulo, "p": prop, "votos": votos[:4], "n_votos": len(votos)}
+            apelido = regras.apelido_de(prop)
+            if apelido:
+                item["apel"] = apelido
+            if m.tipo == "n":
+                item.update({"v": m.veiculo, "u": m.url})
+            else:
+                item["id"] = m.materia
+            itens.append(item)
+            if len(itens) >= lista:
+                return itens
+    return itens
+
+
 def _linha_de_lista(f: Mapping[str, Any], **extra: Any) -> dict[str, Any]:
     return {"k": f["k"], "nome": f["nome"], "partido": f.get("partido") or "", "uf": f.get("uf") or "", **extra}
 
@@ -585,6 +735,11 @@ def _listas(fichas: list[Mapping[str, Any]], medias: Mapping[str, Mapping[str, A
         "parados": [_linha_de_lista(f, n=f["autoria"]["paradas_n"], total=f["autoria"]["total"]) for f in parados[:LISTA]],
         "citados": [_linha_de_lista(f, n=f["jornal"]["n30"], frase=(f.get("frases") or [""])[0]) for f in citados[:LISTA]],
         "mudam_tema": [{k: v for k, v in c.items() if k != "p"} for c in mudam_conforme_tema(fichas, legislatura)[:LISTA]],
+        "jornal_voto": sorted(
+            (_linha_de_lista(f, **item) for f in ativos for item in (f.get("jornal_voto") or [])[:2]),
+            key=lambda i: (i["d"], i["nome"]),
+            reverse=True,
+        )[:LISTA],
     }
 
 
@@ -959,9 +1114,14 @@ def atualizar(
     # O banco do jornal.
     nomes = jornal.Nomes(jornal.Pessoa(c.chave, c.casa, c.nome) for casa in cadastros.values() for c in casa.values())
     desde = (date.fromisoformat(hoje) - timedelta(days=opcoes.noticias_dias)).isoformat()
-    cruzamento = jornal.cruzar(Path(data_dir) / "busca", nomes, desde=desde)
+    cruzamento = jornal.cruzar(Path(data_dir) / "busca", nomes, desde=desde, apelidos=regras.apelidos_para_busca())
+    # O apelido ao lado do número, nas listas de proposições.
+    for p in [*props_cd, *props_sf, *(a.prop for casa in aprovadas.values() for a in casa)]:
+        if not p.apelido:
+            p.apelido = regras.apelido_de(p.titulo)
 
     # Fichas.
+    por_prop = {casa: votacoes_por_proposicao(votos[casa], regras, legislatura.numero) for casa in ("cd", "sf")}
     fichas: dict[str, list[dict[str, Any]]] = {"cd": [], "sf": []}
     for casa in ("cd", "sf"):
         for pid, cadastro in cadastros[casa].items():
@@ -982,9 +1142,13 @@ def atualizar(
             )
             if casa == "cd" and presidentes.get(pid):
                 fichas[casa][-1]["presidiu"] = [list(i) for i in presidentes[pid]]
+            jv = jornal_e_voto(cruzamento.de(cadastro.chave), pid, por_prop[casa], regras)
+            if jv:
+                fichas[casa][-1]["jornal_voto"] = jv
 
     for casa in ("cd", "sf"):
         marcar_temas_que_viram(fichas[casa], legislatura.numero)
+        rankings(fichas[casa], legislatura.numero, governo.nome if governo else "")
 
     # Painéis.
     paineis: dict[str, dict[str, Any]] = {}
@@ -1045,7 +1209,7 @@ def atualizar(
             "bancadas": bancadas,
             "temas": _matriz_de_temas(votos[casa], regras, legislatura.numero, grandes),
             "rachas": _rachas(votos[casa], regras, legislatura.numero),
-            "relevancia": relevancia.painel(esperando[casa], aprovadas[casa], reguas[casa], hoje)
+            "relevancia": relevancia.painel(esperando[casa], aprovadas[casa], reguas[casa], hoje, citadas=cruzamento.citadas)
             if esperando[casa] or aprovadas[casa]
             else {},
             "ultimas": _ultimas(votos[casa], regras, nomes_casa),
@@ -1106,6 +1270,11 @@ def atualizar(
         for antigo in (pasta / FICHAS).glob("*.json"):
             if antigo.name not in atuais:
                 antigo.unlink(missing_ok=True)
+    for casa in ("cd", "sf"):
+        chaves = {pid: c.chave for pid, c in cadastros[casa].items()}
+        resultado.gravados += _gravar(
+            pasta / VOTOS.format(casa=casa), _json_por_linha(votos_da_legislatura(votos[casa], regras, legislatura.numero, chaves, casa))
+        )
     resultado.gravados += _gravar(pasta / RESUMO, _json(resumo))
     resultado.gravados += _gravar(pasta / ACHADOS, _json({"v": VERSAO, "hoje": hoje, "achados": leitura}))
     resultado.gravados += _gravar(pasta / META, _json(meta))

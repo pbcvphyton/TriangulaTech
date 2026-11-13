@@ -273,6 +273,8 @@ def _item(p: Proposicao, nota: Nota, **extra: Any) -> dict[str, Any]:
         d["tm"] = p.temas[:2]
     if p.autoria and p.origem != "parlamentar":
         d["autoria"] = p.autoria
+    if p.apelido:
+        d["apel"] = p.apelido
     d.update(extra)
     return d
 
@@ -284,9 +286,16 @@ def painel(
     hoje: str,
     *,
     lista: int = LISTA,
+    citadas: Mapping[str, int] | None = None,
 ) -> dict[str, Any]:
-    """As duas listas lidas com a mesma régua, os pontos do gráfico e as contas do achado."""
+    """As duas listas lidas com a mesma régua, os pontos do gráfico e as contas do achado.
+    ``citadas``: quantos textos do jornal citam cada proposição (pelo número ou apelido)."""
     rel = regua.rel
+    citadas = citadas or {}
+
+    def jornal(p: Proposicao) -> dict[str, Any]:
+        return {"jor": citadas[p.titulo]} if citadas.get(p.titulo) else {}
+
     esperam = []
     for p in esperando:
         nota = regua.nota(p, hoje)
@@ -324,7 +333,10 @@ def painel(
         "mediana_esperam": mediana([e[1].valor for e in esperam]),
         "mediana_passaram": mediana([x[1].valor for x in passaram]),
         "sem_demanda": regua.filhos is None,
-        "esperam": [_item(p, nota, pronta=p.movimento or p.apresentada, idade=idade) for p, nota, idade, _pr in topo],
-        "passaram": [_item(a.prop, nota, aprovada=a.data, dias=dias, **({"caminho": a.caminho} if a.caminho else {})) for a, nota, dias in baixas],
+        "esperam": [_item(p, nota, pronta=p.movimento or p.apresentada, idade=idade, **jornal(p)) for p, nota, idade, _pr in topo],
+        "passaram": [
+            _item(a.prop, nota, aprovada=a.data, dias=dias, **({"caminho": a.caminho} if a.caminho else {}), **jornal(a.prop))
+            for a, nota, dias in baixas
+        ],
         "pontos": pontos,
     }

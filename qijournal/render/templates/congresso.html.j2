@@ -121,13 +121,23 @@
       {% if casa.faixas %}
       <div class="az-blk" id="cg-faixas-{{ casa.id }}">
         <h4 class="az-h">Onde cada um está <span>um ponto por parlamentar em exercício, partido a partido</span></h4>
+        {% if casa.temas_faixa %}
+        <div class="cg-fx-f" hidden>
+          <label class="az-lbl az-lbl-2" for="cgFxTema-{{ casa.id }}">Ver por tema</label>
+          <select class="cg-fx-s" id="cgFxTema-{{ casa.id }}" data-faixas="cg-faixas-{{ casa.id }}">
+            <option value="">Todas as votações esquerda × direita</option>
+            {% for t in casa.temas_faixa %}<option value="{{ t.id }}"{% if t.poucas %} disabled{% endif %}>{{ t.nome }} ({{ t.n }} {{ "votação" if t.n == 1 else "votações" }}{% if t.poucas %}: poucas para o saldo{% endif %})</option>{% endfor %}
+          </select>
+          <p class="cg-fx-st" aria-live="polite"></p>
+        </div>
+        {% endif %}
         {{ legenda() }}
         <div class="cg-fx">
           {{ regua() }}
           {% for f in casa.faixas %}
           <div class="cg-fx-l">
             <p class="cg-fx-n"><b>{{ f.sigla }}</b><span>{{ f.membros }} · média {{ f.media }}</span></p>
-            <div class="cg-fx-p" style="height:{{ f.altura }}px">{% for p in f.pontos %}<a class="cg-pt cg-{{ p.classe }}" href="#p={{ p.k }}" data-k="{{ p.k }}" style="left:{{ p.left }}%;top:{{ p.top }}px" title="{{ p.titulo }}"><span class="sr-only">{{ p.titulo }}</span></a>{% endfor %}</div>
+            <div class="cg-fx-p" style="height:{{ f.altura }}px">{% for p in f.pontos %}<a class="cg-pt cg-{{ p.classe }}" href="#p={{ p.k }}" data-k="{{ p.k }}" data-nome="{{ p.nome }}" style="left:{{ p.left }}%;top:{{ p.top }}px" title="{{ p.titulo }}"><span class="sr-only">{{ p.titulo }}</span></a>{% endfor %}</div>
           </div>
           {% endfor %}
         </div>
@@ -244,7 +254,7 @@
             <h5 class="cg-rv-h">Sinais fortes, esperando <span>{{ rv.fortes_paradas }} com nota {{ rv.alta }} ou mais estão sem andamento há mais de um ano</span></h5>
             <ol class="cg-ls cg-rv-l">
               {% for i in rv.esperam %}
-              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span class="cg-rv-n">nota {{ i.n }}</span></p>
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
                 <p class="cg-ls-x">{{ i.e }}</p>
                 <p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
                 <p class="cg-rv-q">último andamento em {{ i.pronta }} · protocolada há {{ i.idade }}{% if i.urg %} · em regime de urgência, e não votada{% endif %}</p></li>
@@ -255,7 +265,7 @@
             <h5 class="cg-rv-h">Sinais fracos, aprovadas <span>{{ rv.fracas_rapidas }} com nota abaixo de {{ rv.baixa }} passaram em menos de 120 dias; da mais rápida</span></h5>
             <ol class="cg-ls cg-rv-l">
               {% for i in rv.passaram %}
-              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span class="cg-rv-n">nota {{ i.n }}</span></p>
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
                 <p class="cg-ls-x">{{ i.e }}</p>
                 {% if i.sinais %}<p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
                 <p class="cg-rv-q">aprovada em {{ i.aprovada }}, {{ i.tempo }} depois do protocolo{% if i.autoria %} · {{ i.autoria }}{% endif %}</p>
@@ -316,7 +326,7 @@
             <h4 class="az-h">Prontas para o Plenário, fora da pauta <span>{{ f.prontas_n }} matérias; as que esperam há mais tempo</span></h4>
             <ol class="cg-ls">
               {% for i in f.prontas %}
-              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b><span>parada há {{ i.tempo }}</span></p><p class="cg-ls-x">{{ i.e }}</p></li>
+              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span>parada há {{ i.tempo }}</span></p><p class="cg-ls-x">{{ i.e }}</p></li>
               {% endfor %}
             </ol>
           </div>
@@ -357,7 +367,7 @@
         <li class="cg-v">
           <div class="cg-v-h">
             <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.racha %}<span class="cg-div cg-div-r">racha: {{ v.racha|join(", ") }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
-            <h5 class="cg-v-t">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}{{ v.descricao }}</h5>
+            <h5 class="cg-v-t">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}{% if v.apelido %}<span class="cg-apel">{{ v.apelido }}</span> {% endif %}{{ v.descricao }}</h5>
             {% if v.ementa %}<p class="cg-v-e">{{ v.ementa }}</p>{% endif %}
           </div>
           <div class="cg-v-p">
@@ -410,6 +420,24 @@
     </div>
     {% endfor %}
 
+    {% for casa in c.casas %}{% if casa.jornal_voto %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <div class="az-blk" id="cg-jornal-voto-{{ casa.id }}">
+        <h4 class="az-h">No jornal × no voto <span>a manchete que cita alguém e um projeto, ao lado de como ele votou nesse projeto</span></h4>
+        <p class="az-dek">O que saiu no jornal posto ao lado do registro de voto, para quem lê comparar o que se diz com o que se vota. A página não interpreta a fala: mostra as duas coisas. O projeto é achado pelo número ou pelo apelido (como "PEC da Blindagem").</p>
+        <ol class="cg-jv">
+          {% for i in casa.jornal_voto %}
+          <li>
+            <p class="cg-jv-k">{{ pessoa(i.k, i.nome) }} <span>{{ i.legenda }}</span> <time>{{ i.data }}</time>{% if i.veiculo %} · {{ i.veiculo }}{% endif %}</p>
+            <p class="cg-jv-t">{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.titulo }}</a>{% else %}{{ i.titulo }}{% endif %}</p>
+            <p class="cg-jv-v">No voto: <b>{{ i.prop }}</b>{% if i.apel %} ({{ i.apel }}){% endif %} — {% for v in i.votos %}{{ v.tipo }} em {{ v.data }}: <b>{{ v.voto }}</b>{% if v.resultado %} ({{ v.resultado }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor %}{% if i.mais %}; e mais {{ i.mais }}{% endif %}.</p>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </div>
+    {% endif %}{% endfor %}
+
     <div class="az-blk" id="cg-todos">
       <h4 class="az-h">Todos os parlamentares <span>{{ c.totais.pessoas|num }} em exercício nas duas Casas</span></h4>
       <div class="az-fil cg-fil" id="cgFil" hidden>
@@ -421,6 +449,7 @@
       <div class="an-tbl-wrap">
         <table class="an-tbl cg-tb cg-todos" id="cgTab">
           <thead><tr>
+            <th scope="col" class="cg-cp-th"><span class="sr-only">Comparar</span><span aria-hidden="true">⇄</span></th>
             <th scope="col" data-ord="nome">Nome</th><th scope="col" data-ord="partido">Partido</th><th scope="col" data-ord="uf">UF</th>
             <th scope="col" class="an-l" data-ord="saldo">Com quem vota</th><th scope="col" data-ord="saldo">Saldo</th>
             <th scope="col" data-ord="gov" title="Votou com a orientação do governo {{ c.governo }}">Governo</th>
@@ -434,6 +463,7 @@
           <tbody>
             {% for p in c.pessoas %}
             <tr{% if not p.ex %} class="cg-fora" hidden{% endif %} data-casa="{{ p.casa }}" data-b="{{ p.busca }}" data-nome="{{ p.nome }}" data-partido="{{ p.partido }}" data-uf="{{ p.uf }}" data-saldo="{{ p.saldo if p.saldo is not none else '' }}" data-gov="{{ p.gov if p.gov is not none else '' }}" data-pres="{{ p.pres if p.pres is not none else '' }}" data-fid="{{ p.fid if p.fid is not none else '' }}" data-prop="{{ p.prop }}" data-par="{{ p.par }}" data-rel="{{ p.rel }}" data-jor="{{ p.jor }}">
+              <td class="cg-cp-td"><input type="checkbox" class="cg-cp-ck" data-cmp="{{ p.k }}" aria-label="Comparar {{ p.nome }}" title="Marque dois para comparar lado a lado"></td>
               <th scope="row">{{ pessoa(p.k, p.nome) }}<small>{{ p.casa_nome }}{% if not p.ex %} · fora do exercício{% endif %}</small></th>
               <td>{{ p.partido }}</td><td>{{ p.uf }}</td>
               <td class="an-l"><span class="cg-bar" aria-hidden="true"><i class="cg-{{ p.classe }}" style="left:{{ p.left }}%;width:{{ p.width }}%"></i></span></td>
@@ -444,7 +474,7 @@
           </tbody>
         </table>
       </div>
-      <p class="az-dek">Saldo sem número: menos votações divisivas do que o mínimo para dizer algo. Propostas: só as de autoria principal (quem assina primeiro).</p>
+      <p class="az-dek">Saldo sem número: menos votações divisivas do que o mínimo para dizer algo. Propostas: só as de autoria principal (quem assina primeiro). Marque dois nomes na primeira coluna (⇄) para ver os perfis lado a lado, com quanto os dois votam juntos.</p>
     </div>
   </section>
 
@@ -470,6 +500,11 @@
 {% endblock %}
 
 {% block after %}
+<div class="cg-cp-bar" id="cgCmp" role="region" aria-label="Comparativo" hidden>
+  <p class="cg-cp-sel"><b>Comparar</b> <span id="cgCmpA">escolha dois</span> <span aria-hidden="true">×</span> <span id="cgCmpB">—</span></p>
+  <button class="cg-cp-ir" id="cgCmpIr" type="button" disabled>Comparar lado a lado</button>
+  <button class="cg-cp-x" id="cgCmpX" type="button">Limpar</button>
+</div>
 <div class="cg-mo" id="cgDossie" role="dialog" aria-modal="true" aria-labelledby="cgDossieT" hidden>
   <article class="cg-ml" tabindex="-1">
     <button class="mc cg-mc" type="button" aria-label="Fechar o dossiê">&times;</button>

@@ -563,7 +563,9 @@ A página segue o padrão do Analítico (a leitura → as lentes → Como ler):
   onde ele está na página; abaixo, os demais achados, numerados. Uma caixa abre o
   dossiê de qualquer nome.
 - **1 · Com quem vota** ("Por baixo dos rótulos, de que lado cada um fica"):
-  quantos votam com cada polo, a matriz **partido × tema** (o mesmo partido vota
+  **onde cada um está** (um ponto por parlamentar, partido a partido, com um seletor
+  de **tema**: escolhido o tema, cada ponto vai para o saldo da pessoa naquele assunto,
+  os partidos se reordenam pela média e quem vira de lado ganha contorno), a matriz **partido × tema** (o mesmo partido vota
   com a direita num assunto e com a esquerda em outro), **onde cada polo racha**
   (as votações em que um partido de um lado votou fechado com o outro: o PSOL com o
   PL contra o PT, o NOVO com o PT contra o PL, com o tema e a orientação do governo
@@ -583,18 +585,27 @@ A página segue o padrão do Analítico (a leitura → as lentes → Como ler):
 - **4 · Quem é quem** ("O que cada um vota, propõe e deixa parado"): as listas
   (quem menos vota, quem mais vota contra o próprio partido, **quem muda de lado
   conforme o assunto**, quem vota longe da própria bancada, quem mudou em relação
-  ao governo, quem tem mais propostas paradas, os mais citados no jornal) e a
-  tabela de **todos os parlamentares**, com
+  ao governo, quem tem mais propostas paradas, os mais citados no jornal), **no
+  jornal × no voto** (a manchete que cita alguém e um projeto, ao lado de como ele
+  votou nesse projeto) e a tabela de **todos os parlamentares**, com a primeira
+  coluna para marcar dois e abrir o **comparativo lado a lado**, com
   filtro e ordenação. Um botão troca a Casa (Câmara ou Senado).
 - **O dossiê**: clicar num nome abre a ficha (endereço próprio:
   `congresso.html#p=cd-204536`): com quem vota, quanto segue o governo da vez (e o
-  anterior), presença, fidelidade ao partido, o saldo **por tema** (com o tema em
+  anterior), presença, fidelidade ao partido, **na Casa** (a posição dele em cada
+  ranking: presença, propostas, paradas, relatorias, votos contra o partido, jornal…;
+  "115º de 513", "o 3º que menos vota", com os empates), **no jornal × no voto**, o saldo **por tema** (com o tema em
   que vira de lado, quando passa do acaso), o governismo **semestre a semestre**,
   **onde sai da linha, por assunto** (votos contra o partido e com o outro polo,
   tema a tema), **quando saiu da linha** (dissidências e surpresas, com o tema), os
   últimos votos, **o que propõe** (por tema e por situação, com as paradas), **o
   que tem na mão** (relatorias sem parecer) e **no jornal** (as manchetes que o
-  citam).
+  citam). Um botão leva ao comparativo.
+- **O comparativo** (`congresso.html#c=cd-204536,cd-209787`): os dois perfis lado a
+  lado, com a posição de cada um em cada ranking, o saldo por tema (e onde ficam de
+  lados opostos), quanto **votam juntos** (a parte das votações de conteúdo em que os
+  dois votaram igual, onde mais divergem e as últimas em que votaram diferente) e a
+  divergência por assunto. Funciona entre Casas, sem a parte dos votos em comum.
 
 **Nas matérias da edição**: quando o texto de uma matéria cita um deputado ou
 senador em exercício, ela ganha o bloco **No Congresso**, com a ficha curta de cada
@@ -624,10 +635,16 @@ feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da lege
 | Nota de relevância (0 a 100) | sinais que dá para medir nos registros, com os pesos de `relevancia` em `config/congresso.yaml`: **projetos parecidos** anexados à matéria (até 40; 15 ou mais dão a nota cheia, em escala log; só na Câmara), **origem** (até 25: já aprovada pela outra Casa ou iniciativa popular, Executivo, comissão, Judiciário e órgãos de controle, parlamentar), **alcance** (até 20: PEC, lei complementar, lei) e **apoio** (até 15: autores de mais de um partido, nota cheia se dos dois polos). No Senado, sem os projetos parecidos, os outros pesos valem o todo. Matéria simbólica (dia nacional, denominação, título, rota turística…) não passa de 10. Não diz se a matéria é boa: diz quantos sinais de relevância pública ela tem |
 | O que espera × o que passa | esperam: prontas para o Plenário, fora da pauta (PL, PLP e PEC; medidas provisórias ficam de fora, têm prazo na Constituição). Passam: aprovadas pelo Plenário nos últimos 12 meses (Câmara: pelo histórico oficial de cada matéria, `/proposicoes/{id}/tramitacoes`; Senado: pela lista de deliberações). Sinais fortes: nota 60 ou mais; fracos: abaixo de 30 |
 | Por que andou | do histórico oficial (Câmara): a urgência aprovada antes da votação e quem a pediu, e o parecer dado direto no Plenário (no lugar das comissões) e por quem. Só o que o histórico registra |
+| Rankings | entre os que estão em exercício na Casa; o 1º é quem tem o maior número; empate divide a posição ("413º de 513 · empatado com outros 100"); quem preside a Casa fica fora do de presença |
+| Votam juntos? | nas votações de conteúdo abertas de Plenário da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não): a parte em que votaram igual, e a mesma conta só nas que dividiram esquerda e direita |
+| Onde cada um está, por tema | o saldo de cada um nas votações esquerda × direita do tema, com 5 ou mais; o contorno marca quem vira de lado no tema (o mesmo teste do dossiê). Tema com menos de 5 dessas votações na Casa aparece no seletor desabilitado, com o motivo |
+| No jornal × no voto | o texto do jornal que cita a pessoa e uma proposição (pelo número ou pelo apelido de `apelidos` em `config/congresso.yaml`); numa matéria, os dois na mesma frase. Ao lado, os votos dela nessa proposição (o texto principal primeiro; na PEC, com o turno que a descrição oficial dá). A página não interpreta a fala: põe as duas coisas lado a lado |
 | No jornal | os nomes procurados nas manchetes e no texto das matérias de `data/busca/` (as edições dos últimos 60 dias; fora esporte, natureza e variedades) |
 
 Os polos (hoje PT, PSOL e PCdoB × PL e NOVO), os governos, os limiares, as faixas
-do campo e os macrotemas são **escolhas editoriais**: ficam em
+do campo, os macrotemas, os pesos da nota de relevância e os **apelidos dos
+projetos** (cada um conferido contra a ementa oficial; apelido ambíguo, como "reforma
+tributária", fica de fora) são **escolhas editoriais**: ficam em
 `config/congresso.yaml` e vão escritos no **Como ler** da aba. Mudar um valor muda a
 conta na atualização seguinte.
 
@@ -663,7 +680,8 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `base/cd-exercicio.json` | os períodos em exercício de cada deputado e quem presidiu a Câmara |
 | `fichas/<casa>-<id>.json` | o dossiê de cada parlamentar (carregado quando a ficha abre) |
 | `resumo.json` | uma linha por parlamentar (a tabela da aba e as fichas das matérias) |
-| `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, listas, últimas votações) |
+| `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, listas, no jornal × no voto, últimas votações) |
+| `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação (o comparativo lê quando abre) |
 | `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
 
 - **Desligar**: `congresso.enabled: false` em `config/site.yaml`, ou a variável

@@ -7,6 +7,7 @@ Tudo contra o Congresso de mentira de ``tests/fixtures/congresso/fabrica.py``, s
 from __future__ import annotations
 
 import dataclasses
+from collections import Counter
 import json
 from pathlib import Path
 
@@ -309,6 +310,86 @@ def test_o_que_espera_e_o_que_passou_no_painel(publicado: tuple[Path, fabrica.Fe
     assert [(x["t"], x["dias"], x["n"]) for x in sf["passaram"]] == [("PL 20/2026", 12, 20)]
 
 
+def test_os_votos_da_legislatura_para_o_comparativo(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado]):
+    """Só as votações de conteúdo abertas de Plenário, em ordem; um caractere por votação."""
+    data_dir, _fetch, _resultado = publicado
+    texto = (data_dir / "congresso" / "votos-cd.json").read_text(encoding="utf-8")
+    votos = json.loads(texto)
+    assert [v[0] for v in votos["votacoes"]] == ["1010-1", "1011-1", "1010-2", "1012-2"]  # sem o requerimento, a urgência e a CCJC
+    assert [v[6] for v in votos["votacoes"]] == [1, 1, 1, 0]  # as que dividiram esquerda e direita
+    assert all(len(v) == 8 and v[7] in (0, 1, 2) for v in votos["votacoes"])  # o turno, quando a descrição diz
+    assert (votos["votos"]["cd-1"], votos["votos"]["cd-9"], votos["votos"]["cd-11"]) == ("SNSS", "SSPS", "---S")
+    assert texto.count("\n") >= len(votos["votacoes"]) + len(votos["votos"])  # uma linha por votação e por pessoa
+    sf = json.loads((data_dir / "congresso" / "votos-sf.json").read_text(encoding="utf-8"))
+    assert [v[0] for v in sf["votacoes"]] == ["sf501"] and sf["votos"]["sf-104"] == "J"  # a secreta fica de fora
+
+
+def test_no_jornal_e_no_voto(coletor: fontes.Coletor, r: regras.Regras):
+    """A manchete que cita alguém e um projeto (pelo número ou pelo apelido) vai ao lado dos
+    votos dele nesse projeto; numa matéria, só vale o projeto citado na mesma frase."""
+    from qijournal.congresso import base
+
+    r = dataclasses.replace(r, apelidos={"PL 10/2026": ["PL do Imposto"]})
+    assert r.apelido_de("PL 10/2026") == "PL do Imposto" and r.apelidos_para_busca() == {"pl do imposto": "PL 10/2026"}
+    nomes = jornal.Nomes([jornal.Pessoa("cd-4", "cd", "Davi Rocha"), jornal.Pessoa("cd-7", "cd", "Gil Castro")])
+    busca = {
+        "data": "2026-11-12", "secoes": [["politica", "Política", "#C90055"]], "veiculos": ["Folha"],
+        "noticias": [[0, -1, 0, "Davi Rocha vota contra o PL do Imposto", "folha.example/x", 10]],
+        "materias": [{"id": "m1", "s": 0, "t": "Votações da semana", "l": "",
+                      "c": "O deputado Gil Castro (PP-BA) elogiou o PL 11/2026. A PEC 1/2026 segue parada na Mesa."}],
+    }
+    citadas: Counter[str] = Counter()
+    _lidas, por = jornal.mencoes_do_dia(busca, nomes, r.apelidos_para_busca(), citadas)
+    assert citadas == Counter({"PL 10/2026": 1, "PL 11/2026": 1, "PEC 1/2026": 1})
+    assert por["cd-4"][0].props == ("PL 10/2026",) and por["cd-7"][0].props == ("PL 11/2026",)  # a PEC está em outra frase
+    ano = base.camara_ano(coletor, 2026)
+    por_prop = dados.votacoes_por_proposicao([ano], r, 57)
+    (davi,) = dados.jornal_e_voto(por["cd-4"], 4, por_prop, r)
+    assert (davi["p"], davi["apel"], davi["v"], davi["u"]) == ("PL 10/2026", "PL do Imposto", "Folha", "https://folha.example/x")
+    assert [(v["t"], v["x"]) for v in davi["votos"]] == [("merito", "N"), ("destaque", "N")]  # o texto principal primeiro
+    (gil,) = dados.jornal_e_voto(por["cd-7"], 7, por_prop, r)
+    assert (gil["p"], gil["id"], [(v["t"], v["x"]) for v in gil["votos"]]) == ("PL 11/2026", "m1", [("merito", "S"), ("procedimento", "N")])
+    assert dados.jornal_e_voto(por["cd-7"], 999, por_prop, r) == []  # quem não votou no projeto não aparece
+
+
+@pytest.mark.parametrize(
+    ("descricao", "esperado"),
+    [
+        ("Aprovada, em primeiro turno, a Proposta de Emenda à Constituição nº 221, de 2019. Sim: 472; Não: 22; Total: 494.", 1),
+        ("Aprovada, em segundo turno, a Proposta de Emenda à Constituição n° 221, de 2019. . Sim: 461; Não: 19; Total: 480.", 2),
+        ("PEC 66/2023, nos termos do parecer (2º turno)", 2),
+        ("Votação nominal do 1° turno da Proposta de Emenda à Constituição", 1),
+        ("Requerimento de quebra de interstício entre o primeiro e o segundo turno de deliberação da PEC", None),
+        ("Aprovado o Requerimento. Sim: 372; Não: 101; Total: 473.", None),
+    ],
+)
+def test_o_turno_da_pec_sai_da_descricao_oficial(descricao: str, esperado: int | None):
+    assert dados.turno(descricao) == esperado
+
+
+def test_rankings_de_cada_um_na_casa():
+    def f(k: str, pres: float | None, prop: int | None, *, exercicio: bool = True, presidiu: list | None = None) -> dict:
+        ficha_ = {"k": k, "exercicio": exercicio, "leg": {"57": {"pres": {"pct": pres}} if pres is not None else {}}}
+        if prop is not None:
+            ficha_["autoria"] = {"total": prop}
+        if presidiu:
+            ficha_["presidiu"] = presidiu
+        return ficha_
+
+    fichas = [
+        f("a", 90.0, 10), f("b", 80.0, None), f("c", 80.0, 3),
+        f("d", 50.0, 99, exercicio=False),  # fora do exercício: fora dos rankings
+        f("e", 20.0, 1, presidiu=[["2025-02-01", ""]]),  # preside a Casa: fora do ranking de presença
+    ]
+    dados.rankings(fichas, 57, "Lula")
+    por = {x["k"]: x.get("ranks", {}) for x in fichas}
+    assert (por["a"]["pres"], por["b"]["pres"], por["c"]["pres"]) == ([1, 3, 3], [2, 3, 1], [2, 3, 1])  # empate: mesma posição
+    assert "pres" not in por["e"] and por["d"] == {}
+    assert (por["a"]["prop"], por["b"]["prop"], por["c"]["prop"], por["e"]["prop"]) == ([1, 4, 4], [4, 4, 1], [2, 4, 3], [3, 4, 2])
+    assert "gov" not in por["a"]  # sem votos com orientação do governo: sem posição
+    assert all("_preside" not in x for x in fichas)
+
+
 def test_rachas_por_partido_com_tema_e_governo():
     """O PSOL vota com o PL contra o PT e o governo em cinco votações de economia, e com o
     PT em uma: cinco rachas, todas contra o governo; viram achado da Casa."""
@@ -451,6 +532,25 @@ def test_a_aba_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso,
     manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
     assert (manifesto["hoje"], manifesto["base"], manifesto["governo"]) == (HOJE, "../data/congresso/fichas/", "Lula")
     assert html.count('data-casa="cd" data-b=') == 11 and html.count('data-casa="sf" data-b=') == 4
+
+
+def test_o_seletor_de_tema_so_oferece_o_que_poe_alguem_na_faixa(
+    publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config, monkeypatch: pytest.MonkeyPatch
+):
+    data_dir, _fetch, _resultado = publicado
+    monkeypatch.setitem(pagina.FAIXA_MIN, "cd", 1)  # a fixture tem poucos deputados por partido
+    # Na fixture, os temas da Câmara têm 2 e 1 votações esquerda × direita: nenhum chega ao mínimo, não há seletor.
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    assert 'id="cg-faixas-cd"' in html and 'id="cgFxTema-cd"' not in html
+    arquivo = data_dir / dados.PASTA / "casa-cd.json"
+    painel = json.loads(arquivo.read_text(encoding="utf-8"))
+    economia = next(t for t in painel["temas"]["temas"] if t["id"] == "economia")
+    economia["n"] = ficha.MINIMO_TEMA_FAIXA
+    arquivo.write_text(json.dumps(painel), encoding="utf-8")
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    seletor = html.split('id="cgFxTema-cd"', 1)[1].split("</select>", 1)[0]
+    assert '<option value="economia">Economia (5 votações)</option>' in seletor
+    assert '<option value="seguranca" disabled>Segurança (1 votação: poucas para o saldo)</option>' in seletor
 
 
 def test_sem_dados_nao_ha_aba(tmp_path: Path, config: Config):

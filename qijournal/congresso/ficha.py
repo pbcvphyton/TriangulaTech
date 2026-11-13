@@ -287,6 +287,9 @@ def saldo_no_partido(ficha: Mapping[str, Any], minimo: int) -> float | None:
     return no_partido.get("saldo") if (no_partido.get("n") or 0) >= minimo else None
 
 
+MINIMO_TEMA_FAIXA = 5  # votações esquerda × direita no tema para a pessoa aparecer na faixa filtrada
+
+
 def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
     """A linha da pessoa no índice (``resumo.json``): o que a tabela, o mapa e as
     fichas dentro das matérias precisam, sem abrir a ficha inteira."""
@@ -330,4 +333,12 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
+    # Com quem vota em cada tema (para as faixas filtradas por tema): [saldo, votações, vira de lado?]
+    temas = {}
+    for t in ficha.get("temas") or []:
+        e = t.get("eixo") or {}
+        if (e.get("n") or 0) >= MINIMO_TEMA_FAIXA and e.get("saldo") is not None:
+            temas[t["t"]] = [e["saldo"], e["n"]] + ([1] if t.get("vira") else [])
+    if temas:
+        d["tm"] = temas
     return d

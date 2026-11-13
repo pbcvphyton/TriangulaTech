@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import text
 from ..config import Config
-from ..congresso import VERSAO, base, dados, jornal, projetos, relevancia
+from ..congresso import VERSAO, base, dados, ficha, jornal, projetos, relevancia
 from ..models import Edition
 from . import filters
 from .web import brand_view
@@ -69,6 +69,7 @@ ORDEM_FILAS = (
     projetos.F_OUTRA,
 )
 LADO = {"S": "Sim", "N": "Não", "L": "Liberado", "O": "Obstrução", "": "—"}
+VOTO_NOME = {"S": "Sim", "N": "Não", "A": "Abstenção", "O": "Obstrução", "P": "Presidia", "E": "Presente, sem voto", "V": "Votou (secreta)", "J": "Ausência justificada", "F": "Faltou"}
 
 
 # ── dados ────────────────────────────────────────────────────────────────────
@@ -217,10 +218,12 @@ class CasaView:
     faixas: list[Faixa]
     bancadas: list[dict[str, Any]]
     matriz_temas: list[dict[str, Any]]
+    temas_faixa: list[dict[str, Any]]  # os temas do seletor de "Onde cada um está"
     matriz: list[LinhaMatriz]
     matriz_base: int
     rachas: dict[str, Any] | None
     relevancia: dict[str, Any] | None
+    jornal_voto: list[dict[str, Any]]
     fila: dict[str, Any] | None
     furaram: dict[str, Any] | None
     ultimas: list[dict[str, Any]]
@@ -306,6 +309,7 @@ def _votacao(v: Mapping[str, Any], casa: str) -> dict[str, Any]:
         "hora": v.get("hora") or "",
         "tipo": base.TIPOS.get(v.get("tipo") or "", "votação"),
         "prop": v.get("prop") or "",
+        "apelido": v.get("apelido") or "",
         "descricao": v.get("descricao") or "",
         "ementa": v.get("ementa") or "",
         "resultado": "" if aprovada is None else ("Aprovada" if aprovada else "Rejeitada"),
@@ -374,7 +378,7 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
         {
             "t": i["t"], "u": filters.safe_url(i.get("u")) or "", "e": i.get("e") or "", "n": i["n"], "sinais": _sinais(i),
             "pronta": _data(i.get("pronta"), ano=True), "idade": _tempo(i.get("idade")), "urg": bool(i.get("urg")),
-            "autoria": i.get("autoria") or "",
+            "autoria": i.get("autoria") or "", "apel": i.get("apel") or "", "jor": i.get("jor") or 0,
         }
         for i in r.get("esperam") or []
     ]
@@ -391,6 +395,7 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
         passaram.append(
             {
                 "t": i["t"], "u": filters.safe_url(i.get("u")) or "", "e": i.get("e") or "", "n": i["n"], "sinais": _sinais(i),
+                "apel": i.get("apel") or "", "jor": i.get("jor") or 0,
                 "aprovada": _data(i.get("aprovada"), ano=True), "tempo": _tempo(i.get("dias")), "dias": i.get("dias"),
                 "rapida": (i.get("dias") or 0) < relevancia.RAPIDA, "passos": passos, "autoria": i.get("autoria") or "",
             }
@@ -421,6 +426,28 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
         "alta": round(alta),
         "baixa": round(baixa),
     }
+
+
+def _jornal_voto(itens: list[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """No jornal × no voto, na Casa: a manchete que cita alguém e uma proposição, e como ele votou nela."""
+    saida = []
+    for i in itens:
+        votos = [
+            {"data": _data(v.get("d"), ano=True),
+             "tipo": base.TIPOS.get(v.get("t") or "", "votação") + (f", {v['tu']}º turno," if v.get("tu") else ""),
+             "voto": VOTO_NOME.get(v.get("x") or "", v.get("x") or ""),
+             "resultado": "" if v.get("ap") is None else ("aprovada" if v.get("ap") else "rejeitada")}
+            for v in i.get("votos") or []
+        ]
+        saida.append(
+            {
+                "k": i["k"], "nome": i["nome"], "legenda": f"{i.get('partido', '')}-{i.get('uf', '')}".strip("-"),
+                "data": _data(i.get("d"), ano=True), "titulo": i.get("t") or "", "veiculo": i.get("v") or "",
+                "u": filters.safe_url(i.get("u")) or "", "materia": i.get("id") or "",
+                "prop": i.get("p") or "", "apel": i.get("apel") or "", "votos": votos, "mais": max(0, (i.get("n_votos") or 0) - len(votos)),
+            }
+        )
+    return saida
 
 
 def _rachas(r: Mapping[str, Any], temas_nomes: Mapping[str, str]) -> dict[str, Any] | None:
@@ -508,7 +535,7 @@ def _fila(fila: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
         ],
         "prontas_n": _num(fila.get("prontas_plenario_n") or 0),
         "prontas": [
-            {"t": i["t"], "e": i.get("e") or "", "u": filters.safe_url(i.get("u")) or "", "tempo": _tempo(i.get("dias")), "desde": _data(i.get("m") or i.get("d"), ano=True)}
+            {"t": i["t"], "apel": i.get("ap") or "", "e": i.get("e") or "", "u": filters.safe_url(i.get("u")) or "", "tempo": _tempo(i.get("dias")), "desde": _data(i.get("m") or i.get("d"), ano=True)}
             for i in fila.get("prontas_plenario") or []
         ],
     }
@@ -627,15 +654,29 @@ def _casa(
         faixas=_faixas(casa, pessoas, campos),
         bancadas=bancadas,
         matriz_temas=temas_cols,
+        temas_faixa=_temas_faixa(matriz),
         matriz=linhas,
         matriz_base=int(matriz.get("divisivas") or 0),
         rachas=_rachas(painel.get("rachas") or {}, temas_nomes),
         relevancia=_relevancia(painel.get("relevancia") or {}, casa, relev_alta, relev_baixa),
+        jornal_voto=_jornal_voto((painel.get("listas") or {}).get("jornal_voto") or []),
         fila=_fila(painel.get("fila") or {}, casa),
         furaram=_furaram(painel.get("furaram") or {}),
         ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
         listas=_listas(painel.get("listas") or {}),
     )
+
+
+def _temas_faixa(matriz: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Os temas do seletor de "Onde cada um está". Tema com menos votações esquerda × direita
+    que o mínimo da faixa não põe ninguém nela: fica à vista, desabilitado, com o motivo. Sem
+    nenhum tema que passe do mínimo, não há seletor."""
+    temas = [
+        {"id": t["id"], "nome": t["nome"], "n": t["n"], "poucas": t["n"] < ficha.MINIMO_TEMA_FAIXA}
+        for t in matriz.get("temas") or []
+        if t.get("n")
+    ]
+    return temas if any(not t["poucas"] for t in temas) else []
 
 
 def _leitura(achados: list[dict[str, Any]], d: Dados) -> dict[str, Any] | None:
@@ -803,6 +844,19 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "99%); no dossiê, contando os temas da pessoa.",
         ),
         (
+            "Onde cada um está, por tema",
+            f"Escolhido um tema, cada ponto vai para o saldo da pessoa nas votações esquerda × direita daquele tema; quem tem "
+            f"menos de {ficha.MINIMO_TEMA_FAIXA} no tema fica de fora, e os partidos se reordenam pela média. O contorno marca "
+            "quem vira de lado no tema, pelo mesmo teste do dossiê. Tema com menos votações do que isso na Casa aparece "
+            "desabilitado no seletor.",
+        ),
+        (
+            "Na Casa",
+            "O dossiê mostra a posição da pessoa em cada número (presença, governismo, fidelidade, votos contra o partido, "
+            "propostas, paradas, normas, relatorias, jornal), entre os que estão em exercício na mesma Casa. O 1º é quem tem o "
+            "maior número; empate divide a posição. Quem preside a Casa fica fora do ranking de presença.",
+        ),
+        (
             "Temas",
             "Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a "
             "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml).",
@@ -830,6 +884,21 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "nomes de uma palavra e homônimos só valem com o título (“deputado”, “senadora”) ou a legenda ao lado.",
         ),
         (
+            "No jornal × no voto",
+            "O texto do jornal que cita a pessoa e uma proposição, pelo número (\"PEC 3/2021\") ou por um apelido conferido "
+            "contra a ementa oficial (a lista fica em config/congresso.yaml; apelido que serve a mais de um projeto fica de fora). "
+            "Numa matéria, a pessoa e a proposição precisam estar na mesma frase. Ao lado, os votos dela nessa proposição (o "
+            "texto principal primeiro; na PEC, com o turno que a descrição oficial da votação dá). A "
+            "página não interpreta a fala: põe as duas coisas lado a lado.",
+        ),
+        (
+            "O comparativo",
+            "Votam juntos: nas votações de conteúdo da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não), "
+            "a parte em que votaram igual; ao lado, a mesma conta só nas que dividiram esquerda e direita. Num tema, os dois ficam "
+            "de lados opostos quando cada um tem saldo de 20 ou mais, um para cada lado. Deputado e senador não têm votações em "
+            "comum: as Casas votam em separado.",
+        ),
+        (
             "O que isto não diz",
             "Voto não é discurso, e a página não lê discurso: ela mostra o registro para ser posto ao lado do que cada um diz. "
             "Voto com o governo não é ideologia; votação simbólica não aparece; ausência pode ter motivo que o registro não traz. "
@@ -851,6 +920,7 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         "v": VERSAO,
         "hoje": str(d.meta.get("hoje") or ""),
         "base": f"../data/{dados.PASTA}/{dados.FICHAS}/",
+        "votosArq": f"../data/{dados.PASTA}/" + dados.VOTOS.replace("{casa}.json", ""),
         "pesquisa": "pesquisa.html",
         "edicoes": "./",
         "legislatura": leg.get("numero"),
@@ -858,6 +928,8 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         "governo": d.meta.get("governo") or "",
         "campos": campos,
         "temas": {t["id"]: t["nome"] for t in d.meta.get("temas") or []},
+        # Com quem cada um vota em cada tema, para as faixas filtradas: pessoa → {tema: [saldo, n, vira]}
+        "tm": {p["k"]: p["tm"] for p in d.resumo.get("pessoas") or [] if p.get("ex") and p.get("tm")},
         "tipos": base.TIPOS,
         "votos": {
             "S": "Sim",
