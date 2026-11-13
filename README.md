@@ -21,6 +21,11 @@ Nada precisa ser feito à mão: o GitHub gera a edição sozinho a partir das
   GitHub Actions — todo dia a partir das 05:07 (Brasília; de hora em hora + disparo da rotina)
         │
         ▼
+  0. Congresso ── (Triangula) dados abertos da Câmara e do Senado: votações nominais,
+        │      proposições e relatorias viram a aba Congresso (edicoes/congresso.html)
+        │      e as fichas de quem a edição citar. Sem IA. Acessório: se falhar, a
+        │      edição sai com o que já existe em data/congresso/
+        ▼
   1. Coleta ── ~100 feeds (Valor, Folha, Estadão, FT, WSJ, NYT, JOTA, STF, STJ, ge,
         │      g1 Natureza…), cotações (Yahoo Finance, CoinGecko, Banco Central) e
         │      clima de São Paulo (Open-Meteo). Nenhuma editoria é descartada.
@@ -74,6 +79,8 @@ Garantias importantes:
 | Todas as notícias de um dia | `https://pbcvphyton.github.io/TriangulaTech/edicoes/AAAA-MM-DD-todas.html` |
 | Analítico Político (como a imprensa cobre a política: manchetes, enquadramento e termômetro) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/analitico.html> |
 | Pesquisa analítica (busca em todas as edições) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/pesquisa.html> |
+| Congresso (o que cada deputado e senador vota, propõe e deixa parado) | <https://pbcvphyton.github.io/TriangulaTech/edicoes/congresso.html> |
+| O dossiê de um parlamentar | `https://pbcvphyton.github.io/TriangulaTech/edicoes/congresso.html#p=cd-<id>` (deputado) ou `#p=sf-<código>` (senador) |
 
 Cada matéria tem endereço próprio (`…#s-<id>`) e, clicada, abre na tela inteira
 (no computador, no tablet e no celular). Os links do e-mail apontam para a
@@ -540,6 +547,116 @@ placar).
 
 ---
 
+## Analítico do Congresso (aba Congresso, só Triangula)
+
+O botão **Congresso** do cabeçalho abre `edicoes/congresso.html`: o que cada
+deputado e senador **vota, propõe e deixa parado**, lido dos registros oficiais
+das duas Casas. **Nenhuma IA entra nas contas**: é contagem sobre voto nominal,
+proposição e relatoria, com as réguas à vista em
+[`config/congresso.yaml`](config/congresso.yaml). Cobre todos os que estão em
+exercício (513 deputados e 81 senadores) e quem passou pela legislatura, com o
+histórico de votos desde 2019.
+
+A página segue o padrão do Analítico (a leitura → as lentes → Como ler):
+
+- **A leitura**: a manchete é o achado de maior peso, com o número e o link para
+  onde ele está na página; abaixo, os demais achados, numerados. Uma caixa abre o
+  dossiê de qualquer nome.
+- **1 · Com quem vota** ("Por baixo dos rótulos, de que lado cada um fica"):
+  quantos votam com cada polo, a matriz **partido × tema** (o mesmo partido vota
+  com a direita num assunto e com a esquerda em outro) e as bancadas (saldo,
+  governismo e coesão).
+- **2 · A fila** ("O que espera, com quem, e o que passou na frente"): quantas
+  matérias tramitam e em que porta estão (à espera de relator, de parecer, de
+  pauta…), as comissões e os relatores com mais matérias na mão, os projetos
+  prontos para o Plenário que não entram na pauta e **o que passou na frente** (do
+  protocolo ao voto em menos de 120 dias).
+- **3 · O Plenário** ("O que foi votado, e quem saiu da linha"): as últimas
+  votações nominais, com o placar, a orientação do governo, como cada partido votou
+  e quem votou contra o próprio partido.
+- **4 · Quem é quem** ("O que cada um vota, propõe e deixa parado"): as listas
+  (quem menos vota, quem mais vota contra o próprio partido, quem vota longe da
+  própria bancada, quem mudou em relação ao governo, quem tem mais propostas
+  paradas, os mais citados no jornal) e a tabela de **todos os parlamentares**, com
+  filtro e ordenação. Um botão troca a Casa (Câmara ou Senado).
+- **O dossiê**: clicar num nome abre a ficha (endereço próprio:
+  `congresso.html#p=cd-204536`): com quem vota, quanto segue o governo da vez (e o
+  anterior), presença, fidelidade ao partido, o saldo **por tema**, o governismo
+  **semestre a semestre**, **quando saiu da linha** (dissidências e surpresas), os
+  últimos votos, **o que propõe** (por tema e por situação, com as paradas), **o
+  que tem na mão** (relatorias sem parecer) e **no jornal** (as manchetes que o
+  citam).
+
+**Nas matérias da edição**: quando o texto de uma matéria cita um deputado ou
+senador em exercício, ela ganha o bloco **No Congresso**, com a ficha curta de cada
+um (até `fichas_por_materia`, 4): o saldo, o governismo, a presença, as propostas
+paradas, as relatorias sem parecer e o link para o dossiê. O nome só casa inteiro; nomes de uma palavra só (ou
+feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da legenda
+("(PL-SP)") ao lado, para não confundir com homônimos.
+
+### As contas
+
+| Conta | Como é feita |
+|---|---|
+| Só voto nominal | só as votações de Plenário que registram o voto de cada um; a simbólica (a maioria) não diz quem votou o quê. As secretas do Senado (autoridades) contam para a presença, não para a posição |
+| Tipo da votação | pela descrição oficial: texto principal, destaque/emenda, urgência, requerimento de procedimento, recurso, autoridade |
+| Com quem vota (saldo) | só votações **de conteúdo** (texto principal e destaques) **divisivas**: a maioria do polo de esquerda votou de um jeito e a do polo de direita, de outro, com 75% de cada polo do mesmo lado. Vai de −100 (sempre com a esquerda) a +100 (sempre com a direita); aparece com 10 votações ou mais. É comportamento, não rótulo |
+| Governismo | onde a liderança do Governo orientou Sim ou Não, a parte em que votou igual; contado à parte em cada governo (quem acompanha qualquer governo aparece assim). Obstrução conta como Não |
+| Presença | votações em que podia votar e votou. Câmara: só os dias em exercício (histórico do mandato); os dados abertos não dizem se a ausência foi justificada. Senado: a ausência justificada (licença, missão, atividade parlamentar) fica fora da conta e aparece à parte. Quem preside a Casa só vota em caso de empate: fica fora da lista |
+| Fidelidade e dissidência | votos iguais aos da maioria do partido do dia; dissidência é votar diferente quando 80% ou mais do partido votou junto |
+| Surpresa | quem tem lado definido (saldo além de ±60) e, numa votação divisiva, ficou com o outro polo |
+| Mudança | o último semestre contra os anteriores do mesmo governo: só com 15 pontos ou mais e 99% de confiança (duas proporções) |
+| Temas | a área temática oficial da matéria votada (Câmara) ou a classe do processo (Senado), levadas a 13 macrotemas |
+| A fila | a situação oficial de cada proposição vira um estado (tramitando, apensada, aprovada, virou norma, encerrada) e uma porta (relator, parecer, pauta, Mesa, comissão…); "parada" é sem andamento há mais de 365 dias |
+| Passou na frente | texto principal aprovado em votação nominal nos últimos 240 dias, menos de 120 dias depois de apresentado |
+| No jornal | os nomes procurados nas manchetes e no texto das matérias de `data/busca/` (as edições dos últimos 60 dias; fora esporte, natureza e variedades) |
+
+Os polos (hoje PT, PSOL e PCdoB × PL e NOVO), os governos, os limiares, as faixas
+do campo e os macrotemas são **escolhas editoriais**: ficam em
+`config/congresso.yaml` e vão escritos no **Como ler** da aba. Mudar um valor muda a
+conta na atualização seguinte.
+
+**Limites**: mede voto, não discurso (o cruzamento "disse × votou" ainda é manual:
+a ficha põe o voto ao lado da manchete); só o Plenário (as comissões ficam de fora
+das contas de voto); a autoria conta o primeiro signatário; no Senado, a fila só
+tem o que tramita; nomes muito comuns podem deixar de casar nas matérias (o
+contrário, casar errado, é o que a regra evita).
+
+### Dados e atualização
+
+- **Fontes** (públicas, sem chave): arquivos em lote e API da Câmara
+  (`dadosabertos.camara.leg.br`) e API legislativa do Senado
+  (`legis.senado.leg.br/dadosabertos`).
+- **Todo dia**, antes da edição, o passo *Atualizar o Congresso* do `daily.yml`
+  roda `python -m qijournal congresso atualizar`: baixa o que mudou, refaz as contas
+  e grava só os arquivos que mudaram (cerca de 2 minutos; os anos fechados da base
+  de votos nunca são refeitos). O que foi baixado fica num cache do Actions, fora do
+  repositório. O passo é acessório (`continue-on-error`, 15 minutos): se uma fonte
+  estiver fora do ar, a edição sai com os dados da véspera.
+- **À mão**: *Actions → **Congresso** → Run workflow* atualiza fora de hora; a
+  opção **Carga completa** refaz também os anos fechados e relê todas as
+  proposições.
+- **Onde fica** (`data/congresso/`, gerado):
+
+| Arquivo | O quê |
+|---|---|
+| `base/cd-AAAA.json`, `base/sf-AAAA.json` | as votações nominais de cada Casa e ano: um caractere por pessoa por votação (`S` sim, `N` não, `A` abstenção, `O` obstrução, `P` presidiu, `J` ausência justificada, `F` falta…), uma votação por linha |
+| `base/cd-exercicio.json` | os períodos em exercício de cada deputado e quem presidiu a Câmara |
+| `fichas/<casa>-<id>.json` | o dossiê de cada parlamentar (carregado quando a ficha abre) |
+| `resumo.json` | uma linha por parlamentar (a tabela da aba e as fichas das matérias) |
+| `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, fila, listas, últimas votações) |
+| `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
+
+- **Desligar**: `congresso.enabled: false` em `config/site.yaml`, ou a variável
+  **`QIJ_NO_CONGRESSO`** = `1` (o botão e os blocos somem; os dados ficam).
+- **Código**: `qijournal/congresso/` (`fontes.py` coleta e cache; `base.py` votações;
+  `regras.py` as réguas; `perfil.py` as contas de voto; `exercicio.py` períodos de
+  mandato; `projetos.py` proposições, relatorias e fila; `jornal.py` os nomes no
+  banco do jornal; `ficha.py` o dossiê; `dados.py` a atualização; `cli.py` os
+  comandos) e `qijournal/render/congresso.py` com os modelos `congresso.*.j2`.
+
+---
+
 ## Receber por e-mail
 
 O e-mail segue o modelo do e-mail do **TSA Tech**: a faixa do cabeçalho (o logo
@@ -635,6 +752,9 @@ Rodar de novo no mesmo dia substitui a edição do dia. Ao final, a aba
 *Summary* da execução mostra o modo (IA ou automático), os tokens usados, as
 fontes com erro e os links da edição.
 
+*Actions → **Congresso** → Run workflow* atualiza só os dados e a aba do
+Congresso (opção **Carga completa**: refaz tudo desde 2019).
+
 ### No computador
 
 Requer Python 3.11 ou mais novo.
@@ -660,6 +780,8 @@ Todos os comandos (`python -m qijournal <comando> --help` mostra os detalhes):
 | `render --bundle ARQ --out DIR [--no-llm]` | gera a edição a partir de uma coleta salva, sem internet e sem e-mail |
 | `send-email [--dir DIR] [--force-email]` | envia por SMTP o e-mail da última edição gerada (uma vez por edição, salvo `--force-email`) |
 | `check-sources` | testa cada fonte e mostra quais estão respondendo |
+| `congresso atualizar [--dir DIR] [--cache DIR] [--completo] [--now ISO]` | baixa os dados da Câmara e do Senado, refaz as contas, `data/congresso/` e a aba Congresso (o que baixa fica em `.cache/congresso`, fora do git) |
+| `congresso pagina [--dir DIR]` | só refaz a aba Congresso a partir de `data/congresso/`, sem internet |
 
 Códigos de saída: `0` sucesso; `1` erro; `2` dados insuficientes (edição não
 publicada) ou argumentos inválidos.
@@ -773,6 +895,7 @@ Cada peça passa por um lint antes de sair e, reprovada, cai para um substituto;
 | `IG_API_VERSION`, `IG_API_HOST`, `IG_PAUSE` | variáveis (opcionais) | versão e host da API do Instagram; `IG_PAUSE=true` pausa as publicações |
 | `QIJ_BRAND` | variável | marca (`tech` ou `pbcv`) |
 | `QIJ_NO_TERMOMETRO` | variável | `1` desliga o Termômetro de Viés e a aba Analítico Político |
+| `QIJ_NO_CONGRESSO` | variável | `1` desliga a aba Congresso e as fichas nas matérias |
 | `QIJ_MODEL` | variável | modelo do Claude |
 | `QIJ_GEMINI_MODEL`, `QIJ_GEMINI_LITE_MODEL`, `QIJ_AIML_MODEL`, `QIJ_SENSENOVA_MODEL`, `QIJ_MISTRAL_MODEL`, `QIJ_KIMI_MODEL` | variáveis | modelo de cada editor (padrões na tabela de editores acima) |
 
@@ -796,6 +919,10 @@ publicado normalmente.
   `python -m qijournal render --bundle bundle-AAAA-MM-DD.json --out /tmp/x --no-llm`.
   A edição por IA não é reproduzível (o modelo pode escolher e escrever
   diferente a cada chamada).
+- **O passo *Atualizar o Congresso* falhou ou demorou:** a edição sai do mesmo
+  jeito, com os dados do Congresso da véspera (o passo é acessório e tem 15
+  minutos). O *Summary* da execução lista os avisos (fonte fora do ar, por
+  exemplo). Para refazer: *Actions → Congresso → Run workflow*.
 - **O agendamento atrasou ou não rodou:** o GitHub atrasa ou descarta
   agendamentos (em outubro de 2026, o das 05:07 chegava entre 10h e 14h). Por
   isso o workflow é agendado de hora em hora: a primeira execução que chega a
@@ -831,6 +958,11 @@ qijournal/                código do jornal
   termometro/             Termômetro de Viés: referencia.py (cálculo, cópia literal
                           da especificação), agregacao.py (aba analítica),
                           analise.py (textos → IA → cálculo) e historico.py
+  congresso/              Analítico do Congresso: fontes.py (coleta e cache),
+                          base.py (votações nominais), perfil.py (as contas de
+                          voto), projetos.py (proposições, relatorias e fila),
+                          jornal.py (os nomes no banco do jornal), ficha.py (o
+                          dossiê), dados.py (a atualização) e cli.py (comandos)
   deliver/smtp.py         envio do e-mail por SMTP
   instagram/              Instagram: formatos/ (um módulo por post do dia),
                           estatistica.py, selecao.py e redacao.py (contas, escolha
@@ -842,6 +974,8 @@ config/site.yaml          marca, seções, cotações, clima, limites da ediçã
 config/sources.yaml       fontes de notícia
 config/saida_modelo.schema.json, lexico.yaml, atores.yaml  termômetro (formato da
                           saída da IA, dicionário e âncoras de campo)
+config/congresso.yaml     as réguas do Analítico do Congresso (polos, governos,
+                          limiares, faixas do campo e macrotemas)
 assets/                   logos e ícones das marcas; fonts/ (fontes das imagens do
                           Instagram); instagram/ (foto de perfil e capas de destaque)
 docs/instagram.md         guia do Instagram
@@ -851,10 +985,11 @@ edicoes/                  arquivo de edições, todas as notícias de cada dia,
 data/                     cada edição em JSON; em data/termometro/, as análises
                           do termômetro de cada dia, guardadas para sempre; em
                           data/busca/, o que cada edição publicou, para a Pesquisa
-                          analítica (gerado)
+                          analítica; em data/congresso/, a base de votos, as
+                          fichas e os painéis do Congresso (gerado)
 tests/                    testes automáticos
-.github/workflows/        daily.yml (edição diária), instagram.yml (posts do
-                          Instagram) e ci.yml (testes)
+.github/workflows/        daily.yml (edição diária), congresso.yml (Congresso, à
+                          mão), instagram.yml (posts do Instagram) e ci.yml (testes)
 ```
 
 `index.html`, `edicoes/` e `data/` são escritos pelo robô — não edite à mão.

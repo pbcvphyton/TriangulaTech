@@ -1,0 +1,118 @@
+# Analítico do Congresso, à mão: baixa os dados abertos da Câmara e do Senado, refaz as
+# contas e a aba Congresso (python -m qijournal congresso atualizar) e publica o que
+# mudou em data/congresso/ e edicoes/congresso.html.
+#
+# No dia a dia isto roda dentro da "Edição diária", antes da edição. Este workflow serve
+# para atualizar fora de hora ou refazer tudo ("carga completa": também os anos fechados
+# da base de votos e todos os anos de proposições, baixados de novo).
+name: Congresso
+
+on:
+  workflow_dispatch:
+    inputs:
+      completo:
+        description: "Carga completa (refaz os anos fechados e relê todas as proposições)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  # A mesma fila da edição diária: nunca dois escritores na mesma branch.
+  group: daily-edition-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  congresso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Dia do cache do Congresso
+        id: cg
+        run: echo "dia=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache do que foi baixado do Congresso
+        # O mesmo cache da "Edição diária" (chave do dia; parte do mais recente). A carga
+        # completa baixa tudo de novo de qualquer jeito e deixa o cache em dia.
+        continue-on-error: true
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/congresso
+          key: congresso-${{ steps.cg.outputs.dia }}
+          restore-keys: congresso-
+
+      - name: Atualizar o Congresso
+        env:
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          INPUT_COMPLETO: ${{ inputs.completo }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: |
+          args=(--dir . --cache "$RUNNER_TEMP/congresso")
+          if [ "$INPUT_COMPLETO" = "true" ]; then args+=(--completo); fi
+          python -m qijournal congresso atualizar "${args[@]}"
+
+      - name: Publicar (commit e push)
+        id: publish
+        env:
+          TZ: America/Sao_Paulo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          stage() {
+            git add "$@" -- data/congresso edicoes/congresso.html
+          }
+          stage --all
+          if git diff --cached --quiet; then
+            echo "Nenhuma mudança para publicar."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit --quiet -m "🏛️ Congresso em $(date +%d/%m/%Y)"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then break; fi
+            echo "::notice::Push recusado (tentativa ${attempt}/3); refazendo o commit sobre o remoto."
+            sleep $((attempt * 5))
+            git fetch --quiet origin "${GITHUB_REF_NAME}"
+            git reset --quiet --mixed FETCH_HEAD
+            stage --ignore-removal
+            if git diff --cached --quiet; then
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit --quiet -m "🏛️ Congresso em $(date +%d/%m/%Y)"
+          done
+          echo "::error::Não foi possível enviar os dados do Congresso após 3 tentativas."
+          exit 1
+
+      - name: Pedir build do GitHub Pages
+        if: steps.publish.outputs.changed == 'true'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds"
