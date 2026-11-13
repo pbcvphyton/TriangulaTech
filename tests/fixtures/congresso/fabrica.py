@@ -74,6 +74,7 @@ VOTACOES: list[tuple[str, str, str, str, str, str, tuple[int, str, int], str, di
 ]
 
 # id, sigla, número, ementa, apresentação, situação, órgão, último andamento, relator, tema (código), autores [(deputado, ordem, proponente)], autoria de fora
+# Fora da tabela: a matéria principal de cada apensada (PRINCIPAL) e as sujeitas ao Plenário (PLENARIO).
 PROPOSICOES: list[tuple[int, str, int, str, str, str, str, str, int | None, int | None, list[tuple[int, int, int]], str]] = [
     (1010, "PL", 10, "Altera a tabela do imposto de renda.", "2026-01-05", "Aguardando Designação de Relator(a)", "CCJC", "2026-01-10", None, 40, [(1, 1, 1)], ""),
     (1011, "PL", 11, "Aumenta penas para o crime organizado.", "2026-01-20", "Aguardando Parecer", "CSPCCO", "2026-02-01", 7, 43, [(4, 1, 1)], ""),
@@ -82,7 +83,10 @@ PROPOSICOES: list[tuple[int, str, int, str, str, str, str, str, int | None, int 
     (1014, "PL", 13, "Cria o dia nacional do leitor.", "2026-03-01", "Arquivada", "MESA", "2026-09-01", None, 72, [(1, 1, 1), (2, 2, 1)], ""),
     (1015, "PL", 14, "Regula o trabalho por aplicativo.", "2026-02-20", "Pronta para Pauta", "PLEN", "2026-03-01", None, 58, [(1, 1, 1)], ""),
     (1016, "REQ", 5, "Requer audiência pública.", "2026-03-02", "", "CCJC", "2026-03-02", None, None, [(1, 1, 1)], ""),
+    (1017, "PL", 15, "Também regula o trabalho por aplicativo.", "2026-04-01", "Tramitando em Conjunto", "PLEN", "2026-04-02", None, 58, [], "Senado Federal - Rita Alves"),
 ]
+PRINCIPAL = {1017: 1015}  # o PL 15/2026 anda junto com o PL 14/2026 (um projeto parecido anexado)
+PLENARIO = {1012, 1015}  # "Proposição Sujeita à Apreciação do Plenário"; as demais, sem a informação
 
 SENADORES = [(101, "Rita Alves", "PT", "BA"), (102, "Sérgio Dias", "PL", "SC"), (103, "Túlio Braga", "MDB", "PA"), (104, "Vera Campos", "PSD", "MG")]
 
@@ -143,13 +147,18 @@ def arquivos_da_camara() -> dict[str, bytes]:
             votos.append([vid, voto, dep, nome, partido, uf])
     proposicoes, autores, temas = [], [], []
     for pid, sigla, numero, ementa, apresentada, situacao, orgao, movimento, relator, tema, assinam, de_fora in PROPOSICOES:
-        proposicoes.append([pid, sigla, numero, 2026, ementa, f"{apresentada}T10:00:00", situacao, orgao, f"{movimento}T00:00:00", _uri("deputados", relator), "Ordinário"])
+        apreciacao = "Proposição Sujeita à Apreciação do Plenário" if pid in PLENARIO else ""
+        proposicoes.append(
+            [pid, sigla, numero, 2026, ementa, f"{apresentada}T10:00:00", situacao, orgao, f"{movimento}T00:00:00", _uri("deputados", relator), "Ordinário",
+             _uri("proposicoes", PRINCIPAL.get(pid)), apreciacao]
+        )
         if tema:
             temas.append([_uri("proposicoes", pid), tema])
         for dep, ordem, proponente in assinam:
-            autores.append([pid, dep, nomes[dep][1], ordem, proponente])
+            autores.append([pid, dep, nomes[dep][1], ordem, proponente, "Deputado(a)", nomes[dep][2]])
         if de_fora:
-            autores.append([pid, "", de_fora, 1, 1])
+            tipo = "Órgão do Poder Executivo" if "Executivo" in de_fora else "Órgão do Poder Legislativo"
+            autores.append([pid, "", de_fora, 1, 1, tipo, ""])
     orgaos = [["CCJC", _uri("deputados", 8), "Hugo Leal", "Presidente", "2026-02-05", ""], ["CCJC", _uri("deputados", 1), "Ana Lima", "Titular", "2026-02-05", ""]]
     return {
         "votacoes/csv/votacoes-2026.csv": csv_bytes(["id", "data", "dataHoraRegistro", "siglaOrgao", "aprovacao", "descricao"], votacoes),
@@ -159,10 +168,13 @@ def arquivos_da_camara() -> dict[str, bytes]:
             ["idVotacao", "proposicao_id", "proposicao_siglaTipo", "proposicao_numero", "proposicao_ano", "proposicao_ementa"], afetadas
         ),
         "proposicoes/csv/proposicoes-2026.csv": csv_bytes(
-            ["id", "siglaTipo", "numero", "ano", "ementa", "dataApresentacao", "ultimoStatus_descricaoSituacao", "ultimoStatus_siglaOrgao", "ultimoStatus_dataHora", "ultimoStatus_uriRelator", "ultimoStatus_regime"],
+            ["id", "siglaTipo", "numero", "ano", "ementa", "dataApresentacao", "ultimoStatus_descricaoSituacao", "ultimoStatus_siglaOrgao", "ultimoStatus_dataHora", "ultimoStatus_uriRelator", "ultimoStatus_regime",
+             "uriPropPrincipal", "ultimoStatus_apreciacao"],
             proposicoes,
         ),
-        "proposicoesAutores/csv/proposicoesAutores-2026.csv": csv_bytes(["idProposicao", "idDeputadoAutor", "nomeAutor", "ordemAssinatura", "proponente"], autores),
+        "proposicoesAutores/csv/proposicoesAutores-2026.csv": csv_bytes(
+            ["idProposicao", "idDeputadoAutor", "nomeAutor", "ordemAssinatura", "proponente", "tipoAutor", "siglaPartidoAutor"], autores
+        ),
         "proposicoesTemas/csv/proposicoesTemas-2026.csv": csv_bytes(["uriProposicao", "codTema"], temas),
         "orgaosDeputados/csv/orgaosDeputados-L57.csv": csv_bytes(["siglaOrgao", "uriDeputado", "nomeDeputado", "cargo", "dataInicio", "dataFim"], orgaos),
     }
@@ -173,6 +185,20 @@ def historico(dep: int) -> list[dict[str, Any]]:
     return [
         {"dataHora": "2023-02-01T00:00", "situacao": None, "idLegislatura": 57},
         {"dataHora": inicio, "situacao": "Exercício", "idLegislatura": 57},
+    ]
+
+
+def tramitacoes_do_pl_12() -> list[dict[str, Any]]:
+    """O caminho do PL 12/2026, do Executivo: urgência a pedido de dois deputados, parecer no Plenário, aprovado em 16/06."""
+    def passo(seq: int, data: str, orgao: str, descricao: str, despacho: str) -> dict[str, Any]:
+        return {"sequencia": seq, "dataHora": f"{data}T15:00", "siglaOrgao": orgao, "descricaoTramitacao": descricao, "despacho": despacho}
+
+    return [
+        passo(1, "2026-06-01", "MESA", "Apresentação de Proposição", "Apresentação do PL n. 12/2026, pelo Poder Executivo."),
+        passo(2, "2026-06-09", "PLEN", "Aprovação de Urgência (154, 155 ou 64 CF)", "Aprovado o requerimento nº 77/2026, dos Srs. Ana Lima e Davi Rocha, que solicita urgência (art. 155) para o PL 12/2026."),
+        passo(3, "2026-06-16", "PLEN", "Parecer do(a) Relator(a)", "Parecer proferido em Plenário pelo Relator, Dep. Hugo Leal (PP-PE), pela Comissão de Viação e Transportes, que conclui pela aprovação."),
+        passo(4, "2026-06-16", "PLEN", "Aprovação de Proposição (Plenário)", "Aprovado o Projeto de Lei nº 12, de 2026."),
+        passo(5, "2026-06-20", "MESA", "Remessa ao Senado Federal", "Remessa ao Senado Federal por meio do Of. nº 1/2026."),
     ]
 
 
@@ -204,6 +230,19 @@ def processos_do_senado() -> list[dict[str, Any]]:
          "situacaoAtual": "AGUARDANDO DESIGNAÇÃO DO RELATOR", "dataSituacaoAtual": "2026-01-20", "tramitando": "Sim", "autoria": "Senadora Rita Alves (PT/BA), Senador Túlio Braga (MDB/PA)"},
         {"id": 7004, "codigoMateria": 160004, "identificacao": "RQS 9/2026", "ementa": "Requer voto de aplauso.", "dataApresentacao": "2026-02-01",
          "situacaoAtual": "AGUARDANDO DESPACHO", "dataSituacaoAtual": "2026-02-01", "tramitando": "Sim", "autoria": "Senadora Rita Alves (PT/BA)"},
+        {"id": 7005, "codigoMateria": 160005, "identificacao": "PL 22/2026", "ementa": "Institui o Dia Nacional do Ciclista.", "dataApresentacao": "2025-03-10",
+         "situacaoAtual": "PRONTO PARA DELIBERAÇÃO DO PLENÁRIO", "dataSituacaoAtual": "2025-09-01", "tramitando": "Sim", "autoria": "Câmara dos Deputados", "objetivo": "Revisora"},
+    ]
+
+
+def deliberacoes_do_senado() -> list[dict[str, Any]]:
+    """O que o Plenário do Senado aprovou: o PL 20/2026, em 12/05 (e um requerimento, que fica de fora)."""
+    return [
+        {"id": 7001, "codigoMateria": 160001, "identificacao": "PL 20/2026", "ementa": "Altera o imposto de renda.", "dataApresentacao": "2026-04-30",
+         "dataDeliberacao": "2026-05-12", "siglaTipoDeliberacao": "APROVADA_NO_PLENARIO", "situacaoAtual": "REMETIDA À CÂMARA DOS DEPUTADOS",
+         "autoria": "Senadora Rita Alves (PT/BA)", "objetivo": "Iniciadora"},
+        {"id": 7009, "codigoMateria": 160009, "identificacao": "RQS 12/2026", "ementa": "Requer urgência.", "dataApresentacao": "2026-05-01",
+         "dataDeliberacao": "2026-05-12", "siglaTipoDeliberacao": "APROVADA_NO_PLENARIO", "autoria": "Senadora Rita Alves (PT/BA)"},
     ]
 
 
@@ -255,6 +294,11 @@ def respostas() -> dict[str, bytes]:
     for codigo, nome, *_resto in SENADORES:
         meus = [p for p in processos_do_senado() if nome in p["autoria"]]
         mapa[f"{s}/processo?codigoParlamentarAutor={codigo}"] = json.dumps(meus).encode("utf-8")
+    mapa["/api/v2/proposicoes/1012/tramitacoes"] = dados(tramitacoes_do_pl_12())
+    trechos = [("2025-11-13", "2026-02-12"), ("2026-02-13", "2026-05-15"), ("2026-05-16", "2026-08-15"), ("2026-08-16", HOJE)]
+    for inicio, fim in trechos:
+        itens = [d for d in deliberacoes_do_senado() if inicio <= d["dataDeliberacao"] <= fim]
+        mapa[f"{s}/processo?dataInicioDeliberacao={inicio}&dataFimDeliberacao={fim}"] = json.dumps(itens).encode("utf-8")
     mapa[f"{s}/processo/relatoria?tramitando=S"] = json.dumps(
         [{"codigoParlamentar": 103, "identificacaoProcesso": "PL 21/2026", "codigoMateria": 160003, "ementaProcesso": "Cria o cadastro de obras paradas.", "dataDesignacao": "2026-02-01 10:00:00", "dataDestituicao": None, "siglaColegiado": "CI", "autoriaProcesso": "Senadora Rita Alves"}]
     ).encode("utf-8")

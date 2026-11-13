@@ -28,7 +28,7 @@ from datetime import date
 from typing import Any
 
 from .. import net, text
-from . import fontes
+from . import base, fontes
 from .fontes import Coletor
 from .regras import Limiares
 from .temas import TemasCamara
@@ -114,6 +114,10 @@ class Proposicao:
     autoria: str = ""  # texto da autoria (quando não é de parlamentar da Casa)
     temas: list[str] = field(default_factory=list)
     apelido: str = ""
+    origem: str = ""  # de onde veio: outra_casa, executivo, comissao, judiciario, popular, parlamentar
+    partidos: list[str] = field(default_factory=list)  # partidos dos autores parlamentares
+    principal: int | None = None  # Câmara: a matéria a que esta está apensada
+    apreciacao: str = ""  # Câmara: "plenario" ou "conclusiva" (nas comissões)
 
     @property
     def titulo(self) -> str:
@@ -140,6 +144,23 @@ class Relatoria:
     orgao: str = ""
     autoria: str = ""
     url: str = ""
+
+
+def origem_do_autor(tipo: str | None, nome: str | None) -> str:
+    """De onde a matéria veio, pelo autor: a outra Casa, o Executivo, uma comissão, o
+    Judiciário (e os órgãos de controle), a sociedade ou um parlamentar."""
+    t, n = text.normalize(tipo or ""), text.normalize(nome or "")
+    if n.startswith("senado federal") or n.startswith("camara dos deputados") or "camara dos deputados" == n:
+        return "outra_casa"
+    if "executivo" in t or "executivo" in n or "presidencia da republica" in n or n.startswith("presidente da republica"):
+        return "executivo"
+    if "judiciario" in t or re.search(r"\b(tribunal|ministerio publico|procuradoria|defensoria|supremo)\b", n):
+        return "judiciario"
+    if re.search(r"sociedade civil|iniciativa popular|popular", t) or re.search(r"legislacao participativa|iniciativa popular|sugestao", n):
+        return "popular"
+    if re.search(r"\bcomissao|\bmista|\bcpi\b|parlamentar de inquerito|mesa diretora", t + " " + n):
+        return "comissao"
+    return "parlamentar"
 
 
 def dias_entre(inicio: str, fim: str) -> int | None:
@@ -242,6 +263,8 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
         situacao = (r.get("ultimoStatus_descricaoSituacao") or "").strip()
         estado, fila = classificar(situacao)
         regime = text.normalize(r.get("ultimoStatus_regime") or "")
+        apreciacao = text.normalize(r.get("ultimoStatus_apreciacao") or "")
+        principal = fontes.id_da_uri(r.get("uriPropPrincipal"))
         por_id[pid] = Proposicao(
             id=pid,
             casa="cd",
@@ -258,6 +281,8 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
             relator=fontes.id_da_uri(r.get("ultimoStatus_uriRelator")),
             urgencia="urgencia" in regime,
             temas=temas(pid, ano) if temas else [],
+            principal=principal if principal and principal != pid else None,
+            apreciacao="plenario" if "plenario" in apreciacao else ("conclusiva" if "conclusiva" in apreciacao else ""),
         )
     for r in fontes.csv_linhas(fontes.camara_arquivo(coletor, "proposicoesAutores", ano, validade_h=validade_h)):
         prop = por_id.get(fontes.inteiro(r.get("idProposicao")) or -1)
@@ -265,13 +290,22 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
             continue
         autor = fontes.inteiro(r.get("idDeputadoAutor"))
         proponente = (r.get("proponente") or "").strip() == "1"
-        if autor and (r.get("ordemAssinatura") or "").strip() == "1":
+        primeiro = (r.get("ordemAssinatura") or "").strip() == "1"
+        if autor and primeiro:
             prop.primeiro = autor
+        if primeiro and not prop.origem:
+            prop.origem = origem_do_autor(r.get("tipoAutor"), r.get("nomeAutor"))
         if autor and proponente:
             if autor not in prop.autores:
                 prop.autores.append(autor)
+            sigla_partido = base.partido(r.get("siglaPartidoAutor"))
+            if sigla_partido and sigla_partido not in prop.partidos:
+                prop.partidos.append(sigla_partido)
         elif not autor and proponente and not prop.autoria:
             prop.autoria = _curto(r.get("nomeAutor"), 80)
+    for prop in por_id.values():
+        if not prop.origem:
+            prop.origem = "parlamentar" if prop.autores else origem_do_autor("", prop.autoria)
     return list(por_id.values())
 
 
@@ -301,6 +335,17 @@ def camara_presidentes(coletor: Coletor, legislatura: int, hoje: str, *, validad
 # ── Senado ───────────────────────────────────────────────────────────────────
 
 _IDENT = re.compile(r"^([A-Z.]+)\s+(\d+)/(\d{4})")
+_PARTIDO_UF = re.compile(r"\(([A-Za-zÀ-ú.]+(?:\s[A-Za-zÀ-ú.]+)?)/[A-Z]{2}\)")
+_NO_PLENARIO = re.compile(r"\b(plenario|ordem do dia)\b")
+
+
+def origem_senado(autoria: str | None, objetivo: str | None) -> str:
+    if text.normalize(objetivo or "") == "revisora":
+        return "outra_casa"
+    autoria = (autoria or "").strip()
+    if re.match(r"(?i)senador", autoria):
+        return "parlamentar"
+    return origem_do_autor("", autoria.split(",")[0])
 
 
 def _do_senado(item: Mapping[str, Any]) -> Proposicao | None:
@@ -313,6 +358,15 @@ def _do_senado(item: Mapping[str, Any]) -> Proposicao | None:
     estado, fila = classificar(situacao, tramitando=tramitando)
     if tramitando and estado in (ENCERRADA, APROVADA, NORMA):
         estado, fila = TRAMITANDO, F_OUTRA  # o Senado diz que tramita: vale o que ele diz
+    s_norm = text.normalize(situacao)
+    # o Senado não diz o colegiado: "pronto para deliberação do Plenário" e "incluída em Ordem do Dia" são do Plenário
+    orgao = "PLEN" if fila == F_PAUTA and _NO_PLENARIO.search(s_norm) and "requerimento" not in s_norm else ""
+    autoria = str(item.get("autoria") or "")
+    partidos = []
+    for sigla in _PARTIDO_UF.findall(autoria):
+        sigla = base.partido(sigla)
+        if sigla and sigla not in partidos:
+            partidos.append(sigla)
     return Proposicao(
         id=fontes.inteiro(item.get("codigoMateria")) or pid,
         casa="sf",
@@ -325,8 +379,11 @@ def _do_senado(item: Mapping[str, Any]) -> Proposicao | None:
         estado=estado,
         fila=fila,
         movimento=str(item.get("dataSituacaoAtual") or item.get("dataUltimaAtualizacao") or "")[:10],
+        orgao=orgao,
         autoria=_curto(item.get("autoria"), 120),
         apelido=_curto(item.get("apelido"), 60),
+        origem=origem_senado(autoria, item.get("objetivo")),
+        partidos=partidos,
     )
 
 

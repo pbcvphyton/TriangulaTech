@@ -7,6 +7,7 @@ Por isso ficam num arquivo só, à vista, e vão escritas na seção "Como ler" 
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -73,6 +74,49 @@ class Tema:
     senado: tuple[str, ...] = ()  # prefixos de "Raiz / Filho", normalizados
 
 
+@dataclass(frozen=True)
+class Relevancia:
+    """O índice de relevância das matérias (0 a 100): sinais que dá para medir nos
+    registros oficiais. Não diz se a matéria é boa; diz quantos sinais de relevância
+    pública ela tem. Pesos e critérios ficam em ``config/congresso.yaml``."""
+
+    pesos: tuple[tuple[str, float], ...] = (("demanda", 40.0), ("origem", 25.0), ("alcance", 20.0), ("apoio", 15.0))
+    janela_demanda_anos: int = 0  # só os projetos parecidos apresentados nos N anos antes da referência (0: todos)
+    demanda_cheia: int = 15  # tantos projetos parecidos na janela dão a nota cheia (escala logarítmica)
+    origem: tuple[tuple[str, float], ...] = (
+        ("outra_casa", 1.0),
+        ("popular", 1.0),
+        ("executivo", 0.8),
+        ("comissao", 0.7),
+        ("judiciario", 0.6),
+        ("parlamentar", 0.0),
+    )
+    alcance: tuple[tuple[str, float], ...] = (("PEC", 1.0), ("PLP", 0.8), ("PL", 0.6), ("PLS", 0.6), ("PLC", 0.6), ("PDL", 0.3))
+    simbolicas: tuple[str, ...] = (
+        r"^(institui|cria|estabelece|dispoe sobre) (o|a) (dia|semana|mes|ano|jornada) ",
+        r"\bdia nacional\b",
+        r"\bsemana nacional\b",
+        r"^denomina\b",
+        r"^confere\b",
+        r"^inscreve\b",
+        r"^declara\b",
+        r"\bcapital nacional d",
+        r"\blivro dos herois\b",
+        r"\btitulo de cidada",
+        r"\bpatrimonio (cultural|historico|imaterial)\b",
+        r"\bcalendario oficial\b",
+        r"\bmanifestacao da cultura nacional\b",
+        r"\b(rota|regiao|circuito|polo) turistic",
+        r"\bcapital (nacional|brasileira) d",
+    )
+    simbolica_teto: float = 10.0  # matéria simbólica não passa desta nota
+    alta: float = 60.0  # nota a partir da qual os sinais são fortes
+    baixa: float = 30.0  # nota abaixo da qual os sinais são fracos
+
+    def peso(self, componente: str) -> float:
+        return dict(self.pesos).get(componente, 0.0)
+
+
 CAMPOS_PADRAO = (
     Campo("esquerda", "com a esquerda", -60),
     Campo("centro_esquerda", "mais com a esquerda", -20),
@@ -90,12 +134,15 @@ class Regras:
     limiares: Limiares = field(default_factory=Limiares)
     campos: tuple[Campo, ...] = CAMPOS_PADRAO
     temas: list[Tema] = field(default_factory=list)
+    relevancia: Relevancia = field(default_factory=Relevancia)
+    apelidos: dict[str, list[str]] = field(default_factory=dict)  # "PL 2630/2020" → ["PL das Fake News", …]
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
         prefixos = [(prefixo, t.id) for t in self.temas for prefixo in t.senado]
         self._tema_senado = sorted(prefixos, key=lambda par: len(par[0]), reverse=True)
         self._nomes = {t.id: t.nome for t in self.temas}
+        self._busca_apelidos = {text.normalize(nome): titulo for titulo, nomes in self.apelidos.items() for nome in nomes if text.normalize(nome)}
 
     # ── períodos ─────────────────────────────────────────────────────────────
 
@@ -143,9 +190,39 @@ class Regras:
     def nome_do_tema(self, tema: str) -> str:
         return self._nomes.get(tema, tema)
 
+    # ── apelidos ─────────────────────────────────────────────────────────────
+
+    def apelidos_para_busca(self) -> dict[str, str]:
+        """Apelido (sem acento, minúsculo) → proposição, para achar no texto do jornal."""
+        return dict(self._busca_apelidos)
+
+    def apelido_de(self, titulo: str) -> str:
+        """O apelido que a página mostra ao lado do número (o primeiro da lista)."""
+        nomes = self.apelidos.get(titulo) or []
+        return nomes[0] if nomes else ""
+
 
 def _partidos(valores: Any) -> frozenset[str]:
     return frozenset(base.partido(str(v)) for v in (valores or []) if str(v).strip())
+
+
+def _relevancia(bruto: Any) -> Relevancia:
+    if not isinstance(bruto, dict):
+        return Relevancia()
+    padrao = Relevancia()
+    campos: dict[str, Any] = {}
+    for chave in ("pesos", "origem", "alcance"):
+        if isinstance(bruto.get(chave), dict):
+            campos[chave] = tuple((str(k), float(v)) for k, v in bruto[chave].items())
+    if isinstance(bruto.get("simbolicas"), list):
+        campos["simbolicas"] = tuple(str(p) for p in bruto["simbolicas"])
+    for chave in ("janela_demanda_anos", "demanda_cheia"):
+        if bruto.get(chave) is not None:
+            campos[chave] = int(bruto[chave])
+    for chave in ("simbolica_teto", "alta", "baixa"):
+        if bruto.get(chave) is not None:
+            campos[chave] = float(bruto[chave])
+    return Relevancia(**{**padrao.__dict__, **campos})
 
 
 def de_dict(bruto: dict[str, Any]) -> Regras:
@@ -180,6 +257,11 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             )
             for t in bruto.get("temas") or []
         ],
+        relevancia=_relevancia(bruto.get("relevancia")),
+        apelidos={
+            re.sub(r"\s+", " ", str(titulo)).strip(): [str(n).strip() for n in (nomes if isinstance(nomes, list) else [nomes]) if str(n).strip()]
+            for titulo, nomes in (bruto.get("apelidos") or {}).items()
+        },
     )
 
 

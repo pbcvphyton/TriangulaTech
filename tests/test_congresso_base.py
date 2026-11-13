@@ -285,6 +285,66 @@ def test_quem_troca_de_partido_tem_o_saldo_de_cada_partido(r: regras.Regras):
     assert set(perfis[1].eixos_por_partido[57]) == {"PT"}
 
 
+def test_o_psol_com_o_pl_contra_o_pt_vira_racha():
+    r = regras.de_dict(
+        {
+            "legislaturas": [{"numero": 57, "inicio": "2026-01-01", "fim": "2027-01-31"}],
+            "polos": [{"inicio": "2019-01-01", "esquerda": ["PT", "PSOL"], "direita": ["PL"]}],
+            "limiares": {"coesao_polo": 0.75, "minimo_polo": 2, "minimo_partido": 2},
+        }
+    )
+    # PT 8 Sim; PSOL 2 Não; PL 4 Não → esquerda 8 × 2 (80% Sim), direita Não: polos opostos, e o PSOL ficou com a direita
+    siglas = ["PT"] * 8 + ["PSOL"] * 2 + ["PL"] * 4
+    v = base.Votacao(id="x", data="2026-03-01", orgao=base.PLENARIO, descricao="Aprovado o Projeto.", tipo=base.MERITO, votos="S" * 8 + "NN" + "NNNN")
+    leitura = perfil.ler_votacao(v, siglas, r)
+    assert leitura.opostos and leitura.racha == {"PSOL": "direita"} and not leitura.divisiva
+    # o mesmo placar com o PSOL junto do PT: esquerda × direita de verdade
+    v.votos = "S" * 10 + "NNNN"
+    leitura = perfil.ler_votacao(v, siglas, r)
+    assert leitura.divisiva and leitura.racha == {}
+    # partido de um polo dividido (1 × 1) não racha o polo
+    v.votos = "S" * 8 + "SN" + "NNNN"
+    assert perfil.ler_votacao(v, siglas, r).divisiva
+
+
+def test_o_saldo_de_quem_racha_conta_so_esquerda_contra_direita():
+    """O PSOL vota com o PL em duas votações (rachas) e com o PT em duas: o saldo do
+    PSOL só vê as duas em que esquerda e direita se opuseram de verdade, e fica −100."""
+    r = regras.de_dict(
+        {
+            "legislaturas": [{"numero": 57, "inicio": "2026-01-01", "fim": "2027-01-31"}],
+            "polos": [{"inicio": "2019-01-01", "esquerda": ["PT", "PSOL"], "direita": ["PL"]}],
+            "limiares": {"coesao_polo": 0.75, "minimo_polo": 2, "minimo_divisivas": 2, "minimo_partido": 2},
+        }
+    )
+    pessoas = [base.Pessoa(i, f"Deputado {i}", "SP", [(0, "PT" if i <= 8 else "PSOL" if i <= 10 else "PL")]) for i in range(1, 15)]
+    racha, junto = "S" * 8 + "NN" + "NNNN", "S" * 10 + "NNNN"
+    votacoes = [
+        base.Votacao(id=f"v{k}", data=f"2026-03-{k + 1:02d}", orgao=base.PLENARIO, descricao="Aprovado o Projeto.", tipo=base.MERITO, votos=votos)
+        for k, votos in enumerate([racha, racha, junto, junto])
+    ]
+    perfis = perfil.calcular([base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=votacoes)], r)
+    psol = perfis[9].legislaturas[57].eixo
+    assert (psol.esq, psol.dir, psol.saldo) == (2, 0, -100.0)
+    assert perfis[1].legislaturas[57].eixo.saldo == -100.0 and perfis[11].legislaturas[57].eixo.saldo == 100.0
+
+
+def test_fora_da_linha_por_tema(perfis: dict[int, perfil.Perfil], r: regras.Regras):
+    """João (PP) votou contra o PP fechado em V1 (economia): uma dissidência, no tema da
+    matéria. Com saldo +100, nunca ficou com a esquerda."""
+    assert perfis[10].fora[57] == [1, 0] and perfis[10].fora_tema[57] == {"economia": [1, 0]}
+    assert 57 not in perfis[1].fora  # Ana nunca saiu da linha
+    # quem tem lado definido e vota com o outro polo num tema: conta no tema
+    pessoas = [base.Pessoa(i, f"Deputado {i}", "SP", [(0, sigla)]) for i, sigla in ((1, "PT"), (2, "PT"), (3, "PL"), (4, "PL"), (5, "PP"))]
+    votacoes = [
+        base.Votacao(id=f"v{k}", data=f"2026-03-{k + 1:02d}", orgao=base.PLENARIO, descricao="Aprovado o Projeto.", tipo=base.MERITO,
+                     votos="SSNN" + ("S" if k == 3 else "N"), temas=["trabalho" if k == 3 else "economia"])
+        for k in range(6)
+    ]
+    cinco = perfil.calcular([base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=votacoes)], r)[5]
+    assert cinco.fora[57] == [0, 1] and cinco.fora_tema[57] == {"trabalho": [0, 1]}
+
+
 def test_temas_e_tipos_ficam_por_legislatura(perfis: dict[int, perfil.Perfil]):
     gil = perfis[7]
     assert set(gil.temas[57]) == {"economia", "seguranca", "cidades"}

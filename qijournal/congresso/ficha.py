@@ -108,6 +108,8 @@ def marca(m: Marca) -> dict[str, Any]:
         d["c"] = round(100 * m.coesao)
     if m.com:
         d["com"] = m.com
+    if v.temas:
+        d["tm"] = list(v.temas)
     return d
 
 
@@ -245,6 +247,14 @@ def montar(
             if cadastro.partido and set(por_partido) - {cadastro.partido}:
                 no_atual = por_partido.get(cadastro.partido) or Eixo()
                 ficha["campo"]["no_partido"] = {"saldo": pct(no_atual.saldo), "n": no_atual.n}
+        fora = perfil.fora.get(legislatura)
+        if fora and any(fora):
+            ficha["fora"] = {"partido": fora[0], "polo": fora[1]}
+            ficha["fora_tema"] = [
+                {"t": tema, "nome": regras.nome_do_tema(tema), "partido": a, "polo": b}
+                for tema, (a, b) in sorted(perfil.fora_tema.get(legislatura, {}).items(), key=lambda kv: (-(kv[1][0] + kv[1][1]), kv[0]))
+                if a or b
+            ]
         ficha["dissidencias"] = [marca(m) for m in perfil.dissidencias]
         ficha["surpresas"] = [marca(m) for m in perfil.surpresas]
         ficha["recentes"] = [marca(m) for m in perfil.recentes]
@@ -275,6 +285,9 @@ def saldo_no_partido(ficha: Mapping[str, Any], minimo: int) -> float | None:
     if no_partido is None:
         return campo.get("saldo")
     return no_partido.get("saldo") if (no_partido.get("n") or 0) >= minimo else None
+
+
+MINIMO_TEMA_FAIXA = 5  # votações esquerda × direita no tema para a pessoa aparecer na faixa filtrada
 
 
 def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
@@ -320,4 +333,12 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
+    # Com quem vota em cada tema (para as faixas filtradas por tema): [saldo, votações, vira de lado?]
+    temas = {}
+    for t in ficha.get("temas") or []:
+        e = t.get("eixo") or {}
+        if (e.get("n") or 0) >= MINIMO_TEMA_FAIXA and e.get("saldo") is not None:
+            temas[t["t"]] = [e["saldo"], e["n"]] + ([1] if t.get("vira") else [])
+    if temas:
+        d["tm"] = temas
     return d

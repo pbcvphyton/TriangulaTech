@@ -26,7 +26,7 @@ from __future__ import annotations
 import json
 import logging
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -73,6 +73,7 @@ class Mencao:
     url: str = ""  # manchete: link original
     materia: str = ""  # matéria: id (âncora #s-<id> na edição)
     secao: str = ""
+    props: tuple[str, ...] = ()  # proposições citadas no mesmo texto (número ou apelido)
 
 
 def _sem_acento(valor: str) -> str:
@@ -132,6 +133,8 @@ class Nomes:
 
 # ── proposições citadas ──────────────────────────────────────────────────────
 
+_FRASES = re.compile(r"(?<=[.!?;])\s+(?=[A-ZÀ-Ú\"“(])")  # fim de frase: pontuação, espaço, maiúscula
+
 _PROPOSICAO = re.compile(
     r"\b(PEC|PLP|PL|PDL|MPV|MP)\s*(?:n[ºo°.]{0,2}\s*)?(\d{1,2}\.?\d{0,3})\s*(?:/|\s+de\s+)\s*(\d{4}|\d{2})\b"
 )
@@ -165,13 +168,18 @@ class Cruzamento:
     edicoes: list[str] = field(default_factory=list)  # datas lidas, em ordem
     manchetes: int = 0  # manchetes lidas (nas editorias que contam)
     por_pessoa: dict[str, list[Mencao]] = field(default_factory=dict)
+    citadas: Counter[str] = field(default_factory=Counter)  # proposição → textos que a citam
 
     def de(self, chave: str) -> list[Mencao]:
         return self.por_pessoa.get(chave, [])
 
 
-def mencoes_do_dia(dados: Mapping[str, Any], nomes: Nomes) -> tuple[int, dict[str, list[Mencao]]]:
-    """As menções num arquivo de busca: ``(manchetes lidas, {chave: [menções]})``."""
+def mencoes_do_dia(
+    dados: Mapping[str, Any], nomes: Nomes, apelidos: Mapping[str, str] | None = None, citadas: Counter[str] | None = None
+) -> tuple[int, dict[str, list[Mencao]]]:
+    """As menções num arquivo de busca: ``(manchetes lidas, {chave: [menções]})``. Cada
+    menção leva as proposições citadas no mesmo texto; ``citadas`` soma, se dado, as
+    proposições citadas em todos os textos lidos (com ou sem parlamentar)."""
     data = str(dados.get("data") or "")
     secoes = [str(s[0]) for s in dados.get("secoes") or []]
     veiculos = [str(v) for v in dados.get("veiculos") or []]
@@ -188,12 +196,15 @@ def mencoes_do_dia(dados: Mapping[str, Any], nomes: Nomes) -> tuple[int, dict[st
         if secao not in SECOES:
             continue
         lidas += 1
+        props = tuple(proposicoes_citadas(titulo, apelidos))
+        if citadas is not None:
+            citadas.update(props)
         for pessoa in nomes.achar(titulo):
             if (pessoa.chave, url) in vistos:
                 continue
             vistos.add((pessoa.chave, url))
             por[pessoa.chave].append(
-                Mencao(data=data, tipo="n", titulo=titulo, veiculo=veiculo, url=f"https://{url}" if "://" not in url else url, secao=secao)
+                Mencao(data=data, tipo="n", titulo=titulo, veiculo=veiculo, url=f"https://{url}" if "://" not in url else url, secao=secao, props=props)
             )
     for materia in dados.get("materias") or []:
         try:
@@ -201,14 +212,22 @@ def mencoes_do_dia(dados: Mapping[str, Any], nomes: Nomes) -> tuple[int, dict[st
         except (IndexError, KeyError, TypeError):
             secao = ""
         corpo = " ".join(str(materia.get(k) or "") for k in ("t", "l", "c"))
+        if citadas is not None:
+            citadas.update(proposicoes_citadas(corpo, apelidos))
+        frases = [f for f in _FRASES.split(corpo) if f.strip()]
         for pessoa in nomes.achar(corpo):
+            # Numa matéria longa, a proposição só vale se aparece na mesma frase que a pessoa.
+            props: list[str] = []
+            for frase in frases:
+                if any(p.chave == pessoa.chave for p in nomes.achar(frase)):
+                    props += [t for t in proposicoes_citadas(frase, apelidos) if t not in props]
             por[pessoa.chave].append(
-                Mencao(data=data, tipo="m", titulo=str(materia.get("t") or ""), materia=str(materia.get("id") or ""), secao=secao)
+                Mencao(data=data, tipo="m", titulo=str(materia.get("t") or ""), materia=str(materia.get("id") or ""), secao=secao, props=tuple(props))
             )
     return lidas, dict(por)
 
 
-def cruzar(pasta_busca: Path, nomes: Nomes, *, desde: str = "") -> Cruzamento:
+def cruzar(pasta_busca: Path, nomes: Nomes, *, desde: str = "", apelidos: Mapping[str, str] | None = None) -> Cruzamento:
     """Lê os arquivos de busca de ``pasta_busca`` (``data/busca``), das edições a partir
     de ``desde``, e junta as menções de cada pessoa (da mais nova para a mais antiga)."""
     cruzamento = Cruzamento()
@@ -223,7 +242,7 @@ def cruzar(pasta_busca: Path, nomes: Nomes, *, desde: str = "") -> Cruzamento:
             continue
         if not isinstance(dados, dict):
             continue
-        lidas, do_dia = mencoes_do_dia(dados, nomes)
+        lidas, do_dia = mencoes_do_dia(dados, nomes, apelidos, cruzamento.citadas)
         cruzamento.edicoes.append(arquivo.stem)
         cruzamento.manchetes += lidas
         for chave, mencoes in do_dia.items():
