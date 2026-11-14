@@ -1,0 +1,609 @@
+{#- Aba Congresso: a ficha de cada matéria, o detalhe de cada tema e os votos de cada um por
+    tema (incluído por congresso.js.j2, dentro da mesma função). Tudo sai de
+    data/congresso/materias-<casa>.json, lido só quando alguém abre um detalhe, e, para o voto
+    de cada pessoa, de votos-<casa>.json. Sempre com textContent: nada do arquivo vira HTML. -#}
+  /* ════ As matérias ════ */
+  var cacheMat = {}, filaMat = {};
+  function materiasDa(casa, pronto) {
+    if (cacheMat[casa]) { pronto(null, cacheMat[casa]); return; }
+    if (filaMat[casa]) { filaMat[casa].push(pronto); return; }
+    filaMat[casa] = [pronto];
+    buscar(M.materiasArq + casa + '.json', function (erro, x) {
+      var ok = !erro && x && x.materias;
+      if (ok) cacheMat[casa] = x;
+      var fila = filaMat[casa];
+      filaMat[casa] = null;
+      fila.forEach(function (fn) { fn(ok ? null : (erro || new Error('formato')), cacheMat[casa]); });
+    });
+  }
+  function chaveDaMateria(casa, titulo) {
+    var m = /^([A-Z]+) (\d+)\/(\d{4})$/.exec(titulo || '');
+    return m ? casa + '-' + m[1] + '-' + m[2] + '-' + m[3] : '';
+  }
+  function materiaDaChave(k) {
+    var m = /^(cd|sf)-([A-Z]+)-(\d+)-(\d{4})$/.exec(k || '');
+    return m ? { casa: m[1], titulo: m[2] + ' ' + m[3] + '/' + m[4] } : null;
+  }
+  /* id da votação → { t: matéria, m: ficha, v: votação } */
+  function indiceDeVotacoes(mat) {
+    if (!mat._idx) {
+      mat._idx = {};
+      Object.keys(mat.materias).forEach(function (t) {
+        (mat.materias[t].vot || []).forEach(function (v) { mat._idx[v.id] = { t: t, m: mat.materias[t], v: v }; });
+      });
+    }
+    return mat._idx;
+  }
+  function curto(texto, limite) {
+    texto = texto || '';
+    if (texto.length <= limite) return texto;
+    var corte = texto.slice(0, limite + 1), i = corte.lastIndexOf(' ');
+    return (i > limite * 0.6 ? corte.slice(0, i) : corte.slice(0, limite)).replace(/[ ,;:.–—-]+$/, '') + '…';
+  }
+  function plural(n, um, varios) { return num(n) + ' ' + (n === 1 ? um : varios); }
+  function nomeDoTema(t) { return (M.temas || {})[t] || t; }
+  /* O que entra num tema: as áreas temáticas oficiais da Casa. */
+  function definicaoDoTema(t, casa) {
+    var def = (M.temasDef || {})[t], areas = def ? (def[casa] || []) : [];
+    if (!areas.length) return '';
+    return (casa === 'cd' ? 'Matérias que a Câmara classifica em ' : 'Matérias que o Senado classifica em ') +
+      areas.map(function (a) { return '“' + a + '”'; }).join(areas.length > 2 ? ', ' : ' e ') + '.';
+  }
+  function chipDoTema(t, casa) {
+    var def = definicaoDoTema(t, casa);
+    return h('span', { cls: 'cg-chip' + (def ? ' cg-tem' : ''), 'data-dica': def || null, tabindex: def ? '0' : null, text: nomeDoTema(t) });
+  }
+
+  /* As dicas: um rótulo com data-dica mostra a definição ao passar o ponteiro, ao receber o foco ou ao toque. */
+  var GLOSS = {
+    saldo: 'De −100 (votou sempre com a esquerda) a +100 (sempre com a direita). Conta só as votações de conteúdo em que a maioria da esquerda e a da direita ficaram em lados opostos: (votos com a direita − votos com a esquerda) ÷ votações.',
+    divisivas: 'Votações de conteúdo (texto principal, destaques e emendas) em que esquerda e direita ficaram em lados opostos e a pessoa votou Sim ou Não. São as que entram no saldo.',
+    governo: 'Nas votações em que a liderança do Governo orientou Sim ou Não, a parte em que a pessoa votou igual. Obstrução conta como Não.',
+    presenca: 'A parte das votações nominais em que a pessoa podia votar e votou.',
+    partido: 'A parte dos votos iguais ao da maioria do próprio partido naquele dia.',
+    simnao: 'Quantas vezes votou Sim e quantas votou Não em todas as votações do tema, não só nas que opuseram os polos.',
+    vira: 'O tema fica do lado oposto ao do saldo geral, e a diferença passa do acaso (teste binomial, 99%).',
+    nota: 'Nota de relevância, de 0 a 100: soma de sinais que dá para medir nos registros (projetos parecidos anexados, origem, alcance da norma, apoio entre partidos). Não diz se a matéria é boa.',
+    polos: 'Esquerda: ' + ((M.polos || {}).esquerda || []).join(', ') + '. Direita: ' + ((M.polos || {}).direita || []).join(', ') + '. O lado de cada polo numa votação é o da maioria dos seus parlamentares (75% ou mais).',
+    juntos: 'Das votações de conteúdo em que os dois votaram Sim ou Não, a parte em que votaram igual.',
+    contagem: 'Sim–Não de cada partido do polo nessa votação.'
+  };
+  function dica(chave) {
+    return h('button', { cls: 'cg-i', type: 'button', 'aria-label': 'O que é isto', 'data-dica': GLOSS[chave] || chave, text: 'i' });
+  }
+  var popDica = null, donoDaDica = null;
+  function mostrarDica(el) {
+    var texto = el.getAttribute('data-dica');
+    if (!texto) return;
+    if (!popDica) { popDica = h('div', { cls: 'cg-dica', role: 'tooltip' }); d.body.appendChild(popDica); }
+    popDica.textContent = texto;
+    popDica.hidden = false;
+    donoDaDica = el;
+    var r = el.getBoundingClientRect(), largura = Math.min(320, w.innerWidth - 24);
+    popDica.style.maxWidth = largura + 'px';
+    var x = Math.max(12, Math.min(r.left + r.width / 2 - popDica.offsetWidth / 2, w.innerWidth - popDica.offsetWidth - 12));
+    var y = r.bottom + 8;
+    if (y + popDica.offsetHeight > w.innerHeight - 8) y = Math.max(8, r.top - popDica.offsetHeight - 8);
+    popDica.style.left = x + 'px';
+    popDica.style.top = y + 'px';
+  }
+  function esconderDica() { if (popDica) popDica.hidden = true; donoDaDica = null; }
+  d.addEventListener('mouseover', function (ev) { var el = ev.target.closest ? ev.target.closest('[data-dica]') : null; if (el) mostrarDica(el); else if (donoDaDica) esconderDica(); });
+  d.addEventListener('focusin', function (ev) { var el = ev.target.closest ? ev.target.closest('[data-dica]') : null; if (el) mostrarDica(el); });
+  d.addEventListener('focusout', esconderDica);
+  d.addEventListener('click', function (ev) {
+    var el = ev.target.closest ? ev.target.closest('[data-dica]') : null;
+    if (el) { if (donoDaDica === el && ev.detail === 0) esconderDica(); else mostrarDica(el); } else esconderDica();
+  });
+  w.addEventListener('scroll', esconderDica, true);
+
+  /* ── Uma votação, por extenso ── */
+  var LADO = { S: 'Sim', N: 'Não' };
+  var SENTIDO = {
+    texto: 'O Sim era para aprovar o texto em votação.',
+    emenda: 'O Sim era para aprovar a emenda.',
+    trecho: 'O Sim era para manter no texto o trecho destacado; o Não, para retirá-lo.',
+    requerimento: 'O Sim era para aprovar o requerimento.'
+  };
+  var SENTIDO_CURTO = { texto: 'Sim = aprovar o texto', emenda: 'Sim = aprovar a emenda', trecho: 'Sim = manter o trecho', requerimento: 'Sim = aprovar o requerimento' };
+  function tipoDaVotacao(v) { return ((M.tipos || {})[v.t] || v.t) + (v.tu ? ', ' + v.tu + 'º turno' : ''); }
+  function resultadoDaVotacao(v) {
+    if (v.apv == null) return '';
+    if (v.ss === 'trecho') return v.apv ? 'trecho mantido' : 'trecho retirado';
+    if (v.ss === 'emenda') return v.apv ? 'emenda aprovada' : 'emenda rejeitada';
+    if (v.ss === 'requerimento') return v.apv ? 'requerimento aprovado' : 'requerimento rejeitado';
+    return v.apv ? 'aprovado' : 'rejeitado';
+  }
+  function chipDosPolos(v) {
+    if (v.dv) return h('span', { cls: 'cg-div', text: 'dividiu os polos' });
+    if (v.rc) return h('span', { cls: 'cg-div cg-div-r', text: 'racha: ' + Object.keys(v.rc).map(function (s) { return s + ' com a ' + v.rc[s]; }).join(', ') });
+    if (v.e && v.dr && v.e === v.dr) return h('span', { cls: 'cg-div cg-div-j', text: 'os polos votaram juntos' });
+    return null;
+  }
+  /* Com que polo um voto ficou. */
+  function ladoDoVoto(v, voto) {
+    var p = voto === 'O' ? 'N' : voto;
+    if (p !== 'S' && p !== 'N') return '';
+    if (v.e && v.dr) {
+      if (v.e === v.dr) return p === v.e ? 'j' : 'x';
+      return p === v.e ? 'e' : 'd';
+    }
+    return '';
+  }
+  var COM = { e: 'com a esquerda', d: 'com a direita', j: 'com os dois polos', x: 'contra os dois polos' };
+  function contagemDoPolo(v, polo) {
+    return (v.pp || []).filter(function (x) { return x[3] === polo; }).map(function (x) { return x[0] + ' ' + x[1] + '–' + x[2]; }).join(' · ');
+  }
+  function linhaDosPolos(v) {
+    function um(nome, lado, polo) {
+      var conta = contagemDoPolo(v, polo);
+      return h('span', { cls: 'cg-pl cg-pl-' + polo }, [h('b', { text: nome + ': ' + (lado ? LADO[lado] : 'sem maioria clara') }), conta ? h('small', { text: ' (' + conta + ')' }) : null]);
+    }
+    var nos = [um('Esquerda', v.e, 'e'), h('span', { cls: 'cg-pl-x', 'aria-hidden': 'true', text: '×' }), um('Direita', v.dr, 'd')];
+    if (v.g) nos.push(h('span', { cls: 'cg-pl cg-pl-g' }, [h('b', { text: 'Governo: ' + LADO[v.g] })]));
+    return h('p', { cls: 'cg-vl-p' }, nos);
+  }
+  function chipDaPessoa(v, p) {
+    var lado = ladoDoVoto(v, p.voto), nomeVoto = (M.votos || {})[p.voto] || p.voto;
+    return h('span', { cls: 'cg-vp' + (lado ? ' cg-vp-' + lado : ' cg-vp-0') }, [p.nome ? p.nome + ': ' : '', h('b', { text: nomeVoto }), lado ? ' · ' + COM[lado] : '']);
+  }
+  /* opts: pessoas [{nome, voto}], completo (os demais partidos), curto (uma linha a menos) */
+  function itemDaVotacao(v, opts) {
+    opts = opts || {};
+    var res = resultadoDaVotacao(v);
+    var nos = [h('p', { cls: 'cg-vl-k' }, [
+      h('time', { text: dataBr(v.d) }), h('span', { cls: 'az-selo', text: tipoDaVotacao(v) }),
+      res ? h('span', { cls: 'cg-res cg-res-' + (v.apv ? 'ok' : 'no'), text: res }) : null,
+      h('span', { cls: 'cg-vl-pl', text: num(v.s) + ' Sim × ' + num(v.n) + ' Não' }),
+      chipDosPolos(v),
+      opts.curto && v.ss ? h('span', { cls: 'cg-vl-ss', text: SENTIDO_CURTO[v.ss] }) : null
+    ])];
+    if ((opts.pessoas || []).length) nos.push(h('p', { cls: 'cg-vl-v' }, opts.pessoas.map(function (p) { return chipDaPessoa(v, p); })));
+    nos.push(h('p', { cls: 'cg-vl-x' }, [v.dq ? h('b', { text: 'Destaque pedido por ' + v.dq + '. ' }) : null, v.x]));
+    if (v.ab && (v.t === 'destaque' || v.dq) && !opts.curto) nos.push(h('p', { cls: 'cg-vl-ab', text: 'A Mesa pôs em votação: ' + v.ab }));
+    if (v.ss && !opts.curto) nos.push(h('p', { cls: 'cg-vl-s', text: SENTIDO[v.ss] }));
+    nos.push(linhaDosPolos(v));
+    if (opts.completo && (v.pt || []).length) {
+      nos.push(h('p', { cls: 'cg-v-b' }, v.pt.map(function (x) {
+        return h('span', { cls: 'cg-pb cg-pb-' + (x[1] === 'S' ? 's' : 'n'), title: x[0] + ': ' + x[2] + '% votaram ' + LADO[x[1]] }, [x[0] + ' ', h('b', { text: LADO[x[1]] }), x[2] < 100 ? h('i', { text: ' ' + x[2] + '%' }) : null]);
+      })));
+    }
+    return h('li', { cls: 'cg-vl' + (opts.cls ? ' ' + opts.cls : '') }, nos);
+  }
+  function linkDaMateria(casa, t) {
+    var k = chaveDaMateria(casa, t);
+    return k ? h('a', { cls: 'cg-mt', href: '#m=' + k, 'data-m': k, text: t }) : h('span', { text: t });
+  }
+  function cabecaDaMateria(casa, t, m, chips) {
+    return h('p', { cls: 'cg-mh' }, [linkDaMateria(casa, t), m && m.ap ? h('span', { cls: 'cg-apel', text: m.ap }) : null].concat(chips || []));
+  }
+  /* Como os polos votaram o texto principal de uma matéria (a última dessas votações). */
+  function ladosNoTexto(m) {
+    var principais = (m.vot || []).filter(function (v) { return v.t === 'merito' && v.e && v.dr; });
+    if (!principais.length) return '';
+    var v = principais[principais.length - 1];
+    if (v.e === v.dr) return v.e === 'S' ? 'texto principal: os dois polos a favor' : 'texto principal: os dois polos contra';
+    return v.e === 'S' ? 'texto principal: esquerda a favor, direita contra' : 'texto principal: direita a favor, esquerda contra';
+  }
+
+  /* ── A ficha da matéria (#m=cd-PL-2630-2020) ── */
+  function linhaDl(rotulo, filhos) { return h('div', {}, [h('dt', { text: rotulo }), h('dd', {}, filhos)]); }
+  function sinaisDaNota(titulo, m, mat) {
+    var rel = m.rel, pesos = mat.pesos || {}, pt = rel.pt || {}, linhas = [], sigla = titulo.split(' ')[0];
+    var partidos = m.pa || [];
+    var diz = {
+      demanda: rel.dem == null ? '' : (rel.dem ? plural(rel.dem, 'projeto parecido anexado a esta matéria', 'projetos parecidos anexados a esta matéria') : 'nenhum projeto parecido anexado'),
+      origem: (M.origens || {})[m.o || ''] || 'origem não informada',
+      alcance: (M.siglas || {})[sigla] || sigla,
+      apoio: partidos.length > 1 ? 'autores de ' + partidos.length + (partidos.length >= 6 ? ' ou mais' : '') + ' partidos (' + partidos.join(', ') + ')' : (partidos.length === 1 ? 'autores de um partido só (' + partidos[0] + ')' : 'sem autor parlamentar')
+    };
+    ['demanda', 'origem', 'alcance', 'apoio'].forEach(function (k) {
+      if (pesos[k] == null) return;
+      linhas.push(h('tr', {}, [h('th', { scope: 'row', text: (M.relNomes || {})[k] || k }), h('td', { cls: 'an-l', text: diz[k] }), h('td', { text: num(pt[k] || 0) + ' de ' + num(pesos[k]) })]));
+    });
+    return linhas;
+  }
+  function montarMateria(casa, titulo, m, mat) {
+    var nos = [], sigla = titulo.split(' ')[0];
+    var links = h('p', { cls: 'cg-d-s' }, []);
+    function link(href, texto, externo) {
+      if (links.childNodes.length) links.appendChild(d.createTextNode(' · '));
+      links.appendChild(h('a', externo ? { href: href, target: '_blank', rel: 'noopener noreferrer', text: texto } : { href: href, text: texto }));
+    }
+    if (m.u) link(m.u, 'Página oficial ↗', true);
+    if (m.ut) link(m.ut, 'Texto integral ↗', true);
+    link(M.pesquisa + '?q=' + encodeURIComponent('"' + (m.ap || titulo) + '"'), 'O que o jornal publicou →', false);
+    nos.push(h('div', { cls: 'cg-mf-h' }, [
+      h('p', { cls: 'cg-d-k', text: (casa === 'cd' ? 'Câmara dos Deputados' : 'Senado Federal') + ' · ' + ((M.siglas || {})[sigla] || 'matéria') + (m.est ? ' · ' + ((M.estados || {})[m.est] || m.est) : '') }),
+      h('h2', { cls: 'cg-d-t', id: 'cgDossieT' }, [titulo, m.ap ? h('span', { cls: 'cg-apel', text: m.ap }) : null]),
+      links
+    ]));
+
+    /* Sobre o quê. */
+    var sobre = [h('p', { cls: 'cg-mf-e', text: m.e || 'Sem ementa no registro.' })];
+    if (m.ex) sobre.push(h('p', { cls: 'cg-mf-x' }, [h('b', { text: casa === 'cd' ? 'Ementa detalhada (da Câmara): ' : 'Explicação da ementa (do Senado): ' }), m.ex]));
+    if (m.eo) sobre.push(h('p', { cls: 'cg-d-n', text: 'A ementa mudou no caminho. A original dizia: ' + m.eo }));
+    if ((m.tm || []).length) sobre.push(h('p', { cls: 'cg-mf-kw' }, [h('span', { cls: 'cg-cp-l', text: 'Tema: ' })].concat(m.tm.map(function (t) { return chipDoTema(t, casa); }))));
+    if ((m.kw || []).length) sobre.push(h('p', { cls: 'cg-mf-kw' }, [h('span', { cls: 'cg-cp-l', text: 'Palavras-chave do registro: ' })].concat(m.kw.map(function (x) { return h('span', { cls: 'cg-chip', text: x }); }))));
+    sobre.push(h('p', { cls: 'cg-d-n', text: 'A página não resume o projeto: mostra o que a Casa registrou sobre ele. O conteúdo completo está no texto integral.' }));
+    nos.push(secao('Sobre o quê', 'a ementa e a indexação oficiais', sobre));
+
+    /* De onde veio e onde está. */
+    var dl = [];
+    if (m.au) dl.push(linhaDl('Autoria', [m.auk ? h('a', { cls: 'cg-p', href: '#p=' + m.auk, 'data-k': m.auk, text: m.au }) : m.au, m.o && (M.origens || {})[m.o] ? ' · ' + M.origens[m.o] : '', (m.pa || []).length ? ' · ' + m.pa.join(', ') : '']));
+    if (m.da) dl.push(linhaDl('Apresentada em', [dataBr(m.da) + (dias(m.da) != null ? ' (há ' + tempo(dias(m.da)) + ')' : '')]));
+    if (m.sit || m.f) dl.push(linhaDl('Situação', [(m.sit || '') + (m.f && (M.filas || {})[m.f] ? (m.sit ? ': ' : '') + M.filas[m.f] : '') + (m.org ? ' · ' + m.org : '') + (m.mov ? ' · último andamento em ' + dataBr(m.mov) : '')]));
+    if (m.urg) dl.push(linhaDl('Regime', ['Urgência']));
+    if (m.rl) dl.push(linhaDl('Relator', [m.rlk ? h('a', { cls: 'cg-p', href: '#p=' + m.rlk, 'data-k': m.rlk, text: m.rl }) : m.rl]));
+    if (m.jor) dl.push(linhaDl('No jornal', [plural(m.jor, 'texto cita esta matéria', 'textos citam esta matéria') + ' nas edições lidas']));
+    if (dl.length) nos.push(secao('De onde veio e onde está', 'do registro oficial', [h('dl', { cls: 'cg-mf-dl' }, dl)]));
+
+    /* Os sinais de relevância. */
+    if (m.rel) {
+      var rel = m.rel, blocos = [];
+      var quando = rel.q === 'espera' ? 'Pronta para o Plenário e fora da pauta: a nota é a de hoje.'
+        : rel.q === 'passou' ? 'Aprovada pelo Plenário em ' + dataBr(rel.apv) + (rel.dias != null ? ', ' + tempo(rel.dias) + ' depois do protocolo' : '') + '.'
+        : 'Nota na data da última votação (' + dataBr(rel.ref) + '). Não está no gráfico “o que espera × o que passa”: não é das prontas para a pauta nem das aprovadas nos últimos 12 meses.';
+      blocos.push(h('p', { cls: 'cg-mf-n' }, [h('b', { text: num(rel.n) }), h('span', { text: ' de 100 · ' + (rel.n >= (M.rel || {}).alta ? 'sinais fortes' : rel.n < (M.rel || {}).baixa ? 'sinais fracos' : 'sinais médios') }), dica('nota')]));
+      blocos.push(h('p', { cls: 'cg-d-n', text: quando }));
+      blocos.push(h('div', { cls: 'an-tbl-wrap' }, [h('table', { cls: 'an-tbl cg-tb' }, [
+        h('thead', {}, [h('tr', {}, ['Sinal', 'O que o registro diz', 'Pontos'].map(function (x, i) { return h('th', { scope: 'col', cls: i === 1 ? 'an-l' : null, text: x }); }))]),
+        h('tbody', {}, sinaisDaNota(titulo, m, mat))
+      ])]));
+      if (rel.simb) blocos.push(h('p', { cls: 'cg-d-n', text: 'Matéria simbólica (dia nacional, denominação, título, rota turística…): a nota não passa de 10, seja qual for a soma.' }));
+      var cam = rel.cam || {}, passos = [];
+      if (cam.urgencia) passos.push('urgência aprovada em ' + dataBr(cam.urgencia.d) + (cam.urgencia.por ? ', a pedido de ' + cam.urgencia.por : ''));
+      if (cam.parecer_plenario) passos.push('parecer dado direto no Plenário em ' + dataBr(cam.parecer_plenario.d) + ', no lugar das comissões' + (cam.parecer_plenario.relator ? ', pelo relator ' + cam.parecer_plenario.relator : ''));
+      if (passos.length) blocos.push(h('p', { cls: 'cg-rv-c', text: 'Por que andou (do histórico oficial): ' + passos.join('; ') + '.' }));
+      else if (rel.q === 'passou' && casa === 'cd') blocos.push(h('p', { cls: 'cg-d-n', text: 'O histórico oficial não registra urgência aprovada nem parecer dado direto no Plenário antes da aprovação.' }));
+      blocos.push(h('p', { cls: 'cg-d-n', text: 'A nota não diz se a matéria é boa ou ruim: diz quantos sinais de relevância pública ela tem nos registros. Os pesos são escolha editorial e estão em “Como ler”.' }));
+      nos.push(secao('Sinais de relevância', 'a mesma régua para o que espera e o que passa', blocos));
+    }
+
+    /* Como o Plenário votou. */
+    var votos = (m.vot || []).slice().reverse();
+    if (votos.length) {
+      var divisivas = votos.filter(function (v) { return v.dv; }).length;
+      var juntas = votos.filter(function (v) { return v.e && v.dr && v.e === v.dr && (v.t === 'merito' || v.t === 'destaque'); }).length;
+      nos.push(secao('Como o Plenário votou', plural(votos.length, 'votação nominal', 'votações nominais') + ' nesta legislatura, da mais recente', [
+        h('p', { cls: 'cg-d-n' }, [plural(divisivas, 'opôs esquerda e direita', 'opuseram esquerda e direita') + (juntas ? '; em ' + num(juntas) + ', os dois polos votaram do mesmo lado' : '') + '. ', 'O lado de cada polo é o da maioria dos seus parlamentares; entre parênteses, o Sim–Não de cada partido do polo.', dica('polos')]),
+        h('ol', { cls: 'cg-vls' }, votos.map(function (v) { return itemDaVotacao(v, { completo: true }); }))
+      ]));
+    } else {
+      nos.push(h('p', { cls: 'cg-d-n', text: 'Não teve votação nominal no Plenário nesta legislatura. A maioria das votações é simbólica e não registra o voto de cada um.' }));
+    }
+    nos.push(h('p', { cls: 'cg-d-n', text: (casa === 'cd' ? 'Registros oficiais da Câmara dos Deputados' : 'Registros oficiais do Senado Federal') + ', atualizados em ' + dataBr(M.hoje) + '.' }));
+    var voltar = h('button', { type: 'button', text: '← Voltar à página' });
+    voltar.addEventListener('click', function () { fechar(true); });
+    nos.push(h('p', { cls: 'cg-d-back' }, [voltar]));
+    return nos;
+  }
+  function abrirMateria(k, semHistorico) {
+    var alvo = materiaDaChave(k);
+    if (!mo || !alvo) return;
+    var chave = 'm:' + k;
+    if (!aberto) foco = d.activeElement;
+    aberto = chave;
+    mo.hidden = false;
+    d.body.classList.add('cg-aberto');
+    mo.scrollTop = 0;
+    if (!semHistorico && w.location.hash !== '#m=' + k) {
+      if (w.history && w.history.pushState) w.history.pushState(null, '', '#m=' + k); else w.location.hash = 'm=' + k;
+    }
+    mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Ficha da matéria' }), h('p', { cls: 'cg-d-st', text: 'Carregando a ficha de ' + alvo.titulo + '…' })]);
+    materiasDa(alvo.casa, function (erro, mat) {
+      if (aberto !== chave) return;
+      var m = !erro && mat ? mat.materias[alvo.titulo] : null;
+      if (erro) mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Ficha da matéria' }), h('p', { cls: 'cg-d-st', text: 'Não foi possível abrir a ficha agora. Tente de novo em instantes.' })]);
+      else if (!m) mostrar([h('h2', { cls: 'cg-d-t', id: 'cgDossieT', text: alvo.titulo }), h('p', { cls: 'cg-d-st', text: 'Esta matéria não tem ficha aqui. Só entram as que tiveram votação nominal no Plenário nesta legislatura e as de “o que espera × o que passa”.' })]);
+      else mostrar(montarMateria(alvo.casa, alvo.titulo, m, mat));
+      mo.querySelector('.cg-ml').focus();
+    });
+  }
+
+  /* ── O detalhe de um tema: quais matérias foram votadas, o que mudam e como cada polo votou ── */
+  var MATERIAS_DE_INICIO = 10, VOTOS_DE_INICIO = 2;
+  function botaoMais(texto, fn) {
+    var b = h('button', { cls: 'cg-mais', type: 'button', text: texto });
+    b.addEventListener('click', function () { fn(); if (b.parentNode) b.parentNode.removeChild(b); });
+    return b;
+  }
+  /* Uma lista longa em duas partes: o começo à vista e o resto atrás de um botão. */
+  function listaEmPartes(cls, itens, inicio, rotulo) {
+    var ol = h('ol', { cls: cls }, itens.slice(0, inicio)), resto = itens.slice(inicio);
+    if (!resto.length) return [ol];
+    return [ol, botaoMais(rotulo(resto.length), function () { resto.forEach(function (li) { ol.appendChild(li); }); })];
+  }
+  function ordemDoVoto(a, b) {  // o texto principal primeiro; depois, do mais recente
+    var pa = a.t === 'merito' ? 0 : 1, pb = b.t === 'merito' ? 0 : 1;
+    if (pa !== pb) return pa - pb;
+    return a.d < b.d ? 1 : a.d > b.d ? -1 : 0;
+  }
+  function detalharTema(caixa, casa, tema) {
+    while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
+    if (!tema) { caixa.hidden = true; return; }
+    caixa.hidden = false;
+    caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Carregando as matérias de ' + nomeDoTema(tema) + '…' }));
+    materiasDa(casa, function (erro, mat) {
+      var sel = d.getElementById('cgFxTema-' + casa);
+      if (sel && sel.value !== tema) return;  // já escolheram outro tema
+      while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
+      if (erro) { caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Não foi possível carregar as matérias agora. Tente de novo em instantes.' })); return; }
+      var itens = [], total = 0, tipos = { merito: 0, destaque: 0 }, ganhou = { e: 0, d: 0 }, gov = { e: 0, d: 0, n: 0 }, simEsq = 0;
+      Object.keys(mat.materias).forEach(function (t) {
+        var m = mat.materias[t];
+        if ((m.tm || []).indexOf(tema) < 0) return;
+        var votos = (m.vot || []).filter(function (v) { return v.dv; });
+        if (!votos.length) return;
+        votos.forEach(function (v) {
+          total += 1;
+          tipos[v.t] = (tipos[v.t] || 0) + 1;
+          if (v.e === 'S') simEsq += 1;
+          if (v.apv != null) ganhou[(v.apv ? 'S' : 'N') === v.e ? 'e' : 'd'] += 1;
+          if (v.g) { gov.n += 1; gov[v.g === v.e ? 'e' : 'd'] += 1; }
+        });
+        itens.push({ t: t, m: m, votos: votos.slice().sort(ordemDoVoto), ultima: votos[votos.length - 1].d });
+      });
+      itens.sort(function (a, b) { return b.votos.length - a.votos.length || (a.ultima < b.ultima ? 1 : -1); });
+      var nome = nomeDoTema(tema), def = definicaoDoTema(tema, casa);
+      caixa.appendChild(h('h5', { cls: 'cg-td-h' }, ['As ' + plural(total, 'votação', 'votações') + ' de ' + nome, h('span', { text: 'em ' + plural(itens.length, 'matéria', 'matérias') + ' · só as que opuseram esquerda e direita' })]));
+      if (def) caixa.appendChild(h('p', { cls: 'cg-td-def' }, [h('b', { text: 'O que entra no tema: ' }), def]));
+      var chips = [h('span', { cls: 'cg-chip' }, ['texto principal ', h('b', { text: num(tipos.merito || 0) })]), h('span', { cls: 'cg-chip' }, ['destaques e emendas ', h('b', { text: num(tipos.destaque || 0) })])];
+      if (ganhou.e + ganhou.d) chips.push(h('span', { cls: 'cg-chip' }, ['o lado da esquerda venceu ', h('b', { text: num(ganhou.e) })]), h('span', { cls: 'cg-chip' }, ['o da direita venceu ', h('b', { text: num(ganhou.d) })]));
+      if (gov.n) chips.push(h('span', { cls: 'cg-chip' }, ['o Governo orientou com a esquerda em ', h('b', { text: num(gov.e) })]), h('span', { cls: 'cg-chip' }, ['com a direita em ', h('b', { text: num(gov.d) })]));
+      caixa.appendChild(h('p', { cls: 'cg-td-r' }, chips));
+      caixa.appendChild(h('p', { cls: 'cg-d-n' }, [
+        'Por que uma votação conta como “de esquerda” ou “de direita”: não é pelo assunto. É porque, naquela votação, a maioria de ' + ((M.polos || {}).esquerda || []).join(', ') +
+        ' votou de um jeito e a de ' + ((M.polos || {}).direita || []).join(' e ') + ', do outro. Em cada votação abaixo está o que estava em jogo e o Sim–Não de cada partido dos polos. Votar “com a esquerda” é votar igual à maioria dela naquela votação: em ' +
+        num(simEsq) + ' destas ' + num(total) + ', isso foi votar Sim; nas outras ' + num(total - simEsq) + ', votar Não.', dica('polos')
+      ]));
+      var lis = itens.map(function (x) {
+        var m = x.m, extras = [h('span', { cls: 'cg-chip' }, [h('b', { text: num(x.votos.length) }), x.votos.length === 1 ? ' votação' : ' votações'])];
+        var lados = ladosNoTexto(m);
+        if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
+        if (m.rel) extras.push(h('span', { cls: 'cg-rv-n', 'data-dica': GLOSS.nota, tabindex: '0', text: 'nota ' + m.rel.n }));
+        if (m.jor) extras.push(h('span', { cls: 'cg-rv-jor', text: 'no jornal ' + m.jor + '×' }));
+        var filhos = [cabecaDaMateria(casa, x.t, m, extras), h('p', { cls: 'cg-mh-e', text: curto(m.e, 320) })];
+        if (m.ex) filhos.push(h('p', { cls: 'cg-mh-x', text: curto(m.ex, 280) }));
+        var votos = x.votos.map(function (v) { return itemDaVotacao(v, { curto: true }); });
+        listaEmPartes('cg-vls', votos, VOTOS_DE_INICIO, function (n) { return 'mais ' + plural(n, 'votação desta matéria', 'votações desta matéria'); }).forEach(function (no) { filhos.push(no); });
+        return h('li', { cls: 'cg-td-m' }, filhos);
+      });
+      listaEmPartes('cg-td-l', lis, MATERIAS_DE_INICIO, function (n) { return 'mostrar as outras ' + plural(n, 'matéria', 'matérias'); }).forEach(function (no) { caixa.appendChild(no); });
+      caixa.appendChild(h('p', { cls: 'cg-d-n', text: 'Clique no número de uma matéria para abrir a ficha: a ementa inteira, a explicação oficial, quem propôs e todas as votações, com os demais partidos.' }));
+    });
+  }
+  lista(d.querySelectorAll('.cg-fx-s[data-faixas]')).forEach(function (sel) {
+    var casa = sel.id.slice(-2), caixa = d.getElementById('cg-tema-det-' + casa);
+    if (!caixa || !M.materiasArq) return;
+    sel.addEventListener('change', function () { detalharTema(caixa, casa, sel.value); });
+  });
+
+  /* ── Os votos de uma pessoa (ou de duas) num tema ── */
+  function votosNoTema(vt, mat, chaves, tema) {
+    var idx = indiceDeVotacoes(mat), grupos = {}, ordem = [];
+    vt.votacoes.forEach(function (row, i) {
+      if ((row[5] || []).indexOf(tema) < 0) return;
+      var info = idx[row[0]];
+      if (!info) return;
+      var t = info.t;
+      if (!grupos[t]) { grupos[t] = { t: t, m: info.m, votos: [], ultima: '' }; ordem.push(t); }
+      grupos[t].votos.push({ v: info.v, de: chaves.map(function (k) { return ((vt.votos || {})[k] || '').charAt(i) || '-'; }) });
+      if (row[1] > grupos[t].ultima) grupos[t].ultima = row[1];
+    });
+    return ordem.map(function (t) { return grupos[t]; }).sort(function (a, b) { return a.ultima < b.ultima ? 1 : -1; });
+  }
+  function contaDoTema(grupos, i) {
+    var c = { e: 0, d: 0, fora: 0 };
+    grupos.forEach(function (g) { g.votos.forEach(function (x) {
+      if (!x.v.dv) return;
+      var lado = ladoDoVoto(x.v, x.de[i]);
+      if (lado === 'e' || lado === 'd') c[lado] += 1; else c.fora += 1;
+    }); });
+    c.n = c.e + c.d;
+    c.saldo = c.n ? 100 * (c.d - c.e) / c.n : null;
+    return c;
+  }
+  function fraseDoSaldo(nome, c) {
+    if (!c.n) return nome + ' não votou Sim ou Não nas votações do tema que opuseram os polos.';
+    var texto = nome + ': com a direita em ' + num(c.d) + ' e com a esquerda em ' + num(c.e) + ' das ' + num(c.n) + ' votações que opuseram os polos → saldo ' + saldo(c.saldo) + '.';
+    if (c.n > 1) texto += ' Cada voto com o outro lado move o saldo em ' + num(200 / c.n) + ' pontos.';
+    if (c.fora) texto += ' Ficou sem voto em ' + num(c.fora) + '.';
+    return texto;
+  }
+  /* pessoas: [{k, nome}] (uma ou duas, da mesma Casa). modo: 'saldo' (as que opuseram os polos à
+     frente) ou 'juntos' (todas em que as duas votaram, com as divergentes à frente). */
+  function detalheDoTemaDasPessoas(caixa, casa, tema, pessoas, modo) {
+    while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
+    caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Carregando as votações de ' + nomeDoTema(tema) + '…' }));
+    var vt = null, mat = null, faltam = 2, falhou = false;
+    function fim() {
+      faltam -= 1;
+      if (faltam > 0) return;
+      while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
+      if (falhou || !vt || !mat) { caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Não foi possível carregar as votações agora. Tente de novo em instantes.' })); return; }
+      var chaves = pessoas.map(function (p) { return p.k; }), grupos = votosNoTema(vt, mat, chaves, tema);
+      var def = definicaoDoTema(tema, casa);
+      if (def) caixa.appendChild(h('p', { cls: 'cg-td-def' }, [h('b', { text: 'O que entra em ' + nomeDoTema(tema) + ': ' }), def]));
+      pessoas.forEach(function (p, i) { caixa.appendChild(h('p', { cls: 'cg-dt-r', text: fraseDoSaldo(p.nome, contaDoTema(grupos, i)) })); });
+      var dois = pessoas.length === 2;
+      function difere(x) {
+        var a = x.de[0] === 'O' ? 'N' : x.de[0], b = x.de[1] === 'O' ? 'N' : x.de[1];
+        return (a === 'S' || a === 'N') && (b === 'S' || b === 'N') && a !== b;
+      }
+      function ambos(x) { return x.de.every(function (voto) { return voto === 'S' || voto === 'N' || voto === 'O'; }); }
+      function item(x) {
+        return itemDaVotacao(x.v, { curto: true, cls: dois && difere(x) ? 'cg-vl-dif' : '', pessoas: pessoas.map(function (p, i) { return { nome: dois ? p.nome : '', voto: x.de[i] }; }) });
+      }
+      var principais = [], outras = [];
+      grupos.forEach(function (g) {
+        var frente = [], fundo = [];
+        g.votos.forEach(function (x) {
+          var vai = modo === 'juntos' ? ambos(x) : x.v.dv;
+          (vai ? frente : fundo).push(x);
+        });
+        if (frente.length) principais.push({ t: g.t, m: g.m, votos: frente });
+        if (fundo.length) outras.push({ t: g.t, m: g.m, votos: fundo });
+      });
+      if (dois) principais.sort(function (a, b) { return b.votos.filter(difere).length - a.votos.filter(difere).length; });  // onde divergem, primeiro
+      function bloco(g) {
+        var extras = [];
+        if (dois) {
+          var dif = g.votos.filter(difere).length, juntos = g.votos.filter(function (x) { return ambos(x) && !difere(x); }).length;
+          extras.push(h('span', { cls: 'cg-chip' }, ['votaram igual em ', h('b', { text: num(juntos) })]));
+          if (dif) extras.push(h('span', { cls: 'cg-chip cg-chip-dif' }, ['diferente em ', h('b', { text: num(dif) })]));
+        } else {
+          var c = { e: 0, d: 0 };
+          g.votos.forEach(function (x) { var l = ladoDoVoto(x.v, x.de[0]); if (l === 'e' || l === 'd') c[l] += 1; });
+          if (c.e + c.d) extras.push(h('span', { cls: 'cg-chip' }, [c.d ? 'com a direita ' : '', c.d ? h('b', { text: num(c.d) }) : null, c.d && c.e ? ' · ' : '', c.e ? 'com a esquerda ' : '', c.e ? h('b', { text: num(c.e) }) : null]));
+        }
+        var lados = ladosNoTexto(g.m);
+        if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
+        if (g.m.rel) extras.push(h('span', { cls: 'cg-rv-n', 'data-dica': GLOSS.nota, tabindex: '0', text: 'nota ' + g.m.rel.n }));
+        if (g.m.jor) extras.push(h('span', { cls: 'cg-rv-jor', text: 'no jornal ' + g.m.jor + '×' }));
+        var filhos = [cabecaDaMateria(casa, g.t, g.m, extras), h('p', { cls: 'cg-mh-e', text: curto(g.m.e, 260) })];
+        var votos = g.votos.slice().sort(function (a, b) { return (dois ? (difere(b) ? 1 : 0) - (difere(a) ? 1 : 0) : 0) || ordemDoVoto(a.v, b.v); }).map(item);
+        listaEmPartes('cg-vls', votos, 3, function (n) { return 'mais ' + plural(n, 'votação desta matéria', 'votações desta matéria'); }).forEach(function (no) { filhos.push(no); });
+        return h('li', { cls: 'cg-td-m' }, filhos);
+      }
+      if (principais.length) {
+        listaEmPartes('cg-td-l', principais.map(bloco), 8, function (n) { return 'mostrar as outras ' + plural(n, 'matéria', 'matérias'); }).forEach(function (no) { caixa.appendChild(no); });
+      } else {
+        caixa.appendChild(h('p', { cls: 'cg-d-n', text: modo === 'juntos' ? 'Os dois não votaram Sim ou Não nas mesmas votações deste tema.' : 'Nenhuma votação deste tema opôs esquerda e direita.' }));
+      }
+      if (outras.length) {
+        var n = outras.reduce(function (s, g) { return s + g.votos.length; }, 0);
+        var det = h('details', { cls: 'cg-dt-o' }, [h('summary', { text: modo === 'juntos' ? 'As outras ' + plural(n, 'votação do tema', 'votações do tema') + ' (um dos dois não votou)' : 'As outras ' + plural(n, 'votação do tema', 'votações do tema') + ', que não opuseram os polos (não entram no saldo)' })]);
+        var feito = false;
+        det.addEventListener('toggle', function () {
+          if (feito || !det.open) return;
+          feito = true;
+          det.appendChild(h('ol', { cls: 'cg-td-l' }, outras.map(bloco)));
+        });
+        caixa.appendChild(det);
+      }
+    }
+    votosDa(casa, function (erro, x) { if (erro) falhou = true; vt = x; fim(); });
+    materiasDa(casa, function (erro, x) { if (erro) falhou = true; mat = x; fim(); });
+  }
+  /* O botão de um tema (no dossiê e no comparativo) abre, na linha de baixo, as votações dele. */
+  d.addEventListener('click', function (event) {
+    var b = event.target.closest ? event.target.closest('button[data-tema]') : null;
+    if (!b) return;
+    var tr = b.closest('tr'), aberta = b.getAttribute('aria-expanded') === 'true';
+    if (!tr) return;
+    if (aberta) {
+      if (tr.nextSibling && tr.nextSibling.classList && tr.nextSibling.classList.contains('cg-dt')) tr.parentNode.removeChild(tr.nextSibling);
+      b.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    b.setAttribute('aria-expanded', 'true');
+    var caixa = h('div', { cls: 'cg-dt-in' });
+    var linha = h('tr', { cls: 'cg-dt' }, [h('td', { colspan: String(tr.children.length) }, [caixa])]);
+    tr.parentNode.insertBefore(linha, tr.nextSibling);
+    var chaves = (b.getAttribute('data-de') || '').split(','), nomes = (b.getAttribute('data-nomes') || '').split('|');
+    detalheDoTemaDasPessoas(caixa, chaves[0].slice(0, 2), b.getAttribute('data-tema'), chaves.map(function (k, i) { return { k: k, nome: nomes[i] || '' }; }), b.getAttribute('data-modo') || 'saldo');
+  });
+  function botaoDoTema(t, nome, pessoas, modo) {
+    return h('button', {
+      cls: 'cg-tb-b', type: 'button', 'aria-expanded': 'false', 'data-tema': t, 'data-modo': modo || 'saldo',
+      'data-de': pessoas.map(function (p) { return p.k; }).join(','), 'data-nomes': pessoas.map(function (p) { return p.nome; }).join('|'),
+      title: 'Ver as votações deste tema', text: nome
+    });
+  }
+
+  /* ── O gráfico "o que espera × o que passa": cada ponto abre a ficha da matéria ── */
+  lista(d.querySelectorAll('[data-grafico]')).forEach(function (fig) {
+    var svg = fig.querySelector('svg'), dono = fig.closest ? fig.closest('.cg-c[data-casa]') : null;
+    if (!svg || !dono || !svg.getScreenCTM) return;
+    var casa = dono.getAttribute('data-casa'), pontos = lista(svg.querySelectorAll('circle'));
+    svg.classList.add('cg-gr-clica');
+    svg.addEventListener('click', function (ev) {
+      var m = svg.getScreenCTM();
+      if (!m) return;
+      var pt = svg.createSVGPoint();
+      pt.x = ev.clientX; pt.y = ev.clientY;
+      var p = pt.matrixTransform(m.inverse()), melhor = null, dist = 16 * 16;
+      pontos.forEach(function (c) {
+        var dx = c.cx.baseVal.value - p.x, dy = c.cy.baseVal.value - p.y, d2 = dx * dx + dy * dy;
+        if (d2 < dist) { dist = d2; melhor = c; }
+      });
+      if (melhor) abrirMateria(chaveDaMateria(casa, melhor.getAttribute('data-t')));
+    });
+    /* A tabela de todos os pontos: cada nome vira um link para a ficha (quando a tabela é aberta). */
+    var bloco = fig.parentNode, tabela = bloco ? bloco.querySelector('.cg-rv-tb') : null, feito = false;
+    if (tabela) tabela.addEventListener('toggle', function () {
+      if (feito || !tabela.open) return;
+      feito = true;
+      lista(tabela.querySelectorAll('tbody th')).forEach(function (th) {
+        var t = th.textContent, k = chaveDaMateria(casa, t);
+        if (!k) return;
+        th.textContent = '';
+        th.appendChild(h('a', { cls: 'cg-mt', href: '#m=' + k, 'data-m': k, text: t }));
+      });
+    });
+  });
+
+  /* ── As matérias votadas: procurar pelo nome, pelo apelido ou pelo assunto ── */
+  var MB_PAGINA = 30;
+  function iniciarBuscador(bloco) {
+    if (bloco._pronto) return;
+    bloco._pronto = true;
+    var casa = bloco.getAttribute('data-materias');
+    var q = bloco.querySelector('input[type="search"]'), sel = bloco.querySelector('select'), so = bloco.querySelector('input[type="checkbox"]');
+    var conta = bloco.querySelector('.az-fil-n'), ol = bloco.querySelector('.cg-mb-l');
+    bloco.hidden = false;
+    conta.textContent = 'carregando…';
+    materiasDa(casa, function (erro, mat) {
+      if (erro) { conta.textContent = 'não foi possível carregar agora'; return; }
+      var todas = [];
+      Object.keys(mat.materias).forEach(function (t) {
+        var m = mat.materias[t], votos = m.vot || [];
+        if (!votos.length) return;
+        var conteudo = votos.filter(function (v) { return v.t === 'merito' || v.t === 'destaque'; });
+        todas.push({
+          t: t, m: m, n: votos.length, div: votos.filter(function (v) { return v.dv; }).length, ultima: votos[votos.length - 1],
+          conteudo: conteudo.length, busca: semAcento([t, m.ap || '', m.e || '', m.ex || '', (m.kw || []).join(' ')].join(' '))
+        });
+      });
+      todas.sort(function (a, b) { return a.ultima.d < b.ultima.d ? 1 : a.ultima.d > b.ultima.d ? -1 : 0; });
+      var temas = {};
+      todas.forEach(function (x) { (x.m.tm || []).forEach(function (t) { temas[t] = (temas[t] || 0) + 1; }); });
+      Object.keys(temas).sort(function (a, b) { return temas[b] - temas[a]; }).forEach(function (t) {
+        sel.appendChild(h('option', { value: t, text: nomeDoTema(t) + ' (' + temas[t] + ')' }));
+      });
+      var mostrados = MB_PAGINA;
+      function desenhar() {
+        var termos = semAcento(q.value).split(/\s+/).filter(Boolean), tema = sel.value, soDiv = so.checked;
+        var achadas = todas.filter(function (x) {
+          return (!tema || (x.m.tm || []).indexOf(tema) >= 0) && (!soDiv || x.div) && termos.every(function (t) { return x.busca.indexOf(t) >= 0; });
+        });
+        while (ol.firstChild) ol.removeChild(ol.firstChild);
+        achadas.slice(0, mostrados).forEach(function (x) {
+          var u = x.ultima, res = resultadoDaVotacao(u);
+          var extras = [h('span', { cls: 'cg-chip' }, [h('b', { text: num(x.n) }), x.n === 1 ? ' votação nominal' : ' votações nominais'])];
+          if (x.div) extras.push(h('span', { cls: 'cg-div', text: x.div === 1 ? '1 dividiu os polos' : x.div + ' dividiram os polos' }));
+          var lados = ladosNoTexto(x.m);
+          if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
+          ol.appendChild(h('li', { cls: 'cg-td-m' }, [
+            cabecaDaMateria(casa, x.t, x.m, extras),
+            h('p', { cls: 'cg-mh-e', text: curto(x.m.e, 260) }),
+            h('p', { cls: 'cg-mh-u', text: 'Última votação: ' + dataBr(u.d) + ' · ' + tipoDaVotacao(u) + (res ? ' · ' + res : '') + ' · ' + num(u.s) + ' × ' + num(u.n) + ((x.m.tm || []).length ? ' · ' + x.m.tm.map(nomeDoTema).join(', ') : '') })
+          ]));
+        });
+        if (achadas.length > mostrados) ol.appendChild(h('li', { cls: 'cg-mb-m' }, [botaoMais('mostrar mais ' + Math.min(MB_PAGINA, achadas.length - mostrados) + ' de ' + (achadas.length - mostrados), function () { mostrados += MB_PAGINA; desenhar(); })]));
+        conta.textContent = plural(achadas.length, 'matéria', 'matérias');
+      }
+      function refazer() { mostrados = MB_PAGINA; desenhar(); }
+      q.addEventListener('input', refazer);
+      sel.addEventListener('change', refazer);
+      so.addEventListener('change', refazer);
+      desenhar();
+    });
+  }
+  aoAbrirVista.votacoes = function () {
+    lista(root.querySelectorAll('[data-materias]')).forEach(function (bloco) {
+      var casaVista = root.getAttribute('data-ver');
+      if (!casaVista || bloco.getAttribute('data-materias') === casaVista) iniciarBuscador(bloco);
+    });
+  };

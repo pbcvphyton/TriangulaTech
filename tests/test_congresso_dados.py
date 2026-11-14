@@ -16,7 +16,7 @@ import pytest
 from qijournal import pipeline
 from qijournal.__main__ import main
 from qijournal.config import Config, load_config
-from qijournal.congresso import dados, ficha, fontes, jornal, perfil, projetos, regras, temas
+from qijournal.congresso import base, dados, ficha, fontes, jornal, materias, perfil, projetos, regras, temas
 from qijournal.render import congresso as pagina
 from qijournal.render.web import render_edition_page
 from tests.fixtures.congresso import fabrica
@@ -487,7 +487,170 @@ def test_o_resumo_e_os_paineis(publicado: tuple[Path, fabrica.FetchFalso, dados.
     assert (furaram["aprovadas"], furaram["rapidas_n"], furaram["rapidas"][0]["p"], furaram["rapidas"][0]["dias"], furaram["rapidas"][0]["urg"]) == (1, 1, "PL 12/2026", 15, 1)
     achados = _ler(data_dir, "achados.json")["achados"]
     assert {a["tipo"] for a in achados} >= {"fila", "furaram", "relatoria"}
+    assert "juntos" not in {a["tipo"] for a in achados}  # sem a tabela partido × partido (poucas votações), nada a dizer
     assert all(a["titulo"] and a["texto"] and a["alvo"].startswith("#cg-") for a in achados)
+
+
+# ── a ficha de cada matéria ──────────────────────────────────────────────────
+
+
+def test_a_proposicao_guarda_o_que_a_casa_diz_alem_da_ementa(props: list[projetos.Proposicao], coletor: fontes.Coletor):
+    pl10 = next(p for p in props if p.id == 1010)
+    assert pl10.explicacao.startswith("Corrige a tabela do imposto de renda") and pl10.teor == "https://www.camara.example/teor/1010"
+    assert projetos.termos(pl10.chaves) == ["Alteração", "Lei do Imposto de Renda", "tabela progressiva", "isenção", "pessoa física"]
+    assert projetos.termos("ALTERAÇÃO, CÓDIGO PENAL. ALTERAÇÃO; pena", 2) == ["Alteração", "Código penal"]  # o Senado grita; sem repetir
+    assert base.ementa_valida("Dispõe sobre X.\n\nNOVA EMENTA: Dispõe sobre Y; e Z.") == ("Dispõe sobre Y; e Z.", "Dispõe sobre X.")
+    senado = projetos.senado_do_detalhe(fabrica.detalhe_do_processo_7001())
+    assert (senado.titulo, senado.id, senado.processo, senado.explicacao) == (
+        "PL 20/2026", 160001, 7001, "Eleva a faixa de isenção do imposto de renda da pessoa física.")
+    assert (senado.origem, senado.partidos, senado.teor) == ("parlamentar", ["PT"], "https://legis.senado.example/documento/7001")
+    antiga = projetos.camara_do_detalhe(
+        {"id": 99, "siglaTipo": "PL", "numero": 7, "ano": 2007, "ementa": "Trata de terras. NOVA EMENTA: Regula a demarcação de terras.", "keywords": "terra, demarcação",
+         "urlInteiroTeor": "https://www.camara.example/teor/99", "dataApresentacao": "2007-03-01T10:00",
+         "statusProposicao": {"descricaoSituacao": "Transformado em Norma Jurídica", "siglaOrgao": "MESA", "dataHora": "2023-10-20T10:00", "regime": "Urgência"}},
+        [{"uri": f"{fabrica.CAMARA}/api/v2/deputados/4", "nome": "Davi Rocha", "tipo": "Deputado(a)", "ordemAssinatura": 1}],
+    )
+    assert (antiga.titulo, antiga.ementa, antiga.original, antiga.estado, antiga.urgencia) == (
+        "PL 7/2007", "Regula a demarcação de terras.", "Trata de terras.", projetos.NORMA, True)
+    assert (antiga.primeiro, antiga.autores, antiga.origem) == (4, [4], "parlamentar")
+    assert projetos.camara_detalhes(coletor, [424242]) == {}  # fora do ar: só fica de fora
+
+
+@pytest.mark.parametrize(
+    ("tipo", "descricao", "abertura", "esperado"),
+    [
+        (base.MERITO, "Aprovado o Substitutivo ao Projeto de Lei nº 10, de 2026.", "", materias.TEXTO),
+        (base.DESTAQUE, "Mantido o texto. Sim: 282; não: 115.", "Votação do DTQ 16: PL: Destaque para Votação em Separado do Artigo 9º (art. 161, I).", materias.TRECHO),
+        (base.DESTAQUE, "Suprimido o texto. Sim: 173; Não: 238.", "Votação do DTQ 8 (NOVO): Destaque para Votação em Separado do Art. 27.", materias.TRECHO),
+        (base.DESTAQUE, "Rejeitada a Emenda de Comissão nº 15. Sim: 143; não: 195.", "Votação do DTQ 3: PL: Emenda de Comissão Nº 15 (art. 161, II).", materias.EMENDA),
+        (base.DESTAQUE, "Votação nominal da Emenda nº 83 ao Projeto de Lei Complementar nº 93, de 2023, destacada.", "", materias.EMENDA),
+        (base.DESTAQUE, "Votação nominal do Art. 28 do Projeto de Lei nº 2.903, de 2023, destacado.", "", materias.TRECHO),
+        (base.URGENCIA, "Aprovado o Requerimento de Urgência.", "", materias.REQUERIMENTO),
+        (base.DESTAQUE, "Resultado sem objeto claro.", "", ""),
+    ],
+)
+def test_o_que_o_sim_queria_dizer(tipo: str, descricao: str, abertura: str, esperado: str):
+    v = base.Votacao(id="x", data="2026-03-03", orgao="PLEN", descricao=descricao, tipo=tipo, votos="", abertura=abertura)
+    assert materias.sentido_do_sim(v) == esperado
+
+
+@pytest.mark.parametrize(
+    ("abertura", "esperado"),
+    [
+        ("Votação do DTQ 5: PL: Emenda de Plenário Nº 4 (art. 161, II).", "PL"),
+        ("Votação do DTQ 3 (PL, UNIÃO, PP): Destaque da Emenda de Plenário n. 6. (161, II)", "PL, UNIÃO, PP"),
+        ("Votação do DTQ 10: Bloco Fdr PT-PCdoB-PV: Destaque para Votação em Separado do §13", "Bloco Fdr PT-PCdoB-PV"),
+        ("Votação da EMA 1 (Mauro Benevides Filho): Emenda Aglutinativa nº 1.", "Mauro Benevides Filho"),
+        ("Votação em turno único.", ""),
+    ],
+)
+def test_quem_pediu_o_destaque(abertura: str, esperado: str):
+    assert materias.quem_pediu(abertura) == esperado
+
+
+def test_a_ficha_da_materia_diz_o_que_e_e_como_cada_polo_votou(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado]):
+    data_dir, _fetch, _resultado = publicado
+    texto = (data_dir / "congresso" / "materias-cd.json").read_text(encoding="utf-8")
+    cd = json.loads(texto)
+    assert (cd["polos"], cd["pesos"]) == ({"esquerda": ["PT"], "direita": ["PL"]}, {"demanda": 40, "origem": 25, "alcance": 20, "apoio": 15})
+    assert texto.count("\n") >= len(cd["materias"])  # uma matéria por linha
+    # as votadas no Plenário (PL 10, 11 e 12) e as do painel (a PEC 1 não é votada nem está pronta: fica de fora)
+    assert sorted(cd["materias"]) == ["PL 10/2026", "PL 11/2026", "PL 12/2026", "PL 14/2026"]
+    pl10 = cd["materias"]["PL 10/2026"]
+    assert (pl10["e"], pl10["ex"][:30], pl10["kw"][1], pl10["ut"]) == (
+        "Altera a tabela do imposto de renda.", "Corrige a tabela do imposto de", "Lei do Imposto de Renda", "https://www.camara.example/teor/1010")
+    assert (pl10["au"], pl10["auk"], pl10["o"], pl10["pa"], pl10["tm"], pl10["sit"]) == (
+        "Ana Lima", "cd-1", "parlamentar", ["PT"], ["economia"], "Aguardando Designação de Relator(a)")
+    assert [v["id"] for v in pl10["vot"]] == ["1010-1", "1010-2"]  # só o Plenário; a CCJC fica de fora
+    principal, destaque = pl10["vot"]
+    assert (principal["t"], principal["ss"], principal["e"], principal["dr"], principal["g"], principal["dv"], principal["apv"]) == (
+        "merito", "texto", "S", "N", "S", 1, 1)
+    assert (principal["s"], principal["n"]) == (6, 4)
+    assert principal["pp"] == [["PT", 3, 0, "e"], ["PL", 0, 3, "d"]]  # a contagem de cada partido dos polos
+    assert principal["pt"] == [["PP", "S", 75]]  # os demais partidos, pelo lado da maioria
+    assert (destaque["t"], destaque["ss"], destaque["dq"], destaque["apv"]) == ("destaque", "trecho", "PL", 1)  # "Mantido o texto": o Sim venceu
+    assert destaque["ab"].startswith("Votação do DTQ 1: PL: Destaque para Votação em Separado")
+    # a nota do painel: a que espera, a que passou (com o caminho) e, para as só votadas, a nota na data do voto
+    assert cd["materias"]["PL 14/2026"]["rel"]["q"] == "espera" and "vot" not in cd["materias"]["PL 14/2026"]
+    passou = cd["materias"]["PL 12/2026"]["rel"]
+    assert (passou["q"], passou["apv"], passou["dias"], passou["cam"]["urgencia"]["por"]) == ("passou", "2026-06-16", 15, "Ana Lima e Davi Rocha")
+    assert [v["t"] for v in cd["materias"]["PL 12/2026"]["vot"]] == ["urgencia", "merito"]
+    assert (pl10["rel"]["q"], pl10["rel"]["ref"]) == ("votada", "2026-04-07")
+    assert cd["materias"]["PL 11/2026"]["rl"] == "Gil Castro" and cd["materias"]["PL 11/2026"]["rlk"] == "cd-7"
+    sf = json.loads((data_dir / "congresso" / "materias-sf.json").read_text(encoding="utf-8"))
+    pl20 = sf["materias"]["PL 20/2026"]
+    assert (pl20["ex"], pl20["kw"][:2], pl20["u"]) == (
+        "Eleva a faixa de isenção do imposto de renda da pessoa física.", ["Alteração", "Imposto de renda"],
+        "https://www25.senado.leg.br/web/atividade/materias/-/materia/160001")
+    assert [v["id"] for v in pl20["vot"]] == ["sf501"] and "demanda" not in sf["pesos"]  # o Senado não informa os apensados
+    assert materias.chave("cd", "PL 10/2026") == "cd-PL-10-2026" and materias.chave("cd", "REQ 5") == ""
+    assert materias.titulo_da_materia("PEC 66/2023 (fase 2)") == "PEC 66/2023"  # o Senado anota a fase ao lado do número
+
+
+def test_a_materia_de_um_polo_que_o_outro_votou_a_favor(r: regras.Regras):
+    def voto(esquerda: str, direita: str) -> dict[str, str]:
+        return {"t": base.MERITO, "d": "2026-03-03", "e": esquerda, "dr": direita, "apv": 1}
+
+    fichas = {
+        "PL 1/2026": {"e": "Da direita, com a esquerda a favor.", "vot": [voto("N", "S"), voto("S", "S")]},  # vale a última
+        "PL 2/2026": {"e": "Da direita, com a esquerda contra.", "vot": [voto("N", "S")]},
+        "PL 3/2026": {"e": "Da esquerda, com a direita dividida.", "vot": [voto("S", "")]},
+        "PL 4/2026": {"e": "Dos dois polos: não entra.", "vot": [voto("S", "S")]},
+        "PL 5/2026": {"e": "Da direita, só com requerimento votado: não entra.", "vot": [{"t": base.URGENCIA, "d": "2026-03-03"}]},
+    }
+    props = {
+        t: projetos.Proposicao(id=i, casa="cd", sigla="PL", numero=i, ano=2026, partidos=partidos)
+        for i, (t, partidos) in enumerate(zip(fichas, (["PL", "PP"], ["PL"], ["PT"], ["PT", "PL"], ["PL"]), strict=True), start=1)
+    }
+    cruzada = materias.autoria_cruzada(fichas, props, r, HOJE)
+    assert {k: v for k, v in cruzada["direita"].items() if k != "itens"} == {"n": 2, "favor": 1, "contra": 1, "dividido": 0}
+    assert [(i["t"], i["pa"]) for i in cruzada["direita"]["itens"]] == [("PL 1/2026", ["PL"])]
+    assert {k: v for k, v in cruzada["esquerda"].items() if k != "itens"} == {"n": 1, "favor": 0, "contra": 0, "dividido": 1}
+
+
+def test_quanto_os_partidos_votam_juntos_sem_a_regua_dos_polos(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], coletor: fontes.Coletor, r: regras.Regras):
+    """Em todas as votações de conteúdo, não só nas que dividem os polos: é o que mostra que
+    PT e PL também votam do mesmo lado."""
+    ano = base.camara_ano(coletor, 2026)
+    bruto = perfil.convivencia([ano], r, 57)
+    assert {k: v for k, v in bruto.items() if k != "pares"} == {"conteudo": 4, "divisivas": 3, "rachas": 0, "juntos": 1, "sem_lado": 0}
+    assert bruto["pares"][("PL", "PT")] == [1, 4]  # só o PL 12/2026, que todos aprovaram
+    assert bruto["pares"][("PP", "PT")] == [3, 4] and bruto["pares"][("PL", "PP")] == [2, 4]
+    data_dir, _fetch, _resultado = publicado
+    cd = _ler(data_dir, "casa-cd.json")
+    assert cd["convivencia"]["juntos"] == 1 and cd["convivencia"]["partidos"] == []  # menos de 20 votações por par: nada a dizer
+    assert {k: v for k, v in cd["cruzada"]["esquerda"].items() if k != "itens"} == {"n": 1, "favor": 0, "contra": 1, "dividido": 0}
+    meta = _ler(data_dir, "meta.json")
+    economia = next(t for t in meta["temas"] if t["id"] == "economia")
+    assert (economia["camara"], economia["senado"]) == (["Economia"], ["Economia e Desenvolvimento"])  # o que entra no tema
+
+
+def test_sobre_o_que_cada_um_mais_propoe():
+    def prop(i: int, chaves: str, primeiro: int = 1) -> projetos.Proposicao:
+        return projetos.Proposicao(id=i, casa="cd", sigla="PL", numero=i, ano=2026, chaves=chaves, primeiro=primeiro)
+
+    geral = [prop(i, "Alteração, saúde") for i in range(1, 101)]
+    meus = [prop(200, "Alteração, Código Penal, aumento da pena"), prop(201, "ALTERAÇÃO, Código penal, crime"), prop(202, "Alteração, aumento da pena, Código Penal")]
+    vocabulario = projetos.Vocabulario([*geral, *meus])
+    # "alteração" está em todas (não diz o assunto); "crime" só numa proposta dele (pouco para dizer que é assunto dele)
+    assert vocabulario.caracteristicos(meus) == [["Código Penal", 3], ["aumento da pena", 2]]
+    resumo = projetos.resumo_de_autoria(meus, HOJE, fabrica.regras_de_teste().limiares, pessoa=1, vocabulario=vocabulario)
+    assert resumo["termos"] == [["Código Penal", 3], ["aumento da pena", 2]] and resumo["siglas"] == {"PL": 3}
+    assert "termos" not in projetos.resumo_de_autoria(meus, HOJE, fabrica.regras_de_teste().limiares, pessoa=1)
+
+
+def test_um_ano_gravado_no_formato_antigo_e_refeito_uma_vez(tmp_path: Path, coletor: fontes.Coletor, r: regras.Regras):
+    pasta = tmp_path / "base"
+    pasta.mkdir()
+    antigo = base.serializar(base.camara_ano(coletor, 2026)).replace('"f":%d,' % base.FORMATO, "")
+    base.caminho(pasta, "cd", 2026).write_text(antigo, encoding="utf-8")
+    avisos: list[str] = []
+    votos, gravados = dados.atualizar_base(coletor, r, pasta, dados.Opcoes(hoje="2027-01-15", projetos_desde=2026), avisos)
+    refeito = base.ler(pasta, "cd", 2026)  # 2026 é ano fechado em 2027: só é refeito porque estava no formato antigo
+    assert refeito.formato == base.FORMATO and gravados >= 1 and votos["cd"][0].formato == base.FORMATO
+    pedidos = len(coletor.fetch.pedidos)
+    dados.atualizar_base(coletor, r, pasta, dados.Opcoes(hoje="2027-01-15", projetos_desde=2026), [])
+    assert not [u for u in coletor.fetch.pedidos[pedidos:] if "votacoes-2026" in u]  # já está no formato novo: não baixa de novo
 
 
 def test_rodar_de_novo_sem_mudanca_nao_regrava_nada(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path, r: regras.Regras):
@@ -528,10 +691,18 @@ def test_a_aba_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso,
         "Hugo Leal",  # quem preside a comissão que segura a fila
         "Como ler",
         'id="cgCmpF"', 'list="cgNomes"', '<datalist id="cgNomes">',  # comparar quaisquer dois, escolhidos pelo nome
+        # as vistas (uma aba cada; sem script, todas em sequência) e os blocos novos
+        'id="cgBarra"', 'href="#cg-partidos" data-vista="partidos"', 'id="cg-partidos"', 'id="cg-espera"', 'data-vista="votacoes"',
+        'id="cg-juntos-cd"', 'id="cg-cruzada-cd"', 'id="cg-materias-cd"', 'id="cg-tema-det-cd"', 'id="cg-temas-def"',
+        'href="#m=cd-PL-12-2026" data-m="cd-PL-12-2026">PL 12/2026</a>',  # o número da matéria abre a ficha dela
+        "Por que um voto é “de esquerda” ou “de direita”",
     ):
         assert trecho in html, trecho
+    assert html.count('class="az-sec cg-vista"') + html.count('class="cg-vista"') + html.count('class="az-sec az-met cg-vista"') == 8
     manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
     assert (manifesto["hoje"], manifesto["base"], manifesto["governo"]) == (HOJE, "../data/congresso/fichas/", "Lula")
+    assert (manifesto["materiasArq"], manifesto["polos"]) == ("../data/congresso/materias-", {"esquerda": ["PT"], "direita": ["PL"]})
+    assert manifesto["temasDef"]["economia"] == {"cd": ["Economia"], "sf": ["Economia e Desenvolvimento"]}  # a definição de cada tema
     assert html.count('data-casa="cd" data-b=') == 11 and html.count('data-casa="sf" data-b=') == 4
 
 

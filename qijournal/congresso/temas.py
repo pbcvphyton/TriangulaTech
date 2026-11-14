@@ -15,11 +15,56 @@ from collections import defaultdict
 
 from . import fontes
 from .fontes import Coletor
-from .regras import Regras
+from .regras import Regras, Tema
 
 log = logging.getLogger(__name__)
 
 VALIDADE_DETALHE_H = 24 * 60  # a classificação de uma matéria quase nunca muda
+
+# As áreas temáticas da Câmara (código do arquivo proposicoesTemas → nome oficial): servem
+# para dizer, na página, o que entra em cada macrotema.
+AREAS_CAMARA = {
+    34: "Administração Pública",
+    35: "Arte, Cultura e Religião",
+    37: "Comunicações",
+    39: "Esporte e Lazer",
+    40: "Economia",
+    41: "Cidades e Desenvolvimento Urbano",
+    42: "Direito Civil e Processual Civil",
+    43: "Direito Penal e Processual Penal",
+    44: "Direitos Humanos e Minorias",
+    46: "Educação",
+    48: "Meio Ambiente e Desenvolvimento Sustentável",
+    51: "Estrutura Fundiária",
+    52: "Previdência e Assistência Social",
+    53: "Processo Legislativo e Atuação Parlamentar",
+    54: "Energia, Recursos Hídricos e Minerais",
+    55: "Relações Internacionais e Comércio Exterior",
+    56: "Saúde",
+    57: "Defesa e Segurança",
+    58: "Trabalho e Emprego",
+    60: "Turismo",
+    61: "Viação, Transporte e Mobilidade",
+    62: "Ciência, Tecnologia e Inovação",
+    64: "Agricultura, Pecuária, Pesca e Extrativismo",
+    66: "Indústria, Comércio e Serviços",
+    67: "Direito e Defesa do Consumidor",
+    68: "Direito Constitucional",
+    70: "Finanças Públicas e Orçamento",
+    72: "Homenagens e Datas Comemorativas",
+    74: "Política, Partidos e Eleições",
+    76: "Direito e Justiça",
+    85: "Ciências Exatas e da Terra",
+    86: "Ciências Sociais e Humanas",
+}
+
+
+def definicao(tema: Tema) -> dict[str, list[str]]:
+    """O que entra num macrotema: as áreas temáticas da Câmara e as classes do Senado."""
+    return {
+        "camara": [AREAS_CAMARA.get(c, f"área {c}") for c in sorted(tema.camara, key=lambda c: AREAS_CAMARA.get(c, str(c)))],
+        "senado": list(tema.senado_nomes),
+    }
 
 
 class TemasCamara:

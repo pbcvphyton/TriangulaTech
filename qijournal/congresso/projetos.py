@@ -20,6 +20,7 @@ A situação oficial de cada matéria é levada a duas réguas comuns às duas C
 from __future__ import annotations
 
 import logging
+import math
 import re
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
@@ -90,7 +91,11 @@ QUEM_SEGURA = {
     F_COMISSAO: "o presidente da Casa",
 }
 EMENTA_MAX = 260
+INTEIRA_MAX = 1200  # a ementa inteira da ficha da matéria
+EXPLICACAO_MAX = 700
+CHAVES_MAX = 600
 PARALELO = 4
+VALIDADE_DETALHE_H = 24 * 60  # o detalhe de uma matéria (ementa, explicação, indexação) quase nunca muda
 
 
 @dataclass
@@ -118,6 +123,13 @@ class Proposicao:
     partidos: list[str] = field(default_factory=list)  # partidos dos autores parlamentares
     principal: int | None = None  # Câmara: a matéria a que esta está apensada
     apreciacao: str = ""  # Câmara: "plenario" ou "conclusiva" (nas comissões)
+    # O que a Casa registra sobre o conteúdo, além da ementa curta de cima:
+    inteira: str = ""  # a ementa inteira, quando a de cima foi cortada
+    original: str = ""  # Câmara: a ementa original, quando o texto ganhou uma nova no caminho
+    explicacao: str = ""  # Câmara: a ementa detalhada; Senado: a explicação da ementa
+    chaves: str = ""  # as palavras-chave do registro (indexação), como vieram
+    teor: str = ""  # endereço do texto integral
+    processo: int | None = None  # Senado: o id do processo (o detalhe sai de /processo/<id>)
 
     @property
     def titulo(self) -> str:
@@ -172,6 +184,32 @@ def dias_entre(inicio: str, fim: str) -> int | None:
 
 def _curto(valor: Any, limite: int = EMENTA_MAX) -> str:
     return text.truncate(re.sub(r"\s+", " ", str(valor or "").strip()), limite)
+
+
+def _inteira(valor: Any) -> str:
+    """A ementa inteira, só quando a curta (``EMENTA_MAX``) a cortou."""
+    bruta = re.sub(r"\s+", " ", str(valor or "").strip())
+    return text.truncate(bruta, INTEIRA_MAX) if len(bruta) > EMENTA_MAX else ""
+
+
+_SEPARA_TERMOS = re.compile(r"\s*[,;._\n]+\s*")
+
+
+def termos(chaves: str, limite: int | None = None) -> list[str]:
+    """As palavras-chave do registro uma a uma, na ordem e sem repetição. O Senado
+    escreve em maiúsculas: aqui ficam em minúsculas com a inicial maiúscula."""
+    vistos: set[str] = set()
+    saida: list[str] = []
+    for termo in _SEPARA_TERMOS.split(chaves or ""):
+        termo = termo.strip(" -–—…")
+        chave = text.normalize(termo)
+        if len(chave) < 3 or chave in vistos:
+            continue
+        vistos.add(chave)
+        saida.append(termo.capitalize() if termo.isupper() else termo)
+        if limite and len(saida) >= limite:
+            break
+    return saida
 
 
 # ── situação → estado e fila ─────────────────────────────────────────────────
@@ -262,6 +300,7 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
             continue
         situacao = (r.get("ultimoStatus_descricaoSituacao") or "").strip()
         estado, fila = classificar(situacao)
+        ementa, original = base.ementa_valida(r.get("ementa"))
         regime = text.normalize(r.get("ultimoStatus_regime") or "")
         apreciacao = text.normalize(r.get("ultimoStatus_apreciacao") or "")
         principal = fontes.id_da_uri(r.get("uriPropPrincipal"))
@@ -271,7 +310,12 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
             sigla=sigla,
             numero=numero,
             ano=fontes.inteiro(r.get("ano")) or ano,
-            ementa=_curto(r.get("ementa")),
+            ementa=_curto(ementa),
+            inteira=_inteira(ementa),
+            original=text.truncate(original, INTEIRA_MAX),
+            explicacao=_curto(r.get("ementaDetalhada"), EXPLICACAO_MAX),
+            chaves=_curto(r.get("keywords"), CHAVES_MAX),
+            teor=(r.get("urlInteiroTeor") or "").strip(),
             apresentada=(r.get("dataApresentacao") or "")[:10],
             situacao=situacao,
             estado=estado,
@@ -307,6 +351,73 @@ def _camara_ano(coletor: Coletor, ano: int, *, temas: TemasCamara | None, valida
         if not prop.origem:
             prop.origem = "parlamentar" if prop.autores else origem_do_autor("", prop.autoria)
     return list(por_id.values())
+
+
+def camara_do_detalhe(dados: Mapping[str, Any], autores: Iterable[Mapping[str, Any]] = ()) -> Proposicao | None:
+    """Uma proposição da Câmara a partir da API (``/proposicoes/<id>`` e ``…/autores``): para
+    as matérias votadas que ficaram fora dos arquivos em lote lidos (numeração antiga)."""
+    pid, numero = fontes.inteiro(dados.get("id")), fontes.inteiro(dados.get("numero"))
+    sigla = str(dados.get("siglaTipo") or "").strip()
+    if pid is None or not numero or not sigla:
+        return None
+    status = dados.get("statusProposicao") if isinstance(dados.get("statusProposicao"), Mapping) else {}
+    situacao = str(status.get("descricaoSituacao") or "").strip()
+    estado, fila = classificar(situacao)
+    apreciacao = text.normalize(status.get("apreciacao") or "")
+    ementa, original = base.ementa_valida(dados.get("ementa"))
+    p = Proposicao(
+        id=pid,
+        casa="cd",
+        sigla=sigla,
+        numero=numero,
+        ano=fontes.inteiro(dados.get("ano")) or 0,
+        ementa=_curto(ementa),
+        inteira=_inteira(ementa),
+        original=text.truncate(original, INTEIRA_MAX),
+        explicacao=_curto(dados.get("ementaDetalhada"), EXPLICACAO_MAX),
+        chaves=_curto(dados.get("keywords"), CHAVES_MAX),
+        teor=str(dados.get("urlInteiroTeor") or "").strip(),
+        apresentada=str(dados.get("dataApresentacao") or "")[:10],
+        situacao=situacao,
+        estado=estado,
+        fila=fila,
+        orgao=str(status.get("siglaOrgao") or "").strip(),
+        movimento=str(status.get("dataHora") or "")[:10],
+        relator=fontes.id_da_uri(status.get("uriRelator")),
+        urgencia="urgencia" in text.normalize(status.get("regime") or ""),
+        apreciacao="plenario" if "plenario" in apreciacao else ("conclusiva" if "conclusiva" in apreciacao else ""),
+    )
+    assinam = sorted((a for a in autores if isinstance(a, Mapping)), key=lambda a: fontes.inteiro(a.get("ordemAssinatura")) or 999)
+    for a in assinam:
+        uri = str(a.get("uri") or "")
+        autor = fontes.id_da_uri(uri) if "/deputados/" in uri else None
+        if autor is not None and autor not in p.autores:
+            p.autores.append(autor)
+    if assinam:
+        primeiro = assinam[0]
+        p.origem = origem_do_autor(primeiro.get("tipo"), primeiro.get("nome"))
+        if p.autores and "/deputados/" in str(primeiro.get("uri") or ""):
+            p.primeiro = p.autores[0]
+        else:
+            p.autoria = _curto(primeiro.get("nome"), 80)
+    return p
+
+
+def camara_detalhes(coletor: Coletor, ids: Iterable[int], *, validade_h: float = VALIDADE_DETALHE_H) -> dict[int, Proposicao]:
+    """O detalhe de cada proposição pedida (id → proposição), pela API. Uma fora do ar só
+    fica de fora."""
+
+    def uma(pid: int) -> tuple[int, Proposicao | None]:
+        try:
+            dados = fontes.camara_api(coletor, f"proposicoes/{pid}", validade_h=validade_h, paginada=False)
+            autores = fontes.camara_api(coletor, f"proposicoes/{pid}/autores", validade_h=validade_h, paginada=False)
+            return pid, camara_do_detalhe(dados[0], autores) if dados else None
+        except Exception as exc:  # noqa: BLE001 — uma matéria sem detalhe não derruba as outras
+            log.debug("Câmara: detalhe da proposição %s indisponível (%s)", pid, exc)
+            return pid, None
+
+    alvos = sorted({int(i) for i in ids if i})
+    return {pid: p for pid, p in net.parallel_map(uma, alvos, max_workers=PARALELO) if p is not None}
 
 
 def camara_presidentes(coletor: Coletor, legislatura: int, hoje: str, *, validade_h: float = 24 * 3) -> dict[str, tuple[int, str]]:
@@ -374,6 +485,11 @@ def _do_senado(item: Mapping[str, Any]) -> Proposicao | None:
         numero=int(match.group(2)),
         ano=int(match.group(3)),
         ementa=_curto(item.get("ementa")),
+        inteira=_inteira(item.get("ementa")),
+        explicacao=_curto(item.get("explicacaoEmenta"), EXPLICACAO_MAX),
+        chaves=_curto(item.get("indexacao"), CHAVES_MAX),
+        teor=str(item.get("urlDocumento") or "").strip(),
+        processo=pid,
         apresentada=str(item.get("dataApresentacao") or "")[:10],
         situacao=situacao.capitalize(),
         estado=estado,
@@ -385,6 +501,47 @@ def _do_senado(item: Mapping[str, Any]) -> Proposicao | None:
         origem=origem_senado(autoria, item.get("objetivo")),
         partidos=partidos,
     )
+
+
+def senado_do_detalhe(detalhe: Mapping[str, Any]) -> Proposicao | None:
+    """A matéria do Senado a partir do detalhe do processo (``/processo/<id>``), que traz o
+    que as listas não trazem: a explicação da ementa, a indexação e o endereço do texto."""
+    if not isinstance(detalhe, Mapping):
+        return None
+    conteudo = detalhe.get("conteudo") if isinstance(detalhe.get("conteudo"), Mapping) else {}
+    documento = detalhe.get("documento") if isinstance(detalhe.get("documento"), Mapping) else {}
+    return _do_senado(
+        {
+            "id": detalhe.get("id"),
+            "codigoMateria": detalhe.get("codigoMateria"),
+            "identificacao": detalhe.get("identificacao"),
+            "ementa": conteudo.get("ementa"),
+            "explicacaoEmenta": conteudo.get("explicacaoEmenta"),
+            "indexacao": documento.get("indexacao"),
+            "urlDocumento": documento.get("url"),
+            "dataApresentacao": documento.get("dataApresentacao"),
+            "autoria": documento.get("resumoAutoria"),
+            "situacaoAtual": detalhe.get("situacaoAtual"),
+            "dataSituacaoAtual": detalhe.get("dataSituacaoAtual"),
+            "tramitando": detalhe.get("tramitando"),
+            "objetivo": detalhe.get("objetivo"),
+        }
+    )
+
+
+def senado_detalhes(coletor: Coletor, processos: Iterable[int], *, validade_h: float = VALIDADE_DETALHE_H) -> dict[int, Proposicao]:
+    """O detalhe de cada processo pedido (id do processo → matéria). Um processo fora do
+    ar ou que não é matéria acompanhada só fica de fora."""
+
+    def um(processo: int) -> tuple[int, Proposicao | None]:
+        try:
+            return processo, senado_do_detalhe(fontes.senado_api(coletor, f"processo/{processo}", validade_h=validade_h))
+        except Exception as exc:  # noqa: BLE001 — uma matéria sem detalhe não derruba as outras
+            log.debug("Senado: detalhe do processo %s indisponível (%s)", processo, exc)
+            return processo, None
+
+    ids = sorted({int(i) for i in processos if i})
+    return {processo: p for processo, p in net.parallel_map(um, ids, max_workers=PARALELO) if p is not None}
 
 
 def senado_tramitando(coletor: Coletor, *, validade_h: float = 20.0) -> list[Proposicao]:
@@ -492,8 +649,70 @@ def _item(p: Proposicao, hoje: str, *, dias: bool = False) -> dict[str, Any]:
     return d
 
 
+class Vocabulario:
+    """As palavras-chave do registro (a indexação que a Casa dá a cada proposição) e em
+    quantas proposições cada uma aparece. Serve para dizer **sobre o que alguém mais
+    propõe**: os termos que aparecem nas propostas dele e são raros no conjunto.
+
+    Um termo conta uma vez por proposição. Ficam de fora os que estão em mais de
+    ``COMUM`` de todas as proposições ("alteração", "criação", "obrigatoriedade"): dizem
+    a forma do projeto, não o assunto. A ordem é pelo número de propostas da pessoa com
+    o termo, pesado pela raridade dele (``n × log(total / frequência)``)."""
+
+    COMUM = 0.04
+    MINIMO = 2  # propostas da pessoa com o termo
+
+    def __init__(self, props: Iterable[Proposicao]) -> None:
+        self._chaves: dict[str, str] = {}  # termo como veio → normalizado
+        self._forma: dict[str, str] = {}  # normalizado → como apareceu primeiro
+        self._por_prop: dict[tuple[str, int], tuple[str, ...]] = {}
+        self.frequencia: Counter[str] = Counter()
+        self.total = 0
+        for p in props:
+            chaves = self._da(p)
+            if chaves:
+                self.total += 1
+                self.frequencia.update(chaves)
+
+    def _da(self, p: Proposicao) -> tuple[str, ...]:
+        ident = (p.casa, p.id)
+        if ident not in self._por_prop:
+            vistas: list[str] = []
+            for termo in termos(p.chaves):
+                chave = self._chaves.get(termo)
+                if chave is None:
+                    chave = self._chaves[termo] = text.normalize(termo)
+                    self._forma.setdefault(chave, termo)
+                if chave not in vistas:
+                    vistas.append(chave)
+            self._por_prop[ident] = tuple(vistas)
+        return self._por_prop[ident]
+
+    def caracteristicos(self, props: Iterable[Proposicao], limite: int = 10) -> list[list[Any]]:
+        """``[[termo, em quantas propostas], …]``, do mais característico."""
+        if not self.total:
+            return []
+        conta: Counter[str] = Counter()
+        for p in props:
+            conta.update(self._da(p))
+        candidatos = []
+        for chave, n in conta.items():
+            frequencia = self.frequencia.get(chave, 0)
+            if n < self.MINIMO or not frequencia or frequencia / self.total > self.COMUM:
+                continue
+            candidatos.append((n * math.log(self.total / frequencia), n, chave))
+        candidatos.sort(key=lambda c: (-c[0], -c[1], c[2]))
+        return [[self._forma[chave], n] for _peso, n, chave in candidatos[:limite]]
+
+
 def resumo_de_autoria(
-    props: Iterable[Proposicao], hoje: str, lim: Limiares, *, pessoa: int | None = None, lista: int = 10
+    props: Iterable[Proposicao],
+    hoje: str,
+    lim: Limiares,
+    *,
+    pessoa: int | None = None,
+    lista: int = 10,
+    vocabulario: Vocabulario | None = None,
 ) -> dict[str, Any]:
     """O que alguém propôs: quantas, de que tipo e tema, em que estado, e as listas
     que importam (as paradas há mais tempo, as que andaram por último, as que viraram norma).
@@ -516,9 +735,11 @@ def resumo_de_autoria(
     vencedoras = sorted((p for p in props if p.estado in (NORMA, APROVADA)), key=lambda p: p.movimento, reverse=True)
     vencedoras.sort(key=lambda p: p.estado != NORMA)  # as que viraram norma primeiro; em cada grupo, da mais nova
     temas = Counter(t for p in props for t in p.temas[:1])
+    caracteristicos = vocabulario.caracteristicos(props) if vocabulario is not None else []
     return {
         "total": len(props),
         "coautorias": coautorias,
+        **({"termos": caracteristicos} if caracteristicos else {}),
         "siglas": dict(Counter(p.sigla for p in props).most_common()),
         "estados": {e: por_estado.get(e, 0) for e in ESTADOS if por_estado.get(e)},
         "filas": dict(Counter(p.fila for p in tramitam if p.fila).most_common()),

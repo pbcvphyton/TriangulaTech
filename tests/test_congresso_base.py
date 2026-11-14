@@ -130,6 +130,9 @@ def test_camara_ano_le_so_as_votacoes_nominais_com_votos_e_materia(camara: base.
     assert v1.ori == {base.GOVERNO: "S", "PT": "S"}
     assert _votacao(camara, "1011-2").tipo == base.PROCEDIMENTO and _votacao(camara, "1011-2").aprovada is False
     assert _votacao(camara, "1010-2").tipo == base.DESTAQUE
+    # o que a Mesa pôs em votação: quem pediu o destaque e qual trecho
+    assert _votacao(camara, "1010-2").abertura.startswith("Votação do DTQ 1: PL: Destaque para Votação em Separado do art. 3º")
+    assert _votacao(camara, "1010-1").abertura == ""
     assert _votacao(camara, "1012-1").tipo == base.URGENCIA
     assert not _votacao(camara, "1010-3").plenario
 
@@ -165,6 +168,10 @@ def test_serializar_e_ler_sao_ida_e_volta(camara: base.AnoVotos, tmp_path: Path)
     assert base.ler(tmp_path, "sf", 2026) is None
     base.caminho(tmp_path, "cd", 2025).write_text(texto.replace('"v":1', '"v":99'), encoding="utf-8")
     assert base.ler(tmp_path, "cd", 2025) is None  # outra versão do formato: refaz
+    # um ano gravado antes de um campo novo é lido, mas diz o formato em que está (para ser refeito uma vez)
+    assert '"f":%d' % base.FORMATO in texto and base.ler(tmp_path, "cd", 2026).formato == base.FORMATO
+    base.caminho(tmp_path, "cd", 2024).write_text(texto.replace('"f":%d,' % base.FORMATO, ""), encoding="utf-8")
+    assert base.ler(tmp_path, "cd", 2024).formato == 1
 
 
 # ── Senado ───────────────────────────────────────────────────────────────────

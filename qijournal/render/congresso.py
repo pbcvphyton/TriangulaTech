@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import text
 from ..config import Config
-from ..congresso import VERSAO, base, dados, ficha, jornal, projetos, relevancia
+from ..congresso import VERSAO, base, dados, ficha, jornal, materias, projetos, relevancia
 from ..models import Edition
 from . import filters
 from .web import brand_view
@@ -49,6 +49,7 @@ PILHA_MAX = 9
 SELOS = {
     "tema": "Por tema",
     "racha": "Racha",
+    "juntos": "Partidos",
     "fila": "Fila",
     "pauta": "Pauta",
     "furaram": "Passou na frente",
@@ -204,6 +205,7 @@ class LinhaMatriz:
     membros: int
     geral: Celula
     celulas: list[Celula]
+    polo: str = ""  # "esquerda"/"direita": o partido define um polo (fica na ponta da régua por construção)
 
 
 @dataclass
@@ -222,6 +224,8 @@ class CasaView:
     matriz: list[LinhaMatriz]
     matriz_base: int
     rachas: dict[str, Any] | None
+    juntos: dict[str, Any] | None  # quanto os partidos votam juntos (todas as votações de conteúdo)
+    cruzada: list[dict[str, Any]]  # matérias de autores de um polo em que o outro votou a favor
     relevancia: dict[str, Any] | None
     jornal_voto: list[dict[str, Any]]
     fila: dict[str, Any] | None
@@ -240,6 +244,7 @@ class CongressoView:
     casas: list[CasaView]
     pessoas: list[dict[str, Any]]
     fora: int  # linhas de quem não está em exercício (escondidas até pedir)
+    temas: list[dict[str, Any]]  # o que entra em cada tema: [{nome, camara, senado}]
     metodo: list[tuple[str, str]]
     manifesto: str
     totais: dict[str, Any]
@@ -594,6 +599,90 @@ def _listas(listas: Mapping[str, Any]) -> list[dict[str, Any]]:
     return saida
 
 
+def _definicao_do_tema(areas: list[str], casa: str) -> str:
+    """O que entra num tema, numa frase: as áreas oficiais da Casa."""
+    if not areas:
+        return ""
+    lista = (", " if len(areas) > 2 else " e ").join(f"“{a}”" for a in areas)
+    return f"Matérias que {'a Câmara' if casa == 'cd' else 'o Senado'} classifica em {lista}."
+
+
+JUNTOS_FAIXAS = (40, 55, 70, 85)  # cortes das cinco faixas de cor de "quanto votam juntos"
+
+
+def _juntos(cv: Mapping[str, Any], polos: Mapping[str, list[str]], membros: Mapping[str, int]) -> dict[str, Any] | None:
+    """Quanto os partidos votam juntos: as contas do consenso e a tabela partido × partido."""
+    total = int(cv.get("conteudo") or 0) if cv else 0
+    if not total:
+        return None
+    partidos = list(cv.get("partidos") or [])
+    de_polo = {s: "esquerda" for s in polos.get("esquerda") or []} | {s: "direita" for s in polos.get("direita") or []}
+    linhas = []
+    for a, linha in zip(partidos, cv.get("matriz") or [], strict=False):
+        celulas = []
+        for b, celula in zip(partidos, linha, strict=False):
+            if a == b:
+                celulas.append({"valor": "", "classe": "x", "titulo": ""})
+            elif not celula:
+                celulas.append({"valor": "·", "classe": "na", "titulo": f"{a} × {b}: poucas votações em que os dois tiveram lado"})
+            else:
+                pct, n = celula
+                faixa = sum(1 for corte in JUNTOS_FAIXAS if pct >= corte)
+                celulas.append({"valor": str(pct), "classe": f"j{faixa}", "titulo": f"{a} × {b}: do mesmo lado em {pct}% de {_num(n)} votações de conteúdo"})
+        linhas.append({"sigla": a, "polo": de_polo.get(a, ""), "celulas": celulas})
+    # O exemplo que a página escreve por extenso: o maior partido de cada polo.
+    exemplo = None
+    maiores = [max((s for s in partidos if de_polo.get(s) == polo), key=lambda s: membros.get(s, 0), default="") for polo in ("esquerda", "direita")]
+    if all(maiores):
+        celula = (cv.get("matriz") or [])[partidos.index(maiores[0])][partidos.index(maiores[1])]
+        if celula:
+            exemplo = {"a": maiores[0], "b": maiores[1], "pct": celula[0], "n": _num(celula[1])}
+
+    def parte(chave: str) -> dict[str, Any]:
+        n = int(cv.get(chave) or 0)
+        return {"n": _num(n), "pct": _pct(100 * n / total), "w": round(100 * n / total, 1)}
+
+    return {
+        "conteudo": _num(total),
+        "juntos": parte("juntos"),
+        "divisivas": parte("divisivas"),
+        "rachas": parte("rachas"),
+        "sem_lado": parte("sem_lado"),
+        "partidos": partidos,
+        "linhas": linhas,
+        "exemplo": exemplo,
+    }
+
+
+def _cruzada(cz: Mapping[str, Any], casa: str, polos: Mapping[str, list[str]]) -> list[dict[str, Any]]:
+    """As matérias de autores de um polo e como o outro polo votou o texto principal."""
+    saida = []
+    for autor, outro in (("direita", "esquerda"), ("esquerda", "direita")):
+        x = (cz or {}).get(autor) or {}
+        if not x.get("n"):
+            continue
+        saida.append(
+            {
+                "autor": autor,
+                "outro": outro,
+                "siglas": " e ".join(polos.get(autor) or []) if len(polos.get(autor) or []) <= 2 else ", ".join(polos.get(autor) or []),
+                "n": x["n"],
+                "favor": x.get("favor") or 0,
+                "contra": x.get("contra") or 0,
+                "dividido": x.get("dividido") or 0,
+                "itens": [
+                    {
+                        "t": i["t"], "m": materias.chave(casa, i["t"]), "apel": i.get("ap") or "", "e": i.get("e") or "",
+                        "data": _data(i.get("d"), ano=True), "pa": ", ".join(i.get("pa") or []),
+                        "resultado": "" if i.get("apv") is None else ("aprovada" if i["apv"] else "rejeitada"),
+                    }
+                    for i in x.get("itens") or []
+                ],
+            }
+        )
+    return saida
+
+
 def _casa(
     casa: str,
     painel: Mapping[str, Any],
@@ -601,12 +690,20 @@ def _casa(
     campos: list[dict[str, Any]],
     temas_nomes: Mapping[str, str] | None = None,
     relevancia_limites: tuple[float, float] | None = None,
+    polos: Mapping[str, list[str]] | None = None,
+    temas_def: Mapping[str, Mapping[str, list[str]]] | None = None,
 ) -> CasaView:
     temas_nomes = temas_nomes or {}
+    polos = polos or {}
+    temas_def = temas_def or {}
+    de_polo = {s: "esquerda" for s in polos.get("esquerda") or []} | {s: "direita" for s in polos.get("direita") or []}
     relev_alta, relev_baixa = relevancia_limites or (60.0, 30.0)
     estat = painel.get("votacoes") or {}
     matriz = painel.get("temas") or {}
-    temas_cols = (matriz.get("temas") or [])[:11]
+    temas_cols = [
+        {**t, "dica": _definicao_do_tema((temas_def.get(t["id"]) or {}).get("camara" if casa == "cd" else "senado") or [], casa)}
+        for t in (matriz.get("temas") or [])[:11]
+    ]
     membros = {b["sigla"]: b["membros"] for b in painel.get("bancadas") or []}
     linhas = []
     for sigla, por_tema in (matriz.get("partidos") or {}).items():
@@ -616,6 +713,7 @@ def _casa(
                 membros=membros.get(sigla, 0),
                 geral=_celula(por_tema.get("todas"), campos, sigla, "todas as votações de conteúdo"),
                 celulas=[_celula(por_tema.get(t["id"]), campos, sigla, t["nome"]) for t in temas_cols],
+                polo=de_polo.get(sigla, ""),
             )
         )
     linhas.sort(key=lambda linha: float(linha.geral.valor.replace("−", "-")) if linha.geral.valor not in ("·", "—") else 0.0)
@@ -658,6 +756,8 @@ def _casa(
         matriz=linhas,
         matriz_base=int(matriz.get("divisivas") or 0),
         rachas=_rachas(painel.get("rachas") or {}, temas_nomes),
+        juntos=_juntos(painel.get("convivencia") or {}, polos, membros),
+        cruzada=_cruzada(painel.get("cruzada") or {}, casa, polos),
         relevancia=_relevancia(painel.get("relevancia") or {}, casa, relev_alta, relev_baixa),
         jornal_voto=_jornal_voto((painel.get("listas") or {}).get("jornal_voto") or []),
         fila=_fila(painel.get("fila") or {}, casa),
@@ -805,6 +905,29 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "não rótulo: diz com quem a pessoa vota, não o que ela diz ser.",
         ),
         (
+            "Por que um voto é “de esquerda” ou “de direita”",
+            f"Não é o assunto que define o lado. Em cada votação, a esquerda é o lado em que votou a maioria ({round(100 * float(lim.get('coesao_polo', 0.75)))}% ou mais) "
+            f"dos parlamentares de {esquerda}; a direita, o da maioria de {direita}. Votar “com a esquerda” é votar igual a essa maioria "
+            "naquela votação: numa, isso é votar Sim; em outra, votar Não. Por isso os partidos que definem os polos ficam nas pontas "
+            "(−100 e +100) quase por definição: eles são a régua. O que a régua informa é onde ficam os outros partidos e cada pessoa. "
+            "Para saber por que um voto caiu de um lado, a página mostra, em cada votação, o que estava em jogo e o Sim–Não de cada "
+            "partido dos polos (na ficha da matéria, no detalhe de cada tema e nos votos de cada um por tema).",
+        ),
+        (
+            "Quanto os partidos votam juntos",
+            "Na aba Partidos, uma conta que não depende da régua dos polos: em todas as votações de conteúdo do Plenário, dois "
+            "partidos votaram juntos quando a maioria de cada um ficou do mesmo lado. A tabela dá a porcentagem para cada par "
+            f"(par com menos de {dados.MINIMO_PAR} votações fica vazio). Ao lado, quantas votações foram de consenso (os dois polos do "
+            "mesmo lado), quantas opuseram os polos (as únicas que entram no saldo), quantas tiveram racha e em quantas um polo "
+            "não teve maioria clara.",
+        ),
+        (
+            "Quando um lado vota a proposta do outro",
+            "As matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado "
+            "nominalmente no Plenário, e o lado do outro polo na última dessas votações. O autor é o do registro original: o texto "
+            "votado pode ter mudado no caminho (a ficha mostra a ementa original e a que vale).",
+        ),
+        (
             "Os rachas",
             "Se um partido de um polo vota fechado com o outro (o PSOL com o PL contra o PT, por exemplo), a votação sai do saldo. "
             "Em geral são os dois extremos votando contra o governo por razões opostas: o PSOL contra uma regra fiscal por achá-la "
@@ -859,7 +982,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         (
             "Temas",
             "Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a "
-            "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml).",
+            "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml); a "
+            "tabela “O que entra em cada tema”, abaixo, diz quais áreas oficiais caem em cada um.",
         ),
         (
             "A fila",
@@ -876,6 +1000,23 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         (
             "O que espera × o que passa",
             _metodo_relevancia(m.get("relevancia") or {}),
+        ),
+        (
+            "A ficha da matéria",
+            "Para cada matéria votada nominalmente no Plenário nesta legislatura e para cada ponto de “o que espera × o que passa”: "
+            "a ementa inteira (a que vale, quando a Câmara anotou uma nova), a explicação que a Casa escreveu (a ementa detalhada da "
+            "Câmara; a explicação da ementa do Senado), as palavras-chave do registro e o endereço do texto integral. A página não "
+            "resume o projeto: mostra o que a Casa registrou. Em cada votação: o que a Mesa pôs em votação e quem pediu o destaque "
+            "(a Câmara registra; o Senado, não), o placar, o lado de cada polo com o Sim–Não de cada partido dele e a orientação do "
+            "Governo. “O que o Sim queria dizer” sai da descrição oficial, pela regra da Casa: no texto principal, aprovar o texto; "
+            "no destaque de emenda, aprovar a emenda; no destaque para votação em separado, manter o trecho no texto (o Não o retira).",
+        ),
+        (
+            "O que cada um propõe",
+            "As contas são das proposições em que a pessoa assina primeiro (autoria principal). “Os termos que mais marcam as "
+            "propostas” são palavras-chave da indexação oficial da Câmara: as que estão em mais propostas da pessoa e em poucas do "
+            f"conjunto (termo presente em mais de {round(100 * projetos.Vocabulario.COMUM)}% de todas as proposições, como “alteração”, fica de fora). "
+            "O Senado não traz as palavras-chave nas listas de matérias.",
         ),
         (
             "O jornal",
@@ -914,14 +1055,27 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
     temas_nomes = {t["id"]: t["nome"] for t in d.meta.get("temas") or []}
     rel_meta = d.meta.get("relevancia") or {}
     limites = (float(rel_meta.get("alta") or 60), float(rel_meta.get("baixa") or 30))
-    casas = [_casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites) for casa in ("cd", "sf") if casa in d.casas]
     polos = d.meta.get("polos") or {}
+    temas_def = {t["id"]: {"camara": t.get("camara") or [], "senado": t.get("senado") or []} for t in d.meta.get("temas") or []}
+    casas = [
+        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def)
+        for casa in ("cd", "sf")
+        if casa in d.casas
+    ]
     leg = d.meta.get("legislatura") or {}
     manifesto = {
         "v": VERSAO,
         "hoje": str(d.meta.get("hoje") or ""),
         "base": f"../data/{dados.PASTA}/{dados.FICHAS}/",
         "votosArq": f"../data/{dados.PASTA}/" + dados.VOTOS.replace("{casa}.json", ""),
+        "materiasArq": f"../data/{dados.PASTA}/" + materias.ARQUIVO.replace("{casa}.json", ""),
+        "polos": {"esquerda": list(polos.get("esquerda") or []), "direita": list(polos.get("direita") or [])},
+        # O que entra em cada tema: as áreas temáticas da Câmara e as classes do Senado.
+        "temasDef": {t["id"]: {"cd": t.get("camara") or [], "sf": t.get("senado") or []} for t in d.meta.get("temas") or []},
+        "rel": {"alta": rel_meta.get("alta") or 60, "baixa": rel_meta.get("baixa") or 30, "rapida": relevancia.RAPIDA},
+        "relNomes": relevancia.NOMES,
+        "origens": relevancia.ORIGENS,
+        "siglas": projetos.NOMES_SIGLA,
         "pesquisa": "pesquisa.html",
         "edicoes": "./",
         "legislatura": leg.get("numero"),
@@ -958,6 +1112,10 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         casas=casas,
         pessoas=pessoas,
         fora=sum(1 for p in pessoas if not p["ex"]),
+        temas=[
+            {"nome": t["nome"], "camara": "; ".join(t.get("camara") or []) or "—", "senado": "; ".join(t.get("senado") or []) or "—"}
+            for t in d.meta.get("temas") or []
+        ],
         metodo=_metodo(d),
         manifesto=json.dumps(manifesto, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"),
         totais={
