@@ -202,6 +202,16 @@ def _texto(bruto: Any) -> str:
     return re.sub(r"\s+", " ", str(bruto or "")).strip()
 
 
+# Um CPF (com ou sem pontos, inteiro ou mascarado) dentro do nome: o microempreendedor individual
+# tem o CPF no nome da empresa ("FULANO DE TAL 123.456.789-00"), e o CPF não é publicado aqui.
+_CPF_NO_NOME = re.compile(r"[\s,;:-]*\b\d{3}[.\s]?(?:\d{3}|\*{3})[.\s]?(?:\d{3}|\*{3})\s?-?\s?\d{2}\b")
+
+
+def nome_do_fornecedor(bruto: Any) -> str:
+    """O nome do fornecedor como veio, sem um CPF que esteja dentro dele."""
+    return _texto(_CPF_NO_NOME.sub(" ", str(bruto or ""))).strip(" -,;:")
+
+
 def _data(bruto: Any, teto: int) -> str:
     """``AAAA-MM-DD`` se for uma data de verdade entre 2000 e o fim de ``teto``; senão ``""``."""
     s = str(bruto or "").strip()[:10]
@@ -334,7 +344,7 @@ def _linhas_camara(leitor: Iterable[list[str]], posicao: Mapping[str, int], ano:
             reembolso = liquido - restituicao
         if restituicao and not liquido:
             glosa = 0.0  # a linha da devolução repete a nota: a glosa já contou na original
-        fornecedor = _texto(linha[i_fornecedor])
+        fornecedor = nome_do_fornecedor(linha[i_fornecedor])
         doc_cnpj = cnpj(linha[i_cnpj])
         emissao = _data(linha[i_data], teto)
         saida.append(
@@ -412,7 +422,7 @@ def _linhas_senado(dados: list[Any], ano: int, *, teto: int) -> list[Despesa]:
         if not categoria:
             moradia += 1  # tipoDespesa vazio: reembolso de moradia, fora da cota
             continue
-        fornecedor = _texto(item.get("fornecedor"))
+        fornecedor = nome_do_fornecedor(item.get("fornecedor"))
         doc_cnpj = cnpj(item.get("cpfCnpj"))
         emissao = _data(item.get("data"), teto)
         saida.append(

@@ -711,11 +711,14 @@ data da situação oficial, que muda também quando a matéria é pautada e não
   cota).
 - **Todo dia**, antes da edição, o passo *Atualizar o Congresso* do `daily.yml`
   roda `python -m qijournal congresso atualizar`: baixa o que mudou, refaz as contas
-  e grava só os arquivos que mudaram (cerca de 2 minutos; os anos fechados da base
+  e grava só os arquivos que mudaram (cerca de 2 a 4 minutos; os anos fechados da base
   de votos só são refeitos quando o formato da base muda). Também lê o histórico oficial das matérias aprovadas
   pelo Plenário da Câmara nos últimos 12 meses (uma consulta por matéria, guardada
-  por 30 dias) e as deliberações do Plenário do Senado. O que foi baixado fica num
-  cache do Actions, fora do repositório. O passo é acessório (`continue-on-error`, 15 minutos): se uma fonte
+  por 30 dias), as deliberações do Plenário do Senado, as frentes (a lista de membros,
+  perto de 100 MB, é baixada de novo uma vez por semana), a cota do ano (e do anterior
+  até abril; os anos fechados, uma vez por mês) e as votações das 16 comissões
+  permanentes do Senado. Cada uma dessas fontes é acessória: se uma falhar, vira aviso e
+  o resto sai. O que foi baixado fica num cache do Actions, fora do repositório. O passo é acessório (`continue-on-error`, 15 minutos): se uma fonte
   estiver fora do ar, a edição sai com os dados da véspera.
 - **À mão**: *Actions → **Congresso** → Run workflow* atualiza fora de hora; a
   opção **Carga completa** refaz também os anos fechados e relê todas as

@@ -471,3 +471,17 @@ def test_numero_de_nota_valido():
         assert cota.numero_valido(numero), numero
     for numero in ("9/2026", "08/26", "102026", "092025", "0", "000", "S/N", "SN", "s/nº", ""):
         assert not cota.numero_valido(numero), numero
+
+
+@pytest.mark.parametrize(
+    ("bruto", "limpo"),
+    [
+        ("CARLOS MOREIRA CONEGUNDES 489.909.226-15", "CARLOS MOREIRA CONEGUNDES"),
+        ("FULANO DE TAL - 48990922615", "FULANO DE TAL"),
+        ("ALUGUEL 038.***.***-68 LTDA", "ALUGUEL LTDA"),
+        ("POSTO 309 SUL LTDA", "POSTO 309 SUL LTDA"),  # número que não é CPF fica
+        ("AGÊNCIA 2025 COMUNICAÇÃO", "AGÊNCIA 2025 COMUNICAÇÃO"),
+    ],
+)
+def test_o_nome_do_fornecedor_sai_sem_cpf(bruto: str, limpo: str):
+    assert cota.nome_do_fornecedor(bruto) == limpo
