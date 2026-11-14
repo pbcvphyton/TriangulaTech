@@ -516,7 +516,7 @@
         <h5 class="az-h5">Mudou de voto entre a comissão e o Plenário</h5>
         <p class="cg-lt-d">O mesmo parecer votado duas vezes: na comissão e, depois, no Plenário. Entra a última votação da comissão que aprovou o parecer (é ele que o Plenário vota) e quem votou Sim ou Não nas duas.</p>
         <ol class="cg-ls cg-cm-c">{% for c in cm.casos %}<li><p class="cg-ls-k"><b>{{ materia(casa.id, c.prop) }}</b> <span>{{ c.comissao }} em {{ c.dc }} · Plenário em {{ c.dp }}{% if c.parecer %} · parecer {{ c.parecer }}{% endif %}</span></p><p class="cg-ls-x">{{ c.mudaram }} de {{ c.ambas }} que votaram nas duas mudaram: {% for m in c.quem %}{{ pessoa(m.k, m.nome) }} <small>{{ m.legenda }}</small> ({{ m.vc }} → {{ m.vp }}){% if not loop.last %}; {% endif %}{% endfor %}.</p></li>{% endfor %}</ol>
-        {% if cm.casos_sem %}<p class="az-dek">Em outros {{ cm.casos_sem }} pareceres votados nas duas, ninguém mudou de voto.</p>{% endif %}
+        {% if cm.casos_sem %}<p class="az-dek">{% if cm.casos_sem == 1 %}Em outro parecer votado nas duas, ninguém mudou de voto.{% else %}Em outros {{ cm.casos_sem }} pareceres votados nas duas, ninguém mudou de voto.{% endif %}</p>{% endif %}
         {% endif %}
         {% if cm.ultimas %}
         <h5 class="az-h5">As últimas votações divididas</h5>

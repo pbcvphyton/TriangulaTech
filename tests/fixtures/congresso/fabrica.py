@@ -242,20 +242,34 @@ COTA_CAMARA = [
 def cota_da_camara() -> bytes:
     nomes = {d[0]: d for d in DEPUTADOS}
     linhas = [
-        [nomes[dep][1], "000.000.000-00", dep, nomes[dep][3], nomes[dep][2], categoria, fornecedor, cnpj, numero, f"{data}T00:00:00", valor, glosa, mes, 2026,
-         f"https://www.camara.leg.br/cota-parlamentar/nota-fiscal-eletronica?ideDocumento={dep}{numero}"]
+        [nomes[dep][1], "000.000.000-00", dep, nomes[dep][3], nomes[dep][2], categoria, fornecedor, cnpj, numero, f"{data}T00:00:00", valor, glosa,
+         f"{float(valor) - float(glosa):.2f}", "0", mes, 2026, f"https://www.camara.leg.br/cota-parlamentar/documentos/publ/{dep}/2026/{numero}.pdf"]
         for dep, mes, categoria, fornecedor, cnpj, numero, data, valor, glosa in COTA_CAMARA
     ]
-    linhas.append(["LIDERANÇA DO PT", "", "", "", "", "TELEFONIA", "OPERADORA", "66.666.666/0001-66", "1", "2026-03-01T00:00:00", "100.00", "0", 3, 2026, ""])
+    linhas.append(["LIDERANÇA DO PT", "", "", "", "", "TELEFONIA", "OPERADORA", "66.666.666/0001-66", "1", "2026-03-01T00:00:00", "100.00", "0", "100.00", "0", 3, 2026, ""])
     corpo = csv_bytes(
         ["txNomeParlamentar", "cpf", "ideCadastro", "sgUF", "sgPartido", "txtDescricao", "txtFornecedor", "txtCNPJCPF", "txtNumero", "datEmissao",
-         "vlrDocumento", "vlrGlosa", "numMes", "numAno", "urlDocumento"],
+         "vlrDocumento", "vlrGlosa", "vlrLiquido", "vlrRestituicao", "numMes", "numAno", "urlDocumento"],
         linhas,
     )
     arquivo = io.BytesIO()
     with zipfile.ZipFile(arquivo, "w") as z:
         z.writestr("Ano-2026.csv", corpo)
     return arquivo.getvalue()
+
+
+def votacoes_em_comissao_do_senado() -> list[dict[str, Any]]:
+    """Uma votação nominal dividida na CCJ do Senado (o formato da API; o voto único vem como objeto)."""
+    def voto(codigo: int, qualidade: str) -> dict[str, Any]:
+        _c, nome, partido, uf = next(x for x in SENADORES if x[0] == codigo)
+        return {"CodigoParlamentar": codigo, "NomeParlamentar": nome, "SiglaPartidoParlamentar": partido, "SiglaUFParlamentar": uf, "QualidadeVoto": qualidade}
+
+    return [
+        {"CodigoVotacao": 8801, "SiglaCasaColegiado": "SF", "CodigoReuniao": 5001, "DataHoraInicioReuniao": "2026-05-20T10:00:00", "SiglaColegiado": "CCJ",
+         "NomeColegiado": "Comissão de Constituição, Justiça e Cidadania", "IdentificacaoMateria": "PL 20/2026", "DescricaoIdentificacaoMateria": "PL 20/2026",
+         "DescricaoVotacao": "PL 20/2026 (nos termos do Parecer)", "TotalVotosSim": 3, "TotalVotosNao": 1, "TotalVotosAbstencao": 0,
+         "Votos": {"Voto": [voto(101, "S"), voto(102, "N"), voto(103, "S"), voto(104, "S")]}},
+    ]
 
 
 def cota_do_senado() -> list[dict[str, Any]]:
@@ -397,6 +411,10 @@ def respostas() -> dict[str, bytes]:
         mapa[f"{s}/processo?codigoParlamentarAutor={codigo}"] = json.dumps(meus).encode("utf-8")
     mapa["/api/v2/proposicoes/1012/tramitacoes"] = dados(tramitacoes_do_pl_12())
     mapa["/arquivos/cotas/Ano-2026.csv.zip"] = cota_da_camara()
+    for sigla in ("CAE", "CAS", "CCDD", "CCJ", "CCT", "CDD", "CDH", "CDR", "CE", "CEsp", "CI", "CMA", "CRA", "CRE", "CSP", "CTFC"):
+        votacoes = [v for v in votacoes_em_comissao_do_senado() if v["SiglaColegiado"] == sigla]
+        corpo = {"VotacoesComissao": {"Votacoes": {"Votacao": votacoes}} if votacoes else {"VotacoesComissao": {}}}
+        mapa[f"{s}/votacaoComissao/comissao/{sigla}?dataInicio=20260101&dataFim={HOJE.replace('-', '')}"] = json.dumps(corpo).encode("utf-8")
     mapa["/adm-dadosabertos/api/v1/senadores/despesas_ceaps/2026"] = json.dumps(cota_do_senado()).encode("utf-8")
     trechos = [("2025-11-13", "2026-02-12"), ("2026-02-13", "2026-05-15"), ("2026-05-16", "2026-08-15"), ("2026-08-16", HOJE)]
     for inicio, fim in trechos:

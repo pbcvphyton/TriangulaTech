@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import net, text
 from ..net import Fetcher
-from . import VERSAO, base, exercicio, ficha, fontes, frentes, jornal, materias, perfil, peso, projetos, regras as regras_mod, relevancia, temas
+from . import VERSAO, base, comissoes, cota, exercicio, ficha, fontes, frentes, jornal, materias, perfil, peso, projetos, regras as regras_mod, relevancia, temas
 from .base import AnoVotos
 from .ficha import Cadastro
 from .fontes import Coletor
@@ -619,6 +619,7 @@ RANKINGS: tuple[tuple[str, Any], ...] = (
     ("norma", lambda f, leg, gov: ((f.get("autoria") or {}).get("estados") or {}).get("norma", 0)),
     ("rel", lambda f, leg, gov: (f.get("relatorias") or {}).get("total", 0)),
     ("jor", lambda f, leg, gov: (f.get("jornal") or {}).get("n30", 0)),
+    ("ct", lambda f, leg, gov: ((f.get("cota") or {}).get("leg") or {}).get("media")),
 )
 
 
@@ -1262,6 +1263,36 @@ def atualizar(
             if jv:
                 fichas[casa][-1]["jornal_voto"] = jv
 
+    # A cota parlamentar, nota a nota: quanto cada um pede de reembolso, com o quê e com quem.
+    paineis_cota: dict[str, dict[str, Any]] = {}
+    for casa, coletar_cota in (("cd", cota.camara), ("sf", cota.senado)):
+        try:
+            despesas = coletar_cota(coletor, regras.anos(), ano_corrente=corrente)
+            pessoas_casa = {
+                pid: {"k": c.chave, "nome": c.nome, "partido": c.partido, "uf": c.uf, "ex": bool(c.exercicio)} for pid, c in cadastros[casa].items()
+            }
+            paineis_cota[casa], por_pessoa = cota.resumir(despesas, casa=casa, inicio=legislatura.inicio, hoje=hoje, pessoas=pessoas_casa)
+            del despesas  # mais de um milhão de lançamentos na Câmara: libera a memória antes de seguir
+            for f in fichas[casa]:
+                if f["id"] in por_pessoa:
+                    f["cota"] = por_pessoa[f["id"]]
+        except Exception as exc:  # noqa: BLE001 — acessório: sem a cota, a aba sai sem ela
+            avisos.append(f"{_nome_casa(casa)}: cota parlamentar indisponível ({exc})")
+
+    # As votações nominais nas comissões (fora das contas do Plenário: só os membros votam).
+    paineis_comissoes: dict[str, dict[str, Any]] = {}
+    for casa in ("cd", "sf"):
+        try:
+            if casa == "cd":
+                paineis_comissoes[casa], por_pessoa = comissoes.camara(votos["cd"], coletor, regras, legislatura.numero, hoje=hoje)
+            else:
+                paineis_comissoes[casa], por_pessoa = comissoes.senado(coletor, regras, legislatura.numero, inicio=legislatura.inicio, hoje=hoje)
+            for f in fichas[casa]:
+                if f["id"] in por_pessoa:
+                    f["comissoes"] = por_pessoa[f["id"]]
+        except Exception as exc:  # noqa: BLE001 — acessório: sem as comissões, a aba sai sem elas
+            avisos.append(f"{_nome_casa(casa)}: votações nas comissões indisponíveis ({exc})")
+
     # Frentes parlamentares (só a Câmara registra quem assina): quem assina cada frente de causa
     # e como vota no tema dela, ao lado do coordenador.
     painel_frentes: dict[str, Any] = {}
@@ -1363,6 +1394,10 @@ def atualizar(
         }
         if casa == "cd" and painel_frentes:
             paineis[casa]["frentes"] = painel_frentes
+        if paineis_cota.get(casa):
+            paineis[casa]["cota"] = paineis_cota[casa]
+        if paineis_comissoes.get(casa):
+            paineis[casa]["comissoes"] = paineis_comissoes[casa]
 
     # As fichas das matérias: as votadas no Plenário nesta legislatura e as de "o que espera × o que passa".
     fichas_das_materias: dict[str, dict[str, Any]] = {}

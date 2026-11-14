@@ -894,6 +894,15 @@ def _cnpj(cnpj: str | None) -> str:
     return d
 
 
+def _extra_cota(x: Mapping[str, Any]) -> str:
+    """O total e os meses; na Câmara, as passagens da agência em 2024 (fora da conta), para
+    quem parece gastar pouco só porque viaja pela agência."""
+    texto = f"{reais(x.get('total'))} em {_num(x.get('meses'))} meses"
+    if float(x.get("sigepa_2024") or 0) > 0:
+        texto += f"; fora da conta, {reais(x.get('sigepa_2024'))} em passagens da agência em 2024"
+    return texto
+
+
 def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
     """A cota parlamentar da Casa, pronta para mostrar."""
     if not ct or not ct.get("total"):
@@ -912,8 +921,8 @@ def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
         "pessoas": _num(ct.get("pessoas")),
         "mediana": reais(ct.get("mediana")),
         "quem": "deputados" if casa == "cd" else "senadores",
-        "mais": [pessoa_(x, valor=reais(x.get("media")), extra=f"{reais(x.get('total'))} em {_num(x.get('meses'))} meses") for x in (ct.get("mais_gastam") or [])[:10]],
-        "menos": [pessoa_(x, valor=reais(x.get("media")), extra=f"{reais(x.get('total'))} em {_num(x.get('meses'))} meses") for x in (ct.get("menos_gastam") or [])[:10]],
+        "mais": [pessoa_(x, valor=reais(x.get("media")), extra=_extra_cota(x)) for x in (ct.get("mais_gastam") or [])[:10]],
+        "menos": [pessoa_(x, valor=reais(x.get("media")), extra=_extra_cota(x)) for x in (ct.get("menos_gastam") or [])[:10]],
         "categorias": [
             {"nome": c.get("nome") or "", "valor": reais(c.get("total")), "pct": _pct(c.get("pct")), "w": round(100 * float(c.get("total") or 0) / maior_cat, 1)}
             for c in (ct.get("categorias") or [])[:12]
@@ -1376,14 +1385,17 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         (
             "Cota parlamentar",
             "Os reembolsos da cota para o exercício da atividade parlamentar, nota a nota: na Câmara, os arquivos anuais oficiais "
-            "(com o endereço de cada nota); no Senado, os dados abertos administrativos. O valor é o da nota menos a glosa (a parte "
-            "que a própria Casa recusou). A média por mês é o total da legislatura dividido pelos meses com despesa: a cota acumula "
+            "(com o endereço de cada nota); no Senado, os dados abertos administrativos. O valor é o reembolsado: a nota menos a glosa "
+            "(a parte que a própria Casa recusou) e menos o que o parlamentar devolveu. A média por mês é o total da legislatura "
+            "dividido pelos meses fechados com despesa (o mês corrente, ainda incompleto, fica fora da média): a cota acumula "
             "dentro do ano, então um mês alto não diz nada sozinho; as listas só têm quem tem 6 meses ou mais. O fornecedor é "
-            "contado pelo CNPJ. “Um fornecedor só”: 25% ou mais do próprio total para uma empresa, com R$ 50 mil ou mais. “A mesma "
+            "contado pelo CNPJ; pagamento a pessoa física não tem o nome mostrado. “Um fornecedor só”: 25% ou mais do próprio total para uma empresa, com R$ 50 mil ou mais. “A mesma "
             "nota em mais de um gabinete”: mesmo CNPJ, número, data e valor reembolsados a pessoas diferentes (números que são só "
             "mês/ano, como “9/2026”, ficam de fora); o registro não diz o motivo. Na Câmara, ficam fora de todos os anos as passagens "
             "aéreas compradas pela agência da Casa (SIGEPA), que o arquivo oficial deixou de trazer em agosto de 2025: com elas em "
-            "uns anos e não em outros, a comparação seria injusta. O teto da cota muda por estado e não está nos dados abertos.",
+            "uns anos e não em outros, a comparação seria injusta; ao lado de quem parece gastar pouco, a página mostra quanto ele "
+            "teve em passagens da agência em 2024, o último ano completo. No Senado, fica fora o reembolso de moradia, que o "
+            "Senado lança no mesmo arquivo mas não conta como cota. O teto da cota muda por estado e não está nos dados abertos.",
         ),
         (
             "Escolha o seu candidato",

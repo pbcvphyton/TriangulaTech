@@ -458,7 +458,8 @@
       return h('li', {}, [h('span', { cls: 'cg-ct-cn', text: capital(x[0]) }), barraCat, h('span', { cls: 'cg-ct-cv' }, [h('b', { text: reais(x[1]) })])]);
     })));
     if ((c.fornecedores || []).length) colA.push(h('h4', { cls: 'az-h5', text: 'Com quem' }), h('ol', { cls: 'cg-ls' }, c.fornecedores.map(function (x) {
-      return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', { text: x.nome }), h('span', { text: reais(x.valor) + ' · ' + num(x.n) + (x.n === 1 ? ' nota' : ' notas') + (x.cnpj ? ' · CNPJ ' + x.cnpj : '') })])]);
+      var cnpj = /^\d{14}$/.test(x.cnpj || '') ? x.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : (x.cnpj || '');
+      return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', { text: x.nome }), h('span', { text: reais(x.valor) + ' · ' + num(x.n) + (x.n === 1 ? ' nota' : ' notas') + (cnpj ? ' · CNPJ ' + cnpj : '') })])]);
     })));
     if ((c.maiores || []).length) colB.push(h('h4', { cls: 'az-h5', text: 'As maiores notas' }), h('ol', { cls: 'cg-ls' }, c.maiores.map(function (x) {
       var k = h('p', { cls: 'cg-ls-k' }, [h('b', { text: reais(x.valor) }), h('span', { text: (x.fornecedor || '') + ' · ' + dataBr(x.d) })]);
@@ -468,6 +469,8 @@
     })));
     if (c.glosa && c.glosa.valor) colB.push(h('p', { cls: 'cg-d-n', text: 'A Casa recusou ' + reais(c.glosa.valor) + ' de ' + num(c.glosa.n) + (c.glosa.n === 1 ? ' nota apresentada' : ' notas apresentadas') + ' (glosa).' }));
     if (colA.length || colB.length) nos.push(h('div', { cls: 'cg-d-2c' }, [h('div', {}, colA), h('div', {}, colB)]));
+    var sg = c.sigepa || {}, anosSg = Object.keys(sg).sort().filter(function (a) { return sg[a]; });
+    if (anosSg.length) nos.push(h('p', { cls: 'cg-d-n', text: 'Fora da conta, as passagens compradas pela agência da Câmara: ' + anosSg.map(function (a) { return a + (a === '2025' ? ' (até julho)' : '') + ', ' + reais(sg[a]); }).join(' · ') + '.' }));
     if (casa.sem) nos.push(h('p', { cls: 'cg-d-n', text: 'Fora da conta: ' + casa.sem + '.' }));
     return secao('Cota parlamentar', 'o que pediu de reembolso, com o quê e com quem', nos);
   }

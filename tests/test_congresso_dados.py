@@ -852,3 +852,32 @@ def test_o_saldo_pesado_chega_a_ficha_ao_resumo_e_a_pagina(publicado: tuple[Path
         assert p.get("sp") == (f.get("peso") or {}).get("saldo")
     html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
     assert 'data-ord="sp"' in html and "Saldo pesado pela relevância" in html
+
+
+def test_a_cota_no_painel_na_ficha_e_na_aba(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, resultado = publicado
+    assert resultado.avisos == []
+    camara, senado = _ler(data_dir, "casa-cd.json")["cota"], _ler(data_dir, "casa-sf.json")["cota"]
+    assert "SIGEPA" in camara["sem"] and "moradia" in senado["sem"]
+    assert all("SIGEPA" not in c["nome"] for c in camara["categorias"])  # as passagens da agência ficam fora de todos os anos
+    repetida = next(r for r in camara["repetidas"] if r["fornecedor"] == "LOCADORA SUL")
+    assert sorted(d["k"] for d in repetida["docs"]) == ["cd-1", "cd-2"]  # a mesma nota em dois gabinetes
+    assert senado["total"] == 12000.0  # o reembolso de moradia (tipo nulo) fica fora
+    davi = _ler(data_dir, "fichas/cd-4.json")["cota"]
+    assert davi["fornecedores"][0]["cnpj"] == "11111111000111" and davi["maiores"][0]["url"].startswith("https://www.camara.leg.br/")
+    linha = next(p for p in _ler(data_dir, "resumo.json")["pessoas"] if p["k"] == "cd-4")
+    assert linha["ct"] == round(davi["leg"]["media"])
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    for trecho in ('id="cg-cota-cd"', "A mesma nota em mais de um gabinete", "LOCADORA SUL", "Fora da conta:", 'id="cgEscCt"'):
+        assert trecho in html, trecho
+
+
+def test_as_comissoes_no_painel_na_ficha_e_na_aba(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, _resultado = publicado
+    camara, senado = _ler(data_dir, "casa-cd.json")["comissoes"], _ler(data_dir, "casa-sf.json")["comissoes"]
+    assert (camara["votacoes"], camara["por_comissao"]) == (1, [["CCJC", 1]])  # a votação nominal da CCJC, fora das contas do Plenário
+    assert (senado["votacoes"], senado["ultimas"][0]["prop"]) == (1, "PL 20/2026")
+    assert _ler(data_dir, "fichas/sf-102.json")["comissoes"]["votos"][0]["v"] == "N"
+    assert _ler(data_dir, "fichas/cd-4.json")["comissoes"]["n"] == 1
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    assert 'id="cg-comissoes-cd"' in html and 'id="cg-comissoes-sf"' in html and "Nas comissões" in html
