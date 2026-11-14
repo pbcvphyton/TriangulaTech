@@ -28,6 +28,13 @@ polos:
     esquerda: [PT, PSOL, PCdoB]
     direita: [PL, NOVO]
 
+# Fusões e incorporações de partidos na legislatura (decisões do TSE). Quem estava no partido
+# que deixou de existir e seguiu para o sucessor não "mudou de partido".
+fusoes:
+  - {de: [PATRIOTA, PTB], para: PRD}      # fusão aprovada pelo TSE em novembro de 2023
+  - {de: [PSC], para: PODE}               # incorporação aprovada em junho de 2023
+  - {de: [PROS], para: SOLIDARIEDADE}     # incorporação aprovada em fevereiro de 2023
+
 # Limiares das contas (o que entra e o que vira afirmação).
 limiares:
   coesao_polo: 0.75         # parte do polo do mesmo lado para a votação contar

@@ -155,6 +155,7 @@ class Regras:
     relevancia: Relevancia = field(default_factory=Relevancia)
     apelidos: dict[str, list[str]] = field(default_factory=dict)  # "PL 2630/2020" → ["PL das Fake News", …]
     frentes: tuple[FrenteDeCausa, ...] = ()  # as frentes parlamentares de causa (só a Câmara registra quem assina)
+    fusoes: dict[str, str] = field(default_factory=dict)  # partido que deixou de existir → o sucessor (siglas normalizadas)
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
@@ -288,6 +289,13 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             for f in bruto.get("frentes") or []
             if f.get("titulo")
         ),
+        fusoes={
+            text.normalize(str(de)): text.normalize(str(f["para"]))
+            for f in bruto.get("fusoes") or []
+            if f.get("para")
+            for de in (f.get("de") if isinstance(f.get("de"), list) else [f.get("de")])
+            if de
+        },
     )
 
 

@@ -223,7 +223,8 @@ def montar(
         ficha["extra"] = cadastro.extra
     ficha["frases"] = frase(cadastro.casa, atual, governos, governo_atual, autoria, relatorias, regras)
     if perfil is not None:
-        ficha["partidos"] = [list(p) for p in perfil.partidos]
+        # [data da 1ª votação, sigla, data do último registro por ele]
+        ficha["partidos"] = [[data, sigla, ate] for (data, sigla), ate in zip(perfil.partidos, perfil.partidos_ate, strict=False)]
         ficha["ultimo_voto"] = perfil.ultimo_voto
         ficha["leg"] = {str(numero): recorte(r) for numero, r in sorted(perfil.legislaturas.items())}
         ficha["gov"] = {nome: fracao(r.governo) for nome, r in perfil.governos.items() if r.governo.n}
@@ -290,22 +291,41 @@ def saldo_no_partido(ficha: Mapping[str, Any], minimo: int) -> float | None:
 MINIMO_TEMA_FAIXA = 5  # votações esquerda × direita no tema para a pessoa aparecer na faixa filtrada
 
 
-def troca_de_partido(ficha: Mapping[str, Any], inicio: str) -> list[str] | None:
+def troca_de_partido(ficha: Mapping[str, Any], inicio: str, sucessores: Mapping[str, str] | None = None) -> list[str] | None:
     """Para quem mudou de partido na legislatura: ``[desde (AAAA-MM), partido anterior]``. A data
-    é a do primeiro voto registrado pelo partido atual, não a da filiação; fica vazia quando a
-    pessoa ainda não votou pelo partido novo."""
-    votados = [(str(data), str(sigla)) for data, sigla in ficha.get("partidos") or [] if sigla]
+    é a do primeiro registro de votação pelo partido atual, não a da filiação; fica vazia quando
+    a pessoa ainda não tem registro pelo partido novo.
+
+    Não é troca: seguir do partido que deixou de existir para o seu sucessor (``sucessores``:
+    as fusões e incorporações de ``config/congresso.yaml``, sigla → sucessora, normalizadas).
+    E só vale com registro de votação pelos DOIS partidos nesta legislatura: quem voltou ao
+    mandato já em outro partido pode ter mudado antes dela."""
+    sucessores = sucessores or {}
+    trechos: list[list[str]] = []  # [desde, sigla, até]; o partido e o seu sucessor contam como um trecho só
+    for item in ficha.get("partidos") or []:
+        desde, sigla = str(item[0]), str(item[1])
+        ate = str(item[2]) if len(item) > 2 else ""
+        if not sigla:
+            continue
+        anterior = text.normalize(trechos[-1][1]) if trechos else ""
+        if trechos and (anterior == text.normalize(sigla) or sucessores.get(anterior) == text.normalize(sigla)):
+            trechos[-1] = [trechos[-1][0], sigla, ate or trechos[-1][2]]
+        else:
+            trechos.append([desde, sigla, ate])
     atual = str(ficha.get("partido") or "")
-    if not votados or not atual:
+    if not trechos or not atual:
         return None
-    if text.normalize(votados[-1][1]) != text.normalize(atual):
-        return ["", votados[-1][1]]  # o cadastro já diz o partido novo; os votos, ainda o antigo
-    if len(votados) >= 2 and inicio and votados[-1][0] >= inicio:
-        return [votados[-1][0][:7], votados[-2][1]]
+    ultimo = text.normalize(trechos[-1][1])
+    if ultimo != text.normalize(atual) and sucessores.get(ultimo) != text.normalize(atual):
+        return ["", trechos[-1][1]]  # o cadastro já diz o partido novo; os votos, ainda o antigo
+    if len(trechos) >= 2 and inicio and trechos[-1][0] >= inicio:
+        if trechos[-2][2] and trechos[-2][2] < inicio:
+            return None  # sem registro pelo partido anterior nesta legislatura
+        return [trechos[-1][0][:7], trechos[-2][1]]
     return None
 
 
-def linha(ficha: Mapping[str, Any], legislatura: int, inicio: str = "") -> dict[str, Any]:
+def linha(ficha: Mapping[str, Any], legislatura: int, inicio: str = "", sucessores: Mapping[str, str] | None = None) -> dict[str, Any]:
     """A linha da pessoa no índice (``resumo.json``): o que a tabela, o mapa e as
     fichas dentro das matérias precisam, sem abrir a ficha inteira."""
     atual = (ficha.get("leg") or {}).get(str(legislatura)) or {}
@@ -354,7 +374,7 @@ def linha(ficha: Mapping[str, Any], legislatura: int, inicio: str = "") -> dict[
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
-    troca = troca_de_partido(ficha, inicio)
+    troca = troca_de_partido(ficha, inicio, sucessores)
     if troca:
         d["troca"] = troca
     cota = ficha.get("cota") or {}

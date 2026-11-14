@@ -149,6 +149,7 @@ class Perfil:
     partido: str = ""  # o mais recente
     ultimo_voto: str = ""  # data da última votação com registro
     partidos: list[tuple[str, str]] = field(default_factory=list)  # (data da 1ª votação, sigla)
+    partidos_ate: list[str] = field(default_factory=list)  # para cada trecho de ``partidos``: a data do último registro de votação por ele
     legislaturas: dict[int, Recorte] = field(default_factory=dict)
     governos: dict[str, Recorte] = field(default_factory=dict)
     semestres: dict[str, Recorte] = field(default_factory=dict)
@@ -298,13 +299,20 @@ def calcular(
     for ano in sorted(anos, key=lambda a: a.ano):
         casa = ano.casa
         plenario = [(k, v) for k, v in enumerate(ano.votacoes) if v.plenario]
-        for pessoa in ano.pessoas:
+        for posicao, pessoa in enumerate(ano.pessoas):
             p = perfis.setdefault(pessoa.id, Perfil(id=pessoa.id, casa=casa))
             p.nome, p.uf = pessoa.nome or p.nome, pessoa.uf or p.uf
-            for indice, sigla in pessoa.partidos:
+            for n, (indice, sigla) in enumerate(pessoa.partidos):
                 data = ano.votacoes[indice].data if indice < len(ano.votacoes) else f"{ano.ano}-01-01"
+                # O último registro da pessoa (voto, presença ou falta) enquanto estava neste partido, no ano.
+                fim = min(pessoa.partidos[n + 1][0] if n + 1 < len(pessoa.partidos) else len(ano.votacoes), len(ano.votacoes))
+                ultimo = next((k for k in range(fim - 1, indice - 1, -1) if ano.votacoes[k].votos[posicao : posicao + 1] not in ("", base.SEM_REGISTRO)), None)
+                ate = ano.votacoes[ultimo].data if ultimo is not None else ""
                 if not p.partidos or p.partidos[-1][1] != sigla:
                     p.partidos.append((data, sigla))
+                    p.partidos_ate.append(ate)
+                elif ate:
+                    p.partidos_ate[-1] = max(p.partidos_ate[-1], ate)
         for k, v in plenario:
             leg = regras.legislatura_em(v.data)
             governo = regras.governo_em(v.data)

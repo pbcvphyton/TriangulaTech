@@ -964,10 +964,20 @@ def test_a_excecao_e_o_tema_do_lado_oposto_ao_padrao_geral():
         ([["2023-02-07", "PT"]], "PT", None),  # nunca mudou
         ([["2023-02-07", "UNIÃO"]], "PL", ["", "UNIÃO"]),  # o cadastro já diz o partido novo; ainda não votou por ele
         ([], "PL", None),
+        # fusão não é troca: o Patriota virou PRD (e o cadastro pode dizer PRD antes do primeiro registro)
+        ([["2019-02-12", "PATRIOTA", "2023-11-08"], ["2024-02-06", "PRD", "2026-10-14"]], "PRD", None),
+        ([["2019-02-12", "PATRIOTA", "2023-11-08"]], "PRD", None),
+        # ...mas quem veio de outro partido para o que depois se fundiu, na legislatura, mudou
+        ([["2019-02-12", "PL", "2023-05-03"], ["2023-06-06", "PATRIOTA", "2023-11-08"], ["2024-02-06", "PRD", "2026-10-14"]], "PRD", ["2023-06", "PL"]),
+        ([["2019-02-12", "PSC", "2023-05-03"], ["2023-08-22", "PL", "2026-10-14"]], "PL", ["2023-08", "PSC"]),  # saiu do partido antes da incorporação: mudou
+        # sem registro pelo partido anterior nesta legislatura (voltou ao mandato já no outro): não afirma
+        ([["2019-02-12", "PSDB", "2022-12-20"], ["2025-03-11", "PSD", "2026-10-14"]], "PSD", None),
+        ([["2019-02-12", "PSDB", "2023-12-20"], ["2025-03-11", "PSD", "2026-10-14"]], "PSD", ["2025-03", "PSDB"]),
     ],
 )
 def test_a_troca_de_partido_na_legislatura(partidos: list[list[str]], atual: str, esperado: list[str] | None):
-    assert ficha.troca_de_partido({"partidos": partidos, "partido": atual}, "2023-02-01") == esperado
+    sucessores = {"patriota": "prd", "ptb": "prd", "psc": "pode"}
+    assert ficha.troca_de_partido({"partidos": partidos, "partido": atual}, "2023-02-01", sucessores) == esperado
 
 
 @pytest.mark.parametrize(("nome", "esperado"), [("Maria do Rosário", "MR"), ("Tiririca", "T"), ("Dr. Zacharias Calil", "DC"), ("AJ Albuquerque", "AA"), ("", "")])

@@ -1569,7 +1569,7 @@ def atualizar(
         "v": VERSAO,
         "hoje": hoje,
         "legislatura": legislatura.numero,
-        "pessoas": [ficha.linha(f, legislatura.numero, legislatura.inicio) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
+        "pessoas": [ficha.linha(f, legislatura.numero, legislatura.inicio, regras.fusoes) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
     }
     atuais = set()
     for casa in ("cd", "sf"):
