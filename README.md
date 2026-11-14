@@ -595,20 +595,26 @@ o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
   muda de lado conforme o assunto, **quem muda quando pesa a relevância**…), **no jornal ×
   no voto**, e a tabela de todos (com o saldo simples e o **pesado pela relevância**), com
   **Comparar dois**.
-- **Frentes**: cada frente parlamentar de causa (a lista, com as duas pontas de cada tema,
-  fica em `config/congresso.yaml`) com quem assina e como vota no tema dela: os membros
-  por lado (com a esquerda, dividido, com a direita), quanto votam igual ao coordenador e
-  os que mais votam diferente dele; e quem assina quase todas. Só a Câmara registra quem
-  assina.
+- **Frentes**: "assinar é fácil; e na hora do voto?". Um cartão por frente parlamentar de
+  causa (a lista, com as duas pontas de cada tema, fica em `config/congresso.yaml`), que
+  responde a uma pergunta: quem assina vota junto com quem coordena? Cada ponto é um
+  deputado que assina, do lado em que vota no tema; ao lado, a mesma conta para **quem não
+  assina** (a base de comparação) e os que mais votam diferente do coordenador. O cartão
+  abre a **ficha da frente** (`#f=<id>`), com todos os que assinam, um a um. Só a Câmara
+  registra quem assina.
 - **Cota parlamentar**: quem gasta mais e menos (média por mês), para onde vai o dinheiro,
   os fornecedores que mais recebem e de quantos gabinetes, quem pagou um quarto ou mais da
   própria cota a uma empresa só, **a mesma nota em mais de um gabinete** (com o link de
   cada nota) e o que a Casa recusou (glosa).
-- **Escolha o seu candidato**: um filtro sobre quem está no mandato pelo que o registro diz
-  de cada um: estado, partido, de que lado vota em cada tema, sobre o que propôs, a frente
-  que assina, a cota, a presença, o governismo e as propostas que viraram norma. Cada nome
-  diz por que entrou, com o número; o endereço guarda a escolha
-  (`#v=escolha&uf=SP&t=ambiente.e`). Sem script, a lista sai inteira, por estado.
+- **Escolha o seu candidato**: quem tem mandato pelo seu estado, um **cartão com a foto
+  oficial** cada: de que lado vota (a régua), a presença e o voto com o partido (com a
+  mediana da Casa), a **exceção** (o tema em que vota do lado oposto ao seu padrão), se
+  **mudou de partido** na legislatura e o que propôs; o cartão abre o dossiê. Atalhos para
+  o que é raro (mudou de partido, vota diferente do partido, vota pouco, muda de lado em
+  algum tema) e filtros por tema, proposta, frente, cota (comparada dentro do estado),
+  presença e governismo. Cada nome diz por que entrou, com o número; o endereço guarda a
+  escolha (`#v=escolha&uf=SP&t=ambiente.e&at=troca`). Sem script, a lista sai inteira, por
+  estado.
 - **Como ler**: cada conta, por extenso, e a tabela **O que entra em cada tema**.
 
 Três fichas abrem por cima da página, cada uma com endereço próprio:
@@ -679,10 +685,11 @@ feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da lege
 | No jornal × no voto | o texto do jornal que cita a pessoa e uma proposição (pelo número ou pelo apelido de `apelidos` em `config/congresso.yaml`); numa matéria, os dois na mesma frase. Ao lado, os votos dela nessa proposição (o texto principal primeiro; na PEC, com o turno que a descrição oficial dá). A página não interpreta a fala: põe as duas coisas lado a lado |
 | No jornal | os nomes procurados nas manchetes e no texto das matérias de `data/busca/` (as edições dos últimos 60 dias; fora esporte, natureza e variedades) |
 | Saldo pesado pela relevância | o mesmo saldo, com cada voto pesando a nota de relevância da matéria (0 a 100); só as votações cuja matéria tem nota (PL, PLP, PEC; MP e PDL ficam de fora), com 10 ou mais. Ao lado, o saldo sem peso nas votações de nota igual ou acima da mediana da Casa e nas de nota abaixo (5 ou mais em cada metade; a mediana, e não as faixas fixas, porque na Câmara quase toda matéria votada tem nota baixa). "Quem muda quando pesa": o saldo pesado a 20 pontos ou mais do saldo sem peso nas mesmas votações (as que têm nota); vira achado só se a diferença entre as metades passar do acaso (99%). A nota mede sinais do registro, não a repercussão |
-| Frentes | as frentes de causa de `frentes` em `config/congresso.yaml` (o começo do título oficial e o tema em que a causa se vota; "todas" para as sem tema), com as duas pontas de cada tema. Lado de cada membro em exercício: o saldo dele no tema (5 ou mais votações esquerda × direita; nas sem tema, o geral). Com o coordenador: nas votações esquerda × direita do tema, quanto o membro votou igual a ele (a frente não registra posição; o coordenador a registra). A Câmara não registra quando cada um assinou; o Senado não publica as frentes |
+| Frentes | as frentes de causa de `frentes` em `config/congresso.yaml` (o começo do título oficial e o tema em que a causa se vota; "todas" para as sem tema), com as duas pontas de cada tema. Lado de cada membro em exercício: o saldo dele no tema (5 ou mais votações esquerda × direita; nas sem tema, o geral). Com o coordenador: nas votações esquerda × direita do tema, quanto o membro votou igual a ele (a frente não registra posição; o coordenador a registra; só vale o coordenador que a lista de membros marca). A mesma conta sai para quem está em exercício e NÃO assina: é a base de comparação. "Do lado oposto ao do coordenador" só aparece com o coordenador numa ponta da régua (saldo até −60 ou acima de +60). Com menos de 20 votações no tema (`limiares.frente_poucas`), o cartão avisa que são poucas. A Câmara não registra quando cada um assinou; o Senado não publica as frentes |
 | Nas comissões | votações nominais das comissões (Câmara: os arquivos em lote; Senado: as 16 permanentes), fora das contas do Plenário. Na Câmara, o voto é no parecer (Sim = aprovar o parecer, que pode ser pela rejeição) e só aparece quem votou. "Mudou de voto": o Plenário votou o parecer de uma comissão; vale a última votação da comissão que aprovou esse parecer, e entra quem votou Sim ou Não nas duas. No Senado, o registro não traz o resultado nem se o item era terminativo |
 | Cota parlamentar | os reembolsos da cota nota a nota (Câmara: arquivos anuais oficiais, com o link de cada nota; Senado: dados abertos administrativos). Valor = o reembolsado (nota − glosa − o que foi devolvido). Média por mês = total da legislatura ÷ meses fechados com despesa (o mês corrente fica fora da média; listas com 6 meses ou mais). Fornecedor pelo CNPJ; pessoa física sem o nome. "Um fornecedor só": 25% ou mais do próprio total, com R$ 50 mil ou mais. "A mesma nota": CNPJ, número, data e valor iguais em gabinetes diferentes (número que é só mês/ano fica de fora). Quem está em exercício há tempo (100 votações possíveis ou mais) e não pediu reembolso nenhum aparece à parte, com zero. Ranking e filtro da cota: 6 meses ou mais, como as listas. Fora da conta: na Câmara, as passagens da agência da Casa (SIGEPA), que o arquivo deixou de trazer em ago/2025 (fora de todos os anos; ao lado de cada um, o que teve delas em 2024); no Senado, o reembolso de moradia, que o próprio Senado não conta como cota |
-| Escolha o seu candidato | os números da página, filtrados: lado no tema = saldo do tema até −20 (esquerda), acima de −20 até +20 (dividido), acima de +20 (direita), com 5 ou mais votações no tema; "propôs sobre" = autoria principal; cota = até a mediana ou o primeiro quartil da Casa. A ordem "mais perto do que escolhi" é a média do saldo no sentido escolhido |
+| Escolha o seu candidato | os números da página, filtrados: lado no tema = saldo do tema até −20 (esquerda), acima de −20 até +20 (dividido), acima de +20 (direita), com 5 ou mais votações no tema; "propôs sobre" = autoria principal; cota = até a mediana ou o primeiro quartil do estado (Câmara, porque o teto muda por estado) ou da Casa (Senado). A ordem "mais perto do que escolhi" é a média do saldo no sentido escolhido. Exceção = quem tem lado no geral e, num tema com 5 votações ou mais, vota do lado oposto (o tema de mais votações). Mudou de partido = o partido anterior e o mês do primeiro voto pelo partido atual. Atalhos: vota com a maioria do partido em menos de 80% das vezes (`limiares.escolha_fidelidade`); votou em menos de 60% das votações (`limiares.escolha_presenca`) |
+| O placar | como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (no lado de cada um ela vale como Não; no placar, não é voto Não). Nas votações de conteúdo de PEC e de projeto de lei complementar, o número de Sim que a Constituição exige (três quintos: 308 e 49; maioria absoluta: 257 e 41) vai ao lado do placar |
 
 Os polos (hoje PT, PSOL e PCdoB × PL e NOVO), os governos, os limiares, as faixas
 do campo, os macrotemas, os pesos da nota de relevância e os **apelidos dos
@@ -732,7 +739,8 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `fichas/<casa>-<id>.json` | o dossiê de cada parlamentar (carregado quando a ficha abre) |
 | `resumo.json` | uma linha por parlamentar (a tabela da aba e as fichas das matérias) |
 | `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, listas, no jornal × no voto, últimas votações, a cobertura do saldo pesado, as frentes, a cota e as comissões) |
-| `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação (o comparativo e os votos por tema leem quando abrem) |
+| `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação, e o **partido de cada um no dia de cada votação** (`partidos`: só de quem mudou) (o comparativo, os votos por tema e o plenário em pontos leem quando abrem) |
+| `frentes-cd.json` | a ficha de cada frente de causa: todos os que assinam e estão em exercício, com o saldo no tema e quanto votaram igual ao coordenador (lido quando a ficha da frente abre) |
 | `materias-cd.json`, `materias-sf.json` | a ficha de cada matéria votada no Plenário na legislatura e de cada ponto de "o que espera × o que passa", uma por linha: sobre o quê, autoria, situação, nota e cada votação com os lados (lido quando um detalhe abre) |
 | `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
 

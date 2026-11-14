@@ -712,6 +712,7 @@ def _casa(
     temas_def: Mapping[str, Mapping[str, list[str]]] | None = None,
     temas_meta: list[dict[str, Any]] | None = None,
     governo: str = "",
+    limiares: Mapping[str, Any] | None = None,
 ) -> CasaView:
     temas_nomes = temas_nomes or {}
     polos = polos or {}
@@ -785,7 +786,7 @@ def _casa(
         ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
         listas=_listas(painel.get("listas") or {}),
         escolha=_escolha(casa, pessoas, temas_meta or [], campos, governo),
-        frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos, int(painel.get("em_exercicio") or 0)),
+        frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos, int(painel.get("em_exercicio") or 0), int((limiares or {}).get("frente_poucas") or FRENTE_POUCAS)),
         cota=_cota(painel.get("cota") or {}, casa),
         comissoes=_comissoes(painel.get("comissoes") or {}, casa),
     )
@@ -1101,7 +1102,7 @@ FRENTE_LINHAS = 8  # deputados por coluna no desenho de cada frente (um ponto po
 FRENTE_CONTRA = 5  # membros que menos votam igual ao coordenador, na lista de cada cartão
 
 
-FRENTE_POUCAS = 20  # votações abaixo disto: a conclusão do cartão leva o aviso de poucas votações
+FRENTE_POUCAS = 20  # votações abaixo disto: o cartão avisa que são poucas (o valor vem de config/congresso.yaml, limiares.frente_poucas)
 
 
 def lado_firme(saldo: Any, campos: list[dict[str, Any]]) -> str:
@@ -1137,13 +1138,14 @@ def manchete_da_frente(c: Mapping[str, Any], firme: str) -> tuple[dict[str, str]
     return ({"numero": _num(c.get("em_exercicio")), "texto": "deputados assinam. Não há votações bastantes para comparar com o coordenador."}, "assinam")
 
 
-def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[dict[str, Any]], em_exercicio: int = 0) -> dict[str, Any] | None:
+def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[dict[str, Any]], em_exercicio: int = 0, poucas: int = 0) -> dict[str, Any] | None:
     """As frentes de causa (config/congresso.yaml) e o voto de quem assina: um cartão cada, a
     começar por onde menos se vota igual ao coordenador."""
     if not fr or not fr.get("causas"):
         return None
     curtos = {t["id"]: t.get("curto") or t["nome"] for t in temas}
     corte = corte_do_centro(campos)
+    poucas = poucas or FRENTE_POUCAS
     cartoes = []
     for c in fr["causas"]:
         lados = c.get("lados") or {}
@@ -1192,7 +1194,7 @@ def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[di
                 "tipo": tipo,
                 "oposto": int(lados.get("d" if firme == "e" else "e") or 0) if firme else "",
                 "votacoes": _num(votacoes),
-                "poucas": 0 < votacoes < FRENTE_POUCAS,
+                "poucas": 0 < votacoes < poucas,
                 "com_coord": _pct(c.get("com_coord")),
                 "com_coord_n": c.get("com_coord") if c.get("com_coord") is not None else "",
                 "sem_assinar": _pct(c.get("sem_assinar")) if c.get("sem_assinar") is not None else "",
@@ -1217,7 +1219,7 @@ def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[di
         ],
         "cartoes": cartoes,
         "linhas": FRENTE_LINHAS,
-        "poucas": FRENTE_POUCAS,
+        "poucas": poucas,
     }
 
 
@@ -1352,6 +1354,15 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "Só votação nominal",
             "Só as votações que registram o voto de cada um, no Plenário. A votação simbólica, que é a maioria, não diz quem "
             "votou o quê. No Senado, as votações secretas (escolha de autoridades) contam para a presença, não para a posição.",
+        ),
+        (
+            "O placar",
+            "O placar sai como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (a bancada que se declara em "
+            "obstrução não dá número à votação). Na conta de que lado cada um ficou, a obstrução vale como Não, porque é de "
+            "quem não quer a matéria votada; no placar, ela não é voto Não. Proposta de emenda à Constituição precisa do Sim de "
+            f"três quintos da Casa ({base.quorum('cd', 'PEC')} deputados; {base.quorum('sf', 'PEC')} senadores) e projeto de lei complementar, da maioria absoluta "
+            f"({base.quorum('cd', 'PLP')}; {base.quorum('sf', 'PLP')}), no texto e em cada destaque: a página mostra esse número ao lado do placar, porque um texto pode ter "
+            "mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes.",
         ),
         (
             "Com quem vota",
@@ -1511,13 +1522,20 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         ),
         (
             "Frentes",
-            "Uma frente parlamentar é um grupo registrado na Câmara em torno de uma causa; para registrar, basta reunir um terço "
-            "das assinaturas do Congresso, e o registro diz quem assinou e quem coordena (os dados abertos da Câmara, em lote). "
-            "O Senado não publica quem assina. A página não lista todas: as frentes de causa, com o tema da aba em que cada causa "
-            "se vota, ficam em config/congresso.yaml, com as duas pontas de cada tema. Para cada uma, o lado de cada membro em "
-            "exercício (o saldo dele nas votações esquerda × direita do tema, 5 ou mais; nas frentes sem um tema só, o saldo "
-            "geral) e quanto ele votou igual ao coordenador nessas votações (Sim ou Não; obstrução conta como Não). A frente não "
-            "registra posição: o coordenador é quem a registra e responde por ela. A Câmara não registra quando cada um assinou.",
+            "Uma frente parlamentar é um grupo registrado na Câmara em torno de uma causa; para registrar, basta reunir as "
+            "assinaturas de um terço dos deputados e senadores (Ato da Mesa nº 69, de 2005), e o registro diz quem assinou e quem "
+            "coordena (os dados abertos da Câmara, em lote). O Senado não publica quem assina. A página não lista todas: as "
+            "frentes de causa, com o tema da aba em que cada causa se vota, ficam em config/congresso.yaml, com as duas pontas de "
+            "cada tema. Cada cartão responde a uma pergunta: quem assina vota junto com quem coordena? A conta usa as votações "
+            "esquerda × direita do tema da frente (nas frentes sem um tema só, todas): a parte das vezes em que cada membro em "
+            "exercício votou igual ao coordenador (Sim ou Não; obstrução conta como Não). Ao lado vai a mesma conta para os "
+            "deputados em exercício que não assinam: é a base de comparação, porque assinar só diz alguma coisa se quem assina "
+            "vota diferente de quem não assina. Cada ponto do cartão é um deputado que assina, do lado em que ele vota no tema "
+            f"(o saldo dele, com {ficha.MINIMO_TEMA_FAIXA} ou mais votações). “Do lado oposto ao do coordenador” só aparece quando o coordenador vota numa das pontas "
+            "da régua (saldo até −60 ou acima de +60): são os que assinam e votam do outro lado, fora da faixa “dividido”. Com "
+            f"menos de {lim.get('frente_poucas', FRENTE_POUCAS)} votações no tema, o cartão avisa que são poucas. Coordenador é só quem a lista de membros marca "
+            "assim. O cartão abre a ficha da frente, com todos os que assinam, um a um. A frente não registra posição: o "
+            "coordenador é quem a registra e responde por ela. A Câmara não registra quando cada um assinou.",
         ),
         (
             "Nas comissões",
@@ -1547,12 +1565,19 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         ),
         (
             "Escolha o seu candidato",
-            "Um filtro sobre quem está no mandato, com os mesmos números do resto da página: o estado, o partido, o lado em que "
+            "Não é lista de candidatos: é quem está no mandato hoje, um cartão cada, com os mesmos números do resto da página: o "
+            "estado, o partido, de que lado vota (a régua), a presença e quanto vota com o próprio partido (com a mediana da Casa "
+            f"ao lado) e o que propôs. “Exceção” é o tema em que a pessoa vota do lado oposto ao do seu padrão geral: ela tem lado no geral e, num tema com {ficha.MINIMO_TEMA_FAIXA} "
+            "votações ou mais, fica do outro (havendo mais de um, o de mais votações). “Mudou de partido” traz o partido "
+            "anterior e o mês do primeiro voto registrado pelo partido atual (a data da filiação não está nos dados de votação). "
+            f"Os atalhos: mudou de partido na legislatura; vota diferente do partido (com a maioria dele em menos de {lim.get('escolha_fidelidade', 80)}% das "
+            f"vezes); votou em menos de {lim.get('escolha_presenca', 60)}% das votações; muda de lado em algum tema (a exceção). Os filtros: o lado em que "
             f"vota em cada tema (com a esquerda: saldo do tema até {_saldo(corte[0])}; dividido: acima disso e até {_saldo(corte[1])}; com a direita: acima de "
             f"{_saldo(corte[1])}; só quem tem {ficha.MINIMO_TEMA_FAIXA} ou mais votações esquerda × direita no tema), o tema sobre o qual propôs (autoria principal), "
-            "a frente que assina, a presença, o governismo e as propostas que viraram norma. Escolhidos os temas, a lista se "
-            "ordena por quanto cada um está do lado escolhido (a média, nos temas escolhidos, do saldo no sentido pedido). Não "
-            "é recomendação: é o registro de cada um diante do que você escolher.",
+            "a frente que assina, a presença, o governismo, as propostas que viraram norma e a cota (na Câmara, comparada dentro "
+            "do estado, porque o teto muda por estado; no Senado, com a Casa inteira). Escolhidos os temas, a lista se ordena por "
+            "quanto cada um está do lado escolhido (a média, nos temas escolhidos, do saldo no sentido pedido). As fotos são as "
+            "oficiais de cada Casa. Não é recomendação: é o registro de cada um diante do que você escolher.",
         ),
         (
             "O que isto não diz",
@@ -1572,7 +1597,7 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
     polos = d.meta.get("polos") or {}
     temas_def = {t["id"]: {"camara": t.get("camara") or [], "senado": t.get("senado") or []} for t in d.meta.get("temas") or []}
     casas = [
-        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def, d.meta.get("temas") or [], str(d.meta.get("governo") or ""))
+        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def, d.meta.get("temas") or [], str(d.meta.get("governo") or ""), d.meta.get("limiares") or {})
         for casa in ("cd", "sf")
         if casa in d.casas
     ]
@@ -1657,6 +1682,9 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
             "votacoes": sum(c.estat.get("total") or 0 for c in casas),
             "divisivas": sum(c.estat.get("divisivas") or 0 for c in casas),
             "tramitando": sum((d.casas[c.id].get("fila") or {}).get("tramitando") or 0 for c in casas),
+            # Os cortes dos atalhos de "Escolha o seu candidato" (config/congresso.yaml, limiares).
+            "escolha_fidelidade": int((d.meta.get("limiares") or {}).get("escolha_fidelidade") or 80),
+            "escolha_presenca": int((d.meta.get("limiares") or {}).get("escolha_presenca") or 60),
         },
     )
 

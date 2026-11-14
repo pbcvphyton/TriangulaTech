@@ -514,6 +514,11 @@ def test_a_proposicao_guarda_o_que_a_casa_diz_alem_da_ementa(props: list[projeto
         "PL 7/2007", "Regula a demarcação de terras.", "Trata de terras.", projetos.NORMA, True)
     assert (antiga.primeiro, antiga.autores, antiga.origem) == (4, [4], "parlamentar")
     assert projetos.camara_detalhes(coletor, [424242]) == {}  # fora do ar: só fica de fora
+    # o CPF que um registro traz dentro da ementa (o ofício de um tribunal, por exemplo) sai mascarado
+    oficio = projetos.camara_do_detalhe(
+        {"id": 98, "siglaTipo": "PL", "numero": 8, "ano": 2024, "ementa": "Comunica a prisão de FULANO (Deputado Federal, CPF no 123.456.789-00), nos termos da Lei nº 12.850/2013.",
+         "dataApresentacao": "2024-03-25T10:00", "statusProposicao": {"descricaoSituacao": "Transformado em Norma Jurídica", "siglaOrgao": "MESA", "dataHora": "2024-04-10T10:00"}}, [])
+    assert "123.456.789-00" not in oficio.ementa and "CPF no ***.***.***-**" in oficio.ementa and "12.850/2013" in oficio.ementa
 
 
 @pytest.mark.parametrize(

@@ -757,8 +757,8 @@
       <div class="cg-esc-at" id="cgEscAt" role="group" aria-label="Atalhos">
         <span class="cg-esc-rot">O que é raro e diz muito</span>
         <button type="button" class="cg-esc-atb" data-at="troca" aria-pressed="false">Mudou de partido na legislatura <b></b></button>
-        <button type="button" class="cg-esc-atb" data-at="fid" aria-pressed="false">Vota diferente do partido <b></b></button>
-        <button type="button" class="cg-esc-atb" data-at="pres" aria-pressed="false">Votou em menos de 60% das votações <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="fid" aria-pressed="false" data-dica="Votou com a maioria do próprio partido em menos de {{ c.totais.escolha_fidelidade }}% das vezes.">Vota diferente do partido <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="pres" aria-pressed="false">Votou em menos de {{ c.totais.escolha_presenca }}% das votações <b></b></button>
         <button type="button" class="cg-esc-atb" data-at="exc" aria-pressed="false">Muda de lado em algum tema <b></b></button>
       </div>
       <details class="cg-esc-mf" id="cgEscMf">

@@ -15,13 +15,14 @@
     var cota = el('cgEscCt'), cortesCota = {};  // Casa → [mediana, 1º quartil] da média mensal da cota
     var ufs = el('cgEscUfs'), ufRotulo = el('cgEscUfL'), atalhos = el('cgEscAt'), maisFiltros = el('cgEscMf');
     /* Os atalhos: o que é raro e diz muito (cada um com a contagem na Casa da vez). */
+    var CORTE_FID = (M.limiares || {}).escolha_fidelidade || 80, CORTE_PRES = (M.limiares || {}).escolha_presenca || 60;  // config/congresso.yaml
     var ATALHOS = {
       troca: function (li) { return li.getAttribute('data-troca') === '1'; },
-      fid: function (li) { var f = parseFloat(li.getAttribute('data-fid')); return !isNaN(f) && f < 80; },
-      pres: function (li) { var p = parseFloat(li.getAttribute('data-pres')); return !isNaN(p) && p < 60; },
+      fid: function (li) { var f = parseFloat(li.getAttribute('data-fid')); return !isNaN(f) && f < CORTE_FID; },
+      pres: function (li) { var p = parseFloat(li.getAttribute('data-pres')); return !isNaN(p) && p < CORTE_PRES; },
       exc: function (li) { return li.getAttribute('data-exc') === '1'; }
     };
-    var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de 80% das vezes', pres: 'votou em menos de 60% das votações', exc: 'muda de lado em algum tema' };
+    var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de ' + CORTE_FID + '% das vezes', pres: 'votou em menos de ' + CORTE_PRES + '% das votações', exc: 'muda de lado em algum tema' };
     function atalhosLigados() { return atalhos ? lista(atalhos.querySelectorAll('.cg-esc-atb[aria-pressed="true"]')).map(function (b) { return b.getAttribute('data-at'); }) : []; }
     var LOTE = 24, limite = {};  // quantos cartões à vista em cada Casa (o resto vem com "mostrar mais")
     var mais = {};

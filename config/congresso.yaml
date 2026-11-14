@@ -38,6 +38,9 @@ limiares:
   minimo_presenca: 20       # votações no exercício para mostrar a presença
   dias_parado: 365          # projeto sem andamento há mais que isso está "parado"
   dias_relatoria: 180       # relatoria sem parecer há mais que isso entra em "sentado em cima"
+  escolha_fidelidade: 80    # atalho "vota diferente do partido": votou com a maioria do partido em menos que isto (%)
+  escolha_presenca: 60      # atalho "votou em menos de X% das votações" (%)
+  frente_poucas: 20         # votações do tema abaixo disto: o cartão da frente avisa que são poucas
 
 # Faixas do "campo" (pelo saldo: −100 = sempre com a esquerda, +100 = sempre com a
 # direita). Os ids são os do Termômetro de Viés; os nomes dizem comportamento ("vota
