@@ -2702,7 +2702,12 @@ a.cg-tv-c-t:hover{text-decoration:underline}
 @media (prefers-reduced-motion:reduce){
   .cg-tv-card,.cg-tv-card.cg-tv-vira,.cg-vt,.cg-tv-cw::before,.cg-tv-cw::after{transition:none!important;animation:none!important}
 }
-</style>
+/* O atalho para as votações do tema, logo abaixo do seletor. */
+.cg-tv-irp{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.cg-tv-atl{padding:7px 14px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--paper);font:600 13px var(--ss);cursor:pointer}
+.cg-tv-atl:hover{opacity:.88}
+.cg-tv-atl:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.cg-fx-d[hidden]{display:none}</style>
 </head>
 <body>
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -11826,7 +11831,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     <dl class="az-dl">
       <div><dt>De onde vem</dt><dd>Dos dados abertos da Câmara dos Deputados (arquivos em lote e API) e do Senado Federal (API legislativa), baixados todo dia antes da edição. São registros oficiais; nenhuma IA entra nas contas.</dd></div>
       <div><dt>Só votação nominal</dt><dd>Só as votações que registram o voto de cada um, no Plenário. A votação simbólica, que é a maioria, não diz quem votou o quê. No Senado, as votações secretas (escolha de autoridades) contam para a presença, não para a posição.</dd></div>
-      <div><dt>O placar</dt><dd>O placar sai como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (a bancada que se declara em obstrução não dá número à votação). Na conta de que lado cada um ficou, a obstrução vale como Não, porque é de quem não quer a matéria votada; no placar, ela não é voto Não. Proposta de emenda à Constituição precisa do Sim de três quintos da Casa (308 deputados; 49 senadores) e projeto de lei complementar, da maioria absoluta (257; 41), no texto e em cada destaque: a página mostra esse número ao lado do placar, porque um texto pode ter mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes.</dd></div>
+      <div><dt>O placar</dt><dd>O placar sai como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (a bancada que se declara em obstrução não dá número à votação). Na conta de que lado cada um ficou, a obstrução vale como Não, porque é de quem não quer a matéria votada; no placar, ela não é voto Não. Proposta de emenda à Constituição precisa do Sim de três quintos da Casa (308 deputados; 49 senadores) e projeto de lei complementar, da maioria absoluta (257; 41), no texto e em cada destaque: a página mostra esse número ao lado do placar, porque um texto pode ter mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes. A Câmara publica o placar na descrição de cada votação e, à parte, o voto de cada deputado. Quando os dois não batem (diferença de mais de 20 votos no Sim ou no Não, o que inclui a votação sem o voto de ninguém, como a secreta), a votação fica fora de todas as contas: um voto posto na votação errada viraria “votou contra o partido” de quem não votou.</dd></div>
       <div><dt>Com quem vota</dt><dd>Entram só as votações de conteúdo (texto principal, destaques e emendas) em que a maioria do polo de esquerda (PCdoB, PSOL, PT) votou de um jeito e a do polo de direita (NOVO, PL), de outro, com pelo menos 75% de cada polo do mesmo lado. O saldo vai de −100 (sempre com a esquerda) a +100 (sempre com a direita) e só aparece com 10 votações ou mais. É comportamento, não rótulo: diz com quem a pessoa vota, não o que ela diz ser.</dd></div>
       <div><dt>Por que um voto é “de esquerda” ou “de direita”</dt><dd>Não é o assunto que define o lado. Em cada votação, a esquerda é o lado em que votou a maioria (75% ou mais) dos parlamentares de PCdoB, PSOL, PT; a direita, o da maioria de NOVO, PL. Votar “com a esquerda” é votar igual a essa maioria naquela votação: numa, isso é votar Sim; em outra, votar Não. Por isso os partidos que definem os polos ficam nas pontas (−100 e +100) quase por definição: eles são a régua. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para saber por que um voto caiu de um lado, a página mostra, em cada votação, o que estava em jogo e o Sim–Não de cada partido dos polos (na ficha da matéria, no detalhe de cada tema e nos votos de cada um por tema).</dd></div>
       <div><dt>Quanto os partidos votam juntos</dt><dd>Na aba Partidos, uma conta que não depende da régua dos polos: em todas as votações de conteúdo do Plenário, dois partidos votaram juntos quando a maioria de cada um ficou do mesmo lado. A tabela dá a porcentagem para cada par (par com menos de 20 votações fica vazio). Ao lado, quantas votações foram de consenso (os dois polos do mesmo lado), quantas opuseram os polos (as únicas que entram no saldo), quantas tiveram racha e em quantas um polo não teve maioria clara.</dd></div>
@@ -11838,7 +11843,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
       <div><dt>Presença</dt><dd>A parte das votações nominais em que a pessoa podia votar e votou. Na Câmara, só contam os dias em que o deputado estava em exercício (o histórico do mandato diz quando ele se licenciou ou quando o suplente assumiu); os dados abertos da Câmara não dizem se uma ausência foi justificada. No Senado, a própria votação registra quem faltou e quem tinha ausência justificada (licença, missão, atividade parlamentar): a justificada fica fora da conta e aparece à parte na ficha. Quem preside a Casa só vota em caso de empate e não entra na lista de quem menos vota.</dd></div>
       <div><dt>Partido e dissidência</dt><dd>A fidelidade é a parte dos votos iguais ao da maioria do partido do dia. Dissidência é votar diferente quando 80% ou mais do partido votou junto. Surpresa é quem tem lado definido (saldo além de ±60) e, numa votação divisiva, ficou com o outro polo.</dd></div>
       <div><dt>Fora da linha, por assunto</dt><dd>No dossiê, cada voto contra o próprio partido fechado e cada voto com o outro polo é contado no tema da matéria. &#34;Muda de lado conforme o assunto&#34; é quem tem lado definido (saldo além de ±60) e, num tema com 10 votações ou mais, fica do lado oposto: o voto naquele tema é comparado com o resto dos votos da própria pessoa (teste binomial exato). Na lista da Casa, a diferença precisa passar do acaso contando todas as pessoas e temas comparados (Holm, 99%); no dossiê, contando os temas da pessoa.</dd></div>
-      <div><dt>Onde cada um está, por tema</dt><dd>Escolhido um tema, cada ponto vai para o saldo da pessoa nas votações esquerda × direita daquele tema; quem tem menos de 5 no tema fica de fora, e os partidos se reordenam pela média. O contorno marca quem vira de lado no tema, pelo mesmo teste do dossiê. Tema com menos votações do que isso na Casa aparece desabilitado no seletor.</dd></div>
+      <div><dt>Onde cada um está, por tema</dt><dd>Escolhido um tema, cada ponto vai para o saldo da pessoa nas votações esquerda × direita daquele tema; quem tem menos de 5 no tema fica de fora, e os partidos se reordenam pela média. O contorno marca quem vira de lado no tema, pelo mesmo teste do dossiê. Tema com menos votações do que isso na Casa aparece desabilitado no seletor. Abaixo das faixas vêm as votações do tema. A fita tem um ponto por votação que opôs esquerda e direita, na ordem do tempo, com as da mesma matéria empilhadas: quadrado é o texto principal, círculo é destaque ou emenda, e a cor diz de que polo era o lado que prevaleceu. Os realces: texto principal; governo derrotado (a liderança do Governo orientou o lado que perdeu); diferença pequena (menos de 30 votos entre o Sim e o Não na Câmara; no Senado, a mesma proporção das cadeiras); com obstrução. A matéria é representada pela votação do texto principal com mais votos (não pela redação final). Em “Quem votou”, cada linha é um partido (o do dia da votação) e cada ponto, um parlamentar: Sim à esquerda do eixo, Não à direita; ponto vazado é obstrução ou abstenção; o aro marca quem votou contra o próprio partido fechado; e a cor do ponto é o saldo da pessoa nas votações do tema (com 5 ou mais), não o voto daquele dia. O traço na barra do placar marca os votos Sim que a Constituição exige (veja “O placar”). Quando os votos um a um não batem com o placar que a Mesa anunciou, o cartão avisa.</dd></div>
       <div><dt>Na Casa</dt><dd>O dossiê mostra a posição da pessoa em cada número (presença, governismo, fidelidade, votos contra o partido, propostas, paradas, normas, relatorias, jornal), entre os que estão em exercício na mesma Casa. O 1º é quem tem o maior número; empate divide a posição. Quem preside a Casa fica fora do ranking de presença.</dd></div>
       <div><dt>Temas</dt><dd>Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml); a tabela “O que entra em cada tema”, abaixo, diz quais áreas oficiais caem em cada um.</dd></div>
       <div><dt>A fila</dt><dd>A situação oficial de cada proposição diz de quem ela está esperando: a designação de um relator (presidente da comissão), o parecer (relator), a pauta ou um despacho da Mesa. Parada é a que tramita sem andamento há mais de 365 dias. Na Câmara entram as proposições apresentadas desde 2011; no Senado, tudo o que tramita.</dd></div>
@@ -13850,7 +13855,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     var cadeiras = CADEIRAS[casa] || 0, lim = M.limiares || {}, polos = M.polos || {};
     var coesao = parseFloat(lim.coesao_partido) || 0.8, minimo = parseInt(lim.minimo_partido, 10) || 4;
     var semMovimento = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    var uid = 'cgTv-' + casa + '-', aperto = Math.max(3, Math.round(cadeiras * 30 / 513));  // "diferença pequena": 30 votos na Câmara, 5 no Senado
+    var uid = 'cgTv-' + casa + '-', aperto = Math.max(3, Math.round(cadeiras * (lim.voto_apertado || 30) / 513));  // "diferença pequena": 30 votos na Câmara, 5 no Senado
 
     /* ── Os dados: as matérias do tema com votação que opôs os polos, no tempo; as votações de cada
        uma, em ordem. V é a ordem de leitura da fita (matéria a matéria). ── */
@@ -14560,6 +14565,8 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     anotar();
     ajustarCartao();
     if (!pedido) endereco();  // o tema foi escolhido na página: o endereço passa a dizer o que está na tela
+    /* Chegou pelo endereço de uma matéria ou de uma votação: a página desce até o bloco do tema. */
+    if (pedido && (pedido.m || pedido.v) && !aberto && caixa.scrollIntoView) w.requestAnimationFrame(function () { caixa.scrollIntoView({ block: 'start' }); });
     /* A fita e os pontos se refazem quando a largura muda (ou quando a Casa ou a aba voltam a aparecer). */
     var espera = 0, vigia = null;
     function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); ajustarCartao(); medir(); }, 80); }
@@ -14572,8 +14579,22 @@ a.cg-tv-c-t:hover{text-decoration:underline}
         if (alvo) mostrarVotacao(alvo, false);
         if ((p.s || '') !== estado.q && (!p.s || G[p.s])) seguir(p.s || '', true);
       },
-      sair: function () { w.clearTimeout(espera); w.removeEventListener('resize', remedir); if (vigia) vigia.disconnect(); }
+      sair: function () { w.clearTimeout(espera); w.removeEventListener('resize', remedir); if (vigia) vigia.disconnect(); atalho(false); }
     };
+    atalho(true);
+    /* O atalho logo abaixo do seletor: as votações ficam depois das faixas dos partidos, e quem
+       acabou de escolher o tema não precisa rolar para achá-las. */
+    function atalho(ligar) {
+      var faixas = d.getElementById('cg-faixas-' + casa), pista = faixas ? faixas.querySelector('.cg-fx-d:not(.cg-tv-irp)') : null;
+      var velho = faixas ? faixas.querySelector('.cg-tv-irp') : null;
+      if (velho) velho.parentNode.removeChild(velho);
+      if (!pista) return;
+      pista.hidden = ligar;
+      if (!ligar) return;
+      var ir = h('button', { cls: 'cg-tv-atl', type: 'button', text: (V.length === 1 ? 'Ver a votação de ' : 'Ver as ' + num(V.length) + ' votações de ') + nome + ' ↓' });
+      ir.addEventListener('click', function () { caixa.scrollIntoView({ block: 'start', behavior: semMovimento ? 'auto' : 'smooth' }); });
+      pista.parentNode.insertBefore(h('p', { cls: 'cg-fx-d cg-tv-irp' }, [ir, h('span', { text: ' O que se votou em cada uma, quem ganhou e como votou cada parlamentar.' })]), pista.nextSibling);
+    }
   }
   lista(d.querySelectorAll('.cg-fx-s[data-faixas]')).forEach(function (sel) {
     var casa = sel.id.slice(-2), caixa = d.getElementById('cg-tema-det-' + casa);
@@ -14628,7 +14649,8 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     };
     var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de ' + CORTE_FID + '% das vezes', pres: 'votou em menos de ' + CORTE_PRES + '% das votações', exc: 'muda de lado em algum tema' };
     function atalhosLigados() { return atalhos ? lista(atalhos.querySelectorAll('.cg-esc-atb[aria-pressed="true"]')).map(function (b) { return b.getAttribute('data-at'); }) : []; }
-    var LOTE = 24, limite = {};  // quantos cartões à vista em cada Casa (o resto vem com "mostrar mais")
+    /* Quantos cartões à vista em cada Casa (o resto vem com "mostrar mais"): no celular, onde eles se empilham, menos. */
+    var LOTE = w.matchMedia && w.matchMedia('(max-width: 640px)').matches ? 8 : 24, limite = {};
     var mais = {};
     ols.forEach(function (ol) {
       var casa = ol.getAttribute('data-casa'), b = h('button', { cls: 'cg-esc-mais', type: 'button' });
