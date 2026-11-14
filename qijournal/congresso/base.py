@@ -277,6 +277,29 @@ def turno(descricao: str) -> int | None:
     return achados.pop() if len(achados) == 1 else None
 
 
+# O que a Constituição exige para o Sim vencer: três quintos da Casa na proposta de emenda à
+# Constituição (art. 60, § 2º) e a maioria absoluta no projeto de lei complementar (art. 69).
+# Vale para o texto e para os destaques (quem quer manter o trecho ou aprovar a emenda precisa
+# dos mesmos votos). Nas demais matérias decide a maioria dos presentes: não há número fixo.
+CADEIRAS = {"cd": 513, "sf": 81}
+_SIGLA = re.compile(r"^\s*([A-Z]+)\b")
+
+
+def quorum(casa: str, prop: str | None) -> int | None:
+    """Os votos Sim que a Constituição exige nas votações de conteúdo de uma PEC (três
+    quintos: 308 na Câmara, 49 no Senado) ou de um PLP (maioria absoluta: 257 e 41). Sem
+    número fixo (``None``) nas demais."""
+    cadeiras = CADEIRAS.get(casa)
+    achado = _SIGLA.match(prop or "")
+    if not cadeiras or not achado:
+        return None
+    if achado.group(1) == "PEC":
+        return -(-cadeiras * 3 // 5)
+    if achado.group(1) == "PLP":
+        return cadeiras // 2 + 1
+    return None
+
+
 _NOVA_EMENTA = re.compile(r"\s*NOVA EMENTA:\s*", re.IGNORECASE)
 
 

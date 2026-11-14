@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from qijournal.congresso import base, exercicio, fontes, perfil, regras, temas
+from qijournal.congresso import base, exercicio, fontes, materias, perfil, regras, temas
 from tests.fixtures.congresso import fabrica
 
 
@@ -421,3 +421,25 @@ def test_atualizar_so_consulta_quem_falta_ou_mudou_de_estado(coletor: fontes.Col
 
 def test_presidencia_da_camara(coletor: fontes.Coletor):
     assert exercicio.presidencia(coletor, [57]) == {9: [("2025-02-01", "")]}
+
+
+def test_o_placar_separa_a_obstrucao_do_nao_e_diz_o_quorum(r: regras.Regras):
+    """O placar sai como a Mesa anuncia: a obstrução fica fora do Sim e do Não (na conta de
+    que lado cada um ficou ela vale como Não). E a proposta de emenda à Constituição e o
+    projeto de lei complementar dizem quantos votos Sim a Constituição exige."""
+    assert (base.quorum("cd", "PEC 3/2021"), base.quorum("sf", "PEC 66/2023 (fase 2)")) == (308, 49)  # três quintos
+    assert (base.quorum("cd", "PLP 281/2019"), base.quorum("sf", "PLP 68/2024")) == (257, 41)  # maioria absoluta
+    assert base.quorum("cd", "PL 10/2026") is None and base.quorum("cd", "") is None and base.quorum("xx", "PEC 1/2026") is None
+    pessoas = [base.Pessoa(i, f"Deputado {i}", "SP", [(0, sigla)]) for i, sigla in ((1, "PT"), (2, "PT"), (3, "PT"), (4, "PL"), (5, "PL"), (6, "PL"), (7, "PP"))]
+    v = base.Votacao(id="v1", data="2026-03-02", orgao=base.PLENARIO, descricao="Rejeitada a Subemenda Substitutiva. Sim: 3; Não: 2; Total: 5.",
+                     tipo=base.MERITO, prop="PLP 281/2019", aprovada=False, votos="SSSNNOA")
+    ano = base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=[v])
+    na_ficha = materias.votacao(v, ano, 0, r)
+    assert (na_ficha["s"], na_ficha["n"], na_ficha["o"], na_ficha["a"], na_ficha["q"]) == (3, 2, 1, 1, 257)
+    assert na_ficha["pp"] == [["PT", 3, 0, "e"], ["PL", 0, 3, "d"]]  # no lado de cada polo, a obstrução conta como Não
+    na_lista = perfil.resumo_da_votacao(v, ano, 0, r)
+    assert (na_lista["sim"], na_lista["nao"], na_lista["obstrucao"], na_lista["abstencao"], na_lista["quorum"]) == (3, 2, 1, 1, 257)
+    # o requerimento (urgência, retirada de pauta) decide por maioria dos presentes, mesmo numa PEC
+    urgencia = base.Votacao(id="v2", data="2026-03-03", orgao=base.PLENARIO, descricao="Aprovado o Requerimento de Urgência.", tipo=base.URGENCIA, prop="PEC 3/2021", votos="SSSNNNS")
+    ano.votacoes.append(urgencia)
+    assert "q" not in materias.votacao(urgencia, ano, 1, r) and perfil.resumo_da_votacao(urgencia, ano, 1, r)["quorum"] == 0

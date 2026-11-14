@@ -154,7 +154,7 @@
     var nos = [h('p', { cls: 'cg-vl-k' }, [
       h('time', { text: dataBr(v.d) }), h('span', { cls: 'az-selo', text: tipoDaVotacao(v) }),
       res ? h('span', { cls: 'cg-res cg-res-' + (v.apv ? 'ok' : 'no'), text: res }) : null,
-      h('span', { cls: 'cg-vl-pl', text: num(v.s) + ' Sim × ' + num(v.n) + ' Não' }),
+      h('span', { cls: 'cg-vl-pl', text: num(v.s) + ' Sim × ' + num(v.n) + ' Não' + (v.o ? ' · ' + num(v.o) + ' em obstrução' : '') + (v.q ? ' · precisava de ' + num(v.q) + ' Sim' : '') }),
       chipDosPolos(v),
       opts.curto && v.ss ? h('span', { cls: 'cg-vl-ss', text: SENTIDO_CURTO[v.ss] }) : null
     ])];

@@ -143,8 +143,15 @@ def votacao(v: Votacao, ano: AnoVotos, k: int, regras: Regras) -> dict[str, Any]
         "t": v.tipo,
         "x": v.descricao,
         "s": conta.get(base.SIM, 0),
-        "n": conta.get(base.NAO, 0) + conta.get(base.OBSTRUCAO, 0),
+        "n": conta.get(base.NAO, 0),
     }
+    # O placar como a Mesa anuncia: a obstrução fica fora do Sim e do Não (na conta de que lado
+    # cada um ficou ela vale como Não, mas não é voto Não).
+    if conta.get(base.OBSTRUCAO):
+        d["o"] = conta[base.OBSTRUCAO]
+    exigido = base.quorum(ano.casa, v.prop) if v.tipo in perfil.CONTEUDO else None
+    if exigido:
+        d["q"] = exigido
     if v.hora:
         d["h"] = v.hora
     if v.abertura:

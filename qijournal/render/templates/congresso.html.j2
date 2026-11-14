@@ -493,7 +493,7 @@
             {% if v.secreta %}
             <p class="cg-v-n">Votação secreta: {{ v.sim }} Sim, {{ v.nao }} Não.</p>
             {% else %}
-            <p class="cg-v-n"><b class="cg-s">{{ v.sim }}</b> Sim <span aria-hidden="true">×</span> <b class="cg-n">{{ v.nao }}</b> Não{% if v.abstencao %} · {{ v.abstencao }} abst.{% endif %}</p>
+            <p class="cg-v-n"><b class="cg-s">{{ v.sim }}</b> Sim <span aria-hidden="true">×</span> <b class="cg-n">{{ v.nao }}</b> Não{% if v.obstrucao %} · {{ v.obstrucao }} em obstrução{% endif %}{% if v.abstencao %} · {{ v.abstencao }} abst.{% endif %}{% if v.quorum %} · precisava de {{ v.quorum }} Sim{% endif %}</p>
             <p class="cg-v-o">Governo: <b>{{ v.governo or "—" }}</b> · Esquerda: <b>{{ v.esquerda or "—" }}</b> · Direita: <b>{{ v.direita or "—" }}</b></p>
             {% endif %}
           </div>

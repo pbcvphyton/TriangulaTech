@@ -329,6 +329,8 @@ def _votacao(v: Mapping[str, Any], casa: str) -> dict[str, Any]:
         "secreta": bool(v.get("secreta")),
         "sim": v.get("sim") or 0,
         "nao": v.get("nao") or 0,
+        "obstrucao": v.get("obstrucao") or 0,
+        "quorum": v.get("quorum") or 0,
         "abstencao": v.get("abstencao") or 0,
         "governo": LADO.get(v.get("governo") or "", ""),
         "esquerda": LADO.get(v.get("esquerda") or "", ""),
@@ -1585,6 +1587,7 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         # O endereço da foto oficial de cada um, pela chave ({id}): para os cartões e as dicas montados pelo script.
         "fotos": {"cd": ficha.FOTO_CAMARA, "sf": ficha.FOTO_SENADO},
         "polos": {"esquerda": list(polos.get("esquerda") or []), "direita": list(polos.get("direita") or [])},
+        "cadeiras": dict(base.CADEIRAS),
         # O que entra em cada tema: as áreas temáticas da Câmara e as classes do Senado.
         "temasDef": {t["id"]: {"cd": t.get("camara") or [], "sf": t.get("senado") or []} for t in d.meta.get("temas") or []},
         "rel": {"alta": rel_meta.get("alta") or 60, "baixa": rel_meta.get("baixa") or 30, "rapida": relevancia.RAPIDA},

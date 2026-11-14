@@ -565,7 +565,7 @@ def test_a_ficha_da_materia_diz_o_que_e_e_como_cada_polo_votou(publicado: tuple[
     principal, destaque = pl10["vot"]
     assert (principal["t"], principal["ss"], principal["e"], principal["dr"], principal["g"], principal["dv"], principal["apv"]) == (
         "merito", "texto", "S", "N", "S", 1, 1)
-    assert (principal["s"], principal["n"]) == (6, 4)
+    assert (principal["s"], principal["n"]) == (6, 4) and "o" not in principal and "q" not in principal  # sem obstrução; projeto de lei não tem número fixo
     assert principal["pp"] == [["PT", 3, 0, "e"], ["PL", 0, 3, "d"]]  # a contagem de cada partido dos polos
     assert principal["pt"] == [["PP", "S", 75]]  # os demais partidos, pelo lado da maioria
     assert (destaque["t"], destaque["ss"], destaque["dq"], destaque["apv"]) == ("destaque", "trecho", "PL", 1)  # "Mantido o texto": o Sim venceu

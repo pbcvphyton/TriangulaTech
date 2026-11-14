@@ -547,8 +547,10 @@ def resumo_da_votacao(v: Votacao, ano: AnoVotos, indice: int, regras: Regras) ->
         "aprovada": v.aprovada,
         "secreta": v.secreta,
         "sim": conta.get(base.SIM, 0),
-        "nao": conta.get(base.NAO, 0) + conta.get(base.OBSTRUCAO, 0),
+        "nao": conta.get(base.NAO, 0),
+        "obstrucao": conta.get(base.OBSTRUCAO, 0),  # fora do Sim e do Não, como a Mesa anuncia
         "abstencao": conta.get(base.ABSTENCAO, 0),
+        "quorum": (base.quorum(ano.casa, v.prop) if v.tipo in CONTEUDO else None) or 0,
         "governo": leitura.governo,
         "esquerda": leitura.esquerda,
         "direita": leitura.direita,
