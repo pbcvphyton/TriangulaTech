@@ -704,7 +704,7 @@
   }
   function abrir(k, semHistorico) {
     if (!mo || !/^(cd|sf)-\d+$/.test(k)) return;
-    if (!aberto) foco = d.activeElement;
+    if (!aberto) lembrarFundo();
     aberto = k;
     mo.hidden = false;
     d.body.classList.add('cg-aberto');
@@ -731,15 +731,22 @@
     pedido.onerror = pedido.onload;
     pedido.send();
   }
+  /* Antes de abrir uma ficha por cima: de onde veio o foco e o endereço da vista que fica por baixo
+     (com o que ela guarda: o tema e a matéria em foco, os filtros da escolha). */
+  var fundo = '';
+  function lembrarFundo() {
+    foco = d.activeElement;
+    fundo = /^#v=/.test(w.location.hash || '') ? w.location.hash : '';
+  }
   function fechar(comHistorico) {
     if (!aberto) return;
     aberto = null;
     mo.hidden = true;
     d.body.classList.remove('cg-aberto');
-    if (comHistorico && /^#[pcm]=/.test(w.location.hash)) {
+    if (comHistorico && /^#[pcmf]=/.test(w.location.hash)) {
       // fechou o dossiê: o endereço volta a ser o da vista que está por baixo
-      var destino = vistaAtual && vistaAtual !== vistaPadrao ? '#v=' + vistaAtual : w.location.pathname + w.location.search;
-      if (w.history && w.history.pushState) w.history.pushState(null, '', destino); else w.location.hash = vistaAtual && vistaAtual !== vistaPadrao ? 'v=' + vistaAtual : '';
+      var destino = fundo || (vistaAtual && vistaAtual !== vistaPadrao ? '#v=' + vistaAtual : w.location.pathname + w.location.search);
+      if (w.history && w.history.pushState) w.history.pushState(null, '', destino); else w.location.hash = fundo ? fundo.slice(1) : (vistaAtual && vistaAtual !== vistaPadrao ? 'v=' + vistaAtual : '');
     }
     if (foco && foco.focus) foco.focus();
   }
@@ -751,6 +758,8 @@
     if (m) { abrir(m[1], true); return; }
     if (c) { abrirComparacao(c[1], c[2], true); return; }
     if (mt) { abrirMateria(mt[1], true); return; }
+    var fr = /^#f=(\d+)$/.exec(hash);
+    if (fr) { abrirFrente(fr[1], true); return; }
     fechar(false);
     if (!abas.length) return;
     if (v && aoEndereco[v[1]]) aoEndereco[v[1]](v[2] || '');
@@ -763,6 +772,9 @@
     if (el && !event.metaKey && !event.ctrlKey && !event.shiftKey) { event.preventDefault(); abrir(el.getAttribute('data-k')); return; }
     var mt = event.target && event.target.closest ? event.target.closest('[data-m]') : null;
     if (mt && !event.metaKey && !event.ctrlKey && !event.shiftKey) { event.preventDefault(); abrirMateria(mt.getAttribute('data-m')); return; }
+    /* O cartão de uma frente abre a ficha dela (menos nos links e nas listas de dentro dele). */
+    var cartaoFr = event.target && event.target.closest ? event.target.closest('[data-frente]') : null;
+    if (cartaoFr && !(event.target.closest('a, summary, details, select') && !event.target.closest('[data-f]'))) { event.preventDefault(); abrirFrente(cartaoFr.getAttribute('data-frente')); return; }
     if (aberto && (event.target === mo || (event.target.closest && event.target.closest('.cg-mc')))) fechar(true);
   });
   d.addEventListener('keydown', function (event) { if (event.key === 'Escape' && aberto) fechar(true); });
@@ -1064,7 +1076,7 @@
   function abrirComparacao(a, b, semHistorico) {
     if (!mo || !/^(cd|sf)-\d+$/.test(a) || !/^(cd|sf)-\d+$/.test(b) || a === b) return;
     var chave = 'c:' + a + ',' + b;
-    if (!aberto) foco = d.activeElement;
+    if (!aberto) lembrarFundo();
     aberto = chave;
     mo.hidden = false;
     d.body.classList.add('cg-aberto');
@@ -1098,6 +1110,8 @@
     acharQ.addEventListener('change', ir);
   }
 {% include "congresso_materias.js.j2" %}
+{% include "congresso_cartoes.js.j2" %}
+{% include "congresso_tema.js.j2" %}
 {% include "congresso_escolha.js.j2" %}
   if (abas.length) verVista(vistaPadrao, true);
   doEndereco();

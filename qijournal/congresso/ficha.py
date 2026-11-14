@@ -290,7 +290,22 @@ def saldo_no_partido(ficha: Mapping[str, Any], minimo: int) -> float | None:
 MINIMO_TEMA_FAIXA = 5  # votações esquerda × direita no tema para a pessoa aparecer na faixa filtrada
 
 
-def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
+def troca_de_partido(ficha: Mapping[str, Any], inicio: str) -> list[str] | None:
+    """Para quem mudou de partido na legislatura: ``[desde (AAAA-MM), partido anterior]``. A data
+    é a do primeiro voto registrado pelo partido atual, não a da filiação; fica vazia quando a
+    pessoa ainda não votou pelo partido novo."""
+    votados = [(str(data), str(sigla)) for data, sigla in ficha.get("partidos") or [] if sigla]
+    atual = str(ficha.get("partido") or "")
+    if not votados or not atual:
+        return None
+    if text.normalize(votados[-1][1]) != text.normalize(atual):
+        return ["", votados[-1][1]]  # o cadastro já diz o partido novo; os votos, ainda o antigo
+    if len(votados) >= 2 and inicio and votados[-1][0] >= inicio:
+        return [votados[-1][0][:7], votados[-2][1]]
+    return None
+
+
+def linha(ficha: Mapping[str, Any], legislatura: int, inicio: str = "") -> dict[str, Any]:
     """A linha da pessoa no índice (``resumo.json``): o que a tabela, o mapa e as
     fichas dentro das matérias precisam, sem abrir a ficha inteira."""
     atual = (ficha.get("leg") or {}).get(str(legislatura)) or {}
@@ -339,6 +354,9 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
+    troca = troca_de_partido(ficha, inicio)
+    if troca:
+        d["troca"] = troca
     cota = ficha.get("cota") or {}
     leg_cota = cota.get("leg") or {}
     if cota.get("sem_despesa"):

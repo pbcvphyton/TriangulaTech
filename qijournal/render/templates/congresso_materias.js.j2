@@ -282,7 +282,7 @@
     var alvo = materiaDaChave(k);
     if (!mo || !alvo) return;
     var chave = 'm:' + k;
-    if (!aberto) foco = d.activeElement;
+    if (!aberto) lembrarFundo();
     aberto = chave;
     mo.hidden = false;
     d.body.classList.add('cg-aberto');
@@ -319,66 +319,6 @@
     if (pa !== pb) return pa - pb;
     return a.d < b.d ? 1 : a.d > b.d ? -1 : 0;
   }
-  function detalharTema(caixa, casa, tema) {
-    while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
-    if (!tema) { caixa.hidden = true; return; }
-    caixa.hidden = false;
-    caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Carregando as matérias de ' + nomeDoTema(tema) + '…' }));
-    materiasDa(casa, function (erro, mat) {
-      var sel = d.getElementById('cgFxTema-' + casa);
-      if (sel && sel.value !== tema) return;  // já escolheram outro tema
-      while (caixa.firstChild) caixa.removeChild(caixa.firstChild);
-      if (erro) { caixa.appendChild(h('p', { cls: 'cg-d-st', text: 'Não foi possível carregar as matérias agora. Tente de novo em instantes.' })); return; }
-      var itens = [], total = 0, tipos = { merito: 0, destaque: 0 }, ganhou = { e: 0, d: 0 }, gov = { e: 0, d: 0, n: 0 }, simEsq = 0;
-      Object.keys(mat.materias).forEach(function (t) {
-        var m = mat.materias[t];
-        if ((m.tm || []).indexOf(tema) < 0) return;
-        var votos = (m.vot || []).filter(function (v) { return v.dv; });
-        if (!votos.length) return;
-        votos.forEach(function (v) {
-          total += 1;
-          tipos[v.t] = (tipos[v.t] || 0) + 1;
-          if (v.e === 'S') simEsq += 1;
-          if (v.apv != null) ganhou[(v.apv ? 'S' : 'N') === v.e ? 'e' : 'd'] += 1;
-          if (v.g) { gov.n += 1; gov[v.g === v.e ? 'e' : 'd'] += 1; }
-        });
-        itens.push({ t: t, m: m, votos: votos.slice().sort(ordemDoVoto), ultima: votos[votos.length - 1].d });
-      });
-      itens.sort(function (a, b) { return b.votos.length - a.votos.length || (a.ultima < b.ultima ? 1 : -1); });
-      var nome = nomeDoTema(tema), def = definicaoDoTema(tema, casa);
-      caixa.appendChild(h('h5', { cls: 'cg-td-h' }, ['As ' + plural(total, 'votação', 'votações') + ' de ' + nome, h('span', { text: 'em ' + plural(itens.length, 'matéria', 'matérias') + ' · só as que opuseram esquerda e direita' })]));
-      if (def) caixa.appendChild(h('p', { cls: 'cg-td-def' }, [h('b', { text: 'O que entra no tema: ' }), def]));
-      var chips = [h('span', { cls: 'cg-chip' }, ['texto principal ', h('b', { text: num(tipos.merito || 0) })]), h('span', { cls: 'cg-chip' }, ['destaques e emendas ', h('b', { text: num(tipos.destaque || 0) })])];
-      if (ganhou.e + ganhou.d) chips.push(h('span', { cls: 'cg-chip' }, ['o lado da esquerda venceu ', h('b', { text: num(ganhou.e) })]), h('span', { cls: 'cg-chip' }, ['o da direita venceu ', h('b', { text: num(ganhou.d) })]));
-      if (gov.n) chips.push(h('span', { cls: 'cg-chip' }, ['o Governo orientou com a esquerda em ', h('b', { text: num(gov.e) })]), h('span', { cls: 'cg-chip' }, ['com a direita em ', h('b', { text: num(gov.d) })]));
-      caixa.appendChild(h('p', { cls: 'cg-td-r' }, chips));
-      caixa.appendChild(h('p', { cls: 'cg-d-n' }, [
-        'Por que uma votação conta como “de esquerda” ou “de direita”: não é pelo assunto. É porque, naquela votação, a maioria de ' + ((M.polos || {}).esquerda || []).join(', ') +
-        ' votou de um jeito e a de ' + ((M.polos || {}).direita || []).join(' e ') + ', do outro. Em cada votação abaixo está o que estava em jogo e o Sim–Não de cada partido dos polos. Votar “com a esquerda” é votar igual à maioria dela naquela votação: em ' +
-        num(simEsq) + ' destas ' + num(total) + ', isso foi votar Sim; nas outras ' + num(total - simEsq) + ', votar Não.', dica('polos')
-      ]));
-      var lis = itens.map(function (x) {
-        var m = x.m, extras = [h('span', { cls: 'cg-chip' }, [h('b', { text: num(x.votos.length) }), x.votos.length === 1 ? ' votação' : ' votações'])];
-        var lados = ladosNoTexto(m);
-        if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
-        if (m.rel) extras.push(h('span', { cls: 'cg-rv-n', 'data-dica': GLOSS.nota, tabindex: '0', text: 'nota ' + m.rel.n }));
-        if (m.jor) extras.push(h('span', { cls: 'cg-rv-jor', text: 'no jornal ' + m.jor + '×' }));
-        var filhos = [cabecaDaMateria(casa, x.t, m, extras), h('p', { cls: 'cg-mh-e', text: curto(m.e, 320) })];
-        if (m.ex) filhos.push(h('p', { cls: 'cg-mh-x', text: curto(m.ex, 280) }));
-        var votos = x.votos.map(function (v) { return itemDaVotacao(v, { curto: true }); });
-        listaEmPartes('cg-vls', votos, VOTOS_DE_INICIO, function (n) { return 'mais ' + plural(n, 'votação desta matéria', 'votações desta matéria'); }).forEach(function (no) { filhos.push(no); });
-        return h('li', { cls: 'cg-td-m' }, filhos);
-      });
-      listaEmPartes('cg-td-l', lis, MATERIAS_DE_INICIO, function (n) { return 'mostrar as outras ' + plural(n, 'matéria', 'matérias'); }).forEach(function (no) { caixa.appendChild(no); });
-      caixa.appendChild(h('p', { cls: 'cg-d-n', text: 'Clique no número de uma matéria para abrir a ficha: a ementa inteira, a explicação oficial, quem propôs e todas as votações, com os demais partidos.' }));
-    });
-  }
-  lista(d.querySelectorAll('.cg-fx-s[data-faixas]')).forEach(function (sel) {
-    var casa = sel.id.slice(-2), caixa = d.getElementById('cg-tema-det-' + casa);
-    if (!caixa || !M.materiasArq) return;
-    sel.addEventListener('change', function () { detalharTema(caixa, casa, sel.value); });
-  });
-
   /* ── Os votos de uma pessoa (ou de duas) num tema ── */
   function votosNoTema(vt, mat, chaves, tema) {
     var idx = indiceDeVotacoes(mat), grupos = {}, ordem = [];

@@ -783,7 +783,7 @@ def _casa(
         ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
         listas=_listas(painel.get("listas") or {}),
         escolha=_escolha(casa, pessoas, temas_meta or [], campos, governo),
-        frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos),
+        frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos, int(painel.get("em_exercicio") or 0)),
         cota=_cota(painel.get("cota") or {}, casa),
         comissoes=_comissoes(painel.get("comissoes") or {}, casa),
     )
@@ -791,6 +791,15 @@ def _casa(
 
 ESCOLHA_TEMAS = 3  # temas de cada lado na linha de cada um
 ESCOLHA_PROPOE = 3  # temas em que mais propõe, na linha de cada um
+
+
+def iniciais(nome: str) -> str:
+    """As iniciais do primeiro e do último nome ("Maria do Rosário" → "MR"): o que o cartão
+    mostra enquanto a foto não vem (ou se ela não vier)."""
+    partes = [parte for parte in nome.replace(".", " ").split() if parte[:1].isalpha() and parte.lower() not in ("de", "da", "do", "das", "dos", "e")]
+    if not partes:
+        return ""
+    return (partes[0][0] + (partes[-1][0] if len(partes) > 1 else "")).upper()
 
 
 def corte_do_centro(campos: list[dict[str, Any]]) -> tuple[float, float]:
@@ -810,16 +819,54 @@ def lado_no_tema(saldo: float, corte: tuple[float, float]) -> str:
     return "d" if saldo > corte[1] else "c"
 
 
+MESES_CURTOS = ("jan.", "fev.", "mar.", "abr.", "maio", "jun.", "jul.", "ago.", "set.", "out.", "nov.", "dez.")
+
+
+def _mediana(valores: list[float]) -> float | None:
+    ordem = sorted(valores)
+    if not ordem:
+        return None
+    meio = len(ordem) // 2
+    return ordem[meio] if len(ordem) % 2 else (ordem[meio - 1] + ordem[meio]) / 2
+
+
+def excecao_de_tema(p: Mapping[str, Any], corte: tuple[float, float]) -> tuple[str, float, int] | None:
+    """O tema em que a pessoa vota do lado oposto ao do seu padrão geral (``(tema, saldo,
+    votações)``; ``None`` se não houver): ela tem lado no geral (fora da faixa "dividido") e, num
+    tema com 5 votações ou mais, fica do outro lado. Havendo mais de um, o de mais votações."""
+    if p.get("saldo") is None:
+        return None
+    geral = lado_no_tema(float(p["saldo"]), corte)
+    if geral == "c":
+        return None
+    opostos = [
+        (tema, float(valores[0]), int(valores[1]))
+        for tema, valores in (p.get("tm") or {}).items()
+        if lado_no_tema(float(valores[0]), corte) not in ("c", geral)
+    ]
+    return max(opostos, key=lambda x: (x[2], abs(x[1]), x[0])) if opostos else None
+
+
 def _escolha(casa: str, pessoas: list[dict[str, Any]], temas: list[dict[str, Any]], campos: list[dict[str, Any]], governo: str) -> dict[str, Any]:
-    """"Escolha o seu candidato": quem está em exercício na Casa, do estado A ao Z, com o que
-    o registro diz de cada um (de que lado vota em cada tema, sobre o que propõe, presença,
-    governo, normas). O script filtra e ordena esta mesma lista; sem ele, ela sai inteira."""
+    """"Escolha o seu candidato": quem está em exercício na Casa, do estado A ao Z, um cartão
+    cada: a foto, de que lado vota, se aparece para votar, se acompanha o partido, onde foge do
+    próprio padrão e o que propôs; o resto atrás do "ver mais". O script filtra e ordena esta
+    mesma lista; sem ele, ela sai inteira."""
     curtos = {t["id"]: t.get("curto") or t["nome"] for t in temas}
     corte = corte_do_centro(campos)
+    da_casa = [p for p in pessoas if p["k"].startswith(casa + "-") and p.get("ex")]
+    mediana_pres = _mediana([float(p["pres"]) for p in da_casa if p.get("pres") is not None])
+    mediana_fid = _mediana([float(p["fid"]) for p in da_casa if p.get("fid") is not None])
+    # A cota se compara dentro do estado (o gasto e o teto mudam com a distância de Brasília); no
+    # Senado, com três por estado, a comparação é com a Casa.
+    por_uf: dict[str, list[float]] = defaultdict(list)
+    for p in da_casa:
+        if p.get("ct") is not None:
+            por_uf[p.get("uf") or "" if casa == "cd" else ""].append(float(p["ct"]))
+    medianas_ct = {uf: _mediana(v) for uf, v in por_uf.items()}
+    onde_casa = "da Câmara" if casa == "cd" else "do Senado"
     itens = []
-    for p in pessoas:
-        if not p["k"].startswith(casa + "-") or not p.get("ex"):
-            continue
+    for p in da_casa:
         lados: dict[str, list[tuple[str, int, int]]] = {"e": [], "c": [], "d": []}
         for tema, valores in (p.get("tm") or {}).items():
             if tema in curtos:
@@ -827,6 +874,32 @@ def _escolha(casa: str, pessoas: list[dict[str, Any]], temas: list[dict[str, Any
         for lista in lados.values():
             lista.sort(key=lambda x: (-x[2], x[0]))
         propoe = sorted(((curtos[t], n) for t, n in (p.get("pt") or {}).items() if t in curtos), key=lambda x: (-x[1], x[0]))
+        exc = excecao_de_tema(p, corte)
+        troca = p.get("troca") or None
+        desde = ""
+        if troca and troca[0]:
+            desde = f"{MESES_CURTOS[int(troca[0][5:7]) - 1]} {troca[0][:4]}"
+        uf_ct = (p.get("uf") or "") if casa == "cd" else ""
+        mediana_ct = medianas_ct.get(uf_ct)
+        left, _width = _barra(p.get("saldo"))
+        mais = [
+            x
+            for x in (
+                (f"Com o governo {governo}".strip(), f"votou com a orientação em {_pct(p.get('gov'))} das vezes") if p.get("gov") is not None else None,
+                (
+                    "Cota parlamentar",
+                    f"{reais(p.get('ct'))} por mês"
+                    + (f" · mediana {'de ' + uf_ct if uf_ct else onde_casa}: {reais(mediana_ct)}" if mediana_ct is not None else ""),
+                )
+                if p.get("ct") is not None
+                else None,
+                ("Com a esquerda em", ", ".join(f"{nome} {_saldo(v)}" for nome, v, _n in lados["e"])) if lados["e"] else None,
+                ("Com a direita em", ", ".join(f"{nome} {_saldo(v)}" for nome, v, _n in lados["d"])) if lados["d"] else None,
+                ("Propõe sobre", ", ".join(f"{nome} ({n})" for nome, n in propoe[:ESCOLHA_PROPOE])) if propoe else None,
+                ("Frentes", f"assina {_num(p.get('frn'))}") if p.get("frn") else None,
+            )
+            if x
+        ]
         itens.append(
             {
                 "k": p["k"],
@@ -838,31 +911,42 @@ def _escolha(casa: str, pessoas: list[dict[str, Any]], temas: list[dict[str, Any
                 "classe": classe_do_saldo(p.get("saldo"), campos),
                 "pres": p.get("pres"),
                 "gov": p.get("gov"),
+                "fid": p.get("fid"),
                 "norma": p.get("norma") or 0,
                 "prop": p.get("prop") or 0,
                 "ct": p.get("ct"),
-                "esq": [f"{nome} {_saldo(v)}" for nome, v, _n in lados["e"][:ESCOLHA_TEMAS]],
-                "esq_mais": max(0, len(lados["e"]) - ESCOLHA_TEMAS),
-                "dir": [f"{nome} {_saldo(v)}" for nome, v, _n in lados["d"][:ESCOLHA_TEMAS]],
-                "dir_mais": max(0, len(lados["d"]) - ESCOLHA_TEMAS),
-                "propoe": [f"{nome} ({n})" for nome, n in propoe[:ESCOLHA_PROPOE]],
-                "numeros": " · ".join(
-                    x
-                    for x in (
-                        f"Presença {_pct(p.get('pres'))}" if p.get("pres") is not None else "",
-                        f"governo {_pct(p.get('gov'))}" if p.get("gov") is not None and governo else "",
-                        f"{_num(p.get('prop'))} propostas" if p.get("prop") else "nenhuma proposta de autoria principal",
-                        (f"{_num(p.get('norma'))} virou norma" if p.get("norma") == 1 else f"{_num(p.get('norma'))} viraram norma") if p.get("norma") else "",
-                        f"cota {reais(p.get('ct'))}/mês" if p.get("ct") is not None else "",
-                    )
-                    if x
-                ),
+                "foto": filters.safe_url(p.get("foto")) or "",
+                "iniciais": iniciais(p["nome"]),
+                # De que lado vota, em palavras (o começo da frase da ficha), com o número e a base.
+                "vota": str(p.get("frase") or "").split(":", 1)[0] if p.get("saldo") is not None else "",
+                "regua": round(50 + float(p["saldo"]) / 2, 1) if p.get("saldo") is not None else None,
+                "div": _num(p.get("div")) if p.get("div") else "",
+                "troca": {"desde": desde, "antes": troca[1]} if troca else None,
+                "pres_txt": _pct(p.get("pres")) if p.get("pres") is not None else "",
+                "fid_txt": _pct(p.get("fid")) if p.get("fid") is not None else "",
+                "excecao": {"tema": curtos.get(exc[0], exc[0]), "lado": "com a direita" if exc[1] > 0 else "com a esquerda", "saldo": _saldo(exc[1]), "n": _num(exc[2])} if exc else None,
+                "propostas": (
+                    f"{_num(p.get('prop'))} {'proposta' if p.get('prop') == 1 else 'propostas'}"
+                    + (f" · {_num(p.get('norma'))} {'virou norma' if p.get('norma') == 1 else 'viraram norma'}" if p.get("norma") else "")
+                )
+                if p.get("prop")
+                else "Nenhuma proposta de autoria principal",
+                "mais": mais,
             }
         )
     itens.sort(key=lambda i: (i["uf"], text.normalize(i["nome"])))
     ufs = sorted({i["uf"] for i in itens if i["uf"]})
     partidos = sorted({i["partido"] for i in itens if i["partido"]}, key=text.normalize)
-    return {"itens": itens, "ufs": ufs, "partidos": partidos, "corte": [corte[0], corte[1]], "corte_txt": [_saldo(corte[0]), _saldo(corte[1])]}
+    return {
+        "itens": itens,
+        "ufs": ufs,
+        "partidos": partidos,
+        "corte": [corte[0], corte[1]],
+        "corte_txt": [_saldo(corte[0]), _saldo(corte[1])],
+        "mediana_pres": _pct(mediana_pres) if mediana_pres is not None else "",
+        "mediana_fid": _pct(mediana_fid) if mediana_fid is not None else "",
+        "casa_txt": onde_casa,
+    }
 
 
 MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
@@ -1011,54 +1095,117 @@ def _comissoes(cm: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
     }
 
 
-FRENTE_PARTIDOS = 6  # partidos com mais membros na linha de cada frente
-FRENTE_CONTRA = 5  # membros que mais votam diferente do coordenador, em cada frente
+FRENTE_LINHAS = 8  # deputados por coluna no desenho de cada frente (um ponto por deputado que assina)
+FRENTE_CONTRA = 5  # membros que menos votam igual ao coordenador, na lista de cada cartão
 
 
-def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """As frentes de causa (config/congresso.yaml) e o voto de quem assina, agrupadas pelo tema."""
+FRENTE_POUCAS = 20  # votações abaixo disto: a conclusão do cartão leva o aviso de poucas votações
+
+
+def lado_firme(saldo: Any, campos: list[dict[str, Any]]) -> str:
+    """``e`` ou ``d`` quando o saldo está numa das pontas da régua (a primeira e a última faixa
+    de ``campos``: até −60 e acima de +60 no padrão); senão, vazio. Só com o coordenador numa
+    ponta a página fala em "lado oposto ao do coordenador"."""
+    if saldo is None:
+        return ""
+    ordem = sorted(campos, key=lambda c: float(c.get("ate") or 0))
+    if len(ordem) < 2:
+        return ""
+    if float(saldo) <= float(ordem[0]["ate"]):
+        return "e"
+    return "d" if float(saldo) > float(ordem[-2]["ate"]) else ""
+
+
+def manchete_da_frente(c: Mapping[str, Any], firme: str) -> tuple[dict[str, str], str]:
+    """A conclusão do cartão da frente (o número e a frase) e de que tipo ela é.
+
+    ``oposto``: o coordenador vota numa das pontas (``firme``) e há membros com votações no
+    tema: quantos deles votam do lado oposto ao dele. ``igual``: sem isso, mas com votações em
+    comum: em quanto das vezes quem assina votou igual a ele. ``assinam``: nada a comparar."""
+    lados = c.get("lados") or {}
+    com_lado = sum(int(lados.get(x) or 0) for x in ("e", "c", "d"))
+    if firme and com_lado:
+        n = int(lados.get("d" if firme == "e" else "e") or 0)
+        return ({"numero": f"{_num(n)} de {_num(com_lado)}", "texto": "que assinam votam do lado oposto ao do coordenador."}, "oposto")
+    if c.get("com_coord") is not None:
+        return (
+            {"numero": _pct(c.get("com_coord")), "texto": "das vezes, quem assina votou igual ao coordenador, que não vota de um lado só neste tema."},
+            "igual",
+        )
+    return ({"numero": _num(c.get("em_exercicio")), "texto": "deputados assinam. Não há votações bastantes para comparar com o coordenador."}, "assinam")
+
+
+def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[dict[str, Any]], em_exercicio: int = 0) -> dict[str, Any] | None:
+    """As frentes de causa (config/congresso.yaml) e o voto de quem assina: um cartão cada, a
+    começar por onde menos se vota igual ao coordenador."""
     if not fr or not fr.get("causas"):
         return None
     curtos = {t["id"]: t.get("curto") or t["nome"] for t in temas}
-    grupos: dict[str, list[dict[str, Any]]] = {}
+    corte = corte_do_centro(campos)
+    cartoes = []
     for c in fr["causas"]:
         lados = c.get("lados") or {}
-        com_lado = sum(int(lados.get(x) or 0) for x in ("e", "c", "d", "sem")) or 1
         coord = c.get("coord") or None
         tema = c.get("tema") or "todas"
-        grupos.setdefault(tema, []).append(
+        onde = f"em {curtos.get(tema, tema)}" if tema != "todas" else "nas votações que opõem esquerda e direita"
+        firme = lado_firme(coord.get("saldo") if coord else None, campos)
+        manchete, tipo = manchete_da_frente(c, firme)
+        lado_coord = lado_no_tema(float(coord["saldo"]), corte) if coord and coord.get("saldo") is not None else ""
+        # Com o coordenador numa ponta, os grupos se chamam pelo lado dele; senão, pelo lado da régua.
+        nomes = {"e": "com a esquerda", "c": "divididos", "d": "com a direita", "sem": "sem votações bastantes"}
+        if firme:
+            nomes["e" if firme == "e" else "d"] = "do mesmo lado"
+            nomes["d" if firme == "e" else "e"] = "do lado oposto"
+        votacoes = int(c.get("votacoes") or 0)
+        cartoes.append(
             {
                 "id": c["id"],
                 "nome": c.get("nome") or c.get("titulo") or "",
                 "titulo": c.get("titulo") or "",
                 "doc": filters.safe_url(c.get("doc")) or "",
                 "criada": _data(c.get("criada"), ano=True),
+                "tema": tema,
+                "tema_nome": curtos.get(tema, "Sem um tema só"),
+                "onde": onde,
                 "membros": _num(c.get("membros")),
-                "em_exercicio": _num(c.get("em_exercicio")),
+                "em_exercicio": int(c.get("em_exercicio") or 0),
+                "em_exercicio_txt": _num(c.get("em_exercicio")),
                 "coord": {
                     **coord,
                     "saldo_txt": _saldo(coord.get("saldo")),
                     "classe": classe_do_saldo(coord.get("saldo"), campos),
+                    "vota": next((str(x.get("nome")) for x in sorted(campos, key=lambda x: float(x.get("ate") or 0)) if float(coord["saldo"]) <= float(x.get("ate") or 0)), "")
+                    if coord.get("saldo") is not None
+                    else "",
                 }
                 if coord
                 else None,
-                "lados": [
-                    {"id": x, "n": int(lados.get(x) or 0), "w": round(100 * int(lados.get(x) or 0) / com_lado, 1), "nome": nome}
-                    for x, nome in (("e", "com a esquerda"), ("c", "dividido"), ("d", "com a direita"), ("sem", "sem votações bastantes"))
+                # Um ponto por deputado: colunas cheias de FRENTE_LINHAS e o resto da última coluna.
+                "grupos": [
+                    {"id": x, "n": int(lados.get(x) or 0), "nome": nomes[x], "cols": int(lados.get(x) or 0) // FRENTE_LINHAS, "resto": int(lados.get(x) or 0) % FRENTE_LINHAS, "coord": x == lado_coord}
+                    for x in ("e", "c", "d", "sem")
+                    if lados.get(x)
                 ],
-                "votacoes": _num(c.get("votacoes")),
+                "manchete": manchete,
+                "tipo": tipo,
+                "oposto": int(lados.get("d" if firme == "e" else "e") or 0) if firme else "",
+                "votacoes": _num(votacoes),
+                "poucas": 0 < votacoes < FRENTE_POUCAS,
                 "com_coord": _pct(c.get("com_coord")),
-                "partidos": [f"{sigla} {membros} de {bancada}" for sigla, membros, bancada in (c.get("partidos") or [])[:FRENTE_PARTIDOS]],
-                "partidos_mais": max(0, len(c.get("partidos") or []) - FRENTE_PARTIDOS),
+                "com_coord_n": c.get("com_coord") if c.get("com_coord") is not None else "",
+                "sem_assinar": _pct(c.get("sem_assinar")) if c.get("sem_assinar") is not None else "",
                 "contra": [
                     {**x, "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"), "pct_txt": _pct(x.get("pct"))}
                     for x in (c.get("contra") or [])[:FRENTE_CONTRA]
                 ],
             }
         )
-    ordem = [t["id"] for t in temas] + ["todas"]
+    # Primeiro, onde menos se vota igual ao coordenador; sem a conta, no fim, pelo nome.
+    cartoes.sort(key=lambda f: (f["com_coord_n"] == "", f["com_coord_n"] or 0, text.normalize(f["nome"])))
     return {
         "total": _num(fr.get("total")),
+        "causas": _num(len(cartoes)),
+        "da_casa": _num(em_exercicio) if em_exercicio else "",
         "mediana": _num(fr.get("mediana")),
         "media": str(fr.get("media") or "").replace(".", ","),
         "nenhuma": int(fr.get("nenhuma") or 0),
@@ -1066,11 +1213,9 @@ def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[di
         "mais_assinam": [
             {**x, "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"), "n_txt": _num(x.get("n"))} for x in (fr.get("mais_assinam") or [])[:10]
         ],
-        "grupos": [
-            {"tema": t, "nome": curtos.get(t, "Sem um tema só: todas as votações esquerda × direita"), "frentes": grupos[t]}
-            for t in ordem
-            if t in grupos
-        ],
+        "cartoes": cartoes,
+        "linhas": FRENTE_LINHAS,
+        "poucas": FRENTE_POUCAS,
     }
 
 
@@ -1436,6 +1581,9 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         "base": f"../data/{dados.PASTA}/{dados.FICHAS}/",
         "votosArq": f"../data/{dados.PASTA}/" + dados.VOTOS.replace("{casa}.json", ""),
         "materiasArq": f"../data/{dados.PASTA}/" + materias.ARQUIVO.replace("{casa}.json", ""),
+        "frentesArq": f"../data/{dados.PASTA}/{dados.FRENTES}",
+        # O endereço da foto oficial de cada um, pela chave ({id}): para os cartões e as dicas montados pelo script.
+        "fotos": {"cd": ficha.FOTO_CAMARA, "sf": ficha.FOTO_SENADO},
         "polos": {"esquerda": list(polos.get("esquerda") or []), "direita": list(polos.get("direita") or [])},
         # O que entra em cada tema: as áreas temáticas da Câmara e as classes do Senado.
         "temasDef": {t["id"]: {"cd": t.get("camara") or [], "sf": t.get("senado") or []} for t in d.meta.get("temas") or []},

@@ -1,0 +1,227 @@
+{#- Aba Congresso: os cartões e os pontos (incluído por congresso.js.j2, dentro da mesma
+    função). Três coisas: (1) as matérias de um tema viram um ponto cada uma, no tempo; o ponto
+    escolhido abre um cartão com o essencial e QUEM VOTOU, um ponto por parlamentar, no partido
+    em que ele estava no dia; (2) a ficha de cada frente, com todos os membros na régua do tema;
+    (3) a inclinação dos cartões sob o ponteiro. Tudo sai de materias-<casa>.json,
+    votos-<casa>.json e frentes-cd.json, lidos quando alguém abre. Sempre com textContent. -#}
+  /* ════ Cartões com profundidade: inclinam um pouco sob o ponteiro ════ */
+  (function () {
+    var parado = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var fino = w.matchMedia && w.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (parado || !fino || !w.requestAnimationFrame) return;
+    var vivo = null, quadro = 0, ultimo = null;
+    function soltar() {
+      if (!vivo) return;
+      ['--rx', '--ry', '--mx', '--my'].forEach(function (p) { vivo.style.removeProperty(p); });
+      vivo.classList.remove('cg-3d-on');
+      vivo = null;
+    }
+    d.addEventListener('pointermove', function (ev) {
+      var c = ev.target.closest ? ev.target.closest('.cg-3d') : null;
+      if (c !== vivo) { soltar(); vivo = c; if (c) c.classList.add('cg-3d-on'); }
+      if (!c) return;
+      ultimo = ev;
+      if (quadro) return;
+      quadro = w.requestAnimationFrame(function () {
+        quadro = 0;
+        if (!vivo || !ultimo) return;
+        var r = vivo.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        var x = (ultimo.clientX - r.left) / r.width, y = (ultimo.clientY - r.top) / r.height;
+        var forca = parseFloat(vivo.getAttribute('data-3d')) || 4;
+        vivo.style.setProperty('--ry', ((x - 0.5) * 2 * forca).toFixed(2) + 'deg');
+        vivo.style.setProperty('--rx', ((0.5 - y) * 2 * forca).toFixed(2) + 'deg');
+        vivo.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+        vivo.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      });
+    });
+    d.addEventListener('pointerleave', soltar);
+    w.addEventListener('scroll', soltar, true);
+  })();
+
+  /* ════ Quem votou, em pontos ════ */
+  var PESSOAS = null;
+  /* O que a tabela de todos diz de cada um: nome, partido de hoje, UF e saldo geral. */
+  function pessoaDe(k) {
+    if (!PESSOAS) {
+      PESSOAS = {};
+      linhas.forEach(function (tr) {
+        var ck = tr.querySelector('.cg-cp-ck'), chave = ck ? ck.getAttribute('data-cmp') : '', s = tr.getAttribute('data-saldo');
+        if (chave) PESSOAS[chave] = { nome: tr.getAttribute('data-nome') || chave, partido: tr.getAttribute('data-partido') || '', uf: tr.getAttribute('data-uf') || '', saldo: s === '' || s == null ? null : parseFloat(s), fora: tr.classList.contains('cg-fora') };
+      });
+    }
+    return PESSOAS[k] || { nome: k, partido: '', uf: '', saldo: null, fora: true };
+  }
+  /* O partido em que a pessoa estava na votação de índice `coluna` (votos-<casa>.json, "partidos"). */
+  function partidoNoDia(vt, k, coluna) {
+    var t = (vt.partidos || {})[k];
+    if (!t || !t.length) return pessoaDe(k).partido;
+    var sigla = t[0][1];
+    for (var i = 1; i < t.length && t[i][0] <= coluna; i++) sigla = t[i][1];
+    return sigla;
+  }
+  /* A ordem dos partidos, da esquerda para a direita: a média do saldo geral de quem votou em cada um. */
+  function mediaDosPartidos(vt) {
+    if (vt._media) return vt._media;
+    var soma = {}, n = {};
+    Object.keys(vt.partidos || {}).forEach(function (k) {
+      var s = pessoaDe(k).saldo;
+      if (s == null || isNaN(s)) return;
+      vt.partidos[k].forEach(function (t) { soma[t[1]] = (soma[t[1]] || 0) + s; n[t[1]] = (n[t[1]] || 0) + 1; });
+    });
+    vt._media = {};
+    Object.keys(n).forEach(function (p) { vt._media[p] = soma[p] / n[p]; });
+    return vt._media;
+  }
+  function colunaDe(vt, id) {
+    if (!vt._col) { vt._col = {}; vt.votacoes.forEach(function (row, i) { vt._col[row[0]] = i; }); }
+    return vt._col[id];
+  }
+  /* ════ As frentes: a ordem dos cartões e a ficha de cada frente (#f=54406) ════ */
+  var cacheFrentes = null, filaFrentes = null;
+  function frentesDoArquivo(pronto) {
+    if (cacheFrentes) { pronto(null, cacheFrentes); return; }
+    if (filaFrentes) { filaFrentes.push(pronto); return; }
+    filaFrentes = [pronto];
+    buscar(M.frentesArq, function (erro, x) {
+      var ok = !erro && x && x.frentes, fila = filaFrentes;
+      if (ok) cacheFrentes = x;
+      filaFrentes = null;
+      fila.forEach(function (fn) { fn(ok ? null : (erro || new Error('formato')), cacheFrentes); });
+    });
+  }
+  var GRUPOS_FRENTE = [['e', 'Com a esquerda'], ['c', 'Divididos'], ['d', 'Com a direita'], ['sem', 'Sem votações bastantes']];
+  function ladoDoSaldo(s) {
+    var cs = (M.campos || []).slice().sort(function (a, b) { return a.ate - b.ate; }), corte = [-20, 20];
+    cs.forEach(function (c, i) { if (c.id === 'centro') corte = [i ? cs[i - 1].ate : -100, c.ate]; });
+    return s == null ? 'sem' : (s <= corte[0] ? 'e' : (s > corte[1] ? 'd' : 'c'));
+  }
+  function montarFrente(f) {
+    var tema = f.tema === 'todas' ? '' : ((M.temasCurtos || {})[f.tema] || f.tema);
+    var onde = tema ? 'em ' + tema : 'nas votações que opõem esquerda e direita', coord = f.coord || null;
+    var nos = [h('p', { cls: 'cg-d-k', text: 'Frente parlamentar · ' + (tema || 'sem um tema só') })];
+    nos.push(h('h2', { cls: 'cg-d-t', id: 'cgDossieT', text: f.nome }));
+    var sub = h('p', { cls: 'cg-d-s' }, [f.titulo && f.titulo !== f.nome ? f.titulo + (f.criada ? ' · registrada em ' + dataBr(f.criada) : '') : (f.criada ? 'Registrada em ' + dataBr(f.criada) : '')]);
+    if (f.doc && /^https:\/\/www\.camara\.leg\.br\//.test(f.doc)) { sub.appendChild(d.createTextNode(' · ')); sub.appendChild(h('a', { href: f.doc, target: '_blank', rel: 'noopener noreferrer', text: 'O registro oficial ↗' })); }
+    nos.push(sub);
+    var membros = f.membros || [], grupos = { e: [], c: [], d: [], sem: [] };
+    membros.forEach(function (m) { grupos[ladoDoSaldo(m[1])].push(m); });
+    var frases = [num(membros.length) + ' deputados em exercício assinam' + (f.membros_total && f.membros_total !== membros.length ? ' (' + num(f.membros_total) + ' na legislatura)' : '') + '.'];
+    if (coord) {
+      frases.push('Coordena ' + coord.nome + ' (' + coord.partido + '-' + coord.uf + ')' + (coord.ex ? '' : ', hoje fora do exercício') + (coord.saldo != null ? ', com saldo de ' + saldo(coord.saldo) + ' ' + onde + ' (' + campo(coord.saldo) + ')' : '') + '.');
+      if (f.com_coord != null) frases.push('Votaram igual a ele: quem assina, ' + pct(f.com_coord) + (f.sem_assinar != null ? '; quem não assina, ' + pct(f.sem_assinar) : '') + '. Medido em ' + num(f.votacoes) + (f.votacoes === 1 ? ' votação ' : ' votações ') + (tema ? 'de ' + tema + ' ' : '') + 'em que esquerda e direita ficaram em lados opostos' + (tema ? ' (não só votações sobre a causa)' : '') + '.');
+    }
+    nos.push(h('ul', { cls: 'cg-d-fr' }, frases.map(function (x) { return h('li', { text: x }); })));
+
+    /* Os membros em pontos: um por deputado, pela cor do lado em que vota no tema. */
+    var blocos = GRUPOS_FRENTE.filter(function (g) { return grupos[g[0]].length; }).map(function (g) {
+      var pontos = grupos[g[0]].map(function (m) {
+        var p = pessoaDe(m[0]);
+        var texto = p.nome + ' (' + p.partido + '-' + p.uf + ')' + (m[5] ? ' · coordena a frente' : '') + (m[1] != null ? ' · saldo de ' + saldo(m[1]) + ' ' + onde + ', em ' + num(m[2]) + (m[2] === 1 ? ' votação' : ' votações') : ' · sem votações bastantes ' + onde) +
+          (m[3] != null && !m[5] ? ' · igual ao coordenador em ' + pct(m[3]) + ' de ' + num(m[4]) : '');
+        return h('a', { cls: 'cg-pv ' + (m[1] == null ? 'cg-pv-a' : 'cg-' + classe(m[1])) + (m[5] ? ' cg-pv-x' : ''), href: '#p=' + m[0], 'data-k': m[0], 'data-dica': texto, 'aria-label': texto, tabindex: '-1' });
+      });
+      return h('div', { cls: 'cg-qv-b' }, [h('div', { cls: 'cg-qv-g' }, pontos), h('p', { cls: 'cg-qv-s' }, [h('b', { text: g[1] }), h('span', { text: num(grupos[g[0]].length) })])]);
+    });
+    var quadro = h('div', { cls: 'cg-qv cg-qv-f', role: 'group', tabindex: '0', 'aria-label': 'Os ' + membros.length + ' deputados que assinam, um ponto cada, pelo lado em que votam ' + onde + '. Use as setas para percorrer e Enter para abrir o dossiê.' }, blocos);
+    quadro.addEventListener('keydown', function (ev) {
+      var passo = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : 0);
+      if (!passo) return;
+      var todos = lista(quadro.querySelectorAll('.cg-pv')), i = todos.indexOf(d.activeElement), alvo = todos[Math.max(0, Math.min(todos.length - 1, i < 0 ? 0 : i + passo))];
+      if (alvo) { ev.preventDefault(); alvo.focus(); }
+    });
+    nos.push(secao('Quem assina, em pontos', 'um ponto por deputado, do que mais vota com a esquerda ' + onde + ' ao que mais vota com a direita; o contorno marca o coordenador', [quadro]));
+
+    /* A tabela de todos: o dado completo, com ordem a escolher. */
+    var ordem = { chave: 3, sobe: true };
+    var corpo = h('tbody', {});
+    function linhasDaTabela() {
+      var lista_ = membros.slice().sort(function (a, b) {
+        var x = ordem.chave === 0 ? semAcento(pessoaDe(a[0]).nome) : (ordem.chave === 9 ? semAcento(pessoaDe(a[0]).partido) : a[ordem.chave]);
+        var y = ordem.chave === 0 ? semAcento(pessoaDe(b[0]).nome) : (ordem.chave === 9 ? semAcento(pessoaDe(b[0]).partido) : b[ordem.chave]);
+        if (x == null || y == null) return x == null && y == null ? 0 : (x == null ? 1 : -1);  // sem o número, no fim
+        var c = typeof x === 'string' ? x.localeCompare(y) : x - y;
+        return (ordem.sobe ? c : -c) || semAcento(pessoaDe(a[0]).nome).localeCompare(semAcento(pessoaDe(b[0]).nome));
+      });
+      esvaziar(corpo);
+      lista_.forEach(function (m) {
+        var p = pessoaDe(m[0]);
+        corpo.appendChild(h('tr', {}, [
+          h('th', { scope: 'row' }, [h('a', { cls: 'cg-p', href: '#p=' + m[0], 'data-k': m[0], text: p.nome }), m[5] ? h('small', { text: ' coordena' }) : null]),
+          h('td', { text: p.partido + (p.uf ? '-' + p.uf : '') }),
+          h('td', { cls: 'an-l' }, [barra(m[1])]),
+          h('td', { text: m[1] == null ? '—' : saldo(m[1]) }),
+          h('td', { text: m[2] ? num(m[2]) : '—' }),
+          h('td', { text: m[5] ? '—' : (m[3] == null ? '—' : pct(m[3])) }),
+          h('td', { text: m[5] ? '—' : (m[4] ? num(m[4]) : '—') })
+        ]));
+      });
+    }
+    var colunas = [['Deputado', 0], ['Partido', 9], ['Lado ' + onde, 1], ['Saldo', 1], ['Votações', 2], ['Igual ao coordenador', 3], ['Em comum', 4]];
+    var cabeca = h('tr', {}, colunas.map(function (c, i) {
+      var th = h('th', { scope: 'col', cls: i === 2 ? 'an-l' : null, 'data-col': String(c[1]), tabindex: '0', role: 'button', text: c[0] });
+      return th;
+    }));
+    function ordenarPor(th) {
+      var chave = parseInt(th.getAttribute('data-col'), 10);
+      ordem = { chave: chave, sobe: ordem.chave === chave ? !ordem.sobe : true };
+      lista(cabeca.children).forEach(function (x) { x.removeAttribute('aria-sort'); });
+      th.setAttribute('aria-sort', ordem.sobe ? 'ascending' : 'descending');
+      linhasDaTabela();
+    }
+    cabeca.addEventListener('click', function (ev) { var th = ev.target.closest ? ev.target.closest('th[data-col]') : null; if (th) ordenarPor(th); });
+    cabeca.addEventListener('keydown', function (ev) { var th = ev.target.closest ? ev.target.closest('th[data-col]') : null; if (th && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); ordenarPor(th); } });
+    linhasDaTabela();
+    nos.push(secao('Um a um', 'os ' + num(membros.length) + ' que assinam; primeiro os que menos votam igual ao coordenador · clique num título para mudar a ordem', [
+      h('div', { cls: 'an-tbl-wrap' }, [h('table', { cls: 'an-tbl cg-tb cg-fm-t' }, [h('thead', {}, [cabeca]), corpo])])
+    ]));
+    if ((f.partidos || []).length) {
+      nos.push(secao('Por partido', 'quantos deputados em exercício de cada partido assinam, de quantos ele tem', [
+        h('p', { cls: 'cg-pr-c' }, f.partidos.map(function (x) { return h('span', { cls: 'cg-chip' }, [x[0] + ' ', h('b', { text: num(x[1]) }), ' de ' + num(x[2])]); }))
+      ]));
+    }
+    if (f.tema !== 'todas') nos.push(h('p', { cls: 'cg-d-n' }, [h('a', { href: '#v=posicoes&c=cd&t=' + f.tema, text: 'Ver as votações de ' + tema + ' que entraram na conta →' })]));
+    nos.push(h('p', { cls: 'cg-d-n', text: 'O lado de cada um é o saldo dele nas votações que opõem esquerda e direita ' + onde + ' (com 5 ou mais). O registro da frente não diz que posição ela defende: a comparação é com o voto de quem a coordena, nas votações em que os dois votaram Sim ou Não (com 5 ou mais em comum). A Câmara não registra a data de cada assinatura: alguém pode ter assinado depois destas votações. Só os deputados: os senadores das frentes mistas o registro só conta.' }));
+    return nos;
+  }
+  function abrirFrente(id, semHistorico) {
+    if (!mo || !/^\d+$/.test(String(id)) || !M.frentesArq) return;
+    var chave = 'f:' + id;
+    if (!aberto) lembrarFundo();
+    aberto = chave;
+    mo.hidden = false;
+    d.body.classList.add('cg-aberto');
+    mo.scrollTop = 0;
+    if (!semHistorico && w.location.hash !== '#f=' + id) {
+      if (w.history && w.history.pushState) w.history.pushState(null, '', '#f=' + id); else w.location.hash = 'f=' + id;
+    }
+    mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Ficha da frente' }), h('p', { cls: 'cg-d-st', text: 'Carregando a frente…' })]);
+    frentesDoArquivo(function (erro, x) {
+      if (aberto !== chave) return;
+      var f = !erro && x ? x.frentes[String(id)] : null;
+      if (!f) mostrar([h('h2', { cls: 'sr-only', id: 'cgDossieT', text: 'Ficha da frente' }), h('p', { cls: 'cg-d-st', text: erro ? 'Não foi possível abrir a frente agora. Tente de novo em instantes.' : 'Esta frente não tem ficha aqui.' })]);
+      else mostrar(montarFrente(f));
+      mo.querySelector('.cg-ml').focus();
+    });
+  }
+  (function () {
+    var grade = d.getElementById('cgFrG'), ord = d.getElementById('cgFrOrd'), rotulo = d.getElementById('cgFrOrdL');
+    if (!grade || !M.frentesArq) return;
+    lista(grade.querySelectorAll('.cg-fr-v')).forEach(function (p) { p.hidden = false; });
+    if (!ord || !rotulo) return;
+    rotulo.hidden = false;
+    var cartoes = lista(grade.children);
+    function numero(el, attr, vazio) { var v = el.getAttribute(attr); return v === '' || v == null ? vazio : parseFloat(v); }
+    ord.addEventListener('change', function () {
+      var modo = ord.value;
+      cartoes.sort(function (a, b) {
+        var oa = numero(a, 'data-ordem', 0), ob = numero(b, 'data-ordem', 0);
+        if (modo === 'coesa') return numero(b, 'data-coesa', -1) - numero(a, 'data-coesa', -1) || oa - ob;
+        if (modo === 'oposto') return numero(b, 'data-oposto', -1) / Math.max(1, numero(b, 'data-membros', 1)) - numero(a, 'data-oposto', -1) / Math.max(1, numero(a, 'data-membros', 1)) || oa - ob;
+        if (modo === 'membros') return numero(b, 'data-membros', 0) - numero(a, 'data-membros', 0) || oa - ob;
+        if (modo === 'tema') return semAcento(a.getAttribute('data-tema') === 'todas' ? 'zzz' : ((M.temasCurtos || {})[a.getAttribute('data-tema')] || '')).localeCompare(semAcento(b.getAttribute('data-tema') === 'todas' ? 'zzz' : ((M.temasCurtos || {})[b.getAttribute('data-tema')] || ''))) || oa - ob;
+        return oa - ob;
+      });
+      cartoes.forEach(function (c) { grade.appendChild(c); });
+    });
+  })();

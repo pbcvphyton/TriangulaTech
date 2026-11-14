@@ -296,6 +296,7 @@ def analisar(
         coord = frente.coordenador
         pares: dict[int, list[int]] = {}  # membro → [votações do mesmo lado do coordenador, votações]
         com_posicao = 0  # votações em que o coordenador tomou posição
+        fora = [0, 0]  # quem não assina: [votos do mesmo lado do coordenador, votos]
         if coord is not None:
             outros = sorted(frente.membros - {coord})
             for d in votacoes:
@@ -310,6 +311,14 @@ def analisar(
                     par = pares.setdefault(m, [0, 0])
                     par[0] += do_membro == do_coord
                     par[1] += 1
+                # A base de comparação: quem está em exercício e NÃO assina a frente, nas mesmas votações.
+                for m in em_exercicio:
+                    if m in frente.membros:
+                        continue
+                    do_outro = d.posicoes.get(m)
+                    if do_outro is not None:
+                        fora[0] += do_outro == do_coord
+                        fora[1] += 1
 
         membros_ex = sorted((m for m in frente.membros if m in exercendo), key=chave_nome)
         lados = {"e": 0, "c": 0, "d": 0, "sem": 0}
@@ -350,6 +359,7 @@ def analisar(
                 "lados": lados,
                 "votacoes": com_posicao,
                 "com_coord": _pct(soma_k, soma_n),
+                "sem_assinar": _pct(fora[0], fora[1]),  # a mesma conta entre quem não assina
                 "contra": [
                     {**quem(m), "pct": _pct(*pares[m]), "k_n": pares[m][0], "n": pares[m][1]} for m in contra
                 ],

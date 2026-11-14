@@ -51,6 +51,7 @@ FICHAS = "fichas"
 RESUMO = "resumo.json"
 META = "meta.json"
 ACHADOS = "achados.json"
+FRENTES = "frentes-cd.json"  # os membros em exercício de cada frente de causa, com o voto de cada um no tema (lido quando a ficha da frente abre)
 VOTOS = "votos-{casa}.json"  # os votos de cada um nas votações de conteúdo da legislatura (para o comparativo)
 ULTIMAS = 14  # votações nominais mais recentes no painel de cada Casa
 LISTA = 15  # tamanho das listas do painel
@@ -414,21 +415,71 @@ def votos_da_legislatura(anos: Iterable[AnoVotos], regras: Regras, legislatura: 
         votacoes.append([v.id, v.data, v.tipo, v.prop, text.truncate(v.ementa or v.descricao, 140), list(v.temas), 1 if leitura.divisiva else 0, turno(v.descricao) or 0])
     indices = {id(ano): ano.indice() for ano, _k in colunas}
     votos = {}
+    partidos: dict[str, list[list[Any]]] = {}
     for pid, chave in sorted(chaves.items(), key=lambda kv: kv[1]):
         linha = "".join(
             ano.votacoes[k].votos[indices[id(ano)][pid]] if pid in indices[id(ano)] else base.SEM_REGISTRO for ano, k in colunas
         )
-        if linha.strip(base.SEM_REGISTRO):
-            votos[chave] = linha
-    return {"v": VERSAO, "casa": casa, "legislatura": legislatura, "votacoes": votacoes, "votos": votos}
+        if not linha.strip(base.SEM_REGISTRO):
+            continue
+        votos[chave] = linha
+        # O partido no dia de cada votação: [índice da votação em que passa a valer, sigla]. Quem
+        # trocou de legenda aparece, em cada votação, no partido em que estava naquele dia.
+        trechos: list[list[Any]] = []
+        for coluna, (ano, k) in enumerate(colunas):
+            i = indices[id(ano)].get(pid)
+            if i is None:
+                continue
+            sigla = ano.pessoas[i].partido_em(k)
+            if sigla and (not trechos or trechos[-1][1] != sigla):
+                trechos.append([coluna, sigla])
+        if trechos:
+            partidos[chave] = trechos
+    return {"v": VERSAO, "casa": casa, "legislatura": legislatura, "votacoes": votacoes, "votos": votos, "partidos": partidos}
+
+
+def membros_das_frentes(
+    painel: dict[str, Any],
+    fichas: Iterable[Mapping[str, Any]],
+    saldos_tema: Mapping[int, Mapping[str, tuple[float, int]]],
+    saldo_geral: Mapping[int, tuple[float, int]],
+) -> dict[str, Any]:
+    """A ficha de cada frente de causa do ``painel`` (o que a página lê quando alguém abre uma
+    frente): o que o painel diz dela e os membros em exercício, um por linha: ``[chave, saldo no
+    tema da frente (ou None), votações do saldo, % das vezes com o coordenador (ou None),
+    votações em comum, coordena (0/1)]``, do saldo menor para o maior (sem saldo, no fim)."""
+    membros: dict[int, list[list[Any]]] = {c["id"]: [] for c in painel.get("causas") or []}
+    temas = {c["id"]: c.get("tema") or frentes.TODAS for c in painel.get("causas") or []}
+    for f in fichas:
+        if not f.get("exercicio"):
+            continue
+        for c in (f.get("frentes") or {}).get("causas") or []:
+            if c["id"] not in membros:
+                continue
+            tema = temas[c["id"]]
+            saldo = saldo_geral.get(f["id"]) if tema == frentes.TODAS else (saldos_tema.get(f["id"]) or {}).get(tema)
+            membros[c["id"]].append([f["k"], saldo[0] if saldo else None, saldo[1] if saldo else 0, c.get("com"), c.get("n") or 0, 1 if c.get("coord") else 0])
+    detalhe = {}
+    for c in painel.get("causas") or []:
+        lista = sorted(membros[c["id"]], key=lambda m: (m[1] is None, m[1] if m[1] is not None else 0, m[0]))
+        detalhe[str(c["id"])] = {**c, "membros_total": c.get("membros"), "membros": lista}
+    return detalhe
+
+
+def _frentes_por_linha(dados: Mapping[str, Any]) -> str:
+    """O arquivo dos membros das frentes com uma frente por linha."""
+    frentes_ = ",\n".join(f"{json.dumps(k)}:{json.dumps(v, ensure_ascii=False, separators=(',', ':'))}" for k, v in dados["frentes"].items())
+    cabeca = json.dumps({k: v for k, v in dados.items() if k != "frentes"}, ensure_ascii=False, separators=(",", ":"))[:-1]
+    return f'{cabeca},"frentes":{{\n{frentes_}\n}}}}\n'
 
 
 def _json_por_linha(dados: Mapping[str, Any]) -> str:
     """O arquivo de votos com uma votação e uma pessoa por linha (diferenças pequenas no git)."""
     votacoes = ",\n".join(json.dumps(v, ensure_ascii=False, separators=(",", ":")) for v in dados["votacoes"])
     votos = ",\n".join(f"{json.dumps(k)}:{json.dumps(v)}" for k, v in dados["votos"].items())
-    cabeca = json.dumps({k: v for k, v in dados.items() if k not in ("votacoes", "votos")}, ensure_ascii=False, separators=(",", ":"))[:-1]
-    return f'{cabeca},"votacoes":[\n{votacoes}\n],"votos":{{\n{votos}\n}}}}\n'
+    partidos = ",\n".join(f"{json.dumps(k)}:{json.dumps(v, ensure_ascii=False, separators=(',', ':'))}" for k, v in (dados.get("partidos") or {}).items())
+    cabeca = json.dumps({k: v for k, v in dados.items() if k not in ("votacoes", "votos", "partidos")}, ensure_ascii=False, separators=(",", ":"))[:-1]
+    return f'{cabeca},"votacoes":[\n{votacoes}\n],"votos":{{\n{votos}\n}},"partidos":{{\n{partidos}\n}}}}\n'
 
 
 def _estatisticas(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> dict[str, Any]:
@@ -1318,6 +1369,7 @@ def atualizar(
     # Frentes parlamentares (só a Câmara registra quem assina): quem assina cada frente de causa
     # e como vota no tema dela, ao lado do coordenador.
     painel_frentes: dict[str, Any] = {}
+    detalhe_frentes: dict[str, Any] = {}
     try:
         da_legislatura = frentes.coletar(coletor, legislatura.numero)
         causas = frentes.de_causa(da_legislatura, regras)
@@ -1339,6 +1391,7 @@ def atualizar(
         for f in fichas["cd"]:
             if f["id"] in por_deputado:
                 f["frentes"] = por_deputado[f["id"]]
+        detalhe_frentes = membros_das_frentes(painel_frentes, fichas["cd"], saldos_tema, saldo_geral)
     except Exception as exc:  # noqa: BLE001 — acessório: sem as frentes, a aba sai sem elas
         avisos.append(f"Câmara: frentes parlamentares indisponíveis ({exc})")
 
@@ -1504,7 +1557,7 @@ def atualizar(
         "v": VERSAO,
         "hoje": hoje,
         "legislatura": legislatura.numero,
-        "pessoas": [ficha.linha(f, legislatura.numero) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
+        "pessoas": [ficha.linha(f, legislatura.numero, legislatura.inicio) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
     }
     atuais = set()
     for casa in ("cd", "sf"):
@@ -1524,6 +1577,8 @@ def atualizar(
             pasta / VOTOS.format(casa=casa), _json_por_linha(votos_da_legislatura(votos[casa], regras, legislatura.numero, chaves, casa))
         )
         resultado.gravados += _gravar(pasta / materias.ARQUIVO.format(casa=casa), materias.serializar(fichas_das_materias[casa]))
+    if detalhe_frentes:
+        resultado.gravados += _gravar(pasta / FRENTES, _frentes_por_linha({"v": VERSAO, "casa": "cd", "legislatura": legislatura.numero, "frentes": detalhe_frentes}))
     resultado.gravados += _gravar(pasta / RESUMO, _json(resumo))
     resultado.gravados += _gravar(pasta / ACHADOS, _json({"v": VERSAO, "hoje": hoje, "achados": leitura}))
     resultado.gravados += _gravar(pasta / META, _json(meta))

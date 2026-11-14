@@ -26,6 +26,7 @@
 {% block styles %}
 {% include "analitico.css.j2" %}
 {% include "congresso.css.j2" %}
+{% include "congresso_tema.css.j2" %}
 {% endblock %}
 
 {#- Nome que abre o dossiê (com script) ou a busca do nome no jornal (sem script). -#}
@@ -629,41 +630,46 @@
   <section class="az-sec cg-vista" data-vista="frentes" aria-labelledby="cg-frentes-h">
     <header class="az-lh" id="cg-frentes">
       <p class="az-ln">Frentes</p>
-      <h3 class="az-lt" id="cg-frentes-h">Quem assina cada causa, e como vota nela</h3>
-      <p class="az-ld">Uma frente parlamentar é um grupo registrado em torno de uma causa (o agro, o meio ambiente, a educação sem doutrinação, os direitos LGBTI+…). Assinar custa uma assinatura; votar é outra coisa. Aqui, cada frente de causa ao lado do voto de quem a assina, no tema dela: de que lado cada membro vota e quanto vota igual ao coordenador, que é quem registra a frente.</p>
+      <h3 class="az-lt" id="cg-frentes-h">Assinar é fácil. E na hora do voto?</h3>
+      <p class="az-ld">Frente parlamentar é um abaixo-assinado de deputados em torno de uma causa: o agro, o meio ambiente, a escola pública. Assinar é fácil. Aqui dá para ver se quem assinou vota do mesmo lado de quem coordena a frente, ou do lado oposto.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}" id="cg-frentes-{{ casa.id }}">
       {% if casa.frentes %}{% set fr = casa.frentes %}
-      <p class="az-ph">Na legislatura {{ c.periodo }}, a Câmara registrou <b>{{ fr.total }}</b> frentes. Um deputado em exercício assina, na mediana, <b>{{ fr.mediana }}</b> delas{% if fr.nenhuma %}; {{ fr.nenhuma }} não assina{{ "m" if fr.nenhuma > 1 else "" }} nenhuma{% endif %}. Por isso a assinatura sozinha diz pouco: o que diz é o voto de quem assina.</p>
-      {% for g in fr.grupos %}
-      <div class="az-blk" id="cg-frentes-{{ casa.id }}-{{ g.tema }}">
-        <h4 class="az-h">{{ g.nome }}{% if g.tema != "todas" %} <span>o voto de cada membro nas votações esquerda × direita do tema</span>{% endif %}</h4>
-        <div class="cg-fr-g">
-          {% for f in g.frentes %}
-          <article class="cg-fr" id="cg-frente-{{ f.id }}">
-            <h5 class="cg-fr-t">{{ f.nome }}{% if f.doc %} <a href="{{ f.doc }}" target="_blank" rel="noopener noreferrer" title="{{ f.titulo }}: o registro oficial">registro ↗</a>{% endif %}</h5>
-            <p class="cg-fr-k">{{ f.em_exercicio }} deputados em exercício assinam{% if f.membros != f.em_exercicio %} ({{ f.membros }} na legislatura){% endif %}{% if f.criada %} · desde {{ f.criada }}{% endif %}</p>
-            {% if f.coord %}<p class="cg-fr-c">Coordenador: {{ pessoa(f.coord.k, f.coord.nome) }} <small>{{ f.coord.partido }}-{{ f.coord.uf }}</small>{% if f.coord.saldo is not none %} <span class="cg-esc-sd cg-{{ f.coord.classe }}">{{ f.coord.saldo_txt }}</span>{% endif %}{% if not f.coord.ex %} <small>fora do exercício</small>{% endif %}</p>{% endif %}
-            <p class="cg-fr-l"><span class="cg-fr-b" aria-hidden="true">{% for l in f.lados %}{% if l.n %}<i class="cg-frb-{{ l.id }}" style="width:{{ l.w }}%"></i>{% endif %}{% endfor %}</span>{% for l in f.lados %}{% if l.n %}<span class="cg-fr-n cg-fr-n{{ l.id }}"><b>{{ l.n }}</b> {{ l.nome }}</span>{% endif %}{% endfor %}</p>
-            {% if f.coord and f.com_coord != "—" %}<p class="cg-fr-x">Os membros votaram do mesmo lado que o coordenador em <b>{{ f.com_coord }}</b> das vezes, em {{ f.votacoes }} votações.</p>{% endif %}
-            {% if f.partidos %}<p class="cg-fr-x cg-fr-p">{{ f.partidos|join(" · ") }}{% if f.partidos_mais %} · e mais {{ f.partidos_mais }} partidos{% endif %}</p>{% endif %}
-            {% if f.contra %}
-            <p class="cg-fr-s">Assinam e mais votam diferente do coordenador:</p>
-            <ol class="cg-fr-o">{% for x in f.contra %}<li>{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small> <span>com o coordenador em {{ x.pct_txt }} de {{ x.n }}</span></li>{% endfor %}</ol>
-            {% endif %}
-          </article>
-          {% endfor %}
-        </div>
+      <p class="az-ph">A Câmara registrou <b>{{ fr.total }}</b> frentes nesta legislatura, e um deputado assina, na mediana, <b>{{ fr.mediana }}</b> delas{% if fr.nenhuma %} ({{ fr.nenhuma }} não assina{{ "m" if fr.nenhuma > 1 else "" }} nenhuma){% endif %}. A assinatura sozinha diz pouco. O voto de quem assinou é que diz.</p>
+      <p class="cg-fr-esc">Aqui estão {{ fr.causas }} das {{ fr.total }}: as de causa, com as duas pontas de cada tema. O registro de uma frente não diz que posição ela defende: a comparação é com o voto de quem a coordena, nas votações do tema dela em que esquerda e direita ficaram em lados opostos.</p>
+      <div class="cg-fr-ctl">
+        <p class="cg-fr-leg" aria-hidden="true"><span class="cg-fr-lk">cada ponto é um deputado que assina:</span><span class="cg-fr-lk"><i class="cg-wf cg-wf-e" style="--c:1;--l:1"></i> vota com a esquerda no tema</span><span class="cg-fr-lk"><i class="cg-wf cg-wf-c" style="--c:1;--l:1"></i> dividido</span><span class="cg-fr-lk"><i class="cg-wf cg-wf-d" style="--c:1;--l:1"></i> com a direita</span><span class="cg-fr-lk"><i class="cg-wf cg-wf-sem" style="--c:1;--l:1"></i> sem votações bastantes</span></p>
+        <label class="cg-fr-ord" id="cgFrOrdL" hidden><span>Ordenar</span><select id="cgFrOrd"><option value="coord">Onde menos se vota igual ao coordenador</option><option value="oposto">Onde mais gente vota do lado oposto</option><option value="coesa">As mais coesas</option><option value="membros">Mais deputados</option><option value="tema">Por tema</option></select></label>
       </div>
-      {% endfor %}
+      <div class="cg-fr-g" id="cgFrG" style="--cg-wf-l:{{ fr.linhas }}">
+        {% for f in fr.cartoes %}
+        <article class="cg-fr cg-3d{% if f.poucas %} cg-fr-pouco{% endif %}" data-3d="3.5" id="cg-frente-{{ f.id }}" data-frente="{{ f.id }}" data-oposto="{{ f.oposto }}" data-coesa="{{ f.com_coord_n }}" data-membros="{{ f.em_exercicio }}" data-tema="{{ f.tema }}" data-ordem="{{ loop.index0 }}">
+          <p class="cg-fr-k"><span>{{ f.tema_nome }} · {{ f.em_exercicio_txt }}{% if fr.da_casa %} dos {{ fr.da_casa }}{% endif %} deputados assinam</span>{% if f.doc %}<a href="{{ f.doc }}" target="_blank" rel="noopener noreferrer" title="{{ f.titulo }}: o registro oficial">registro ↗</a>{% endif %}</p>
+          <h4 class="cg-fr-t">{{ f.nome }}</h4>
+          <p class="cg-fr-c">{% if f.coord %}Coordena {{ pessoa(f.coord.k, f.coord.nome) }} <small>{{ f.coord.partido }}-{{ f.coord.uf }}</small>{% if f.coord.vota %}, que vota {{ f.coord.vota }} {{ f.onde }}{% endif %}{% if not f.coord.ex %} (hoje fora do exercício){% endif %}.{% else %}Sem coordenador no registro.{% endif %}</p>
+          <p class="cg-fr-m"><b>{{ f.manchete.numero }}</b> <span>{{ f.manchete.texto }}</span></p>
+          <div class="cg-fr-w" role="img" aria-label="{% for g in f.grupos %}{{ g.n }} {{ g.nome }}{% if not loop.last %}, {% endif %}{% endfor %}">{% for g in f.grupos %}<span class="cg-fr-wg">{% if g.cols %}<i class="cg-wf cg-wf-{{ g.id }}" style="--c:{{ g.cols }}"></i>{% endif %}{% if g.resto %}<i class="cg-wf cg-wf-{{ g.id }}" style="--c:1;--l:{{ g.resto }}"></i>{% endif %}</span>{% endfor %}</div>
+          <p class="cg-fr-l">{% for g in f.grupos %}<span class="cg-fr-n cg-fr-n{{ g.id }}"><b>{{ g.n }}</b> {{ g.nome }}{% if g.coord and f.tipo != "oposto" %} <i>lado do coordenador</i>{% endif %}</span>{% endfor %}</p>
+          {% if f.com_coord != "—" %}<p class="cg-fr-x">Votaram igual ao coordenador: quem assina, <b>{{ f.com_coord }}</b>{% if f.sem_assinar %} · quem não assina, <b>{{ f.sem_assinar }}</b>{% endif %}.</p>{% endif %}
+          <p class="cg-fr-p">{% if f.poucas %}<b>Poucas votações ({{ f.votacoes }}): leia com cuidado.</b> {% endif %}Medido em {{ f.votacoes }} {{ "votação" if f.votacoes == "1" else "votações" }} {% if f.tema != "todas" %}de {{ f.tema_nome }} {% endif %}em que esquerda e direita ficaram em lados opostos{% if f.tema != "todas" %}; não são só votações sobre a causa: <a href="#v=posicoes&amp;c={{ casa.id }}&amp;t={{ f.tema }}">veja quais</a>{% endif %}.</p>
+          {% if f.contra %}
+          <details class="cg-fr-d">
+            <summary>Quem assina e menos vota igual ao coordenador</summary>
+            <ol class="cg-fr-o">{% for x in f.contra %}<li>{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small> <span>igual a ele em {{ x.pct_txt }} de {{ x.n }}</span></li>{% endfor %}</ol>
+          </details>
+          {% endif %}
+          <p class="cg-fr-v" hidden><button type="button" data-f="{{ f.id }}">Ver os {{ f.em_exercicio_txt }} que assinam, um a um <span aria-hidden="true">→</span></button></p>
+        </article>
+        {% endfor %}
+      </div>
       {% if fr.mais_assinam %}
       <div class="az-blk">
         <h4 class="az-h">Quem mais assina <span>de {{ fr.total }} frentes da legislatura</span></h4>
         <ol class="cg-fr-o cg-fr-mais">{% for x in fr.mais_assinam %}<li>{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small> <span>{{ x.n_txt }}</span></li>{% endfor %}</ol>
       </div>
       {% endif %}
-      <p class="az-dek">“Partido n de m”: n membros em exercício do partido, de m deputados dele em exercício. O lado de cada membro é o saldo dele nas votações esquerda × direita do tema (5 ou mais; nas frentes sem um tema só, o saldo geral). A Câmara não registra quando cada um assinou: a frente pode ter sido assinada depois de uma votação. As frentes escolhidas e o tema de cada uma estão em config/congresso.yaml, com as duas pontas de cada tema.</p>
+      <p class="az-dek">O lado de cada deputado é o saldo dele nas votações que opõem esquerda e direita no tema da frente (com 5 ou mais; nas frentes sem um tema só, o saldo geral). “Do lado oposto ao do coordenador” só aparece quando ele vota numa das pontas da régua (até −60 ou acima de +60); senão, vale a parte das vezes em que quem assina votou igual a ele, ao lado da mesma conta entre quem não assina. Com menos de {{ fr.poucas }} votações, o cartão avisa. A Câmara não registra quando cada um assinou: a assinatura pode ter vindo depois de uma votação. As frentes mistas têm senadores, que o registro só conta: aqui, só os deputados. As frentes escolhidas e o tema de cada uma estão em config/congresso.yaml.</p>
       {% elif casa.id == "sf" %}
       <p class="az-ph">O Senado não publica quem assina cada frente: nas frentes mistas, os senadores aparecem só como um número no registro da Câmara. Veja as frentes na Câmara.</p>
       {% endif %}
@@ -740,26 +746,40 @@
   <section class="az-sec cg-vista" data-vista="escolha" aria-labelledby="cg-escolha-h">
     <header class="az-lh" id="cg-escolha">
       <p class="az-ln">Escolha o seu candidato</p>
-      <h3 class="az-lt" id="cg-escolha-h">Quem combina com o que você procura</h3>
-      <p class="az-ld">Quem está no mandato, filtrado pelo que o registro diz de cada um: o estado, de que lado vota em cada tema, sobre o que propõe, a presença, o governo. Cada nome diz por que entrou, com o número; clicar abre o dossiê. Não é recomendação: é o voto e a proposta de cada um diante do que você escolher.</p>
+      <h3 class="az-lt" id="cg-escolha-h">Como vota, na prática, quem tem mandato pelo seu estado</h3>
+      <p class="az-ld">Não é lista de candidatos: é quem está no mandato hoje, com o que o registro oficial mostra de cada um. Cada cartão diz de que lado a pessoa vota, se aparece para votar, se acompanha o partido e onde foge do próprio padrão. Clicar abre o dossiê inteiro. Não é recomendação nem nota: é o registro diante do que você escolher.</p>
     </header>
     <form class="cg-esc-f" id="cgEscF" hidden>
-      <div class="cg-esc-l">
-        <label><span>Estado</span><select id="cgEscUf"><option value="">Todos</option></select></label>
-        <label><span>Partido</span><select id="cgEscPt"><option value="">Todos</option></select></label>
-        <label><span>Presença</span><select id="cgEscPres"><option value="">Qualquer</option><option value="80">80% ou mais</option><option value="90">90% ou mais</option><option value="95">95% ou mais</option></select></label>
-        <label><span>Com o governo {{ c.governo }}</span><select id="cgEscGov"><option value="">Tanto faz</option><option value="a">Vota com ele (70% ou mais)</option><option value="c">Vota contra (menos de 40%)</option></select></label>
-        <label><span>Propôs sobre</span><select id="cgEscProp"><option value="">Qualquer tema</option></select></label>
-        <label><span>Gasto da cota</span><select id="cgEscCt"><option value="">Tanto faz</option><option value="m">Até a mediana da Casa</option><option value="q">Entre os 25% que menos gastam</option></select></label>
-        <label id="cgEscFrL"><span>Assina a frente</span><select id="cgEscFr"><option value="">Qualquer uma</option></select></label>
-        <label class="cg-esc-ck"><input type="checkbox" id="cgEscNorma"> tem proposta que virou norma</label>
+      <div class="cg-esc-e1">
+        <p class="cg-esc-rot" id="cgEscUfsT">Comece pelo seu estado</p>
+        <div class="cg-esc-ufs" id="cgEscUfs" role="group" aria-labelledby="cgEscUfsT"></div>
       </div>
-      <fieldset class="cg-esc-tm">
-        {% set corte = (c.casas[0].escolha.corte_txt if c.casas else ["−20", "+20"]) %}<legend>De que lado vota em cada tema <span>o saldo nas votações esquerda × direita do tema (5 ou mais); “dividido” é acima de {{ corte[0] }} e até {{ corte[1] }}</span></legend>
-        <div class="cg-esc-tg" id="cgEscTemas"></div>
-      </fieldset>
+      <div class="cg-esc-at" id="cgEscAt" role="group" aria-label="Atalhos">
+        <span class="cg-esc-rot">O que é raro e diz muito</span>
+        <button type="button" class="cg-esc-atb" data-at="troca" aria-pressed="false">Mudou de partido na legislatura <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="fid" aria-pressed="false">Vota diferente do partido <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="pres" aria-pressed="false">Votou em menos de 60% das votações <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="exc" aria-pressed="false">Muda de lado em algum tema <b></b></button>
+      </div>
+      <details class="cg-esc-mf" id="cgEscMf">
+        <summary>Mais filtros <span>partido, de que lado vota em cada tema, o que propôs, frente, cota, presença, governo</span></summary>
+        <div class="cg-esc-l">
+          <label id="cgEscUfL"><span>Estado</span><select id="cgEscUf"><option value="">Todos</option></select></label>
+          <label><span>Partido</span><select id="cgEscPt"><option value="">Todos</option></select></label>
+          <label><span>Presença</span><select id="cgEscPres"><option value="">Qualquer</option><option value="80">80% ou mais</option><option value="90">90% ou mais</option><option value="95">95% ou mais</option></select></label>
+          <label><span>Com o governo {{ c.governo }}</span><select id="cgEscGov"><option value="">Tanto faz</option><option value="a">Vota com ele (70% ou mais)</option><option value="c">Vota contra (menos de 40%)</option></select></label>
+          <label><span>Propôs sobre</span><select id="cgEscProp"><option value="">Qualquer tema</option></select></label>
+          <label><span>Gasto da cota</span><select id="cgEscCt"><option value="">Tanto faz</option><option value="m">Até a mediana do estado</option><option value="q">Entre os 25% que menos gastam do estado</option></select></label>
+          <label id="cgEscFrL"><span>Assina a frente</span><select id="cgEscFr"><option value="">Qualquer uma</option></select></label>
+          <label class="cg-esc-ck"><input type="checkbox" id="cgEscNorma"> tem proposta que virou norma</label>
+        </div>
+        <fieldset class="cg-esc-tm">
+          {% set corte = (c.casas[0].escolha.corte_txt if c.casas else ["−20", "+20"]) %}<legend>De que lado vota em cada tema <span>o saldo nas votações esquerda × direita do tema (5 ou mais); “dividido” é acima de {{ corte[0] }} e até {{ corte[1] }}</span></legend>
+          <div class="cg-esc-tg" id="cgEscTemas"></div>
+        </fieldset>
+      </details>
       <div class="cg-esc-b">
-        <label><span>Ordenar por</span><select id="cgEscOrd"><option value="af">Mais perto do que escolhi</option><option value="prop">Mais propostas no tema escolhido</option><option value="pres">Presença</option><option value="nome">Nome</option></select></label>
+        <label><span>Ordenar por</span><select id="cgEscOrd"><option value="af">Estado e nome</option><option value="prop">Mais propostas no tema escolhido</option><option value="pres">Presença</option><option value="fid">Menos acompanha o partido</option><option value="nome">Nome</option></select></label>
         <button type="button" class="cg-esc-lp" id="cgEscX">Limpar</button>
         <span class="cg-esc-n" id="cgEscN" role="status" aria-live="polite"></span>
       </div>
@@ -769,14 +789,20 @@
       <h4 class="cg-ct">{{ casa.nome }} <span>{{ e.itens|length }} em exercício, por estado</span></h4>
       <ol class="cg-esc" data-casa="{{ casa.id }}">
         {% for p in e.itens -%}
-        <li data-pk="{{ p.k }}" data-uf="{{ p.uf }}" data-partido="{{ p.partido }}" data-pres="{{ p.pres if p.pres is not none else '' }}" data-gov="{{ p.gov if p.gov is not none else '' }}" data-norma="{{ p.norma }}" data-ct="{{ p.ct if p.ct is not none else '' }}"><p class="cg-esc-t"><b>{{ p.uf }}</b> {{ pessoa(p.k, p.nome) }} <small>{{ p.partido }}</small> <span class="cg-esc-sd cg-{{ p.classe }}">{{ p.saldo_txt }}</span></p>
-          {%- if p.esq or p.dir %}<p class="cg-esc-x">{% if p.esq %}<span class="cg-esc-e">Esquerda:</span> {{ p.esq|join(", ") }}{% if p.esq_mais %} e mais {{ p.esq_mais }}{% endif %}{% endif %}{% if p.esq and p.dir %}. {% endif %}{% if p.dir %}<span class="cg-esc-d">Direita:</span> {{ p.dir|join(", ") }}{% if p.dir_mais %} e mais {{ p.dir_mais }}{% endif %}{% endif %}.</p>{% endif -%}
-          <p class="cg-esc-x cg-esc-num">{% if p.propoe %}Propõe sobre {{ p.propoe|join(", ") }}. {% endif %}{{ p.numeros }}.</p></li>
+        <li data-pk="{{ p.k }}" class="cg-cd cg-3d" data-3d="5" data-uf="{{ p.uf }}" data-partido="{{ p.partido }}" data-pres="{{ p.pres if p.pres is not none else '' }}" data-gov="{{ p.gov if p.gov is not none else '' }}" data-fid="{{ p.fid if p.fid is not none else '' }}" data-norma="{{ p.norma }}" data-ct="{{ p.ct if p.ct is not none else '' }}"{% if p.troca %} data-troca="1"{% endif %}{% if p.excecao %} data-exc="1"{% endif %}><div class="cg-cd-h"><span class="cg-cd-f cg-{{ p.classe }}" aria-hidden="true"><span>{{ p.iniciais }}</span>{% if p.foto %}<img src="{{ p.foto }}" alt="" width="72" height="96" loading="lazy" decoding="async" referrerpolicy="no-referrer">{% endif %}</span><div class="cg-cd-i"><p class="cg-cd-n">{{ pessoa(p.k, p.nome) }}</p><p class="cg-cd-l">{{ p.partido }} · {{ p.uf }}</p>{% if p.troca %}<p class="cg-cd-tr">{% if p.troca.desde %}vota pelo {{ p.partido }} desde {{ p.troca.desde }} · {% endif %}antes, {{ p.troca.antes }}</p>{% endif %}</div></div>
+          {%- if p.vota %}<p class="cg-cd-v">{{ p.vota }}</p><p class="cg-cd-rg"><span class="cg-cd-tk" aria-hidden="true"><i class="cg-{{ p.classe }}" style="left:{{ p.regua }}%"></i></span><span><b>{{ p.saldo_txt }}</b> na régua · {{ p.div }} votações</span></p>{% else %}<p class="cg-cd-v cg-cd-sem">Poucas votações para dizer de que lado vota</p>{% endif -%}
+          <ul class="cg-cd-tc">
+            {%- if p.pres_txt %}<li>Votou em <b>{{ p.pres_txt }}</b> das votações{% if e.mediana_pres %} <small>(mediana {{ e.casa_txt }}: {{ e.mediana_pres }})</small>{% endif %}</li>{% endif -%}
+            {%- if p.fid_txt %}<li>Com a maioria do partido em <b>{{ p.fid_txt }}</b> das vezes{% if e.mediana_fid %} <small>(mediana: {{ e.mediana_fid }})</small>{% endif %}</li>{% endif -%}
+            {%- if p.excecao %}<li class="cg-cd-ex">Exceção: <b>{{ p.excecao.tema }}</b>, {{ p.excecao.lado }} <small>({{ p.excecao.saldo }} em {{ p.excecao.n }} votações)</small></li>{% endif -%}
+            <li>{{ p.propostas }}</li></ul>
+          {%- if p.mais %}<details class="cg-cd-mais"><summary>ver mais</summary><dl>{% for rotulo, valor in p.mais %}<div><dt>{{ rotulo }}</dt><dd>{{ valor }}</dd></div>{% endfor %}</dl></details>{% endif -%}
+        </li>
         {% endfor %}
       </ol>
     </div>
     {% endfor %}
-    <p class="az-dek">Ao lado de cada nome, o saldo geral (−100: sempre com a esquerda; +100: sempre com a direita); “Esquerda” e “Direita” listam os temas em que ele fica de cada lado, com o saldo do tema. Os números são os do resto da página: o saldo de cada tema conta só as votações em que a esquerda ({{ c.polos.esquerda }}) e a direita ({{ c.polos.direita }}) votaram de lados opostos, com 5 ou mais no tema; “propõe sobre” conta as proposições de autoria principal; a presença e o governo são os da legislatura. Quem tem poucas votações num tema fica de fora quando o tema é escolhido.</p>
+    <p class="az-dek">“De que lado vota” é o saldo na régua: −100, sempre com a esquerda ({{ c.polos.esquerda }}); +100, sempre com a direita ({{ c.polos.direita }}); conta só as votações de conteúdo em que os dois lados se opuseram. A régua mede com quem a pessoa vota, não o que ela diz ser. “Votou em” é a parte das votações nominais em que podia votar e votou (o registro não traz o motivo da ausência). “Com a maioria do partido” compara com o partido do dia de cada voto. “Exceção” é o tema, com 5 votações ou mais, em que a pessoa fica do lado oposto ao do seu padrão geral. O partido é o de hoje: para quem mudou na legislatura, o cartão diz desde quando vota pelo atual (a data do primeiro voto registrado por ele) e qual era o anterior. A cota se compara dentro do estado.</p>
   </section>
 
   <section class="az-sec az-met cg-vista" data-vista="metodo" aria-labelledby="cg-metodo-h">
