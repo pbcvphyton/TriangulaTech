@@ -223,5 +223,27 @@
         return oa - ob;
       });
       cartoes.forEach(function (c) { grade.appendChild(c); });
+      aVista = LOTE_FR;
+      mostrarLote();
     });
+    /* Os primeiros cartões à vista e o resto a um toque: a ordem já põe na frente o que mais chama
+       a atenção. Sem script, todos os cartões ficam na página. */
+    var LOTE_FR = 6, aVista = LOTE_FR;
+    var mais = h('button', { cls: 'cg-esc-mais', type: 'button' });
+    function mostrarLote() {
+      cartoes.forEach(function (c, i) { c.hidden = i >= aVista; });
+      var faltam = cartoes.length - aVista;
+      mais.hidden = faltam <= 0;
+      if (faltam > 0) mais.textContent = 'Mostrar mais ' + Math.min(LOTE_FR, faltam) + ' frentes' + (faltam > LOTE_FR ? ' (faltam ' + num(faltam) + ')' : '');
+    }
+    mais.addEventListener('click', function () {
+      var primeiro = cartoes[aVista];
+      aVista += LOTE_FR;
+      mostrarLote();
+      if (primeiro) { primeiro.setAttribute('tabindex', '-1'); primeiro.focus({ preventScroll: true }); }
+    });
+    if (cartoes.length > LOTE_FR) {
+      grade.parentNode.insertBefore(mais, grade.nextSibling);
+      mostrarLote();
+    }
   })();
