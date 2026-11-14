@@ -69,6 +69,7 @@
   var abas = nav ? lista(nav.querySelectorAll('a[data-vista]')) : [];
   var vistas = lista(root.querySelectorAll('.cg-vista'));
   var vistaAtual = '', aoAbrirVista = {};  // nome → função chamada quando a vista aparece
+  var aoEndereco = {};  // nome → função que recebe o resto do endereço (#v=escolha&uf=SP → "uf=SP")
   function vistaDe(el) {
     while (el && el !== root) {
       if (el.classList && el.classList.contains('cg-vista')) return el.getAttribute('data-vista');
@@ -385,7 +386,8 @@
     ['par', 'Propostas paradas há mais de um ano', 'com mais propostas paradas', 'com menos propostas paradas'],
     ['norma', 'Propostas que viraram norma', 'que mais virou norma', 'que menos virou norma'],
     ['rel', 'Relatorias esperando o seu parecer', 'com mais relatorias na mão', 'com menos relatorias na mão'],
-    ['jor', 'Manchetes no jornal (30 dias)', 'mais citado no jornal', 'menos citado no jornal']
+    ['jor', 'Manchetes no jornal (30 dias)', 'mais citado no jornal', 'menos citado no jornal'],
+    ['ct', 'Cota parlamentar por mês', 'que mais gasta', 'que menos gasta']
   ];
   function valorDoRank(f, chave) {
     var leg = (f.leg || {})[String(M.legislatura)] || {}, a = f.autoria || {};
@@ -398,6 +400,7 @@
     if (chave === 'norma') return num((a.estados || {}).norma || 0);
     if (chave === 'rel') return num((f.relatorias || {}).total || 0);
     if (chave === 'jor') return num((f.jornal || {}).n30 || 0);
+    if (chave === 'ct') return reais(((f.cota || {}).leg || {}).media);
     return '—';
   }
   function posicao(f, chave, curto) {
@@ -425,6 +428,91 @@
       ])])
     ]);
   }
+  /* O saldo com cada voto pesando a nota de relevância da matéria, e o simples por faixa da nota. */
+  function fraseDoPeso(f) {
+    var p = f.peso || {}, fx = p.faixas || {}, partes = [];
+    if (p.saldo == null) return '';
+    var t = ' Pesado pela relevância da matéria: ' + saldo(p.saldo) + ' (' + num(p.n) + ' das ' + num(p.de) + ' votações têm nota).';
+    if (fx.alta && fx.alta.saldo != null) partes.push('nas matérias de nota alta (da mediana da Casa para cima), ' + saldo(fx.alta.saldo) + ' em ' + num(fx.alta.n));
+    if (fx.baixa && fx.baixa.saldo != null) partes.push('nas de nota baixa, ' + saldo(fx.baixa.saldo) + ' em ' + num(fx.baixa.n));
+    return t + (partes.length ? ' Sem peso, ' + partes.join('; ') + '.' : '');
+  }
+  function reais(v) {
+    if (v == null || isNaN(v)) return '—';
+    return 'R$ ' + (Math.abs(v) < 1000 ? v.toFixed(2).replace('.', ',') : num(v));
+  }
+  function capital(t) { t = (t || '').toLowerCase(); return t.charAt(0).toUpperCase() + t.slice(1); }
+  /* A cota parlamentar: quanto pediu de reembolso, ano a ano, com o quê, com quem e as maiores notas. */
+  function secaoCota(f) {
+    var c = f.cota, nos = [], casa = (M.cota || {})[f.casa] || {};
+    if (!c || !c.leg) return null;
+    var pos = posicao(f, 'ct');
+    if (c.sem_despesa) return secao('Cota parlamentar', 'o que pediu de reembolso', [h('p', { cls: 'cg-d-n', text: 'Não pediu reembolso nenhum da cota nesta legislatura' + (pos ? ' (' + pos + ')' : '') + '.' })]);
+    nos.push(h('p', { cls: 'cg-d-n', text: 'Na legislatura: ' + reais(c.leg.total) + ' em ' + num(c.leg.meses) + (c.leg.meses === 1 ? ' mês' : ' meses') + ' com despesa, ' + reais(c.leg.media) + ' por mês em média' + (casa.mediana != null ? ' (a mediana da Casa é ' + reais(casa.mediana) + ')' : '') + (pos ? '; ' + pos : '') + '.' }));
+    var anos = Object.keys(c.anos || {}).sort();
+    if (anos.length) nos.push(h('p', { cls: 'cg-d-n', text: 'Ano a ano: ' + anos.map(function (a) { return a + ', ' + reais(c.anos[a]); }).join(' · ') + '.' }));
+    var cats = (c.categorias || []).slice(0, 6), maior = cats.length ? cats[0][1] : 0;
+    var colA = [], colB = [];
+    if (cats.length) colA.push(h('h4', { cls: 'az-h5', text: 'Com o quê' }), h('ul', { cls: 'cg-ct-cat cg-ct-cat-d' }, cats.map(function (x) {
+      var barraCat = h('span', { cls: 'cg-ct-cb', 'aria-hidden': 'true' }, [h('i')]);
+      barraCat.firstChild.style.width = (maior ? Math.round(1000 * x[1] / maior) / 10 : 0) + '%';
+      return h('li', {}, [h('span', { cls: 'cg-ct-cn', text: capital(x[0]) }), barraCat, h('span', { cls: 'cg-ct-cv' }, [h('b', { text: reais(x[1]) })])]);
+    })));
+    if ((c.fornecedores || []).length) colA.push(h('h4', { cls: 'az-h5', text: 'Com quem' }), h('ol', { cls: 'cg-ls' }, c.fornecedores.map(function (x) {
+      var cnpj = /^\d{14}$/.test(x.cnpj || '') ? x.cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : (x.cnpj || '');
+      return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', { text: x.nome }), h('span', { text: reais(x.valor) + ' · ' + num(x.n) + (x.n === 1 ? ' nota' : ' notas') + (cnpj ? ' · CNPJ ' + cnpj : '') })])]);
+    })));
+    if ((c.maiores || []).length) colB.push(h('h4', { cls: 'az-h5', text: 'As maiores notas' }), h('ol', { cls: 'cg-ls' }, c.maiores.map(function (x) {
+      var k = h('p', { cls: 'cg-ls-k' }, [h('b', { text: reais(x.valor) }), h('span', { text: (x.fornecedor || '') + ' · ' + dataBr(x.d) })]);
+      var linha = h('p', { cls: 'cg-ls-x', text: capital(x.categoria) + ' ' });
+      if (x.url) linha.appendChild(h('a', { href: x.url, target: '_blank', rel: 'noopener noreferrer', text: 'a nota ↗' }));
+      return h('li', {}, [k, linha]);
+    })));
+    if (c.glosa && c.glosa.valor) colB.push(h('p', { cls: 'cg-d-n', text: 'A Casa recusou ' + reais(c.glosa.valor) + ' de ' + num(c.glosa.n) + (c.glosa.n === 1 ? ' nota apresentada' : ' notas apresentadas') + ' (glosa).' }));
+    if (colA.length || colB.length) nos.push(h('div', { cls: 'cg-d-2c' }, [h('div', {}, colA), h('div', {}, colB)]));
+    var sg = c.sigepa || {}, anosSg = Object.keys(sg).sort().filter(function (a) { return sg[a]; });
+    if (anosSg.length) nos.push(h('p', { cls: 'cg-d-n', text: 'Fora da conta, as passagens compradas pela agência da Câmara: ' + anosSg.map(function (a) { return a + (a === '2025' ? ' (até julho)' : '') + ', ' + reais(sg[a]); }).join(' · ') + '.' }));
+    if (casa.sem) nos.push(h('p', { cls: 'cg-d-n', text: 'Fora da conta: ' + casa.sem + '.' }));
+    return secao('Cota parlamentar', 'o que pediu de reembolso, com o quê e com quem', nos);
+  }
+  /* Os votos nominais nas comissões: quantos, onde, os últimos em votações divididas e quem mudou no Plenário. */
+  var VOTO_LETRA = { S: 'Sim', N: 'Não', A: 'Abstenção', O: 'Obstrução' };
+  function secaoComissoes(f) {
+    var c = f.comissoes, nos = [];
+    if (!c || !c.n) return null;
+    var onde = (c.comissoes || []).slice(0, 5).map(function (x) { return x[0] + ' (' + num(x[1]) + ')'; }).join(', ');
+    nos.push(h('p', { cls: 'cg-d-n', text: 'Votou em ' + num(c.n) + (c.n === 1 ? ' votação nominal' : ' votações nominais') + ' nas comissões nesta legislatura' + (c.divididas ? ', ' + num(c.divididas) + ' com votos dos dois lados' : '') + (onde ? ': ' + onde : '') + '.' }));
+    (c.mudou || []).forEach(function (m) {
+      nos.push(h('p', { cls: 'cg-d-n cg-cm-m', text: 'Mudou de voto no mesmo parecer: ' + (m.prop || '') + ' — ' + (VOTO_LETRA[m.vc] || m.vc) + ' na ' + m.comissao + ' em ' + dataBr(m.dc) + ', ' + (VOTO_LETRA[m.vp] || m.vp) + ' no Plenário em ' + dataBr(m.dp) + (m.parecer ? ' (parecer ' + m.parecer + ')' : '') + '.' }));
+    });
+    if ((c.votos || []).length) nos.push(h('ol', { cls: 'cg-ls' }, c.votos.map(function (v) {
+      var placar = num(v.sim) + ' Sim × ' + num(v.nao) + ' Não' + (v.abst ? ' · ' + num(v.abst) + ' abst.' : '');
+      var lado = v.venceu === true ? ' · ficou com a maioria' : (v.venceu === false ? ' · ficou vencido' : '');
+      return h('li', {}, [
+        h('p', { cls: 'cg-ls-k' }, [h('b', { text: VOTO_LETRA[v.v] || v.v }), h('span', { text: (v.prop ? v.prop + ' · ' : '') + v.comissao + ' · ' + dataBr(v.d) + (v.parecer ? ' · parecer ' + v.parecer : '') + ' · ' + placar + lado })]),
+        v.x ? h('p', { cls: 'cg-ls-x', text: v.x }) : null
+      ]);
+    })));
+    return secao('Nas comissões', f.casa === 'cd' ? 'o voto é no parecer do relator: Sim é aprovar o parecer, que pode ser pela rejeição' : 'a descrição oficial de cada votação, sem dizer o que o Sim queria dizer', nos);
+  }
+  /* As frentes que a pessoa assina: quantas, as que coordena e, nas de causa, o voto ao lado do coordenador. */
+  function secaoFrentes(f) {
+    var fr = f.frentes;
+    if (!fr || !fr.de) return null;
+    var nos = [];
+    var mediana = (M.frentes || {}).mediana;
+    nos.push(h('p', { cls: 'cg-d-n', text: fr.n ? 'Assina ' + num(fr.n) + ' das ' + num(fr.de) + ' frentes parlamentares da legislatura' + (mediana != null ? ' (na mediana, um deputado assina ' + num(mediana) + ')' : '') + '.' : 'Não assina nenhuma das ' + num(fr.de) + ' frentes parlamentares da legislatura.' }));
+    if ((fr.coordena || []).length) nos.push(h('p', { cls: 'cg-d-n', text: 'Coordena ' + (fr.coordena.length === 1 ? 'a ' : 'as ') + fr.coordena.map(function (x) { return x.titulo; }).join('; ') + '.' }));
+    if ((fr.causas || []).length) {
+      nos.push(h('h4', { cls: 'az-h5', text: 'Frentes de causa que assina' }));
+      nos.push(h('ul', { cls: 'cg-d-frl' }, fr.causas.map(function (c) {
+        var tema = c.tema === 'todas' ? 'todas as votações esquerda × direita' : ((M.temasCurtos || {})[c.tema] || c.tema);
+        var texto = c.coord ? 'é quem coordena' : (c.com != null ? 'votou do mesmo lado que o coordenador em ' + pct(c.com) + ' de ' + num(c.n) + (c.n === 1 ? ' votação' : ' votações') : 'sem votação em comum com o coordenador');
+        return h('li', {}, [h('a', { href: '#cg-frente-' + c.id, 'data-frente': c.id, text: c.nome }), h('span', { text: ' · ' + tema + ' · ' + texto })]);
+      })));
+    }
+    return secao('Frentes', 'grupos registrados em torno de uma causa: assinar é barato, o voto é que diz', nos);
+  }
   var casaDoDossie = 'cd';  // a Casa do dossiê aberto (para os links das matérias)
   function montar(f) {
     var leg = (f.leg || {})[String(M.legislatura)] || {}, nos = [];
@@ -450,7 +538,7 @@
     var eixo = leg.eixo, tiles = [], media = f.partido_media || {};
     if (eixo && f.campo) {
       var lado = eixo.saldo >= 0 ? 'direita' : 'esquerda', vezes = eixo.saldo >= 0 ? eixo.dir : eixo.esq;
-      tiles.push(tile('Com quem vota', saldo(eixo.saldo), f.campo.nome, 'Com a ' + lado + ' em ' + pct(100 * vezes / eixo.n) + ' das ' + num(eixo.n) + ' votações de conteúdo que dividiram os polos.' + noPartido(f) + (media.saldo != null ? ' Média do ' + f.partido + ': ' + saldo(media.saldo) + '.' : ''), barra(eixo.saldo)));
+      tiles.push(tile('Com quem vota', saldo(eixo.saldo), f.campo.nome, 'Com a ' + lado + ' em ' + pct(100 * vezes / eixo.n) + ' das ' + num(eixo.n) + ' votações de conteúdo que dividiram os polos.' + noPartido(f) + (media.saldo != null ? ' Média do ' + f.partido + ': ' + saldo(media.saldo) + '.' : '') + fraseDoPeso(f), barra(eixo.saldo)));
     } else {
       tiles.push(tile('Com quem vota', '—', '', 'Menos votações divisivas do que o mínimo para dizer de que lado fica' + (eixo ? ' (' + eixo.n + ').' : '.')));
     }
@@ -579,6 +667,12 @@
       blocos.push(h('div', { cls: 'cg-d-2c' }, [h('div', {}, colA), h('div', {}, colB)]));
       nos.push(secao('O que propõe', num(a.total) + ' proposições de autoria principal' + (a.desde ? ' desde ' + a.desde.slice(0, 4) : ''), blocos));
     }
+    var secFr = secaoFrentes(f);
+    if (secFr) nos.push(secFr);
+    var secCt = secaoCota(f);
+    if (secCt) nos.push(secCt);
+    var secCm = secaoComissoes(f);
+    if (secCm) nos.push(secCm);
     var r = f.relatorias;
     if (r && r.total) {
       nos.push(secao('O que tem na mão', num(r.total) + ' matérias esperando o seu parecer' + (r.antigas_n ? ', ' + num(r.antigas_n) + ' há mais de seis meses' : ''), [
@@ -653,12 +747,13 @@
   function doEndereco() {
     var hash = w.location.hash || '';
     var m = /^#p=((?:cd|sf)-\d+)$/.exec(hash), c = /^#c=((?:cd|sf)-\d+),((?:cd|sf)-\d+)$/.exec(hash);
-    var mt = /^#m=((?:cd|sf)-[A-Z]+-\d+-\d{4})$/.exec(hash), v = /^#v=([a-z]+)$/.exec(hash);
+    var mt = /^#m=((?:cd|sf)-[A-Z]+-\d+-\d{4})$/.exec(hash), v = /^#v=([a-z]+)(?:&(.*))?$/.exec(hash);
     if (m) { abrir(m[1], true); return; }
     if (c) { abrirComparacao(c[1], c[2], true); return; }
     if (mt) { abrirMateria(mt[1], true); return; }
     fechar(false);
     if (!abas.length) return;
+    if (v && aoEndereco[v[1]]) aoEndereco[v[1]](v[2] || '');
     if (v && verVista(v[1], true)) return;
     if (hash.length > 1 && irPara(hash.slice(1))) return;
     verVista(vistaPadrao, true);
@@ -1003,6 +1098,7 @@
     acharQ.addEventListener('change', ir);
   }
 {% include "congresso_materias.js.j2" %}
+{% include "congresso_escolha.js.j2" %}
   if (abas.length) verVista(vistaPadrao, true);
   doEndereco();
 })();

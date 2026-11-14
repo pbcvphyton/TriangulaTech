@@ -50,60 +50,73 @@ campos:
   - {id: centro_direita, nome: "mais com a direita", ate: 60}
   - {id: direita, nome: "com a direita", ate: 100}
 
-# Macrotemas: as 32 áreas temáticas da Câmara (códigos de /referencias/proposicoes/codTema)
+# Macrotemas ("curto": o nome nas listas e nos filtros): as 32 áreas temáticas da Câmara (códigos de /referencias/proposicoes/codTema)
 # e a classificação do Senado (/processo/classes, "Raiz / Filho") numa lista só.
 # No Senado vale o prefixo mais longo.
 temas:
   - id: economia
     nome: "Economia, tributos e orçamento"
+    curto: "Economia"
     camara: [40, 70, 66, 67, 60]
     senado: ["Economia e Desenvolvimento", "Orçamento Público", "Jurídico / Direito do Consumidor", "Jurídico / Direito Empresarial e Econômico"]
   - id: trabalho
     nome: "Trabalho e previdência"
+    curto: "Trabalho"
     camara: [58, 52]
     senado: ["Política Social / Trabalho e Emprego", "Política Social / Previdência Social"]
   - id: saude
     nome: "Saúde"
+    curto: "Saúde"
     camara: [56]
     senado: ["Política Social / Saúde"]
   - id: educacao
     nome: "Educação, cultura e esporte"
+    curto: "Educação"
     camara: [46, 35, 39, 86]
     senado: ["Política Social / Educação", "Política Social / Cultura", "Política Social / Desporto e Lazer"]
   - id: seguranca
     nome: "Segurança e justiça penal"
+    curto: "Segurança"
     camara: [43, 57]
     senado: ["Jurídico / Direito Penal e Penitenciário", "Soberania, Defesa Nacional e Ordem Pública / Defesa do Estado e das Instituições Democráticas"]
   - id: direitos
     nome: "Direitos humanos e proteção social"
+    curto: "Direitos humanos"
     camara: [44]
     senado: ["Política Social / Proteção Social", "Jurídico / Direitos e Garantias", "Política Social"]
   - id: ambiente
     nome: "Meio ambiente e energia"
+    curto: "Meio ambiente"
     camara: [48, 54, 85]
     senado: ["Meio Ambiente", "Infraestrutura / Minas e Energia"]
   - id: agro
     nome: "Agro e terra"
+    curto: "Agro"
     camara: [64, 51]
     senado: ["Economia e Desenvolvimento / Agropecuária e Abastecimento", "Economia e Desenvolvimento / Política Fundiária e Reforma Agrária"]
   - id: cidades
     nome: "Cidades, transporte e infraestrutura"
+    curto: "Cidades"
     camara: [41, 61]
     senado: ["Infraestrutura", "Política Social / Habitação", "Política Social / Desenvolvimento Urbano", "Jurídico / Direito de Trânsito"]
   - id: politica
     nome: "Política, Estado e Justiça"
+    curto: "Política"
     camara: [34, 53, 68, 74, 76, 42]
     senado: ["Administração Pública", "Organização do Estado", "Jurídico"]
   - id: exterior
     nome: "Relações exteriores e defesa"
+    curto: "Relações exteriores"
     camara: [55]
     senado: ["Soberania, Defesa Nacional e Ordem Pública"]
   - id: tecnologia
     nome: "Ciência, tecnologia e comunicações"
+    curto: "Ciência e tecnologia"
     camara: [62, 37]
     senado: ["Economia e Desenvolvimento / Ciência, Tecnologia e Informática", "Infraestrutura / Comunicações"]
   - id: homenagens
     nome: "Homenagens e datas"
+    curto: "Homenagens"
     camara: [72]
     senado: ["Honorífico"]
 
@@ -149,3 +162,48 @@ apelidos:
   "PEC 45/2023": ["PEC das Drogas"]
   "PL 2338/2023": ["PL da Inteligência Artificial", "PL da IA"]
   "MPV 1303/2025": ["MP do IOF"]
+
+# Frentes parlamentares de causa: quem assina cada uma e como vota no tema dela. Só a Câmara
+# registra quem assina (o Senado não publica as frentes). "titulo": o começo do título
+# oficial (vale para qualquer legislatura em que a frente for registrada de novo com o mesmo
+# nome; se dois registros casarem, vale o de mais membros); "nome": como aparece na página;
+# "tema": o tema da aba em que a causa se vota ("todas": a frente não tem um tema só, e conta
+# todas as votações esquerda × direita). A frente não registra posição: a página compara o
+# voto de cada membro com o do coordenador, que é quem a registra. Assinar é barato: na
+# legislatura 57, um deputado assina, na mediana, 109 das 320 frentes. A lista tem as duas
+# pontas de cada tema, para não escolher lado.
+frentes:
+  - {titulo: "Frente Parlamentar Mista pelo Livre Mercado", nome: "Livre Mercado", tema: economia}
+  - {titulo: "Frente Parlamentar contra os Juros Abusivos", nome: "Contra os Juros Abusivos", tema: economia}
+  - {titulo: "Frente Parlamentar Mista em Defesa da Desoneração da Folha", nome: "Desoneração da Folha", tema: economia}
+  - {titulo: "Frente Parlamentar em Defesa da Previdência Social Pública", nome: "Previdência Social Pública", tema: trabalho}
+  - {titulo: "Frente Parlamentar em Defesa dos Trabalhadores por Aplicativo", nome: "Trabalhadores por Aplicativo", tema: trabalho}
+  - {titulo: "Frente Parlamentar do Sistema Único de Saúde", nome: "SUS", tema: saude}
+  - {titulo: "Frente Parlamentar Mista em Defesa da Reforma Psiquiátrica", nome: "Reforma Psiquiátrica e Luta Antimanicomial", tema: saude}
+  - {titulo: "Frente Parlamentar em Defesa das Comunidades Terapêuticas", nome: "Comunidades Terapêuticas", tema: saude}
+  - {titulo: "Frente Parlamentar Mista da Educação", nome: "Educação", tema: educacao}
+  - {titulo: "Frente Parlamentar Mista em Defesa da Escola Pública", nome: "Escola Pública", tema: educacao}
+  - {titulo: "Frente Parlamentar em Defesa da Educação Sem Doutrinação", nome: "Educação Sem Doutrinação", tema: educacao}
+  - {titulo: "Frente Parlamentar da Segurança Pública", nome: "Segurança Pública", tema: seguranca}
+  - {titulo: "Frente Parlamentar Mista de Proteção aos Colecionadores, Atiradores", nome: "Colecionadores, Atiradores e Caçadores (CACs)", tema: seguranca}
+  - {titulo: "Frente Parlamentar Mista por Cidadania e Direitos LGBTI", nome: "Direitos LGBTI+", tema: direitos}
+  - {titulo: "Frente Parlamentar Mista em Defesa dos Direitos dos Povos Indígenas", nome: "Povos Indígenas", tema: direitos}
+  - {titulo: "Frente Parlamentar Mista Brasil-África com participação Popular de Enfrentamento ao Racismo", nome: "Enfrentamento ao Racismo", tema: direitos}
+  - {titulo: "Frente Parlamentar Mista contra o Aborto", nome: "Contra o Aborto e em Defesa da Vida", tema: direitos}
+  - {titulo: "Frente Parlamentar em Defesa da Vida e da Família", nome: "Vida e Família", tema: direitos}
+  - {titulo: "Frente Parlamentar Mista Ambientalista", nome: "Ambientalista", tema: ambiente}
+  - {titulo: "Frente Parlamentar Mista em Defesa da Transição Climática Justa", nome: "Transição Climática Justa", tema: ambiente}
+  - {titulo: "Frente Parlamentar em Apoio ao Petróleo, Gás e Energia", nome: "Petróleo, Gás e Energia", tema: ambiente}
+  - {titulo: "Frente Parlamentar Mista em Defesa da Exploração de Petróleo na Margem Equatorial", nome: "Petróleo na Margem Equatorial", tema: ambiente}
+  - {titulo: "Frente Parlamentar da Agropecuária", nome: "Agropecuária (FPA)", tema: agro}
+  - {titulo: "Frente Parlamentar Mista da Agricultura Familiar", nome: "Agricultura Familiar", tema: agro}
+  - {titulo: "Frente Parlamentar pelo Desenvolvimento da Agroecologia", nome: "Agroecologia", tema: agro}
+  - {titulo: "Frente Parlamentar em Defesa da Regularização Fundiária Rural", nome: "Regularização Fundiária Rural", tema: agro}
+  - {titulo: "Frente Parlamentar Mista em Defesa do Serviço Público", nome: "Serviço Público", tema: politica}
+  - {titulo: "Frente Parlamentar Mista de Combate à Corrupção", nome: "Combate à Corrupção", tema: politica}
+  - {titulo: "Frente Parlamentar em Defesa da Liberdade de Expressão", nome: "Liberdade de Expressão", tema: politica}
+  - {titulo: "Frente Parlamentar em Defesa da Soberania Nacional", nome: "Soberania Nacional", tema: politica}
+  - {titulo: "Frente Parlamentar Evangélica", nome: "Evangélica", tema: todas}
+  - {titulo: "Frente Parlamentar Católica", nome: "Católica", tema: todas}
+  - {titulo: "Frente Parlamentar em defesa do Estado Laico", nome: "Estado Laico e Liberdade Religiosa", tema: todas}
+  - {titulo: "Frente Parlamentar Conservadora", nome: "Conservadora", tema: todas}

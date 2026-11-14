@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import text
 from ..config import Config
-from ..congresso import VERSAO, base, dados, ficha, jornal, materias, projetos, relevancia
+from ..congresso import VERSAO, base, dados, ficha, jornal, materias, peso, projetos, relevancia
 from ..models import Edition
 from . import filters
 from .web import brand_view
@@ -59,6 +59,9 @@ SELOS = {
     "mudanca": "Mudança",
     "destoa": "Fora da curva",
     "tema_pessoa": "Muda de lado",
+    "frente": "Frentes",
+    "cota": "Cota",
+    "peso": "Relevância",
 }
 ORDEM_FILAS = (
     projetos.F_RELATOR,
@@ -232,6 +235,10 @@ class CasaView:
     furaram: dict[str, Any] | None
     ultimas: list[dict[str, Any]]
     listas: list[dict[str, Any]]
+    escolha: dict[str, Any] = field(default_factory=dict)  # "Escolha o seu candidato": quem está no mandato, com os traços
+    frentes: dict[str, Any] | None = None  # frentes de causa × voto (só a Câmara registra quem assina)
+    cota: dict[str, Any] | None = None  # a cota parlamentar: quem gasta quanto, com o quê e com quem
+    comissoes: dict[str, Any] | None = None  # as votações nominais nas comissões
 
 
 @dataclass
@@ -567,6 +574,7 @@ _LISTAS = (
     ("dissidentes", "Quem mais vota contra o próprio partido", "A parte das votações em que cada um votou com a maioria do partido do dia.", "pct", "com o partido em"),
     ("mudam_tema", "Quem muda de lado conforme o assunto", "Quem vota de um lado em quase tudo e do outro num tema: o saldo daquele tema contra o geral. Só entra o que passa do acaso, contando todas as pessoas e temas comparados.", "tema", ""),
     ("destoam", "Quem vota longe da própria bancada", "O saldo de cada um contra a média do partido (−100 = sempre com a esquerda; +100 = sempre com a direita). De quem trocou de partido, só contam os votos dados no partido atual.", "saldo", ""),
+    ("muda_peso", "Quem muda quando pesa a relevância", "Nas votações cujas matérias têm nota, o saldo sem peso contra o saldo com cada voto pesando a nota de relevância, e o saldo sem peso nas de nota alta e nas de nota baixa (da mediana da Casa para cima e abaixo dela): quem vota de um lado nas matérias pequenas e do outro nas grandes.", "peso", ""),
     ("mudaram", "Quem mudou em relação ao governo", "O último semestre contra os anteriores do mesmo governo: só entra quem mudou mais de 15 pontos, com 99% de confiança.", "mud", ""),
     ("parados", "Quem tem mais propostas paradas", "Proposições de autoria principal que tramitam e não têm andamento há mais de um ano.", "n", ""),
     ("citados", "Os mais citados no jornal", "Manchetes dos últimos 30 dias que citam o nome, e o que os registros dizem dele.", "n", ""),
@@ -587,6 +595,14 @@ def _listas(listas: Mapping[str, Any]) -> list[dict[str, Any]]:
                 valor, extra = f"{_saldo(i.get('tema_saldo'))} em {i.get('tema_nome') or ''}", f"geral {_saldo(i.get('saldo'))} · {_num(i.get('n'))} votações"
             elif tipo == "saldo":
                 valor, extra = _saldo(i.get("saldo")), f"partido: {_saldo(i.get('partido_saldo'))}" + (" · desde que entrou" if i.get("no_partido") else "")
+            elif tipo == "peso":
+                valor = f"{_saldo(i.get('simples'))} → {_saldo(i.get('pesado'))}"
+                partes = []
+                if i.get("alta") is not None:
+                    partes.append(f"nota alta {_saldo(i.get('alta'))} ({_num(i.get('alta_n'))})")
+                if i.get("baixa") is not None:
+                    partes.append(f"baixa {_saldo(i.get('baixa'))} ({_num(i.get('baixa_n'))})")
+                extra = " · ".join(partes)
             elif tipo == "mud":
                 antes, agora = (i.get("antes") or {}).get("pct"), (i.get("agora") or {}).get("pct")
                 valor, extra = f"{_pct(antes)} → {_pct(agora)}", f"semestre {str(i.get('semestre') or '').replace('-', '/')}"
@@ -692,6 +708,8 @@ def _casa(
     relevancia_limites: tuple[float, float] | None = None,
     polos: Mapping[str, list[str]] | None = None,
     temas_def: Mapping[str, Mapping[str, list[str]]] | None = None,
+    temas_meta: list[dict[str, Any]] | None = None,
+    governo: str = "",
 ) -> CasaView:
     temas_nomes = temas_nomes or {}
     polos = polos or {}
@@ -764,7 +782,296 @@ def _casa(
         furaram=_furaram(painel.get("furaram") or {}),
         ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
         listas=_listas(painel.get("listas") or {}),
+        escolha=_escolha(casa, pessoas, temas_meta or [], campos, governo),
+        frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos),
+        cota=_cota(painel.get("cota") or {}, casa),
+        comissoes=_comissoes(painel.get("comissoes") or {}, casa),
     )
+
+
+ESCOLHA_TEMAS = 3  # temas de cada lado na linha de cada um
+ESCOLHA_PROPOE = 3  # temas em que mais propõe, na linha de cada um
+
+
+def corte_do_centro(campos: list[dict[str, Any]]) -> tuple[float, float]:
+    """Os limites da faixa "dividido" (o campo ``centro`` de config/congresso.yaml): de
+    −20 a +20 no padrão. Abaixo, "com a esquerda"; acima, "com a direita"."""
+    ordem = sorted(campos, key=lambda c: float(c.get("ate") or 0))
+    for i, c in enumerate(ordem):
+        if c.get("id") == "centro":
+            return (float(ordem[i - 1]["ate"]) if i else -100.0, float(c["ate"]))
+    return (-20.0, 20.0)
+
+
+def lado_no_tema(saldo: float, corte: tuple[float, float]) -> str:
+    """``e`` (com a esquerda), ``c`` (dividido) ou ``d`` (com a direita)."""
+    if saldo <= corte[0]:
+        return "e"
+    return "d" if saldo > corte[1] else "c"
+
+
+def _escolha(casa: str, pessoas: list[dict[str, Any]], temas: list[dict[str, Any]], campos: list[dict[str, Any]], governo: str) -> dict[str, Any]:
+    """"Escolha o seu candidato": quem está em exercício na Casa, do estado A ao Z, com o que
+    o registro diz de cada um (de que lado vota em cada tema, sobre o que propõe, presença,
+    governo, normas). O script filtra e ordena esta mesma lista; sem ele, ela sai inteira."""
+    curtos = {t["id"]: t.get("curto") or t["nome"] for t in temas}
+    corte = corte_do_centro(campos)
+    itens = []
+    for p in pessoas:
+        if not p["k"].startswith(casa + "-") or not p.get("ex"):
+            continue
+        lados: dict[str, list[tuple[str, int, int]]] = {"e": [], "c": [], "d": []}
+        for tema, valores in (p.get("tm") or {}).items():
+            if tema in curtos:
+                lados[lado_no_tema(float(valores[0]), corte)].append((curtos[tema], int(valores[0]), int(valores[1])))
+        for lista in lados.values():
+            lista.sort(key=lambda x: (-x[2], x[0]))
+        propoe = sorted(((curtos[t], n) for t, n in (p.get("pt") or {}).items() if t in curtos), key=lambda x: (-x[1], x[0]))
+        itens.append(
+            {
+                "k": p["k"],
+                "nome": p["nome"],
+                "partido": p.get("partido") or "",
+                "uf": p.get("uf") or "",
+                "saldo": p.get("saldo"),
+                "saldo_txt": _saldo(p.get("saldo")),
+                "classe": classe_do_saldo(p.get("saldo"), campos),
+                "pres": p.get("pres"),
+                "gov": p.get("gov"),
+                "norma": p.get("norma") or 0,
+                "prop": p.get("prop") or 0,
+                "ct": p.get("ct"),
+                "esq": [f"{nome} {_saldo(v)}" for nome, v, _n in lados["e"][:ESCOLHA_TEMAS]],
+                "esq_mais": max(0, len(lados["e"]) - ESCOLHA_TEMAS),
+                "dir": [f"{nome} {_saldo(v)}" for nome, v, _n in lados["d"][:ESCOLHA_TEMAS]],
+                "dir_mais": max(0, len(lados["d"]) - ESCOLHA_TEMAS),
+                "propoe": [f"{nome} ({n})" for nome, n in propoe[:ESCOLHA_PROPOE]],
+                "numeros": " · ".join(
+                    x
+                    for x in (
+                        f"Presença {_pct(p.get('pres'))}" if p.get("pres") is not None else "",
+                        f"governo {_pct(p.get('gov'))}" if p.get("gov") is not None and governo else "",
+                        f"{_num(p.get('prop'))} propostas" if p.get("prop") else "nenhuma proposta de autoria principal",
+                        (f"{_num(p.get('norma'))} virou norma" if p.get("norma") == 1 else f"{_num(p.get('norma'))} viraram norma") if p.get("norma") else "",
+                        f"cota {reais(p.get('ct'))}/mês" if p.get("ct") is not None else "",
+                    )
+                    if x
+                ),
+            }
+        )
+    itens.sort(key=lambda i: (i["uf"], text.normalize(i["nome"])))
+    ufs = sorted({i["uf"] for i in itens if i["uf"]})
+    partidos = sorted({i["partido"] for i in itens if i["partido"]}, key=text.normalize)
+    return {"itens": itens, "ufs": ufs, "partidos": partidos, "corte": [corte[0], corte[1]], "corte_txt": [_saldo(corte[0]), _saldo(corte[1])]}
+
+
+MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
+
+
+def reais(valor: Any) -> str:
+    """R$ em reais inteiros ("R$ 42.638"); abaixo de mil, com centavos."""
+    try:
+        v = float(valor)
+    except (TypeError, ValueError):
+        return "—"
+    return "R$ " + (text.format_number_pt(v, 2) if abs(v) < 1000 else text.format_number_pt(round(v), 0))
+
+
+def _mes(am: str | None) -> str:
+    """"2026-10" → "out/2026"."""
+    if not am or len(am) < 7:
+        return ""
+    try:
+        return f"{MESES[int(am[5:7]) - 1]}/{am[:4]}"
+    except (ValueError, IndexError):
+        return am
+
+
+def _cnpj(cnpj: str | None) -> str:
+    d = "".join(ch for ch in (cnpj or "") if ch.isdigit())
+    if len(d) == 14:
+        return f"{d[:2]}.{d[2:5]}.{d[5:8]}/{d[8:12]}-{d[12:]}"
+    return d
+
+
+def _extra_cota(x: Mapping[str, Any]) -> str:
+    """O total e os meses; na Câmara, as passagens da agência em 2024 (fora da conta), para
+    quem parece gastar pouco só porque viaja pela agência."""
+    texto = f"{reais(x.get('total'))} em {_num(x.get('meses'))} meses"
+    if float(x.get("sigepa_2024") or 0) > 0:
+        texto += f"; fora da conta, {reais(x.get('sigepa_2024'))} em passagens da agência em 2024"
+    return texto
+
+
+def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
+    """A cota parlamentar da Casa, pronta para mostrar."""
+    if not ct or not ct.get("total"):
+        return None
+
+    def pessoa_(x: Mapping[str, Any], **extra: Any) -> dict[str, Any]:
+        return {"k": x.get("k") or "", "nome": x.get("nome") or "", "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"), **extra}
+
+    total = float(ct.get("total") or 0) or 1.0
+    maior_cat = max((float(c.get("total") or 0) for c in ct.get("categorias") or []), default=0) or 1.0
+    return {
+        "desde": _mes(ct.get("desde")),
+        "ate": _mes(ct.get("ate")),
+        "sem": ct.get("sem") or "",
+        "total": reais(ct.get("total")),
+        "pessoas": _num(ct.get("pessoas")),
+        "mediana": reais(ct.get("mediana")),
+        "quem": "deputados" if casa == "cd" else "senadores",
+        "mais": [pessoa_(x, valor=reais(x.get("media")), extra=_extra_cota(x)) for x in (ct.get("mais_gastam") or [])[:10]],
+        "menos": [pessoa_(x, valor=reais(x.get("media")), extra=_extra_cota(x)) for x in (ct.get("menos_gastam") or [])[:10]],
+        "categorias": [
+            {"nome": c.get("nome") or "", "valor": reais(c.get("total")), "pct": _pct(c.get("pct")), "w": round(100 * float(c.get("total") or 0) / maior_cat, 1)}
+            for c in (ct.get("categorias") or [])[:12]
+        ],
+        "fornecedores": [
+            {"nome": f.get("nome") or "", "cnpj": _cnpj(f.get("cnpj")), "valor": reais(f.get("total")), "gabinetes": _num(f.get("gabinetes")), "n": _num(f.get("n"))}
+            for f in (ct.get("fornecedores") or [])[:15]
+        ],
+        "concentrados": [
+            pessoa_(x, fornecedor=x.get("fornecedor") or "", cnpj=_cnpj(x.get("cnpj")), valor=reais(x.get("valor")), pct=_pct(x.get("pct")), total=reais(x.get("total")))
+            for x in (ct.get("concentrados") or [])[:15]
+        ],
+        "repetidas": [
+            {
+                "fornecedor": r.get("fornecedor") or "",
+                "cnpj": _cnpj(r.get("cnpj")),
+                "numero": r.get("numero") or "",
+                "data": _data(r.get("data"), ano=True),
+                "valor": reais(r.get("valor")),
+                "docs": [pessoa_(x, url=filters.safe_url(x.get("url")) or "") for x in r.get("docs") or []],
+            }
+            for r in (ct.get("repetidas") or [])[:20]
+        ],
+        "glosas": [pessoa_(x, valor=reais(x.get("valor")), extra=f"{_num(x.get('n'))} notas") for x in (ct.get("glosas") or [])[:10]],
+        "sem_despesa": [pessoa_(x) for x in ct.get("sem_despesa") or []],
+        "parte_maior": _pct(100 * float(((ct.get("categorias") or [{}])[0]).get("total") or 0) / total) if ct.get("categorias") else "—",
+    }
+
+
+VOTO_LETRA = {"S": "Sim", "N": "Não", "A": "Abstenção", "O": "Obstrução"}
+
+
+def _comissoes(cm: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
+    """As votações nominais nas comissões da Casa, prontas para mostrar."""
+    if not cm or not cm.get("votacoes"):
+        return None
+    casos = []
+    por_caso: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for m in cm.get("mudaram") or []:
+        por_caso[(m.get("prop") or "", m.get("dp") or "")].append(m)
+    for c in cm.get("mudaram_casos") or []:
+        quem = por_caso.get((c.get("prop") or "", c.get("dp") or ""), [])
+        casos.append(
+            {
+                "prop": c.get("prop") or "",
+                "comissao": c.get("comissao") or "",
+                "dc": _data(c.get("dc"), ano=True),
+                "dp": _data(c.get("dp"), ano=True),
+                "mudaram": int(c.get("mudaram") or 0),
+                "ambas": int(c.get("ambas") or 0),
+                "quem": [
+                    {
+                        "k": m["k"],
+                        "nome": m.get("nome") or "",
+                        "legenda": f"{m.get('partido', '')}-{m.get('uf', '')}".strip("-"),
+                        "vc": VOTO_LETRA.get(m.get("vc") or "", m.get("vc") or ""),
+                        "vp": VOTO_LETRA.get(m.get("vp") or "", m.get("vp") or ""),
+                    }
+                    for m in quem
+                ],
+                "parecer": (quem[0].get("parecer") if quem else "") or "",
+            }
+        )
+    return {
+        "votacoes": _num(cm.get("votacoes")),
+        "conteudo": _num(cm.get("conteudo")),
+        "divididas": _num(cm.get("divididas")),
+        "por_comissao": [f"{sigla} {_num(n)}" for sigla, n in (cm.get("por_comissao") or [])[:12]],
+        "ultimas": [
+            {
+                "data": _data(v.get("d"), ano=True),
+                "comissao": v.get("comissao") or "",
+                "prop": v.get("prop") or "",
+                "x": v.get("x") or "",
+                "parecer": v.get("parecer") or "",
+                "sim": _num(v.get("sim")),
+                "nao": _num(v.get("nao")),
+                "abst": int(v.get("abst") or 0),
+                "resultado": {True: "aprovado", False: "rejeitado"}.get(v.get("aprovada"), ""),
+                "classe": {True: "ok", False: "no"}.get(v.get("aprovada"), ""),
+            }
+            for v in (cm.get("ultimas") or [])[:15]
+        ],
+        "casos": [c for c in casos if c["mudaram"]],
+        "casos_sem": sum(1 for c in casos if not c["mudaram"]),
+    }
+
+
+FRENTE_PARTIDOS = 6  # partidos com mais membros na linha de cada frente
+FRENTE_CONTRA = 5  # membros que mais votam diferente do coordenador, em cada frente
+
+
+def _frentes(fr: Mapping[str, Any], temas: list[dict[str, Any]], campos: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """As frentes de causa (config/congresso.yaml) e o voto de quem assina, agrupadas pelo tema."""
+    if not fr or not fr.get("causas"):
+        return None
+    curtos = {t["id"]: t.get("curto") or t["nome"] for t in temas}
+    grupos: dict[str, list[dict[str, Any]]] = {}
+    for c in fr["causas"]:
+        lados = c.get("lados") or {}
+        com_lado = sum(int(lados.get(x) or 0) for x in ("e", "c", "d", "sem")) or 1
+        coord = c.get("coord") or None
+        tema = c.get("tema") or "todas"
+        grupos.setdefault(tema, []).append(
+            {
+                "id": c["id"],
+                "nome": c.get("nome") or c.get("titulo") or "",
+                "titulo": c.get("titulo") or "",
+                "doc": filters.safe_url(c.get("doc")) or "",
+                "criada": _data(c.get("criada"), ano=True),
+                "membros": _num(c.get("membros")),
+                "em_exercicio": _num(c.get("em_exercicio")),
+                "coord": {
+                    **coord,
+                    "saldo_txt": _saldo(coord.get("saldo")),
+                    "classe": classe_do_saldo(coord.get("saldo"), campos),
+                }
+                if coord
+                else None,
+                "lados": [
+                    {"id": x, "n": int(lados.get(x) or 0), "w": round(100 * int(lados.get(x) or 0) / com_lado, 1), "nome": nome}
+                    for x, nome in (("e", "com a esquerda"), ("c", "dividido"), ("d", "com a direita"), ("sem", "sem votações bastantes"))
+                ],
+                "votacoes": _num(c.get("votacoes")),
+                "com_coord": _pct(c.get("com_coord")),
+                "partidos": [f"{sigla} {membros} de {bancada}" for sigla, membros, bancada in (c.get("partidos") or [])[:FRENTE_PARTIDOS]],
+                "partidos_mais": max(0, len(c.get("partidos") or []) - FRENTE_PARTIDOS),
+                "contra": [
+                    {**x, "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"), "pct_txt": _pct(x.get("pct"))}
+                    for x in (c.get("contra") or [])[:FRENTE_CONTRA]
+                ],
+            }
+        )
+    ordem = [t["id"] for t in temas] + ["todas"]
+    return {
+        "total": _num(fr.get("total")),
+        "mediana": _num(fr.get("mediana")),
+        "media": str(fr.get("media") or "").replace(".", ","),
+        "nenhuma": int(fr.get("nenhuma") or 0),
+        "legislatura": fr.get("legislatura"),
+        "mais_assinam": [
+            {**x, "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"), "n_txt": _num(x.get("n"))} for x in (fr.get("mais_assinam") or [])[:10]
+        ],
+        "grupos": [
+            {"tema": t, "nome": curtos.get(t, "Sem um tema só: todas as votações esquerda × direita"), "frentes": grupos[t]}
+            for t in ordem
+            if t in grupos
+        ],
+    }
 
 
 def _temas_faixa(matriz: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -825,6 +1132,8 @@ def _pessoas(resumo: Mapping[str, Any], campos: list[dict[str, Any]]) -> list[di
                 "ex": bool(p.get("ex")),
                 "saldo": p.get("saldo"),
                 "saldo_txt": _saldo(p.get("saldo")),
+                "sp": p.get("sp"),
+                "sp_txt": _saldo(p.get("sp")),
                 "classe": classe_do_saldo(p.get("saldo"), campos),
                 "left": round(left, 1),
                 "width": round(width, 1),
@@ -885,6 +1194,7 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         f"{g['nome']} ({g['inicio'][:4]}–{g['fim'][:4] if g.get('fim') else 'hoje'})" for g in m.get("governos") or []
     )
     jor = m.get("jornal") or {}
+    corte = corte_do_centro([c for c in m.get("campos") or [] if isinstance(c, dict)])
     return [
         (
             "De onde vem",
@@ -933,6 +1243,18 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "Em geral são os dois extremos votando contra o governo por razões opostas: o PSOL contra uma regra fiscal por achá-la "
             "dura demais, o PL por ser oposição. Contada no saldo, ela faria o PSOL parecer menos de esquerda que o PT. Essas "
             "votações aparecem à parte, em \"Onde cada polo racha\", com o tema e a orientação do governo de cada uma.",
+        ),
+        (
+            "Saldo pesado pela relevância",
+            "O mesmo saldo, com cada voto pesando a nota de relevância da matéria votada (0 a 100, a de “o que espera × o que "
+            "passa”): um voto no texto de uma PEC com muitos sinais pesa mais que um voto num projeto de sinais fracos. Só entram "
+            "as votações cuja matéria tem nota (projetos de lei, de lei complementar e PECs; medidas provisórias e decretos "
+            f"legislativos ficam de fora) e o número aparece com {lim.get('minimo_divisivas', 10)} delas ou mais. Ao lado, o saldo sem peso "
+            "em duas metades: as votações de nota igual ou acima da mediana da Casa e as de nota abaixo dela (cada metade com "
+            f"{peso.MINIMO_FAIXA} votações ou mais). “Quem muda quando pesa” é quem tem o saldo pesado a {peso.DIFERENCA} pontos ou mais do saldo sem peso "
+            "nas mesmas votações. A nota mede sinais do registro (projetos parecidos anexados, origem, tipo de norma, apoio), não a "
+            "repercussão: um projeto que voltou do Senado com o número de lá, como o do licenciamento ambiental, pode ter nota "
+            "baixa. O saldo simples continua sendo o da página.",
         ),
         (
             "Por que só conteúdo",
@@ -1041,6 +1363,51 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "comum: as Casas votam em separado.",
         ),
         (
+            "Frentes",
+            "Uma frente parlamentar é um grupo registrado na Câmara em torno de uma causa; para registrar, basta reunir um terço "
+            "das assinaturas do Congresso, e o registro diz quem assinou e quem coordena (os dados abertos da Câmara, em lote). "
+            "O Senado não publica quem assina. A página não lista todas: as frentes de causa, com o tema da aba em que cada causa "
+            "se vota, ficam em config/congresso.yaml, com as duas pontas de cada tema. Para cada uma, o lado de cada membro em "
+            "exercício (o saldo dele nas votações esquerda × direita do tema, 5 ou mais; nas frentes sem um tema só, o saldo "
+            "geral) e quanto ele votou igual ao coordenador nessas votações (Sim ou Não; obstrução conta como Não). A frente não "
+            "registra posição: o coordenador é quem a registra e responde por ela. A Câmara não registra quando cada um assinou.",
+        ),
+        (
+            "Nas comissões",
+            "As votações nominais das comissões (na Câmara, dos arquivos em lote de votações; no Senado, da API de votações em "
+            "comissão das 16 permanentes). Ficam fora das contas do Plenário (saldo, presença, governismo): a maioria das decisões "
+            "das comissões é simbólica, a maioria das nominais é de requerimento de pauta, e só os membros votam, então uma taxa "
+            "mediria mais a sorte de ser membro do que a posição. A página lista os votos. Na Câmara, o voto é no parecer do relator "
+            "(Sim é aprovar o parecer, que pode concluir pela rejeição; a conclusão vem do último parecer registrado) e só aparece "
+            "quem votou. “Mudou de voto entre a comissão e o Plenário”: o Plenário votou o parecer de uma comissão; vale a última "
+            "votação da comissão que aprovou esse parecer, e entra quem votou Sim ou Não nas duas. No Senado, o registro não diz se "
+            "o item era terminativo nem o resultado: a página mostra a descrição oficial e o placar.",
+        ),
+        (
+            "Cota parlamentar",
+            "Os reembolsos da cota para o exercício da atividade parlamentar, nota a nota: na Câmara, os arquivos anuais oficiais "
+            "(com o endereço de cada nota); no Senado, os dados abertos administrativos. O valor é o reembolsado: a nota menos a glosa "
+            "(a parte que a própria Casa recusou) e menos o que o parlamentar devolveu. A média por mês é o total da legislatura "
+            "dividido pelos meses fechados com despesa (o mês corrente, ainda incompleto, fica fora da média): a cota acumula "
+            "dentro do ano, então um mês alto não diz nada sozinho; as listas só têm quem tem 6 meses ou mais. O fornecedor é "
+            "contado pelo CNPJ; pagamento a pessoa física não tem o nome mostrado. “Um fornecedor só”: 25% ou mais do próprio total para uma empresa, com R$ 50 mil ou mais. “A mesma "
+            "nota em mais de um gabinete”: mesmo CNPJ, número, data e valor reembolsados a pessoas diferentes (números que são só "
+            "mês/ano, como “9/2026”, ficam de fora); o registro não diz o motivo. Na Câmara, ficam fora de todos os anos as passagens "
+            "aéreas compradas pela agência da Casa (SIGEPA), que o arquivo oficial deixou de trazer em agosto de 2025: com elas em "
+            "uns anos e não em outros, a comparação seria injusta; ao lado de quem parece gastar pouco, a página mostra quanto ele "
+            "teve em passagens da agência em 2024, o último ano completo. No Senado, fica fora o reembolso de moradia, que o "
+            "Senado lança no mesmo arquivo mas não conta como cota. O teto da cota muda por estado e não está nos dados abertos.",
+        ),
+        (
+            "Escolha o seu candidato",
+            "Um filtro sobre quem está no mandato, com os mesmos números do resto da página: o estado, o partido, o lado em que "
+            f"vota em cada tema (com a esquerda: saldo do tema até {_saldo(corte[0])}; dividido: acima disso e até {_saldo(corte[1])}; com a direita: acima de "
+            f"{_saldo(corte[1])}; só quem tem {ficha.MINIMO_TEMA_FAIXA} ou mais votações esquerda × direita no tema), o tema sobre o qual propôs (autoria principal), "
+            "a frente que assina, a presença, o governismo e as propostas que viraram norma. Escolhidos os temas, a lista se "
+            "ordena por quanto cada um está do lado escolhido (a média, nos temas escolhidos, do saldo no sentido pedido). Não "
+            "é recomendação: é o registro de cada um diante do que você escolher.",
+        ),
+        (
             "O que isto não diz",
             "Voto não é discurso, e a página não lê discurso: ela mostra o registro para ser posto ao lado do que cada um diz. "
             "Voto com o governo não é ideologia; votação simbólica não aparece; ausência pode ter motivo que o registro não traz. "
@@ -1058,7 +1425,7 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
     polos = d.meta.get("polos") or {}
     temas_def = {t["id"]: {"camara": t.get("camara") or [], "senado": t.get("senado") or []} for t in d.meta.get("temas") or []}
     casas = [
-        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def)
+        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def, d.meta.get("temas") or [], str(d.meta.get("governo") or ""))
         for casa in ("cd", "sf")
         if casa in d.casas
     ]
@@ -1085,6 +1452,22 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         "temas": {t["id"]: t["nome"] for t in d.meta.get("temas") or []},
         # Com quem cada um vota em cada tema, para as faixas filtradas: pessoa → {tema: [saldo, n, vira]}
         "tm": {p["k"]: p["tm"] for p in d.resumo.get("pessoas") or [] if p.get("ex") and p.get("tm")},
+        # Sobre o que cada um propõe: pessoa → {tema: propostas de autoria principal} (para "Escolha o seu candidato").
+        "pt": {p["k"]: p["pt"] for p in d.resumo.get("pessoas") or [] if p.get("ex") and p.get("pt")},
+        "temasCurtos": {t["id"]: t.get("curto") or t["nome"] for t in d.meta.get("temas") or []},
+        # As frentes de causa (Câmara): a mediana de frentes por deputado, o nome de cada uma e quem assina quais.
+        "frentes": {
+            "mediana": ((d.casas.get("cd") or {}).get("frentes") or {}).get("mediana"),
+            "nomes": {str(c["id"]): c.get("nome") or c.get("titulo") or "" for c in ((d.casas.get("cd") or {}).get("frentes") or {}).get("causas") or []},
+            "temas": {str(c["id"]): c.get("tema") or "todas" for c in ((d.casas.get("cd") or {}).get("frentes") or {}).get("causas") or []},
+        },
+        "fr": {p["k"]: p["fr"] for p in d.resumo.get("pessoas") or [] if p.get("ex") and p.get("fr")},
+        # A cota de cada Casa: a mediana da média mensal e o que fica fora da conta (para o dossiê).
+        "cota": {
+            casa: {"mediana": (d.casas[casa].get("cota") or {}).get("mediana"), "sem": (d.casas[casa].get("cota") or {}).get("sem") or ""}
+            for casa in ("cd", "sf")
+            if casa in d.casas and d.casas[casa].get("cota")
+        },
         "tipos": base.TIPOS,
         "votos": {
             "S": "Sim",

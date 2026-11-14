@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import net, text
 from ..net import Fetcher
-from . import VERSAO, base, exercicio, ficha, fontes, jornal, materias, perfil, projetos, regras as regras_mod, relevancia, temas
+from . import VERSAO, base, comissoes, cota, exercicio, ficha, fontes, frentes, jornal, materias, perfil, peso, projetos, regras as regras_mod, relevancia, temas
 from .base import AnoVotos
 from .ficha import Cadastro
 from .fontes import Coletor
@@ -619,7 +619,18 @@ RANKINGS: tuple[tuple[str, Any], ...] = (
     ("norma", lambda f, leg, gov: ((f.get("autoria") or {}).get("estados") or {}).get("norma", 0)),
     ("rel", lambda f, leg, gov: (f.get("relatorias") or {}).get("total", 0)),
     ("jor", lambda f, leg, gov: (f.get("jornal") or {}).get("n30", 0)),
+    ("ct", lambda f, leg, gov: media_da_cota(f)),
 )
+
+
+def media_da_cota(f: Mapping[str, Any]) -> float | None:
+    """A média mensal da cota que entra no ranking e no filtro: com cota.MINIMO_MESES meses ou
+    mais de despesa (como as listas), ou zero para quem não pediu reembolso nenhum."""
+    c = f.get("cota") or {}
+    leg = c.get("leg") or {}
+    if c.get("sem_despesa"):
+        return 0.0
+    return leg.get("media") if (leg.get("meses") or 0) >= cota.MINIMO_MESES else None
 
 
 def rankings(fichas: Iterable[dict[str, Any]], legislatura: int, governo: str) -> None:
@@ -770,6 +781,9 @@ def _na_casa(casa: str) -> str:
 
 
 MINIMO_TEMA = 20  # votações divisivas para um tema entrar no achado do partido que muda de lado
+MINIMO_FRENTE = 20  # membros em exercício com lado no tema para a frente virar achado
+MINIMO_SEM_COTA = 100  # votações possíveis na legislatura para quem não pediu reembolso entrar como "gastou zero"
+PARTE_FRENTE = 0.2  # parte dos membros do outro lado do coordenador para virar achado
 BANCADA_DO_ACHADO = {"cd": 20, "sf": 5}  # parlamentares em exercício para o partido ser o assunto do achado
 
 
@@ -1039,6 +1053,82 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "ficha": muda["k"],
                 }
             )
+        # 4. A frente de causa em que mais membros votam do outro lado do coordenador, no tema dela.
+        fr = painel.get("frentes") or {}
+        melhor_fr = None
+        for c in fr.get("causas") or []:
+            coord = c.get("coord") or {}
+            lados = c.get("lados") or {}
+            if coord.get("saldo") is None or abs(coord["saldo"]) < 60:
+                continue  # o coordenador precisa ter lado definido no tema
+            com_lado = sum(int(lados.get(x) or 0) for x in ("e", "c", "d"))
+            outro = int(lados.get("d" if coord["saldo"] < 0 else "e") or 0)
+            if com_lado >= MINIMO_FRENTE and (melhor_fr is None or outro / com_lado > melhor_fr[0]):
+                melhor_fr = (outro / com_lado, outro, com_lado, c)
+        if melhor_fr and melhor_fr[0] >= PARTE_FRENTE:
+            _parte, outro, com_lado, c = melhor_fr
+            lado_coord = "esquerda" if c["coord"]["saldo"] < 0 else "direita"
+            lado_outro = "direita" if lado_coord == "esquerda" else "esquerda"
+            onde = f"em {regras.nome_do_tema(c['tema'])}" if c.get("tema") != "todas" else "nas votações esquerda × direita"
+            saida.append(
+                {
+                    "tipo": "frente",
+                    "casa": casa,
+                    "peso": 88,
+                    "titulo": f"{_na_casa(casa)}, {_num(outro)} dos {_num(com_lado)} membros da frente {c['nome']} votam com a {lado_outro} {onde}; o coordenador, com a {lado_coord}",
+                    "texto": (
+                        f"O coordenador, {c['coord'].get('nome', '')} ({c['coord'].get('partido', '')}-{c['coord'].get('uf', '')}), tem saldo de "
+                        f"{_sinal(c['coord']['saldo'])} {onde}. Assinar uma frente custa uma assinatura: um deputado assina, na mediana, "
+                        f"{_num(fr.get('mediana') or 0)} das {_num(fr.get('total') or 0)} frentes da legislatura."
+                    ),
+                    "alvo": f"#cg-frente-{c['id']}",
+                }
+            )
+        # 5. A cota: quem pagou a maior parte da própria cota a uma empresa só.
+        ct = painel.get("cota") or {}
+        conc = next(iter(ct.get("concentrados") or []), None)
+        if conc and float(conc.get("pct") or 0) >= 50:
+            saida.append(
+                {
+                    "tipo": "cota",
+                    "casa": casa,
+                    "peso": 80,
+                    "titulo": f"{nome}: {conc['nome']} ({conc.get('partido', '')}-{conc.get('uf', '')}) pagou {_num(round(float(conc['pct'])))}% da própria cota a uma empresa só",
+                    "texto": (
+                        f"R$ {_num(round(float(conc.get('valor') or 0)))} de R$ {_num(round(float(conc.get('total') or 0)))} reembolsados na legislatura (até o último mês fechado) foram para "
+                        f"{conc.get('fornecedor', '')}. Cada nota está no registro oficial da Casa."
+                    ),
+                    "alvo": f"#cg-cota-{casa}",
+                    "ficha": conc["k"],
+                }
+            )
+        # 6. Quem vota de um lado nas matérias de nota alta e do outro nas de nota baixa (só o que passa do acaso, 99%).
+        for i in (painel.get("listas") or {}).get("muda_peso") or []:
+            alta, baixa = i.get("alta"), i.get("baixa")
+            if alta is None or baixa is None or not ((alta > 20 and baixa < -20) or (alta < -20 and baixa > 20)):
+                continue
+            k1, n1 = round(i["alta_n"] * (alta + 100) / 200), i["alta_n"]
+            k2, n2 = round(i["baixa_n"] * (baixa + 100) / 200), i["baixa_n"]
+            if abs(perfil.z_duas_proporcoes(k1, n1, k2, n2)) < perfil.Z_MUDANCA:
+                continue
+            lado_alta = "direita" if alta > 0 else "esquerda"
+            lado_baixa = "direita" if baixa > 0 else "esquerda"
+            saida.append(
+                {
+                    "tipo": "peso",
+                    "casa": casa,
+                    "peso": 70,
+                    "titulo": f"{nome}: {i['nome']} ({i['partido']}-{i['uf']}) vota com a {lado_alta} nas matérias de mais peso e com a {lado_baixa} nas de menos",
+                    "texto": (
+                        f"Saldo de {_sinal(alta)} nas {_num(n1)} votações de matérias com nota de relevância da mediana da Casa para cima e de "
+                        f"{_sinal(baixa)} nas {_num(n2)} abaixo dela. Nessas votações, pesado pela nota, o saldo vai de {_sinal(i['simples'])} para {_sinal(i['pesado'])}. "
+                        "A diferença passa do acaso (99%)."
+                    ),
+                    "alvo": f"#cg-listas-{casa}",
+                    "ficha": i["k"],
+                }
+            )
+            break
     saida.sort(key=lambda a: -a["peso"])
     return saida
 
@@ -1184,6 +1274,74 @@ def atualizar(
             if jv:
                 fichas[casa][-1]["jornal_voto"] = jv
 
+    # A cota parlamentar, nota a nota: quanto cada um pede de reembolso, com o quê e com quem.
+    paineis_cota: dict[str, dict[str, Any]] = {}
+    for casa, coletar_cota in (("cd", cota.camara), ("sf", cota.senado)):
+        try:
+            despesas = coletar_cota(coletor, regras.anos(), ano_corrente=corrente)
+            pessoas_casa = {
+                pid: {"k": c.chave, "nome": c.nome, "partido": c.partido, "uf": c.uf, "ex": bool(c.exercicio)} for pid, c in cadastros[casa].items()
+            }
+            paineis_cota[casa], por_pessoa = cota.resumir(despesas, casa=casa, inicio=legislatura.inicio, hoje=hoje, pessoas=pessoas_casa)
+            del despesas  # mais de um milhão de lançamentos na Câmara: libera a memória antes de seguir
+            for f in fichas[casa]:
+                if f["id"] in por_pessoa:
+                    f["cota"] = por_pessoa[f["id"]]
+            # Quem está em exercício há tempo (MINIMO_SEM_COTA votações possíveis ou mais) e não pediu
+            # reembolso nenhum na legislatura: gastou zero, e isso também é dado.
+            sem = [
+                f
+                for f in fichas[casa]
+                if f.get("exercicio") and "cota" not in f
+                and (((f.get("leg") or {}).get(str(legislatura.numero)) or {}).get("pres") or {}).get("n", 0) >= MINIMO_SEM_COTA
+            ]
+            for f in sem:
+                f["cota"] = {"leg": {"total": 0.0, "meses": 0, "media": 0.0}, "sem_despesa": 1}
+            paineis_cota[casa]["sem_despesa"] = [_linha_de_lista(f) for f in sorted(sem, key=lambda f: text.normalize(f["nome"]))]
+        except Exception as exc:  # noqa: BLE001 — acessório: sem a cota, a aba sai sem ela
+            avisos.append(f"{_nome_casa(casa)}: cota parlamentar indisponível ({exc})")
+
+    # As votações nominais nas comissões (fora das contas do Plenário: só os membros votam).
+    paineis_comissoes: dict[str, dict[str, Any]] = {}
+    for casa in ("cd", "sf"):
+        try:
+            if casa == "cd":
+                paineis_comissoes[casa], por_pessoa = comissoes.camara(votos["cd"], coletor, regras, legislatura.numero, hoje=hoje)
+            else:
+                paineis_comissoes[casa], por_pessoa = comissoes.senado(coletor, regras, legislatura.numero, inicio=legislatura.inicio, hoje=hoje)
+            for f in fichas[casa]:
+                if f["id"] in por_pessoa:
+                    f["comissoes"] = por_pessoa[f["id"]]
+        except Exception as exc:  # noqa: BLE001 — acessório: sem as comissões, a aba sai sem elas
+            avisos.append(f"{_nome_casa(casa)}: votações nas comissões indisponíveis ({exc})")
+
+    # Frentes parlamentares (só a Câmara registra quem assina): quem assina cada frente de causa
+    # e como vota no tema dela, ao lado do coordenador.
+    painel_frentes: dict[str, Any] = {}
+    try:
+        da_legislatura = frentes.coletar(coletor, legislatura.numero)
+        causas = frentes.de_causa(da_legislatura, regras)
+        pessoas_cd = {
+            pid: {"k": c.chave, "nome": c.nome, "partido": c.partido, "uf": c.uf, "ex": bool(c.exercicio)} for pid, c in cadastros["cd"].items()
+        }
+        saldos_tema = {
+            f["id"]: {
+                t["t"]: (t["eixo"]["saldo"], t["eixo"]["n"])
+                for t in f.get("temas") or []
+                if (t.get("eixo") or {}).get("saldo") is not None and t["eixo"]["n"] >= ficha.MINIMO_TEMA_FAIXA
+            }
+            for f in fichas["cd"]
+        }
+        saldo_geral = {f["id"]: (f["campo"]["saldo"], f["campo"]["n"]) for f in fichas["cd"] if f.get("campo")}
+        painel_frentes, por_deputado = frentes.analisar(
+            da_legislatura, causas, votos["cd"], regras, legislatura.numero, pessoas=pessoas_cd, saldos_tema=saldos_tema, saldo_geral=saldo_geral
+        )
+        for f in fichas["cd"]:
+            if f["id"] in por_deputado:
+                f["frentes"] = por_deputado[f["id"]]
+    except Exception as exc:  # noqa: BLE001 — acessório: sem as frentes, a aba sai sem elas
+        avisos.append(f"Câmara: frentes parlamentares indisponíveis ({exc})")
+
     for casa in ("cd", "sf"):
         marcar_temas_que_viram(fichas[casa], legislatura.numero)
         rankings(fichas[casa], legislatura.numero, governo.nome if governo else "")
@@ -1256,6 +1414,12 @@ def atualizar(
             "fila": fila,
             "furaram": furaram,
         }
+        if casa == "cd" and painel_frentes:
+            paineis[casa]["frentes"] = painel_frentes
+        if paineis_cota.get(casa):
+            paineis[casa]["cota"] = paineis_cota[casa]
+        if paineis_comissoes.get(casa):
+            paineis[casa]["comissoes"] = paineis_comissoes[casa]
 
     # As fichas das matérias: as votadas no Plenário nesta legislatura e as de "o que espera × o que passa".
     fichas_das_materias: dict[str, dict[str, Any]] = {}
@@ -1290,6 +1454,18 @@ def atualizar(
             detalhe=detalhe,
         )
 
+    # O saldo pesado pela relevância da matéria (a nota das fichas das matérias).
+    for casa in ("cd", "sf"):
+        notas = peso.notas_das_materias(fichas_das_materias[casa].get("materias") or {})
+        pesados, cobertura = peso.calcular(votos[casa], regras, legislatura.numero, notas)
+        for f in fichas[casa]:
+            pesado = pesados.get(f["id"])
+            resumo_peso = peso.resumo(pesado, regras.limiares.minimo_divisivas) if pesado else None
+            if resumo_peso:
+                f["peso"] = resumo_peso
+        paineis[casa]["peso"] = cobertura
+        paineis[casa]["listas"]["muda_peso"] = peso.muda_quando_pesa(fichas[casa])[:LISTA]
+
     leitura = achados(paineis, regras)
     polos = regras.polos_em(hoje)
     meta = {
@@ -1312,7 +1488,7 @@ def atualizar(
             "baixa": regras.relevancia.baixa,
             "rapida": relevancia.RAPIDA,
         },
-        "temas": [{"id": t.id, "nome": t.nome, **temas.definicao(t)} for t in regras.temas],
+        "temas": [{"id": t.id, "nome": t.nome, "curto": t.curto, **temas.definicao(t)} for t in regras.temas],
         "anos": regras.anos(),
         "projetos_desde": opcoes.projetos_desde,
         "jornal": {"edicoes": len(cruzamento.edicoes), "de": cruzamento.edicoes[0] if cruzamento.edicoes else "", "ate": cruzamento.edicoes[-1] if cruzamento.edicoes else "", "manchetes": cruzamento.manchetes},

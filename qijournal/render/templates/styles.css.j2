@@ -879,8 +879,15 @@ body.modal-open .btt{visibility:hidden}
 .mcg-f{margin-top:8px;padding-top:9px;border-top:1px solid var(--rl);font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
 .mcg-f a{font-weight:700;color:var(--link);white-space:nowrap}
 .mcg-f a:hover{text-decoration:underline}
+/* No celular, o Congresso é o único botão com o nome (sem ele, o ícone sozinho não
+   se acha): Buscar e Escuro ficam só com o ícone, e o Edições também abaixo de 350 px.
+   O nome some só da tela (o leitor de tela continua a lê-lo). */
 @media (max-width:480px){
-  .tool.tool-cg span,.tool.tool-an span{display:none}
+  .tool.tool-an span{display:none}
+  .mast-tools a[href$="pesquisa.html"] span,#dmBtn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@media (max-width:350px){
+  .mast-tools a[title="Edições anteriores"] span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
 
 {% endif %}

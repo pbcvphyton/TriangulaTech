@@ -26,6 +26,8 @@
 .cg-casas{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:9px 0 3px}
 .cg-vistas ul{list-style:none;display:flex;gap:0 22px;padding:4px 0 0;overflow-x:auto;scrollbar-width:none}
 .cg-vistas ul::-webkit-scrollbar{display:none}
+/* Fora do celular, as abas quebram a linha em vez de rolar: todas ficam à vista. */
+@media (min-width:761px){.cg-vistas ul{flex-wrap:wrap;gap:0 20px;overflow-x:visible}}
 .cg-vistas a{display:block;padding:5px 0 9px;font-family:var(--ss);font-size:13px;font-weight:600;color:var(--mute2);white-space:nowrap;box-shadow:inset 0 -2px 0 transparent;transition:color .2s,box-shadow .2s}
 .cg-vistas a:hover,.cg-vistas a[aria-current]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--qc)}
 .cg-abas .cg-vista{display:none}
@@ -495,5 +497,88 @@ body.cg-aberto{overflow:hidden}
   .cg-dt-in{padding:8px 6px 2px}
 }
 
+/* Escolha o seu candidato: os filtros e a lista de quem está no mandato */
+.cg-esc-f{margin:14px 0 6px;padding:14px 16px;border:1px solid var(--rule);border-radius:8px;background:var(--soft);font-family:var(--ss)}
+.cg-esc-l,.cg-esc-b{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px}
+.cg-esc-f label>span,.cg-esc-f legend{display:block;margin-bottom:4px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.cg-esc-f select{max-width:100%;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink);font-family:var(--ss);font-size:13px}
+.cg-esc-ck{display:flex;align-items:center;gap:6px;padding-bottom:6px;font-size:13px;color:var(--ink)}
+.cg-esc-tm{margin-top:14px;padding:0;border:0;min-width:0}
+.cg-esc-f legend span{display:block;margin-top:2px;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;line-height:1.45}
+.cg-esc-tg{display:grid;grid-template-columns:repeat(4,max-content minmax(0,150px));align-items:center;gap:6px 10px;margin-top:6px}
+.cg-esc-tl{font-size:13px;color:var(--ink);text-align:right}
+.cg-esc-tl small{display:block;font-size:10.5px;color:var(--faint)}
+.cg-esc-tg select{width:100%}
+.cg-esc-b{margin-top:14px;padding-top:12px;border-top:1px solid var(--rl)}
+.cg-esc-lp{padding:6px 12px;border:1px solid var(--rule);border-radius:16px;background:var(--paper);color:var(--link);font-family:var(--ss);font-size:12.5px;font-weight:600;cursor:pointer}
+.cg-esc-n{flex:1 1 220px;padding-bottom:6px;font-size:13px;font-weight:600;color:var(--ink)}
+.cg-esc{list-style:none;margin-top:8px;columns:2;column-gap:36px}
+.cg-esc li{break-inside:avoid;padding:9px 0 10px;border-bottom:1px solid var(--rl);font-family:var(--ss)}
+.cg-esc-t{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:14px;font-weight:700}
+.cg-esc-t small{font-family:var(--mn);font-size:11px;font-weight:400;color:var(--muted)}
+.cg-esc-t b{flex:none;min-width:24px;font-family:var(--mn);font-size:11px;font-weight:600;color:var(--faint)}
+.cg-esc-sd{margin-left:auto;padding:0 6px;border-radius:3px;font-family:var(--mn);font-size:11.5px;font-weight:600;color:var(--cg-on2)}
+.cg-esc-sd.cg-e3,.cg-esc-sd.cg-d3{color:var(--cg-on3)}
+.cg-esc-x{margin-top:3px;font-size:12.5px;line-height:1.5;color:var(--body)}
+.cg-esc-e,.cg-esc-d{font-weight:700}
+.cg-esc-e{color:var(--cg-e3)}.cg-esc-d{color:var(--cg-d3)}
+.cg-esc-num{color:var(--muted)}
+.cg-esc-m{margin-top:5px;padding:4px 8px;border-left:3px solid var(--link);background:var(--soft);font-size:12.5px;line-height:1.5;color:var(--ink)}
+@media (max-width:1100px){
+  .cg-esc-tg{grid-template-columns:repeat(2,max-content minmax(0,170px))}
+}
+@media (max-width:760px){
+  .cg-esc{columns:1}
+  .cg-esc-tg{grid-template-columns:max-content minmax(0,1fr)}
+  .cg-esc-l label{flex:1 1 140px}
+  .cg-esc-l select{width:100%}
+}
+
+/* Frentes: cada frente de causa, o lado de quem assina e o coordenador */
+.cg-fr-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px;margin-top:8px}
+.cg-fr{padding:12px 0 10px;border-top:2px solid var(--ink);font-family:var(--ss)}
+.cg-fr-t{font-size:15.5px;font-weight:700;color:var(--ink)}
+.cg-fr-t a{margin-left:6px;font-size:11.5px;font-weight:600;color:var(--link);white-space:nowrap}
+.cg-fr-k{margin-top:2px;font-size:12px;color:var(--muted)}
+.cg-fr-c{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:6px;font-size:13px;color:var(--ink)}
+.cg-fr-c small{font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-fr-l{display:flex;flex-wrap:wrap;gap:3px 12px;margin-top:8px;font-size:12px;color:var(--body)}
+.cg-fr-b{display:flex;flex-basis:100%;height:10px;overflow:hidden;border-radius:2px;background:var(--cg-na)}
+.cg-fr-b i{display:block;height:100%}
+.cg-frb-e{background:var(--cg-e3)}.cg-frb-c{background:var(--cg-c0)}.cg-frb-d{background:var(--cg-d3)}.cg-frb-sem{background:var(--cg-na)}
+.cg-fr-ne b{color:var(--cg-e3)}.cg-fr-nd b{color:var(--cg-d3)}
+.cg-fr-x{margin-top:6px;font-size:12.5px;line-height:1.5;color:var(--body)}
+.cg-fr-p{font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-fr-s{margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.cg-fr-o{list-style:none;margin-top:3px}
+.cg-fr-o li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;padding:4px 0;border-bottom:1px solid var(--rl);font-size:12.5px}
+.cg-fr-o small{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-fr-o span{margin-left:auto;font-family:var(--mn);font-size:11.5px;color:var(--ink)}
+.cg-fr-mais{columns:2;column-gap:28px}
+.cg-fr-mais li{break-inside:avoid}
+@media (max-width:760px){
+  .cg-fr-g{grid-template-columns:minmax(0,1fr)}
+  .cg-fr-mais{columns:1}
+}
+
+/* Cota parlamentar */
+.cg-ct-cat{list-style:none;margin-top:8px;font-family:var(--ss)}
+.cg-ct-cat li{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr) max-content;align-items:center;gap:4px 14px;padding:5px 0;border-bottom:1px solid var(--rl);font-size:13px}
+.cg-ct-cn{color:var(--ink)}
+.cg-ct-cb{display:block;height:9px;border-radius:2px;background:var(--cg-trk)}
+.cg-ct-cb i{display:block;height:100%;border-radius:2px;background:var(--link)}
+.cg-ct-cv{font-family:var(--mn);font-size:12px;text-align:right;color:var(--ink)}
+.cg-ct-cv small{margin-left:4px;color:var(--muted)}
+.cg-ct-cat-d li{grid-template-columns:minmax(0,1fr) 70px max-content}
+.cg-ct-f td{font-family:var(--mn);font-size:12px}
+.cg-ls-k .cg-res{color:#fff}
+:root[data-theme="dark"] .cg-ls-k .cg-res{color:#0b0f17}
+.cg-ct-o .cg-ls-x small{font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-ct-o .cg-ls-x a{font-weight:600;color:var(--link);white-space:nowrap}
+@media (max-width:760px){
+  .cg-ct-cat li{grid-template-columns:minmax(0,1fr) max-content}
+  .cg-ct-cat .cg-ct-cb{grid-column:1/-1;grid-row:2}
+}
+
 /* O atributo hidden vale mesmo onde o CSS dá display ao elemento */
-.cg-cp-bar[hidden],.cg-fx-f[hidden],.cg-fx-l[hidden],.cg-casas[hidden],.cg-achar[hidden],.cg-cmpf[hidden],.cg-td[hidden],.cg-mb[hidden]{display:none}
+.cg-cp-bar[hidden],.cg-fx-f[hidden],.cg-fx-l[hidden],.cg-casas[hidden],.cg-achar[hidden],.cg-cmpf[hidden],.cg-td[hidden],.cg-mb[hidden],.cg-esc-f[hidden],.cg-esc li[hidden],.cg-esc-m[hidden]{display:none}
