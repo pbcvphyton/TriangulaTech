@@ -311,6 +311,8 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["saldo"] = campo["saldo"]
         d["campo"] = campo["id"]
         d["div"] = campo["n"]
+    if (ficha.get("peso") or {}).get("saldo") is not None:
+        d["sp"] = ficha["peso"]["saldo"]  # o saldo pesado pela relevância da matéria
     if governo:
         d["gov"] = governo["pct"]
     if atual.get("pres"):
@@ -322,6 +324,10 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["prop"] = autoria["total"]
         d["par"] = autoria.get("paradas_n") or 0
         d["norma"] = (autoria.get("estados") or {}).get("norma") or 0
+        # Sobre o que propõe: as propostas de autoria principal por tema (para "Escolha o seu candidato").
+        temas_propostos = {t: n for t, n in (autoria.get("temas") or {}).items() if n}
+        if temas_propostos:
+            d["pt"] = temas_propostos
     if relatorias.get("total"):
         d["rel"] = relatorias["total"]
         d["rel_ant"] = relatorias.get("antigas_n") or 0
@@ -333,6 +339,14 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
+    cota = (ficha.get("cota") or {}).get("leg") or {}
+    if cota.get("media") is not None:
+        d["ct"] = round(cota["media"])  # a cota parlamentar: média por mês com despesa na legislatura
+    frentes = ficha.get("frentes") or {}
+    if frentes.get("de"):
+        d["frn"] = frentes.get("n") or 0  # frentes que assina (Câmara)
+        if frentes.get("causas"):
+            d["fr"] = [c["id"] for c in frentes["causas"]]  # as frentes de causa que assina
     # Com quem vota em cada tema (para as faixas filtradas por tema): [saldo, votações, vira de lado?]
     temas = {}
     for t in ficha.get("temas") or []:

@@ -698,7 +698,9 @@ def test_a_aba_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso,
         "Por que um voto é “de esquerda” ou “de direita”",
     ):
         assert trecho in html, trecho
-    assert html.count('class="az-sec cg-vista"') + html.count('class="cg-vista"') + html.count('class="az-sec az-met cg-vista"') == 8
+    assert html.count('class="az-sec cg-vista"') + html.count('class="cg-vista"') + html.count('class="az-sec az-met cg-vista"') == 11
+    for vista in ("frentes", "cota", "escolha"):  # as abas da leva 4
+        assert f'data-vista="{vista}"' in html and f'id="cg-{vista}"' in html, vista
     manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
     assert (manifesto["hoje"], manifesto["base"], manifesto["governo"]) == (HOJE, "../data/congresso/fichas/", "Lula")
     assert (manifesto["materiasArq"], manifesto["polos"]) == ("../data/congresso/materias-", {"esquerda": ["PT"], "direita": ["PL"]})
@@ -790,3 +792,63 @@ def test_anexar_congresso_nunca_derruba_a_edicao(tmp_path: Path, config: Config)
     assert not desligado.congresso_ativo
     pipeline.anexar_congresso(edition, desligado, tmp_path)
     assert edition.congresso is None
+
+
+# ── leva 4: saldo pesado, frentes, escolha ───────────────────────────────────
+
+
+def test_o_nome_curto_do_tema_e_as_frentes_de_causa_da_config():
+    assert regras.nome_curto("Economia, tributos e orçamento") == "Economia"
+    assert regras.nome_curto("Agro e terra") == "Agro" and regras.nome_curto("Saúde") == "Saúde"
+    r = regras.de_dict({"temas": [{"id": "x", "nome": "Meio ambiente e energia", "curto": "Ambiente"}, {"id": "y", "nome": "Cidades, transporte"}],
+                        "frentes": [{"titulo": "Frente Parlamentar Mista Ambientalista", "nome": "Ambientalista", "tema": "x"}, {"titulo": "Frente Evangélica"}]})
+    assert [t.curto for t in r.temas] == ["Ambiente", "Cidades"]
+    assert r.frentes[0] == regras.FrenteDeCausa(titulo="frente parlamentar mista ambientalista", nome="Ambientalista", tema="x")
+    assert (r.frentes[1].nome, r.frentes[1].tema) == ("Frente Evangélica", "todas")  # sem tema: todas as votações divisivas
+
+
+def test_frentes_no_painel_na_ficha_no_resumo_e_na_aba(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, resultado = publicado
+    assert resultado.avisos == []
+    painel = _ler(data_dir, "casa-cd.json")["frentes"]
+    assert (painel["total"], [c["id"] for c in painel["causas"]]) == (2, [9001, 9002])  # a da outra legislatura e a que não casa ficam de fora
+    economia = painel["causas"][0]
+    assert (economia["nome"], economia["coord"]["k"], economia["membros"]) == ("Economia Livre", "cd-4", 6)
+    assert economia["doc"] == "https://www.camara.leg.br/frente/9001.pdf"  # sem a aspa que o arquivo traz sobrando
+    assert "frentes" not in _ler(data_dir, "casa-sf.json")  # o Senado não publica as frentes
+    gil = _ler(data_dir, "fichas/cd-7.json")["frentes"]
+    assert (gil["n"], gil["de"], [c["id"] for c in gil["causas"]]) == (2, 2, [9001, 9002])
+    linha = next(p for p in _ler(data_dir, "resumo.json")["pessoas"] if p["k"] == "cd-7")
+    assert (linha["frn"], linha["fr"]) == (2, [9001, 9002])
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    for trecho in ('id="cg-frentes"', 'id="cg-frente-9001"', 'href="#cg-frentes" data-vista="frentes"', "Economia Livre", "O Senado não publica quem assina"):
+        assert trecho in html, trecho
+    manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
+    assert manifesto["fr"]["cd-7"] == [9001, 9002] and manifesto["frentes"]["nomes"] == {"9001": "Economia Livre", "9002": "Trabalho Decente"}
+
+
+def test_escolha_o_seu_candidato_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, _resultado = publicado
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    resumo = _ler(data_dir, "resumo.json")["pessoas"]
+    em_exercicio = {casa: sum(1 for p in resumo if p["ex"] and p["k"].startswith(casa)) for casa in ("cd", "sf")}
+    escolha = html.split('id="cg-escolha"', 1)[1].split('data-vista="metodo"', 1)[0]
+    assert escolha.count('<li data-pk="cd-') == em_exercicio["cd"] and escolha.count('<li data-pk="sf-') == em_exercicio["sf"]
+    assert 'id="cgEscF" hidden' in escolha  # os filtros são reforço: sem script, a lista inteira
+    assert 'href="#p=cd-7" data-k="cd-7">Gil Castro</a>' in escolha  # o nome abre o dossiê
+    assert "data-k=" not in escolha.split('<li data-pk="cd-7"', 1)[1].split("<a ", 1)[0]  # o item não abre o dossiê inteiro: só o nome
+    manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
+    assert manifesto["temasCurtos"]["economia"] == "Economia"
+    propoe = {p["k"]: p["pt"] for p in resumo if p.get("pt") and p["ex"]}
+    assert propoe and manifesto["pt"] == propoe  # sobre o que cada um propõe, por tema
+
+
+def test_o_saldo_pesado_chega_a_ficha_ao_resumo_e_a_pagina(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, _resultado = publicado
+    cobertura = _ler(data_dir, "casa-cd.json")["peso"]
+    assert cobertura["divisivas"] >= cobertura["com_nota"] >= 0
+    for p in _ler(data_dir, "resumo.json")["pessoas"]:
+        f = _ler(data_dir, f"fichas/{p['k']}.json")
+        assert p.get("sp") == (f.get("peso") or {}).get("saldo")
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    assert 'data-ord="sp"' in html and "Saldo pesado pela relevância" in html

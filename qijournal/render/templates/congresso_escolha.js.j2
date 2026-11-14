@@ -1,0 +1,188 @@
+{#- Aba Congresso: "Escolha o seu candidato" (incluído por congresso.js.j2, dentro da mesma
+    função). Filtra e ordena a lista de quem está no mandato, a mesma que sai sem script,
+    pelo que o registro diz de cada um. O endereço guarda a escolha
+    (#v=escolha&uf=SP&t=ambiente.e~seguranca.d&p=saude&pres=90), para ser enviada. Sempre com
+    textContent: nada dos dados vira HTML. -#}
+  /* ════ Escolha o seu candidato ════ */
+  (function () {
+    var form = d.getElementById('cgEscF');
+    var ols = lista(d.querySelectorAll('ol.cg-esc[data-casa]'));
+    if (!form || !ols.length) return;
+    function el(id) { return d.getElementById(id); }
+    var uf = el('cgEscUf'), pt = el('cgEscPt'), pres = el('cgEscPres'), gov = el('cgEscGov'), prop = el('cgEscProp');
+    var norma = el('cgEscNorma'), ord = el('cgEscOrd'), limpar = el('cgEscX'), conta = el('cgEscN'), grade = el('cgEscTemas');
+    var frente = el('cgEscFr'), frenteL = el('cgEscFrL'), FR = M.fr || {}, frNomes = (M.frentes || {}).nomes || {};
+    var cota = el('cgEscCt'), cortesCota = {};  // Casa → [mediana, 1º quartil] da média mensal da cota
+    var curtos = M.temasCurtos || {}, TM = M.tm || {}, PT = M.pt || {};
+    var LADOS = [['', 'Tanto faz'], ['e', 'Com a esquerda'], ['c', 'Dividido'], ['d', 'Com a direita']];
+    var NOMES_LADO = { e: 'com a esquerda', c: 'dividido', d: 'com a direita' };
+    /* "Dividido" é a faixa "centro" de config/congresso.yaml (−20 a +20 no padrão). */
+    var corte = [-20, 20];
+    var cs = (M.campos || []).slice().sort(function (a, b) { return a.ate - b.ate; });
+    cs.forEach(function (c, i) { if (c.id === 'centro') corte = [i ? cs[i - 1].ate : -100, c.ate]; });
+    function ladoDe(s) { return s <= corte[0] ? 'e' : (s > corte[1] ? 'd' : 'c'); }
+
+    var itens = {}, casaPronta = '', pedidoDoEndereco = null;
+    ols.forEach(function (ol) { itens[ol.getAttribute('data-casa')] = lista(ol.children); });
+    function casaAtual() { return root.getAttribute('data-ver') || ols[0].getAttribute('data-casa'); }
+    function opcoes(sel, valores, primeiro) {
+      var atual = sel.value;
+      while (sel.firstChild) sel.removeChild(sel.firstChild);
+      sel.appendChild(h('option', { value: '', text: primeiro }));
+      valores.forEach(function (v) { sel.appendChild(h('option', { value: v[0], text: v[1] })); });
+      sel.value = valores.some(function (v) { return v[0] === atual; }) ? atual : '';
+    }
+    /* Os seletores da Casa da vez: os estados, os partidos e os temas em que alguém tem saldo. */
+    function preparar() {
+      var casa = casaAtual();
+      if (casa === casaPronta) return;
+      casaPronta = casa;
+      var lst = itens[casa] || [], ufs = {}, partidos = {}, comDado = {};
+      lst.forEach(function (li) {
+        ufs[li.getAttribute('data-uf')] = 1;
+        partidos[li.getAttribute('data-partido')] = 1;
+        Object.keys(TM[li.getAttribute('data-pk')] || {}).forEach(function (t) { comDado[t] = (comDado[t] || 0) + 1; });
+      });
+      opcoes(uf, Object.keys(ufs).filter(Boolean).sort().map(function (x) { return [x, x]; }), 'Todos');
+      opcoes(pt, Object.keys(partidos).filter(Boolean).sort(function (a, b) { return semAcento(a).localeCompare(semAcento(b)); }).map(function (x) { return [x, x]; }), 'Todos');
+      opcoes(prop, Object.keys(curtos).map(function (t) { return [t, curtos[t]]; }), 'Qualquer tema');
+      /* As frentes: só a Câmara registra quem assina. */
+      var temFrentes = casa === 'cd' && Object.keys(frNomes).length > 0;
+      opcoes(frente, temFrentes ? Object.keys(frNomes).map(function (id) { return [id, frNomes[id]]; }).sort(function (a, b) { return semAcento(a[1]).localeCompare(semAcento(b[1])); }) : [], 'Qualquer uma');
+      frenteL.hidden = !temFrentes;
+      /* Os cortes da cota: a mediana e o primeiro quartil da média mensal de quem está na lista. */
+      var valores = lst.map(function (li) { return parseFloat(li.getAttribute('data-ct')); }).filter(function (x) { return !isNaN(x); }).sort(function (a, b) { return a - b; });
+      cortesCota[casa] = valores.length ? [valores[Math.floor((valores.length - 1) / 2)], valores[Math.floor((valores.length - 1) / 4)]] : null;
+      cota.disabled = !valores.length;
+      var antes = {};
+      lista(grade.querySelectorAll('select')).forEach(function (s) { antes[s.getAttribute('data-t')] = s.value; });
+      while (grade.firstChild) grade.removeChild(grade.firstChild);
+      Object.keys(curtos).filter(function (t) { return comDado[t]; }).forEach(function (t) {
+        var sel = h('select', { 'data-t': t, id: 'cgEscT-' + t }, LADOS.map(function (x) { return h('option', { value: x[0], text: x[1] }); }));
+        sel.value = antes[t] || '';
+        grade.appendChild(h('label', { cls: 'cg-esc-tl', 'for': 'cgEscT-' + t }, [h('span', { text: curtos[t] }), h('small', { text: comDado[t] + ' com saldo' })]));
+        grade.appendChild(sel);
+      });
+    }
+    function nomeDoItem(li) { var a = li.querySelector('.cg-p'); return semAcento(a ? a.textContent : ''); }
+    function temasEscolhidos() {
+      return lista(grade.querySelectorAll('select')).filter(function (s) { return s.value; }).map(function (s) { return { t: s.getAttribute('data-t'), l: s.value }; });
+    }
+
+    /* O endereço: só os filtros que estão valendo. */
+    function endereco() {
+      var partes = [], escolhas = temasEscolhidos();
+      if (uf.value) partes.push('uf=' + encodeURIComponent(uf.value));
+      if (pt.value) partes.push('pt=' + encodeURIComponent(pt.value));
+      if (escolhas.length) partes.push('t=' + escolhas.map(function (e) { return e.t + '.' + e.l; }).join('~'));
+      if (prop.value) partes.push('p=' + prop.value);
+      if (frente.value) partes.push('fr=' + frente.value);
+      if (cota.value) partes.push('ct=' + cota.value);
+      if (pres.value) partes.push('pres=' + pres.value);
+      if (gov.value) partes.push('gov=' + gov.value);
+      if (norma.checked) partes.push('norma=1');
+      if (ord.value !== 'af') partes.push('ord=' + ord.value);
+      return '#v=escolha' + (partes.length ? '&' + partes.join('&') : '');
+    }
+    function lerEndereco(q) {
+      var p = {};
+      (q || '').split('&').forEach(function (par) {
+        var i = par.indexOf('=');
+        if (i > 0) { try { p[par.slice(0, i)] = decodeURIComponent(par.slice(i + 1)); } catch (erro) { /* parâmetro malformado: ignorado */ } }
+      });
+      return p;
+    }
+    function aplicarEndereco(p) {
+      uf.value = p.uf || '';
+      pt.value = p.pt || '';
+      prop.value = p.p || '';
+      frente.value = p.fr || '';
+      cota.value = p.ct === 'm' || p.ct === 'q' ? p.ct : '';
+      pres.value = p.pres || '';
+      gov.value = p.gov || '';
+      norma.checked = p.norma === '1';
+      ord.value = p.ord === 'pres' || p.ord === 'nome' || p.ord === 'prop' ? p.ord : 'af';
+      var escolha = {};
+      (p.t || '').split('~').forEach(function (x) { var m = /^([a-z]+)\.([ecd])$/.exec(x); if (m) escolha[m[1]] = m[2]; });
+      lista(grade.querySelectorAll('select')).forEach(function (s) { s.value = escolha[s.getAttribute('data-t')] || ''; });
+    }
+
+    function aplicar(semEndereco) {
+      var casa = casaAtual(), lst = itens[casa] || [], escolhas = temasEscolhidos();
+      var vPres = parseFloat(pres.value) || 0, vGov = gov.value, vProp = prop.value, vNorma = norma.checked;
+      var cabem = [], fora = [];
+      lst.forEach(function (li, i) {
+        var k = li.getAttribute('data-pk'), motivos = [], ok = true, af = 0;
+        if (uf.value && li.getAttribute('data-uf') !== uf.value) ok = false;
+        if (ok && pt.value && li.getAttribute('data-partido') !== pt.value) ok = false;
+        var p = parseFloat(li.getAttribute('data-pres')), g = parseFloat(li.getAttribute('data-gov'));
+        escolhas.forEach(function (e) {
+          if (!ok) return;
+          var x = (TM[k] || {})[e.t];
+          if (!x || ladoDe(x[0]) !== e.l) { ok = false; return; }
+          motivos.push(curtos[e.t] + ' ' + saldo(x[0]) + ' em ' + num(x[1]) + (x[1] === 1 ? ' votação' : ' votações'));
+          af += e.l === 'e' ? -x[0] : (e.l === 'd' ? x[0] : 100 - 2 * Math.abs(x[0]));
+        });
+        if (ok && vProp) {
+          var np = (PT[k] || {})[vProp] || 0;
+          if (!np) ok = false; else motivos.push(num(np) + (np === 1 ? ' proposta sobre ' : ' propostas sobre ') + curtos[vProp]);
+        }
+        if (ok && frente.value) {
+          if ((FR[k] || []).indexOf(parseInt(frente.value, 10)) < 0) ok = false; else motivos.push('assina a frente ' + frNomes[frente.value]);
+        }
+        if (ok && cota.value && cortesCota[casa]) {
+          var ct = parseFloat(li.getAttribute('data-ct')), teto = cortesCota[casa][cota.value === 'q' ? 1 : 0];
+          if (isNaN(ct) || ct > teto) ok = false; else motivos.push('cota de R$ ' + num(ct) + ' por mês');
+        }
+        if (ok && vPres) { if (isNaN(p) || p < vPres) ok = false; else motivos.push('presença ' + pct(p)); }
+        if (ok && vGov) { if (isNaN(g) || (vGov === 'a' ? g < 70 : g >= 40)) ok = false; else motivos.push('com o governo ' + pct(g)); }
+        if (ok && vNorma) {
+          var nn = parseInt(li.getAttribute('data-norma'), 10) || 0;
+          if (!nn) ok = false; else motivos.push(num(nn) + (nn === 1 ? ' proposta virou norma' : ' propostas viraram norma'));
+        }
+        li.hidden = !ok;
+        var linha = li.querySelector('.cg-esc-m');
+        if (ok && motivos.length) {
+          if (!linha) { linha = h('p', { cls: 'cg-esc-m' }); li.appendChild(linha); }
+          linha.textContent = 'Por que entrou: ' + motivos.join(' · ') + '.';
+          linha.hidden = false;
+        } else if (linha) linha.hidden = true;
+        (ok ? cabem : fora).push({ li: li, i: i, af: escolhas.length ? af / escolhas.length : 0, pres: isNaN(p) ? -1 : p, nome: nomeDoItem(li), np: vProp ? ((PT[k] || {})[vProp] || 0) : 0 });
+      });
+      var o = ord.value;
+      cabem.sort(function (a, b) {
+        if (o === 'af' && escolhas.length && a.af !== b.af) return b.af - a.af;
+        if (o === 'pres' && a.pres !== b.pres) return b.pres - a.pres;
+        if (o === 'prop' && a.np !== b.np) return b.np - a.np;
+        if (o === 'nome') return a.nome.localeCompare(b.nome);
+        return a.i - b.i;
+      });
+      var ol = lst.length ? lst[0].parentNode : null;
+      if (ol) cabem.concat(fora).forEach(function (x) { ol.appendChild(x.li); });
+      var quem = casa === 'sf' ? 'senadores' : 'deputados';
+      var filtros = uf.value || pt.value || escolhas.length || vProp || frente.value || cota.value || vPres || vGov || vNorma;
+      conta.textContent = !filtros ? num(lst.length) + ' ' + quem + ' em exercício. Escolha o que importa para você.'
+        : cabem.length ? num(cabem.length) + ' de ' + num(lst.length) + ' ' + quem + ' combinam com tudo o que você escolheu.'
+          : 'Nenhum dos ' + num(lst.length) + ' ' + quem + ' combina com tudo isso: tire um critério.';
+      if (!semEndereco && vistaAtual === 'escolha' && w.history && w.history.replaceState) w.history.replaceState(null, '', endereco());
+    }
+
+    form.hidden = false;
+    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.addEventListener('change', function () { aplicar(); });
+    limpar.addEventListener('click', function () {
+      aplicarEndereco({});
+      aplicar();
+    });
+    aoAbrirVista.escolha = function () {
+      preparar();
+      if (pedidoDoEndereco !== null) { aplicarEndereco(lerEndereco(pedidoDoEndereco)); pedidoDoEndereco = null; }
+      aplicar(true);
+    };
+    /* #v=escolha&uf=SP…: a vista abre com os filtros do endereço. */
+    aoEndereco.escolha = function (q) {
+      pedidoDoEndereco = q || '';
+      if (vistaAtual === 'escolha') aoAbrirVista.escolha();
+    };
+    preparar();
+  })();

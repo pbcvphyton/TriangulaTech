@@ -73,6 +73,18 @@ class Tema:
     camara: frozenset[int] = frozenset()
     senado: tuple[str, ...] = ()  # prefixos de "Raiz / Filho", normalizados
     senado_nomes: tuple[str, ...] = ()  # os mesmos, como estão escritos (para mostrar a definição do tema)
+    curto: str = ""  # o nome curto, para listas e filtros ("Economia")
+
+
+@dataclass(frozen=True)
+class FrenteDeCausa:
+    """Uma frente parlamentar de causa (config/congresso.yaml, ``frentes``): o começo do
+    título oficial, o nome curto e o tema da aba em que a causa se vota (``todas``: a frente
+    não tem um tema só, e conta tudo)."""
+
+    titulo: str  # normalizado (sem acento, minúsculas)
+    nome: str
+    tema: str
 
 
 @dataclass(frozen=True)
@@ -137,6 +149,7 @@ class Regras:
     temas: list[Tema] = field(default_factory=list)
     relevancia: Relevancia = field(default_factory=Relevancia)
     apelidos: dict[str, list[str]] = field(default_factory=dict)  # "PL 2630/2020" → ["PL das Fake News", …]
+    frentes: tuple[FrenteDeCausa, ...] = ()  # as frentes parlamentares de causa (só a Câmara registra quem assina)
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
@@ -256,6 +269,7 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
                 camara=frozenset(int(c) for c in t.get("camara") or []),
                 senado=tuple(text.normalize(str(s)) for s in t.get("senado") or []),
                 senado_nomes=tuple(str(s).strip() for s in t.get("senado") or []),
+                curto=str(t.get("curto") or "").strip() or nome_curto(str(t.get("nome") or t["id"])),
             )
             for t in bruto.get("temas") or []
         ],
@@ -264,7 +278,18 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             re.sub(r"\s+", " ", str(titulo)).strip(): [str(n).strip() for n in (nomes if isinstance(nomes, list) else [nomes]) if str(n).strip()]
             for titulo, nomes in (bruto.get("apelidos") or {}).items()
         },
+        frentes=tuple(
+            FrenteDeCausa(titulo=text.normalize(str(f["titulo"])), nome=str(f.get("nome") or f["titulo"]).strip(), tema=str(f.get("tema") or "todas"))
+            for f in bruto.get("frentes") or []
+            if f.get("titulo")
+        ),
     )
+
+
+def nome_curto(nome: str) -> str:
+    """O começo do nome do tema, até a primeira vírgula ou " e " ("Economia, tributos e
+    orçamento" → "Economia"), quando o config não dá o nome curto."""
+    return re.split(r",\s*| e ", nome, maxsplit=1)[0].strip() or nome
 
 
 def carregar(root: Path) -> Regras:
