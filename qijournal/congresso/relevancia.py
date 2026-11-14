@@ -147,7 +147,7 @@ class Regua:
 # ── as que passaram ──────────────────────────────────────────────────────────
 
 _REQUERENTES = re.compile(
-    r"(?:dos?|das?)\s+(?:Srs?\.?|Sras?\.?|Senhor(?:es)?|Senhoras?|Deputad[oa]s?|L[ií]der(?:es)?(?: d[oa]s?)?)\s*(.+?),?\s+que\s+solicita",
+    r"(?:dos?|das?)\s+(?:Sras?\.?|Srs?\.?|Senhoras?|Senhor(?:es)?|Deputad[oa]s?|L[ií]der(?:es)?(?: d[oa]s?)?)\s*(.+?),?\s+que\s+solicita",
     re.IGNORECASE,
 )
 _RELATOR = re.compile(r"Relator(?:a)?,?\s+(?:Dep\.|Deputad[oa])\s*([^(]+?\s*\([^)]+\))")

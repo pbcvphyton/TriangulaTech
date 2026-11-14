@@ -567,7 +567,7 @@ def test_a_ficha_da_materia_diz_o_que_e_e_como_cada_polo_votou(publicado: tuple[
     assert (principal["s"], principal["n"]) == (6, 4)
     assert principal["pp"] == [["PT", 3, 0, "e"], ["PL", 0, 3, "d"]]  # a contagem de cada partido dos polos
     assert principal["pt"] == [["PP", "S", 75]]  # os demais partidos, pelo lado da maioria
-    assert (destaque["t"], destaque["ss"], destaque["dq"]) == ("destaque", "trecho", "PL")
+    assert (destaque["t"], destaque["ss"], destaque["dq"], destaque["apv"]) == ("destaque", "trecho", "PL", 1)  # "Mantido o texto": o Sim venceu
     assert destaque["ab"].startswith("Votação do DTQ 1: PL: Destaque para Votação em Separado")
     # a nota do painel: a que espera, a que passou (com o caminho) e, para as só votadas, a nota na data do voto
     assert cd["materias"]["PL 14/2026"]["rel"]["q"] == "espera" and "vot" not in cd["materias"]["PL 14/2026"]

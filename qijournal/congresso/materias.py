@@ -104,6 +104,19 @@ def sentido_do_sim(v: Votacao) -> str:
     return ""
 
 
+def sim_venceu(v: Votacao) -> bool | None:
+    """Se o lado do Sim venceu: o que a fonte diz (aprovada ou rejeitada) ou, no destaque
+    para votação em separado, o que a Mesa anotou: "mantido" (o Sim venceu) ou "suprimido"."""
+    if v.aprovada is not None:
+        return v.aprovada
+    resultado = text.normalize(v.descricao)
+    if resultado.startswith("mantid"):
+        return True
+    if resultado.startswith(("suprimid", "rejeitad")):
+        return False
+    return None
+
+
 # ── uma votação ──────────────────────────────────────────────────────────────
 
 
@@ -132,8 +145,9 @@ def votacao(v: Votacao, ano: AnoVotos, k: int, regras: Regras) -> dict[str, Any]
     turno = base.turno(v.descricao) if v.tipo in perfil.CONTEUDO else None
     if turno:
         d["tu"] = turno
-    if v.aprovada is not None:
-        d["apv"] = 1 if v.aprovada else 0
+    venceu = sim_venceu(v)
+    if venceu is not None:
+        d["apv"] = 1 if venceu else 0
     if conta.get(base.ABSTENCAO):
         d["a"] = conta[base.ABSTENCAO]
     sentido = sentido_do_sim(v)

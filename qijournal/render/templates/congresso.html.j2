@@ -33,6 +33,13 @@
 <a class="cg-p" href="#p={{ k }}" data-k="{{ k }}">{{ nome }}</a>
 {%- endmacro %}
 
+{#- O número da matéria: com script, abre a ficha dela aqui na página (#m=cd-PL-2630-2020); sem
+    script, vai para a página oficial (quando há o endereço). -#}
+{% macro materia(casa, titulo, url="") -%}
+{%- set chave = casa ~ "-" ~ titulo|replace(" ", "-")|replace("/", "-") -%}
+<a class="cg-mt" href="{{ url or ("#m=" ~ chave) }}" data-m="{{ chave }}"{% if url %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ titulo }}</a>
+{%- endmacro %}
+
 {#- A régua do saldo: −100 (com a esquerda) a +100 (com a direita). -#}
 {% macro regua() -%}
 <div class="cg-regua" aria-hidden="true"><span>−100<i>sempre com a esquerda</i></span><span>0</span><span>+100<i>sempre com a direita</i></span></div>
@@ -48,18 +55,30 @@
     <h2 class="kicker" id="cg-h">Congresso</h2>
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
-  <nav class="az-nav" id="cgNav" aria-label="Nesta página">
-    <ul>
-      {% if c.leitura %}<li><a href="#cg-leitura">A leitura</a></li>{% endif %}
-      <li><a href="#cg-polos"><b>1</b>Com quem vota</a></li>
-      <li><a href="#cg-fila"><b>2</b>A fila</a></li>
-      <li><a href="#cg-plenario"><b>3</b>O Plenário</a></li>
-      <li><a href="#cg-quem"><b>4</b>Quem é quem</a></li>
-      <li><a href="#cg-metodo">Como ler</a></li>
-    </ul>
-  </nav>
+  {#- A barra fixa: a Casa e, logo abaixo, as vistas dela (uma de cada vez, com script; sem script, todas em sequência). -#}
+  <div class="cg-barra" id="cgBarra">
+    <div class="cg-casas" id="cgCasas" role="group" aria-label="Casa" hidden>
+      {% for casa in c.casas %}
+      <button class="cg-casa-b" type="button" data-casa="{{ casa.id }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ casa.curto }} <span>{{ casa.em_exercicio }}</span></button>
+      {% endfor %}
+      <span class="cg-casas-n">Escolha a Casa e, abaixo, o que quer ver dela.</span>
+    </div>
+    <nav class="cg-vistas" id="cgNav" aria-label="O que ver">
+      <ul>
+        {% if c.leitura %}<li><a href="#cg-leitura" data-vista="resumo">Resumo</a></li>{% endif %}
+        <li><a href="#cg-polos" data-vista="posicoes">Onde cada um está</a></li>
+        <li><a href="#cg-partidos" data-vista="partidos">Partidos</a></li>
+        <li><a href="#cg-espera" data-vista="espera">O que espera × o que passa</a></li>
+        <li><a href="#cg-fila" data-vista="fila">A fila</a></li>
+        <li><a href="#cg-plenario" data-vista="votacoes">Votações e matérias</a></li>
+        <li><a href="#cg-quem" data-vista="pessoas">Parlamentares</a></li>
+        <li><a href="#cg-metodo" data-vista="metodo">Como ler</a></li>
+      </ul>
+    </nav>
+  </div>
 
   {% if c.leitura %}{% set l = c.leitura %}
+  <div class="cg-vista" data-vista="resumo">
   <div class="az-lead" id="cg-leitura">
     <div class="az-box">
       <p class="az-chapeu">{{ l.chapeu }}</p>
@@ -97,17 +116,11 @@
       </form>
     </aside>
   </div>
+  </div>
   {% endif %}
 
-  <div class="cg-casas" id="cgCasas" role="group" aria-label="Casa" hidden>
-    {% for casa in c.casas %}
-    <button class="cg-casa-b" type="button" data-casa="{{ casa.id }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ casa.curto }} <span>{{ casa.em_exercicio }}</span></button>
-    {% endfor %}
-    <span class="cg-casas-n">As lentes abaixo mostram uma Casa por vez.</span>
-  </div>
-
-  {#- 1 · Com quem vota -#}
-  <section class="az-sec" aria-labelledby="cg-polos-h">
+  {#- Onde cada um está -#}
+  <section class="az-sec cg-vista" data-vista="posicoes" aria-labelledby="cg-polos-h">
     <header class="az-lh" id="cg-polos">
       <p class="az-ln"><b>1</b>Com quem vota</p>
       <h3 class="az-lt" id="cg-polos-h">Por baixo dos rótulos, de que lado cada um fica</h3>
@@ -128,6 +141,7 @@
             {% for t in casa.temas_faixa %}<option value="{{ t.id }}"{% if t.poucas %} disabled{% endif %}>{{ t.nome }} ({{ t.n }} {{ "votação" if t.n == 1 else "votações" }}{% if t.poucas %}: poucas para o saldo{% endif %})</option>{% endfor %}
           </select>
           <p class="cg-fx-st" aria-live="polite"></p>
+          <p class="cg-fx-d">Escolha um tema para ver, abaixo das faixas, <b>quais matérias foram votadas</b>, o que cada uma muda e como cada polo votou.</p>
         </div>
         {% endif %}
         {{ legenda() }}
@@ -144,6 +158,21 @@
       </div>
       {% endif %}
 
+      <div class="cg-td" id="cg-tema-det-{{ casa.id }}" data-casa="{{ casa.id }}" hidden></div>
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- Partidos -#}
+  <section class="az-sec cg-vista" data-vista="partidos" aria-labelledby="cg-partidos-h">
+    <header class="az-lh" id="cg-partidos">
+      <p class="az-ln">Partidos</p>
+      <h3 class="az-lt" id="cg-partidos-h">Como cada bancada vota, e quanto vota junto com as outras</h3>
+      <p class="az-ld">O saldo esquerda × direita só olha as votações em que os polos se opõem. Nele, {{ c.polos.esquerda }} e {{ c.polos.direita }} ficam nas pontas por construção: são eles que definem os lados. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para ver quanto dois partidos votam juntos sem depender da régua, a tabela "Quanto os partidos votam juntos" conta todas as votações de conteúdo.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
       {% if casa.matriz %}
       <div class="az-blk" id="cg-temas-{{ casa.id }}">
         <h4 class="az-h">Partido por tema <span>onde o rótulo e o voto se separam</span></h4>
@@ -153,13 +182,66 @@
             <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>{{ casa.matriz_base }}</small></th>{% for t in casa.matriz_temas %}<th scope="col">{{ t.nome }}<small>{{ t.n }}</small></th>{% endfor %}</tr></thead>
             <tbody>
               {% for linha in casa.matriz %}
-              <tr><th scope="row">{{ linha.sigla }}<small>{{ linha.membros }}</small></th><td class="cg-{{ linha.geral.classe }} cg-mx-g" title="{{ linha.geral.titulo }}">{{ linha.geral.valor }}</td>{% for cel in linha.celulas %}<td class="cg-{{ cel.classe }}" title="{{ cel.titulo }}">{{ cel.valor }}</td>{% endfor %}</tr>
+              <tr{% if linha.polo %} class="cg-mx-polo"{% endif %}><th scope="row">{{ linha.sigla }}{% if linha.polo %}<i title="Define o polo de {{ linha.polo }}: fica na ponta da régua por construção">régua</i>{% endif %}<small>{{ linha.membros }}</small></th><td class="cg-{{ linha.geral.classe }} cg-mx-g" title="{{ linha.geral.titulo }}">{{ linha.geral.valor }}</td>{% for cel in linha.celulas %}<td class="cg-{{ cel.classe }}" title="{{ cel.titulo }}">{{ cel.valor }}</td>{% endfor %}</tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
         {{ legenda() }}
-        <p class="az-dek">O número pequeno ao lado do tema é quantas votações divisivas ele teve; ao lado do partido, quantos parlamentares em exercício. Célula com ponto: menos de 5 votações, sem saldo.</p>
+        <p class="az-dek">O número pequeno ao lado do tema é quantas votações divisivas ele teve; ao lado do partido, quantos parlamentares em exercício. Célula com ponto: menos de 5 votações, sem saldo. Os partidos marcados com "régua" ({{ c.polos.esquerda }}; {{ c.polos.direita }}) definem os polos: a esquerda <i>é</i> o lado em que a maioria deles vota, por isso ficam em −100 e +100 quase por definição. O que a tabela informa é onde os outros partidos ficam em cada tema.</p>
+      </div>
+      {% endif %}
+
+      {% if casa.juntos %}{% set j = casa.juntos %}
+      <div class="az-blk" id="cg-juntos-{{ casa.id }}">
+        <h4 class="az-h">Quanto os partidos votam juntos <span>em todas as votações de conteúdo, não só nas que opõem os polos</span></h4>
+        <p class="az-dek">Das <b>{{ j.conteudo }}</b> votações de conteúdo do Plenário nesta legislatura, só as que opõem esquerda e direita entram no saldo. As outras também contam a história: em boa parte delas os dois polos votaram do mesmo lado.</p>
+        <ul class="cg-jt">
+          <li class="cg-jt-a"><b>{{ j.juntos.n }}</b><span>os dois polos do mesmo lado</span><small>{{ j.juntos.pct }} · consenso</small></li>
+          <li class="cg-jt-b"><b>{{ j.divisivas.n }}</b><span>esquerda contra direita</span><small>{{ j.divisivas.pct }} · entram no saldo</small></li>
+          <li class="cg-jt-c"><b>{{ j.rachas.n }}</b><span>um partido votou com o outro polo</span><small>{{ j.rachas.pct }} · rachas</small></li>
+          <li class="cg-jt-d"><b>{{ j.sem_lado.n }}</b><span>um polo sem maioria clara</span><small>{{ j.sem_lado.pct }}</small></li>
+        </ul>
+        <div class="cg-jt-bar" role="img" aria-label="Das {{ j.conteudo }} votações de conteúdo: {{ j.juntos.pct }} de consenso entre os polos, {{ j.divisivas.pct }} de esquerda contra direita, {{ j.rachas.pct }} de rachas e {{ j.sem_lado.pct }} com um polo sem maioria clara"><i class="cg-jt-a" style="width:{{ j.juntos.w }}%"></i><i class="cg-jt-b" style="width:{{ j.divisivas.w }}%"></i><i class="cg-jt-c" style="width:{{ j.rachas.w }}%"></i><i class="cg-jt-d" style="width:{{ j.sem_lado.w }}%"></i></div>
+        {% if j.linhas %}
+        {% if j.exemplo %}<p class="az-ph">{{ j.exemplo.a }} e {{ j.exemplo.b }} ficaram do mesmo lado em <b>{{ j.exemplo.pct }}%</b> das {{ j.exemplo.n }} votações de conteúdo em que os dois tiveram posição.</p>{% endif %}
+        <div class="az-mx-wrap">
+          <table class="az-mx cg-mx cg-jx">
+            <caption class="sr-only">Em quantas das votações de conteúdo a maioria de cada partido ficou do mesmo lado que a maioria de cada outro, em porcentagem</caption>
+            <thead><tr><th scope="col" class="az-mx-v">Partido</th>{% for s in j.partidos %}<th scope="col">{{ s }}</th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for linha in j.linhas %}
+              <tr{% if linha.polo %} class="cg-mx-polo"{% endif %}><th scope="row">{{ linha.sigla }}</th>{% for cel in linha.celulas %}<td class="cg-{{ cel.classe }}"{% if cel.titulo %} title="{{ cel.titulo }}"{% endif %}>{{ cel.valor }}</td>{% endfor %}</tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="cg-leg cg-jx-leg" aria-hidden="true"><span><i class="cg-j0"></i>menos de 40%</span><span><i class="cg-j1"></i>40 a 54%</span><span><i class="cg-j2"></i>55 a 69%</span><span><i class="cg-j3"></i>70 a 84%</span><span><i class="cg-j4"></i>85% ou mais</span></p>
+        <p class="az-dek">Cada número é a parte das votações de conteúdo em que a maioria dos dois partidos votou do mesmo lado (Sim ou Não). Os partidos vão da esquerda para a direita, pela ordem do saldo. Esta tabela não usa a régua dos polos: conta todas as votações de conteúdo em que os dois tiveram posição.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if casa.cruzada %}
+      <div class="az-blk" id="cg-cruzada-{{ casa.id }}">
+        <h4 class="az-h">Quando um lado vota a proposta do outro <span>matérias de autores de um polo e como o outro polo votou o texto principal</span></h4>
+        <div class="az-2c">
+          {% for x in casa.cruzada %}
+          <div class="az-col">
+            <p class="az-ph">Das <b>{{ x.n }}</b> matérias de autores da {{ x.autor }} ({{ x.siglas }}) com o texto principal votado nominalmente, a {{ x.outro }} votou <b>a favor de {{ x.favor }}</b> e contra {{ x.contra }}{% if x.dividido %}; em {{ x.dividido }}, não teve maioria clara{% endif %}.</p>
+            {% if x.itens %}
+            <ol class="cg-ls">
+              {% for i in x.itens %}
+              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span>autor{{ "es" if "," in i.pa else "" }}: {{ i.pa }} · {{ i.data }}{% if i.resultado %} · {{ i.resultado }}{% endif %}</span></p><p class="cg-ls-x">{{ i.e }}</p></li>
+              {% endfor %}
+            </ol>
+            {% else %}
+            <p class="az-dek">Nenhuma em que a {{ x.outro }} tenha votado a favor.</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. Clique no número para ver a ficha da matéria e a contagem de cada partido.</p>
       </div>
       {% endif %}
 
@@ -174,7 +256,7 @@
           <ol class="cg-rc-l">
             {% for i in p.itens %}
             <li><p class="cg-rc-k"><time>{{ i.data }}</time><span class="az-selo">{{ i.tipo }}</span>{% if i.resultado %}<span>{{ i.resultado }}</span>{% endif %}</p>
-              <p class="cg-rc-e">{% if i.prop %}<b>{{ i.prop }}</b> {% endif %}{{ i.ementa }}</p>
+              <p class="cg-rc-e">{% if i.prop %}<b>{{ materia(casa.id, i.prop) }}</b> {% endif %}{{ i.ementa }}</p>
               <p class="cg-rc-v">{{ p.sigla }}: <b>{{ i.lado }}</b>{% if i.parte and i.parte < 100 %} ({{ i.parte }}%){% endif %} · resto da {{ p.polo }}: <b>{{ i.polo }}</b> · governo: <b>{{ i.gov or "—" }}</b>{% if i.temas %} · {{ i.temas|join(", ") }}{% endif %}</p></li>
             {% endfor %}
           </ol>
@@ -202,29 +284,16 @@
     {% endfor %}
   </section>
 
-  {#- 2 · A fila -#}
-  <section class="az-sec" aria-labelledby="cg-fila-h">
-    <header class="az-lh" id="cg-fila">
-      <p class="az-ln"><b>2</b>A fila</p>
-      <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
-      <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
+  {#- O que espera × o que passa -#}
+  <section class="az-sec cg-vista" data-vista="espera" aria-labelledby="cg-espera-h">
+    <header class="az-lh" id="cg-espera">
+      <p class="az-ln">A pauta</p>
+      <h3 class="az-lt" id="cg-espera-h">O que está pronto para votar e o que foi votado, pela mesma régua</h3>
+      <p class="az-ld">Cada ponto do gráfico é uma matéria. Clique num ponto (ou num nome da lista) para abrir a ficha dela: o que é, quem propôs, os sinais de relevância um a um e por que andou ou não.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
       <h4 class="cg-ct">{{ casa.nome }}</h4>
-      {% if casa.fila %}{% set f = casa.fila %}
-      <div class="az-blk" id="cg-fila-{{ casa.id }}">
-        <h4 class="az-h">Em que porta está parado <span>{{ f.tramitando }} matérias tramitando; outras {{ f.apensadas }} andam junto com alguma delas</span></h4>
-        <ol class="cg-fl">
-          {% for b in f.blocos %}
-          <li>
-            <p class="cg-fl-n"><b>{{ b.n }}</b> {{ b.nome }}{% if b.quem %} <span>quem segura: {{ b.quem }}</span>{% endif %}</p>
-            <span class="cg-fl-b" aria-hidden="true"><i style="width:{{ b.largura }}%"></i></span>
-            <p class="cg-fl-x">{{ b.parte }} do que tramita · metade sem andamento há mais de {{ b.mediana }} · <b>{{ b.parados }}</b> ({{ b.parados_parte }}) paradas há mais de um ano</p>
-          </li>
-          {% endfor %}
-        </ol>
-      </div>
       {% if casa.relevancia %}{% set rv = casa.relevancia %}{% set g = rv.grafico %}
       <div class="az-blk cg-rv" id="cg-relev-{{ casa.id }}">
         <h4 class="az-h">O que espera × o que passa <span>a mesma régua para as matérias prontas e para as aprovadas</span></h4>
@@ -253,7 +322,7 @@
             <h5 class="cg-rv-h">Sinais fortes, esperando <span>{{ rv.fortes_paradas }} com nota {{ rv.alta }} ou mais estão sem andamento há mais de um ano</span></h5>
             <ol class="cg-ls cg-rv-l">
               {% for i in rv.esperam %}
-              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
+              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
                 <p class="cg-ls-x">{{ i.e }}</p>
                 <p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
                 <p class="cg-rv-q">último andamento em {{ i.pronta }} · protocolada há {{ i.idade }}{% if i.urg %} · em regime de urgência, e não votada{% endif %}</p></li>
@@ -264,7 +333,7 @@
             <h5 class="cg-rv-h">Sinais fracos, aprovadas <span>{{ rv.fracas_rapidas }} com nota abaixo de {{ rv.baixa }} passaram em menos de 120 dias; da mais rápida</span></h5>
             <ol class="cg-ls cg-rv-l">
               {% for i in rv.passaram %}
-              <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
+              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
                 <p class="cg-ls-x">{{ i.e }}</p>
                 {% if i.sinais %}<p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
                 <p class="cg-rv-q">aprovada em {{ i.aprovada }}, {{ i.tempo }} depois do protocolo{% if i.autoria %} · {{ i.autoria }}{% endif %}</p>
@@ -285,6 +354,34 @@
         <p class="az-dek">A nota não diz se a matéria é boa ou ruim: diz quantos sinais de relevância pública ela tem nos registros oficiais. Os pesos estão no "Como ler" e são escolha editorial. Medidas provisórias ficam de fora, porque têm prazo na Constituição. Na Câmara, "por que andou" sai do histórico oficial de cada matéria.</p>
       </div>
       {% endif %}
+      {% if not casa.relevancia %}<p class="term-note">Sem os dados desta comparação nesta atualização.</p>{% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- A fila -#}
+  <section class="az-sec cg-vista" data-vista="fila" aria-labelledby="cg-fila-h">
+    <header class="az-lh" id="cg-fila">
+      <p class="az-ln"><b>2</b>A fila</p>
+      <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
+      <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.fila %}{% set f = casa.fila %}
+      <div class="az-blk" id="cg-fila-{{ casa.id }}">
+        <h4 class="az-h">Em que porta está parado <span>{{ f.tramitando }} matérias tramitando; outras {{ f.apensadas }} andam junto com alguma delas</span></h4>
+        <ol class="cg-fl">
+          {% for b in f.blocos %}
+          <li>
+            <p class="cg-fl-n"><b>{{ b.n }}</b> {{ b.nome }}{% if b.quem %} <span>quem segura: {{ b.quem }}</span>{% endif %}</p>
+            <span class="cg-fl-b" aria-hidden="true"><i style="width:{{ b.largura }}%"></i></span>
+            <p class="cg-fl-x">{{ b.parte }} do que tramita · metade sem andamento há mais de {{ b.mediana }} · <b>{{ b.parados }}</b> ({{ b.parados_parte }}) paradas há mais de um ano</p>
+          </li>
+          {% endfor %}
+        </ol>
+      </div>
       <div class="az-2c">
         <div class="az-col">
           {% if f.orgaos %}
@@ -336,7 +433,7 @@
             <p class="az-ph">{{ r.rapidas_n }} de {{ r.aprovadas }} matérias aprovadas no Plenário desde {{ r.desde }}; {{ r.com_urgencia }} tiveram a urgência votada.</p>
             <ol class="cg-ls">
               {% for i in r.rapidas %}
-              <li><p class="cg-ls-k"><b>{{ i.p }}</b><span>{{ i.tempo }}{% if i.urg %} · com urgência{% endif %} · votada em {{ i.data }}</span></p><p class="cg-ls-x">{{ i.e }}{% if i.autoria %} <i>Autoria: {{ i.autoria }}.</i>{% endif %}</p></li>
+              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.p) }}</b><span>{{ i.tempo }}{% if i.urg %} · com urgência{% endif %} · votada em {{ i.data }}</span></p><p class="cg-ls-x">{{ i.e }}{% if i.autoria %} <i>Autoria: {{ i.autoria }}.</i>{% endif %}</p></li>
               {% endfor %}
             </ol>
             <p class="az-dek">Metade das aprovadas levou menos de {{ r.mediana }} desde a apresentação. Só entram matérias com votação nominal do texto principal.</p>
@@ -351,8 +448,8 @@
     {% endfor %}
   </section>
 
-  {#- 3 · O Plenário -#}
-  <section class="az-sec" aria-labelledby="cg-plenario-h">
+  {#- Votações e matérias -#}
+  <section class="az-sec cg-vista" data-vista="votacoes" aria-labelledby="cg-plenario-h">
     <header class="az-lh" id="cg-plenario">
       <p class="az-ln"><b>3</b>O Plenário</p>
       <h3 class="az-lt" id="cg-plenario-h">O que foi votado, e quem saiu da linha</h3>
@@ -361,12 +458,26 @@
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
       <h4 class="cg-ct">{{ casa.nome }}</h4>
+      <div class="az-blk cg-mb" id="cg-materias-{{ casa.id }}" data-materias="{{ casa.id }}" hidden>
+        <h4 class="az-h">As matérias votadas <span>todas as que tiveram votação nominal no Plenário nesta legislatura: ache pelo nome, pelo apelido ou pelo assunto</span></h4>
+        <div class="cg-mb-f">
+          <label class="sr-only" for="cgMbQ-{{ casa.id }}">Procurar matéria</label>
+          <input class="az-fil-in" id="cgMbQ-{{ casa.id }}" type="search" autocomplete="off" spellcheck="false" placeholder="Procurar: licenciamento, imposto, PL 2159, escala 6x1…">
+          <label class="sr-only" for="cgMbT-{{ casa.id }}">Tema</label>
+          <select class="cg-fx-s" id="cgMbT-{{ casa.id }}"><option value="">Todos os temas</option></select>
+          <label class="az-fil-ck"><input type="checkbox" id="cgMbD-{{ casa.id }}"> só as que dividiram esquerda e direita</label>
+          <span class="az-fil-n" role="status"></span>
+        </div>
+        <ol class="cg-mb-l"></ol>
+        <p class="az-dek">Clique numa matéria para abrir a ficha: o que ela é e muda (a ementa e a explicação oficiais), quem propôs, e cada votação com o lado de cada polo e a contagem de cada partido.</p>
+      </div>
+      <h4 class="az-h cg-vs-h">As últimas votações <span>com quem votou diferente do próprio partido</span></h4>
       <ol class="cg-vs" id="cg-votacoes-{{ casa.id }}">
         {% for v in casa.ultimas %}
         <li class="cg-v">
           <div class="cg-v-h">
             <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.racha %}<span class="cg-div cg-div-r">racha: {{ v.racha|join(", ") }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
-            <h5 class="cg-v-t">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}{% if v.apelido %}<span class="cg-apel">{{ v.apelido }}</span> {% endif %}{{ v.descricao }}</h5>
+            <h5 class="cg-v-t">{% if v.prop %}<b>{{ materia(casa.id, v.prop) }}</b> {% endif %}{% if v.apelido %}<span class="cg-apel">{{ v.apelido }}</span> {% endif %}{{ v.descricao }}</h5>
             {% if v.ementa %}<p class="cg-v-e">{{ v.ementa }}</p>{% endif %}
           </div>
           <div class="cg-v-p">
@@ -393,8 +504,8 @@
     {% endfor %}
   </section>
 
-  {#- 4 · Quem é quem -#}
-  <section class="az-sec" aria-labelledby="cg-quem-h">
+  {#- Parlamentares -#}
+  <section class="az-sec cg-vista" data-vista="pessoas" aria-labelledby="cg-quem-h">
     <header class="az-lh" id="cg-quem">
       <p class="az-ln"><b>4</b>Quem é quem</p>
       <h3 class="az-lt" id="cg-quem-h">O que cada um vota, propõe e deixa parado</h3>
@@ -429,7 +540,7 @@
           <li>
             <p class="cg-jv-k">{{ pessoa(i.k, i.nome) }} <span>{{ i.legenda }}</span> <time>{{ i.data }}</time>{% if i.veiculo %} · {{ i.veiculo }}{% endif %}</p>
             <p class="cg-jv-t">{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.titulo }}</a>{% else %}{{ i.titulo }}{% endif %}</p>
-            <p class="cg-jv-v">No voto: <b>{{ i.prop }}</b>{% if i.apel %} ({{ i.apel }}){% endif %} — {% for v in i.votos %}{{ v.tipo }} em {{ v.data }}: <b>{{ v.voto }}</b>{% if v.resultado %} ({{ v.resultado }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor %}{% if i.mais %}; e mais {{ i.mais }}{% endif %}.</p>
+            <p class="cg-jv-v">No voto: <b>{{ materia(casa.id, i.prop) }}</b>{% if i.apel %} ({{ i.apel }}){% endif %} — {% for v in i.votos %}{{ v.tipo }} em {{ v.data }}: <b>{{ v.voto }}</b>{% if v.resultado %} ({{ v.resultado }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor %}{% if i.mais %}; e mais {{ i.mais }}{% endif %}.</p>
           </li>
           {% endfor %}
         </ol>
@@ -489,7 +600,7 @@
     </div>
   </section>
 
-  <section class="az-sec az-met" aria-labelledby="cg-metodo-h">
+  <section class="az-sec az-met cg-vista" data-vista="metodo" aria-labelledby="cg-metodo-h">
     <header class="az-lh" id="cg-metodo">
       <p class="az-ln">Método</p>
       <h3 class="az-lt" id="cg-metodo-h">Como ler</h3>
