@@ -339,9 +339,12 @@ def linha(ficha: Mapping[str, Any], legislatura: int) -> dict[str, Any]:
         d["preside"] = 1  # preside a Casa hoje: só vota em caso de empate
     if ficha.get("frases"):
         d["frase"] = ficha["frases"][0]
-    cota = (ficha.get("cota") or {}).get("leg") or {}
-    if cota.get("media") is not None:
-        d["ct"] = round(cota["media"])  # a cota parlamentar: média por mês com despesa na legislatura
+    cota = ficha.get("cota") or {}
+    leg_cota = cota.get("leg") or {}
+    if cota.get("sem_despesa"):
+        d["ct"] = 0  # em exercício e sem nenhum pedido de reembolso na legislatura
+    elif leg_cota.get("media") is not None and (leg_cota.get("meses") or 0) >= 6:
+        d["ct"] = round(leg_cota["media"])  # a cota: média por mês fechado com despesa (6 meses ou mais, como as listas)
     frentes = ficha.get("frentes") or {}
     if frentes.get("de"):
         d["frn"] = frentes.get("n") or 0  # frentes que assina (Câmara)

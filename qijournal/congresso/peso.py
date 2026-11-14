@@ -25,7 +25,7 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
-from . import base
+from . import base, materias
 from .base import AnoVotos
 from .perfil import CONTEUDO, Eixo, ler_votacao
 from .regras import Regras
@@ -79,7 +79,8 @@ def calcular(
                 continue
             leitura = ler_votacao(v, [p.partido_em(k) for p in ano.pessoas], regras)
             if leitura.divisiva:
-                divisivas.append((ano, v, leitura.direita, notas.get(v.prop) if v.prop else None))
+                # A nota é a da matéria: o Senado anota a fase ao lado do número ("PEC 66/2023 (fase 2)").
+                divisivas.append((ano, v, leitura.direita, notas.get(materias.titulo_da_materia(v.prop)) if v.prop else None))
     com_nota = [nota for _a, _v, _d, nota in divisivas if nota is not None]
     corte = mediana(com_nota)
     cobertura: dict[str, Any] = {"divisivas": len(divisivas), "com_nota": len(com_nota)}
@@ -130,6 +131,7 @@ def resumo(p: Pesado, minimo: int) -> dict[str, Any] | None:
     d: dict[str, Any] = {"n": p.eixo.n, "de": p.todas}
     if p.eixo.n >= minimo and p.saldo is not None:
         d["saldo"] = round(p.saldo)
+        d["simples"] = round(p.eixo.saldo)  # o saldo sem peso nas mesmas votações (as que têm nota)
     faixas = {f: _eixo(e) for f, e in p.faixas.items() if e.n >= MINIMO_FAIXA}
     if faixas:
         d["faixas"] = faixas
@@ -138,14 +140,14 @@ def resumo(p: Pesado, minimo: int) -> dict[str, Any] | None:
 
 def muda_quando_pesa(fichas: Iterable[Mapping[str, Any]], diferenca: int = DIFERENCA) -> list[dict[str, Any]]:
     """Quem está em exercício e tem o saldo pesado a ``diferenca`` pontos ou mais do saldo
-    simples, da maior diferença para a menor."""
+    sem peso nas mesmas votações (as que têm nota), da maior diferença para a menor: a
+    diferença é só o efeito do peso."""
     saida = []
     for f in fichas:
         peso = f.get("peso") or {}
-        campo = f.get("campo") or {}
-        if not f.get("exercicio") or peso.get("saldo") is None or campo.get("saldo") is None:
+        if not f.get("exercicio") or peso.get("saldo") is None or peso.get("simples") is None:
             continue
-        dif = peso["saldo"] - campo["saldo"]
+        dif = peso["saldo"] - peso["simples"]
         if abs(dif) >= diferenca:
             faixas = peso.get("faixas") or {}
             saida.append(
@@ -154,7 +156,7 @@ def muda_quando_pesa(fichas: Iterable[Mapping[str, Any]], diferenca: int = DIFER
                     "nome": f["nome"],
                     "partido": f.get("partido") or "",
                     "uf": f.get("uf") or "",
-                    "saldo": campo["saldo"],
+                    "simples": peso["simples"],
                     "pesado": peso["saldo"],
                     "dif": dif,
                     "alta": (faixas.get("alta") or {}).get("saldo"),

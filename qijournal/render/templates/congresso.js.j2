@@ -433,7 +433,7 @@
     var p = f.peso || {}, fx = p.faixas || {}, partes = [];
     if (p.saldo == null) return '';
     var t = ' Pesado pela relevância da matéria: ' + saldo(p.saldo) + ' (' + num(p.n) + ' das ' + num(p.de) + ' votações têm nota).';
-    if (fx.alta && fx.alta.saldo != null) partes.push('nas matérias de nota alta (acima da mediana da Casa), ' + saldo(fx.alta.saldo) + ' em ' + num(fx.alta.n));
+    if (fx.alta && fx.alta.saldo != null) partes.push('nas matérias de nota alta (da mediana da Casa para cima), ' + saldo(fx.alta.saldo) + ' em ' + num(fx.alta.n));
     if (fx.baixa && fx.baixa.saldo != null) partes.push('nas de nota baixa, ' + saldo(fx.baixa.saldo) + ' em ' + num(fx.baixa.n));
     return t + (partes.length ? ' Sem peso, ' + partes.join('; ') + '.' : '');
   }
@@ -447,6 +447,7 @@
     var c = f.cota, nos = [], casa = (M.cota || {})[f.casa] || {};
     if (!c || !c.leg) return null;
     var pos = posicao(f, 'ct');
+    if (c.sem_despesa) return secao('Cota parlamentar', 'o que pediu de reembolso', [h('p', { cls: 'cg-d-n', text: 'Não pediu reembolso nenhum da cota nesta legislatura' + (pos ? ' (' + pos + ')' : '') + '.' })]);
     nos.push(h('p', { cls: 'cg-d-n', text: 'Na legislatura: ' + reais(c.leg.total) + ' em ' + num(c.leg.meses) + (c.leg.meses === 1 ? ' mês' : ' meses') + ' com despesa, ' + reais(c.leg.media) + ' por mês em média' + (casa.mediana != null ? ' (a mediana da Casa é ' + reais(casa.mediana) + ')' : '') + (pos ? '; ' + pos : '') + '.' }));
     var anos = Object.keys(c.anos || {}).sort();
     if (anos.length) nos.push(h('p', { cls: 'cg-d-n', text: 'Ano a ano: ' + anos.map(function (a) { return a + ', ' + reais(c.anos[a]); }).join(' · ') + '.' }));

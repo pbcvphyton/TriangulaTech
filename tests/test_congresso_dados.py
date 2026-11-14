@@ -866,7 +866,7 @@ def test_a_cota_no_painel_na_ficha_e_na_aba(publicado: tuple[Path, fabrica.Fetch
     davi = _ler(data_dir, "fichas/cd-4.json")["cota"]
     assert davi["fornecedores"][0]["cnpj"] == "11111111000111" and davi["maiores"][0]["url"].startswith("https://www.camara.leg.br/")
     linha = next(p for p in _ler(data_dir, "resumo.json")["pessoas"] if p["k"] == "cd-4")
-    assert linha["ct"] == round(davi["leg"]["media"])
+    assert davi["leg"]["meses"] < 6 and "ct" not in linha  # com menos de 6 meses de despesa, fora do ranking e do filtro (como das listas)
     html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
     for trecho in ('id="cg-cota-cd"', "A mesma nota em mais de um gabinete", "LOCADORA SUL", "Fora da conta:", 'id="cgEscCt"'):
         assert trecho in html, trecho

@@ -690,7 +690,7 @@
         </div>
         <div class="cg-lt">
           <h4 class="az-h5">Quem menos gasta</h4>
-          <p class="cg-lt-d">A mesma média, do menor para o maior.</p>
+          <p class="cg-lt-d">A mesma média, do menor para o maior.{% if ct.sem_despesa %} Não pediram reembolso nenhum na legislatura: {% for x in ct.sem_despesa %}{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
           <ol>{% for x in ct.menos %}<li><span class="cg-lt-n">{{ pessoa(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b> <small>{{ x.extra }}</small></span></li>{% endfor %}</ol>
         </div>
         {% if ct.glosas %}

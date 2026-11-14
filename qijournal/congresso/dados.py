@@ -619,8 +619,18 @@ RANKINGS: tuple[tuple[str, Any], ...] = (
     ("norma", lambda f, leg, gov: ((f.get("autoria") or {}).get("estados") or {}).get("norma", 0)),
     ("rel", lambda f, leg, gov: (f.get("relatorias") or {}).get("total", 0)),
     ("jor", lambda f, leg, gov: (f.get("jornal") or {}).get("n30", 0)),
-    ("ct", lambda f, leg, gov: ((f.get("cota") or {}).get("leg") or {}).get("media")),
+    ("ct", lambda f, leg, gov: media_da_cota(f)),
 )
+
+
+def media_da_cota(f: Mapping[str, Any]) -> float | None:
+    """A média mensal da cota que entra no ranking e no filtro: com cota.MINIMO_MESES meses ou
+    mais de despesa (como as listas), ou zero para quem não pediu reembolso nenhum."""
+    c = f.get("cota") or {}
+    leg = c.get("leg") or {}
+    if c.get("sem_despesa"):
+        return 0.0
+    return leg.get("media") if (leg.get("meses") or 0) >= cota.MINIMO_MESES else None
 
 
 def rankings(fichas: Iterable[dict[str, Any]], legislatura: int, governo: str) -> None:
@@ -772,6 +782,7 @@ def _na_casa(casa: str) -> str:
 
 MINIMO_TEMA = 20  # votações divisivas para um tema entrar no achado do partido que muda de lado
 MINIMO_FRENTE = 20  # membros em exercício com lado no tema para a frente virar achado
+MINIMO_SEM_COTA = 100  # votações possíveis na legislatura para quem não pediu reembolso entrar como "gastou zero"
 PARTE_FRENTE = 0.2  # parte dos membros do outro lado do coordenador para virar achado
 BANCADA_DO_ACHADO = {"cd": 20, "sf": 5}  # parlamentares em exercício para o partido ser o assunto do achado
 
@@ -1084,7 +1095,7 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "peso": 80,
                     "titulo": f"{nome}: {conc['nome']} ({conc.get('partido', '')}-{conc.get('uf', '')}) pagou {_num(round(float(conc['pct'])))}% da própria cota a uma empresa só",
                     "texto": (
-                        f"R$ {_num(round(float(conc.get('valor') or 0)))} de R$ {_num(round(float(conc.get('total') or 0)))} pedidos na legislatura foram para "
+                        f"R$ {_num(round(float(conc.get('valor') or 0)))} de R$ {_num(round(float(conc.get('total') or 0)))} reembolsados na legislatura (até o último mês fechado) foram para "
                         f"{conc.get('fornecedor', '')}. Cada nota está no registro oficial da Casa."
                     ),
                     "alvo": f"#cg-cota-{casa}",
@@ -1109,8 +1120,8 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "peso": 70,
                     "titulo": f"{nome}: {i['nome']} ({i['partido']}-{i['uf']}) vota com a {lado_alta} nas matérias de mais peso e com a {lado_baixa} nas de menos",
                     "texto": (
-                        f"Saldo de {_sinal(alta)} nas {_num(n1)} votações de matérias com nota de relevância acima da mediana da Casa e de "
-                        f"{_sinal(baixa)} nas {_num(n2)} abaixo dela. Pesado pela nota, o saldo vai de {_sinal(i['saldo'])} para {_sinal(i['pesado'])}. "
+                        f"Saldo de {_sinal(alta)} nas {_num(n1)} votações de matérias com nota de relevância da mediana da Casa para cima e de "
+                        f"{_sinal(baixa)} nas {_num(n2)} abaixo dela. Nessas votações, pesado pela nota, o saldo vai de {_sinal(i['simples'])} para {_sinal(i['pesado'])}. "
                         "A diferença passa do acaso (99%)."
                     ),
                     "alvo": f"#cg-listas-{casa}",
@@ -1276,6 +1287,17 @@ def atualizar(
             for f in fichas[casa]:
                 if f["id"] in por_pessoa:
                     f["cota"] = por_pessoa[f["id"]]
+            # Quem está em exercício há tempo (MINIMO_SEM_COTA votações possíveis ou mais) e não pediu
+            # reembolso nenhum na legislatura: gastou zero, e isso também é dado.
+            sem = [
+                f
+                for f in fichas[casa]
+                if f.get("exercicio") and "cota" not in f
+                and (((f.get("leg") or {}).get(str(legislatura.numero)) or {}).get("pres") or {}).get("n", 0) >= MINIMO_SEM_COTA
+            ]
+            for f in sem:
+                f["cota"] = {"leg": {"total": 0.0, "meses": 0, "media": 0.0}, "sem_despesa": 1}
+            paineis_cota[casa]["sem_despesa"] = [_linha_de_lista(f) for f in sorted(sem, key=lambda f: text.normalize(f["nome"]))]
         except Exception as exc:  # noqa: BLE001 — acessório: sem a cota, a aba sai sem ela
             avisos.append(f"{_nome_casa(casa)}: cota parlamentar indisponível ({exc})")
 

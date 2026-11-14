@@ -99,9 +99,18 @@ def test_notas_das_materias_e_muda_quando_pesa():
     materias = {"PL 1/2026": {"rel": {"n": 72}}, "MPV 2/2026": {"e": "sem nota"}, "PL 3/2026": {"rel": {"q": "votada"}}}
     assert peso.notas_das_materias(materias) == {"PL 1/2026": 72.0}
     fichas = [
-        {"k": "cd-5", "nome": "Cinco", "exercicio": True, "campo": {"saldo": -50}, "peso": {"saldo": 50, "faixas": {"alta": {"saldo": 100, "n": 6}}}},
-        {"k": "cd-6", "nome": "Seis", "exercicio": True, "campo": {"saldo": 10}, "peso": {"saldo": 20}},  # 10 pontos: fica de fora
-        {"k": "cd-7", "nome": "Sete", "exercicio": False, "campo": {"saldo": -90}, "peso": {"saldo": 90}},  # fora do exercício
+        {"k": "cd-5", "nome": "Cinco", "exercicio": True, "campo": {"saldo": -80}, "peso": {"saldo": 50, "simples": -50, "faixas": {"alta": {"saldo": 100, "n": 6}}}},
+        {"k": "cd-6", "nome": "Seis", "exercicio": True, "campo": {"saldo": -60}, "peso": {"saldo": 20, "simples": 10}},  # 10 pontos de peso: fora (os 80 do campo vêm do recorte)
+        {"k": "cd-7", "nome": "Sete", "exercicio": False, "campo": {"saldo": -90}, "peso": {"saldo": 90, "simples": -90}},  # fora do exercício
     ]
     lista = peso.muda_quando_pesa(fichas)
     assert [(i["k"], i["dif"], i["alta"], i["alta_n"], i["baixa"]) for i in lista] == [("cd-5", 100, 100, 6, None)]
+
+
+def test_a_nota_do_senado_vale_para_a_materia_com_a_fase_ao_lado():
+    """O Senado anota a fase ao lado do número ("PL 1/2026 (Substitutivo-CD)"): a nota é a da matéria."""
+    r = _regras()
+    ano = _ano([("PL 1/2026 (Substitutivo-CD)", base.MERITO, "SSNNS"), ("PEC 2/2026 (fase 2)", base.MERITO, "SSNNN")])
+    pessoas, cobertura = peso.calcular([ano], r, 57, {"PL 1/2026": 10, "PEC 2/2026": 90})
+    assert cobertura["com_nota"] == 2 and pessoas[5].saldo == 80.0
+    assert peso.resumo(pessoas[5], minimo=2)["simples"] == 0

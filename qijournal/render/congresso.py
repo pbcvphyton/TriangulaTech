@@ -574,7 +574,7 @@ _LISTAS = (
     ("dissidentes", "Quem mais vota contra o próprio partido", "A parte das votações em que cada um votou com a maioria do partido do dia.", "pct", "com o partido em"),
     ("mudam_tema", "Quem muda de lado conforme o assunto", "Quem vota de um lado em quase tudo e do outro num tema: o saldo daquele tema contra o geral. Só entra o que passa do acaso, contando todas as pessoas e temas comparados.", "tema", ""),
     ("destoam", "Quem vota longe da própria bancada", "O saldo de cada um contra a média do partido (−100 = sempre com a esquerda; +100 = sempre com a direita). De quem trocou de partido, só contam os votos dados no partido atual.", "saldo", ""),
-    ("muda_peso", "Quem muda quando pesa a relevância", "O saldo simples contra o saldo com cada voto pesando a nota de relevância da matéria, e o saldo sem peso nas votações de nota alta e nas de nota baixa (acima e abaixo da mediana da Casa): quem vota de um lado nas matérias pequenas e do outro nas grandes.", "peso", ""),
+    ("muda_peso", "Quem muda quando pesa a relevância", "Nas votações cujas matérias têm nota, o saldo sem peso contra o saldo com cada voto pesando a nota de relevância, e o saldo sem peso nas de nota alta e nas de nota baixa (da mediana da Casa para cima e abaixo dela): quem vota de um lado nas matérias pequenas e do outro nas grandes.", "peso", ""),
     ("mudaram", "Quem mudou em relação ao governo", "O último semestre contra os anteriores do mesmo governo: só entra quem mudou mais de 15 pontos, com 99% de confiança.", "mud", ""),
     ("parados", "Quem tem mais propostas paradas", "Proposições de autoria principal que tramitam e não têm andamento há mais de um ano.", "n", ""),
     ("citados", "Os mais citados no jornal", "Manchetes dos últimos 30 dias que citam o nome, e o que os registros dizem dele.", "n", ""),
@@ -596,7 +596,7 @@ def _listas(listas: Mapping[str, Any]) -> list[dict[str, Any]]:
             elif tipo == "saldo":
                 valor, extra = _saldo(i.get("saldo")), f"partido: {_saldo(i.get('partido_saldo'))}" + (" · desde que entrou" if i.get("no_partido") else "")
             elif tipo == "peso":
-                valor = f"{_saldo(i.get('saldo'))} → {_saldo(i.get('pesado'))}"
+                valor = f"{_saldo(i.get('simples'))} → {_saldo(i.get('pesado'))}"
                 partes = []
                 if i.get("alta") is not None:
                     partes.append(f"nota alta {_saldo(i.get('alta'))} ({_num(i.get('alta_n'))})")
@@ -947,6 +947,7 @@ def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
             for r in (ct.get("repetidas") or [])[:20]
         ],
         "glosas": [pessoa_(x, valor=reais(x.get("valor")), extra=f"{_num(x.get('n'))} notas") for x in (ct.get("glosas") or [])[:10]],
+        "sem_despesa": [pessoa_(x) for x in ct.get("sem_despesa") or []],
         "parte_maior": _pct(100 * float(((ct.get("categorias") or [{}])[0]).get("total") or 0) / total) if ct.get("categorias") else "—",
     }
 
@@ -1250,8 +1251,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "as votações cuja matéria tem nota (projetos de lei, de lei complementar e PECs; medidas provisórias e decretos "
             f"legislativos ficam de fora) e o número aparece com {lim.get('minimo_divisivas', 10)} delas ou mais. Ao lado, o saldo sem peso "
             "em duas metades: as votações de nota igual ou acima da mediana da Casa e as de nota abaixo dela (cada metade com "
-            f"{peso.MINIMO_FAIXA} votações ou mais). “Quem muda quando pesa” é quem tem os dois saldos a {peso.DIFERENCA} pontos ou mais um "
-            "do outro. A nota mede sinais do registro (projetos parecidos anexados, origem, tipo de norma, apoio), não a "
+            f"{peso.MINIMO_FAIXA} votações ou mais). “Quem muda quando pesa” é quem tem o saldo pesado a {peso.DIFERENCA} pontos ou mais do saldo sem peso "
+            "nas mesmas votações. A nota mede sinais do registro (projetos parecidos anexados, origem, tipo de norma, apoio), não a "
             "repercussão: um projeto que voltou do Senado com o número de lá, como o do licenciamento ambiental, pode ter nota "
             "baixa. O saldo simples continua sendo o da página.",
         ),
