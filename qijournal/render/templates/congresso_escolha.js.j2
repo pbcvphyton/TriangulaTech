@@ -24,7 +24,8 @@
     };
     var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de ' + CORTE_FID + '% das vezes', pres: 'votou em menos de ' + CORTE_PRES + '% das votações', exc: 'muda de lado em algum tema' };
     function atalhosLigados() { return atalhos ? lista(atalhos.querySelectorAll('.cg-esc-atb[aria-pressed="true"]')).map(function (b) { return b.getAttribute('data-at'); }) : []; }
-    var LOTE = 24, limite = {};  // quantos cartões à vista em cada Casa (o resto vem com "mostrar mais")
+    /* Quantos cartões à vista em cada Casa (o resto vem com "mostrar mais"): no celular, onde eles se empilham, menos. */
+    var LOTE = w.matchMedia && w.matchMedia('(max-width: 640px)').matches ? 8 : 24, limite = {};
     var mais = {};
     ols.forEach(function (ol) {
       var casa = ol.getAttribute('data-casa'), b = h('button', { cls: 'cg-esc-mais', type: 'button' });

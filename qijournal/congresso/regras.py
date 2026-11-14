@@ -60,6 +60,7 @@ class Limiares:
     escolha_fidelidade: int = 80  # "vota diferente do partido": com a maioria do partido em menos que isto (%)
     escolha_presenca: int = 60  # "votou em menos de X% das votações"
     frente_poucas: int = 20  # votações em comum abaixo disto: o cartão da frente avisa que são poucas
+    voto_apertado: int = 30  # "diferença pequena" entre o Sim e o Não, em votos da Câmara (no Senado, na mesma proporção)
 
 
 @dataclass(frozen=True)

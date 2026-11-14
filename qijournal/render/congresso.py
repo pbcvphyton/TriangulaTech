@@ -1451,7 +1451,16 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             f"Escolhido um tema, cada ponto vai para o saldo da pessoa nas votações esquerda × direita daquele tema; quem tem "
             f"menos de {ficha.MINIMO_TEMA_FAIXA} no tema fica de fora, e os partidos se reordenam pela média. O contorno marca "
             "quem vira de lado no tema, pelo mesmo teste do dossiê. Tema com menos votações do que isso na Casa aparece "
-            "desabilitado no seletor.",
+            "desabilitado no seletor. Abaixo das faixas vêm as votações do tema. A fita tem um ponto por votação que opôs "
+            "esquerda e direita, na ordem do tempo, com as da mesma matéria empilhadas: quadrado é o texto principal, círculo é "
+            "destaque ou emenda, e a cor diz de que polo era o lado que prevaleceu. Os realces: texto principal; governo "
+            f"derrotado (a liderança do Governo orientou o lado que perdeu); diferença pequena (menos de {lim.get('voto_apertado', 30)} votos entre o Sim e "
+            "o Não na Câmara; no Senado, a mesma proporção das cadeiras); com obstrução. A matéria é representada pela votação "
+            "do texto principal com mais votos (não pela redação final). Em “Quem votou”, cada linha é um partido (o do dia da "
+            "votação) e cada ponto, um parlamentar: Sim à esquerda do eixo, Não à direita; ponto vazado é obstrução ou "
+            "abstenção; o aro marca quem votou contra o próprio partido fechado; e a cor do ponto é o saldo da pessoa nas "
+            f"votações do tema (com {ficha.MINIMO_TEMA_FAIXA} ou mais), não o voto daquele dia. O traço na barra do placar marca os votos Sim que a "
+            "Constituição exige (veja “O placar”). Quando os votos um a um não batem com o placar que a Mesa anunciou, o cartão avisa.",
         ),
         (
             "Na Casa",

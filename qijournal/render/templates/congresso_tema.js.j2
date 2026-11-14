@@ -77,7 +77,7 @@
     var cadeiras = CADEIRAS[casa] || 0, lim = M.limiares || {}, polos = M.polos || {};
     var coesao = parseFloat(lim.coesao_partido) || 0.8, minimo = parseInt(lim.minimo_partido, 10) || 4;
     var semMovimento = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    var uid = 'cgTv-' + casa + '-', aperto = Math.max(3, Math.round(cadeiras * 30 / 513));  // "diferença pequena": 30 votos na Câmara, 5 no Senado
+    var uid = 'cgTv-' + casa + '-', aperto = Math.max(3, Math.round(cadeiras * (lim.voto_apertado || 30) / 513));  // "diferença pequena": 30 votos na Câmara, 5 no Senado
 
     /* ── Os dados: as matérias do tema com votação que opôs os polos, no tempo; as votações de cada
        uma, em ordem. V é a ordem de leitura da fita (matéria a matéria). ── */
@@ -787,6 +787,8 @@
     anotar();
     ajustarCartao();
     if (!pedido) endereco();  // o tema foi escolhido na página: o endereço passa a dizer o que está na tela
+    /* Chegou pelo endereço de uma matéria ou de uma votação: a página desce até o bloco do tema. */
+    if (pedido && (pedido.m || pedido.v) && !aberto && caixa.scrollIntoView) w.requestAnimationFrame(function () { caixa.scrollIntoView({ block: 'start' }); });
     /* A fita e os pontos se refazem quando a largura muda (ou quando a Casa ou a aba voltam a aparecer). */
     var espera = 0, vigia = null;
     function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); ajustarCartao(); medir(); }, 80); }
@@ -799,8 +801,22 @@
         if (alvo) mostrarVotacao(alvo, false);
         if ((p.s || '') !== estado.q && (!p.s || G[p.s])) seguir(p.s || '', true);
       },
-      sair: function () { w.clearTimeout(espera); w.removeEventListener('resize', remedir); if (vigia) vigia.disconnect(); }
+      sair: function () { w.clearTimeout(espera); w.removeEventListener('resize', remedir); if (vigia) vigia.disconnect(); atalho(false); }
     };
+    atalho(true);
+    /* O atalho logo abaixo do seletor: as votações ficam depois das faixas dos partidos, e quem
+       acabou de escolher o tema não precisa rolar para achá-las. */
+    function atalho(ligar) {
+      var faixas = d.getElementById('cg-faixas-' + casa), pista = faixas ? faixas.querySelector('.cg-fx-d:not(.cg-tv-irp)') : null;
+      var velho = faixas ? faixas.querySelector('.cg-tv-irp') : null;
+      if (velho) velho.parentNode.removeChild(velho);
+      if (!pista) return;
+      pista.hidden = ligar;
+      if (!ligar) return;
+      var ir = h('button', { cls: 'cg-tv-atl', type: 'button', text: (V.length === 1 ? 'Ver a votação de ' : 'Ver as ' + num(V.length) + ' votações de ') + nome + ' ↓' });
+      ir.addEventListener('click', function () { caixa.scrollIntoView({ block: 'start', behavior: semMovimento ? 'auto' : 'smooth' }); });
+      pista.parentNode.insertBefore(h('p', { cls: 'cg-fx-d cg-tv-irp' }, [ir, h('span', { text: ' O que se votou em cada uma, quem ganhou e como votou cada parlamentar.' })]), pista.nextSibling);
+    }
   }
   lista(d.querySelectorAll('.cg-fx-s[data-faixas]')).forEach(function (sel) {
     var casa = sel.id.slice(-2), caixa = d.getElementById('cg-tema-det-' + casa);
