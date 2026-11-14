@@ -1,0 +1,196 @@
+/* ── O que espera × o que passa: as manchetes, o gráfico com o cartão em foco, a lista "vale olhar", a direção por tema e o "quando vota" (congresso_pauta.js.j2). Sem script, tudo aparece; os botões só ganham mão com o script (.cg-abas). ── */
+.cg-pa{max-width:1216px}
+.cg-pa button{font-family:inherit}
+.cg-pa-m:focus-visible,.cg-pa-f:focus-visible,.cg-pa-d:focus-visible,.cg-pa-nav button:focus-visible,.cg-pa-ver:focus-visible,.cg-pa-limpa:focus-visible,.cg-pa-plot:focus-visible,.cg-pa-tema select:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+
+/* 1. As manchetes: quatro números, cada um um botão que realça as matérias no gráfico */
+.cg-pa-ms{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-top:14px;perspective:1600px}
+.cg-pa-ms li{display:flex;min-width:0}
+.cg-pa-m{display:flex;flex-direction:column;gap:3px;width:100%;padding:13px 16px 11px;border:1px solid var(--rule);border-top:4px solid var(--ink);border-radius:3px 3px 10px 10px;background:var(--paper);box-shadow:var(--cg-sombra);font-family:var(--ss);text-align:left;color:var(--ink);cursor:default}
+.cg-abas .cg-pa-m{cursor:pointer}
+.cg-pa-m.cg-3d-on,.cg-pa-m[aria-pressed="true"]{box-shadow:var(--cg-sombra-alta)}
+.cg-pa-m[aria-pressed="true"]{border-color:var(--ink)}
+.cg-pa-m-n{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px;font-size:12px;color:var(--muted)}
+.cg-pa-m-n b{font-family:var(--sf);font-size:36px;font-weight:700;line-height:1.05;color:var(--ink)}
+.cg-pa-m-f{font-family:var(--sf);font-size:16px;font-weight:700;line-height:1.3}
+.cg-pa-m-x{font-size:12px;line-height:1.45;color:var(--muted)}
+.cg-pa-m-ir{display:none;margin-top:auto;padding-top:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--link)}
+.cg-abas .cg-pa-m-ir{display:block}
+
+/* 2. Os filtros do gráfico */
+.cg-pa-g{margin-top:22px}
+.cg-pa-fs{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:10px}
+.cg-pa-fk{font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.cg-pa-chips{display:contents}
+.cg-pa-f{display:inline-flex;gap:6px;align-items:baseline;padding:3px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-size:12px;color:var(--body);white-space:nowrap;cursor:default}
+.cg-pa-f b{font-family:var(--mn);font-weight:600;color:var(--ink)}
+.cg-abas .cg-pa-f{cursor:pointer}
+.cg-abas .cg-pa-f:hover{border-color:var(--ink)}
+.cg-pa-f[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.cg-pa-f[aria-pressed="true"] b{color:var(--paper)}
+.cg-pa-f-fim{margin-right:10px}
+.cg-pa-tema{display:none;align-items:center;gap:6px;font-family:var(--ss);font-size:12px;color:var(--muted)}
+.cg-abas .cg-pa-tema{display:inline-flex}
+.cg-pa-tema select{max-width:190px;padding:4px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font:inherit;font-size:12.5px;color:var(--ink)}
+.cg-pa-limpa{padding:3px 10px;border:0;background:none;font-size:12px;font-weight:600;color:var(--link);text-decoration:underline;cursor:pointer}
+.cg-pa-st{flex:1 1 100%;min-height:18px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.cg-pa-st b{color:var(--ink)}
+
+/* O gráfico (as posições em %, para esticar com a tela) e, ao lado, o cartão da matéria em foco */
+.cg-pa-foco{display:grid;grid-template-columns:minmax(0,1fr) 432px;gap:0 28px;align-items:start;margin-top:4px}
+.cg-pa-fig{position:relative;min-width:0;margin:0}
+.cg-pa-ey,.cg-pa-ex{font-family:var(--ss);font-size:11px;color:var(--muted)}
+.cg-pa-ex{margin:0 10px 0 34px;text-align:right}
+.cg-pa-ex span{color:var(--faint)}
+.cg-pa-plot{position:relative;margin:4px 10px 26px 34px;border-radius:2px}
+.cg-pa-svg{display:block;width:100%;height:410px;overflow:visible}
+.cg-abas .cg-pa-svg{cursor:pointer}
+.cg-pa-faixa{fill:var(--rl);opacity:.45}
+.cg-pa-grade{stroke:var(--rl);stroke-width:1}
+.cg-pa-marca{stroke:var(--rl);stroke-width:1;stroke-dasharray:2 4}
+.cg-pa-ty{fill:var(--muted);font-family:var(--mn);font-size:11px;text-anchor:end}
+.cg-pa-tx{fill:var(--muted);font-family:var(--mn);font-size:11px;text-anchor:middle}
+.cg-pa-tx-ini{text-anchor:start}
+.cg-pa-canto{fill:var(--ink);font-family:var(--ss);font-size:11.5px;font-weight:600;paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.cg-pa-canto-d{text-anchor:end}
+.cg-pa-cel{display:none}
+.cg-pa-e{fill:var(--paper);fill-opacity:.01;stroke:var(--cg-esp);stroke-width:1.5;stroke-opacity:.8}
+.cg-pa-a{fill:var(--cg-ok);fill-opacity:.92;stroke:var(--paper);stroke-width:1.5}
+.cg-pa-pts circle.cg-pa-off{opacity:.13}
+.cg-pa-pts circle.on{stroke:var(--ink);stroke-width:2.5;stroke-opacity:1;opacity:1}
+.cg-pa-sel{fill:none;stroke:var(--ink);stroke-width:2.5;pointer-events:none}
+.cg-pa-dica{pointer-events:none}
+.cg-pa-lf{display:inline-block;width:14px;height:10px;border-radius:2px;background:var(--rl)}
+
+.cg-pa-cw{display:flex;flex-direction:column;min-width:0;perspective:1600px}
+.cg-pa-card{display:flex;flex-direction:column;min-height:440px;padding:14px 18px 12px;border:1px solid var(--rule);border-top:4px solid var(--ink);border-radius:3px 3px 10px 10px;background:var(--paper);box-shadow:var(--cg-sombra);font-family:var(--ss);line-height:1.4;color:var(--ink)}
+.cg-pa-card.cg-pa-vira{animation:cg-pa-vira .26s ease-out}
+@keyframes cg-pa-vira{from{opacity:.3;transform:perspective(900px) rotateY(-8deg) translateX(-8px)}}
+.cg-pa-c-k{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.cg-pa-c-q{padding:0 6px;border:1px solid currentColor;border-radius:3px;font-family:var(--mn);font-size:9px;font-weight:600;letter-spacing:1px;line-height:1.7;text-transform:uppercase;color:var(--muted)}
+.cg-pa-c-t{font-family:var(--mn);font-size:15px;font-weight:600}
+.cg-pa-c-k .cg-apel{margin:0}
+.cg-pa-c-n{margin-left:auto;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-pa-c-n b{font-size:13px;color:var(--ink)}
+.cg-pa-c-e{margin-top:8px;font-family:var(--sf);font-size:15.5px;line-height:1.4;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.cg-pa-c-h{display:flex;align-items:baseline;gap:8px;margin-top:11px;padding-top:9px;border-top:1px solid var(--rule);font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+.cg-pa-c-h b{margin-left:auto;font-family:var(--mn);font-size:12px;font-weight:600;letter-spacing:0;text-transform:none}
+.cg-pa-tl{list-style:none;margin-top:6px}
+.cg-pa-tl li{position:relative;padding:2px 0 2px 92px;font-size:12px;line-height:1.45;color:var(--muted)}
+.cg-pa-tl li::before{content:"";position:absolute;left:0;top:7px;width:7px;height:7px;border-radius:50%;background:var(--ink)}
+.cg-pa-tl li::after{content:"";position:absolute;left:3px;top:15px;bottom:-6px;width:1px;background:var(--rule)}
+.cg-pa-tl li:last-child::after{display:none}
+.cg-pa-tl time{position:absolute;left:15px;top:3px;font-family:var(--mn);font-size:11px}
+.cg-pa-tl b{margin-right:6px;font-weight:600;color:var(--ink)}
+.cg-pa-c-s{list-style:none;margin-top:6px}
+.cg-pa-c-s li{position:relative;padding:2px 0 2px 15px;font-size:12px;line-height:1.45;color:var(--muted)}
+.cg-pa-c-s li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:1px;background:var(--ink)}
+.cg-pa-c-s b{margin-right:6px;font-weight:600;color:var(--ink)}
+.cg-pa-c-o{margin-top:8px;font-size:12px;line-height:1.5;color:var(--muted)}
+.cg-pa-c-enq{margin-top:12px;padding:8px 11px;border-left:3px solid var(--ink);background:var(--soft);font-size:12.5px;line-height:1.5;color:var(--body)}
+.cg-pa-c-enq b{color:var(--ink)}
+.cg-pa-c-l{margin-top:auto;padding-top:10px;font-size:12px;color:var(--muted)}
+.cg-pa-c-l a{font-weight:600;color:var(--link)}
+.cg-pa-c-l a:hover{text-decoration:underline}
+.cg-pa-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.cg-pa-nav[hidden]{display:none}
+.cg-pa-nav button{flex:none;width:44px;height:32px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:18px;line-height:1;color:var(--ink);cursor:pointer}
+.cg-pa-nav button:hover:not(:disabled){border-color:var(--ink)}
+.cg-pa-nav button:disabled{opacity:.35;cursor:default}
+.cg-pa-pos{font-family:var(--mn);font-size:11px;text-align:center;color:var(--muted)}
+
+/* 3. Vale olhar */
+.cg-pa-vl{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;margin-top:2px}
+.cg-pa-v{min-width:0;padding:9px 0;border-bottom:1px solid var(--rl)}
+.cg-pa-v-k{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:13px;color:var(--ink)}
+.cg-pa-v-k .cg-apel{margin:0}
+.cg-pa-v-d{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-pa-v-d b{font-size:12px;color:var(--ink)}
+.cg-pa-ver{margin-left:auto;padding:1px 9px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-size:11.5px;color:var(--link);cursor:pointer}
+.cg-pa-ver:hover{border-color:var(--link)}
+.cg-pa-v-e{margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.45;color:var(--body);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cg-pa-v-s{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.cg-pa-v-s{gap:3px}
+.cg-pa-vl-h{display:none}
+.cg-pa-v-s .cg-chip{font-size:10.5px;padding:0 5px}
+
+/* 4. A direção da Casa: por tema, a parte das aprovadas (barra cheia) × a parte das que esperam (barra vazada) */
+.cg-pa-d-leg{margin-top:6px}
+.cg-pa-d-la,.cg-pa-d-le{display:inline-block;width:16px;height:8px;border-radius:0 4px 4px 0}
+.cg-pa-d-la,.cg-pa-d-a{background:var(--cg-ok)}
+.cg-pa-d-le,.cg-pa-d-e{border:1.5px solid var(--cg-esp);background:transparent}
+.cg-pa-dl{list-style:none;margin-top:6px}
+.cg-pa-d{display:grid;grid-template-columns:150px minmax(0,1fr) 132px;gap:0 10px;align-items:center;width:100%;padding:3px 6px;border:0;border-bottom:1px solid var(--rl);background:none;text-align:left;color:var(--ink);cursor:default}
+.cg-abas .cg-pa-d{cursor:pointer}
+.cg-abas .cg-pa-d:hover{background:var(--hover)}
+.cg-pa-d[aria-pressed="true"]{background:var(--hl)}
+.cg-pa-d-n{display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;line-height:1.2}
+.cg-pa-d-c{flex:none;width:8px;height:8px;border-radius:50%}
+.cg-pa-d-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cg-pa-d-t i{display:block;height:7px;min-width:3px;border-radius:0 4px 4px 0}
+.cg-pa-d-v{display:flex;flex-direction:column;font-family:var(--mn);font-size:10px;line-height:1.25;color:var(--muted);white-space:nowrap}
+.cg-pa-d-v b{font-weight:600;color:var(--ink)}
+.cg-pa-d-sep{padding:7px 6px 3px;border-top:1px dashed var(--muted);font-family:var(--ss);font-size:11px;font-style:italic;color:var(--muted)}
+.cg-pa-or{margin-top:12px}
+
+/* 5. Quando vota: uma coluna por semana, um quadradinho por matéria aprovada */
+.cg-pa-q{display:flex;align-items:stretch;height:calc(var(--pa-max,8)*12px + 44px);margin:12px 0 24px}
+.cg-pa-w{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding-bottom:2px;border-bottom:1px solid var(--rule)}
+.cg-pa-w-rec{background:repeating-linear-gradient(135deg,var(--rl) 0 3px,transparent 3px 6px)}
+.cg-pa-w-dia{box-shadow:inset -1.5px 0 0 var(--ink)}
+.cg-pa-b{display:block;flex:none;width:calc(100% - 2px);max-width:10px;aspect-ratio:1/1;padding:0;border:0;border-radius:2px;background:var(--cg-ok);cursor:default}
+.cg-abas .cg-pa-b{cursor:pointer}
+.cg-abas .cg-pa-b:hover,.cg-pa-b:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+.cg-pa-b[aria-pressed="true"]{background:var(--ink)}
+.cg-pa-q[data-f] .cg-pa-b:not(.cg-pa-hit){opacity:.2}
+.cg-pa-w-n{font-family:var(--mn);font-size:10px;font-weight:600;line-height:1.1;color:var(--ink)}
+.cg-pa-w-r,.cg-pa-w-m{position:absolute;top:0;left:1px;z-index:1;font-family:var(--ss);font-size:10px;line-height:1.2;white-space:nowrap;color:var(--muted)}
+.cg-pa-w-m{top:13px;left:auto;right:4px}
+.cg-pa-w-x{position:absolute;left:0;bottom:-17px;font-family:var(--mn);font-size:9.5px;white-space:nowrap;color:var(--muted)}
+.cg-pa-q-f{font-size:15.5px}
+
+/* 6. As listas longas e a tabela */
+.cg-pa-mais{margin-top:12px}
+.cg-pa-mais summary{cursor:pointer;font-family:var(--ss);font-size:13px;color:var(--link)}
+.cg-pa-mais>.az-2c{grid-template-columns:minmax(0,1fr);max-height:560px;margin-top:6px;padding-right:10px;overflow:auto}
+.cg-pa-tb{margin-top:8px}
+.cg-pa-met a{color:var(--link);text-decoration:underline}
+
+@media (max-width:1000px){
+  .cg-pa-foco{grid-template-columns:minmax(0,1fr);gap:14px 0}
+  .cg-pa-card{min-height:0}
+  .cg-pa-nav{order:-1;margin:0 0 8px}
+  .cg-pa-svg{height:340px}
+}
+@media (max-width:760px){
+  .cg-pa-ms{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .cg-pa-m{padding:10px 11px 9px}
+  .cg-pa-m-n b{font-size:28px}
+  .cg-pa-m-f{font-size:14px}
+  .cg-pa-m-x{font-size:11.5px}
+  .cg-pa-chips{display:flex;flex:1 1 100%;flex-wrap:nowrap;gap:6px;min-width:0;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin}
+  .cg-pa-f{flex:none;padding:5px 11px}
+  .cg-pa-tema select{padding:7px 8px;font-size:13px}
+  .cg-pa-svg{height:300px}
+  .cg-pa-plot{margin-left:28px;margin-right:6px}
+  .cg-pa-ex{margin-left:28px;margin-right:6px}
+  .cg-pa-ex span{display:none}
+  .cg-pa-pc{display:none}
+  .cg-pa-cel{display:inline}
+  .cg-pa-canto{font-size:10.5px}
+  .cg-pa-card{padding:12px 13px 10px}
+  /* no celular, a lista "vale olhar" vira uma fila de cartões que se arrasta para o lado */
+  .cg-pa-vl{display:flex;gap:10px;margin:8px -16px 0;padding:2px 16px 10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:thin}
+  .cg-pa-v{flex:0 0 84%;padding:10px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);box-shadow:var(--cg-sombra);scroll-snap-align:start}
+  .cg-pa-v-e{-webkit-line-clamp:3}
+  .cg-pa-vl-h{display:inline}
+  .cg-pa-d{grid-template-columns:92px minmax(0,1fr) 124px;gap:0 6px;padding:4px 2px}
+  .cg-pa-d-n{font-size:12.5px}
+  .cg-pa-d-v{font-size:10px}
+  .cg-pa-q{height:calc(var(--pa-max,8)*8px + 44px)}
+  .cg-pa-b{border-radius:1px}
+  .cg-pa-w{gap:1px}
+}
+@media (prefers-reduced-motion:reduce){
+  .cg-pa-card.cg-pa-vira{animation:none}
+}

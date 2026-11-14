@@ -6,8 +6,10 @@ desce por quatro lentes e fecha com o método.
 
 1. **Com quem vota**: cada parlamentar entre os dois polos, partido a partido, e a
    matriz partido × tema (onde o rótulo e o voto se separam);
-2. **A fila**: o que tramita, esperando o quê e com quem, e o que passou na frente;
-3. **O Plenário**: as últimas votações nominais, com quem votou contra o próprio partido;
+2. **A fila e a pauta**: o que tramita, esperando o quê e com quem; e por onde passou o que
+   o Plenário aprovou (urgência, parecer em Plenário, votação simbólica);
+3. **O Plenário**: as últimas matérias votadas, cada uma numa folha, com o placar e quem
+   votou contra o próprio partido;
 4. **Quem é quem**: as listas (quem falta, quem diverge, quem mudou) e a tabela de
    todos; clicar num nome abre o **dossiê**, carregado de
    ``data/congresso/fichas/<casa>-<id>.json``.
@@ -29,13 +31,13 @@ import math
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
 from .. import text
 from ..config import Config
-from ..congresso import VERSAO, base, dados, ficha, jornal, materias, peso, projetos, relevancia
+from ..congresso import VERSAO, base, dados, ficha, jornal, materias, pauta, peso, projetos, relevancia
 from ..models import Edition
 from . import filters
 from .web import brand_view
@@ -232,13 +234,13 @@ class CasaView:
     relevancia: dict[str, Any] | None
     jornal_voto: list[dict[str, Any]]
     fila: dict[str, Any] | None
-    furaram: dict[str, Any] | None
     ultimas: list[dict[str, Any]]
     listas: list[dict[str, Any]]
     escolha: dict[str, Any] = field(default_factory=dict)  # "Escolha o seu candidato": quem está no mandato, com os traços
     frentes: dict[str, Any] | None = None  # frentes de causa × voto (só a Câmara registra quem assina)
     cota: dict[str, Any] | None = None  # a cota parlamentar: quem gasta quanto, com o quê e com quem
     comissoes: dict[str, Any] | None = None  # as votações nominais nas comissões
+    pauta: dict[str, Any] | None = None  # por onde passou o que foi aprovado: sinais, direção por tema, semanas
 
 
 @dataclass
@@ -565,22 +567,41 @@ def _folhas(painel: Mapping[str, Any], casa: str, temas_meta: list[dict[str, Any
     return [_folha(f, casa, temas, oferecidos) for f in brutas if f.get("vot")]
 
 
-# O gráfico "o que espera × o que passou": nota (0 a 100) × tempo desde o protocolo, em escala log.
-GR_W, GR_H = 800, 330
-GR_M = {"l": 46, "r": 18, "t": 14, "b": 44}
-GR_DIAS = (7, 7300)  # de uma semana a vinte anos
-GR_TICKS = ((7, "1 sem."), (30, "1 mês"), (90, "3 meses"), (365, "1 ano"), (730, "2 anos"), (1825, "5 anos"), (3650, "10 anos"), (7300, "20 anos"))
+# O gráfico "o que espera × o que passa": nota (0 a 100) × tempo desde o protocolo, em escala
+# logarítmica. As posições saem em porcentagem da área do gráfico: o desenho estica com a tela
+# e as marcas e os textos ficam do mesmo tamanho.
+GR_DIAS = (1, 7300)  # de um dia a vinte anos
+# (dias, rótulo, some no celular)
+GR_TICKS = (
+    (1, "1 dia", False), (7, "1 sem.", False), (30, "1 mês", False), (90, "3 meses", True), (365, "1 ano", False),
+    (730, "2 anos", True), (1825, "5 anos", False), (3650, "10 anos", True), (7300, "20 anos", True),
+)  # fmt: skip
+MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
+# De onde vieram as aprovadas, na frase da origem: (uma, várias).
+PA_ORIGENS = {
+    "outra_casa": ("da outra Casa, já votada lá", "da outra Casa, já votadas lá"),
+    "popular": ("da sociedade", "da sociedade"),
+    "executivo": ("do Executivo", "do Executivo"),
+    "comissao": ("de comissão", "de comissão"),
+    "judiciario": ("do Judiciário ou de órgão de controle", "do Judiciário ou de órgão de controle"),
+    "parlamentar": ("de parlamentar", "de parlamentar"),
+}
+
+
+GR_FOLGA = 1.5  # % de folga de cada lado, para o ponto de 1 dia não ficar em cima do eixo
 
 
 def _gx(dias: float) -> float:
     d = min(max(float(dias), GR_DIAS[0]), GR_DIAS[1])
-    largura = GR_W - GR_M["l"] - GR_M["r"]
-    return round(GR_M["l"] + largura * (math.log10(d) - math.log10(GR_DIAS[0])) / (math.log10(GR_DIAS[1]) - math.log10(GR_DIAS[0])), 1)
+    parte = (math.log10(d) - math.log10(GR_DIAS[0])) / (math.log10(GR_DIAS[1]) - math.log10(GR_DIAS[0]))
+    return round(GR_FOLGA + (100 - 2 * GR_FOLGA) * parte, 2)
+
+
+GR_TOPO, GR_PE = 5.0, 8.0  # % de folga em cima e embaixo: é onde ficam os nomes dos cantos
 
 
 def _gy(nota: float) -> float:
-    altura = GR_H - GR_M["t"] - GR_M["b"]
-    return round(GR_M["t"] + altura * (1 - max(0.0, min(100.0, float(nota))) / 100), 1)
+    return round(GR_TOPO + (100 - GR_TOPO - GR_PE) * (1 - max(0.0, min(100.0, float(nota))) / 100), 2)
 
 
 def _sinais(i: Mapping[str, Any]) -> list[str]:
@@ -601,13 +622,17 @@ def _sinais(i: Mapping[str, Any]) -> list[str]:
 
 
 def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> dict[str, Any] | None:
+    """O gráfico (um ponto por matéria, com o tema e os sinais que os filtros leem), as duas
+    listas longas e a tabela de todos os pontos."""
     if not r or not (r.get("esperam_n") or r.get("passaram_n")):
         return None
     pontos = []
-    for dias, nota, grupo, titulo in r.get("pontos") or []:
+    for ponto in r.get("pontos") or []:
+        dias, nota, grupo, titulo = ponto[:4]
         pontos.append(
             {
-                "x": _gx(dias), "y": _gy(nota), "g": "a" if grupo else "e", "t": titulo, "n": nota,
+                "x": _gx(dias), "y": _gy(nota), "g": "a" if grupo else "e", "t": titulo, "n": nota, "d": dias,
+                "tm": ponto[4] if len(ponto) > 4 else "", "s": ponto[5] if len(ponto) > 5 else "",
                 "tempo": _tempo(dias), "situacao": "aprovada" if grupo else "esperando",
             }
         )
@@ -637,7 +662,7 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
                 "rapida": (i.get("dias") or 0) < relevancia.RAPIDA, "passos": passos, "autoria": i.get("autoria") or "",
             }
         )
-    largura = GR_W - GR_M["l"] - GR_M["r"]
+    ultimo = len(GR_TICKS) - 1
     return {
         "esperam_n": _num(r.get("esperam_n") or 0),
         "passaram_n": _num(r.get("passaram_n") or 0),
@@ -650,11 +675,15 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
         "esperam": esperam,
         "passaram": passaram,
         "grafico": {
-            "w": GR_W, "h": GR_H, "l": GR_M["l"], "r": GR_W - GR_M["r"], "t": GR_M["t"], "b": GR_H - GR_M["b"], "largura": largura,
-            "xticks": [{"x": _gx(d), "rotulo": rotulo, "fim": d == GR_TICKS[-1][0]} for d, rotulo in GR_TICKS],
-            "yticks": [{"y": _gy(v), "rotulo": str(v)} for v in (0, 25, 50, 75, 100)],
-            "alta": _gy(alta), "baixa": _gy(baixa), "x_rapida": _gx(relevancia.RAPIDA), "x_ano": _gx(365),
+            "xticks": [
+                {"x": _gx(d), "rotulo": rotulo, "celular": not some, "ponta": "ini" if k == 0 else "fim" if k == ultimo else ""}
+                for k, (d, rotulo, some) in enumerate(GR_TICKS)
+            ],
+            "yticks": [{"y": _gy(v), "rotulo": str(round(v))} for v in (0, baixa, alta, 100)],
+            "alta": _gy(alta), "baixa": _gy(baixa),
             "pontos": pontos,
+            "pontos_e": sum(1 for p in pontos if p["g"] == "e"),
+            "fortes": sum(1 for p in pontos if p["n"] >= alta),
         },
         "tabela": sorted(
             ({"t": p["t"], "situacao": p["situacao"], "n": p["n"], "tempo": p["tempo"]} for p in pontos),
@@ -662,6 +691,234 @@ def _relevancia(r: Mapping[str, Any], casa: str, alta: float, baixa: float) -> d
         ),
         "alta": round(alta),
         "baixa": round(baixa),
+    }
+
+
+# ── a pauta: por onde passou o que foi aprovado ──────────────────────────────
+
+
+def _em_dias(dias: int) -> str:
+    """Do protocolo ao voto: "no mesmo dia", "em 1 dia", "em 23 dias", "em 7 meses"."""
+    return "no mesmo dia" if dias == 0 else f"em {_tempo(dias)}"
+
+
+def _manchete(n: int, total: int, uma: str, varias: str, nota: str, filtro: str) -> dict[str, str]:
+    """Um número da manchete, por extenso: "88 de 110 aprovadas tiveram urgência"; com zero, a
+    frase muda: "Nenhuma das 110 aprovadas teve urgência"."""
+    if n == 0:
+        return {"num": "Nenhuma", "de": f"das {_num(total)} aprovadas", "frase": uma, "nota": nota, "f": filtro}
+    return {"num": _num(n), "de": f"de {_num(total)} aprovadas", "frase": uma if n == 1 else varias, "nota": nota, "f": filtro}
+
+
+def _cartao_da_pauta(i: Mapping[str, Any], casa: str, pa: Mapping[str, Any], nomes: Mapping[str, str], baixa: float) -> dict[str, Any]:
+    """Uma aprovada por extenso: a linha do tempo do atalho (do protocolo ao voto, com os dias
+    entre um passo e outro), os sinais dela, cada um com a explicação, e o "enquanto isso"."""
+    linhas = pa.get("curtas") or pa.get("linhas") or {}
+    caminho = i.get("cam") or {}
+    meio = []
+    if caminho.get("urgencia"):
+        u = caminho["urgencia"]
+        meio.append({"d": u.get("d") or "", "o": "Urgência aprovada", "x": f"a pedido de {u['por']}" if u.get("por") else ""})
+    if caminho.get("parecer_plenario"):
+        p = caminho["parecer_plenario"]
+        meio.append({"d": p.get("d") or "", "o": "Parecer em Plenário", "x": f"relator: {p['relator']}" if p.get("relator") else "no lugar das comissões"})
+    passos = [
+        {"d": i.get("da") or "", "o": "Protocolo", "x": relevancia.ORIGENS.get(i.get("o") or "", "")},
+        *sorted(meio, key=lambda passo: passo["d"]),
+        {"d": i.get("apv") or "", "o": "Aprovada pelo Plenário", "x": ""},
+    ]
+    anterior = ""
+    for passo in passos:
+        dias = projetos.dias_entre(anterior, passo["d"]) if anterior and passo["d"] else None
+        passo["depois"] = ("no mesmo dia" if dias == 0 else f"{_tempo(dias)} depois") if dias is not None and dias >= 0 else ""
+        passo["data"] = _data(passo["d"], ano=True)
+        anterior = passo["d"] or anterior
+    sinais = []
+    for s in i.get("sin") or []:
+        if s not in linhas:
+            continue
+        if s == "relampago":
+            x = f"do protocolo ao voto {_em_dias(i['dias'])}"
+            if i.get("o") == "outra_casa":
+                x += f" (veio {'do Senado' if casa == 'cd' else 'da Câmara'} já votada lá)"
+            elif i.get("o") == "executivo":
+                x += " (veio do Executivo)"
+        elif s == "fraca":
+            x = f"nota {i['n']}, abaixo de {round(baixa)}"
+        else:
+            x = linhas[s]
+        sinais.append({"id": s, "rotulo": pauta.ROTULOS[s], "x": x})
+    enq, tema = i.get("enq"), nomes.get(i.get("tm") or "", "")
+    enquanto = None
+    if enq and tema:
+        enquanto = {"n": enq.get("n") or 0, "tema": tema, "t": enq.get("t") or "", "ha": _tempo(projetos.dias_entre(enq.get("da"), pa.get("hoje"))) if enq.get("da") else ""}
+    return {
+        "t": i["t"], "k": materias.chave(casa, i["t"]), "apel": i.get("ap") or "", "e": i.get("e") or "", "u": filters.safe_url(i.get("u")) or "",
+        "n": i["n"], "dias": i["dias"], "tempo": _em_dias(i["dias"]), "aprovada": _data(i.get("apv"), ano=True),
+        "passos": passos, "sinais": sinais, "enq": enquanto, "tema": tema,
+    }
+
+
+def _quando(pa: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
+    """As semanas da janela, uma coluna por semana (segunda a domingo) e um quadradinho por
+    matéria aprovada; as semanas cheias marcadas e o calendário oficial anotado."""
+    if not pa.get("semanas") or not pa.get("hoje") or not pa.get("desde"):
+        return None
+    hoje, desde = date.fromisoformat(pa["hoje"]), date.fromisoformat(pa["desde"])
+    dia, ultima = desde - timedelta(days=desde.weekday()), hoje - timedelta(days=hoje.weekday())
+    por = {s["d"]: s for s in pa["semanas"]}
+    marcos = pa.get("calendario") or []
+    colunas: list[dict[str, Any]] = []
+    mes, rotulos, recesso = 0, 0, False
+    while dia <= ultima:
+        iso, fim = dia.isoformat(), (dia + timedelta(days=6)).isoformat()
+        s = por.get(iso) or {}
+        col: dict[str, Any] = {
+            "d": iso, "data": _data(iso, ano=True), "n": s.get("n", 0), "cheia": bool(s.get("s")),
+            "m": [{"t": t, "k": materias.chave(casa, t)} for t in s.get("m") or []],
+            "mes": "", "mes_celular": True, "marco": "", "recesso": False, "recesso_ini": False,
+        }  # fmt: skip
+        if dia.month != mes:
+            col["mes"] = MESES[dia.month - 1] + (f" {dia.year % 100:02d}" if dia.month == 1 else "")
+            col["mes_celular"] = rotulos % 2 == 0
+            mes, rotulos = dia.month, rotulos + 1
+        em_recesso = False
+        for m in marcos:
+            if m["de"] > fim or m["ate"] < iso:
+                continue
+            if m["de"] == m["ate"]:
+                col["marco"] = f"{m['nome']}, {_data(m['de'])}"
+            else:
+                em_recesso = True
+        if em_recesso:
+            col["recesso"] = True
+            col["recesso_ini"] = not recesso
+        recesso = em_recesso
+        colunas.append(col)
+        dia += timedelta(days=7)
+    cheias = sorted(pa["semanas"], key=lambda s: (-s["n"], s["d"]))[:3]
+    return {
+        "colunas": colunas,
+        "maior": max(s["n"] for s in pa["semanas"]),
+        "semanas_n": len(pa["semanas"]),
+        "cheias_n": sum(1 for s in pa["semanas"] if s.get("s")),
+        "mediana": str(pa.get("mediana_semana") or 0).replace(".", ","),
+        "surto_de": pa.get("surto_de") or 0,
+        "vezes": str(pa["regras"]["surto_vezes"]).removesuffix(".0").replace(".", ","),
+        "topo": [{"data": _data(s["d"], ano=True), "n": s["n"]} for s in cheias],
+        "marcos": [
+            {"nome": m["nome"], "quando": _data(m["de"], ano=True) if m["de"] == m["ate"] else f"de {_data(m['de'], ano=True)} a {_data(m['ate'], ano=True)}"}
+            for m in marcos
+        ],
+    }
+
+
+def _pauta(pa: Mapping[str, Any], rel: Mapping[str, Any], casa: str, temas_meta: list[dict[str, Any]], alta: float, baixa: float) -> dict[str, Any] | None:
+    """A aba "O que espera × o que passa" além do gráfico: as manchetes, os filtros, o cartão
+    em foco de quando a página abre, a lista "vale olhar", a direção por tema e o "quando vota"."""
+    if not pa or not pa.get("n"):
+        return None
+    total, esperam = pa["n"], pa.get("esperam") or 0
+    conta, linhas, regras = pa.get("conta") or {}, pa.get("linhas") or {}, pa.get("regras") or {}
+    curtas = pa.get("curtas") or linhas
+    nomes = {t["id"]: t.get("curto") or t.get("nome") or t["id"] for t in temas_meta}
+    outra = "do Senado" if casa == "cd" else "da Câmara"
+
+    manchetes = []
+    if "urgencia" in conta:
+        manchetes.append(
+            _manchete(conta["urgencia"], total, "teve urgência", "tiveram urgência",
+                      "A urgência é um pedido votado no Plenário: tira a matéria da fila das comissões e a leva direto ao Plenário.", "s:urgencia")
+        )  # fmt: skip
+    if "plenario" in conta:
+        manchetes.append(
+            _manchete(conta["plenario"], total, "recebeu o parecer no próprio Plenário", "receberam o parecer no próprio Plenário",
+                      "O parecer é a opinião do relator sobre o texto. Dado no Plenário, nenhuma comissão votou a matéria.", "s:plenario")
+        )  # fmt: skip
+    if "urgencia" not in conta and "relampago" in conta:
+        veio = (pa.get("origem") or {}).get("outra_casa") or 0
+        manchetes.append(
+            _manchete(conta["relampago"], total, f"foi do protocolo ao voto em até {regras.get('relampago_dias')} dias", f"foram do protocolo ao voto em até {regras.get('relampago_dias')} dias",
+                      f"{_num(veio)} das {_num(total)} aprovadas vieram {outra}, já votadas lá." if veio > 1 else "O tempo conta do protocolo nesta Casa.", "s:relampago")
+        )  # fmt: skip
+    if "sem_nominal" in conta:
+        manchetes.append(
+            _manchete(conta["sem_nominal"], total, "passou sem votação nominal", "passaram sem votação nominal",
+                      "Na votação simbólica, não fica registrado quem votou o quê.", "s:sem_nominal")
+        )  # fmt: skip
+    paradas = rel.get("fortes_paradas") or 0
+    espera_forte = (
+        "Nenhuma com sinais fortes espera pronta há mais de um ano."
+        if not paradas
+        else f"{_num(paradas)} que {'tem' if paradas == 1 else 'têm'} {'espera pronta' if paradas == 1 else 'esperam prontas'}, sem andamento há mais de um ano."
+    )
+    manchetes.append(_manchete(pa.get("altas") or 0, total, "tinha sinais fortes de relevância", "tinham sinais fortes de relevância", espera_forte, "f:forte"))
+
+    filtros = [
+        {
+            "id": s, "rotulo": pauta.ROTULOS[s], "n": _num(conta[s]), "linha": curtas.get(s, ""),
+            "dica": (linhas.get(s, "")[:1].upper() + linhas.get(s, "")[1:] + ". " + pauta.RESSALVAS.get(s, "")).strip(),
+        }
+        for s in conta
+    ]
+    direcao = pa.get("direcao") or []
+    temas = [{"id": d["t"], "nome": nomes.get(d["t"], d["t"]), "n": d["a"] + d["e"]} for d in direcao if d["a"] + d["e"]]
+    temas.sort(key=lambda t: text.normalize(t["nome"]))
+
+    vale = []
+    for i in pa.get("vale") or []:
+        vale.append(
+            {
+                "t": i["t"], "k": materias.chave(casa, i["t"]), "apel": i.get("ap") or "", "e": i.get("e") or "", "tempo": _em_dias(i["dias"]),
+                "chips": [pauta.ROTULOS[s] for s in i.get("sin") or [] if s in linhas], "n": i["n"],
+            }
+        )
+
+    # A direção por tema: só quando o registro traz o tema de parte bastante das matérias.
+    sem_tema = pa.get("sem_tema") or {}
+    com_a, com_e = total - (sem_tema.get("a") or 0), esperam - (sem_tema.get("e") or 0)
+    minimo = regras.get("tema_minimo") or 0
+    cobre = bool(direcao and total and esperam and 100 * com_a / total >= minimo and 100 * com_e / esperam >= minimo)
+    linhas_dir = []
+    if cobre:
+        maior = max(max(d["a"] / total, d["e"] / esperam) for d in direcao) or 1
+        atras = False
+        for d in direcao:
+            pa_, pe = d["a"] / total, d["e"] / esperam
+            linha = {
+                "id": d["t"], "nome": nomes.get(d["t"], d["t"]), "a": _num(d["a"]), "e": _num(d["e"]), "pa": _pct(100 * pa_), "pe": _pct(100 * pe),
+                "wa": round(100 * pa_ / maior, 1), "we": round(100 * pe / maior, 1), "corte": pa_ < pe and not atras,
+            }
+            atras = atras or pa_ < pe
+            linhas_dir.append(linha)
+    origem = [f"{_num(n)} {PA_ORIGENS.get(o, (o, o))[0 if n == 1 else 1]}" for o, n in (pa.get("origem") or {}).items()]
+
+    do_jogo = pa.get("proprio") or {}
+    foco = pa.get("foco") or {}
+    no_grafico = next((p for p in rel.get("pontos") or [] if p[2] and p[3] == foco.get("t")), None)
+    return {
+        "n": _num(total),
+        "foco_xy": {"x": _gx(no_grafico[0]), "y": _gy(no_grafico[1])} if no_grafico else None,
+        "esperam": _num(esperam),
+        "manchetes": manchetes,
+        "filtros": filtros,
+        "temas": temas,
+        "foco": _cartao_da_pauta(pa["foco"], casa, pa, nomes, baixa) if pa.get("foco") else None,
+        "vale": vale,
+        "vale_n": pa.get("vale_n") or 0,
+        "vale_limiar": regras.get("vale_olhar"),
+        "relampago_dias": regras.get("relampago_dias"),
+        "direcao": linhas_dir,
+        "sem_tema": {"a": _num(sem_tema.get("a") or 0), "e": _num(sem_tema.get("e") or 0), "com_a": _num(com_a), "com_e": _num(com_e)},
+        "origem": origem,
+        "quando": _quando(pa, casa),
+        "proprio": {
+            "n": do_jogo.get("n") or 0, "esperam": _num(do_jogo.get("esperam") or 0),
+            "mediana": _tempo(do_jogo.get("mediana_dias")), "demais": _tempo(do_jogo.get("mediana_demais")),
+        },
+        "mediana": _tempo(pa.get("mediana_dias")),
+        "sem_caminho": "urgencia" not in conta,
+        "outra": outra,
     }
 
 
@@ -774,22 +1031,6 @@ def _fila(fila: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
         "prontas": [
             {"t": i["t"], "apel": i.get("ap") or "", "e": i.get("e") or "", "u": filters.safe_url(i.get("u")) or "", "tempo": _tempo(i.get("dias")), "desde": _data(i.get("m") or i.get("d"), ano=True)}
             for i in fila.get("prontas_plenario") or []
-        ],
-    }
-
-
-def _furaram(f: Mapping[str, Any]) -> dict[str, Any] | None:
-    if not f or not f.get("aprovadas"):
-        return None
-    return {
-        "desde": _data(f.get("desde"), ano=True),
-        "aprovadas": _num(f["aprovadas"]),
-        "rapidas_n": _num(f.get("rapidas_n") or 0),
-        "mediana": _tempo(f.get("mediana_dias")),
-        "com_urgencia": _num(f.get("com_urgencia") or 0),
-        "rapidas": [
-            {"p": i["p"], "e": i.get("e") or "", "tempo": _tempo(i["dias"]), "data": _data(i.get("d"), ano=True), "urg": bool(i.get("urg")), "autoria": i.get("autoria") or ""}
-            for i in f.get("rapidas") or []
         ],
     }
 
@@ -1005,13 +1246,13 @@ def _casa(
         relevancia=_relevancia(painel.get("relevancia") or {}, casa, relev_alta, relev_baixa),
         jornal_voto=_jornal_voto((painel.get("listas") or {}).get("jornal_voto") or []),
         fila=_fila(painel.get("fila") or {}, casa),
-        furaram=_furaram(painel.get("furaram") or {}),
         ultimas=_folhas(painel, casa, temas_meta or []),  # as últimas matérias votadas, cada uma numa folha
         listas=_listas(painel.get("listas") or {}),
         escolha=_escolha(casa, pessoas, temas_meta or [], campos, governo),
         frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos, int(painel.get("em_exercicio") or 0), int((limiares or {}).get("frente_poucas") or FRENTE_POUCAS)),
         cota=_cota(painel.get("cota") or {}, casa),
         comissoes=_comissoes(painel.get("comissoes") or {}, casa),
+        pauta=_pauta(painel.get("pauta") or {}, painel.get("relevancia") or {}, casa, temas_meta or [], relev_alta, relev_baixa),
     )
 
 
@@ -1175,7 +1416,6 @@ def _escolha(casa: str, pessoas: list[dict[str, Any]], temas: list[dict[str, Any
     }
 
 
-MESES = ("jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez")
 
 
 def reais(valor: Any) -> str:
@@ -1576,6 +1816,42 @@ def _metodo_fora_do_placar(m: Mapping[str, Any], lim: Mapping[str, Any]) -> str:
     return f"{regra} Nesta legislatura {'é uma' if len(fora) == 1 else 'são ' + _num(len(fora))}: {casos}."
 
 
+def _metodo_pauta(d: Dados) -> str:
+    """O "Como ler" da aba "O que espera × o que passa": os sinais das aprovadas, com os limiares
+    em uso (``pauta.regras`` de cada Casa, que vêm de config/congresso.yaml)."""
+    cd = ((d.casas.get("cd") or {}).get("pauta") or {}).get("regras") or {}
+    sf = ((d.casas.get("sf") or {}).get("pauta") or {}).get("regras") or {}
+    baixa = _num((d.meta.get("relevancia") or {}).get("baixa") or 30)
+    vezes = float(cd.get("surto_vezes") or 2)
+    return (
+        "A aba compara dois grupos com a mesma régua: as matérias que o Plenário aprovou nos últimos 12 meses e as que estão "
+        "prontas para o Plenário e fora da pauta (medidas provisórias ficam de fora, porque têm prazo na Constituição). Para "
+        "cada aprovada, a página lê sete sinais no registro oficial. Todos são sim ou não, e nenhum diz que a matéria é ruim "
+        "nem prova pressa indevida: dizem por onde ela passou. Com urgência: o Plenário aprovou um requerimento de urgência "
+        "(Regimento da Câmara, art. 155), que dispensa prazos e leva a matéria direto ao Plenário. Sem comissão: o parecer, "
+        "que é a opinião do relator sobre o texto, foi dado no próprio Plenário, no lugar das comissões; nenhuma comissão "
+        f"votou o texto. Relâmpago: do protocolo ao voto em até {_num(cd.get('relampago_dias') or 30)} dias (matéria que veio da outra Casa ou do Executivo "
+        "chega com parte do caminho andado; o cartão avisa). Urgência no dia: a urgência e o texto foram votados no mesmo "
+        "dia. Sem registro de voto: o texto principal não teve votação nominal no Plenário; foi aprovado em votação "
+        "simbólica, em que ninguém registra o voto (é o caso mais comum). Regras do próprio jogo: a ementa trata de "
+        "eleições, partidos, fundos de campanha, mandatos, imunidade, emendas parlamentares, número de cadeiras, anistia a "
+        "partidos ou cargos das próprias Casas; quem vota decide sobre regras que valem para si. A página acha essas matérias "
+        "por padrões de texto nos primeiros 400 caracteres da ementa, e a lista de padrões está em config/congresso.yaml. "
+        f"Sinais fracos: nota de relevância abaixo de {baixa}. “Vale olhar” é a lista das aprovadas com {_num(cd.get('vale_olhar') or 4)} sinais ou mais (no "
+        f"Senado, {_num(sf.get('vale_olhar') or 3)}); a urgência sozinha não conta para a lista, porque a maioria das aprovadas tem. “Enquanto isso”: para "
+        "cada aprovada, quantas matérias prontas esperam no mesmo tema com nota maior que a dela, e qual é a mais antiga pelo "
+        "protocolo (vale o 1º tema de cada matéria). “A direção da Casa”: por tema, a parte das aprovadas e a parte das "
+        "prontas que esperam; em cima ficam os temas em que a parte aprovada é maior. “Quando vota”: uma coluna por semana, "
+        f"um quadradinho por matéria aprovada; semana cheia é a que tem pelo menos {_num(int(vezes)) if vezes == int(vezes) else str(vezes).replace('.', ',')} vezes a mediana das semanas em que "
+        "houve aprovação. As faixas marcam os recessos (18 a 31 de julho; 23 de dezembro a 1º de fevereiro; Constituição, "
+        "art. 57) e o traço, as eleições; a página anota as datas e não diz a causa de nenhuma semana. No Senado, o registro "
+        "não diz se a matéria teve urgência nem onde recebeu o parecer: lá valem só quatro sinais (relâmpago, sem registro de "
+        "voto, regras do próprio jogo e sinais fracos); a maioria das matérias também não traz tema, e por isso a comparação "
+        "por tema não aparece; e a nota do Senado não conta os projetos parecidos, então não se compara com a da Câmara. "
+        "“Sem registro de voto” olha as votações nominais desta legislatura."
+    )
+
+
 def _metodo(d: Dados) -> list[tuple[str, str]]:
     m = d.meta
     lim = m.get("limiares") or {}
@@ -1725,13 +2001,31 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "Senado, tudo o que tramita.",
         ),
         (
-            "Passaram na frente",
-            f"Das matérias aprovadas no Plenário nos últimos {dados.JANELA_FURARAM} dias, as que foram do protocolo ao voto em menos de "
-            f"{dados.RAPIDO} dias, com a urgência quando houve. A fila ao lado dá a medida do que ficou para trás.",
+            "A pauta: por onde passou o que foi aprovado",
+            _metodo_pauta(d),
         ),
         (
             "O que espera × o que passa",
             _metodo_relevancia(m.get("relevancia") or {}),
+        ),
+        (
+            "Votações e matérias: a folha, o carimbo e o placar",
+            "Cada folha é uma matéria que foi a voto no Plenário e copia o registro oficial: a Casa, o tipo por extenso, o número "
+            "e o ano, a ementa (o resumo oficial do que a matéria faz), quem apresentou e quando. A página não resume nem "
+            f"reescreve. A mesa traz as {materias.FOLHAS} matérias votadas por último; as outras estão na busca, em folhas pequenas. O carimbo é o "
+            "resultado da votação, em palavras: “Aprovado” ou “Rejeitado”, e sobre o quê (o texto principal, a emenda, a "
+            "urgência, o requerimento); no destaque de um trecho, “Mantido” ou “Retirado”. Destaque é o pedido para votar um "
+            "trecho ou uma emenda em separado; urgência é o pedido para votar logo no Plenário, sem esperar as comissões. As "
+            "folhas atrás da primeira dizem que a matéria teve mais de uma votação nominal no Plenário nesta legislatura "
+            "(quantas, vai escrito). Na capa fica a votação do texto principal (na PEC, o último turno); sem ela, a da redação "
+            "final; sem ela, a de um destaque ou emenda; sem nenhuma, a de um requerimento. As outras votações estão nas abas "
+            "ao lado, e o carimbo muda com a aba. A faixa no alto tem a cor do tema da matéria (a classificação oficial da Casa; "
+            "havendo mais de um, vale o primeiro), sempre com o nome escrito: treze cores não se distinguem todas de relance. "
+            "A barra do placar representa todas as cadeiras da Casa: o Sim cresce da esquerda, o Não da direita, e o vão do meio "
+            "é quem não votou Sim nem Não; o risco marca os votos Sim que a Constituição exige (veja “O placar”). Na votação "
+            "secreta o registro não traz o placar nem o voto de cada um, e a página diz só quantos votaram. “Quem saiu da linha” "
+            f"são os que votaram diferente do próprio partido onde ele votou fechado ({round(100 * float(lim.get('coesao_partido', 0.8)))}% ou mais do mesmo lado); onde o partido se "
+            "dividiu não há linha de que sair, e a página mostra só a divisão.",
         ),
         (
             "A ficha da matéria",

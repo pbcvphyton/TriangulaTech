@@ -580,19 +580,37 @@ o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
   par, em quantas das votações de conteúdo dois partidos ficaram do mesmo lado: uma
   conta que não depende da régua), **quando um lado vota a proposta do outro**, **onde
   cada polo racha** e as bancadas.
-- **O que espera × o que passa**: o gráfico com a mesma nota de relevância para as
-  matérias prontas para o Plenário e para as aprovadas em 12 meses; **cada ponto abre a
-  ficha da matéria**. Ao lado, as de sinais fortes que esperam e as de sinais fracos
-  que passaram, com **por que andou**.
+- **O que espera × o que passa** (a pauta): abre com os números do período: das
+  aprovadas pelo Plenário em 12 meses, quantas tiveram **urgência**, quantas receberam o
+  **parecer no próprio Plenário**, quantas passaram **sem votação nominal** e quantas
+  tinham sinais fortes de relevância. Cada número é um botão que realça essas matérias
+  no gráfico (nota de relevância × tempo desde o protocolo, com os quatro cantos
+  nomeados e filtros por sinal, situação e tema). O ponto escolhido abre um **cartão**
+  com a linha do tempo do atalho (protocolo, urgência, parecer em Plenário, aprovação,
+  com os dias entre um passo e outro), os sinais da matéria e o **"enquanto isso"**:
+  quantas matérias de nota maior esperam prontas no mesmo tema. Abaixo, a lista **vale
+  olhar** (4 sinais ou mais), **a direção da Casa** por tema (parte das aprovadas ×
+  parte das que esperam) e **quando vota** (um quadradinho por aprovada, semana a
+  semana, com as semanas cheias e o calendário oficial anotado). Endereço:
+  `#v=espera&c=cd&m=cd-PL-179-2026&s=urgencia,plenario&t=politica`.
 - **A fila**: em que porta cada matéria parou (relator, parecer, pauta…), as comissões
-  e os relatores com mais matérias na mão, as prontas fora da pauta e o que foi do
-  protocolo ao voto em menos de 120 dias.
-- **Votações e matérias**: um buscador das matérias votadas (pelo número, pelo apelido
-  ou pelo assunto, com filtro de tema) e as últimas votações, com o placar, o governo,
-  cada partido e quem votou contra o próprio.
-- **Votações e matérias** traz também **Nas comissões**: as votações nominais das
-  comissões, as últimas divididas e **quem mudou de voto entre a comissão e o Plenário**
-  sobre o mesmo parecer.
+  e os relatores com mais matérias na mão e as prontas fora da pauta.
+- **Votações e matérias**: cada matéria votada é uma **folha de papel** com cara de
+  documento oficial: a Casa, o tipo por extenso, o número, a ementa oficial, a autoria e
+  a data, e o resultado em **carimbo** de texto ("Aprovado, o texto principal";
+  "Retirado, o trecho destacado"). A **pilha** atrás da folha diz que houve mais de uma
+  votação nominal; a faixa do alto tem a **cor do tema**, com o nome sempre escrito (13
+  temas; cores em `congresso_temas.css.j2`, com o contraste conferido por teste). A mesa
+  mostra as 10 matérias votadas por último, **uma em foco por vez** (miniaturas, ‹ ›,
+  teclado; `#v=votacoes&c=cd&m=cd-PLP-281-2019&vt=<votação>`). Ao lado da folha, os
+  dados: a descrição oficial, **o placar como a Mesa anuncia** (obstrução e abstenção à
+  parte; na PEC e na lei complementar, a marca dos votos Sim exigidos e quantos
+  faltaram), os lados do Governo e dos polos, os partidos e **quem saiu da linha**. A
+  votação da capa é a do texto principal; as demais ficam em abas. A **busca** devolve
+  folhas pequenas (número, apelido ou assunto), e a legenda das cores filtra por tema.
+- **Votações e matérias** traz também **Nas comissões** (recolhido, no fim): as votações
+  nominais das comissões, as últimas divididas e **quem mudou de voto entre a comissão
+  e o Plenário** sobre o mesmo parecer.
 - **Parlamentares**: as listas (quem menos vota, quem mais vota contra o partido, quem
   muda de lado conforme o assunto, **quem muda quando pesa a relevância**…), **no jornal ×
   no voto**, e a tabela de todos (com o saldo simples e o **pesado pela relevância**), com
@@ -677,7 +695,12 @@ feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da lege
 | A ficha da matéria | as votadas nominalmente no Plenário na legislatura e as de "o que espera × o que passa": a ementa que vale (e a original, se mudou), a ementa detalhada (Câmara) ou a explicação da ementa (Senado), as palavras-chave e o texto integral. A página não resume o projeto |
 | O que cada um propõe | só a autoria principal (quem assina primeiro). Os termos que mais marcam as propostas são palavras-chave da indexação da Câmara, frequentes nas propostas da pessoa e raras no conjunto (termo em mais de 4% de todas as proposições fica de fora); o Senado não as traz nas listas |
 | A fila | a situação oficial de cada proposição vira um estado (tramitando, apensada, aprovada, virou norma, encerrada) e uma porta (relator, parecer, pauta, Mesa, comissão…); "parada" é sem andamento há mais de 365 dias |
-| Passou na frente | texto principal aprovado em votação nominal nos últimos 240 dias, menos de 120 dias depois de apresentado |
+| Sinais da pauta | para cada aprovada pelo Plenário em 12 meses: com urgência (requerimento aprovado, no histórico); sem comissão (parecer dado em Plenário); relâmpago (até 30 dias do protocolo ao voto); urgência no dia; sem registro de voto (nenhuma votação nominal do texto principal); regras do próprio jogo (padrões na ementa: eleições, partidos, fundos de campanha, mandatos, imunidade, emendas, cadeiras, anistia a partidos, cargos das Casas); sinais fracos (nota abaixo de 30). No Senado, o registro não traz o caminho: só relâmpago, sem registro de voto, regras do próprio jogo e sinais fracos. Limiares, calendário e padrões no bloco `pauta` de `config/congresso.yaml` (`relampago_dias`, `sinais_vale_olhar`, `sinais_vale_olhar_senado`, `surto_vezes`, `ementa_ate`, `tema_minimo`, `calendario`, `proprio_jogo`) |
+| Vale olhar | aprovadas com 4 sinais ou mais (Senado: 3), sem contar a urgência, que a maioria tem |
+| Enquanto isso | prontas esperando no mesmo 1º tema com nota maior que a da aprovada: quantas e a mais antiga |
+| A direção da Casa | por 1º tema, parte das aprovadas × parte das prontas esperando; só com tema em ao menos 50% das matérias de cada grupo |
+| Semana cheia | semana (segunda a domingo) com 2 vezes a mediana das semanas com aprovação, ou mais; os recessos e a eleição são só anotados |
+| A capa da folha | em "Votações e matérias", a votação que representa a matéria: a do texto principal (na PEC, o último turno); sem ela, a da redação final; depois, a de um destaque ou emenda; por fim, a de um requerimento |
 | Nota de relevância (0 a 100) | sinais que dá para medir nos registros, com os pesos de `relevancia` em `config/congresso.yaml`: **projetos parecidos** anexados à matéria (até 40; 15 ou mais dão a nota cheia, em escala log; só na Câmara), **origem** (até 25: já aprovada pela outra Casa ou iniciativa popular, Executivo, comissão, Judiciário e órgãos de controle, parlamentar), **alcance** (até 20: PEC, lei complementar, lei) e **apoio** (até 15: autores de mais de um partido, nota cheia se dos dois polos). No Senado, sem os projetos parecidos, os outros pesos valem o todo. Matéria simbólica (dia nacional, denominação, título, rota turística…) não passa de 10. Não diz se a matéria é boa: diz quantos sinais de relevância pública ela tem |
 | O que espera × o que passa | esperam: prontas para o Plenário, fora da pauta (PL, PLP e PEC; medidas provisórias ficam de fora, têm prazo na Constituição). Passam: aprovadas pelo Plenário nos últimos 12 meses (Câmara: pelo histórico oficial de cada matéria, `/proposicoes/{id}/tramitacoes`; Senado: pela lista de deliberações). Sinais fortes: nota 60 ou mais; fracos: abaixo de 30 |
 | Por que andou | do histórico oficial (Câmara): a urgência aprovada antes da votação e quem a pediu, e o parecer dado direto no Plenário (no lugar das comissões) e por quem. Só o que o histórico registra |
@@ -742,7 +765,7 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `base/cd-exercicio.json` | os períodos em exercício de cada deputado e quem presidiu a Câmara |
 | `fichas/<casa>-<id>.json` | o dossiê de cada parlamentar (carregado quando a ficha abre) |
 | `resumo.json` | uma linha por parlamentar (a tabela da aba e as fichas das matérias) |
-| `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, listas, no jornal × no voto, últimas votações, a cobertura do saldo pesado, as frentes, a cota e as comissões) |
+| `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, a pauta (`pauta`: os sinais das aprovadas, a direção por tema e as semanas), as folhas da mesa (`folhas`), listas, no jornal × no voto, últimas votações, a cobertura do saldo pesado, as frentes, a cota e as comissões) |
 | `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação, e o **partido de cada um no dia de cada votação** (`partidos`: só de quem mudou) (o comparativo, os votos por tema e o plenário em pontos leem quando abrem) |
 | `frentes-cd.json` | a ficha de cada frente de causa: todos os que assinam e estão em exercício, com o saldo no tema e quanto votaram igual ao coordenador (lido quando a ficha da frente abre) |
 | `materias-cd.json`, `materias-sf.json` | a ficha de cada matéria votada no Plenário na legislatura e de cada ponto de "o que espera × o que passa", uma por linha: sobre o quê, autoria, situação, nota e cada votação com os lados (lido quando um detalhe abre) |
@@ -752,12 +775,17 @@ data da situação oficial, que muda também quando a matéria é pautada e não
   **`QIJ_NO_CONGRESSO`** = `1` (o botão e os blocos somem; os dados ficam).
 - **Código**: `qijournal/congresso/` (`fontes.py` coleta e cache; `base.py` votações;
   `regras.py` as réguas; `perfil.py` as contas de voto; `exercicio.py` períodos de
-  mandato; `projetos.py` proposições, relatorias e fila; `relevancia.py` o que espera × o que passa; `materias.py` a ficha de
-  cada matéria; `peso.py` o saldo pesado pela relevância; `frentes.py` as frentes × o voto; `cota.py` a cota parlamentar;
+  mandato; `projetos.py` proposições, relatorias e fila; `relevancia.py` a nota de relevância; `pauta.py` os sinais das aprovadas, a direção e as semanas; `materias.py` a ficha de
+  cada matéria e as folhas da mesa; `peso.py` o saldo pesado pela relevância; `frentes.py` as frentes × o voto; `cota.py` a cota parlamentar;
   `comissoes.py` os votos nas comissões; `jornal.py` os nomes no banco do jornal; `ficha.py` o dossiê; `dados.py` a atualização; `cli.py` os
   comandos) e `qijournal/render/congresso.py` com os modelos `congresso.*.j2`
-  (`congresso_materias.js.j2` é o script das fichas das matérias e dos detalhes por tema;
-  `congresso_escolha.js.j2`, o de "Escolha o seu candidato").
+  (`congresso_materias.js.j2` é o script das fichas das matérias e da busca;
+  `congresso_cartoes.js.j2`, o dos cartões que inclinam e da ficha das frentes;
+  `congresso_tema.js.j2`, o das votações de um tema, em fita, cartão e plenário;
+  `congresso_pauta.js.j2`, o de "O que espera × o que passa"; `congresso_papel.js.j2`, o
+  das folhas de "Votações e matérias"; `congresso_escolha.js.j2`, o de "Escolha o seu
+  candidato"; os estilos de cada um em `congresso_tema.css.j2`, `congresso_pauta.css.j2`,
+  `congresso_papel.css.j2` e as cores dos temas em `congresso_temas.css.j2`).
 
 ---
 

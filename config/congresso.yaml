@@ -156,6 +156,139 @@ relevancia:
   alta: 60                  # a partir daqui, sinais fortes
   baixa: 30                 # abaixo daqui, sinais fracos
 
+# A pauta: por que cada matéria aprovada pelo Plenário andou ("O que espera × o que passa").
+# Sete sinais, todos sim ou não, lidos no registro oficial de cada matéria aprovada em 12
+# meses. Nenhum diz que a matéria é ruim nem prova pressa indevida: dizem por onde ela passou.
+#   urgência         o Plenário aprovou o requerimento de urgência (Regimento da Câmara, art. 155)
+#   sem comissão     o parecer foi dado por um relator no Plenário, no lugar das comissões
+#   relâmpago        do protocolo ao voto em até `relampago_dias`
+#   urgência no dia  a urgência e o texto foram votados no mesmo dia
+#   sem registro     nenhuma votação nominal do texto principal: não há lista de quem votou o quê
+#   próprio jogo     a ementa casa com um padrão de `proprio_jogo`
+#   sinais fracos    nota de relevância abaixo de `relevancia.baixa`
+# No Senado o registro não traz o caminho: valem só relâmpago, sem registro, próprio jogo e fracos.
+pauta:
+  relampago_dias: 30        # "relâmpago": do protocolo ao voto em até 30 dias
+  sinais_vale_olhar: 4      # "vale olhar": 4 sinais ou mais (a urgência sozinha, a mais comum, não conta)
+  sinais_vale_olhar_senado: 3   # no Senado o registro só permite ler quatro sinais: 3 ou mais
+  surto_vezes: 2            # "semana cheia": 2 vezes a mediana das semanas em que houve aprovação
+  ementa_ate: 400           # "próprio jogo": o padrão tem de começar nos primeiros 400 caracteres da ementa
+  tema_minimo: 50           # a direção por tema só aparece se ao menos 50% das aprovadas e das que esperam têm tema no registro
+  # O calendário oficial, anotado no "quando vota". Só datas, sem dizer causa. MM-DD vale para
+  # todo ano: o Congresso se reúne de 2 de fevereiro a 17 de julho e de 1º de agosto a 22 de
+  # dezembro (Constituição, art. 57). AAAA-MM-DD vale para aquele dia.
+  calendario:
+    - {nome: "recesso de julho", de: "07-18", ate: "07-31"}
+    - {nome: "recesso de fim de ano", de: "12-23", ate: "02-01"}
+    - {nome: "eleições (1º turno)", de: "2026-10-04"}
+  # "Regras do próprio jogo": matérias sobre eleições, partidos, mandatos, emendas ou os cargos
+  # das próprias Casas (quem vota decide sobre regras que valem para si). Os padrões valem sobre
+  # a ementa sem acento e em minúsculas ("nº" vira "no"). Cada um foi conferido contra as
+  # ementas das matérias prontas e das aprovadas; o que pegava matéria de outro assunto saiu.
+  proprio_jogo:
+    - id: eleicoes
+      nome: "eleições"
+      padroes:
+        - '\bcodigo eleitoral\b'
+        - '\blei das eleicoes\b'
+        - '\blei (?:n[o0]? ?)?9 504\b'
+        - '\blei (?:n[o0]? ?)?4 737\b'
+        - '\beleicoes\b'
+        - '\beleicao (?:indireta|direta|presidencial|suplementar)\b'
+        - '\bcampanhas? eleitora(?:l|is)\b'
+        - '\bpropaganda (?:eleitoral|partidaria)\b'
+        - '\binelegi(?:bilidade|vel|veis)'
+        - '\blei complementar (?:n[o0]? ?)?64\b'
+        - '\bficha limpa\b'
+        - '\bcandidaturas?\b'
+        - '\bsistema eleitoral\b'
+        - '\bcoligac(?:ao|oes)\b'
+        - '\bquociente eleitoral\b'
+        - '\bsobras eleitorais\b'
+        - '\bpesquisas? (?:e testes )?(?:pre )?eleitora(?:l|is)\b'
+        - '\bcrimes? eleitora(?:l|is)\b'
+        - '\blegislacao eleitoral\b'
+        - '\bdomicilio eleitoral\b'
+        - '\burnas? eletronicas?\b'
+        - '\bvoto (?:impresso|distrital|facultativo)\b'
+        - '\bviolencia politica\b'
+        - '\blei (?:n[o0]? ?)?14 192\b'
+    - id: partidos
+      nome: "partidos"
+      padroes:
+        - '\bpartidos? politicos?\b'
+        - '\blei dos partidos\b'
+        - '\blei (?:n[o0]? ?)?9 096\b'
+        - '\bfederac(?:ao|oes) (?:de partidos|partidarias?)\b'
+        - '\b(?:fidelidade|filiacao|janela|agremiac(?:ao|oes)|convenc(?:ao|oes)|dirigentes?|orgaos?|diretorios?|contas) partidari[oa]s?\b'
+        - '\bclausula de (?:barreira|desempenho)\b'
+        - '\bcriacao de partido\b'
+    - id: fundos
+      nome: "fundos de campanha"
+      padroes:
+        - '\bfundo (?:especial )?de financiamento de campanha'
+        - '\bfundo eleitoral\b'
+        - '\bfundos? partidario'
+        - '\bfefc\b'
+        - '\bfinanciamento (?:publico )?(?:de|das) campanhas?\b'
+        - '\bfinanciamento eleitoral\b'
+        - '\bdoac(?:ao|oes) (?:eleitora(?:l|is)|de campanha|a partidos|a candidatos)'
+    - id: mandato
+      nome: "mandato"
+      padroes:
+        - '\bperda d[eo] mandato\b'
+        - '\bdecoro parlamentar\b'
+        - '\bsuplentes? de (?:deputad|senador|vereador)'
+        - '\bmandatos? (?:parlamentar(?:es)?|de (?:deputad|senador|vereador|prefeit|governador|presidente da republica))'
+        - '\bsubsidios? .{0,140}?\b(?:senador(?:es)?|deputados|vereadores|membros do congresso|parlamentares)\b'
+        - '\b(?:remuneracao|aposentadoria|pensao|verbas?) (?:d[eo]s? |para )?(?:os |as )?(?:membros do congresso|parlamentar(?:es)?|deputad[oa]s|senador(?:es|as)?|congressistas|vereador(?:es|as)?|prefeit[oa]s)'
+        - '\bseguridade social dos congressistas\b'
+        - '\batividade parlamentar\b'
+        - '\breeleicao\b'
+        - '\bposse d[eo]s? (?:presidente|governador|prefeit|deputad|senador|vereador)'
+        - '\btransicao (?:administrativa|de governo|de mandato|governamental)\b'
+        - '\bresponsabilidade dos prefeitos\b'
+        - '\bdecreto lei (?:n[o0]? ?)?201\b'
+        - '\bimpeachment\b'
+        - '\bcrimes? de responsabilidade d[eo]s? (?:presidente da republica|governador|prefeit|ministros? de estado)'
+    - id: imunidade
+      nome: "imunidade"
+      padroes:
+        - '\bimunidades? parlamentar'
+        - '\bprerrogativas? (?:parlamentar|d[eo]s? (?:deputad|senador|parlamentar|membros do congresso))'
+        - '\bforo (?:privilegiado|especial|por prerrogativa)'
+        - '\bprerrogativa de (?:foro|funcao)\b'
+        - '\binviolabilidade (?:d[eo]s? )?(?:deputad|senador|parlamentar)'
+        - '\bprisao de (?:deputad|senador|parlamentar)'
+    - id: emendas
+      nome: "emendas parlamentares"
+      padroes:
+        - '\bemendas? parlamentar(?:es)?\b'
+        - '\bemendas? (?:individua(?:l|is)|de bancadas?|de comiss(?:ao|oes)|de relator)\b'
+        - '\bemendas impositivas\b'
+        - '\btransferencias? especia(?:l|is)\b'
+        - '\bprogramac(?:ao|oes) (?:orcamentarias? )?incluidas? por emendas?'
+        - '\blei complementar (?:n[o0]? ?)?210\b'
+    - id: cadeiras
+      nome: "cadeiras"
+      padroes:
+        - '\bnumero (?:maximo |total |minimo )?de (?:\w+ )?(?:deputados|vereadores|senadores|cadeiras|representantes)\b'
+        - '\brepresentacao (?:dos estados |popular )?na camara dos deputados\b'
+        - '\bcomposicao da camara dos deputados\b'
+        - '\blei complementar (?:n[o0]? ?)?78\b'
+        - '\b(?:reserva\w*|vagas) .{0,60}?\b(?:na camara dos deputados|nas assembleias legislativas|nas camaras municipais)\b'
+    - id: anistia
+      nome: "anistia a partidos"
+      padroes:
+        - '\banisti\w* .{0,80}?(?:partidos?|candidat|eleitora|prestac(?:ao|oes) de contas)'
+        - '\b(?:regularizacao|refinanciamento) de debitos de partidos\b'
+    - id: casas
+      nome: "cargos das Casas"
+      padroes:
+        - '\b(?:cargos?|carreiras?|quadro de pessoal|servidores|estrutura administrativa|plano de carreira|funcoes comissionadas)\b.{0,80}?\b(?:da|na|do|no) (?:camara dos deputados|senado federal)\b'
+        - '\bcarreira legislativa\b'
+        - '\bsecretariado parlamentar\b'
+
 # Apelidos de projetos, como o noticiário os chama: servem para achar o projeto quando o
 # jornal não cita o número, e aparecem ao lado do número na página (o primeiro da lista).
 # Cada um foi conferido contra a ementa oficial. Apelido que vale para mais de um projeto

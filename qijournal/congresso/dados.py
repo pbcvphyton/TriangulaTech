@@ -35,7 +35,7 @@ from typing import Any
 
 from .. import net, text
 from ..net import Fetcher
-from . import VERSAO, base, comissoes, cota, exercicio, ficha, fontes, frentes, jornal, materias, perfil, peso, projetos, regras as regras_mod, relevancia, temas
+from . import VERSAO, base, comissoes, cota, exercicio, ficha, fontes, frentes, jornal, materias, pauta, perfil, peso, projetos, regras as regras_mod, relevancia, temas
 from .base import AnoVotos
 from .ficha import Cadastro
 from .fontes import Coletor
@@ -1011,7 +1011,7 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                         + (", com urgência aprovada" if primeira.get("urg") else "")
                         + f"; metade das aprovadas levou mais de {_num(furaram.get('mediana_dias') or 0)} dias."
                     ),
-                    "alvo": f"#cg-furaram-{casa}",
+                    "alvo": f"#cg-relev-{casa}",
                 }
             )
         # 4. Quem segura relatorias.
@@ -1518,6 +1518,14 @@ def atualizar(
         )
         # As folhas da aba "Votações e matérias": as matérias votadas por último, cada uma como documento.
         paineis[casa]["folhas"] = materias.folhas(votos[casa], regras, legislatura.numero, fichas_das_materias[casa].get("materias") or {}, nomes_casa)
+        # A pauta: os sinais de cada aprovada e o "enquanto isso" (gravados na ficha dela), as
+        # contas da Casa e, nos pontos do gráfico, o que os filtros precisam (o 1º tema e os sinais).
+        fichas_da_casa = fichas_das_materias[casa]["materias"]
+        votos_fora = {materias.titulo_da_materia(v.get("prop") or "") for v in fora_do_placar.get(casa) or []}
+        pauta.anotar(fichas_da_casa, regras, casa, votos_desde=legislatura.inicio, votos_fora=votos_fora)
+        paineis[casa]["pauta"] = pauta.painel(fichas_da_casa, regras, hoje, casa)
+        if paineis[casa]["relevancia"].get("pontos"):
+            paineis[casa]["relevancia"]["pontos"] = pauta.pontos(paineis[casa]["relevancia"]["pontos"], fichas_da_casa, regras, casa)
 
     # O saldo pesado pela relevância da matéria (a nota das fichas das matérias).
     for casa in ("cd", "sf"):

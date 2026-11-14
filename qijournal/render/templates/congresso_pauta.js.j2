@@ -1,0 +1,394 @@
+{#- Aba Congresso: "O que espera × o que passa" (incluído por congresso.js.j2, dentro da mesma
+    função). O HTML já traz tudo; aqui os números das manchetes, os temas e os quadradinhos das
+    semanas viram atalhos para o gráfico, os filtros realçam pontos (o que não passa fica
+    esmaecido, não some) e o ponto escolhido abre o cartão ao lado: a linha do tempo do atalho,
+    os sinais e o "enquanto isso". O cartão sai de materias-<casa>.json, lido quando alguém
+    escolhe um ponto. O endereço guarda a Casa, a matéria e os filtros
+    (#v=espera&c=cd&m=cd-PL-179-2026&s=urgencia&t=politica). Sempre com textContent. -#}
+  /* ════ O que espera × o que passa ════ */
+  var pautaDaCasa = {};  // Casa → { doEndereco(parâmetros) }
+  lista(d.querySelectorAll('[data-pauta]')).forEach(function (bloco) {
+    var casa = bloco.getAttribute('data-pauta');
+    var svg = bloco.querySelector('.cg-pa-svg'), plot = bloco.querySelector('[data-plot]'), fig = bloco.querySelector('.cg-pa-fig');
+    var cw = bloco.querySelector('.cg-pa-cw'), card = cw ? cw.querySelector('.cg-pa-card') : null, navEl = cw ? cw.querySelector('.cg-pa-nav') : null;
+    if (!svg || !plot || !card || !navEl) return;
+    var alta = parseFloat(bloco.getAttribute('data-alta')) || 60, baixa = parseFloat(bloco.getAttribute('data-baixa')) || 30;
+    var outra = bloco.getAttribute('data-outra') || '';
+    var halo = svg.querySelector('.cg-pa-sel'), dicaDoPonto = bloco.querySelector('.cg-pa-dica');
+    var ant = navEl.querySelector('.cg-pa-ant'), prox = navEl.querySelector('.cg-pa-prox'), posicaoEl = navEl.querySelector('.cg-pa-pos');
+    var estado = bloco.querySelector('.cg-pa-st'), limpar = bloco.querySelector('.cg-pa-limpa'), seletor = bloco.querySelector('[data-f-tema]');
+    var chips = lista(bloco.querySelectorAll('.cg-pa-f')), manchetes = lista(bloco.querySelectorAll('.cg-pa-m')), linhasDoTema = lista(bloco.querySelectorAll('.cg-pa-d'));
+    var semanas = bloco.querySelector('.cg-pa-q'), quadrados = semanas ? lista(semanas.querySelectorAll('.cg-pa-b')) : [];
+    var parado = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* O rótulo e a explicação de cada sinal vêm das fichas dos filtros (o HTML é a fonte). */
+    var ROTULO = {}, LINHA = {};
+    chips.forEach(function (b) {
+      var f = b.getAttribute('data-f') || '';
+      if (f.slice(0, 2) !== 's:') return;
+      ROTULO[f.slice(2)] = ((b.firstChild && b.firstChild.nodeValue) || '').trim();
+      LINHA[f.slice(2)] = b.getAttribute('data-linha') || '';
+    });
+
+    var pontos = lista(svg.querySelectorAll('.cg-pa-pts circle')).map(function (c) {
+      return {
+        el: c, t: c.getAttribute('data-t') || '', n: parseFloat(c.getAttribute('data-n')) || 0, d: parseFloat(c.getAttribute('data-d')) || 0,
+        a: c.classList.contains('cg-pa-a'), tm: c.getAttribute('data-tm') || '', s: (c.getAttribute('data-s') || '').split(' ').filter(Boolean),
+        x: parseFloat(c.getAttribute('cx')) || 0, y: parseFloat(c.getAttribute('cy')) || 0
+      };
+    });
+    var porTitulo = {};
+    pontos.forEach(function (p) { porTitulo[p.t] = p; });
+
+    /* O filtro: os sinais (todos os marcados), a situação, a nota alta e o tema. */
+    var F = { s: [], q: '', forte: false, tema: '' };
+    var emFoco = porTitulo[bloco.getAttribute('data-foco') || ''] || null;
+    var noCartao = emFoco ? emFoco.t : '';  // a matéria que o cartão mostra (de início, a que veio no HTML)
+    var ordem = [], vez = 0;
+    function temFiltro() { return !!(F.s.length || F.q || F.forte || F.tema); }
+    function passa(p) {
+      if ((F.q === 'a' && !p.a) || (F.q === 'e' && p.a)) return false;
+      if (F.forte && p.n < alta) return false;
+      if (F.tema && p.tm !== F.tema) return false;
+      for (var i = 0; i < F.s.length; i++) if (p.s.indexOf(F.s[i]) < 0) return false;
+      return true;
+    }
+    /* As aprovadas, da mais rápida para a mais lenta; depois as que esperam, da nota mais alta. */
+    function naOrdem(x, y) {
+      if (x.a !== y.a) return x.a ? -1 : 1;
+      if (x.a) return x.d - y.d || (x.t < y.t ? -1 : 1);
+      return y.n - x.n || y.d - x.d || (x.t < y.t ? -1 : 1);
+    }
+    function ligado(f) {
+      var tipo = f.slice(0, 2), valor = f.slice(2);
+      return tipo === 's:' ? F.s.indexOf(valor) >= 0 : tipo === 'q:' ? F.q === valor : tipo === 'f:' ? F.forte : false;
+    }
+    function gravarEndereco() {
+      if (vistaAtual !== 'espera' || aberto || !w.history || !w.history.replaceState) return;
+      if (casas && !casas.hidden && root.getAttribute('data-ver') !== casa) return;
+      var k = emFoco ? chaveDaMateria(casa, emFoco.t) : '';
+      w.history.replaceState(null, '', '#v=espera&c=' + casa + (k ? '&m=' + k : '') + (F.s.length ? '&s=' + F.s.join(',') : '') + (F.tema ? '&t=' + F.tema : '') + (F.q ? '&q=' + F.q : '') + (F.forte ? '&n=forte' : ''));
+    }
+    function atualizarPasso() {
+      var i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
+      ant.disabled = !n || i === 0;
+      prox.disabled = !n || i === n - 1;
+      if (!emFoco) posicaoEl.textContent = n ? num(n) + (temFiltro() ? ' realçadas' : ' matérias') : 'nada realçado';
+      else if (i < 0) posicaoEl.textContent = emFoco.t + ' · fora do realce (' + num(n) + (n === 1 ? ' realçada)' : ' realçadas)');
+      else posicaoEl.textContent = emFoco.t + ' · ' + num(i + 1) + ' de ' + num(n) + (temFiltro() ? (n === 1 ? ' realçada' : ' realçadas') : '');
+    }
+    function aplicar(semEndereco) {
+      var na = 0, ne = 0, filtro = temFiltro();
+      ordem = [];
+      pontos.forEach(function (p) {
+        var ok = passa(p);
+        p.el.classList.toggle('cg-pa-off', !ok);
+        if (!ok) return;
+        ordem.push(p);
+        if (p.a) na += 1; else ne += 1;
+      });
+      ordem.sort(naOrdem);
+      chips.forEach(function (b) { b.setAttribute('aria-pressed', ligado(b.getAttribute('data-f') || '') ? 'true' : 'false'); });
+      manchetes.forEach(function (b) {
+        var on = ligado(b.getAttribute('data-f') || ''), aviso = b.querySelector('.cg-pa-m-ir');
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        if (aviso) aviso.textContent = on ? 'realçado no gráfico' : 'ver no gráfico';
+      });
+      linhasDoTema.forEach(function (b) { b.setAttribute('aria-pressed', F.tema && b.getAttribute('data-tema') === F.tema ? 'true' : 'false'); });
+      if (seletor) seletor.value = F.tema;
+      if (limpar) limpar.hidden = !filtro;
+      if (estado) {
+        esvaziar(estado);
+        if (filtro) {
+          estado.appendChild(h('b', { text: 'Realçadas: ' }));
+          estado.appendChild(d.createTextNode(!ordem.length ? 'nenhuma matéria passa neste filtro.' : plural(na, 'aprovada', 'aprovadas') + ' e ' + num(ne) + ' esperando. O resto fica esmaecido.'));
+        }
+      }
+      if (semanas) {
+        if (filtro) semanas.setAttribute('data-f', '1'); else semanas.removeAttribute('data-f');
+        quadrados.forEach(function (b) { var p = porTitulo[b.getAttribute('data-ver')]; b.classList.toggle('cg-pa-hit', !!(filtro && p && p.a && passa(p))); });
+      }
+      if (ordem.length && (!emFoco || ordem.indexOf(emFoco) < 0)) irAo(ordem[0], { semEndereco: true });
+      else atualizarPasso();
+      if (!semEndereco) gravarEndereco();
+    }
+
+    /* ── O cartão em foco ── */
+    function emDias(n) { return n === 0 ? 'no mesmo dia' : 'em ' + tempo(n); }
+    function entreDatas(a, b) {
+      var x = Date.parse((a || '').slice(0, 10) + 'T00:00:00Z'), y = Date.parse((b || '').slice(0, 10) + 'T00:00:00Z');
+      return isNaN(x) || isNaN(y) ? null : Math.round((y - x) / 864e5);
+    }
+    function cabeca(p, m, situacao) {
+      return h('p', { cls: 'cg-pa-c-k' }, [
+        h('span', { cls: 'cg-pa-c-q', text: situacao }),
+        h('a', { cls: 'cg-mt cg-pa-c-t', href: '#m=' + chaveDaMateria(casa, p.t), 'data-m': chaveDaMateria(casa, p.t), text: p.t }),
+        m && m.ap ? h('span', { cls: 'cg-apel', text: m.ap }) : null,
+        h('span', { cls: 'cg-pa-c-n' }, ['nota ', h('b', { text: String(p.n) })])
+      ]);
+    }
+    function passosNoTempo(passos) {
+      var anterior = '';
+      return h('ol', { cls: 'cg-pa-tl' }, passos.map(function (x) {
+        var n = anterior && x.d ? entreDatas(anterior, x.d) : null;
+        var depois = n == null || n < 0 ? '' : (n === 0 ? 'no mesmo dia' : tempo(n) + ' depois');
+        anterior = x.d || anterior;
+        return h('li', {}, [h('time', { text: dataBr(x.d) }), h('b', { text: x.o }), h('span', { text: [x.x, x.semConta ? '' : depois].filter(Boolean).join(' · ') })]);
+      }));
+    }
+    function titulo5(texto, valor) { return h('h5', { cls: 'cg-pa-c-h' }, [texto, valor != null ? h('b', { text: String(valor) }) : null]); }
+    function pe(p, m) {
+      var k = chaveDaMateria(casa, p.t);
+      return h('p', { cls: 'cg-pa-c-l' }, [
+        h('a', { cls: 'cg-mt', href: '#m=' + k, 'data-m': k, text: 'Abrir a ficha' }),
+        m && m.u ? ' · ' : null,
+        m && m.u ? h('a', { href: m.u, target: '_blank', rel: 'noopener noreferrer', text: 'Página oficial' }) : null
+      ]);
+    }
+    function cartaoDaAprovada(p, m) {
+      var rel = m.rel || {}, caminho = rel.cam || {}, meio = [], nos = [cabeca(p, m, 'aprovada'), h('p', { cls: 'cg-pa-c-e', text: m.e || '' })];
+      if (caminho.urgencia) meio.push({ d: caminho.urgencia.d || '', o: 'Urgência aprovada', x: caminho.urgencia.por ? 'a pedido de ' + caminho.urgencia.por : '' });
+      if (caminho.parecer_plenario) meio.push({ d: caminho.parecer_plenario.d || '', o: 'Parecer em Plenário', x: caminho.parecer_plenario.relator ? 'relator: ' + caminho.parecer_plenario.relator : 'no lugar das comissões' });
+      meio.sort(function (x, y) { return x.d < y.d ? -1 : x.d > y.d ? 1 : 0; });
+      nos.push(titulo5('Do protocolo ao voto', emDias(rel.dias)));
+      nos.push(passosNoTempo([{ d: m.da || '', o: 'Protocolo', x: (M.origens || {})[m.o || 'parlamentar'] || '' }].concat(meio, [{ d: rel.apv || '', o: 'Aprovada pelo Plenário', x: '' }])));
+      if (casa !== 'cd') nos.push(h('p', { cls: 'cg-pa-c-o', text: 'O registro do Senado não traz a urgência nem o parecer.' }));
+      var sinais = (rel.sin || []).filter(function (s) { return ROTULO[s]; });
+      if (sinais.length) {
+        nos.push(titulo5('Os sinais desta matéria', sinais.length));
+        nos.push(h('ul', { cls: 'cg-pa-c-s' }, sinais.map(function (s) {
+          var x = LINHA[s];
+          if (s === 'relampago') x = 'do protocolo ao voto ' + emDias(rel.dias) + (m.o === 'outra_casa' ? ' (veio ' + outra + ' já votada lá)' : m.o === 'executivo' ? ' (veio do Executivo)' : '');
+          else if (s === 'fraca') x = 'nota ' + rel.n + ', abaixo de ' + baixa;
+          return h('li', {}, [h('b', { text: ROTULO[s] }), h('span', { text: x })]);
+        })));
+      }
+      var enq = rel.enq, tema = (M.temasCurtos || {})[(m.tm || [])[0]] || '';
+      if (enq && tema) {
+        var linha = h('p', { cls: 'cg-pa-c-enq' }, [h('b', { text: 'Enquanto isso' }), ', em ' + tema + ': ']);
+        if (!enq.n) linha.appendChild(d.createTextNode('nenhuma matéria com nota maior espera pronta para o Plenário.'));
+        else {
+          var ha = enq.da ? tempo(dias(enq.da)) : '';
+          linha.appendChild(d.createTextNode(enq.n === 1 ? '1 matéria com nota maior espera pronta para o Plenário, ' : num(enq.n) + ' matérias com nota maior esperam prontas para o Plenário; a mais antiga, '));
+          linha.appendChild(linkDaMateria(casa, enq.t));
+          linha.appendChild(d.createTextNode((ha ? (enq.n === 1 ? ', protocolada há ' : ', foi protocolada há ') + ha : '') + '.'));
+        }
+        nos.push(linha);
+      }
+      nos.push(pe(p, m));
+      return nos;
+    }
+    function cartaoDaQueEspera(p, m) {
+      var nos = [cabeca(p, m, 'esperando'), h('p', { cls: 'cg-pa-c-e', text: m.e || '' })];
+      var desde = m.mov || m.da || '';
+      nos.push(titulo5('Pronta para o Plenário, fora da pauta', desde ? 'há ' + tempo(dias(desde)) : null));
+      var passos = [{ d: m.da || '', o: 'Protocolo', x: [(M.origens || {})[m.o || 'parlamentar'] || '', m.da ? 'há ' + tempo(dias(m.da)) : ''].filter(Boolean).join(' · '), semConta: true }];
+      if (m.mov) passos.push({ d: m.mov, o: 'Último andamento', x: [m.sit || 'pronta para a pauta', 'há ' + tempo(dias(m.mov))].join(' · '), semConta: true });
+      nos.push(passosNoTempo(passos));
+      nos.push(h('p', { cls: 'cg-pa-c-o' }, [h('b', { text: 'Com quem está: ' }), 'com quem faz a pauta do Plenário' + (m.rl ? '. Relator: ' + m.rl : '') + (m.urg ? '. Está em regime de urgência, e não foi votada' : '') + '.']));
+      var sinais = [];
+      if (p.n >= alta) sinais.push(['Sinais fortes', 'nota ' + p.n + ', ' + alta + ' ou mais']);
+      if (p.s.indexOf('proprio') >= 0 && ROTULO.proprio) sinais.push([ROTULO.proprio, LINHA.proprio]);
+      if (p.s.indexOf('fraca') >= 0) sinais.push([ROTULO.fraca || 'Sinais fracos', 'nota ' + p.n + ', abaixo de ' + baixa]);
+      if (sinais.length) {
+        nos.push(titulo5('O que dá para dizer antes do voto', null));
+        nos.push(h('ul', { cls: 'cg-pa-c-s' }, sinais.map(function (x) { return h('li', {}, [h('b', { text: x[0] }), h('span', { text: x[1] })]); })));
+      }
+      nos.push(pe(p, m));
+      return nos;
+    }
+    function porNoCartao(nos, semAnimar) {
+      esvaziar(card);
+      nos.forEach(function (no) { if (no) card.appendChild(no); });
+      if (semAnimar || parado) return;
+      card.classList.remove('cg-pa-vira');
+      void card.offsetWidth;
+      card.classList.add('cg-pa-vira');
+    }
+    function desenhar(p) {
+      if (p.t === noCartao) return;
+      noCartao = p.t;
+      var minha = ++vez, pronto = false;
+      materiasDa(casa, function (erro, mat) {
+        pronto = true;
+        if (minha !== vez) return;
+        var m = !erro && mat ? mat.materias[p.t] : null;
+        if (!m) { porNoCartao([cabeca(p, null, p.a ? 'aprovada' : 'esperando'), h('p', { cls: 'cg-pa-c-o', text: erro ? 'Não foi possível abrir os dados desta matéria agora. Tente de novo em instantes.' : 'Sem ficha para esta matéria.' })]); if (erro) noCartao = ''; return; }
+        porNoCartao(p.a && m.rel && m.rel.q === 'passou' ? cartaoDaAprovada(p, m) : cartaoDaQueEspera(p, m));
+      });
+      if (!pronto) porNoCartao([cabeca(p, null, p.a ? 'aprovada' : 'esperando'), h('p', { cls: 'cg-pa-c-o', text: 'Carregando…' })], true);
+    }
+    function rolarAte(el) {
+      if (!el || !barraFixa) return;
+      var topo = w.pageYOffset + el.getBoundingClientRect().top - barraFixa.offsetHeight - 10;
+      if (w.scrollTo) { try { w.scrollTo({ top: Math.max(0, topo), behavior: parado ? 'auto' : 'smooth' }); } catch (erro) { w.scrollTo(0, Math.max(0, topo)); } }
+    }
+    function irAo(p, o) {
+      o = o || {};
+      if (!p) return;
+      emFoco = p;
+      if (halo) { halo.setAttribute('cx', p.x + '%'); halo.setAttribute('cy', p.y + '%'); halo.removeAttribute('visibility'); }
+      quadrados.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-ver') === p.t ? 'true' : 'false'); });
+      atualizarPasso();
+      desenhar(p);
+      if (!o.semEndereco) gravarEndereco();
+      if (o.rolar) rolarAte(plot);
+    }
+    /* Um atalho de fora do gráfico (a lista, a semana): se o filtro esconde a matéria, o filtro sai. */
+    function mostrarMateria(t) {
+      var p = porTitulo[t];
+      if (!p) return;
+      if (temFiltro() && !passa(p)) { F = { s: [], q: '', forte: false, tema: '' }; aplicar(true); }
+      irAo(p, { rolar: true });
+    }
+    function passo(delta) {
+      if (!ordem.length) return;
+      var i = emFoco ? ordem.indexOf(emFoco) : -1;
+      var alvo = i < 0 ? (delta > 0 ? 0 : ordem.length - 1) : Math.max(0, Math.min(ordem.length - 1, i + delta));
+      if (ordem[alvo] !== emFoco) irAo(ordem[alvo]);
+    }
+    navEl.hidden = false;
+    ant.addEventListener('click', function () { passo(-1); });
+    prox.addEventListener('click', function () { passo(1); });
+    function teclas(ev) {
+      if (ev.target && ev.target.closest && ev.target.closest('a, select, input')) return;
+      var delta = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : ev.key === 'Home' ? -1e6 : ev.key === 'End' ? 1e6 : 0;
+      if (!delta) return;
+      ev.preventDefault();
+      passo(delta);
+    }
+    plot.setAttribute('tabindex', '0');
+    plot.setAttribute('role', 'group');
+    plot.setAttribute('aria-label', 'Gráfico das matérias. As setas do teclado andam pelas matérias realçadas; a matéria em foco aparece no cartão ao lado.');
+    plot.addEventListener('keydown', teclas);
+    cw.addEventListener('keydown', teclas);
+
+    /* ── O ponteiro no gráfico: a dica do ponto mais perto; o clique o põe em foco ── */
+    function maisPerto(ev, raio) {
+      var r = svg.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, melhor = null, dist = raio * raio, filtro = temFiltro();
+      pontos.forEach(function (p) {
+        var dx = p.x * r.width / 100 - mx, dy = p.y * r.height / 100 - my, d2 = dx * dx + dy * dy;
+        if (d2 >= raio * raio) return;
+        d2 += (p.a ? 0 : 9) + (filtro && !passa(p) ? 64 : 0);  // na dúvida, a aprovada (desenhada por cima) e a que está realçada
+        if (d2 < dist) { dist = d2; melhor = p; }
+      });
+      return melhor;
+    }
+    var sobre = null;
+    function apagarDica() { if (sobre) sobre.el.classList.remove('on'); sobre = null; if (dicaDoPonto) dicaDoPonto.hidden = true; }
+    plot.addEventListener('pointermove', function (ev) {
+      if (ev.pointerType === 'touch' || !dicaDoPonto) return;
+      var p = maisPerto(ev, 14);
+      if (!p) { apagarDica(); return; }
+      if (p !== sobre) {
+        if (sobre) sobre.el.classList.remove('on');
+        sobre = p;
+        p.el.classList.add('on');
+        esvaziar(dicaDoPonto);
+        dicaDoPonto.appendChild(h('b', { text: p.t }));
+        dicaDoPonto.appendChild(h('span', { text: (p.a ? 'aprovada ' + emDias(p.d) : 'esperando; protocolada há ' + tempo(p.d)) + ' · nota ' + p.n + ' · clique para ver' }));
+      }
+      var caixa = fig.getBoundingClientRect(), r = svg.getBoundingClientRect();
+      var x = r.left - caixa.left + p.x * r.width / 100 + 12, y = r.top - caixa.top + p.y * r.height / 100 - 8;
+      dicaDoPonto.hidden = false;
+      if (x + dicaDoPonto.offsetWidth > caixa.width) x = Math.max(0, x - dicaDoPonto.offsetWidth - 24);
+      dicaDoPonto.style.left = x + 'px';
+      dicaDoPonto.style.top = Math.max(0, y - dicaDoPonto.offsetHeight) + 'px';
+    });
+    plot.addEventListener('pointerleave', apagarDica);
+    plot.addEventListener('click', function (ev) {
+      var p = maisPerto(ev, 20);
+      if (p) irAo(p);
+    });
+
+    /* ── Os filtros ── */
+    function alternar(f, soEste) {
+      var tipo = f.slice(0, 2), valor = f.slice(2), on = ligado(f);
+      if (soEste) F = { s: [], q: '', forte: false, tema: '' };
+      if (tipo === 's:') { if (soEste) F.s = on ? [] : [valor]; else if (on) F.s = F.s.filter(function (x) { return x !== valor; }); else F.s = F.s.concat([valor]); }
+      else if (tipo === 'q:') F.q = on ? '' : valor;
+      else if (tipo === 'f:') F.forte = !on;
+      aplicar();
+    }
+    chips.forEach(function (b) { b.addEventListener('click', function () { alternar(b.getAttribute('data-f') || ''); }); });
+    /* Um número da manchete: só ele realçado, e a tela vai ao gráfico. */
+    manchetes.forEach(function (b) {
+      b.addEventListener('click', function () { alternar(b.getAttribute('data-f') || '', true); rolarAte(bloco.querySelector('.cg-pa-g')); });
+    });
+    if (seletor) seletor.addEventListener('change', function () { F.tema = seletor.value; aplicar(); });
+    linhasDoTema.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var t = b.getAttribute('data-tema') || '', on = F.tema === t;
+        F = { s: [], q: '', forte: false, tema: on ? '' : t };
+        aplicar();
+        if (!on) rolarAte(bloco.querySelector('.cg-pa-g'));
+      });
+    });
+    if (limpar) limpar.addEventListener('click', function () { F = { s: [], q: '', forte: false, tema: '' }; aplicar(); });
+
+    /* ── A lista "vale olhar" e as semanas levam ao cartão ── */
+    lista(bloco.querySelectorAll('.cg-pa-ver')).forEach(function (b) {
+      b.hidden = false;
+      b.addEventListener('click', function () { mostrarMateria(b.getAttribute('data-ver')); });
+    });
+    if (semanas) {
+      if (quadrados.length) quadrados[0].setAttribute('tabindex', '0');
+      semanas.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('.cg-pa-b') : null;
+        if (!b) {  // o toque na coluna da semana: a primeira matéria dela; de novo, a seguinte
+          var coluna = ev.target.closest ? ev.target.closest('.cg-pa-w') : null, dela = coluna ? lista(coluna.querySelectorAll('.cg-pa-b')) : [];
+          if (!dela.length) return;
+          var i = -1;
+          dela.forEach(function (x, k) { if (emFoco && x.getAttribute('data-ver') === emFoco.t) i = k; });
+          b = dela[(i + 1) % dela.length];
+        }
+        mostrarMateria(b.getAttribute('data-ver'));
+      });
+      semanas.addEventListener('keydown', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('.cg-pa-b') : null, delta = ev.key === 'ArrowRight' || ev.key === 'ArrowUp' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowDown' ? -1 : 0;
+        if (!b || !delta) return;
+        ev.preventDefault();
+        var alvo = quadrados[Math.max(0, Math.min(quadrados.length - 1, quadrados.indexOf(b) + delta))];
+        quadrados.forEach(function (x) { x.setAttribute('tabindex', x === alvo ? '0' : '-1'); });
+        alvo.focus();
+      });
+    }
+
+    /* A tabela de todos os pontos: cada nome vira um link para a ficha (quando a tabela é aberta). */
+    var tabelaDosPontos = bloco.querySelector('.cg-pa-tb'), comLinks = false;
+    if (tabelaDosPontos) tabelaDosPontos.addEventListener('toggle', function () {
+      if (comLinks || !tabelaDosPontos.open) return;
+      comLinks = true;
+      lista(tabelaDosPontos.querySelectorAll('tbody th')).forEach(function (th) {
+        var t = th.textContent, k = chaveDaMateria(casa, t);
+        if (!k) return;
+        th.textContent = '';
+        th.appendChild(h('a', { cls: 'cg-mt', href: '#m=' + k, 'data-m': k, text: t }));
+      });
+    });
+
+    aplicar(true);
+    pautaDaCasa[casa] = {
+      doEndereco: function (p) {
+        var sinais = (p.s || '').split(',').filter(function (s) { return ROTULO[s]; });
+        var tema = p.t && seletor && lista(seletor.options).some(function (o) { return o.value === p.t; }) ? p.t : '';
+        F = { s: sinais, q: p.q === 'a' || p.q === 'e' ? p.q : '', forte: p.n === 'forte', tema: tema };
+        aplicar(true);
+        var alvo = materiaDaChave(p.m || ''), ponto = alvo && alvo.casa === casa ? porTitulo[alvo.titulo] : null;
+        if (ponto) irAo(ponto, { semEndereco: true });
+      }
+    };
+  });
+  /* #v=espera&c=cd&m=cd-PL-179-2026&s=urgencia,plenario&t=politica: a Casa, a matéria em foco e os filtros. */
+  aoEndereco.espera = function (q) {
+    var p = {};
+    (q || '').split('&').forEach(function (par) {
+      var i = par.indexOf('=');
+      if (i > 0) { try { p[par.slice(0, i)] = decodeURIComponent(par.slice(i + 1)); } catch (erro) { /* parâmetro malformado: ignorado */ } }
+    });
+    if (!p.c && !p.m && !p.s && !p.t && !p.q && !p.n) return;
+    var casa = p.c === 'sf' || (!p.c && /^sf-/.test(p.m || '')) ? 'sf' : 'cd';
+    if (!pautaDaCasa[casa]) return;
+    if (casas && !casas.hidden && root.getAttribute('data-ver') !== casa) verCasa(casa);
+    pautaDaCasa[casa].doEndereco(p);
+  };

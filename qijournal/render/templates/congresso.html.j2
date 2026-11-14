@@ -29,6 +29,7 @@
 {% include "congresso_tema.css.j2" %}
 {% include "congresso_temas.css.j2" %}
 {% include "congresso_papel.css.j2" %}
+{% include "congresso_pauta.css.j2" %}
 {% endblock %}
 
 {#- Nome que abre o dossiê (com script) ou a busca do nome no jornal (sem script). -#}
@@ -111,13 +112,13 @@
     <aside class="az-rail" aria-labelledby="cg-lentes-h">
       <h4 class="az-lbl" id="cg-lentes-h">O que tem em cada aba <span class="az-lbl-n">para ir direto ao ponto</span></h4>
       <ol class="cg-mapa">
-        <li><a class="hit" href="#cg-polos">Onde cada um está</a><p>De que lado cada um vota, no geral e em cada tema; e quais matérias foram votadas em cada tema, com o que cada polo fez. <b>{{ c.totais.divisivas|num }}</b> votações dividiram os polos.</p></li>
+        <li><a class="hit" href="#cg-polos">Onde cada um está</a><p>De que lado cada um vota, no geral e em cada tema; e, escolhido um tema, as votações dele numa tela só: o que se votou e quem votou, ponto a ponto. <b>{{ c.totais.divisivas|num }}</b> votações dividiram os polos.</p></li>
         <li><a class="hit" href="#cg-partidos">Partidos</a><p>Partido por tema, quanto cada partido vota junto com cada outro e onde os polos racham.</p></li>
-        <li><a class="hit" href="#cg-espera">O que espera × o que passa</a><p>O que está pronto para votar e o que foi votado, pela mesma régua; cada ponto abre a ficha da matéria.</p></li>
+        <li><a class="hit" href="#cg-espera">O que espera × o que passa</a><p>Por onde passou o que o Plenário aprovou (urgência, parecer no Plenário, sem registro de voto) e o que, com mais sinais de relevância, ficou esperando.</p></li>
         <li><a class="hit" href="#cg-fila">A fila</a><p>Em que porta cada matéria parou e quem segura. <b>{{ c.totais.tramitando|num }}</b> tramitando nas duas Casas.</p></li>
-        <li><a class="hit" href="#cg-plenario">Votações e matérias</a><p>Procure uma matéria pelo nome ou pelo assunto; as últimas votações. <b>{{ c.totais.votacoes|num }}</b> votações nominais desde 2023.</p></li>
+        <li><a class="hit" href="#cg-plenario">Votações e matérias</a><p>As últimas matérias votadas, cada uma numa folha, com o placar e quem saiu da linha; e a busca de qualquer matéria pelo nome, pelo assunto ou pelo tema. <b>{{ c.totais.votacoes|num }}</b> votações nominais desde 2023.</p></li>
         <li><a class="hit" href="#cg-quem">Parlamentares</a><p>As listas, a tabela de todos, o dossiê de cada um e o comparativo de dois. <b>{{ c.totais.pessoas|num }}</b> em exercício.</p></li>
-        <li><a class="hit" href="#cg-frentes">Frentes</a><p>Quem assina cada frente de causa e como vota no tema dela, ao lado do coordenador; quem assina quase todas.</p></li>
+        <li><a class="hit" href="#cg-frentes">Frentes</a><p>Quem assina vota junto com quem coordena? Um cartão por frente de causa, com a comparação com quem não assina; e quem assina quase todas.</p></li>
         <li><a class="hit" href="#cg-cota">Cota parlamentar</a><p>Quanto cada um gasta da cota, com o quê e com quem; os fornecedores que mais recebem, a mesma nota em dois gabinetes e o que a Casa recusou.</p></li>
         <li><a class="hit" href="#cg-escolha">Escolha o seu candidato</a><p>Filtre quem está no mandato pelo estado, pelo lado em que vota em cada tema, pelo que propõe e pela presença; cada nome diz por que entrou.</p></li>
       </ol>
@@ -295,65 +296,51 @@
     {% endfor %}
   </section>
 
-  {#- O que espera × o que passa -#}
+  {#- O que espera × o que passa: por onde passou o que o Plenário aprovou, o que ficou esperando,
+      para que temas a Casa olhou e em que semanas votou. Tudo sai no HTML; o script
+      (congresso_pauta.js.j2) liga os filtros, o cartão em foco e o endereço. -#}
   <section class="az-sec cg-vista" data-vista="espera" aria-labelledby="cg-espera-h">
     <header class="az-lh" id="cg-espera">
       <p class="az-ln">A pauta</p>
-      <h3 class="az-lt" id="cg-espera-h">O que está pronto para votar e o que foi votado, pela mesma régua</h3>
-      <p class="az-ld">Cada ponto do gráfico é uma matéria. Clique num ponto (ou num nome da lista) para abrir a ficha dela: o que é, quem propôs, os sinais de relevância um a um e por que andou ou não.</p>
+      <h3 class="az-lt" id="cg-espera-h">O que o Plenário aprovou, por onde passou e o que ficou esperando</h3>
+      <p class="az-ld">Quem faz a pauta decide o que anda. Aqui estão as matérias que o Plenário aprovou em 12 meses e as que estão prontas e esperam, lidas pela mesma régua. A página mostra o registro e a regra; a conclusão é de quem lê.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
       <h4 class="cg-ct">{{ casa.nome }}</h4>
-      {% if casa.relevancia %}{% set rv = casa.relevancia %}{% set g = rv.grafico %}
-      <div class="az-blk cg-rv" id="cg-relev-{{ casa.id }}">
-        <h4 class="az-h">O que espera × o que passa <span>a mesma régua para as matérias prontas e para as aprovadas</span></h4>
-        <p class="az-dek">Cada ponto é uma matéria: as {{ rv.esperam_n }} prontas para o Plenário e fora da pauta (círculos vazios) e as {{ rv.passaram_n }} aprovadas pelo Plenário nos últimos 12 meses (pontos cheios). Na altura, a nota de relevância, de 0 a 100, feita de sinais que dá para medir nos registros: {% if rv.sem_demanda %}a origem, o alcance da norma e o apoio entre partidos (os dados do Senado não dizem quantos projetos parecidos tramitam juntos){% else %}os projetos parecidos anexados, a origem, o alcance da norma e o apoio entre partidos{% endif %}. Na largura, o tempo desde o protocolo. Em cima e à direita fica o que tem sinais fortes e espera há anos; embaixo e à esquerda, o que passou rápido com sinais fracos.</p>
-        <figure class="cg-gr" data-grafico>
-          <div class="cg-gr-w">
-            <svg viewBox="0 0 {{ g.w }} {{ g.h }}" role="img" aria-labelledby="cg-gr-t-{{ casa.id }}">
-              <title id="cg-gr-t-{{ casa.id }}">Nota de relevância por tempo desde o protocolo: {{ rv.esperam_n }} matérias esperando e {{ rv.passaram_n }} aprovadas. A tabela abaixo do gráfico tem todos os pontos.</title>
-              <rect class="cg-gr-faixa" x="{{ g.l }}" y="{{ g.t }}" width="{{ g.largura }}" height="{{ g.alta - g.t }}"></rect>
-              <rect class="cg-gr-faixa" x="{{ g.l }}" y="{{ g.baixa }}" width="{{ g.largura }}" height="{{ g.b - g.baixa }}"></rect>
-              <text class="cg-gr-fx" x="{{ g.l + 6 }}" y="{{ g.t + 12 }}">sinais fortes ({{ rv.alta }} ou mais)</text>
-              <text class="cg-gr-fx" x="{{ g.l + 6 }}" y="{{ g.b - 6 }}">sinais fracos (abaixo de {{ rv.baixa }})</text>
-              {% for t in g.yticks %}<line class="cg-gr-grade" x1="{{ g.l }}" x2="{{ g.r }}" y1="{{ t.y }}" y2="{{ t.y }}"></line><text class="cg-gr-ty" x="{{ g.l - 8 }}" y="{{ t.y + 4 }}">{{ t.rotulo }}</text>{% endfor %}
-              {% for t in g.xticks %}<text class="cg-gr-tx{% if t.fim %} cg-gr-tx-fim{% endif %}" x="{{ t.x }}" y="{{ g.b + 18 }}">{{ t.rotulo }}</text>{% endfor %}
-              <line class="cg-gr-guia" x1="{{ g.x_rapida }}" x2="{{ g.x_rapida }}" y1="{{ g.t }}" y2="{{ g.b }}"></line>
-              <text class="cg-gr-tg" x="{{ g.x_rapida - 4 }}" y="{{ g.t + 28 }}">120 dias</text>
-              <text class="cg-gr-ex" x="{{ (g.l + g.r) / 2 }}" y="{{ g.h - 4 }}">tempo desde o protocolo (escala logarítmica)</text>
-              <g class="cg-gr-pts">{% for p in g.pontos %}<circle class="cg-gr-{{ p.g }}" cx="{{ p.x }}" cy="{{ p.y }}" r="4" data-t="{{ p.t }}" data-n="{{ p.n }}" data-tempo="{{ p.tempo }}" data-s="{{ p.situacao }}"></circle>{% endfor %}</g>
-            </svg>
+      {% if casa.relevancia %}{% set rv = casa.relevancia %}{% set g = rv.grafico %}{% set pa = casa.pauta %}
+      <div class="cg-pa" id="cg-relev-{{ casa.id }}" data-pauta="{{ casa.id }}" data-alta="{{ rv.alta }}" data-baixa="{{ rv.baixa }}"{% if pa %} data-outra="{{ pa.outra }}" data-foco="{{ pa.foco.t if pa.foco else "" }}"{% endif %}>
+        {#- As listas longas, a tabela e o método: escritos ao lado do "quando vota" (ou no fim, se a Casa não tiver os dados da pauta). -#}
+        {% set apendice %}
+        <details class="cg-pa-mais">
+          <summary>As listas longas: as {{ rv.esperam|length }} de nota mais alta que esperam e as {{ rv.passaram|length }} aprovadas de sinais mais fracos</summary>
+          <div class="az-2c">
+            <div class="az-col">
+              <h5 class="cg-rv-h">Sinais fortes, esperando <span>{{ rv.fortes_paradas }} com nota {{ rv.alta }} ou mais estão sem andamento há mais de um ano</span></h5>
+              <ol class="cg-ls cg-rv-l">
+                {% for i in rv.esperam %}
+                <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
+                  <p class="cg-ls-x">{{ i.e }}</p>
+                  <p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
+                  <p class="cg-rv-q">último andamento em {{ i.pronta }} · protocolada há {{ i.idade }}{% if i.urg %} · em regime de urgência, e não votada{% endif %}</p></li>
+                {% endfor %}
+              </ol>
+            </div>
+            <div class="az-col">
+              <h5 class="cg-rv-h">Sinais fracos, aprovadas <span>{{ rv.fracas_rapidas }} com nota abaixo de {{ rv.baixa }} passaram em menos de 120 dias; da mais rápida</span></h5>
+              <ol class="cg-ls cg-rv-l">
+                {% for i in rv.passaram %}
+                <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
+                  <p class="cg-ls-x">{{ i.e }}</p>
+                  {% if i.sinais %}<p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
+                  <p class="cg-rv-q">aprovada em {{ i.aprovada }}, {{ i.tempo }} depois do protocolo{% if i.autoria %} · {{ i.autoria }}{% endif %}</p>
+                  {% if i.passos %}<p class="cg-rv-c">Por onde passou: {{ i.passos|join("; ") }}.</p>{% endif %}</li>
+                {% endfor %}
+              </ol>
+            </div>
           </div>
-          <div class="cg-gr-dica" role="status" hidden></div>
-          <figcaption class="cg-gr-leg"><span><i class="cg-gr-le" aria-hidden="true"></i>pronta para o Plenário, esperando</span><span><i class="cg-gr-la" aria-hidden="true"></i>aprovada pelo Plenário (12 meses)</span><span>linha: 120 dias do protocolo</span></figcaption>
-        </figure>
-        <div class="az-2c">
-          <div class="az-col">
-            <h5 class="cg-rv-h">Sinais fortes, esperando <span>{{ rv.fortes_paradas }} com nota {{ rv.alta }} ou mais estão sem andamento há mais de um ano</span></h5>
-            <ol class="cg-ls cg-rv-l">
-              {% for i in rv.esperam %}
-              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
-                <p class="cg-ls-x">{{ i.e }}</p>
-                <p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
-                <p class="cg-rv-q">último andamento em {{ i.pronta }} · protocolada há {{ i.idade }}{% if i.urg %} · em regime de urgência, e não votada{% endif %}</p></li>
-              {% endfor %}
-            </ol>
-          </div>
-          <div class="az-col">
-            <h5 class="cg-rv-h">Sinais fracos, aprovadas <span>{{ rv.fracas_rapidas }} com nota abaixo de {{ rv.baixa }} passaram em menos de 120 dias; da mais rápida</span></h5>
-            <ol class="cg-ls cg-rv-l">
-              {% for i in rv.passaram %}
-              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.t, i.u) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-rv-n">nota {{ i.n }}</span>{% if i.jor %}<span class="cg-rv-jor">citada {{ i.jor }} {{ "vez" if i.jor == 1 else "vezes" }} no jornal</span>{% endif %}</p>
-                <p class="cg-ls-x">{{ i.e }}</p>
-                {% if i.sinais %}<p class="cg-rv-s">{% for s in i.sinais %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
-                <p class="cg-rv-q">aprovada em {{ i.aprovada }}, {{ i.tempo }} depois do protocolo{% if i.autoria %} · {{ i.autoria }}{% endif %}</p>
-                {% if i.passos %}<p class="cg-rv-c">Por que andou: {{ i.passos|join("; ") }}.</p>{% endif %}</li>
-              {% endfor %}
-            </ol>
-          </div>
-        </div>
-        <details class="cg-rv-tb">
+        </details>
+        <details class="cg-rv-tb cg-pa-tb">
           <summary>Todos os pontos do gráfico, em tabela</summary>
           <div class="an-tbl-wrap">
             <table class="an-tbl cg-tb">
@@ -362,7 +349,159 @@
             </table>
           </div>
         </details>
-        <p class="az-dek">A nota não diz se a matéria é boa ou ruim: diz quantos sinais de relevância pública ela tem nos registros oficiais. Os pesos estão no "Como ler" e são escolha editorial. Medidas provisórias ficam de fora, porque têm prazo na Constituição. Na Câmara, "por que andou" sai do histórico oficial de cada matéria.</p>
+        <p class="az-dek cg-pa-met">A nota não diz se a matéria é boa: diz quantos sinais de relevância ela tem nos registros oficiais. {% if casa.id == "cd" %}A urgência e o parecer saem do histórico oficial de cada matéria; {% endif %}“sem registro de voto” quer dizer que o texto principal não teve votação nominal no Plenário. Medidas provisórias ficam de fora, porque têm prazo na Constituição. Pesos, limiares e padrões são escolha editorial: estão no <a href="#cg-metodo">Como ler</a>.</p>
+        {% endset %}
+        {% set conferir %}
+            <div class="az-blk cg-pa-ap">
+              <h4 class="az-h">Para conferir <span>as listas inteiras e o método</span></h4>
+              {{ apendice }}
+            </div>
+        {% endset %}
+        {% if pa %}
+        {#- 1. As manchetes: cada número filtra o gráfico. -#}
+        <ul class="cg-pa-ms">
+          {% for m in pa.manchetes %}
+          <li><button type="button" class="cg-pa-m cg-3d" data-3d="3" data-f="{{ m.f }}" aria-pressed="false"><span class="cg-pa-m-n"><b>{{ m.num }}</b> {{ m.de }}</span><span class="cg-pa-m-f">{{ m.frase }}</span><span class="cg-pa-m-x">{{ m.nota }}</span><span class="cg-pa-m-ir" aria-hidden="true">ver no gráfico</span></button></li>
+          {% endfor %}
+        </ul>
+        {% if pa.sem_caminho %}<p class="az-dek">O registro do Senado não diz se a matéria teve urgência nem onde recebeu o parecer. Por isso, aqui só valem os sinais que dá para ler: o tempo do protocolo ao voto, a votação nominal, o assunto e a nota.</p>{% endif %}
+        {% endif %}
+
+        {#- 2. O gráfico e o cartão em foco. -#}
+        <div class="az-blk cg-pa-g" id="cg-pa-g-{{ casa.id }}">
+          <h4 class="az-h">O que passou rápido tinha mais sinais de relevância do que o que espera? <span>cada ponto é uma matéria</span></h4>
+          <p class="az-dek">Pontos cheios: as {{ rv.passaram_n }} aprovadas pelo Plenário em 12 meses. Círculos vazios: as {{ rv.esperam_n }} prontas para o Plenário, fora da pauta. Quanto mais alto, mais sinais de relevância: a nota, de 0 a 100, soma {% if rv.sem_demanda %}a origem, o alcance da norma e o apoio entre partidos (o Senado não informa os projetos parecidos){% else %}os projetos parecidos anexados, a origem, o alcance da norma e o apoio entre partidos{% endif %}. Quanto mais à direita, mais tempo desde o protocolo (o dia em que a matéria foi apresentada).</p>
+          {% if pa %}
+          <div class="cg-pa-fs" role="group" aria-label="Realçar no gráfico">
+            <span class="cg-pa-fk">Realçar</span>
+            <div class="cg-pa-chips">
+              <button type="button" class="cg-pa-f" data-f="q:a" aria-pressed="false">Só aprovadas <b>{{ pa.n }}</b></button>
+              <button type="button" class="cg-pa-f" data-f="q:e" aria-pressed="false">Só esperando <b>{{ g.pontos_e }}</b></button>
+              <button type="button" class="cg-pa-f cg-pa-f-fim" data-f="f:forte" data-dica="Nota de relevância {{ rv.alta }} ou mais, entre as aprovadas e as que esperam." aria-pressed="false">Sinais fortes <b>{{ g.fortes }}</b></button>
+              {% for f in pa.filtros %}<button type="button" class="cg-pa-f" data-f="s:{{ f.id }}" data-linha="{{ f.linha }}" data-dica="{{ f.dica }}" aria-pressed="false">{{ f.rotulo }} <b>{{ f.n }}</b></button>{% endfor %}
+            </div>
+            {% if pa.temas %}<label class="cg-pa-tema"><span>Tema</span> <select data-f-tema><option value="">todos</option>{% for t in pa.temas %}<option value="{{ t.id }}">{{ t.nome }} ({{ t.n }})</option>{% endfor %}</select></label>{% endif %}
+            <button type="button" class="cg-pa-limpa" hidden>Limpar</button>
+            <p class="cg-pa-st" role="status" aria-live="polite"></p>
+          </div>
+          {% endif %}
+          <div class="cg-pa-foco">
+            <figure class="cg-pa-fig">
+              <p class="cg-pa-ey" aria-hidden="true">nota de relevância ↑</p>
+              <div class="cg-pa-plot" data-plot>
+                <svg class="cg-pa-svg" role="img" aria-labelledby="cg-pa-t-{{ casa.id }}">
+                  <title id="cg-pa-t-{{ casa.id }}">Nota de relevância por tempo desde o protocolo: {{ rv.esperam_n }} matérias esperando e {{ rv.passaram_n }} aprovadas. A tabela no fim da aba tem todos os pontos.</title>
+                  <rect class="cg-pa-faixa" x="0" y="0" width="100%" height="{{ g.alta }}%"></rect>
+                  <rect class="cg-pa-faixa" x="0" y="{{ g.baixa }}%" width="100%" height="{{ 100 - g.baixa }}%"></rect>
+                  {% for t in g.yticks %}<line class="cg-pa-grade" x1="0" x2="100%" y1="{{ t.y }}%" y2="{{ t.y }}%"></line><text class="cg-pa-ty" x="-8" y="{{ t.y }}%" dy="4">{{ t.rotulo }}</text>{% endfor %}
+                  {% for t in g.xticks %}<line class="cg-pa-marca{% if not t.celular %} cg-pa-pc{% endif %}" x1="{{ t.x }}%" x2="{{ t.x }}%" y1="0" y2="100%"></line><text class="cg-pa-tx{% if t.ponta %} cg-pa-tx-{{ t.ponta }}{% endif %}{% if not t.celular %} cg-pa-pc{% endif %}" x="{{ t.x }}%" y="100%" dy="18">{{ t.rotulo }}</text>{% endfor %}
+                  {#- Os quatro cantos, nomeados no próprio gráfico: numa linha no PC, em duas no celular. -#}
+                  <g class="cg-pa-cantos cg-pa-pc">
+                    <text class="cg-pa-canto" x="8" y="17">sinais fortes, passou rápido</text>
+                    <text class="cg-pa-canto cg-pa-canto-d" x="100%" dx="-8" y="17">sinais fortes, esperando há anos</text>
+                    <text class="cg-pa-canto" x="8" y="100%" dy="-8">sinais fracos, passou rápido</text>
+                    <text class="cg-pa-canto cg-pa-canto-d" x="100%" dx="-8" y="100%" dy="-8">sinais fracos, esperando</text>
+                  </g>
+                  <g class="cg-pa-cantos cg-pa-cel" aria-hidden="true">
+                    <text class="cg-pa-canto" x="6" y="15">sinais fortes,<tspan x="6" dy="13">passou rápido</tspan></text>
+                    <text class="cg-pa-canto cg-pa-canto-d" x="100%" dx="-6" y="15">sinais fortes,<tspan x="100%" dx="-6" dy="13">esperando há anos</tspan></text>
+                    <text class="cg-pa-canto" x="6" y="100%" dy="-20">sinais fracos,<tspan x="6" dy="13">passou rápido</tspan></text>
+                    <text class="cg-pa-canto cg-pa-canto-d" x="100%" dx="-6" y="100%" dy="-20">sinais fracos,<tspan x="100%" dx="-6" dy="13">esperando</tspan></text>
+                  </g>
+                  <g class="cg-pa-pts">{% for p in g.pontos %}<circle class="cg-pa-{{ p.g }}" cx="{{ p.x }}%" cy="{{ p.y }}%" r="4.5" data-t="{{ p.t }}" data-n="{{ p.n }}" data-d="{{ p.d }}"{% if p.tm %} data-tm="{{ p.tm }}"{% endif %}{% if p.s %} data-s="{{ p.s }}"{% endif %}></circle>{% endfor %}</g>
+                  <circle class="cg-pa-sel" r="9"{% if pa and pa.foco_xy %} cx="{{ pa.foco_xy.x }}%" cy="{{ pa.foco_xy.y }}%"{% else %} cx="0" cy="0" visibility="hidden"{% endif %}></circle>
+                </svg>
+              </div>
+              <p class="cg-pa-ex" aria-hidden="true">tempo desde o protocolo → <span>(a escala cresce em saltos, para caber de 1 dia a 20 anos)</span></p>
+              <div class="cg-gr-dica cg-pa-dica" role="status" hidden></div>
+              <figcaption class="cg-gr-leg"><span><i class="cg-gr-la" aria-hidden="true"></i>aprovada pelo Plenário (12 meses)</span><span><i class="cg-gr-le" aria-hidden="true"></i>pronta para o Plenário, esperando</span><span><i class="cg-pa-lf" aria-hidden="true"></i>faixas: nota {{ rv.alta }} ou mais (sinais fortes) e abaixo de {{ rv.baixa }} (fracos)</span></figcaption>
+            </figure>
+            <div class="cg-pa-cw">
+              {% if pa and pa.foco %}{% set f = pa.foco %}
+              <article class="cg-pa-card cg-3d" data-3d="2" aria-label="Matéria em foco">
+                <p class="cg-pa-c-k"><span class="cg-pa-c-q cg-pa-c-qa">aprovada</span><a class="cg-mt cg-pa-c-t" href="#m={{ f.k }}" data-m="{{ f.k }}">{{ f.t }}</a>{% if f.apel %}<span class="cg-apel">{{ f.apel }}</span>{% endif %}<span class="cg-pa-c-n">nota <b>{{ f.n }}</b></span></p>
+                <p class="cg-pa-c-e">{{ f.e }}</p>
+                <h5 class="cg-pa-c-h">Do protocolo ao voto <b>{{ f.tempo }}</b></h5>
+                <ol class="cg-pa-tl">{% for p in f.passos %}<li><time>{{ p.data }}</time><b>{{ p.o }}</b><span>{{ p.x }}{% if p.x and p.depois %} · {% endif %}{{ p.depois }}</span></li>{% endfor %}</ol>
+                {% if pa.sem_caminho %}<p class="cg-pa-c-o">O registro do Senado não traz a urgência nem o parecer.</p>{% endif %}
+                {% if f.sinais %}
+                <h5 class="cg-pa-c-h">Os sinais desta matéria <b>{{ f.sinais|length }}</b></h5>
+                <ul class="cg-pa-c-s">{% for s in f.sinais %}<li><b>{{ s.rotulo }}</b><span>{{ s.x }}</span></li>{% endfor %}</ul>
+                {% endif %}
+                {% if f.enq %}<p class="cg-pa-c-enq"><b>Enquanto isso</b>, em {{ f.enq.tema }}: {% if f.enq.n == 0 %}nenhuma matéria com nota maior espera pronta para o Plenário.{% elif f.enq.n == 1 %}1 matéria com nota maior espera pronta para o Plenário, {{ materia(casa.id, f.enq.t) }}{% if f.enq.ha %}, protocolada há {{ f.enq.ha }}{% endif %}.{% else %}{{ f.enq.n }} matérias com nota maior esperam prontas para o Plenário; a mais antiga, {{ materia(casa.id, f.enq.t) }}{% if f.enq.ha %}, foi protocolada há {{ f.enq.ha }}{% endif %}.{% endif %}</p>{% endif %}
+                <p class="cg-pa-c-l"><a class="cg-mt" href="#m={{ f.k }}" data-m="{{ f.k }}">Abrir a ficha</a>{% if f.u %} · <a href="{{ f.u }}" target="_blank" rel="noopener noreferrer">Página oficial</a>{% endif %}</p>
+              </article>
+              {% else %}
+              <article class="cg-pa-card cg-3d" data-3d="2" aria-label="Matéria em foco"><p class="cg-pa-c-o">Escolha um ponto do gráfico para ver a matéria aqui.</p></article>
+              {% endif %}
+              <div class="cg-pa-nav" hidden><button type="button" class="cg-pa-ant" aria-label="Matéria anterior">‹</button><span class="cg-pa-pos" aria-live="polite"></span><button type="button" class="cg-pa-prox" aria-label="Próxima matéria">›</button></div>
+            </div>
+          </div>
+        </div>
+
+        {% if pa %}
+        {#- 3. Vale olhar. -#}
+        <div class="az-blk cg-pa-vb">
+          <h4 class="az-h">Vale olhar <span>{% if pa.vale_n %}{{ pa.vale_n }} {{ "aprovada" if pa.vale_n == 1 else "aprovadas" }} com {{ pa.vale_limiar }} sinais ou mais{% else %}nenhuma aprovada reúne {{ pa.vale_limiar }} sinais{% endif %}{% if not pa.sem_caminho %}; a urgência sozinha, a mais comum, não conta{% endif %}{% if pa.vale|length > 1 %}<i class="cg-pa-vl-h"> · arraste para o lado para ver {{ "as duas" if pa.vale|length == 2 else "todas" }}</i>{% endif %}</span></h4>
+          {% if pa.vale %}
+          <ol class="cg-pa-vl">
+            {% for i in pa.vale %}
+            <li class="cg-pa-v">
+              <p class="cg-pa-v-k"><b>{{ materia(casa.id, i.t) }}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span class="cg-pa-v-d">do protocolo ao voto <b>{{ i.tempo }}</b></span><button type="button" class="cg-pa-ver" data-ver="{{ i.t }}" hidden>ver no gráfico</button></p>
+              <p class="cg-pa-v-e">{{ i.e }}</p>
+              <p class="cg-pa-v-s">{% for s in i.chips %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>
+            </li>
+            {% endfor %}
+          </ol>
+          {% if pa.vale_n > pa.vale|length %}<p class="az-dek">Aqui, as {{ pa.vale|length }} primeiras: as de mais sinais e, entre elas, as mais rápidas.</p>{% endif %}
+          {% endif %}
+          <p class="az-dek">Um sinal diz por onde a matéria passou. Não diz que ela é ruim nem prova pressa indevida.{% if pa.proprio.n %} {{ pa.proprio.n }} {{ "aprovada trata" if pa.proprio.n == 1 else "aprovadas tratam" }} das regras do próprio jogo (eleições, partidos, mandatos, emendas ou cargos das Casas): {% if pa.proprio.n == 1 %}foi do protocolo ao voto em {{ pa.proprio.mediana }}{% else %}metade delas foi do protocolo ao voto em até {{ pa.proprio.mediana }}{% endif %}; entre as demais, metade levou até {{ pa.proprio.demais }}. Outras {{ pa.proprio.esperam }} do mesmo assunto esperam prontas.{% endif %}</p>
+        </div>
+
+        <div class="az-2c cg-pa-2c">
+          {#- 4. A direção da Casa. -#}
+          <div class="az-col">
+            <div class="az-blk">
+              <h4 class="az-h">A direção da Casa <span>por tema: o que foi aprovado × o que espera pronto</span></h4>
+              {% if pa.direcao %}
+              <p class="az-dek">Em cima, os temas que o Plenário votou mais do que a fila sugeriria; embaixo, os que ficaram para trás. Vale o 1º tema de cada matéria.</p>
+              <p class="cg-gr-leg cg-pa-d-leg"><span><i class="cg-pa-d-la" aria-hidden="true"></i>parte das {{ pa.n }} aprovadas</span><span><i class="cg-pa-d-le" aria-hidden="true"></i>parte das {{ pa.esperam }} prontas que esperam</span></p>
+              <ol class="cg-pa-dl">
+                {% for d in pa.direcao %}
+                {% if d.corte %}<li class="cg-pa-d-sep">daqui para baixo, a fila pede mais do que o Plenário votou</li>{% endif %}
+                <li><button type="button" class="cg-pa-d" data-tema="{{ d.id }}" aria-pressed="false"><span class="cg-pa-d-n"><i class="cg-pa-d-c" style="background:var(--cg-t-{{ d.id }},var(--muted))" aria-hidden="true"></i>{{ d.nome }}</span><span class="cg-pa-d-t"><i class="cg-pa-d-a" style="width:{{ d.wa }}%"></i><i class="cg-pa-d-e" style="width:{{ d.we }}%"></i></span><span class="cg-pa-d-v"><span><b>{{ d.a }}</b> {{ "aprovada" if d.a == "1" else "aprovadas" }} · {{ d.pa }}</span><span><b>{{ d.e }}</b> esperando · {{ d.pe }}</span></span></button></li>
+                {% endfor %}
+              </ol>
+              {% else %}
+              <p class="az-dek">Só {{ pa.sem_tema.com_a }} das {{ pa.n }} aprovadas e {{ pa.sem_tema.com_e }} das {{ pa.esperam }} que esperam têm tema no registro {{ "do Senado" if casa.id == "sf" else "da Câmara" }}. É pouco para comparar tema com tema; por isso a comparação não aparece aqui.</p>
+              {% endif %}
+              {% if pa.origem %}<p class="az-dek cg-pa-or">De onde vieram as {{ pa.n }} aprovadas: {{ pa.origem|join("; ") }}.</p>{% endif %}
+            </div>
+            {% if not pa.direcao %}{{ conferir }}{% endif %}
+          </div>
+          {#- 5. Quando vota. -#}
+          <div class="az-col">
+            <div class="az-blk">
+              <h4 class="az-h">Quando vota <span>um quadradinho por matéria aprovada, semana a semana</span></h4>
+              {% if pa.quando %}{% set q = pa.quando %}
+              <div class="cg-pa-q" style="--pa-max:{{ q.maior }}" role="group" aria-label="Matérias aprovadas por semana, em 12 meses">
+                {% for s in q.colunas %}
+                <div class="cg-pa-w{% if s.cheia %} cg-pa-w-ch{% endif %}{% if s.recesso %} cg-pa-w-rec{% endif %}{% if s.marco %} cg-pa-w-dia{% endif %}" data-sem="{{ s.d }}">{% for m in s.m %}<button type="button" class="cg-pa-b" tabindex="-1" data-ver="{{ m.t }}" aria-label="{{ m.t }}, semana de {{ s.data }}" title="{{ m.t }}"></button>{% endfor %}{% if s.cheia %}<b class="cg-pa-w-n">{{ s.n }}</b>{% endif %}{% if s.recesso_ini %}<span class="cg-pa-w-r">recesso</span>{% endif %}{% if s.marco %}<span class="cg-pa-w-m">{{ s.marco }}</span>{% endif %}{% if s.mes %}<span class="cg-pa-w-x{% if not s.mes_celular %} cg-pa-pc{% endif %}">{{ s.mes }}</span>{% endif %}</div>
+                {% endfor %}
+              </div>
+              <p class="az-ph cg-pa-q-f">{% if q.topo|length == 1 %}A semana mais cheia: a de {{ q.topo[0].data }} ({{ q.topo[0].n }} {{ "aprovada" if q.topo[0].n == 1 else "aprovadas" }}).{% else %}As {{ q.topo|length }} semanas mais cheias: {% for s in q.topo %}{% if not loop.first %}{{ " e " if loop.last else ", " }}{% endif %}a de {{ s.data }} ({{ s.n }}{% if loop.first %} aprovadas{% endif %}){% endfor %}.{% endif %}</p>
+              <p class="az-dek">Com o número em cima, {% if q.cheias_n == 1 %}a semana cheia{% else %}as {{ q.cheias_n }} semanas cheias{% endif %}: {{ q.surto_de }} aprovações ou mais, {{ q.vezes }} vezes a mediana ({{ q.mediana }}) das {{ q.semanas_n }} semanas em que houve aprovação. A semana vai de segunda a domingo. Do calendário oficial: {% for m in q.marcos %}{{ m.nome }}, {{ m.quando }}{{ "; " if not loop.last else "." }}{% endfor %} A página anota as datas; não diz a causa de nenhuma semana.</p>
+              {% else %}
+              <p class="az-dek">Sem aprovações no período.</p>
+              {% endif %}
+            </div>
+            {% if pa.direcao %}{{ conferir }}{% endif %}
+          </div>
+        </div>
+        {% else %}
+        {{ apendice }}
+        {% endif %}
+
       </div>
       {% endif %}
       {% if not casa.relevancia %}<p class="term-note">Sem os dados desta comparação nesta atualização.</p>{% endif %}
@@ -374,8 +513,8 @@
   <section class="az-sec cg-vista" data-vista="fila" aria-labelledby="cg-fila-h">
     <header class="az-lh" id="cg-fila">
       <p class="az-ln">A fila</p>
-      <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
-      <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
+      <h3 class="az-lt" id="cg-fila-h">O que espera, e com quem</h3>
+      <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou. O que o Plenário aprovou, e por onde passou, está em <a href="#cg-espera">O que espera × o que passa</a>.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -436,18 +575,6 @@
               <li><p class="cg-ls-k"><b>{% if i.u %}<a href="{{ i.u }}" target="_blank" rel="noopener noreferrer">{{ i.t }}</a>{% else %}{{ i.t }}{% endif %}</b>{% if i.apel %}<span class="cg-apel">{{ i.apel }}</span>{% endif %}<span>parada há {{ i.tempo }}</span></p><p class="cg-ls-x">{{ i.e }}</p></li>
               {% endfor %}
             </ol>
-          </div>
-          {% endif %}
-          {% if casa.furaram %}{% set r = casa.furaram %}
-          <div class="az-blk" id="cg-furaram-{{ casa.id }}">
-            <h4 class="az-h">Passaram na frente <span>do protocolo ao voto em menos de 120 dias</span></h4>
-            <p class="az-ph">{{ r.rapidas_n }} de {{ r.aprovadas }} matérias aprovadas no Plenário desde {{ r.desde }}; {{ r.com_urgencia }} tiveram a urgência votada.</p>
-            <ol class="cg-ls">
-              {% for i in r.rapidas %}
-              <li><p class="cg-ls-k"><b>{{ materia(casa.id, i.p) }}</b><span>{{ i.tempo }}{% if i.urg %} · com urgência{% endif %} · votada em {{ i.data }}</span></p><p class="cg-ls-x">{{ i.e }}{% if i.autoria %} <i>Autoria: {{ i.autoria }}.</i>{% endif %}</p></li>
-              {% endfor %}
-            </ol>
-            <p class="az-dek">Metade das aprovadas levou menos de {{ r.mediana }} desde a apresentação. Só entram matérias com votação nominal do texto principal.</p>
           </div>
           {% endif %}
         </div>

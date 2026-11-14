@@ -135,6 +135,42 @@ class Relevancia:
         return dict(self.pesos).get(componente, 0.0)
 
 
+@dataclass(frozen=True)
+class GrupoDoJogo:
+    """Um grupo de "regras do próprio jogo" (eleições, partidos, mandato…): os padrões valem
+    sobre o começo da ementa, normalizada (sem acento, minúsculas)."""
+
+    id: str
+    nome: str
+    padroes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Marco:
+    """Uma data do calendário oficial anotada no "quando vota" (recesso, eleição). ``de`` e
+    ``ate`` em ``MM-DD`` valem para todo ano; em ``AAAA-MM-DD``, para aquele dia."""
+
+    nome: str
+    de: str
+    ate: str = ""
+
+
+@dataclass(frozen=True)
+class Pauta:
+    """Os sinais das matérias aprovadas pelo Plenário ("O que espera × o que passa"): os
+    limiares, os padrões de "regras do próprio jogo" e o calendário. Tudo escolha editorial,
+    em ``config/congresso.yaml`` (``pauta``). Sem padrões no arquivo, o sinal não existe."""
+
+    relampago_dias: int = 30  # "relâmpago": do protocolo ao voto em até N dias
+    sinais_vale_olhar: int = 4  # "vale olhar": tantos sinais ou mais (a urgência sozinha não conta)
+    sinais_vale_olhar_senado: int = 3  # o mesmo no Senado, onde o registro só permite ler quatro sinais
+    surto_vezes: float = 2.0  # "surto": semana com N vezes a mediana das semanas com aprovação
+    ementa_ate: int = 400  # "regras do próprio jogo": o padrão tem de começar nos primeiros N caracteres
+    tema_minimo: int = 50  # a direção por tema só aparece se ao menos N% das aprovadas e das que esperam têm tema no registro
+    proprio_jogo: tuple[GrupoDoJogo, ...] = ()
+    calendario: tuple[Marco, ...] = ()
+
+
 CAMPOS_PADRAO = (
     Campo("esquerda", "com a esquerda", -60),
     Campo("centro_esquerda", "mais com a esquerda", -20),
@@ -156,6 +192,7 @@ class Regras:
     apelidos: dict[str, list[str]] = field(default_factory=dict)  # "PL 2630/2020" → ["PL das Fake News", …]
     frentes: tuple[FrenteDeCausa, ...] = ()  # as frentes parlamentares de causa (só a Câmara registra quem assina)
     fusoes: dict[str, str] = field(default_factory=dict)  # partido que deixou de existir → o sucessor (siglas normalizadas)
+    pauta: Pauta = field(default_factory=Pauta)  # os sinais das aprovadas, o calendário e as "regras do próprio jogo"
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
@@ -245,6 +282,31 @@ def _relevancia(bruto: Any) -> Relevancia:
     return Relevancia(**{**padrao.__dict__, **campos})
 
 
+def _pauta(bruto: Any) -> Pauta:
+    if not isinstance(bruto, dict):
+        return Pauta()
+    campos: dict[str, Any] = {}
+    for chave in ("relampago_dias", "sinais_vale_olhar", "sinais_vale_olhar_senado", "ementa_ate", "tema_minimo"):
+        if bruto.get(chave) is not None:
+            campos[chave] = int(bruto[chave])
+    if bruto.get("surto_vezes") is not None:
+        campos["surto_vezes"] = float(bruto["surto_vezes"])
+    grupos = []
+    for g in bruto.get("proprio_jogo") or []:
+        padroes = tuple(str(p) for p in (g.get("padroes") or []) if str(p).strip()) if isinstance(g, dict) else ()
+        if padroes and g.get("id"):
+            for padrao in padroes:
+                re.compile(padrao)  # padrão inválido no arquivo: erro na leitura, não uma regra muda
+            grupos.append(GrupoDoJogo(id=str(g["id"]), nome=str(g.get("nome") or g["id"]).strip(), padroes=padroes))
+    campos["proprio_jogo"] = tuple(grupos)
+    campos["calendario"] = tuple(
+        Marco(nome=str(m.get("nome") or "").strip(), de=str(m["de"]), ate=str(m.get("ate") or ""))
+        for m in bruto.get("calendario") or []
+        if isinstance(m, dict) and m.get("de")
+    )
+    return Pauta(**campos)
+
+
 def de_dict(bruto: dict[str, Any]) -> Regras:
     limiares = Limiares(**{k: v for k, v in (bruto.get("limiares") or {}).items() if k in Limiares.__dataclass_fields__})
     campos = tuple(
@@ -296,6 +358,7 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             for de in (f.get("de") if isinstance(f.get("de"), list) else [f.get("de")])
             if de
         },
+        pauta=_pauta(bruto.get("pauta")),
     )
 
 
