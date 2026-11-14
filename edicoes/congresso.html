@@ -2320,6 +2320,7 @@ body.cg-aberto{overflow:hidden}
 .cg-esc-mf[open]>summary{margin-bottom:12px}
 .cg-esc-mais{display:block;margin:18px auto 0;padding:9px 22px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--link);font-family:var(--ss);font-size:13px;font-weight:700;cursor:pointer}
 .cg-esc-mais:hover{border-color:var(--link)}
+.cg-fr[hidden]{display:none}
 .cg-esc-e1{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--rl)}
 .cg-esc-rot{margin-bottom:6px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
 .cg-esc-ufs{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
@@ -2524,7 +2525,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
 .cg-tv-nota{margin-left:auto;font-family:var(--mn);font-size:11px;color:var(--muted);cursor:help}
 .cg-tv-nota b{font-size:13px;color:var(--ink)}
 .cg-tv-c-s{margin-top:3px;font-family:var(--mn);font-size:10.5px;line-height:1.5;color:var(--muted)}
-.cg-tv-c-e{margin-top:9px;font-family:var(--sf);font-size:17.5px;line-height:1.4;color:var(--ink);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;overflow:hidden}
+.cg-tv-c-e{margin-top:9px;font-family:var(--sf);font-size:17.5px;line-height:1.4;color:var(--ink);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--cg-tv-em,6);overflow:hidden}
 .cg-tv-c-x{margin-top:5px;font-size:12.5px;line-height:1.45;color:var(--body);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .cg-tv-c-x b{color:var(--ink)}
 .cg-tv-c-l{margin-top:7px;font-size:12px;color:var(--muted)}
@@ -2635,7 +2636,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
 .cg-pn-nomes i{font-style:normal;font-weight:600;color:var(--ink)}
 
 /* A dica dos pontos (ponteiro, foco e toque), com o retrato; nunca é o único jeito de ler */
-.cg-tv-dica{position:fixed;z-index:90;display:flex;gap:9px;max-width:300px;padding:8px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);box-shadow:0 8px 24px rgba(0,0,0,.2);font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body);pointer-events:none}
+.cg-tv-dica{position:fixed;z-index:90;display:flex;gap:9px;max-width:300px;padding:8px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);box-shadow:var(--cg-sombra);font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body);pointer-events:none}
 .cg-tv-dica[hidden]{display:none}
 .cg-tv-dica b{display:block;font-size:13px;color:var(--ink)}
 .cg-tv-mn{font-family:var(--mn);font-size:11px}
@@ -2646,7 +2647,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
 .cg-tv-lista li{padding:8px 0;border-top:1px solid var(--rl);line-height:1.5;color:var(--body)}
 .cg-tv-lista li b{font-family:var(--mn)}
 .cg-tv-lista li small{display:block;font-family:var(--mn);font-size:11px;color:var(--muted)}
-.cg-tv-pe{max-width:920px;margin-top:12px;font-size:12px;line-height:1.6;color:var(--muted)}
+.cg-tv-pe{max-width:1100px;margin-top:12px;font-size:12px;line-height:1.6;color:var(--muted)}
 
 /* ── Telas estreitas: o foco vira um cartão de duas faces; no celular, a fita vira linhas ── */
 @media (max-width:1000px){
@@ -11183,7 +11184,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
       <div class="cg-esc-at" id="cgEscAt" role="group" aria-label="Atalhos">
         <span class="cg-esc-rot">O que é raro e diz muito</span>
         <button type="button" class="cg-esc-atb" data-at="troca" aria-pressed="false">Mudou de partido na legislatura <b></b></button>
-        <button type="button" class="cg-esc-atb" data-at="fid" aria-pressed="false">Vota diferente do partido <b></b></button>
+        <button type="button" class="cg-esc-atb" data-at="fid" aria-pressed="false" data-dica="Votou com a maioria do próprio partido em menos de 80% das vezes.">Vota diferente do partido <b></b></button>
         <button type="button" class="cg-esc-atb" data-at="pres" aria-pressed="false">Votou em menos de 60% das votações <b></b></button>
         <button type="button" class="cg-esc-atb" data-at="exc" aria-pressed="false">Muda de lado em algum tema <b></b></button>
       </div>
@@ -11825,6 +11826,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     <dl class="az-dl">
       <div><dt>De onde vem</dt><dd>Dos dados abertos da Câmara dos Deputados (arquivos em lote e API) e do Senado Federal (API legislativa), baixados todo dia antes da edição. São registros oficiais; nenhuma IA entra nas contas.</dd></div>
       <div><dt>Só votação nominal</dt><dd>Só as votações que registram o voto de cada um, no Plenário. A votação simbólica, que é a maioria, não diz quem votou o quê. No Senado, as votações secretas (escolha de autoridades) contam para a presença, não para a posição.</dd></div>
+      <div><dt>O placar</dt><dd>O placar sai como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (a bancada que se declara em obstrução não dá número à votação). Na conta de que lado cada um ficou, a obstrução vale como Não, porque é de quem não quer a matéria votada; no placar, ela não é voto Não. Proposta de emenda à Constituição precisa do Sim de três quintos da Casa (308 deputados; 49 senadores) e projeto de lei complementar, da maioria absoluta (257; 41), no texto e em cada destaque: a página mostra esse número ao lado do placar, porque um texto pode ter mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes.</dd></div>
       <div><dt>Com quem vota</dt><dd>Entram só as votações de conteúdo (texto principal, destaques e emendas) em que a maioria do polo de esquerda (PCdoB, PSOL, PT) votou de um jeito e a do polo de direita (NOVO, PL), de outro, com pelo menos 75% de cada polo do mesmo lado. O saldo vai de −100 (sempre com a esquerda) a +100 (sempre com a direita) e só aparece com 10 votações ou mais. É comportamento, não rótulo: diz com quem a pessoa vota, não o que ela diz ser.</dd></div>
       <div><dt>Por que um voto é “de esquerda” ou “de direita”</dt><dd>Não é o assunto que define o lado. Em cada votação, a esquerda é o lado em que votou a maioria (75% ou mais) dos parlamentares de PCdoB, PSOL, PT; a direita, o da maioria de NOVO, PL. Votar “com a esquerda” é votar igual a essa maioria naquela votação: numa, isso é votar Sim; em outra, votar Não. Por isso os partidos que definem os polos ficam nas pontas (−100 e +100) quase por definição: eles são a régua. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para saber por que um voto caiu de um lado, a página mostra, em cada votação, o que estava em jogo e o Sim–Não de cada partido dos polos (na ficha da matéria, no detalhe de cada tema e nos votos de cada um por tema).</dd></div>
       <div><dt>Quanto os partidos votam juntos</dt><dd>Na aba Partidos, uma conta que não depende da régua dos polos: em todas as votações de conteúdo do Plenário, dois partidos votaram juntos quando a maioria de cada um ficou do mesmo lado. A tabela dá a porcentagem para cada par (par com menos de 20 votações fica vazio). Ao lado, quantas votações foram de consenso (os dois polos do mesmo lado), quantas opuseram os polos (as únicas que entram no saldo), quantas tiveram racha e em quantas um polo não teve maioria clara.</dd></div>
@@ -11847,10 +11849,10 @@ a.cg-tv-c-t:hover{text-decoration:underline}
       <div><dt>O jornal</dt><dd>Os nomes parlamentares são procurados nas manchetes e nas matérias das últimas 46 edições (51.085 manchetes lidas). A regra é conservadora: nome inteiro, com as maiúsculas do registro; nomes de uma palavra e homônimos só valem com o título (“deputado”, “senadora”) ou a legenda ao lado.</dd></div>
       <div><dt>No jornal × no voto</dt><dd>O texto do jornal que cita a pessoa e uma proposição, pelo número (&#34;PEC 3/2021&#34;) ou por um apelido conferido contra a ementa oficial (a lista fica em config/congresso.yaml; apelido que serve a mais de um projeto fica de fora). Numa matéria, a pessoa e a proposição precisam estar na mesma frase. Ao lado, os votos dela nessa proposição (o texto principal primeiro; na PEC, com o turno que a descrição oficial da votação dá). A página não interpreta a fala: põe as duas coisas lado a lado.</dd></div>
       <div><dt>O comparativo</dt><dd>Compara quaisquer dois parlamentares, das duas Casas: pelos nomes em &#34;Comparar dois&#34;, marcando dois na tabela, pelo dossiê ou trocando um dos lados dentro do comparativo. Votam juntos: nas votações de conteúdo da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não), a parte em que votaram igual; ao lado, a mesma conta só nas que dividiram esquerda e direita. Num tema, os dois ficam de lados opostos quando cada um tem saldo de 20 ou mais, um para cada lado. Deputado e senador não têm votações em comum: as Casas votam em separado.</dd></div>
-      <div><dt>Frentes</dt><dd>Uma frente parlamentar é um grupo registrado na Câmara em torno de uma causa; para registrar, basta reunir um terço das assinaturas do Congresso, e o registro diz quem assinou e quem coordena (os dados abertos da Câmara, em lote). O Senado não publica quem assina. A página não lista todas: as frentes de causa, com o tema da aba em que cada causa se vota, ficam em config/congresso.yaml, com as duas pontas de cada tema. Para cada uma, o lado de cada membro em exercício (o saldo dele nas votações esquerda × direita do tema, 5 ou mais; nas frentes sem um tema só, o saldo geral) e quanto ele votou igual ao coordenador nessas votações (Sim ou Não; obstrução conta como Não). A frente não registra posição: o coordenador é quem a registra e responde por ela. A Câmara não registra quando cada um assinou.</dd></div>
+      <div><dt>Frentes</dt><dd>Uma frente parlamentar é um grupo registrado na Câmara em torno de uma causa; para registrar, basta reunir as assinaturas de um terço dos deputados e senadores (Ato da Mesa nº 69, de 2005), e o registro diz quem assinou e quem coordena (os dados abertos da Câmara, em lote). O Senado não publica quem assina. A página não lista todas: as frentes de causa, com o tema da aba em que cada causa se vota, ficam em config/congresso.yaml, com as duas pontas de cada tema. Cada cartão responde a uma pergunta: quem assina vota junto com quem coordena? A conta usa as votações esquerda × direita do tema da frente (nas frentes sem um tema só, todas): a parte das vezes em que cada membro em exercício votou igual ao coordenador (Sim ou Não; obstrução conta como Não). Ao lado vai a mesma conta para os deputados em exercício que não assinam: é a base de comparação, porque assinar só diz alguma coisa se quem assina vota diferente de quem não assina. Cada ponto do cartão é um deputado que assina, do lado em que ele vota no tema (o saldo dele, com 5 ou mais votações). “Do lado oposto ao do coordenador” só aparece quando o coordenador vota numa das pontas da régua (saldo até −60 ou acima de +60): são os que assinam e votam do outro lado, fora da faixa “dividido”. Com menos de 20 votações no tema, o cartão avisa que são poucas. Coordenador é só quem a lista de membros marca assim. O cartão abre a ficha da frente, com todos os que assinam, um a um. A frente não registra posição: o coordenador é quem a registra e responde por ela. A Câmara não registra quando cada um assinou.</dd></div>
       <div><dt>Nas comissões</dt><dd>As votações nominais das comissões (na Câmara, dos arquivos em lote de votações; no Senado, da API de votações em comissão das 16 permanentes). Ficam fora das contas do Plenário (saldo, presença, governismo): a maioria das decisões das comissões é simbólica, a maioria das nominais é de requerimento de pauta, e só os membros votam, então uma taxa mediria mais a sorte de ser membro do que a posição. A página lista os votos. Na Câmara, o voto é no parecer do relator (Sim é aprovar o parecer, que pode concluir pela rejeição; a conclusão vem do último parecer registrado) e só aparece quem votou. “Mudou de voto entre a comissão e o Plenário”: o Plenário votou o parecer de uma comissão; vale a última votação da comissão que aprovou esse parecer, e entra quem votou Sim ou Não nas duas. No Senado, o registro não diz se o item era terminativo nem o resultado: a página mostra a descrição oficial e o placar.</dd></div>
       <div><dt>Cota parlamentar</dt><dd>Os reembolsos da cota para o exercício da atividade parlamentar, nota a nota: na Câmara, os arquivos anuais oficiais (com o endereço de cada nota); no Senado, os dados abertos administrativos. O valor é o reembolsado: a nota menos a glosa (a parte que a própria Casa recusou) e menos o que o parlamentar devolveu. A média por mês é o total da legislatura dividido pelos meses fechados com despesa (o mês corrente, ainda incompleto, fica fora da média): a cota acumula dentro do ano, então um mês alto não diz nada sozinho; as listas só têm quem tem 6 meses ou mais. O fornecedor é contado pelo CNPJ; pagamento a pessoa física não tem o nome mostrado. “Um fornecedor só”: 25% ou mais do próprio total para uma empresa, com R$ 50 mil ou mais. “A mesma nota em mais de um gabinete”: mesmo CNPJ, número, data e valor reembolsados a pessoas diferentes (números que são só mês/ano, como “9/2026”, ficam de fora); o registro não diz o motivo. Na Câmara, ficam fora de todos os anos as passagens aéreas compradas pela agência da Casa (SIGEPA), que o arquivo oficial deixou de trazer em agosto de 2025: com elas em uns anos e não em outros, a comparação seria injusta; ao lado de quem parece gastar pouco, a página mostra quanto ele teve em passagens da agência em 2024, o último ano completo. No Senado, fica fora o reembolso de moradia, que o Senado lança no mesmo arquivo mas não conta como cota. O teto da cota muda por estado e não está nos dados abertos.</dd></div>
-      <div><dt>Escolha o seu candidato</dt><dd>Um filtro sobre quem está no mandato, com os mesmos números do resto da página: o estado, o partido, o lado em que vota em cada tema (com a esquerda: saldo do tema até −20; dividido: acima disso e até +20; com a direita: acima de +20; só quem tem 5 ou mais votações esquerda × direita no tema), o tema sobre o qual propôs (autoria principal), a frente que assina, a presença, o governismo e as propostas que viraram norma. Escolhidos os temas, a lista se ordena por quanto cada um está do lado escolhido (a média, nos temas escolhidos, do saldo no sentido pedido). Não é recomendação: é o registro de cada um diante do que você escolher.</dd></div>
+      <div><dt>Escolha o seu candidato</dt><dd>Não é lista de candidatos: é quem está no mandato hoje, um cartão cada, com os mesmos números do resto da página: o estado, o partido, de que lado vota (a régua), a presença e quanto vota com o próprio partido (com a mediana da Casa ao lado) e o que propôs. “Exceção” é o tema em que a pessoa vota do lado oposto ao do seu padrão geral: ela tem lado no geral e, num tema com 5 votações ou mais, fica do outro (havendo mais de um, o de mais votações). “Mudou de partido” traz o partido anterior e o mês do primeiro voto registrado pelo partido atual (a data da filiação não está nos dados de votação). Os atalhos: mudou de partido na legislatura; vota diferente do partido (com a maioria dele em menos de 80% das vezes); votou em menos de 60% das votações; muda de lado em algum tema (a exceção). Os filtros: o lado em que vota em cada tema (com a esquerda: saldo do tema até −20; dividido: acima disso e até +20; com a direita: acima de +20; só quem tem 5 ou mais votações esquerda × direita no tema), o tema sobre o qual propôs (autoria principal), a frente que assina, a presença, o governismo, as propostas que viraram norma e a cota (na Câmara, comparada dentro do estado, porque o teto muda por estado; no Senado, com a Casa inteira). Escolhidos os temas, a lista se ordena por quanto cada um está do lado escolhido (a média, nos temas escolhidos, do saldo no sentido pedido). As fotos são as oficiais de cada Casa. Não é recomendação: é o registro de cada um diante do que você escolher.</dd></div>
       <div><dt>O que isto não diz</dt><dd>Voto não é discurso, e a página não lê discurso: ela mostra o registro para ser posto ao lado do que cada um diz. Voto com o governo não é ideologia; votação simbólica não aparece; ausência pode ter motivo que o registro não traz. Os polos e os temas são escolhas editoriais, escritas aqui para poderem ser contestadas.</dd></div>
     </dl>
     <div class="az-blk" id="cg-temas-def">
@@ -13753,7 +13755,29 @@ a.cg-tv-c-t:hover{text-decoration:underline}
         return oa - ob;
       });
       cartoes.forEach(function (c) { grade.appendChild(c); });
+      aVista = LOTE_FR;
+      mostrarLote();
     });
+    /* Os primeiros cartões à vista e o resto a um toque: a ordem já põe na frente o que mais chama
+       a atenção. Sem script, todos os cartões ficam na página. */
+    var LOTE_FR = 6, aVista = LOTE_FR;
+    var mais = h('button', { cls: 'cg-esc-mais', type: 'button' });
+    function mostrarLote() {
+      cartoes.forEach(function (c, i) { c.hidden = i >= aVista; });
+      var faltam = cartoes.length - aVista;
+      mais.hidden = faltam <= 0;
+      if (faltam > 0) mais.textContent = 'Mostrar mais ' + Math.min(LOTE_FR, faltam) + ' frentes' + (faltam > LOTE_FR ? ' (faltam ' + num(faltam) + ')' : '');
+    }
+    mais.addEventListener('click', function () {
+      var primeiro = cartoes[aVista];
+      aVista += LOTE_FR;
+      mostrarLote();
+      if (primeiro) { primeiro.setAttribute('tabindex', '-1'); primeiro.focus({ preventScroll: true }); }
+    });
+    if (cartoes.length > LOTE_FR) {
+      grade.parentNode.insertBefore(mais, grade.nextSibling);
+      mostrarLote();
+    }
   })();var CADEIRAS = { cd: 513, sf: 81 };
   /* Só quem registrou voto ou presença vira ponto: ausência não é voto. */
   var VOTO_NO_TEMA = { S: 'Sim', N: 'Não', A: 'Abstenção', O: 'Obstrução', P: 'Presidia a sessão', E: 'Presente, sem voto' };
@@ -13875,7 +13899,9 @@ a.cg-tv-c-t:hover{text-decoration:underline}
         if (p === 'S' || p === 'N') { if (p === v.r.dr) dir += 1; else if (p === v.r.e) esq += 1; }
       });
       if (!algum) return;
-      var p = pessoaDe(k), n = dir + esq, s = n >= 5 ? Math.round(100 * (dir - esq) / n) : null;
+      /* Arredonda como o resto da página (o meio vai para o par), para o número ser o mesmo dos outros quadros. */
+      var p = pessoaDe(k), n = dir + esq, bruto = 100 * (dir - esq) / (n || 1);
+      var s = n < 5 ? null : (Math.abs(bruto % 1) === 0.5 ? 2 * Math.round(bruto / 2) : Math.round(bruto));
       G[k] = { k: k, nome: p.nome, uf: p.uf, partido: p.partido, fora: p.fora, s: s, n: n, cls: s == null ? 'na' : classe(s) };
       todos.push(k);
     });
@@ -14148,6 +14174,9 @@ a.cg-tv-c-t:hover{text-decoration:underline}
       if (v.a) outras.push(plural(v.a, 'abstenção', 'abstenções'));
       if (v.pe) outras.push(plural(v.pe, 'presente sem voto', 'presentes sem voto'));
       if (semReg > 0) outras.push(num(semReg) + ' sem registro (ausentes ou fora do exercício)');
+      /* O texto oficial costuma trazer o placar: se ele não bate com os votos registrados um a um, a tela diz. */
+      var simX = /Sim:\s*(\d+)/i.exec(r.x || ''), naoX = /N[ãa]o:\s*(\d+)/i.exec(r.x || '');
+      var difere = v.col >= 0 && simX && naoX && (parseInt(simX[1], 10) !== v.s || parseInt(naoX[1], 10) !== v.n);
       nos.push(h('div', { cls: 'cg-tv-pl' }, [
         h('p', { cls: 'cg-tv-pl-n' }, [h('span', {}, [h('b', { text: num(v.s) }), ' Sim']), h('span', {}, ['Não ', h('b', { text: num(v.n) })])]),
         h('div', { cls: 'cg-tv-pl-b', role: 'img', 'aria-label': placarDe(v, ', ') + (v.o ? ', ' + num(v.o) + ' em obstrução' : '') + ', de ' + cadeiras + ' cadeiras' }, [
@@ -14155,7 +14184,8 @@ a.cg-tv-c-t:hover{text-decoration:underline}
         ]),
         h('p', { cls: 'cg-tv-pl-x' }, [
           q ? h('b', { text: 'Traço laranja: ' + q[0] + ' Sim para ' + (r.ss === 'trecho' ? 'manter o trecho' : r.ss === 'emenda' ? 'aprovar a emenda' : 'aprovar') + ' (' + q[1] + '). ' }) : null,
-          v.col >= 0 ? 'A barra são as ' + cadeiras + ' cadeiras.' + (outras.length ? ' Fora do Sim e do Não: ' + outras.join(', ') + '.' : '') : 'A barra são as ' + cadeiras + ' cadeiras.'
+          'A barra são as ' + cadeiras + ' cadeiras.' + (v.col >= 0 && outras.length ? ' Fora do Sim e do Não: ' + outras.join(', ') + '.' : ''),
+          difere ? h('b', { text: ' O texto oficial diz ' + simX[1] + ' Sim e ' + naoX[1] + ' Não; os votos registrados um a um somam ' + placarDe(v, ' e ') + '.' }) : null
         ])
       ]));
       esvaziar(card);
@@ -14344,7 +14374,7 @@ a.cg-tv-c-t:hover{text-decoration:underline}
           h('span', { text: ' · ' + VOTO_NO_TEMA[votoDe(k, v)] + (v.contra[k] ? ', contra o partido' : '') })
         ];
         if (o) linhas.push(h('br'), h('span', { cls: 'cg-tv-mn', text: pt + ': ' + o.S.length + ' Sim × ' + (o.N.length + o.O.length) + ' Não' }));
-        linhas.push(h('br'), g.s == null ? 'Poucas votações no tema para ter saldo' : 'No tema: saldo ' + saldo(g.s) + ' em ' + num(g.n), h('br'), como + ': abre o dossiê');
+        linhas.push(h('br'), g.s == null ? 'Poucas votações no tema para ter saldo' : 'No tema: saldo ' + saldo(g.s) + ' em ' + plural(g.n, 'votação', 'votações'), h('br'), como + ': abre o dossiê');
         return [retratoDe(casa, k, g.nome), h('span', {}, linhas)];
       }, x, y);
     }
@@ -14468,7 +14498,19 @@ a.cg-tv-c-t:hover{text-decoration:underline}
       montarCartao(v);
       if (!semMovimento) { card.classList.remove('cg-tv-vira'); void card.offsetWidth; card.classList.add('cg-tv-vira'); }
       montarPlenario(v);
+      ajustarCartao();
       if (comEndereco) endereco();
+    }
+    /* O cartão não deve passar da altura do plenário (o bloco tem de caber em mais ou menos uma tela):
+       se passar, a ementa cede linhas, de 6 até 3. O texto inteiro está na ficha da matéria. */
+    function ajustarCartao() {
+      var em = card.querySelector('.cg-tv-c-e');
+      card.style.removeProperty('--cg-tv-em');
+      if (!em || w.innerWidth <= 1000 || nomes.hidden || !pn.offsetParent || !cw.offsetParent) return;  // uma coluna só: cada face tem a sua altura
+      var sobra = pn.getBoundingClientRect().bottom - nomes.getBoundingClientRect().bottom;  // quanto o cartão passa do plenário
+      var linha = parseFloat(w.getComputedStyle(em).lineHeight) || 24.5, usadas = Math.round(em.getBoundingClientRect().height / linha);
+      var demais = Math.floor(sobra / linha);  // só linhas inteiras: o cartão nunca fica menor que o plenário
+      if (demais >= 1 && usadas > 3) card.style.setProperty('--cg-tv-em', String(Math.max(3, usadas - demais)));
     }
     /* O endereço guarda o tema, a matéria, a votação e quem se segue, para a tela poder ser enviada. */
     function endereco() {
@@ -14516,10 +14558,11 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     mostrarVotacao(inicial, false);
     if (pedido && pedido.s && G[pedido.s]) seguir(pedido.s, true);
     anotar();
+    ajustarCartao();
     if (!pedido) endereco();  // o tema foi escolhido na página: o endereço passa a dizer o que está na tela
     /* A fita e os pontos se refazem quando a largura muda (ou quando a Casa ou a aba voltam a aparecer). */
     var espera = 0, vigia = null;
-    function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); medir(); }, 80); }
+    function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); ajustarCartao(); medir(); }, 80); }
     if (w.ResizeObserver) { vigia = new w.ResizeObserver(remedir); vigia.observe(cols); vigia.observe(plot); }
     w.addEventListener('resize', remedir);
     temaMontado[casa] = {
@@ -14576,13 +14619,14 @@ a.cg-tv-c-t:hover{text-decoration:underline}
     var cota = el('cgEscCt'), cortesCota = {};  // Casa → [mediana, 1º quartil] da média mensal da cota
     var ufs = el('cgEscUfs'), ufRotulo = el('cgEscUfL'), atalhos = el('cgEscAt'), maisFiltros = el('cgEscMf');
     /* Os atalhos: o que é raro e diz muito (cada um com a contagem na Casa da vez). */
+    var CORTE_FID = (M.limiares || {}).escolha_fidelidade || 80, CORTE_PRES = (M.limiares || {}).escolha_presenca || 60;  // config/congresso.yaml
     var ATALHOS = {
       troca: function (li) { return li.getAttribute('data-troca') === '1'; },
-      fid: function (li) { var f = parseFloat(li.getAttribute('data-fid')); return !isNaN(f) && f < 80; },
-      pres: function (li) { var p = parseFloat(li.getAttribute('data-pres')); return !isNaN(p) && p < 60; },
+      fid: function (li) { var f = parseFloat(li.getAttribute('data-fid')); return !isNaN(f) && f < CORTE_FID; },
+      pres: function (li) { var p = parseFloat(li.getAttribute('data-pres')); return !isNaN(p) && p < CORTE_PRES; },
       exc: function (li) { return li.getAttribute('data-exc') === '1'; }
     };
-    var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de 80% das vezes', pres: 'votou em menos de 60% das votações', exc: 'muda de lado em algum tema' };
+    var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de ' + CORTE_FID + '% das vezes', pres: 'votou em menos de ' + CORTE_PRES + '% das votações', exc: 'muda de lado em algum tema' };
     function atalhosLigados() { return atalhos ? lista(atalhos.querySelectorAll('.cg-esc-atb[aria-pressed="true"]')).map(function (b) { return b.getAttribute('data-at'); }) : []; }
     var LOTE = 24, limite = {};  // quantos cartões à vista em cada Casa (o resto vem com "mostrar mais")
     var mais = {};
