@@ -514,6 +514,11 @@ def test_a_proposicao_guarda_o_que_a_casa_diz_alem_da_ementa(props: list[projeto
         "PL 7/2007", "Regula a demarcação de terras.", "Trata de terras.", projetos.NORMA, True)
     assert (antiga.primeiro, antiga.autores, antiga.origem) == (4, [4], "parlamentar")
     assert projetos.camara_detalhes(coletor, [424242]) == {}  # fora do ar: só fica de fora
+    # o CPF que um registro traz dentro da ementa (o ofício de um tribunal, por exemplo) sai mascarado
+    oficio = projetos.camara_do_detalhe(
+        {"id": 98, "siglaTipo": "PL", "numero": 8, "ano": 2024, "ementa": "Comunica a prisão de FULANO (Deputado Federal, CPF no 123.456.789-00), nos termos da Lei nº 12.850/2013.",
+         "dataApresentacao": "2024-03-25T10:00", "statusProposicao": {"descricaoSituacao": "Transformado em Norma Jurídica", "siglaOrgao": "MESA", "dataHora": "2024-04-10T10:00"}}, [])
+    assert "123.456.789-00" not in oficio.ementa and "CPF no ***.***.***-**" in oficio.ementa and "12.850/2013" in oficio.ementa
 
 
 @pytest.mark.parametrize(
@@ -565,7 +570,7 @@ def test_a_ficha_da_materia_diz_o_que_e_e_como_cada_polo_votou(publicado: tuple[
     principal, destaque = pl10["vot"]
     assert (principal["t"], principal["ss"], principal["e"], principal["dr"], principal["g"], principal["dv"], principal["apv"]) == (
         "merito", "texto", "S", "N", "S", 1, 1)
-    assert (principal["s"], principal["n"]) == (6, 4)
+    assert (principal["s"], principal["n"]) == (6, 4) and "o" not in principal and "q" not in principal  # sem obstrução; projeto de lei não tem número fixo
     assert principal["pp"] == [["PT", 3, 0, "e"], ["PL", 0, 3, "d"]]  # a contagem de cada partido dos polos
     assert principal["pt"] == [["PP", "S", 75]]  # os demais partidos, pelo lado da maioria
     assert (destaque["t"], destaque["ss"], destaque["dq"], destaque["apv"]) == ("destaque", "trecho", "PL", 1)  # "Mantido o texto": o Sim venceu
@@ -881,3 +886,115 @@ def test_as_comissoes_no_painel_na_ficha_e_na_aba(publicado: tuple[Path, fabrica
     assert _ler(data_dir, "fichas/cd-4.json")["comissoes"]["n"] == 1
     html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
     assert 'id="cg-comissoes-cd"' in html and 'id="cg-comissoes-sf"' in html and "Nas comissões" in html
+
+
+# ── leva 5: o partido no dia do voto e os membros de cada frente ─────────────
+
+
+def test_o_arquivo_de_votos_guarda_o_partido_do_dia_de_cada_votacao(r: regras.Regras, publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado]):
+    """Quem troca de partido aparece, em cada votação, no partido em que estava naquele dia:
+    o deputado 5 vota três vezes no PP e, da quarta em diante, no PL."""
+    pessoas = [base.Pessoa(i, f"Deputado {i}", "SP", [(0, sigla)]) for i, sigla in ((1, "PT"), (2, "PT"), (3, "PL"), (4, "PL"))]
+    pessoas.append(base.Pessoa(5, "Deputado 5", "SP", [(0, "PP"), (3, "PL")]))
+    votacoes = [
+        base.Votacao(id=f"v{k}", data=f"2026-03-{k + 1:02d}", orgao=base.PLENARIO, descricao="Aprovado o Projeto.", tipo=base.MERITO, votos="SSNN" + ("S" if k < 3 else "N"))
+        for k in range(6)
+    ]
+    ano = base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=votacoes)
+    votos = dados.votos_da_legislatura([ano], r, 57, {i: f"cd-{i}" for i in range(1, 6)}, "cd")
+    assert votos["partidos"]["cd-5"] == [[0, "PP"], [3, "PL"]] and votos["partidos"]["cd-1"] == [[0, "PT"]]
+    assert json.loads(dados._json_por_linha(votos)) == votos  # ida e volta, com um parlamentar por linha
+    # No arquivo publicado, todo mundo que tem voto tem o partido.
+    data_dir, _fetch, _resultado = publicado
+    gravado = json.loads((data_dir / "congresso" / "votos-cd.json").read_text(encoding="utf-8"))
+    assert set(gravado["partidos"]) == set(gravado["votos"]) and gravado["partidos"]["cd-11"] == [[0, "PP"]]
+
+
+def test_a_ficha_de_cada_frente_tem_todos_os_membros(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado]):
+    data_dir, _fetch, _resultado = publicado
+    detalhe = _ler(data_dir, "frentes-cd.json")["frentes"]
+    painel = {str(c["id"]): c for c in _ler(data_dir, "casa-cd.json")["frentes"]["causas"]}
+    assert set(detalhe) == set(painel) == {"9001", "9002"}
+    for fid, c in painel.items():
+        membros = detalhe[fid]["membros"]
+        assert len(membros) == c["em_exercicio"] and sum(m[5] for m in membros) == 1  # todos os em exercício, um coordenador
+        com_saldo = [m[1] for m in membros if m[1] is not None]
+        assert com_saldo == sorted(com_saldo)  # do saldo menor para o maior; sem saldo, no fim
+        assert all(m[1] is None for m in membros[len(com_saldo):])
+        assert detalhe[fid]["membros_total"] == c["membros"]  # todos os que assinaram na legislatura
+        assert {k: v for k, v in detalhe[fid].items() if k not in ("membros", "membros_total")} == {k: v for k, v in c.items() if k != "membros"}  # o que o painel diz, igual
+
+
+# ── leva 5: os cartões (frentes e escolha) ───────────────────────────────────
+
+CAMPOS = [{"id": "esquerda", "ate": -60}, {"id": "centro_esquerda", "ate": -20}, {"id": "centro", "ate": 20}, {"id": "centro_direita", "ate": 60}, {"id": "direita", "ate": 100}]
+
+
+@pytest.mark.parametrize(("saldo", "lado"), [(-100, "e"), (-60, "e"), (-59, ""), (0, ""), (60, ""), (61, "d"), (None, "")])
+def test_so_o_coordenador_numa_ponta_da_regua_tem_lado_firme(saldo: float | None, lado: str):
+    assert pagina.lado_firme(saldo, CAMPOS) == lado
+
+
+def test_a_conclusao_do_cartao_da_frente():
+    """Com o coordenador numa ponta: quantos dos que assinam votam do lado oposto. Sem isso: em
+    quanto das vezes votaram igual a ele. Sem votações em comum: só quantos assinam."""
+    frente = {"lados": {"e": 87, "c": 4, "d": 91, "sem": 2}, "com_coord": 52.9, "em_exercicio": 184}
+    assert pagina.manchete_da_frente(frente, "e") == ({"numero": "91 de 182", "texto": "que assinam votam do lado oposto ao do coordenador."}, "oposto")
+    assert pagina.manchete_da_frente(frente, "d")[0]["numero"] == "87 de 182"  # o oposto de quem vota com a direita
+    manchete, tipo = pagina.manchete_da_frente(frente, "")
+    assert (manchete["numero"], tipo) == ("53%", "igual")
+    assert pagina.manchete_da_frente({"lados": {}, "em_exercicio": 7}, "")[1] == "assinam"
+
+
+def test_a_excecao_e_o_tema_do_lado_oposto_ao_padrao_geral():
+    corte = (-20.0, 20.0)
+    # Vota com a esquerda no geral e com a direita em agro (24 votações) e em segurança (9): fica o de mais votações.
+    pessoa = {"saldo": -42, "tm": {"economia": [-60, 100], "agro": [50, 24], "seguranca": [30, 9], "saude": [10, 12]}}
+    assert pagina.excecao_de_tema(pessoa, corte) == ("agro", 50.0, 24)
+    assert pagina.excecao_de_tema({"saldo": 5, "tm": {"agro": [80, 30]}}, corte) is None  # dividido no geral: não há padrão do qual fugir
+    assert pagina.excecao_de_tema({"saldo": 90, "tm": {"agro": [80, 30], "saude": [0, 9]}}, corte) is None  # dividido num tema não é lado oposto
+    assert pagina.excecao_de_tema({"tm": {"agro": [80, 30]}}, corte) is None  # sem saldo geral
+
+
+@pytest.mark.parametrize(
+    ("partidos", "atual", "esperado"),
+    [
+        ([["2019-02-12", "PL"], ["2026-04-07", "PSDB"]], "PSDB", ["2026-04", "PL"]),  # mudou na legislatura
+        ([["2019-02-12", "PL"], ["2021-03-02", "PSDB"]], "PSDB", None),  # mudou antes dela
+        ([["2023-02-07", "PT"]], "PT", None),  # nunca mudou
+        ([["2023-02-07", "UNIÃO"]], "PL", ["", "UNIÃO"]),  # o cadastro já diz o partido novo; ainda não votou por ele
+        ([], "PL", None),
+        # fusão não é troca: o Patriota virou PRD (e o cadastro pode dizer PRD antes do primeiro registro)
+        ([["2019-02-12", "PATRIOTA", "2023-11-08"], ["2024-02-06", "PRD", "2026-10-14"]], "PRD", None),
+        ([["2019-02-12", "PATRIOTA", "2023-11-08"]], "PRD", None),
+        # ...mas quem veio de outro partido para o que depois se fundiu, na legislatura, mudou
+        ([["2019-02-12", "PL", "2023-05-03"], ["2023-06-06", "PATRIOTA", "2023-11-08"], ["2024-02-06", "PRD", "2026-10-14"]], "PRD", ["2023-06", "PL"]),
+        ([["2019-02-12", "PSC", "2023-05-03"], ["2023-08-22", "PL", "2026-10-14"]], "PL", ["2023-08", "PSC"]),  # saiu do partido antes da incorporação: mudou
+        # sem registro pelo partido anterior nesta legislatura (voltou ao mandato já no outro): não afirma
+        ([["2019-02-12", "PSDB", "2022-12-20"], ["2025-03-11", "PSD", "2026-10-14"]], "PSD", None),
+        ([["2019-02-12", "PSDB", "2023-12-20"], ["2025-03-11", "PSD", "2026-10-14"]], "PSD", ["2025-03", "PSDB"]),
+    ],
+)
+def test_a_troca_de_partido_na_legislatura(partidos: list[list[str]], atual: str, esperado: list[str] | None):
+    sucessores = {"patriota": "prd", "ptb": "prd", "psc": "pode"}
+    assert ficha.troca_de_partido({"partidos": partidos, "partido": atual}, "2023-02-01", sucessores) == esperado
+
+
+@pytest.mark.parametrize(("nome", "esperado"), [("Maria do Rosário", "MR"), ("Tiririca", "T"), ("Dr. Zacharias Calil", "DC"), ("AJ Albuquerque", "AA"), ("", "")])
+def test_as_iniciais_do_cartao(nome: str, esperado: str):
+    assert pagina.iniciais(nome) == esperado
+
+
+def test_os_cartoes_da_escolha_e_das_frentes_saem_sem_script(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], config: Config):
+    data_dir, _fetch, _resultado = publicado
+    html = pagina.render_congresso_page(config, data_dir, home_href="../", archive_href="./")
+    escolha = html.split('id="cg-escolha"', 1)[1].split('data-vista="metodo"', 1)[0]
+    cartao = escolha.split('<li data-pk="cd-7"', 1)[1].split("</li></ul>", 1)[0]
+    assert 'class="cg-cd cg-3d"' in cartao and 'loading="lazy"' in cartao and 'referrerpolicy="no-referrer"' in cartao  # a foto oficial, só quando aparece
+    assert '<span>GC</span>' in cartao  # as iniciais, para quando a foto não vem
+    assert "Não é lista de candidatos" in escolha and 'id="cgEscAt"' in escolha and 'id="cgEscMf"' in escolha
+    frentes_ = html.split('id="cg-frentes"', 1)[1].split('id="cg-cota"', 1)[0]
+    assert "Assinar é fácil. E na hora do voto?" in frentes_ and 'data-frente="9001"' in frentes_
+    assert "Votaram igual ao coordenador: quem assina" in frentes_ and "veja quais" in frentes_
+    manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
+    assert manifesto["frentesArq"] == "../data/congresso/frentes-cd.json" and set(manifesto["fotos"]) == {"cd", "sf"}

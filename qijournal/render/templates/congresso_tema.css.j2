@@ -1,0 +1,264 @@
+/* ── Onde cada um está: as votações de um tema (a fita), o cartão da matéria em foco e quem votou, em pontos (congresso_tema.js.j2) ── */
+.cg-td.cg-tv{max-width:1216px;margin-top:22px;padding-top:0;border-top:0;font-family:var(--ss);line-height:1.4;color:var(--ink)}
+.cg-tv select,.cg-tv input{font:inherit;color:inherit}
+.cg-tv i.cg-tv-e{background:var(--cg-e3)}
+.cg-tv i.cg-tv-d{background:var(--cg-d3)}
+.cg-tv-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.cg-tv-h h5{font-family:var(--sf);font-size:19px;font-weight:700;line-height:1.25;color:var(--ink)}
+.cg-tv-h span{font-size:12.5px;color:var(--muted)}
+
+/* Realçar e ir para */
+.cg-tv-f{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px}
+.cg-tv-fk{font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.cg-tv-chips{display:flex;gap:6px;min-width:0}
+.cg-tv-chip{display:inline-flex;gap:6px;align-items:baseline;padding:3px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-size:12px;color:var(--body);white-space:nowrap;cursor:pointer}
+.cg-tv-chip b{font-family:var(--mn);font-weight:600;color:var(--ink)}
+.cg-tv-chip:hover{border-color:var(--ink)}
+.cg-tv-chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.cg-tv-chip[aria-pressed="true"] b{color:var(--paper)}
+.cg-tv-ir{display:flex;align-items:center;gap:8px;margin-left:auto;min-width:0}
+.cg-tv-ir select{max-width:300px;min-width:0;padding:4px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:12.5px}
+
+/* A fita: uma coluna por matéria, um ponto por votação (quadrado = texto principal; a cor = o lado que prevaleceu) */
+.cg-tv-fita{position:relative;margin-top:8px;padding-bottom:18px}
+.cg-tv-cols{display:flex;align-items:flex-end;height:108px;border-bottom:1px solid var(--rule)}
+.cg-tv-col{position:relative;flex:1 1 0;min-width:0;max-width:64px;display:flex;flex-direction:column-reverse;align-items:stretch;padding-bottom:3px;border-radius:4px 4px 0 0}
+.cg-tv-col:hover{background:var(--hover)}
+.cg-tv-col.on{background:var(--hl)}
+.cg-tv-col.on::after{content:"";position:absolute;left:50%;bottom:-8px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--qc);border-bottom:0}
+.cg-tv-col-ano{box-shadow:inset 1px 0 0 var(--rule)}
+.cg-tv-col-ano::before{content:attr(data-ano);position:absolute;left:5px;bottom:-17px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.cg-tv-v{position:relative;display:block;width:100%;height:12px;padding:0;border:0;background:none;cursor:pointer}
+.cg-tv-v::before{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--cg-c0)}
+.cg-tv-v-m::before{border-radius:2px}
+.cg-tv-v-e::before{background:var(--cg-e3)}
+.cg-tv-v-d::before{background:var(--cg-d3)}
+.cg-tv-v:hover::before,.cg-tv-v:focus-visible::before{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--link)}
+.cg-tv-v:focus-visible{outline:none}
+.cg-tv-v[aria-pressed="true"]::before{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.cg-tv-fita[data-f] .cg-tv-v:not(.cg-tv-hit)::before{opacity:.16}
+/* seguindo alguém: a cor passa a dizer com que lado ELE votou; vazado = sem Sim nem Não */
+.cg-tv-seg .cg-tv-v::before{background:transparent;box-shadow:inset 0 0 0 1.5px var(--faint)}
+.cg-tv-seg .cg-tv-v[data-q="e"]::before{background:var(--cg-e3);box-shadow:none}
+.cg-tv-seg .cg-tv-v[data-q="d"]::before{background:var(--cg-d3);box-shadow:none}
+.cg-tv-seg .cg-tv-v:hover::before,.cg-tv-seg .cg-tv-v:focus-visible::before{box-shadow:0 0 0 2px var(--paper),0 0 0 3.5px var(--link)}
+.cg-tv-seg .cg-tv-v[aria-pressed="true"]::before{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.cg-tv-seg .cg-tv-v[aria-pressed="true"]:not([data-q="e"]):not([data-q="d"])::before{box-shadow:inset 0 0 0 1.5px var(--faint),0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+/* os apelidos, anotados na fita */
+.cg-tv-ap{position:absolute;left:50%;z-index:1;padding:0 0 1px 5px;border-left:1px solid var(--muted);font-family:var(--sf);font-size:11px;font-style:italic;line-height:1.15;white-space:nowrap;color:var(--ink);pointer-events:none}
+.cg-tv-ap-e{left:auto;right:50%;padding:0 5px 1px 0;border-left:0;border-right:1px solid var(--muted)}
+.cg-tv-leg{display:flex;flex-wrap:wrap;align-items:center;gap:3px 14px;margin-top:4px;font-size:11.5px;color:var(--muted)}
+.cg-tv-leg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cg-tv-leg span.cg-tv-fr{display:inline;white-space:normal}
+.cg-tv-leg i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--muted)}
+.cg-tv-leg i.cg-tv-q{border-radius:2px}
+.cg-tv-leg i.cg-tv-o{background:transparent;box-shadow:inset 0 0 0 1.5px var(--faint)}
+.cg-tv-leg b{font-family:var(--mn);font-weight:600;color:var(--ink)}
+.cg-tv-segx{padding:1px 8px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-size:11.5px;color:var(--link);cursor:pointer}
+.cg-tv-ir-m{display:none;align-items:center;gap:6px;margin-top:8px}
+.cg-tv-ir-m select{flex:1;min-width:0;padding:7px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:13px}
+.cg-tv-ir-m button{flex:none;width:38px;height:36px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:16px;cursor:pointer}
+.cg-tv-ir-m button:disabled{opacity:.35;cursor:default}
+
+/* O foco: o cartão (a matéria e a pergunta) e o plenário (quem votou) */
+.cg-tv-faces{display:none}
+.cg-tv-foco{display:grid;grid-template-columns:392px minmax(0,1fr);gap:0 28px;align-items:stretch;margin-top:10px}
+
+/* O cartão, com profundidade: uma folha por baixo para cada votação a mais da matéria (até duas) */
+.cg-tv-cw{position:relative;isolation:isolate}
+.cg-tv-card{z-index:2;display:flex;flex-direction:column;height:100%;padding:14px 18px;border:1px solid var(--rule);border-top:4px solid var(--ink);border-radius:3px 3px 10px 10px;background:var(--paper);box-shadow:var(--cg-sombra)}
+.cg-tv-cw::before,.cg-tv-cw::after{content:"";position:absolute;inset:6px -5px -6px 5px;z-index:1;border:1px solid var(--rule);border-radius:3px 3px 10px 10px;background:var(--soft);transform:rotate(.7deg);transform-origin:0 100%;opacity:0;transition:opacity .2s}
+.cg-tv-cw::after{inset:11px -9px -10px 9px;z-index:0;transform:rotate(1.5deg)}
+.cg-tv-cw[data-pilha="1"]::before,.cg-tv-cw[data-pilha="2"]::before,.cg-tv-cw[data-pilha="2"]::after{opacity:1}
+.cg-tv-card.cg-tv-vira{animation:cg-tv-vira .28s ease-out}
+@keyframes cg-tv-vira{from{opacity:.25;transform:perspective(900px) rotateY(-9deg) translateX(-10px)}}
+.cg-tv-c-k{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.cg-tv-c-t{font-family:var(--mn);font-size:15px;font-weight:600;color:var(--link)}
+a.cg-tv-c-t:hover{text-decoration:underline}
+.cg-tv-apel{padding:0 8px;border-radius:999px;background:var(--hl);font-size:11.5px;font-weight:600;color:var(--ink)}
+.cg-tv-nota{margin-left:auto;font-family:var(--mn);font-size:11px;color:var(--muted);cursor:help}
+.cg-tv-nota b{font-size:13px;color:var(--ink)}
+.cg-tv-c-s{margin-top:3px;font-family:var(--mn);font-size:10.5px;line-height:1.5;color:var(--muted)}
+.cg-tv-c-e{margin-top:9px;font-family:var(--sf);font-size:17.5px;line-height:1.4;color:var(--ink);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:var(--cg-tv-em,6);overflow:hidden}
+.cg-tv-c-x{margin-top:5px;font-size:12.5px;line-height:1.45;color:var(--body);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.cg-tv-c-x b{color:var(--ink)}
+.cg-tv-c-l{margin-top:7px;font-size:12px;color:var(--muted)}
+.cg-tv-c-l a{font-weight:600;color:var(--link)}
+.cg-tv-c-l a:hover{text-decoration:underline}
+.cg-tv-c-v{margin-top:14px;padding-top:11px;border-top:1px solid var(--rule)}
+.cg-tv-c-vh{display:flex;align-items:center;gap:8px;min-height:24px}
+.cg-tv-c-vk{font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink)}
+.cg-tv-passo{display:flex;align-items:center;gap:3px;margin-left:auto}
+.cg-tv-passo button{width:26px;height:24px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:14px;line-height:1;color:var(--ink);cursor:pointer}
+.cg-tv-passo button:hover:not(:disabled){border-color:var(--ink)}
+.cg-tv-passo button:disabled{opacity:.35;cursor:default}
+.cg-tv-passo span{min-width:54px;font-family:var(--mn);font-size:11px;text-align:center;color:var(--muted)}
+.cg-tv-c-d{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:7px;font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-tv-selo{padding:0 6px;border:1px solid currentColor;border-radius:3px;font-size:9px;font-weight:600;letter-spacing:1px;line-height:1.7;text-transform:uppercase;color:var(--link)}
+.cg-tv .cg-res{font-family:var(--mn);font-size:10.5px}
+.cg-tv-c-o{margin-top:7px;font-size:14px;line-height:1.45;color:var(--ink);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.cg-tv-c-ab{margin-top:3px;font-size:12px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.cg-tv-c-ss{margin-top:6px;font-size:12.5px;font-style:italic;color:var(--muted)}
+/* o placar nas cadeiras da Casa: o Sim cresce da esquerda (cheio), o Não da direita (hachurado), a obstrução pontilhada */
+.cg-tv-pl{margin-top:auto;padding-top:10px}
+.cg-tv-pl-n{display:flex;align-items:baseline;justify-content:space-between;font-size:12px;color:var(--body)}
+.cg-tv-pl-n b{font-family:var(--mn);font-size:21px;font-weight:600;color:var(--ink)}
+.cg-tv-pl-b{position:relative;display:flex;height:12px;margin-top:3px;border-radius:2px;background:var(--rl)}
+.cg-tv-pl-b i{display:block;height:100%}
+.cg-tv-pl-s{border-radius:2px 0 0 2px;background:var(--ink)}
+.cg-tv-pl-m{flex:1}
+.cg-tv-pl-o{border:1.5px dotted var(--ink);border-right:0}
+.cg-tv-pl-nn{border-radius:0 2px 2px 0;border:1.5px solid var(--ink);background:repeating-linear-gradient(135deg,var(--ink) 0 1.5px,transparent 1.5px 5px)}
+.cg-tv-pl-b i.cg-tv-pl-q{position:absolute;top:-4px;bottom:-4px;width:0;height:auto;border-left:2px solid var(--qc)}
+.cg-tv-pl-x{margin-top:5px;font-size:11.5px;line-height:1.45;color:var(--muted)}
+.cg-tv-pl-x b{color:var(--ink)}
+
+/* O plenário em pontos: uma linha por partido, o Sim à esquerda do eixo e o Não à direita */
+.cg-pn{min-width:0}
+.cg-pn-top{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.cg-pn-top h6{font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink)}
+.cg-pn-top h6 span{margin-left:6px;font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)}
+.cg-pn-busca{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;color:var(--muted)}
+.cg-pn-busca input{width:170px;padding:4px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font-size:12.5px}
+.cg-pn-seg{display:none;align-items:center;gap:6px;margin-left:auto;padding:2px 4px 2px 10px;border:1.5px solid var(--qc);border-radius:999px;font-size:12px;font-weight:600;color:var(--ink)}
+.cg-pn-seg.on{display:inline-flex}
+.cg-pn-seg.on+.cg-pn-busca{margin-left:0}
+.cg-pn-seg button{width:20px;height:20px;border:0;border-radius:50%;background:var(--hl);font-size:13px;line-height:1;cursor:pointer}
+.cg-pn-g{--rot:116px;--num:34px;display:grid;grid-template-columns:var(--rot) minmax(0,1fr) var(--num) var(--num) minmax(0,1fr);column-gap:0}
+.cg-pn-cab{margin-top:6px;align-items:start;border-bottom:2px solid var(--ink)}
+.cg-pn-cab-s{grid-column:1/4;text-align:right;padding:0 8px 6px 0}
+.cg-pn-cab-n{grid-column:4/6;align-self:stretch;padding:0 0 6px 8px;border-left:1px solid var(--ink)}
+.cg-pn-cab-t{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--ink)}
+.cg-pn-cab-t b{margin:0 5px;font-family:var(--mn);font-size:26px;font-weight:600;letter-spacing:0;line-height:1}
+.cg-pn-cab-t small{font-family:var(--mn);font-size:10.5px;font-weight:400;letter-spacing:0;color:var(--muted)}
+.cg-pn-cab-c{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;min-height:21px}
+.cg-pn-cab-s .cg-pn-cab-c{justify-content:flex-end}
+.cg-pn-polo{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border:1px solid var(--rule);border-radius:999px;font-size:11.5px;color:var(--ink);white-space:nowrap;cursor:help}
+.cg-pn-polo i{width:9px;height:9px;border-radius:2px}
+.cg-pn-plot{position:relative}
+.cg-pn-plot:focus-visible{outline:2px solid var(--link);outline-offset:3px}
+.cg-pn-row{align-items:start;border-bottom:1px solid var(--rl)}
+.cg-pn-pt{padding:1px 0;font-size:11px;font-weight:700;line-height:11px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cg-pn-pt .cg-pn-ct{display:none;text-decoration:none}
+.cg-pn-pt small{margin-left:4px;font-family:var(--mn);font-size:9.5px;font-weight:400;color:var(--faint)}
+.cg-pn-w{display:flex;flex-wrap:wrap;align-content:flex-start;padding:2px 0;min-height:13px}
+.cg-pn-w-s{flex-direction:row-reverse}
+.cg-pn-c{padding:1px 6px;font-family:var(--mn);font-size:11px;font-weight:500;line-height:11px;color:var(--ink)}
+.cg-pn-c-s{text-align:right}
+.cg-pn-c-n{align-self:stretch;border-left:1px solid var(--ink)}
+.cg-pn-c.cg-pn-z{color:var(--faint)}
+.cg-pn-sem{padding:28px 0;font-size:13px;color:var(--muted)}
+/* um ponto por parlamentar: a cor diz como ele costuma votar no tema; hachura = poucas votações para dizer */
+.cg-vt{display:block;width:8px;height:8px;margin:.5px;border-radius:50%;background:var(--cg-na)}
+.cg-vt-e3{background:var(--cg-e3)}.cg-vt-e2{background:var(--cg-e2)}.cg-vt-m{background:var(--cg-c0)}.cg-vt-d2{background:var(--cg-d2)}.cg-vt-d3{background:var(--cg-d3)}
+.cg-vt-na{background:repeating-linear-gradient(135deg,var(--faint) 0 1px,var(--cg-na) 1px 3px)}
+.cg-vt-x{width:10px;height:10px;margin:-.5px 0;padding:1.5px;border:1.5px solid var(--ink);background-clip:content-box}  /* contra o próprio partido fechado: aro de tinta, folga de papel, miolo na cor */
+.cg-vt-o{background:transparent!important;border:1.5px solid var(--cg-na)}  /* obstrução, abstenção: vazado */
+.cg-vt-o.cg-vt-e3{border-color:var(--cg-e3)}.cg-vt-o.cg-vt-e2{border-color:var(--cg-e2)}.cg-vt-o.cg-vt-m{border-color:var(--cg-c0)}.cg-vt-o.cg-vt-d2{border-color:var(--cg-d2)}.cg-vt-o.cg-vt-d3{border-color:var(--cg-d3)}.cg-vt-o.cg-vt-na{border-color:var(--faint);border-style:dotted}
+.cg-vt.cg-vt-cur{position:relative;z-index:2;outline:2px solid var(--link);outline-offset:1px}
+.cg-vt.cg-vt-seg{position:relative;z-index:3;outline:2.5px solid var(--qc);outline-offset:1.5px}
+.cg-pn-sox .cg-vt:not(.cg-vt-x){opacity:.18}
+.cg-pn-row-x{grid-template-columns:var(--rot) minmax(0,1fr);border-bottom:0}
+.cg-pn-row-x .cg-pn-w{align-items:center;gap:0 2px;font-size:11.5px;color:var(--muted)}
+.cg-pn-row-x .cg-pn-w span{margin-left:6px}
+.cg-pn-leg{display:flex;flex-wrap:wrap;align-items:center;gap:3px 12px;margin-top:6px;font-size:11.5px;color:var(--muted)}
+.cg-pn-leg span,.cg-pn-leg button{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cg-pn-leg i{display:inline-block;width:9px;height:9px;margin:0;border-radius:50%}
+.cg-pn-leg i.cg-vt-x{width:11px;height:11px}
+.cg-pn-leg i.cg-vt-leg{border-color:var(--muted)}
+.cg-pn-leg .cg-pn-esc{gap:2px}
+.cg-pn-leg .cg-pn-esc em{margin:0 3px;font-style:normal}
+.cg-pn-leg button{padding:1px 8px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);font-size:11.5px;color:var(--ink);cursor:pointer}
+.cg-pn-leg button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.cg-pn-leg button[aria-pressed="true"] i{border-color:var(--paper)}
+.cg-pn-leg b{font-family:var(--mn);font-weight:600}
+/* a linha de leitura: quem é o ponto, por extenso */
+.cg-pn-le{display:flex;align-items:center;gap:10px;min-height:48px;margin-top:6px;padding:6px 10px;border:1px solid var(--rl);border-radius:8px;background:var(--soft);font-size:12.5px;line-height:1.45;color:var(--body)}
+.cg-pn-le b{color:var(--ink)}
+.cg-pn-le a{font-weight:700;color:var(--link);white-space:nowrap}
+.cg-pn-le a:hover{text-decoration:underline}
+.cg-pn-le-t{flex:1;min-width:0}
+.cg-pn-le[hidden],.cg-pn-leg[hidden],.cg-pn-busca[hidden]{display:none}
+.cg-tv-ft{position:relative;flex:none;display:flex;align-items:center;justify-content:center;width:28px;height:36px;overflow:hidden;border-radius:3px;background:var(--hl);font-family:var(--mn);font-size:10px;font-weight:600;color:var(--muted)}
+.cg-tv-ft img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.cg-pn-nomes{margin-top:6px;font-size:12.5px}
+.cg-pn-nomes summary,.cg-tv-lista summary{width:fit-content;cursor:pointer;font-weight:600;color:var(--link)}
+.cg-pn-nomes p{margin-top:6px;line-height:1.6;color:var(--body)}
+.cg-pn-nomes p b{color:var(--ink)}
+.cg-pn-nomes a{color:var(--link)}
+.cg-pn-nomes a:hover{text-decoration:underline}
+.cg-pn-nomes i{font-style:normal;font-weight:600;color:var(--ink)}
+
+/* A dica dos pontos (ponteiro, foco e toque), com o retrato; nunca é o único jeito de ler */
+.cg-tv-dica{position:fixed;z-index:90;display:flex;gap:9px;max-width:300px;padding:8px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);box-shadow:var(--cg-sombra);font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--body);pointer-events:none}
+.cg-tv-dica[hidden]{display:none}
+.cg-tv-dica b{display:block;font-size:13px;color:var(--ink)}
+.cg-tv-mn{font-family:var(--mn);font-size:11px}
+.cg-tv-dica .cg-tv-ft{width:34px;height:44px}
+
+.cg-tv-lista{margin-top:14px;font-size:13px}
+.cg-tv-lista ol{list-style:none;margin-top:8px;max-width:980px}
+.cg-tv-lista li{padding:8px 0;border-top:1px solid var(--rl);line-height:1.5;color:var(--body)}
+.cg-tv-lista li b{font-family:var(--mn)}
+.cg-tv-lista li small{display:block;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-tv-pe{max-width:1100px;margin-top:12px;font-size:12px;line-height:1.6;color:var(--muted)}
+
+/* ── Telas estreitas: o foco vira um cartão de duas faces; no celular, a fita vira linhas ── */
+@media (max-width:1000px){
+  .cg-tv-foco{grid-template-columns:minmax(0,1fr)}
+  .cg-tv-faces{display:flex;margin-top:10px;border:1px solid var(--ink);border-radius:8px;overflow:hidden}
+  .cg-tv-faces button{flex:1;padding:8px 6px;border:0;background:var(--paper);font-size:12.5px;font-weight:700;color:var(--ink);cursor:pointer}
+  .cg-tv-faces button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+  .cg-tv-faces button:focus-visible{outline-offset:-3px}
+  .cg-tv-foco[data-face="voto"] .cg-pn,.cg-tv-foco[data-face="quem"] .cg-tv-cw{display:none}
+  .cg-tv-pl{margin-top:12px}
+}
+@media (max-width:760px){
+  .cg-td.cg-tv{margin-top:18px}
+  .cg-tv-h h5{font-size:17px}
+  .cg-tv-f{flex-wrap:nowrap}
+  .cg-tv-fk{display:none}
+  .cg-tv-chips{overflow-x:auto;scrollbar-width:none}
+  .cg-tv-chips::-webkit-scrollbar{display:none}
+  .cg-tv-ir{display:none}
+  .cg-tv-ir-m{display:flex}
+  .cg-tv-fita{padding-bottom:0}
+  .cg-tv-cols{flex-wrap:wrap;align-items:center;gap:2px 6px;height:auto;border-bottom:0}
+  .cg-tv-col{flex:none;max-width:none;flex-direction:row;align-items:center;padding:0 1px;border-radius:4px}
+  .cg-tv-col.on::after{display:none}
+  .cg-tv-col-ano{box-shadow:none}
+  .cg-tv-col-ano::before{position:static;margin-right:4px;font-size:9.5px}
+  .cg-tv-v{width:13px;height:22px}
+  .cg-tv-v::before{width:9px;height:9px;margin:-4.5px 0 0 -4.5px}
+  .cg-tv-ap{display:none}
+  .cg-tv-leg .cg-tv-fr{display:none}
+  .cg-tv-card{padding:12px 14px}
+  .cg-tv-cw::before{inset:5px 5px -5px 5px;transform:none}
+  .cg-tv-cw::after{inset:10px 10px -10px 10px;transform:none}
+  .cg-tv-c-e{font-size:15.5px}
+  .cg-tv-lista{margin-top:20px}
+  .cg-pn-g{--rot:48px;--num:26px}
+  .cg-pn-pt{font-size:10px}
+  .cg-pn-pt .cg-pn-lg,.cg-pn-pt small{display:none}
+  .cg-pn-pt .cg-pn-ct{display:inline}
+  .cg-pn-c{padding:2px 3px;font-size:10px}
+  .cg-vt{width:6px;height:6px}
+  .cg-vt-x{width:8px;height:8px;margin:-.5px 0;padding:1px;border-width:1.5px}
+  .cg-pn-busca{margin-left:0;width:100%}
+  .cg-pn-busca input{flex:1;width:auto;min-width:0}
+  .cg-pn-seg{margin-left:0}
+  .cg-pn-cab-t b{font-size:21px}
+  .cg-pn-le{align-items:flex-start}
+  .cg-pn-row-x{grid-template-columns:minmax(0,1fr)}
+  .cg-pn-row-x .cg-pn-pt{padding-top:4px}
+  .cg-pn-leg .cg-pn-esc{flex-wrap:wrap;white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){
+  .cg-tv-card,.cg-tv-card.cg-tv-vira,.cg-vt,.cg-tv-cw::before,.cg-tv-cw::after{transition:none!important;animation:none!important}
+}
+/* O atalho para as votações do tema, logo abaixo do seletor. */
+.cg-tv-irp{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.cg-tv-atl{padding:7px 14px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);color:var(--paper);font:600 13px var(--ss);cursor:pointer}
+.cg-tv-atl:hover{opacity:.88}
+.cg-tv-atl:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.cg-fx-d[hidden]{display:none}

@@ -13,6 +13,33 @@
     var norma = el('cgEscNorma'), ord = el('cgEscOrd'), limpar = el('cgEscX'), conta = el('cgEscN'), grade = el('cgEscTemas');
     var frente = el('cgEscFr'), frenteL = el('cgEscFrL'), FR = M.fr || {}, frNomes = (M.frentes || {}).nomes || {};
     var cota = el('cgEscCt'), cortesCota = {};  // Casa → [mediana, 1º quartil] da média mensal da cota
+    var ufs = el('cgEscUfs'), ufRotulo = el('cgEscUfL'), atalhos = el('cgEscAt'), maisFiltros = el('cgEscMf');
+    /* Os atalhos: o que é raro e diz muito (cada um com a contagem na Casa da vez). */
+    var CORTE_FID = (M.limiares || {}).escolha_fidelidade || 80, CORTE_PRES = (M.limiares || {}).escolha_presenca || 60;  // config/congresso.yaml
+    var ATALHOS = {
+      troca: function (li) { return li.getAttribute('data-troca') === '1'; },
+      fid: function (li) { var f = parseFloat(li.getAttribute('data-fid')); return !isNaN(f) && f < CORTE_FID; },
+      pres: function (li) { var p = parseFloat(li.getAttribute('data-pres')); return !isNaN(p) && p < CORTE_PRES; },
+      exc: function (li) { return li.getAttribute('data-exc') === '1'; }
+    };
+    var MOTIVO_ATALHO = { troca: 'mudou de partido na legislatura', fid: 'vota com o partido em menos de ' + CORTE_FID + '% das vezes', pres: 'votou em menos de ' + CORTE_PRES + '% das votações', exc: 'muda de lado em algum tema' };
+    function atalhosLigados() { return atalhos ? lista(atalhos.querySelectorAll('.cg-esc-atb[aria-pressed="true"]')).map(function (b) { return b.getAttribute('data-at'); }) : []; }
+    /* Quantos cartões à vista em cada Casa (o resto vem com "mostrar mais"): no celular, onde eles se empilham, menos. */
+    var LOTE = w.matchMedia && w.matchMedia('(max-width: 640px)').matches ? 8 : 24, limite = {};
+    var mais = {};
+    ols.forEach(function (ol) {
+      var casa = ol.getAttribute('data-casa'), b = h('button', { cls: 'cg-esc-mais', type: 'button' });
+      limite[casa] = LOTE;
+      b.hidden = true;
+      b.addEventListener('click', function () { limite[casa] += LOTE; aplicar(true); });
+      ol.parentNode.insertBefore(b, ol.nextSibling);
+      mais[casa] = b;
+    });
+    /* A foto que não veio sai da frente: ficam as iniciais. */
+    d.addEventListener('error', function (ev) {
+      var img = ev.target;
+      if (img && img.tagName === 'IMG' && img.parentNode && img.parentNode.classList && img.parentNode.classList.contains('cg-cd-f')) img.parentNode.removeChild(img);
+    }, true);
     var curtos = M.temasCurtos || {}, TM = M.tm || {}, PT = M.pt || {};
     var LADOS = [['', 'Tanto faz'], ['e', 'Com a esquerda'], ['c', 'Dividido'], ['d', 'Com a direita']];
     var NOMES_LADO = { e: 'com a esquerda', c: 'dividido', d: 'com a direita' };
@@ -37,23 +64,50 @@
       var casa = casaAtual();
       if (casa === casaPronta) return;
       casaPronta = casa;
-      var lst = itens[casa] || [], ufs = {}, partidos = {}, comDado = {};
+      var lst = itens[casa] || [], ufsDaCasa = {}, partidos = {}, comDado = {};
       lst.forEach(function (li) {
-        ufs[li.getAttribute('data-uf')] = 1;
+        ufsDaCasa[li.getAttribute('data-uf')] = 1;
         partidos[li.getAttribute('data-partido')] = 1;
         Object.keys(TM[li.getAttribute('data-pk')] || {}).forEach(function (t) { comDado[t] = (comDado[t] || 0) + 1; });
       });
-      opcoes(uf, Object.keys(ufs).filter(Boolean).sort().map(function (x) { return [x, x]; }), 'Todos');
+      var estados = Object.keys(ufsDaCasa).filter(Boolean).sort();
+      opcoes(uf, estados.map(function (x) { return [x, x]; }), 'Todos');
+      /* O estado em botões: é o primeiro passo de quem procura em quem votar. */
+      if (ufs) {
+        while (ufs.firstChild) ufs.removeChild(ufs.firstChild);
+        [''].concat(estados).forEach(function (x) {
+          ufs.appendChild(h('button', { cls: 'cg-esc-uf' + (x ? '' : ' cg-esc-uf0'), type: 'button', 'data-uf': x, 'aria-pressed': uf.value === x ? 'true' : 'false', text: x || 'Todos' }));
+        });
+        if (ufRotulo) ufRotulo.hidden = true;
+      }
       opcoes(pt, Object.keys(partidos).filter(Boolean).sort(function (a, b) { return semAcento(a).localeCompare(semAcento(b)); }).map(function (x) { return [x, x]; }), 'Todos');
       opcoes(prop, Object.keys(curtos).map(function (t) { return [t, curtos[t]]; }), 'Qualquer tema');
       /* As frentes: só a Câmara registra quem assina. */
       var temFrentes = casa === 'cd' && Object.keys(frNomes).length > 0;
       opcoes(frente, temFrentes ? Object.keys(frNomes).map(function (id) { return [id, frNomes[id]]; }).sort(function (a, b) { return semAcento(a[1]).localeCompare(semAcento(b[1])); }) : [], 'Qualquer uma');
       frenteL.hidden = !temFrentes;
-      /* Os cortes da cota: a mediana e o primeiro quartil da média mensal de quem está na lista. */
-      var valores = lst.map(function (li) { return parseFloat(li.getAttribute('data-ct')); }).filter(function (x) { return !isNaN(x); }).sort(function (a, b) { return a - b; });
-      cortesCota[casa] = valores.length ? [valores[Math.floor((valores.length - 1) / 2)], valores[Math.floor((valores.length - 1) / 4)]] : null;
-      cota.disabled = !valores.length;
+      /* Os cortes da cota: a mediana e o primeiro quartil da média mensal. Na Câmara, dentro de cada
+         estado (o gasto muda com a distância de Brasília); no Senado, com três por estado, da Casa. */
+      var porUf = {};
+      lst.forEach(function (li) {
+        var v = parseFloat(li.getAttribute('data-ct'));
+        if (!isNaN(v)) { var chave = casa === 'cd' ? li.getAttribute('data-uf') : ''; (porUf[chave] = porUf[chave] || []).push(v); }
+      });
+      cortesCota[casa] = {};
+      Object.keys(porUf).forEach(function (chave) {
+        var v = porUf[chave].sort(function (a, b) { return a - b; });
+        cortesCota[casa][chave] = [v[Math.floor((v.length - 1) / 2)], v[Math.floor((v.length - 1) / 4)]];
+      });
+      cota.disabled = !Object.keys(porUf).length;
+      lista(cota.options).forEach(function (o) {
+        if (o.value === 'm') o.textContent = casa === 'cd' ? 'Até a mediana do estado' : 'Até a mediana do Senado';
+        if (o.value === 'q') o.textContent = casa === 'cd' ? 'Entre os 25% que menos gastam do estado' : 'Entre os 25% que menos gastam do Senado';
+      });
+      if (atalhos) lista(atalhos.querySelectorAll('.cg-esc-atb')).forEach(function (b) {
+        var teste = ATALHOS[b.getAttribute('data-at')], n = lst.filter(teste).length, conta_ = b.querySelector('b');
+        if (conta_) conta_.textContent = num(n);
+        b.disabled = !n;
+      });
       var antes = {};
       lista(grade.querySelectorAll('select')).forEach(function (s) { antes[s.getAttribute('data-t')] = s.value; });
       while (grade.firstChild) grade.removeChild(grade.firstChild);
@@ -81,6 +135,7 @@
       if (pres.value) partes.push('pres=' + pres.value);
       if (gov.value) partes.push('gov=' + gov.value);
       if (norma.checked) partes.push('norma=1');
+      if (atalhosLigados().length) partes.push('at=' + atalhosLigados().join('.'));
       if (ord.value !== 'af') partes.push('ord=' + ord.value);
       return '#v=escolha' + (partes.length ? '&' + partes.join('&') : '');
     }
@@ -101,7 +156,11 @@
       pres.value = p.pres || '';
       gov.value = p.gov || '';
       norma.checked = p.norma === '1';
-      ord.value = p.ord === 'pres' || p.ord === 'nome' || p.ord === 'prop' ? p.ord : 'af';
+      ord.value = p.ord === 'pres' || p.ord === 'nome' || p.ord === 'prop' || p.ord === 'fid' ? p.ord : 'af';
+      var pedidos = (p.at || '').split('.');
+      if (atalhos) lista(atalhos.querySelectorAll('.cg-esc-atb')).forEach(function (b) { b.setAttribute('aria-pressed', pedidos.indexOf(b.getAttribute('data-at')) >= 0 && !b.disabled ? 'true' : 'false'); });
+      /* Com algum dos filtros de dentro ligado, "Mais filtros" abre. */
+      if (maisFiltros && (p.pt || p.t || p.p || p.fr || p.ct || p.pres || p.gov || p.norma)) maisFiltros.open = true;
       var escolha = {};
       (p.t || '').split('~').forEach(function (x) { var m = /^([a-z]+)\.([ecd])$/.exec(x); if (m) escolha[m[1]] = m[2]; });
       lista(grade.querySelectorAll('select')).forEach(function (s) { s.value = escolha[s.getAttribute('data-t')] || ''; });
@@ -109,7 +168,7 @@
 
     function aplicar(semEndereco) {
       var casa = casaAtual(), lst = itens[casa] || [], escolhas = temasEscolhidos();
-      var vPres = parseFloat(pres.value) || 0, vGov = gov.value, vProp = prop.value, vNorma = norma.checked;
+      var vPres = parseFloat(pres.value) || 0, vGov = gov.value, vProp = prop.value, vNorma = norma.checked, ligados = atalhosLigados();
       var cabem = [], fora = [];
       lst.forEach(function (li, i) {
         var k = li.getAttribute('data-pk'), motivos = [], ok = true, af = 0;
@@ -131,9 +190,11 @@
           if ((FR[k] || []).indexOf(parseInt(frente.value, 10)) < 0) ok = false; else motivos.push('assina a frente ' + frNomes[frente.value]);
         }
         if (ok && cota.value && cortesCota[casa]) {
-          var ct = parseFloat(li.getAttribute('data-ct')), teto = cortesCota[casa][cota.value === 'q' ? 1 : 0];
-          if (isNaN(ct) || ct > teto) ok = false; else motivos.push('cota de R$ ' + num(ct) + ' por mês');
+          var ct = parseFloat(li.getAttribute('data-ct')), doEstado = cortesCota[casa][casa === 'cd' ? li.getAttribute('data-uf') : ''];
+          if (isNaN(ct) || !doEstado || ct > doEstado[cota.value === 'q' ? 1 : 0]) ok = false;
+          else motivos.push('cota de R$ ' + num(ct) + ' por mês (' + (cota.value === 'q' ? 'entre os 25% que menos gastam' : 'até a mediana') + (casa === 'cd' ? ' de ' + li.getAttribute('data-uf') : ' do Senado') + ')');
         }
+        ligados.forEach(function (a) { if (ok) { if (!ATALHOS[a](li)) ok = false; else motivos.push(MOTIVO_ATALHO[a]); } });
         if (ok && vPres) { if (isNaN(p) || p < vPres) ok = false; else motivos.push('presença ' + pct(p)); }
         if (ok && vGov) { if (isNaN(g) || (vGov === 'a' ? g < 70 : g >= 40)) ok = false; else motivos.push('com o governo ' + pct(g)); }
         if (ok && vNorma) {
@@ -141,26 +202,37 @@
           if (!nn) ok = false; else motivos.push(num(nn) + (nn === 1 ? ' proposta virou norma' : ' propostas viraram norma'));
         }
         li.hidden = !ok;
+        li.removeAttribute('data-espera');
         var linha = li.querySelector('.cg-esc-m');
         if (ok && motivos.length) {
           if (!linha) { linha = h('p', { cls: 'cg-esc-m' }); li.appendChild(linha); }
           linha.textContent = 'Por que entrou: ' + motivos.join(' · ') + '.';
           linha.hidden = false;
         } else if (linha) linha.hidden = true;
-        (ok ? cabem : fora).push({ li: li, i: i, af: escolhas.length ? af / escolhas.length : 0, pres: isNaN(p) ? -1 : p, nome: nomeDoItem(li), np: vProp ? ((PT[k] || {})[vProp] || 0) : 0 });
+        var fidDoItem = parseFloat(li.getAttribute('data-fid'));
+        (ok ? cabem : fora).push({ li: li, i: i, af: escolhas.length ? af / escolhas.length : 0, pres: isNaN(p) ? -1 : p, fid: isNaN(fidDoItem) ? 101 : fidDoItem, nome: nomeDoItem(li), np: vProp ? ((PT[k] || {})[vProp] || 0) : 0 });
       });
       var o = ord.value;
       cabem.sort(function (a, b) {
         if (o === 'af' && escolhas.length && a.af !== b.af) return b.af - a.af;
         if (o === 'pres' && a.pres !== b.pres) return b.pres - a.pres;
         if (o === 'prop' && a.np !== b.np) return b.np - a.np;
+        if (o === 'fid' && a.fid !== b.fid) return a.fid - b.fid;
         if (o === 'nome') return a.nome.localeCompare(b.nome);
         return a.i - b.i;
       });
       var ol = lst.length ? lst[0].parentNode : null;
       if (ol) cabem.concat(fora).forEach(function (x) { ol.appendChild(x.li); });
+      /* Só os primeiros cartões à vista: o resto, no "mostrar mais". */
+      cabem.forEach(function (x, j) { if (j >= limite[casa]) { x.li.hidden = true; x.li.setAttribute('data-espera', '1'); } });
+      if (mais[casa]) {
+        var faltam = cabem.length - Math.min(cabem.length, limite[casa]);
+        mais[casa].hidden = !faltam;
+        mais[casa].textContent = 'Mostrar mais ' + Math.min(LOTE, faltam) + (faltam > LOTE ? ' (faltam ' + num(faltam) + ')' : '');
+      }
+      if (ufs) lista(ufs.children).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-uf') === uf.value ? 'true' : 'false'); });
       var quem = casa === 'sf' ? 'senadores' : 'deputados';
-      var filtros = uf.value || pt.value || escolhas.length || vProp || frente.value || cota.value || vPres || vGov || vNorma;
+      var filtros = uf.value || pt.value || escolhas.length || vProp || frente.value || cota.value || vPres || vGov || vNorma || ligados.length;
       conta.textContent = !filtros ? num(lst.length) + ' ' + quem + ' em exercício. Escolha o que importa para você.'
         : cabem.length ? num(cabem.length) + ' de ' + num(lst.length) + ' ' + quem + ' combinam com tudo o que você escolheu.'
           : 'Nenhum dos ' + num(lst.length) + ' ' + quem + ' combina com tudo isso: tire um critério.';
@@ -169,9 +241,24 @@
 
     form.hidden = false;
     form.addEventListener('submit', function (event) { event.preventDefault(); });
-    form.addEventListener('change', function () { aplicar(); });
+    form.addEventListener('change', function () { limite[casaAtual()] = LOTE; aplicar(); });
+    if (atalhos) atalhos.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('.cg-esc-atb') : null;
+      if (!b || b.disabled) return;
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      limite[casaAtual()] = LOTE;
+      aplicar();
+    });
+    if (ufs) ufs.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('.cg-esc-uf') : null;
+      if (!b) return;
+      uf.value = b.getAttribute('data-uf');
+      limite[casaAtual()] = LOTE;
+      aplicar();
+    });
     limpar.addEventListener('click', function () {
       aplicarEndereco({});
+      limite[casaAtual()] = LOTE;
       aplicar();
     });
     aoAbrirVista.escolha = function () {

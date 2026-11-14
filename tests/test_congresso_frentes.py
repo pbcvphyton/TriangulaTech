@@ -337,3 +337,12 @@ def test_por_deputado():
     # Quem saiu da Câmara fica fora do painel, mas tem a ficha: 0 de 5 com a coordenadora.
     assert por[6]["causas"] == [{"id": 100, "nome": "Ambientalista", "tema": "ambiente", "coord": 0, "com": 0.0, "n": 5}]
     assert sorted(por) == [1, 2, 3, 4, 5, 6, 7]
+
+
+def test_a_base_de_comparacao_e_quem_nao_assina():
+    """Quem está em exercício e não assina a Ambientalista: Caio (6 votações, nenhuma igual à
+    da coordenadora) e Gil (4 votações, as 4 iguais): 4 de 10 = 40%. É o número que diz se a
+    assinatura separa alguém de alguém (quem assina: 50%)."""
+    painel, _ = _analise()
+    amb = painel["causas"][0]
+    assert (amb["com_coord"], amb["sem_assinar"]) == (50.0, 40.0)

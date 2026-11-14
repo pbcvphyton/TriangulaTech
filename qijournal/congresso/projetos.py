@@ -182,13 +182,22 @@ def dias_entre(inicio: str, fim: str) -> int | None:
         return None
 
 
+# Um CPF dentro do texto oficial (o ofício de um tribunal transcrito na ementa, por exemplo) não é
+# publicado aqui: sai mascarado.
+_CPF = re.compile(r"\b\d{3}\.\d{3}\.\d{3}\s?-\s?\d{2}\b")
+
+
+def sem_cpf(texto: str) -> str:
+    return _CPF.sub("***.***.***-**", texto)
+
+
 def _curto(valor: Any, limite: int = EMENTA_MAX) -> str:
-    return text.truncate(re.sub(r"\s+", " ", str(valor or "").strip()), limite)
+    return text.truncate(sem_cpf(re.sub(r"\s+", " ", str(valor or "").strip())), limite)
 
 
 def _inteira(valor: Any) -> str:
     """A ementa inteira, só quando a curta (``EMENTA_MAX``) a cortou."""
-    bruta = re.sub(r"\s+", " ", str(valor or "").strip())
+    bruta = sem_cpf(re.sub(r"\s+", " ", str(valor or "").strip()))
     return text.truncate(bruta, INTEIRA_MAX) if len(bruta) > EMENTA_MAX else ""
 
 

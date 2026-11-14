@@ -21,6 +21,11 @@ meses). Cada ficha junta o que os registros oficiais dizem:
 não é o assunto que define o lado, é como os partidos de cada polo votaram **naquela**
 votação. A ficha mostra a contagem.
 
+Daqui saem também **as folhas** da aba "Votações e matérias" (:func:`folhas`): as matérias
+votadas por último no Plenário, cada uma como um documento (o que é, quem propôs, quando)
+com a votação que vai na **capa** (:func:`capa`: a do texto principal, não a da redação
+final nem a de um requerimento) e, ao lado, o placar e quem saiu da linha.
+
 O arquivo (``materias-<casa>.json``) tem uma matéria por linha e só é lido quando alguém
 abre um detalhe. Guarda datas, não contagens de dias: não muda de um dia para o outro
 sem que a matéria mude.
@@ -114,6 +119,42 @@ def sentido_do_sim(v: Votacao) -> str:
     return ""
 
 
+_SECRETA = re.compile(r"^votacao secreta\b")
+_REDACAO_FINAL = re.compile(r"^(?:votacao (?:nominal )?d[ao] |(?:aprovad|rejeitad)[oa],? (?:[ao] )?)redacao final\b")
+
+
+def secreta(v: Votacao) -> bool:
+    """Votação em que o registro não diz como cada um votou: a que a fonte marca (Senado) e a
+    que a Mesa abre como "Votação secreta" (Câmara: a escolha de autoridades)."""
+    return v.secreta or bool(_SECRETA.match(text.normalize(v.abertura)))
+
+
+def redacao_final(descricao: str, abertura: str = "") -> bool:
+    """A votação da redação final: o texto já foi aprovado, e o Plenário só confirma como ele
+    ficou escrito ("Aprovada a Redação Final assinada pelo relator"; "Votação da Redação Final")."""
+    return bool(_REDACAO_FINAL.match(text.normalize(descricao)) or _REDACAO_FINAL.match(text.normalize(abertura)))
+
+
+def _posto(v: Mapping[str, Any]) -> int:
+    """A preferência de uma votação para a capa da folha (menor é melhor)."""
+    if v.get("t") in (base.MERITO, base.AUTORIDADE):
+        return 1 if v.get("rf") else 0
+    return 2 if v.get("t") == base.DESTAQUE else 3
+
+
+def capa(votos: Iterable[Mapping[str, Any]]) -> str:
+    """O id da votação que vai na capa da folha de uma matéria (``votos``: as votações dela, em
+    ordem, no formato de :func:`votacao`). Vale a do **texto principal** (na PEC, o último turno;
+    a escolha de autoridade é o texto principal dela); sem ela, a da redação final; sem ela, a de
+    um destaque ou emenda; sem nenhuma dessas, a de um requerimento (urgência, retirada de
+    pauta). No empate, a mais recente."""
+    melhor: Mapping[str, Any] | None = None
+    for v in votos:
+        if melhor is None or _posto(v) <= _posto(melhor):
+            melhor = v
+    return str(melhor["id"]) if melhor else ""
+
+
 def sim_venceu(v: Votacao) -> bool | None:
     """Se o lado do Sim venceu: o que a fonte diz (aprovada ou rejeitada) ou, no destaque
     para votação em separado, o que a Mesa anotou: "mantido" (o Sim venceu) ou "suprimido"."""
@@ -143,8 +184,24 @@ def votacao(v: Votacao, ano: AnoVotos, k: int, regras: Regras) -> dict[str, Any]
         "t": v.tipo,
         "x": v.descricao,
         "s": conta.get(base.SIM, 0),
-        "n": conta.get(base.NAO, 0) + conta.get(base.OBSTRUCAO, 0),
+        "n": conta.get(base.NAO, 0),
     }
+    # O placar como a Mesa anuncia: a obstrução fica fora do Sim e do Não (na conta de que lado
+    # cada um ficou ela vale como Não, mas não é voto Não).
+    if conta.get(base.OBSTRUCAO):
+        d["o"] = conta[base.OBSTRUCAO]
+    exigido = base.quorum(ano.casa, v.prop) if v.tipo in perfil.CONTEUDO else None
+    if exigido:
+        d["q"] = exigido
+    # Quando o placar que a Mesa anunciou difere um pouco da contagem dos votos um a um (as que
+    # diferem muito já saíram das contas: base.sem_as_que_nao_batem), fica também o anunciado: [Sim, Não].
+    anunciado = base.placar_anunciado(v.descricao)
+    if anunciado and anunciado != (d["s"], d["n"]):
+        d["an"] = list(anunciado)
+    if secreta(v):
+        d["sec"] = 1
+    if v.tipo == base.MERITO and redacao_final(v.descricao, v.abertura):
+        d["rf"] = 1
     if v.hora:
         d["h"] = v.hora
     if v.abertura:
@@ -352,6 +409,8 @@ def montar(
         if not m.get("tm") and ultima.temas:
             m["tm"] = list(ultima.temas)
         m["vot"] = [votacao(ano.votacoes[k], ano, k, regras) for ano, k in lista]
+        if len(m["vot"]) > 1:  # a votação que vai na capa da folha (com uma só, é ela)
+            m["cp"] = capa(m["vot"])
 
     # Os sinais de relevância: a nota do painel para as que esperam e as que passaram; para
     # as demais votadas, a nota na data da última votação (só os tipos que a régua mede).
@@ -428,6 +487,100 @@ def autoria_cruzada(
                 itens.append(item)
         itens.sort(key=lambda i: (i["d"], i["t"]), reverse=True)
         saida[autor] = {**conta, "itens": itens[:lista]}
+    return saida
+
+
+# ── as folhas da aba "Votações e matérias" ───────────────────────────────────
+
+FOLHAS = 10  # matérias na mesa: as que tiveram votação nominal no Plenário por último
+NA_FOLHA = 4  # votações de cada matéria que a mesa mostra por inteiro (a da capa e as mais recentes)
+CONTRA = 12  # nomes de quem saiu da linha, por partido e por votação
+_DA_FICHA = ("e", "eo", "ap", "au", "auk", "da", "o", "pa", "u", "ut", "tm", "sit", "est", "rl", "rlk")
+_DA_VOTACAO = ("ss", "tu", "dq", "ab", "an", "sec", "rf")
+
+
+def _momento(par: tuple[AnoVotos, int]) -> tuple[str, str, str]:
+    v = par[0].votacoes[par[1]]
+    return (v.data, v.hora, v.id)
+
+
+def folhas(
+    anos: Iterable[AnoVotos],
+    regras: Regras,
+    legislatura: int,
+    fichas: Mapping[str, Mapping[str, Any]],
+    nomes: Mapping[int, str],
+    quantas: int = FOLHAS,
+    por_folha: int = NA_FOLHA,
+) -> list[dict[str, Any]]:
+    """As folhas da aba "Votações e matérias": as ``quantas`` matérias que tiveram votação
+    nominal no Plenário por último, da mais recente. Cada folha é a matéria como documento
+    (``fichas``: as de :func:`montar`, pelo título) e, para pôr ao lado, as votações dela:
+
+    - ``n``: quantas votações nominais de Plenário a matéria teve na legislatura (a pilha);
+    - ``cp``: a votação da capa (:func:`capa`), escolhida entre **todas** as da matéria;
+    - ``vot``: a da capa e as mais recentes (até ``por_folha``), em ordem, cada uma com o placar
+      (a obstrução à parte; o quórum da PEC e da lei complementar), o lado do Governo e dos
+      polos e, por partido, o lado da maioria e quem votou diferente: os nomes só onde o
+      partido votou fechado (``coesao_partido`` de ``config/congresso.yaml``, que vai em
+      ``fechado``, em %); onde ele se dividiu, só a contagem.
+
+    Entram também as votações secretas (a escolha de autoridades): não há voto de cada um, mas
+    a página diz que a votação houve e, quando a Mesa anunciou, o placar. A votação sem
+    matéria numerada vira uma folha só dela (``t`` vazio).
+    """
+    fechado = round(100 * regras.limiares.coesao_partido)
+    por: dict[str, list[tuple[AnoVotos, int]]] = defaultdict(list)
+    for ano in anos:
+        for k, v in enumerate(ano.votacoes):
+            leg = regras.legislatura_em(v.data)
+            if v.plenario and leg is not None and leg.numero == legislatura:
+                por[titulo_da_materia(v.prop) if v.prop else f"#{v.id}"].append((ano, k))
+    for lista in por.values():
+        lista.sort(key=_momento)
+    recentes = sorted(por, key=lambda titulo: _momento(por[titulo][-1]), reverse=True)[:quantas]
+    saida = []
+    for titulo in recentes:
+        lista = por[titulo]
+        curtas = [votacao(ano.votacoes[k], ano, k, regras) for ano, k in lista]
+        da_capa = capa(curtas)
+        outras = [c["id"] for c in curtas if c["id"] != da_capa]
+        escolhidas = {da_capa, *outras[max(len(outras) - max(por_folha - 1, 0), 0) :]}
+        ultima = anos_votacao(lista)
+        folha: dict[str, Any] = {"t": "" if titulo.startswith("#") else titulo, "n": len(lista), "cp": da_capa, "fechado": fechado}
+        ficha_ = fichas.get(titulo) or {}
+        for campo in _DA_FICHA:
+            if ficha_.get(campo):
+                folha[campo] = ficha_[campo]
+        # Sem ficha (a votação secreta, a matéria sem número): fica o que a votação diz.
+        if "e" not in folha and ultima.ementa:
+            folha["e"] = ultima.ementa
+        if "tm" not in folha and ultima.temas:
+            folha["tm"] = list(ultima.temas)
+        if "ap" not in folha and regras.apelido_de(titulo):
+            folha["ap"] = regras.apelido_de(titulo)
+        votos = []
+        for (ano, k), curta in zip(lista, curtas, strict=True):
+            if curta["id"] not in escolhidas:
+                continue
+            v = ano.votacoes[k]
+            r = perfil.resumo_da_votacao(v, ano, k, regras)
+            for p in r["partidos"]:
+                contra = p["contra"]
+                p["contra"] = [{"id": pid, "nome": nomes.get(pid, "")} for pid in contra[:CONTRA]] if p["coesao"] >= fechado else len(contra)
+                if p["coesao"] >= fechado and len(contra) > CONTRA:
+                    p["mais"] = len(contra) - CONTRA
+            r["partidos"] = [p for p in r["partidos"] if p["votos"] >= 3][:PARTIDOS]
+            for campo in ("ori", "ementa", "temas", "prop"):
+                r.pop(campo, None)
+            for campo in _DA_VOTACAO:
+                if campo in curta:
+                    r[campo] = curta[campo]
+            if r.get("sec") and not r.get("an"):  # secreta sem placar anunciado: quantos votaram
+                r["votaram"] = v.conta().get(base.SECRETO, 0)
+            votos.append(r)
+        folha["vot"] = votos
+        saida.append(folha)
     return saida
 
 
