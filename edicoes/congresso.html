@@ -1955,6 +1955,7 @@ body.cg-aberto{overflow:hidden}
   .cg-d-f{width:68px;height:88px}
   .cg-barra{margin-left:-16px;margin-right:-16px;padding:0 16px}
   .cg-vistas ul{gap:0 18px}
+  .cg-casas-n{display:none}
   .cg-bar{width:92px}
 }
 
@@ -2099,8 +2100,8 @@ body.cg-aberto{overflow:hidden}
 .cg-jv-v b{color:var(--ink)}
 
 /* ── As matérias: o número que abre a ficha, a ficha e as votações por extenso ── */
-:root{--cg-j0:#EEF2FD;--cg-j1:#D3DDFA;--cg-j2:#A6B9F2;--cg-j3:#6781E0;--cg-j4:#2E4BBB;--cg-jon:#14203f;--cg-jon2:#fff}
-:root[data-theme="dark"]{--cg-j0:#182136;--cg-j1:#22305A;--cg-j2:#30458C;--cg-j3:#4C68CB;--cg-j4:#A3B5F7;--cg-jon:#e8edf7;--cg-jon2:#0b0f17}
+:root{--cg-j0:#EEF2FD;--cg-j1:#D3DDFA;--cg-j2:#A6B9F2;--cg-j3:#4F68CC;--cg-j4:#2A429F;--cg-jon:#14203f;--cg-jon2:#fff}
+:root[data-theme="dark"]{--cg-j0:#182136;--cg-j1:#22305A;--cg-j2:#30458C;--cg-j3:#4560C2;--cg-j4:#A3B5F7;--cg-jon:#e8edf7;--cg-jon2:#0b0f17}
 .cg-mt{color:var(--link);font-weight:700;cursor:pointer}
 .cg-mt:hover{text-decoration:underline}
 .cg-fx-d{margin-top:6px;font-family:var(--ss);font-size:12.5px;color:var(--muted)}
@@ -2141,6 +2142,7 @@ body.cg-aberto{overflow:hidden}
 .cg-mh{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;font-family:var(--ss);font-size:14.5px;color:var(--ink)}
 .cg-mh .cg-apel{margin:0}
 .cg-mh .cg-chip{font-size:11.5px;padding:1px 8px}
+.cg-mh .cg-div{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
 .cg-td-lado{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
 .cg-mh-e{max-width:980px;margin-top:5px;font-family:var(--ss);font-size:13.5px;line-height:1.5;color:var(--body)}
 .cg-mh-x{max-width:980px;margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
@@ -2192,6 +2194,18 @@ body.cg-aberto{overflow:hidden}
 .cg-mf-dl dd{font-family:var(--ss);font-size:13.5px;line-height:1.5;color:var(--ink)}
 .cg-mf-n{display:flex;align-items:baseline;gap:6px;margin-top:10px;font-family:var(--ss);font-size:13px;color:var(--body)}
 .cg-mf-n>b{font-family:var(--mn);font-size:32px;font-weight:600;line-height:1;color:var(--ink)}
+
+/* O mapa das abas (no Resumo) e o que entra em cada tema (no Como ler) */
+.cg-mapa{list-style:none}
+.cg-mapa li{position:relative;padding:11px 0;border-top:1px solid var(--rl)}
+.cg-mapa li:first-child{border-top:0}
+.cg-mapa a{font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.cg-mapa a:hover{color:var(--link)}
+.cg-mapa p{margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.cg-mapa b{font-family:var(--mn);color:var(--ink)}
+.cg-tdef{max-width:1180px;margin-top:10px}
+.cg-tdef td,.cg-tdef th{white-space:normal;text-align:left !important;vertical-align:top;font-family:var(--ss) !important;font-size:12.5px !important;line-height:1.5}
+.cg-tdef th[scope="row"]{min-width:190px}
 
 /* O que cada um propõe */
 .cg-cp-pr{padding-bottom:0;border-bottom:0}
@@ -2328,42 +2342,44 @@ body.cg-aberto{overflow:hidden}
           </li>
           <li class="az-a">
             <div class="az-a-tx">
-              <p class="az-a-k"><span class="az-selo">Muda de lado</span><b class="az-a-num">7</b></p>
+              <p class="az-a-k"><span class="az-selo">Partidos</span><b class="az-a-num">7</b></p>
+              <h5 class="az-a-t"><a class="hit" href="#cg-juntos-cd">Na Câmara, PT e PL ficaram do mesmo lado em 34% das votações de conteúdo</a></h5>
+              <p class="az-a-x">Em 148 das 564 votações de conteúdo do Plenário, os dois polos votaram juntos. O saldo esquerda × direita só olha as 305 em que eles se opuseram.</p>
+            </div>
+          </li>
+          <li class="az-a">
+            <div class="az-a-tx">
+              <p class="az-a-k"><span class="az-selo">Partidos</span><b class="az-a-num">8</b></p>
+              <h5 class="az-a-t"><a class="hit" href="#cg-juntos-sf">No Senado, PT e PL ficaram do mesmo lado em 59% das votações de conteúdo</a></h5>
+              <p class="az-a-x">Em 99 das 176 votações de conteúdo do Plenário, os dois polos votaram juntos. O saldo esquerda × direita só olha as 63 em que eles se opuseram.</p>
+            </div>
+          </li>
+          <li class="az-a">
+            <div class="az-a-tx">
+              <p class="az-a-k"><span class="az-selo">Muda de lado</span><b class="az-a-num">9</b></p>
               <h5 class="az-a-t"><a class="hit" href="#cg-listas-cd">Câmara: Luciano Amaral (PSD-AL) vota com a esquerda, menos em Agro e terra</a></h5>
               <p class="az-a-x">Saldo de −70 no geral e de +24 em Agro e terra, em 21 votações em que esquerda e direita se opuseram. A diferença passa do acaso contando todas as pessoas e temas comparados. <a class="cg-p cg-abrir" href="#p=cd-220581" data-k="cd-220581">Abrir o dossiê</a></p>
             </div>
           </li>
           <li class="az-a">
             <div class="az-a-tx">
-              <p class="az-a-k"><span class="az-selo">Fora da curva</span><b class="az-a-num">8</b></p>
+              <p class="az-a-k"><span class="az-selo">Fora da curva</span><b class="az-a-num">10</b></p>
               <h5 class="az-a-t"><a class="hit" href="#cg-listas-cd">Câmara: João Carlos Bacelar vota longe do próprio partido</a></h5>
               <p class="az-a-x">Saldo de −59 contra +92 da média do PL (−100 = sempre com a esquerda; +100 = sempre com a direita). <a class="cg-p cg-abrir" href="#p=cd-141458" data-k="cd-141458">Abrir o dossiê</a></p>
-            </div>
-          </li>
-          <li class="az-a">
-            <div class="az-a-tx">
-              <p class="az-a-k"><span class="az-selo">Fora da curva</span><b class="az-a-num">9</b></p>
-              <h5 class="az-a-t"><a class="hit" href="#cg-listas-sf">Senado: Lucas Barreto vota longe do próprio partido</a></h5>
-              <p class="az-a-x">Saldo de +49 contra −49 da média do PSD (−100 = sempre com a esquerda; +100 = sempre com a direita). <a class="cg-p cg-abrir" href="#p=sf-5926" data-k="sf-5926">Abrir o dossiê</a></p>
-            </div>
-          </li>
-          <li class="az-a">
-            <div class="az-a-tx">
-              <p class="az-a-k"><span class="az-selo">Pauta</span><b class="az-a-num">10</b></p>
-              <h5 class="az-a-t"><a class="hit" href="#cg-fila-cd">Câmara: 566 projetos prontos para o Plenário não entram na pauta</a></h5>
-              <p class="az-a-x">O mais antigo, PL 1668/2011, espera há 5.601 dias: Altera o art. 91 da Lei nº 9.504, de 30 de setembro de 1997, para vedar a transferência de domicílio eleitoral por Prefeitos e Vice-Prefeitos durante o exercício do mandato.</p>
             </div>
           </li>
         </ol>
       </div>
     </div>
     <aside class="az-rail" aria-labelledby="cg-lentes-h">
-      <h4 class="az-lbl" id="cg-lentes-h">Quatro lentes <span class="az-lbl-n">de onde saem os achados</span></h4>
-      <ol class="az-lentes">
-        <li class="az-l"><p class="az-l-k"><b>1</b>Com quem vota</p><p class="az-l-p"><a class="hit" href="#cg-polos">Por baixo dos rótulos, de que lado cada um fica?</a></p><p class="az-l-v"><b>368</b> <span>votações de conteúdo dividiram os polos</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>2</b>A fila</p><p class="az-l-p"><a class="hit" href="#cg-fila">O que espera, com quem, e o que passou na frente?</a></p><p class="az-l-v"><b>35.531</b> <span>matérias tramitando nas duas Casas</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>3</b>O Plenário</p><p class="az-l-p"><a class="hit" href="#cg-plenario">O que foi votado, e quem saiu da linha?</a></p><p class="az-l-v"><b>1.562</b> <span>votações nominais desde 2023</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>4</b>Quem é quem</p><p class="az-l-p"><a class="hit" href="#cg-quem">O que cada um vota, propõe e deixa parado?</a></p><p class="az-l-v"><b>594</b> <span>parlamentares em exercício, cada um com dossiê</span></p></li>
+      <h4 class="az-lbl" id="cg-lentes-h">O que tem em cada aba <span class="az-lbl-n">para ir direto ao ponto</span></h4>
+      <ol class="cg-mapa">
+        <li><a class="hit" href="#cg-polos">Onde cada um está</a><p>De que lado cada um vota, no geral e em cada tema; e quais matérias foram votadas em cada tema, com o que cada polo fez. <b>368</b> votações dividiram os polos.</p></li>
+        <li><a class="hit" href="#cg-partidos">Partidos</a><p>Partido por tema, quanto cada partido vota junto com cada outro e onde os polos racham.</p></li>
+        <li><a class="hit" href="#cg-espera">O que espera × o que passa</a><p>O que está pronto para votar e o que foi votado, pela mesma régua; cada ponto abre a ficha da matéria.</p></li>
+        <li><a class="hit" href="#cg-fila">A fila</a><p>Em que porta cada matéria parou e quem segura. <b>35.531</b> tramitando nas duas Casas.</p></li>
+        <li><a class="hit" href="#cg-plenario">Votações e matérias</a><p>Procure uma matéria pelo nome ou pelo assunto; as últimas votações. <b>1.562</b> votações nominais desde 2023.</p></li>
+        <li><a class="hit" href="#cg-quem">Parlamentares</a><p>As listas, a tabela de todos, o dossiê de cada um e o comparativo de dois. <b>594</b> em exercício.</p></li>
       </ol>
       <form class="cg-achar" id="cgAchar" role="search" hidden>
         <label class="az-lbl az-lbl-2" for="cgAcharQ">Abrir o dossiê de alguém</label>
@@ -2374,7 +2390,7 @@ body.cg-aberto{overflow:hidden}
   </div>
 <section class="az-sec cg-vista" data-vista="posicoes" aria-labelledby="cg-polos-h">
     <header class="az-lh" id="cg-polos">
-      <p class="az-ln"><b>1</b>Com quem vota</p>
+      <p class="az-ln">Com quem vota</p>
       <h3 class="az-lt" id="cg-polos-h">Por baixo dos rótulos, de que lado cada um fica</h3>
       <p class="az-ld">Só contam as votações de conteúdo em que a esquerda (PCdoB, PSOL, PT) e a direita (NOVO, PL) ficaram em lados opostos, sem nenhum partido de um polo votando com o outro. O saldo de cada um vai de −100, sempre com a esquerda, a +100, sempre com a direita. Não é o que a pessoa diz ser: é com quem ela vota.</p>
     </header>
@@ -2518,7 +2534,7 @@ body.cg-aberto{overflow:hidden}
     <header class="az-lh" id="cg-partidos">
       <p class="az-ln">Partidos</p>
       <h3 class="az-lt" id="cg-partidos-h">Como cada bancada vota, e quanto vota junto com as outras</h3>
-      <p class="az-ld">O saldo esquerda × direita só olha as votações em que os polos se opõem. Nele, PCdoB, PSOL, PT e NOVO, PL ficam nas pontas por construção: são eles que definem os lados. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para ver quanto dois partidos votam juntos sem depender da régua, a tabela "Quanto os partidos votam juntos" conta todas as votações de conteúdo.</p>
+      <p class="az-ld">O saldo esquerda × direita só olha as votações em que os polos se opõem. Nele, os partidos que definem os polos (PCdoB, PSOL, PT de um lado; NOVO, PL do outro) ficam nas pontas por construção: a esquerda <i>é</i> o lado em que a maioria deles vota. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para ver quanto dois partidos votam juntos sem depender da régua, a tabela "Quanto os partidos votam juntos" conta todas as votações de conteúdo.</p>
     </header>
     <div class="cg-c" data-casa="cd">
       <h4 class="cg-ct">Câmara dos Deputados</h4>
@@ -2527,7 +2543,7 @@ body.cg-aberto{overflow:hidden}
         <p class="az-dek">O saldo de cada bancada nas 305 votações de conteúdo que dividiram os polos, separado pelo tema da matéria votada. Uma linha que troca de cor é um partido que muda de lado conforme o assunto.</p>
         <div class="az-mx-wrap">
           <table class="az-mx cg-mx">
-            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>305</small></th><th scope="col">Economia, tributos e orçamento<small>127</small></th><th scope="col">Política, Estado e Justiça<small>119</small></th><th scope="col">Direitos humanos e proteção social<small>46</small></th><th scope="col">Meio ambiente e energia<small>45</small></th><th scope="col">Segurança e justiça penal<small>44</small></th><th scope="col">Agro e terra<small>28</small></th><th scope="col">Educação, cultura e esporte<small>28</small></th><th scope="col">Trabalho e previdência<small>23</small></th><th scope="col">Cidades, transporte e infraestrutura<small>19</small></th><th scope="col">Saúde<small>19</small></th><th scope="col">Ciência, tecnologia e comunicações<small>18</small></th></tr></thead>
+            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>305</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Direito e Defesa do Consumidor”, “Economia”, “Finanças Públicas e Orçamento”, “Indústria, Comércio e Serviços”, “Turismo”." tabindex="0">Economia, tributos e orçamento<small>127</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Administração Pública”, “Direito Civil e Processual Civil”, “Direito Constitucional”, “Direito e Justiça”, “Política, Partidos e Eleições”, “Processo Legislativo e Atuação Parlamentar”." tabindex="0">Política, Estado e Justiça<small>119</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Direitos Humanos e Minorias”." tabindex="0">Direitos humanos e proteção social<small>46</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Ciências Exatas e da Terra”, “Energia, Recursos Hídricos e Minerais”, “Meio Ambiente e Desenvolvimento Sustentável”." tabindex="0">Meio ambiente e energia<small>45</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Defesa e Segurança” e “Direito Penal e Processual Penal”." tabindex="0">Segurança e justiça penal<small>44</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Agricultura, Pecuária, Pesca e Extrativismo” e “Estrutura Fundiária”." tabindex="0">Agro e terra<small>28</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Arte, Cultura e Religião”, “Ciências Sociais e Humanas”, “Educação”, “Esporte e Lazer”." tabindex="0">Educação, cultura e esporte<small>28</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Previdência e Assistência Social” e “Trabalho e Emprego”." tabindex="0">Trabalho e previdência<small>23</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Cidades e Desenvolvimento Urbano” e “Viação, Transporte e Mobilidade”." tabindex="0">Cidades, transporte e infraestrutura<small>19</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Saúde”." tabindex="0">Saúde<small>19</small></th><th scope="col" data-dica="Matérias que a Câmara classifica em “Ciência, Tecnologia e Inovação” e “Comunicações”." tabindex="0">Ciência, tecnologia e comunicações<small>18</small></th></tr></thead>
             <tbody>
               <tr class="cg-mx-polo"><th scope="row">PT<i title="Define o polo de esquerda: fica na ponta da régua por construção">régua</i><small>66</small></th><td class="cg-e3 cg-mx-g" title="PT · todas as votações de conteúdo: saldo −100 (com a esquerda) em 305 votações divisivas">−100</td><td class="cg-e3" title="PT · Economia, tributos e orçamento: saldo −100 (com a esquerda) em 127 votações divisivas">−100</td><td class="cg-e3" title="PT · Política, Estado e Justiça: saldo −100 (com a esquerda) em 119 votações divisivas">−100</td><td class="cg-e3" title="PT · Direitos humanos e proteção social: saldo −100 (com a esquerda) em 46 votações divisivas">−100</td><td class="cg-e3" title="PT · Meio ambiente e energia: saldo −100 (com a esquerda) em 45 votações divisivas">−100</td><td class="cg-e3" title="PT · Segurança e justiça penal: saldo −100 (com a esquerda) em 44 votações divisivas">−100</td><td class="cg-e3" title="PT · Agro e terra: saldo −100 (com a esquerda) em 28 votações divisivas">−100</td><td class="cg-e3" title="PT · Educação, cultura e esporte: saldo −100 (com a esquerda) em 28 votações divisivas">−100</td><td class="cg-e3" title="PT · Trabalho e previdência: saldo −100 (com a esquerda) em 23 votações divisivas">−100</td><td class="cg-e3" title="PT · Cidades, transporte e infraestrutura: saldo −100 (com a esquerda) em 19 votações divisivas">−100</td><td class="cg-e3" title="PT · Saúde: saldo −100 (com a esquerda) em 19 votações divisivas">−100</td><td class="cg-e3" title="PT · Ciência, tecnologia e comunicações: saldo −100 (com a esquerda) em 18 votações divisivas">−100</td></tr>
               <tr class="cg-mx-polo"><th scope="row">PCdoB<i title="Define o polo de esquerda: fica na ponta da régua por construção">régua</i><small>11</small></th><td class="cg-e3 cg-mx-g" title="PCdoB · todas as votações de conteúdo: saldo −100 (com a esquerda) em 305 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Economia, tributos e orçamento: saldo −100 (com a esquerda) em 127 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Política, Estado e Justiça: saldo −100 (com a esquerda) em 119 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Direitos humanos e proteção social: saldo −100 (com a esquerda) em 46 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Meio ambiente e energia: saldo −100 (com a esquerda) em 45 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Segurança e justiça penal: saldo −100 (com a esquerda) em 44 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Agro e terra: saldo −100 (com a esquerda) em 28 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Educação, cultura e esporte: saldo −100 (com a esquerda) em 28 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Trabalho e previdência: saldo −100 (com a esquerda) em 23 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Cidades, transporte e infraestrutura: saldo −100 (com a esquerda) em 19 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Saúde: saldo −100 (com a esquerda) em 19 votações divisivas">−100</td><td class="cg-e3" title="PCdoB · Ciência, tecnologia e comunicações: saldo −100 (com a esquerda) em 18 votações divisivas">−100</td></tr>
@@ -2611,7 +2627,7 @@ body.cg-aberto{overflow:hidden}
             </ol>
           </div>
         </div>
-        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. Clique no número para ver a ficha da matéria e a contagem de cada partido.</p>
+        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. O texto votado pode ser muito diferente do original: a ficha da matéria mostra quando a ementa mudou no caminho. Clique no número para ver a ficha e a contagem de cada partido.</p>
       </div>
 
       <div class="az-blk" id="cg-rachas-cd">
@@ -2733,7 +2749,7 @@ body.cg-aberto{overflow:hidden}
         <p class="az-dek">O saldo de cada bancada nas 63 votações de conteúdo que dividiram os polos, separado pelo tema da matéria votada. Uma linha que troca de cor é um partido que muda de lado conforme o assunto.</p>
         <div class="az-mx-wrap">
           <table class="az-mx cg-mx">
-            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>63</small></th><th scope="col">Economia, tributos e orçamento<small>38</small></th><th scope="col">Política, Estado e Justiça<small>29</small></th><th scope="col">Direitos humanos e proteção social<small>13</small></th><th scope="col">Meio ambiente e energia<small>8</small></th><th scope="col">Educação, cultura e esporte<small>6</small></th><th scope="col">Segurança e justiça penal<small>6</small></th><th scope="col">Cidades, transporte e infraestrutura<small>5</small></th><th scope="col">Saúde<small>3</small></th><th scope="col">Trabalho e previdência<small>2</small></th><th scope="col">Agro e terra<small>1</small></th></tr></thead>
+            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>63</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Economia e Desenvolvimento”, “Orçamento Público”, “Jurídico / Direito do Consumidor”, “Jurídico / Direito Empresarial e Econômico”." tabindex="0">Economia, tributos e orçamento<small>38</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Administração Pública”, “Organização do Estado”, “Jurídico”." tabindex="0">Política, Estado e Justiça<small>29</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Política Social / Proteção Social”, “Jurídico / Direitos e Garantias”, “Política Social”." tabindex="0">Direitos humanos e proteção social<small>13</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Meio Ambiente” e “Infraestrutura / Minas e Energia”." tabindex="0">Meio ambiente e energia<small>8</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Política Social / Educação”, “Política Social / Cultura”, “Política Social / Desporto e Lazer”." tabindex="0">Educação, cultura e esporte<small>6</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Jurídico / Direito Penal e Penitenciário” e “Soberania, Defesa Nacional e Ordem Pública / Defesa do Estado e das Instituições Democráticas”." tabindex="0">Segurança e justiça penal<small>6</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Infraestrutura”, “Política Social / Habitação”, “Política Social / Desenvolvimento Urbano”, “Jurídico / Direito de Trânsito”." tabindex="0">Cidades, transporte e infraestrutura<small>5</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Política Social / Saúde”." tabindex="0">Saúde<small>3</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Política Social / Trabalho e Emprego” e “Política Social / Previdência Social”." tabindex="0">Trabalho e previdência<small>2</small></th><th scope="col" data-dica="Matérias que o Senado classifica em “Economia e Desenvolvimento / Agropecuária e Abastecimento” e “Economia e Desenvolvimento / Política Fundiária e Reforma Agrária”." tabindex="0">Agro e terra<small>1</small></th></tr></thead>
             <tbody>
               <tr class="cg-mx-polo"><th scope="row">PT<i title="Define o polo de esquerda: fica na ponta da régua por construção">régua</i><small>9</small></th><td class="cg-e3 cg-mx-g" title="PT · todas as votações de conteúdo: saldo −100 (com a esquerda) em 63 votações divisivas">−100</td><td class="cg-e3" title="PT · Economia, tributos e orçamento: saldo −100 (com a esquerda) em 38 votações divisivas">−100</td><td class="cg-e3" title="PT · Política, Estado e Justiça: saldo −100 (com a esquerda) em 29 votações divisivas">−100</td><td class="cg-e3" title="PT · Direitos humanos e proteção social: saldo −100 (com a esquerda) em 13 votações divisivas">−100</td><td class="cg-e3" title="PT · Meio ambiente e energia: saldo −100 (com a esquerda) em 8 votações divisivas">−100</td><td class="cg-e3" title="PT · Educação, cultura e esporte: saldo −100 (com a esquerda) em 6 votações divisivas">−100</td><td class="cg-e3" title="PT · Segurança e justiça penal: saldo −100 (com a esquerda) em 6 votações divisivas">−100</td><td class="cg-e3" title="PT · Cidades, transporte e infraestrutura: saldo −100 (com a esquerda) em 5 votações divisivas">−100</td><td class="cg-na" title="PT · Saúde: menos de 5 votações divisivas">·</td><td class="cg-na" title="PT · Trabalho e previdência: menos de 5 votações divisivas">·</td><td class="cg-na" title="PT · Agro e terra: menos de 5 votações divisivas">·</td></tr>
               <tr><th scope="row">MDB<small>9</small></th><td class="cg-e3 cg-mx-g" title="MDB · todas as votações de conteúdo: saldo −68 (com a esquerda) em 62 votações divisivas">−68</td><td class="cg-e3" title="MDB · Economia, tributos e orçamento: saldo −89 (com a esquerda) em 37 votações divisivas">−89</td><td class="cg-e2" title="MDB · Política, Estado e Justiça: saldo −50 (com a esquerda) em 28 votações divisivas">−50</td><td class="cg-e2" title="MDB · Direitos humanos e proteção social: saldo −38 (com a esquerda) em 13 votações divisivas">−38</td><td class="cg-e2" title="MDB · Meio ambiente e energia: saldo −50 (com a esquerda) em 8 votações divisivas">−50</td><td class="cg-e3" title="MDB · Educação, cultura e esporte: saldo −67 (com a esquerda) em 6 votações divisivas">−67</td><td class="cg-e2" title="MDB · Segurança e justiça penal: saldo −33 (com a esquerda) em 6 votações divisivas">−33</td><td class="cg-e3" title="MDB · Cidades, transporte e infraestrutura: saldo −100 (com a esquerda) em 5 votações divisivas">−100</td><td class="cg-na" title="MDB · Saúde: menos de 5 votações divisivas">·</td><td class="cg-na" title="MDB · Trabalho e previdência: menos de 5 votações divisivas">·</td><td class="cg-na" title="MDB · Agro e terra: menos de 5 votações divisivas">·</td></tr>
@@ -2799,17 +2815,16 @@ body.cg-aberto{overflow:hidden}
             </ol>
           </div>
           <div class="az-col">
-            <p class="az-ph">Das <b>6</b> matérias de autores da esquerda (PCdoB, PSOL, PT) com o texto principal votado nominalmente, a direita votou <b>a favor de 5</b> e contra 1.</p>
+            <p class="az-ph">Das <b>5</b> matérias de autores da esquerda (PCdoB, PSOL, PT) com o texto principal votado nominalmente, a direita votou <b>a favor de 4</b> e contra 1.</p>
             <ol class="cg-ls">
               <li><p class="cg-ls-k"><b><a class="cg-mt" href="#m=sf-PLP-77-2026" data-m="sf-PLP-77-2026">PLP 77/2026</a></b><span>autor: PT · 24/03/2026 · aprovada</span></p><p class="cg-ls-x">Dispõe sobre regras relativas a benefícios tributários e despesas obrigatórias no exercício de 2026.</p></li>
               <li><p class="cg-ls-k"><b><a class="cg-mt" href="#m=sf-PLP-168-2025" data-m="sf-PLP-168-2025">PLP 168/2025</a></b><span>autor: PT · 24/09/2025 · aprovada</span></p><p class="cg-ls-x">Dispõe sobre procedimentos excepcionais para despesas e renúncias fiscais associadas à mitigação dos impactos sociais e econômicos causados pela imposição de tarifas adicionais sobre exportações…</p></li>
               <li><p class="cg-ls-k"><b><a class="cg-mt" href="#m=sf-PEC-137-2019" data-m="sf-PEC-137-2019">PEC 137/2019</a></b><span>autor: PT · 09/07/2025 · aprovada</span></p><p class="cg-ls-x">Altera o art. 205 da Constituição Federal, para definir a educação como vetor do progresso do País.</p></li>
-              <li><p class="cg-ls-k"><b><a class="cg-mt" href="#m=sf-PLP-22-2025" data-m="sf-PLP-22-2025">PLP 22/2025</a></b><span>autor: PT · 19/02/2025 · aprovada</span></p><p class="cg-ls-x">Dispõe sobre prazo para liquidação de restos a pagar não processados e dá outras providências.</p></li>
               <li><p class="cg-ls-k"><b><a class="cg-mt" href="#m=sf-PLP-243-2023" data-m="sf-PLP-243-2023">PLP 243/2023</a></b><span>autor: PT · 29/11/2023 · aprovada</span></p><p class="cg-ls-x">Dispõe sobre as despesas voltadas a programa de incentivo à permanência de estudantes no ensino médio.</p></li>
             </ol>
           </div>
         </div>
-        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. Clique no número para ver a ficha da matéria e a contagem de cada partido.</p>
+        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. O texto votado pode ser muito diferente do original: a ficha da matéria mostra quando a ementa mudou no caminho. Clique no número para ver a ficha e a contagem de cada partido.</p>
       </div>
 
 
@@ -3127,7 +3142,7 @@ body.cg-aberto{overflow:hidden}
     </div>
   </section><section class="az-sec cg-vista" data-vista="fila" aria-labelledby="cg-fila-h">
     <header class="az-lh" id="cg-fila">
-      <p class="az-ln"><b>2</b>A fila</p>
+      <p class="az-ln">A fila</p>
       <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
       <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
     </header>
@@ -3377,9 +3392,9 @@ body.cg-aberto{overflow:hidden}
     </div>
   </section><section class="az-sec cg-vista" data-vista="votacoes" aria-labelledby="cg-plenario-h">
     <header class="az-lh" id="cg-plenario">
-      <p class="az-ln"><b>3</b>O Plenário</p>
+      <p class="az-ln">Votações e matérias</p>
       <h3 class="az-lt" id="cg-plenario-h">O que foi votado, e quem saiu da linha</h3>
-      <p class="az-ld">As últimas votações nominais de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
+      <p class="az-ld">Procure qualquer matéria votada nominalmente no Plenário nesta legislatura e abra a ficha dela. Abaixo, as últimas votações de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
     </header>
     <div class="cg-c" data-casa="cd">
       <h4 class="cg-ct">Câmara dos Deputados</h4>
@@ -3798,7 +3813,7 @@ body.cg-aberto{overflow:hidden}
     </div>
   </section><section class="az-sec cg-vista" data-vista="pessoas" aria-labelledby="cg-quem-h">
     <header class="az-lh" id="cg-quem">
-      <p class="az-ln"><b>4</b>Quem é quem</p>
+      <p class="az-ln">Parlamentares</p>
       <h3 class="az-lt" id="cg-quem-h">O que cada um vota, propõe e deixa parado</h3>
       <p class="az-ld">As listas do que salta aos olhos e, abaixo, todos os parlamentares. Clicar num nome abre o dossiê: com quem vota em cada tema, quando saiu da linha, o que propôs e o que o jornal publicou dele.</p>
     </header>
@@ -10099,6 +10114,9 @@ body.cg-aberto{overflow:hidden}
       <div><dt>De onde vem</dt><dd>Dos dados abertos da Câmara dos Deputados (arquivos em lote e API) e do Senado Federal (API legislativa), baixados todo dia antes da edição. São registros oficiais; nenhuma IA entra nas contas.</dd></div>
       <div><dt>Só votação nominal</dt><dd>Só as votações que registram o voto de cada um, no Plenário. A votação simbólica, que é a maioria, não diz quem votou o quê. No Senado, as votações secretas (escolha de autoridades) contam para a presença, não para a posição.</dd></div>
       <div><dt>Com quem vota</dt><dd>Entram só as votações de conteúdo (texto principal, destaques e emendas) em que a maioria do polo de esquerda (PCdoB, PSOL, PT) votou de um jeito e a do polo de direita (NOVO, PL), de outro, com pelo menos 75% de cada polo do mesmo lado. O saldo vai de −100 (sempre com a esquerda) a +100 (sempre com a direita) e só aparece com 10 votações ou mais. É comportamento, não rótulo: diz com quem a pessoa vota, não o que ela diz ser.</dd></div>
+      <div><dt>Por que um voto é “de esquerda” ou “de direita”</dt><dd>Não é o assunto que define o lado. Em cada votação, a esquerda é o lado em que votou a maioria (75% ou mais) dos parlamentares de PCdoB, PSOL, PT; a direita, o da maioria de NOVO, PL. Votar “com a esquerda” é votar igual a essa maioria naquela votação: numa, isso é votar Sim; em outra, votar Não. Por isso os partidos que definem os polos ficam nas pontas (−100 e +100) quase por definição: eles são a régua. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para saber por que um voto caiu de um lado, a página mostra, em cada votação, o que estava em jogo e o Sim–Não de cada partido dos polos (na ficha da matéria, no detalhe de cada tema e nos votos de cada um por tema).</dd></div>
+      <div><dt>Quanto os partidos votam juntos</dt><dd>Na aba Partidos, uma conta que não depende da régua dos polos: em todas as votações de conteúdo do Plenário, dois partidos votaram juntos quando a maioria de cada um ficou do mesmo lado. A tabela dá a porcentagem para cada par (par com menos de 20 votações fica vazio). Ao lado, quantas votações foram de consenso (os dois polos do mesmo lado), quantas opuseram os polos (as únicas que entram no saldo), quantas tiveram racha e em quantas um polo não teve maioria clara.</dd></div>
+      <div><dt>Quando um lado vota a proposta do outro</dt><dd>As matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário, e o lado do outro polo na última dessas votações. O autor é o do registro original: o texto votado pode ter mudado no caminho (a ficha mostra a ementa original e a que vale).</dd></div>
       <div><dt>Os rachas</dt><dd>Se um partido de um polo vota fechado com o outro (o PSOL com o PL contra o PT, por exemplo), a votação sai do saldo. Em geral são os dois extremos votando contra o governo por razões opostas: o PSOL contra uma regra fiscal por achá-la dura demais, o PL por ser oposição. Contada no saldo, ela faria o PSOL parecer menos de esquerda que o PT. Essas votações aparecem à parte, em &#34;Onde cada polo racha&#34;, com o tema e a orientação do governo de cada uma.</dd></div>
       <div><dt>Por que só conteúdo</dt><dd>Requerimentos de retirada de pauta, adiamento e urgência são manobra de plenário: medem quem obstrui e quem toca a pauta. Entram no governismo e na presença, mas não no saldo entre os polos.</dd></div>
       <div><dt>Governismo</dt><dd>Nas votações em que a liderança do Governo orientou Sim ou Não, a parte em que a pessoa votou igual. Contado à parte em cada governo (Bolsonaro (2019–2022); Lula (2023–hoje)): quem acompanha qualquer governo aparece assim. Obstrução conta como Não.</dd></div>
@@ -10107,15 +10125,27 @@ body.cg-aberto{overflow:hidden}
       <div><dt>Fora da linha, por assunto</dt><dd>No dossiê, cada voto contra o próprio partido fechado e cada voto com o outro polo é contado no tema da matéria. &#34;Muda de lado conforme o assunto&#34; é quem tem lado definido (saldo além de ±60) e, num tema com 10 votações ou mais, fica do lado oposto: o voto naquele tema é comparado com o resto dos votos da própria pessoa (teste binomial exato). Na lista da Casa, a diferença precisa passar do acaso contando todas as pessoas e temas comparados (Holm, 99%); no dossiê, contando os temas da pessoa.</dd></div>
       <div><dt>Onde cada um está, por tema</dt><dd>Escolhido um tema, cada ponto vai para o saldo da pessoa nas votações esquerda × direita daquele tema; quem tem menos de 5 no tema fica de fora, e os partidos se reordenam pela média. O contorno marca quem vira de lado no tema, pelo mesmo teste do dossiê. Tema com menos votações do que isso na Casa aparece desabilitado no seletor.</dd></div>
       <div><dt>Na Casa</dt><dd>O dossiê mostra a posição da pessoa em cada número (presença, governismo, fidelidade, votos contra o partido, propostas, paradas, normas, relatorias, jornal), entre os que estão em exercício na mesma Casa. O 1º é quem tem o maior número; empate divide a posição. Quem preside a Casa fica fora do ranking de presença.</dd></div>
-      <div><dt>Temas</dt><dd>Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml).</dd></div>
+      <div><dt>Temas</dt><dd>Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml); a tabela “O que entra em cada tema”, abaixo, diz quais áreas oficiais caem em cada um.</dd></div>
       <div><dt>A fila</dt><dd>A situação oficial de cada proposição diz de quem ela está esperando: a designação de um relator (presidente da comissão), o parecer (relator), a pauta ou um despacho da Mesa. Parada é a que tramita sem andamento há mais de 365 dias. Na Câmara entram as proposições apresentadas desde 2011; no Senado, tudo o que tramita.</dd></div>
       <div><dt>Passaram na frente</dt><dd>Das matérias aprovadas no Plenário nos últimos 240 dias, as que foram do protocolo ao voto em menos de 120 dias, com a urgência quando houve. A fila ao lado dá a medida do que ficou para trás.</dd></div>
       <div><dt>O que espera × o que passa</dt><dd>As matérias prontas para o Plenário e as aprovadas pelo Plenário nos últimos 12 meses ganham a mesma nota, de 0 a 100, feita de sinais que dá para medir nos registros. Projetos parecidos: até 40 pontos, pelos projetos anexados a ela (outros parlamentares pedindo o mesmo; 15 ou mais dão a nota cheia, em escala logarítmica); só na Câmara, porque o Senado não informa. Uma matéria mais antiga teve mais tempo para juntar projetos parecidos; quando o Plenário vota uma matéria, os parecidos mais antigos costumam ser anexados a ela. Origem: até 25 pontos (já aprovada pela outra Casa, 25; do Executivo, 20; de comissão, 18; do Judiciário ou órgão de controle, 15; de um parlamentar, 0). Alcance: até 20 pontos (PEC, 20; lei complementar, 16; lei, 12). Apoio: até 15 pontos, se os autores são de mais de um partido (a nota cheia, se dos dois polos). No Senado, sem os projetos parecidos, os outros pesos valem o todo. Matéria simbólica (dia nacional, denominação, título, patrimônio cultural) não passa de 10. A nota não diz se a matéria é boa: diz quantos sinais de relevância pública ela tem. Na Câmara, a data da aprovação e o caminho (urgência aprovada e a pedido de quem, parecer dado direto no Plenário) vêm do histórico oficial de cada matéria; no Senado, da lista de deliberações do Plenário. Medidas provisórias ficam de fora: têm prazo na Constituição.</dd></div>
+      <div><dt>A ficha da matéria</dt><dd>Para cada matéria votada nominalmente no Plenário nesta legislatura e para cada ponto de “o que espera × o que passa”: a ementa inteira (a que vale, quando a Câmara anotou uma nova), a explicação que a Casa escreveu (a ementa detalhada da Câmara; a explicação da ementa do Senado), as palavras-chave do registro e o endereço do texto integral. A página não resume o projeto: mostra o que a Casa registrou. Em cada votação: o que a Mesa pôs em votação e quem pediu o destaque (a Câmara registra; o Senado, não), o placar, o lado de cada polo com o Sim–Não de cada partido dele e a orientação do Governo. “O que o Sim queria dizer” sai da descrição oficial, pela regra da Casa: no texto principal, aprovar o texto; no destaque de emenda, aprovar a emenda; no destaque para votação em separado, manter o trecho no texto (o Não o retira).</dd></div>
+      <div><dt>O que cada um propõe</dt><dd>As contas são das proposições em que a pessoa assina primeiro (autoria principal). “Os termos que mais marcam as propostas” são palavras-chave da indexação oficial da Câmara: as que estão em mais propostas da pessoa e em poucas do conjunto (termo presente em mais de 4% de todas as proposições, como “alteração”, fica de fora). O Senado não traz as palavras-chave nas listas de matérias.</dd></div>
       <div><dt>O jornal</dt><dd>Os nomes parlamentares são procurados nas manchetes e nas matérias das últimas 46 edições (51.085 manchetes lidas). A regra é conservadora: nome inteiro, com as maiúsculas do registro; nomes de uma palavra e homônimos só valem com o título (“deputado”, “senadora”) ou a legenda ao lado.</dd></div>
       <div><dt>No jornal × no voto</dt><dd>O texto do jornal que cita a pessoa e uma proposição, pelo número (&#34;PEC 3/2021&#34;) ou por um apelido conferido contra a ementa oficial (a lista fica em config/congresso.yaml; apelido que serve a mais de um projeto fica de fora). Numa matéria, a pessoa e a proposição precisam estar na mesma frase. Ao lado, os votos dela nessa proposição (o texto principal primeiro; na PEC, com o turno que a descrição oficial da votação dá). A página não interpreta a fala: põe as duas coisas lado a lado.</dd></div>
       <div><dt>O comparativo</dt><dd>Compara quaisquer dois parlamentares, das duas Casas: pelos nomes em &#34;Comparar dois&#34;, marcando dois na tabela, pelo dossiê ou trocando um dos lados dentro do comparativo. Votam juntos: nas votações de conteúdo da legislatura em que os dois votaram Sim ou Não (obstrução conta como Não), a parte em que votaram igual; ao lado, a mesma conta só nas que dividiram esquerda e direita. Num tema, os dois ficam de lados opostos quando cada um tem saldo de 20 ou mais, um para cada lado. Deputado e senador não têm votações em comum: as Casas votam em separado.</dd></div>
       <div><dt>O que isto não diz</dt><dd>Voto não é discurso, e a página não lê discurso: ela mostra o registro para ser posto ao lado do que cada um diz. Voto com o governo não é ideologia; votação simbólica não aparece; ausência pode ter motivo que o registro não traz. Os polos e os temas são escolhas editoriais, escritas aqui para poderem ser contestadas.</dd></div>
     </dl>
+    <div class="az-blk" id="cg-temas-def">
+      <h4 class="az-h">O que entra em cada tema <span>a classificação oficial de cada Casa, levada a uma lista comum</span></h4>
+      <div class="an-tbl-wrap">
+        <table class="an-tbl cg-tb cg-tdef">
+          <thead><tr><th scope="col">Tema</th><th scope="col">Na Câmara: áreas temáticas</th><th scope="col">No Senado: classes do processo</th></tr></thead>
+          <tbody><tr><th scope="row">Economia, tributos e orçamento</th><td>Direito e Defesa do Consumidor; Economia; Finanças Públicas e Orçamento; Indústria, Comércio e Serviços; Turismo</td><td>Economia e Desenvolvimento; Orçamento Público; Jurídico / Direito do Consumidor; Jurídico / Direito Empresarial e Econômico</td></tr><tr><th scope="row">Trabalho e previdência</th><td>Previdência e Assistência Social; Trabalho e Emprego</td><td>Política Social / Trabalho e Emprego; Política Social / Previdência Social</td></tr><tr><th scope="row">Saúde</th><td>Saúde</td><td>Política Social / Saúde</td></tr><tr><th scope="row">Educação, cultura e esporte</th><td>Arte, Cultura e Religião; Ciências Sociais e Humanas; Educação; Esporte e Lazer</td><td>Política Social / Educação; Política Social / Cultura; Política Social / Desporto e Lazer</td></tr><tr><th scope="row">Segurança e justiça penal</th><td>Defesa e Segurança; Direito Penal e Processual Penal</td><td>Jurídico / Direito Penal e Penitenciário; Soberania, Defesa Nacional e Ordem Pública / Defesa do Estado e das Instituições Democráticas</td></tr><tr><th scope="row">Direitos humanos e proteção social</th><td>Direitos Humanos e Minorias</td><td>Política Social / Proteção Social; Jurídico / Direitos e Garantias; Política Social</td></tr><tr><th scope="row">Meio ambiente e energia</th><td>Ciências Exatas e da Terra; Energia, Recursos Hídricos e Minerais; Meio Ambiente e Desenvolvimento Sustentável</td><td>Meio Ambiente; Infraestrutura / Minas e Energia</td></tr><tr><th scope="row">Agro e terra</th><td>Agricultura, Pecuária, Pesca e Extrativismo; Estrutura Fundiária</td><td>Economia e Desenvolvimento / Agropecuária e Abastecimento; Economia e Desenvolvimento / Política Fundiária e Reforma Agrária</td></tr><tr><th scope="row">Cidades, transporte e infraestrutura</th><td>Cidades e Desenvolvimento Urbano; Viação, Transporte e Mobilidade</td><td>Infraestrutura; Política Social / Habitação; Política Social / Desenvolvimento Urbano; Jurídico / Direito de Trânsito</td></tr><tr><th scope="row">Política, Estado e Justiça</th><td>Administração Pública; Direito Civil e Processual Civil; Direito Constitucional; Direito e Justiça; Política, Partidos e Eleições; Processo Legislativo e Atuação Parlamentar</td><td>Administração Pública; Organização do Estado; Jurídico</td></tr><tr><th scope="row">Relações exteriores e defesa</th><td>Relações Internacionais e Comércio Exterior</td><td>Soberania, Defesa Nacional e Ordem Pública</td></tr><tr><th scope="row">Ciência, tecnologia e comunicações</th><td>Ciência, Tecnologia e Inovação; Comunicações</td><td>Economia e Desenvolvimento / Ciência, Tecnologia e Informática; Infraestrutura / Comunicações</td></tr><tr><th scope="row">Homenagens e datas</th><td>Homenagens e Datas Comemorativas</td><td>Honorífico</td></tr></tbody>
+        </table>
+      </div>
+      <p class="az-dek">Cada votação herda o tema da matéria votada. Na Câmara, a área temática é dada pelo Centro de Documentação e Informação; no Senado, é a classe do processo. Uma matéria pode ter mais de um tema.</p>
+    </div>
   </section>
 </section>
 </main>
@@ -11579,7 +11609,7 @@ body.cg-aberto{overflow:hidden}
         if (frente.length) principais.push({ t: g.t, m: g.m, votos: frente });
         if (fundo.length) outras.push({ t: g.t, m: g.m, votos: fundo });
       });
-      if (modo === 'juntos') principais.sort(function (a, b) { return b.votos.filter(difere).length - a.votos.filter(difere).length; });
+      if (dois) principais.sort(function (a, b) { return b.votos.filter(difere).length - a.votos.filter(difere).length; });  // onde divergem, primeiro
       function bloco(g) {
         var extras = [];
         if (dois) {
@@ -11593,6 +11623,8 @@ body.cg-aberto{overflow:hidden}
         }
         var lados = ladosNoTexto(g.m);
         if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
+        if (g.m.rel) extras.push(h('span', { cls: 'cg-rv-n', 'data-dica': GLOSS.nota, tabindex: '0', text: 'nota ' + g.m.rel.n }));
+        if (g.m.jor) extras.push(h('span', { cls: 'cg-rv-jor', text: 'no jornal ' + g.m.jor + '×' }));
         var filhos = [cabecaDaMateria(casa, g.t, g.m, extras), h('p', { cls: 'cg-mh-e', text: curto(g.m.e, 260) })];
         var votos = g.votos.slice().sort(function (a, b) { return (dois ? (difere(b) ? 1 : 0) - (difere(a) ? 1 : 0) : 0) || ordemDoVoto(a.v, b.v); }).map(item);
         listaEmPartes('cg-vls', votos, 3, function (n) { return 'mais ' + plural(n, 'votação desta matéria', 'votações desta matéria'); }).forEach(function (no) { filhos.push(no); });
