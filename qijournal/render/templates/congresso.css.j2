@@ -205,6 +205,7 @@ body.cg-aberto{overflow:hidden}
   .cg-d-f{width:68px;height:88px}
   .cg-barra{margin-left:-16px;margin-right:-16px;padding:0 16px}
   .cg-vistas ul{gap:0 18px}
+  .cg-casas-n{display:none}
   .cg-bar{width:92px}
 }
 
@@ -349,8 +350,8 @@ body.cg-aberto{overflow:hidden}
 .cg-jv-v b{color:var(--ink)}
 
 /* ── As matérias: o número que abre a ficha, a ficha e as votações por extenso ── */
-:root{--cg-j0:#EEF2FD;--cg-j1:#D3DDFA;--cg-j2:#A6B9F2;--cg-j3:#6781E0;--cg-j4:#2E4BBB;--cg-jon:#14203f;--cg-jon2:#fff}
-:root[data-theme="dark"]{--cg-j0:#182136;--cg-j1:#22305A;--cg-j2:#30458C;--cg-j3:#4C68CB;--cg-j4:#A3B5F7;--cg-jon:#e8edf7;--cg-jon2:#0b0f17}
+:root{--cg-j0:#EEF2FD;--cg-j1:#D3DDFA;--cg-j2:#A6B9F2;--cg-j3:#4F68CC;--cg-j4:#2A429F;--cg-jon:#14203f;--cg-jon2:#fff}
+:root[data-theme="dark"]{--cg-j0:#182136;--cg-j1:#22305A;--cg-j2:#30458C;--cg-j3:#4560C2;--cg-j4:#A3B5F7;--cg-jon:#e8edf7;--cg-jon2:#0b0f17}
 .cg-mt{color:var(--link);font-weight:700;cursor:pointer}
 .cg-mt:hover{text-decoration:underline}
 .cg-fx-d{margin-top:6px;font-family:var(--ss);font-size:12.5px;color:var(--muted)}
@@ -391,6 +392,7 @@ body.cg-aberto{overflow:hidden}
 .cg-mh{display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;font-family:var(--ss);font-size:14.5px;color:var(--ink)}
 .cg-mh .cg-apel{margin:0}
 .cg-mh .cg-chip{font-size:11.5px;padding:1px 8px}
+.cg-mh .cg-div{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
 .cg-td-lado{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
 .cg-mh-e{max-width:980px;margin-top:5px;font-family:var(--ss);font-size:13.5px;line-height:1.5;color:var(--body)}
 .cg-mh-x{max-width:980px;margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
@@ -442,6 +444,18 @@ body.cg-aberto{overflow:hidden}
 .cg-mf-dl dd{font-family:var(--ss);font-size:13.5px;line-height:1.5;color:var(--ink)}
 .cg-mf-n{display:flex;align-items:baseline;gap:6px;margin-top:10px;font-family:var(--ss);font-size:13px;color:var(--body)}
 .cg-mf-n>b{font-family:var(--mn);font-size:32px;font-weight:600;line-height:1;color:var(--ink)}
+
+/* O mapa das abas (no Resumo) e o que entra em cada tema (no Como ler) */
+.cg-mapa{list-style:none}
+.cg-mapa li{position:relative;padding:11px 0;border-top:1px solid var(--rl)}
+.cg-mapa li:first-child{border-top:0}
+.cg-mapa a{font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.cg-mapa a:hover{color:var(--link)}
+.cg-mapa p{margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.cg-mapa b{font-family:var(--mn);color:var(--ink)}
+.cg-tdef{max-width:1180px;margin-top:10px}
+.cg-tdef td,.cg-tdef th{white-space:normal;text-align:left !important;vertical-align:top;font-family:var(--ss) !important;font-size:12.5px !important;line-height:1.5}
+.cg-tdef th[scope="row"]{min-width:190px}
 
 /* O que cada um propõe */
 .cg-cp-pr{padding-bottom:0;border-bottom:0}

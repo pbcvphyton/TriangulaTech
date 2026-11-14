@@ -76,6 +76,16 @@ def chave(casa: str, titulo: str) -> str:
     return f"{casa}-{achado.group(1)}-{achado.group(2)}-{achado.group(3)}" if achado else ""
 
 
+_TITULO = re.compile(r"^([A-Z]+ \d+/\d{4})\b")
+
+
+def titulo_da_materia(prop: str) -> str:
+    """``"PEC 66/2023 (fase 2)"`` → ``"PEC 66/2023"``: o Senado anota a fase ao lado do número
+    (o substitutivo da Câmara, a segunda fase de uma PEC); a matéria é a mesma."""
+    achado = _TITULO.match(prop or "")
+    return achado.group(1) if achado else (prop or "")
+
+
 def sentido_do_sim(v: Votacao) -> str:
     """O que o Sim queria dizer, pela regra da Casa e pela descrição oficial:
 
@@ -192,7 +202,7 @@ def do_plenario(anos: Iterable[AnoVotos], regras: Regras, legislatura: int) -> d
         for k, v in enumerate(ano.votacoes):
             leg = regras.legislatura_em(v.data)
             if v.plenario and not v.secreta and v.prop and leg is not None and leg.numero == legislatura:
-                por[v.prop].append((ano, k))
+                por[titulo_da_materia(v.prop)].append((ano, k))
     for lista in por.values():
         lista.sort(key=lambda par: (par[0].votacoes[par[1]].data, par[0].votacoes[par[1]].hora, par[0].votacoes[par[1]].id))
     return dict(por)

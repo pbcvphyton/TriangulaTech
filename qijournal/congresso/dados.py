@@ -820,6 +820,27 @@ def achados(paineis: Mapping[str, Mapping[str, Any]], regras: Regras) -> list[di
                     "alvo": f"#cg-temas-{casa}",
                 }
             )
+        # 1a. Quanto os polos votam juntos: o maior partido de cada um, em todas as votações de conteúdo.
+        cv = painel.get("convivencia") or {}
+        polos = regras.polos[-1] if regras.polos else None  # os polos de hoje
+        if cv.get("partidos") and polos is not None:
+            membros = {b["sigla"]: b["membros"] for b in painel.get("bancadas") or []}
+            maiores = [max((p for p in cv["partidos"] if p in lado), key=lambda p: membros.get(p, 0), default="") for lado in (polos.esquerda, polos.direita)]
+            celula = cv["matriz"][cv["partidos"].index(maiores[0])][cv["partidos"].index(maiores[1])] if all(maiores) else None
+            if celula:
+                saida.append(
+                    {
+                        "tipo": "juntos",
+                        "casa": casa,
+                        "peso": 72,
+                        "titulo": f"{_na_casa(casa)}, {maiores[0]} e {maiores[1]} ficaram do mesmo lado em {celula[0]}% das votações de conteúdo",
+                        "texto": (
+                            f"Em {_num(cv.get('juntos') or 0)} das {_num(cv.get('conteudo') or 0)} votações de conteúdo do Plenário, os dois polos "
+                            f"votaram juntos. O saldo esquerda × direita só olha as {_num(cv.get('divisivas') or 0)} em que eles se opuseram."
+                        ),
+                        "alvo": f"#cg-juntos-{casa}",
+                    }
+                )
         # 1b. Onde um polo racha (o PSOL com a direita, o NOVO com a esquerda).
         racha = next((r for r in (painel.get("rachas") or {}).get("partidos") or [] if r["n"] >= MINIMO_RACHA), None)
         if racha:

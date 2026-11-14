@@ -49,6 +49,7 @@ PILHA_MAX = 9
 SELOS = {
     "tema": "Por tema",
     "racha": "Racha",
+    "juntos": "Partidos",
     "fila": "Fila",
     "pauta": "Pauta",
     "furaram": "Passou na frente",
@@ -243,6 +244,7 @@ class CongressoView:
     casas: list[CasaView]
     pessoas: list[dict[str, Any]]
     fora: int  # linhas de quem não está em exercício (escondidas até pedir)
+    temas: list[dict[str, Any]]  # o que entra em cada tema: [{nome, camara, senado}]
     metodo: list[tuple[str, str]]
     manifesto: str
     totais: dict[str, Any]
@@ -597,6 +599,14 @@ def _listas(listas: Mapping[str, Any]) -> list[dict[str, Any]]:
     return saida
 
 
+def _definicao_do_tema(areas: list[str], casa: str) -> str:
+    """O que entra num tema, numa frase: as áreas oficiais da Casa."""
+    if not areas:
+        return ""
+    lista = (", " if len(areas) > 2 else " e ").join(f"“{a}”" for a in areas)
+    return f"Matérias que {'a Câmara' if casa == 'cd' else 'o Senado'} classifica em {lista}."
+
+
 JUNTOS_FAIXAS = (40, 55, 70, 85)  # cortes das cinco faixas de cor de "quanto votam juntos"
 
 
@@ -681,14 +691,19 @@ def _casa(
     temas_nomes: Mapping[str, str] | None = None,
     relevancia_limites: tuple[float, float] | None = None,
     polos: Mapping[str, list[str]] | None = None,
+    temas_def: Mapping[str, Mapping[str, list[str]]] | None = None,
 ) -> CasaView:
     temas_nomes = temas_nomes or {}
     polos = polos or {}
+    temas_def = temas_def or {}
     de_polo = {s: "esquerda" for s in polos.get("esquerda") or []} | {s: "direita" for s in polos.get("direita") or []}
     relev_alta, relev_baixa = relevancia_limites or (60.0, 30.0)
     estat = painel.get("votacoes") or {}
     matriz = painel.get("temas") or {}
-    temas_cols = (matriz.get("temas") or [])[:11]
+    temas_cols = [
+        {**t, "dica": _definicao_do_tema((temas_def.get(t["id"]) or {}).get("camara" if casa == "cd" else "senado") or [], casa)}
+        for t in (matriz.get("temas") or [])[:11]
+    ]
     membros = {b["sigla"]: b["membros"] for b in painel.get("bancadas") or []}
     linhas = []
     for sigla, por_tema in (matriz.get("partidos") or {}).items():
@@ -890,6 +905,29 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "não rótulo: diz com quem a pessoa vota, não o que ela diz ser.",
         ),
         (
+            "Por que um voto é “de esquerda” ou “de direita”",
+            f"Não é o assunto que define o lado. Em cada votação, a esquerda é o lado em que votou a maioria ({round(100 * float(lim.get('coesao_polo', 0.75)))}% ou mais) "
+            f"dos parlamentares de {esquerda}; a direita, o da maioria de {direita}. Votar “com a esquerda” é votar igual a essa maioria "
+            "naquela votação: numa, isso é votar Sim; em outra, votar Não. Por isso os partidos que definem os polos ficam nas pontas "
+            "(−100 e +100) quase por definição: eles são a régua. O que a régua informa é onde ficam os outros partidos e cada pessoa. "
+            "Para saber por que um voto caiu de um lado, a página mostra, em cada votação, o que estava em jogo e o Sim–Não de cada "
+            "partido dos polos (na ficha da matéria, no detalhe de cada tema e nos votos de cada um por tema).",
+        ),
+        (
+            "Quanto os partidos votam juntos",
+            "Na aba Partidos, uma conta que não depende da régua dos polos: em todas as votações de conteúdo do Plenário, dois "
+            "partidos votaram juntos quando a maioria de cada um ficou do mesmo lado. A tabela dá a porcentagem para cada par "
+            f"(par com menos de {dados.MINIMO_PAR} votações fica vazio). Ao lado, quantas votações foram de consenso (os dois polos do "
+            "mesmo lado), quantas opuseram os polos (as únicas que entram no saldo), quantas tiveram racha e em quantas um polo "
+            "não teve maioria clara.",
+        ),
+        (
+            "Quando um lado vota a proposta do outro",
+            "As matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado "
+            "nominalmente no Plenário, e o lado do outro polo na última dessas votações. O autor é o do registro original: o texto "
+            "votado pode ter mudado no caminho (a ficha mostra a ementa original e a que vale).",
+        ),
+        (
             "Os rachas",
             "Se um partido de um polo vota fechado com o outro (o PSOL com o PL contra o PT, por exemplo), a votação sai do saldo. "
             "Em geral são os dois extremos votando contra o governo por razões opostas: o PSOL contra uma regra fiscal por achá-la "
@@ -944,7 +982,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         (
             "Temas",
             "Cada votação herda o tema da matéria votada: na Câmara, a área temática dada pelo Centro de Documentação; no Senado, a "
-            "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml).",
+            "classe do processo. As duas classificações foram levadas a uma lista comum de macrotemas (config/congresso.yaml); a "
+            "tabela “O que entra em cada tema”, abaixo, diz quais áreas oficiais caem em cada um.",
         ),
         (
             "A fila",
@@ -961,6 +1000,23 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
         (
             "O que espera × o que passa",
             _metodo_relevancia(m.get("relevancia") or {}),
+        ),
+        (
+            "A ficha da matéria",
+            "Para cada matéria votada nominalmente no Plenário nesta legislatura e para cada ponto de “o que espera × o que passa”: "
+            "a ementa inteira (a que vale, quando a Câmara anotou uma nova), a explicação que a Casa escreveu (a ementa detalhada da "
+            "Câmara; a explicação da ementa do Senado), as palavras-chave do registro e o endereço do texto integral. A página não "
+            "resume o projeto: mostra o que a Casa registrou. Em cada votação: o que a Mesa pôs em votação e quem pediu o destaque "
+            "(a Câmara registra; o Senado, não), o placar, o lado de cada polo com o Sim–Não de cada partido dele e a orientação do "
+            "Governo. “O que o Sim queria dizer” sai da descrição oficial, pela regra da Casa: no texto principal, aprovar o texto; "
+            "no destaque de emenda, aprovar a emenda; no destaque para votação em separado, manter o trecho no texto (o Não o retira).",
+        ),
+        (
+            "O que cada um propõe",
+            "As contas são das proposições em que a pessoa assina primeiro (autoria principal). “Os termos que mais marcam as "
+            "propostas” são palavras-chave da indexação oficial da Câmara: as que estão em mais propostas da pessoa e em poucas do "
+            f"conjunto (termo presente em mais de {round(100 * projetos.Vocabulario.COMUM)}% de todas as proposições, como “alteração”, fica de fora). "
+            "O Senado não traz as palavras-chave nas listas de matérias.",
         ),
         (
             "O jornal",
@@ -1000,7 +1056,12 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
     rel_meta = d.meta.get("relevancia") or {}
     limites = (float(rel_meta.get("alta") or 60), float(rel_meta.get("baixa") or 30))
     polos = d.meta.get("polos") or {}
-    casas = [_casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos) for casa in ("cd", "sf") if casa in d.casas]
+    temas_def = {t["id"]: {"camara": t.get("camara") or [], "senado": t.get("senado") or []} for t in d.meta.get("temas") or []}
+    casas = [
+        _casa(casa, d.casas[casa], d.resumo.get("pessoas") or [], campos, temas_nomes, limites, polos, temas_def)
+        for casa in ("cd", "sf")
+        if casa in d.casas
+    ]
     leg = d.meta.get("legislatura") or {}
     manifesto = {
         "v": VERSAO,
@@ -1051,6 +1112,10 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         casas=casas,
         pessoas=pessoas,
         fora=sum(1 for p in pessoas if not p["ex"]),
+        temas=[
+            {"nome": t["nome"], "camara": "; ".join(t.get("camara") or []) or "—", "senado": "; ".join(t.get("senado") or []) or "—"}
+            for t in d.meta.get("temas") or []
+        ],
         metodo=_metodo(d),
         manifesto=json.dumps(manifesto, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"),
         totais={

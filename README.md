@@ -557,59 +557,65 @@ proposição e relatoria, com as réguas à vista em
 exercício (513 deputados e 81 senadores) e quem passou pela legislatura, com o
 histórico de votos desde 2019.
 
-A página segue o padrão do Analítico (a leitura → as lentes → Como ler):
+A página é feita de **abas**. No alto fica a Casa (Câmara ou Senado) e, logo abaixo,
+o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
+(`congresso.html#v=partidos`). Sem script, as abas saem todas em sequência.
 
-- **A leitura**: a manchete é o achado de maior peso, com o número e o link para
-  onde ele está na página; abaixo, os demais achados, numerados. Uma caixa abre o
-  dossiê de qualquer nome.
-- **1 · Com quem vota** ("Por baixo dos rótulos, de que lado cada um fica"):
-  **onde cada um está** (um ponto por parlamentar, partido a partido, com um seletor
-  de **tema**: escolhido o tema, cada ponto vai para o saldo da pessoa naquele assunto,
-  os partidos se reordenam pela média e quem vira de lado ganha contorno), a matriz **partido × tema** (o mesmo partido vota
-  com a direita num assunto e com a esquerda em outro), **onde cada polo racha**
-  (as votações em que um partido de um lado votou fechado com o outro: o PSOL com o
-  PL contra o PT, o NOVO com o PT contra o PL, com o tema e a orientação do governo
-  de cada uma) e as bancadas (saldo, governismo e coesão).
-- **2 · A fila** ("O que espera, com quem, e o que passou na frente"): quantas
-  matérias tramitam e em que porta estão (à espera de relator, de parecer, de
-  pauta…); **o que espera × o que passa** (um gráfico com a mesma nota de
-  relevância para as matérias prontas para o Plenário e para as aprovadas nos
-  últimos 12 meses, a lista das de sinais fortes que esperam e a das de sinais
-  fracos que passaram, da mais rápida, com **por que andou**: urgência aprovada e a
-  pedido de quem, parecer dado direto no Plenário e por quem); as comissões e os
-  relatores com mais matérias na mão, os projetos prontos para o Plenário que não
-  entram na pauta e o que foi do protocolo ao voto nominal em menos de 120 dias.
-- **3 · O Plenário** ("O que foi votado, e quem saiu da linha"): as últimas
-  votações nominais, com o placar, a orientação do governo, como cada partido votou
-  e quem votou contra o próprio partido.
-- **4 · Quem é quem** ("O que cada um vota, propõe e deixa parado"): as listas
-  (quem menos vota, quem mais vota contra o próprio partido, **quem muda de lado
-  conforme o assunto**, quem vota longe da própria bancada, quem mudou em relação
-  ao governo, quem tem mais propostas paradas, os mais citados no jornal), **no
-  jornal × no voto** (a manchete que cita alguém e um projeto, ao lado de como ele
-  votou nesse projeto) e a tabela de **todos os parlamentares**, com a primeira
-  coluna para marcar dois e abrir o **comparativo lado a lado**, com
-  filtro e ordenação. Um botão troca a Casa (Câmara ou Senado).
-- **O dossiê**: clicar num nome abre a ficha (endereço próprio:
-  `congresso.html#p=cd-204536`): com quem vota, quanto segue o governo da vez (e o
-  anterior), presença, fidelidade ao partido, **na Casa** (a posição dele em cada
-  ranking: presença, propostas, paradas, relatorias, votos contra o partido, jornal…;
-  "115º de 513", "o 3º que menos vota", com os empates), **no jornal × no voto**, o saldo **por tema** (com o tema em
-  que vira de lado, quando passa do acaso), o governismo **semestre a semestre**,
-  **onde sai da linha, por assunto** (votos contra o partido e com o outro polo,
-  tema a tema), **quando saiu da linha** (dissidências e surpresas, com o tema), os
-  últimos votos, **o que propõe** (por tema e por situação, com as paradas), **o
-  que tem na mão** (relatorias sem parecer) e **no jornal** (as manchetes que o
-  citam). Um botão leva ao comparativo.
-- **O comparativo** (`congresso.html#c=cd-204536,cd-209787`): quaisquer dois,
-  escolhidos de quatro jeitos: escrevendo os dois nomes em **Comparar dois** (em Todos
-  os parlamentares, com as sugestões da lista), marcando dois na coluna ⇄ da tabela,
-  pelo campo **Comparar com** do dossiê, ou trocando um dos lados (**Trocar por…**)
-  dentro do próprio comparativo. Mostra os dois perfis lado a
-  lado, com a posição de cada um em cada ranking, o saldo por tema (e onde ficam de
-  lados opostos), quanto **votam juntos** (a parte das votações de conteúdo em que os
-  dois votaram igual, onde mais divergem e as últimas em que votaram diferente) e a
-  divergência por assunto. Funciona entre Casas, sem a parte dos votos em comum.
+- **Resumo**: a leitura do dia (a manchete é o achado de maior peso, com o número e o
+  link para a prova; abaixo, os demais), o mapa do que tem em cada aba e a caixa que
+  abre o dossiê de qualquer nome.
+- **Onde cada um está**: um ponto por parlamentar, partido a partido, na régua de −100
+  (sempre com a esquerda) a +100 (sempre com a direita). O seletor **Ver por tema**
+  leva cada ponto para o saldo da pessoa naquele assunto e abre, embaixo, **as matérias
+  votadas no tema**: o que entra no tema (as áreas oficiais), o que cada matéria é, o
+  que estava em votação, quem pediu o destaque, e o Sim–Não de cada partido dos polos.
+  É ali que se vê por que um voto conta como "de esquerda": não é o assunto, é como
+  cada polo votou naquela votação.
+- **Partidos**: a matriz **partido × tema** (com a marca "régua" nos partidos que
+  definem os polos: eles ficam em −100 e +100 quase por definição), **quanto os
+  partidos votam juntos** (quantas votações foram de consenso entre os polos e, par a
+  par, em quantas das votações de conteúdo dois partidos ficaram do mesmo lado: uma
+  conta que não depende da régua), **quando um lado vota a proposta do outro**, **onde
+  cada polo racha** e as bancadas.
+- **O que espera × o que passa**: o gráfico com a mesma nota de relevância para as
+  matérias prontas para o Plenário e para as aprovadas em 12 meses; **cada ponto abre a
+  ficha da matéria**. Ao lado, as de sinais fortes que esperam e as de sinais fracos
+  que passaram, com **por que andou**.
+- **A fila**: em que porta cada matéria parou (relator, parecer, pauta…), as comissões
+  e os relatores com mais matérias na mão, as prontas fora da pauta e o que foi do
+  protocolo ao voto em menos de 120 dias.
+- **Votações e matérias**: um buscador das matérias votadas (pelo número, pelo apelido
+  ou pelo assunto, com filtro de tema) e as últimas votações, com o placar, o governo,
+  cada partido e quem votou contra o próprio.
+- **Parlamentares**: as listas (quem menos vota, quem mais vota contra o partido, quem
+  muda de lado conforme o assunto…), **no jornal × no voto**, e a tabela de todos, com
+  **Comparar dois**.
+- **Como ler**: cada conta, por extenso, e a tabela **O que entra em cada tema**.
+
+Três fichas abrem por cima da página, cada uma com endereço próprio:
+
+- **O dossiê** (`#p=cd-204536`): com quem vota, governismo, presença, fidelidade, a
+  posição **na Casa** em cada ranking, o saldo **por tema** (clicar num tema abre **as
+  votações dele com o voto da pessoa**: cada matéria, o que estava em jogo, de que lado
+  ela ficou; e a conta do saldo: "+71 em 14 votações: 12 com a direita e 2 com a
+  esquerda; cada voto move 14 pontos"), semestre a semestre, onde sai da linha, os
+  últimos votos, **o que propõe** (de que tipo, sobre que temas, os termos do registro
+  que mais marcam as propostas, as que viraram norma e as paradas), o que tem na mão e o
+  que saiu no jornal.
+- **O comparativo** (`#c=cd-204536,cd-209787`): quaisquer dois (pelos nomes em
+  **Comparar dois**, marcando dois na tabela, pelo dossiê, ou trocando um dos lados),
+  com os números e as posições, **o que cada um propõe**, o saldo **por tema** (o tema
+  abre as votações com o voto dos dois, as divergentes à frente) e **votam juntos?**, no
+  total e tema a tema (cada tema abre as matérias em que votaram igual e diferente).
+- **A ficha da matéria** (`#m=cd-PL-2630-2020`): a ementa inteira e a explicação que a
+  Casa escreveu, as palavras-chave do registro, o texto integral, autoria, situação e
+  relator, a nota de relevância sinal a sinal, por que andou, e **cada votação nominal**
+  com o que a Mesa pôs em votação, quem pediu o destaque, o que o Sim queria dizer, o
+  placar, o lado de cada polo com a contagem de cada partido, o governo e os demais
+  partidos. Abre de qualquer número de matéria da página.
+
+Os rótulos e os números têm uma dica (o "i" ao lado, ou o tema tracejado) com a
+definição curta.
 
 **Nas matérias da edição**: quando o texto de uma matéria cita um deputado ou
 senador em exercício, ela ganha o bloco **No Congresso**, com a ficha curta de cada
@@ -633,7 +639,13 @@ feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da lege
 | Fidelidade e dissidência | votos iguais aos da maioria do partido do dia; dissidência é votar diferente quando 80% ou mais do partido votou junto |
 | Surpresa | quem tem lado definido (saldo além de ±60) e, numa votação divisiva, ficou com o outro polo |
 | Mudança | o último semestre contra os anteriores do mesmo governo: só com 15 pontos ou mais e 99% de confiança (duas proporções) |
-| Temas | a área temática oficial da matéria votada (Câmara) ou a classe do processo (Senado), levadas a 13 macrotemas |
+| Temas | a área temática oficial da matéria votada (Câmara) ou a classe do processo (Senado), levadas a 13 macrotemas; a tabela "O que entra em cada tema", no Como ler, diz quais áreas caem em cada um |
+| Por que um voto é "de esquerda" | não é o assunto: em cada votação, a esquerda é o lado da maioria (75% ou mais) de PT, PSOL e PCdoB, e a direita, o da maioria de PL e NOVO. Votar "com a esquerda" é votar igual a essa maioria ali (Sim numa, Não em outra). Os partidos dos polos ficam nas pontas por construção; a régua informa onde ficam os outros e cada pessoa |
+| Quanto os partidos votam juntos | em todas as votações de conteúdo do Plenário, dois partidos votaram juntos quando a maioria de cada um ficou do mesmo lado; par com menos de 20 votações fica vazio. Consenso: os dois polos do mesmo lado. Não usa a régua dos polos |
+| Quando um lado vota a proposta do outro | matérias de parlamentares de partidos de um polo, sem coautor do outro, com o texto principal votado nominalmente: o lado do outro polo na última dessas votações. O autor é o do registro original |
+| O que se votou | na Câmara, a abertura da votação registrada pela Mesa diz quem pediu o destaque e qual trecho ou emenda. "O que o Sim queria dizer" sai da descrição oficial pela regra da Casa: texto principal, aprovar; destaque de emenda, aprovar a emenda; destaque para votação em separado, manter o trecho (o Não o retira) |
+| A ficha da matéria | as votadas nominalmente no Plenário na legislatura e as de "o que espera × o que passa": a ementa que vale (e a original, se mudou), a ementa detalhada (Câmara) ou a explicação da ementa (Senado), as palavras-chave e o texto integral. A página não resume o projeto |
+| O que cada um propõe | só a autoria principal (quem assina primeiro). Os termos que mais marcam as propostas são palavras-chave da indexação da Câmara, frequentes nas propostas da pessoa e raras no conjunto (termo em mais de 4% de todas as proposições fica de fora); o Senado não as traz nas listas |
 | A fila | a situação oficial de cada proposição vira um estado (tramitando, apensada, aprovada, virou norma, encerrada) e uma porta (relator, parecer, pauta, Mesa, comissão…); "parada" é sem andamento há mais de 365 dias |
 | Passou na frente | texto principal aprovado em votação nominal nos últimos 240 dias, menos de 120 dias depois de apresentado |
 | Nota de relevância (0 a 100) | sinais que dá para medir nos registros, com os pesos de `relevancia` em `config/congresso.yaml`: **projetos parecidos** anexados à matéria (até 40; 15 ou mais dão a nota cheia, em escala log; só na Câmara), **origem** (até 25: já aprovada pela outra Casa ou iniciativa popular, Executivo, comissão, Judiciário e órgãos de controle, parlamentar), **alcance** (até 20: PEC, lei complementar, lei) e **apoio** (até 15: autores de mais de um partido, nota cheia se dos dois polos). No Senado, sem os projetos parecidos, os outros pesos valem o todo. Matéria simbólica (dia nacional, denominação, título, rota turística…) não passa de 10. Não diz se a matéria é boa: diz quantos sinais de relevância pública ela tem |
@@ -653,8 +665,10 @@ tributária", fica de fora) são **escolhas editoriais**: ficam em
 conta na atualização seguinte.
 
 **Limites**: mede voto, não discurso (o cruzamento "disse × votou" ainda é manual:
-a ficha põe o voto ao lado da manchete); só o Plenário (as comissões ficam de fora
-das contas de voto); a autoria conta o primeiro signatário; no Senado, a fila só
+a ficha põe o voto ao lado da manchete); a página **não resume** o que cada projeto
+faz: mostra a ementa, a explicação e as palavras-chave oficiais, e aponta o texto
+integral (a explicação só existe para parte das matérias); só o Plenário (as comissões
+ficam de fora das contas de voto); a autoria conta o primeiro signatário; no Senado, a fila só
 tem o que tramita; nomes muito comuns podem deixar de casar nas matérias (o
 contrário, casar errado, é o que a regra evita). Na nota de relevância, uma matéria
 mais antiga teve mais tempo para juntar projetos parecidos, e "último andamento" é a
@@ -668,7 +682,7 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 - **Todo dia**, antes da edição, o passo *Atualizar o Congresso* do `daily.yml`
   roda `python -m qijournal congresso atualizar`: baixa o que mudou, refaz as contas
   e grava só os arquivos que mudaram (cerca de 2 minutos; os anos fechados da base
-  de votos nunca são refeitos). Também lê o histórico oficial das matérias aprovadas
+  de votos só são refeitos quando o formato da base muda). Também lê o histórico oficial das matérias aprovadas
   pelo Plenário da Câmara nos últimos 12 meses (uma consulta por matéria, guardada
   por 30 dias) e as deliberações do Plenário do Senado. O que foi baixado fica num
   cache do Actions, fora do repositório. O passo é acessório (`continue-on-error`, 15 minutos): se uma fonte
@@ -685,16 +699,18 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `fichas/<casa>-<id>.json` | o dossiê de cada parlamentar (carregado quando a ficha abre) |
 | `resumo.json` | uma linha por parlamentar (a tabela da aba e as fichas das matérias) |
 | `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, listas, no jornal × no voto, últimas votações) |
-| `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação (o comparativo lê quando abre) |
+| `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação (o comparativo e os votos por tema leem quando abrem) |
+| `materias-cd.json`, `materias-sf.json` | a ficha de cada matéria votada no Plenário na legislatura e de cada ponto de "o que espera × o que passa", uma por linha: sobre o quê, autoria, situação, nota e cada votação com os lados (lido quando um detalhe abre) |
 | `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
 
 - **Desligar**: `congresso.enabled: false` em `config/site.yaml`, ou a variável
   **`QIJ_NO_CONGRESSO`** = `1` (o botão e os blocos somem; os dados ficam).
 - **Código**: `qijournal/congresso/` (`fontes.py` coleta e cache; `base.py` votações;
   `regras.py` as réguas; `perfil.py` as contas de voto; `exercicio.py` períodos de
-  mandato; `projetos.py` proposições, relatorias e fila; `relevancia.py` o que espera × o que passa; `jornal.py` os nomes no
-  banco do jornal; `ficha.py` o dossiê; `dados.py` a atualização; `cli.py` os
-  comandos) e `qijournal/render/congresso.py` com os modelos `congresso.*.j2`.
+  mandato; `projetos.py` proposições, relatorias e fila; `relevancia.py` o que espera × o que passa; `materias.py` a ficha de
+  cada matéria; `jornal.py` os nomes no banco do jornal; `ficha.py` o dossiê; `dados.py` a atualização; `cli.py` os
+  comandos) e `qijournal/render/congresso.py` com os modelos `congresso.*.j2`
+  (`congresso_materias.js.j2` é o script das fichas das matérias e dos detalhes por tema).
 
 ---
 

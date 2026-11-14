@@ -445,7 +445,7 @@
         if (frente.length) principais.push({ t: g.t, m: g.m, votos: frente });
         if (fundo.length) outras.push({ t: g.t, m: g.m, votos: fundo });
       });
-      if (modo === 'juntos') principais.sort(function (a, b) { return b.votos.filter(difere).length - a.votos.filter(difere).length; });
+      if (dois) principais.sort(function (a, b) { return b.votos.filter(difere).length - a.votos.filter(difere).length; });  // onde divergem, primeiro
       function bloco(g) {
         var extras = [];
         if (dois) {
@@ -459,6 +459,8 @@
         }
         var lados = ladosNoTexto(g.m);
         if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
+        if (g.m.rel) extras.push(h('span', { cls: 'cg-rv-n', 'data-dica': GLOSS.nota, tabindex: '0', text: 'nota ' + g.m.rel.n }));
+        if (g.m.jor) extras.push(h('span', { cls: 'cg-rv-jor', text: 'no jornal ' + g.m.jor + '×' }));
         var filhos = [cabecaDaMateria(casa, g.t, g.m, extras), h('p', { cls: 'cg-mh-e', text: curto(g.m.e, 260) })];
         var votos = g.votos.slice().sort(function (a, b) { return (dois ? (difere(b) ? 1 : 0) - (difere(a) ? 1 : 0) : 0) || ordemDoVoto(a.v, b.v); }).map(item);
         listaEmPartes('cg-vls', votos, 3, function (n) { return 'mais ' + plural(n, 'votação desta matéria', 'votações desta matéria'); }).forEach(function (no) { filhos.push(no); });

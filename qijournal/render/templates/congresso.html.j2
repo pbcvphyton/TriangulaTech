@@ -103,12 +103,14 @@
       {% endif %}
     </div>
     <aside class="az-rail" aria-labelledby="cg-lentes-h">
-      <h4 class="az-lbl" id="cg-lentes-h">Quatro lentes <span class="az-lbl-n">de onde saem os achados</span></h4>
-      <ol class="az-lentes">
-        <li class="az-l"><p class="az-l-k"><b>1</b>Com quem vota</p><p class="az-l-p"><a class="hit" href="#cg-polos">Por baixo dos rótulos, de que lado cada um fica?</a></p><p class="az-l-v"><b>{{ c.totais.divisivas|num }}</b> <span>votações de conteúdo dividiram os polos</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>2</b>A fila</p><p class="az-l-p"><a class="hit" href="#cg-fila">O que espera, com quem, e o que passou na frente?</a></p><p class="az-l-v"><b>{{ c.totais.tramitando|num }}</b> <span>matérias tramitando nas duas Casas</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>3</b>O Plenário</p><p class="az-l-p"><a class="hit" href="#cg-plenario">O que foi votado, e quem saiu da linha?</a></p><p class="az-l-v"><b>{{ c.totais.votacoes|num }}</b> <span>votações nominais desde 2023</span></p></li>
-        <li class="az-l"><p class="az-l-k"><b>4</b>Quem é quem</p><p class="az-l-p"><a class="hit" href="#cg-quem">O que cada um vota, propõe e deixa parado?</a></p><p class="az-l-v"><b>{{ c.totais.pessoas|num }}</b> <span>parlamentares em exercício, cada um com dossiê</span></p></li>
+      <h4 class="az-lbl" id="cg-lentes-h">O que tem em cada aba <span class="az-lbl-n">para ir direto ao ponto</span></h4>
+      <ol class="cg-mapa">
+        <li><a class="hit" href="#cg-polos">Onde cada um está</a><p>De que lado cada um vota, no geral e em cada tema; e quais matérias foram votadas em cada tema, com o que cada polo fez. <b>{{ c.totais.divisivas|num }}</b> votações dividiram os polos.</p></li>
+        <li><a class="hit" href="#cg-partidos">Partidos</a><p>Partido por tema, quanto cada partido vota junto com cada outro e onde os polos racham.</p></li>
+        <li><a class="hit" href="#cg-espera">O que espera × o que passa</a><p>O que está pronto para votar e o que foi votado, pela mesma régua; cada ponto abre a ficha da matéria.</p></li>
+        <li><a class="hit" href="#cg-fila">A fila</a><p>Em que porta cada matéria parou e quem segura. <b>{{ c.totais.tramitando|num }}</b> tramitando nas duas Casas.</p></li>
+        <li><a class="hit" href="#cg-plenario">Votações e matérias</a><p>Procure uma matéria pelo nome ou pelo assunto; as últimas votações. <b>{{ c.totais.votacoes|num }}</b> votações nominais desde 2023.</p></li>
+        <li><a class="hit" href="#cg-quem">Parlamentares</a><p>As listas, a tabela de todos, o dossiê de cada um e o comparativo de dois. <b>{{ c.totais.pessoas|num }}</b> em exercício.</p></li>
       </ol>
       <form class="cg-achar" id="cgAchar" role="search" hidden>
         <label class="az-lbl az-lbl-2" for="cgAcharQ">Abrir o dossiê de alguém</label>
@@ -122,7 +124,7 @@
   {#- Onde cada um está -#}
   <section class="az-sec cg-vista" data-vista="posicoes" aria-labelledby="cg-polos-h">
     <header class="az-lh" id="cg-polos">
-      <p class="az-ln"><b>1</b>Com quem vota</p>
+      <p class="az-ln">Com quem vota</p>
       <h3 class="az-lt" id="cg-polos-h">Por baixo dos rótulos, de que lado cada um fica</h3>
       <p class="az-ld">Só contam as votações de conteúdo em que a esquerda ({{ c.polos.esquerda }}) e a direita ({{ c.polos.direita }}) ficaram em lados opostos, sem nenhum partido de um polo votando com o outro. O saldo de cada um vai de −100, sempre com a esquerda, a +100, sempre com a direita. Não é o que a pessoa diz ser: é com quem ela vota.</p>
     </header>
@@ -168,7 +170,7 @@
     <header class="az-lh" id="cg-partidos">
       <p class="az-ln">Partidos</p>
       <h3 class="az-lt" id="cg-partidos-h">Como cada bancada vota, e quanto vota junto com as outras</h3>
-      <p class="az-ld">O saldo esquerda × direita só olha as votações em que os polos se opõem. Nele, {{ c.polos.esquerda }} e {{ c.polos.direita }} ficam nas pontas por construção: são eles que definem os lados. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para ver quanto dois partidos votam juntos sem depender da régua, a tabela "Quanto os partidos votam juntos" conta todas as votações de conteúdo.</p>
+      <p class="az-ld">O saldo esquerda × direita só olha as votações em que os polos se opõem. Nele, os partidos que definem os polos ({{ c.polos.esquerda }} de um lado; {{ c.polos.direita }} do outro) ficam nas pontas por construção: a esquerda <i>é</i> o lado em que a maioria deles vota. O que a régua informa é onde ficam os outros partidos e cada pessoa. Para ver quanto dois partidos votam juntos sem depender da régua, a tabela "Quanto os partidos votam juntos" conta todas as votações de conteúdo.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -179,7 +181,7 @@
         <p class="az-dek">O saldo de cada bancada nas {{ casa.matriz_base|num }} votações de conteúdo que dividiram os polos, separado pelo tema da matéria votada. Uma linha que troca de cor é um partido que muda de lado conforme o assunto.</p>
         <div class="az-mx-wrap">
           <table class="az-mx cg-mx">
-            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>{{ casa.matriz_base }}</small></th>{% for t in casa.matriz_temas %}<th scope="col">{{ t.nome }}<small>{{ t.n }}</small></th>{% endfor %}</tr></thead>
+            <thead><tr><th scope="col" class="az-mx-v">Partido</th><th scope="col">Todas<small>{{ casa.matriz_base }}</small></th>{% for t in casa.matriz_temas %}<th scope="col"{% if t.dica %} data-dica="{{ t.dica }}" tabindex="0"{% endif %}>{{ t.nome }}<small>{{ t.n }}</small></th>{% endfor %}</tr></thead>
             <tbody>
               {% for linha in casa.matriz %}
               <tr{% if linha.polo %} class="cg-mx-polo"{% endif %}><th scope="row">{{ linha.sigla }}{% if linha.polo %}<i title="Define o polo de {{ linha.polo }}: fica na ponta da régua por construção">régua</i>{% endif %}<small>{{ linha.membros }}</small></th><td class="cg-{{ linha.geral.classe }} cg-mx-g" title="{{ linha.geral.titulo }}">{{ linha.geral.valor }}</td>{% for cel in linha.celulas %}<td class="cg-{{ cel.classe }}" title="{{ cel.titulo }}">{{ cel.valor }}</td>{% endfor %}</tr>
@@ -241,7 +243,7 @@
           </div>
           {% endfor %}
         </div>
-        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. Clique no número para ver a ficha da matéria e a contagem de cada partido.</p>
+        <p class="az-dek">Entram as matérias de parlamentares de partidos de um polo, sem coautor do outro, que tiveram o texto principal votado nominalmente no Plenário; vale a última dessas votações. O texto votado pode ser muito diferente do original: a ficha da matéria mostra quando a ementa mudou no caminho. Clique no número para ver a ficha e a contagem de cada partido.</p>
       </div>
       {% endif %}
 
@@ -362,7 +364,7 @@
   {#- A fila -#}
   <section class="az-sec cg-vista" data-vista="fila" aria-labelledby="cg-fila-h">
     <header class="az-lh" id="cg-fila">
-      <p class="az-ln"><b>2</b>A fila</p>
+      <p class="az-ln">A fila</p>
       <h3 class="az-lt" id="cg-fila-h">O que espera, com quem, e o que passou na frente</h3>
       <p class="az-ld">Toda proposição que tramita está esperando alguém: um presidente de comissão designar o relator, o relator dar o parecer, alguém pôr na pauta. A situação oficial de cada uma diz em que porta ela parou.</p>
     </header>
@@ -451,9 +453,9 @@
   {#- Votações e matérias -#}
   <section class="az-sec cg-vista" data-vista="votacoes" aria-labelledby="cg-plenario-h">
     <header class="az-lh" id="cg-plenario">
-      <p class="az-ln"><b>3</b>O Plenário</p>
+      <p class="az-ln">Votações e matérias</p>
       <h3 class="az-lt" id="cg-plenario-h">O que foi votado, e quem saiu da linha</h3>
-      <p class="az-ld">As últimas votações nominais de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
+      <p class="az-ld">Procure qualquer matéria votada nominalmente no Plenário nesta legislatura e abra a ficha dela. Abaixo, as últimas votações de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -507,7 +509,7 @@
   {#- Parlamentares -#}
   <section class="az-sec cg-vista" data-vista="pessoas" aria-labelledby="cg-quem-h">
     <header class="az-lh" id="cg-quem">
-      <p class="az-ln"><b>4</b>Quem é quem</p>
+      <p class="az-ln">Parlamentares</p>
       <h3 class="az-lt" id="cg-quem-h">O que cada um vota, propõe e deixa parado</h3>
       <p class="az-ld">As listas do que salta aos olhos e, abaixo, todos os parlamentares. Clicar num nome abre o dossiê: com quem vota em cada tema, quando saiu da linha, o que propôs e o que o jornal publicou dele.</p>
     </header>
@@ -610,6 +612,18 @@
       <div><dt>{{ titulo }}</dt><dd>{{ texto }}</dd></div>
       {% endfor %}
     </dl>
+    {% if c.temas %}
+    <div class="az-blk" id="cg-temas-def">
+      <h4 class="az-h">O que entra em cada tema <span>a classificação oficial de cada Casa, levada a uma lista comum</span></h4>
+      <div class="an-tbl-wrap">
+        <table class="an-tbl cg-tb cg-tdef">
+          <thead><tr><th scope="col">Tema</th><th scope="col">Na Câmara: áreas temáticas</th><th scope="col">No Senado: classes do processo</th></tr></thead>
+          <tbody>{% for t in c.temas %}<tr><th scope="row">{{ t.nome }}</th><td>{{ t.camara }}</td><td>{{ t.senado }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <p class="az-dek">Cada votação herda o tema da matéria votada. Na Câmara, a área temática é dada pelo Centro de Documentação e Informação; no Senado, é a classe do processo. Uma matéria pode ter mais de um tema.</p>
+    </div>
+    {% endif %}
   </section>
 </section>
 {% endblock %}

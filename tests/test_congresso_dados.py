@@ -487,6 +487,7 @@ def test_o_resumo_e_os_paineis(publicado: tuple[Path, fabrica.FetchFalso, dados.
     assert (furaram["aprovadas"], furaram["rapidas_n"], furaram["rapidas"][0]["p"], furaram["rapidas"][0]["dias"], furaram["rapidas"][0]["urg"]) == (1, 1, "PL 12/2026", 15, 1)
     achados = _ler(data_dir, "achados.json")["achados"]
     assert {a["tipo"] for a in achados} >= {"fila", "furaram", "relatoria"}
+    assert "juntos" not in {a["tipo"] for a in achados}  # sem a tabela partido × partido (poucas votações), nada a dizer
     assert all(a["titulo"] and a["texto"] and a["alvo"].startswith("#cg-") for a in achados)
 
 
@@ -583,6 +584,7 @@ def test_a_ficha_da_materia_diz_o_que_e_e_como_cada_polo_votou(publicado: tuple[
         "https://www25.senado.leg.br/web/atividade/materias/-/materia/160001")
     assert [v["id"] for v in pl20["vot"]] == ["sf501"] and "demanda" not in sf["pesos"]  # o Senado não informa os apensados
     assert materias.chave("cd", "PL 10/2026") == "cd-PL-10-2026" and materias.chave("cd", "REQ 5") == ""
+    assert materias.titulo_da_materia("PEC 66/2023 (fase 2)") == "PEC 66/2023"  # o Senado anota a fase ao lado do número
 
 
 def test_a_materia_de_um_polo_que_o_outro_votou_a_favor(r: regras.Regras):
@@ -689,10 +691,18 @@ def test_a_aba_sai_inteira_sem_script(publicado: tuple[Path, fabrica.FetchFalso,
         "Hugo Leal",  # quem preside a comissão que segura a fila
         "Como ler",
         'id="cgCmpF"', 'list="cgNomes"', '<datalist id="cgNomes">',  # comparar quaisquer dois, escolhidos pelo nome
+        # as vistas (uma aba cada; sem script, todas em sequência) e os blocos novos
+        'id="cgBarra"', 'href="#cg-partidos" data-vista="partidos"', 'id="cg-partidos"', 'id="cg-espera"', 'data-vista="votacoes"',
+        'id="cg-juntos-cd"', 'id="cg-cruzada-cd"', 'id="cg-materias-cd"', 'id="cg-tema-det-cd"', 'id="cg-temas-def"',
+        'href="#m=cd-PL-12-2026" data-m="cd-PL-12-2026">PL 12/2026</a>',  # o número da matéria abre a ficha dela
+        "Por que um voto é “de esquerda” ou “de direita”",
     ):
         assert trecho in html, trecho
+    assert html.count('class="az-sec cg-vista"') + html.count('class="cg-vista"') + html.count('class="az-sec az-met cg-vista"') == 8
     manifesto = json.loads(html.split('id="cgManifesto">', 1)[1].split("</script>", 1)[0])
     assert (manifesto["hoje"], manifesto["base"], manifesto["governo"]) == (HOJE, "../data/congresso/fichas/", "Lula")
+    assert (manifesto["materiasArq"], manifesto["polos"]) == ("../data/congresso/materias-", {"esquerda": ["PT"], "direita": ["PL"]})
+    assert manifesto["temasDef"]["economia"] == {"cd": ["Economia"], "sf": ["Economia e Desenvolvimento"]}  # a definição de cada tema
     assert html.count('data-casa="cd" data-b=') == 11 and html.count('data-casa="sf" data-b=') == 4
 
 
