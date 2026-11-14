@@ -61,6 +61,7 @@ class Limiares:
     escolha_presenca: int = 60  # "votou em menos de X% das votações"
     frente_poucas: int = 20  # votações em comum abaixo disto: o cartão da frente avisa que são poucas
     voto_apertado: int = 30  # "diferença pequena" entre o Sim e o Não, em votos da Câmara (no Senado, na mesma proporção)
+    placar_tolerancia: int = 20  # diferença, em votos, entre o registro um a um e o placar anunciado para a votação sair das contas
 
 
 @dataclass(frozen=True)

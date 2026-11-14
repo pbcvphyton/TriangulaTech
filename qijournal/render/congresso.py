@@ -1334,6 +1334,25 @@ def _metodo_relevancia(rel: Mapping[str, Any]) -> str:
     )
 
 
+def _metodo_fora_do_placar(m: Mapping[str, Any], lim: Mapping[str, Any]) -> str:
+    """A frase do "Como ler" sobre as votações cujo registro um a um não bate com o placar."""
+    fora = [v for lista in (m.get("fora_do_placar") or {}).values() for v in lista]
+    regra = (
+        " A Câmara publica o placar na descrição de cada votação e, à parte, o voto de cada deputado. Quando os dois não "
+        f"batem (diferença de mais de {lim.get('placar_tolerancia', 20)} votos no Sim ou no Não, o que inclui a votação sem o voto de ninguém, como a "
+        "secreta), a votação fica fora de todas as contas: um voto posto na votação errada viraria “votou contra o partido” "
+        "de quem não votou."
+    )
+    if not fora:
+        return regra
+    casos = "; ".join(
+        f"{v.get('prop') or 'votação ' + str(v.get('id'))}, em {_data(v.get('data'), ano=True)} (anunciado {v['anunciado'][0]} × {v['anunciado'][1]}; nos votos, {v['contado'][0]} × {v['contado'][1]})"
+        for v in sorted(fora, key=lambda v: (v.get("data") or "", str(v.get("id"))))
+        if len(v.get("anunciado") or []) == 2 and len(v.get("contado") or []) == 2
+    )
+    return f"{regra} Nesta legislatura {'é uma' if len(fora) == 1 else 'são ' + _num(len(fora))}: {casos}."
+
+
 def _metodo(d: Dados) -> list[tuple[str, str]]:
     m = d.meta
     lim = m.get("limiares") or {}
@@ -1362,7 +1381,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "quem não quer a matéria votada; no placar, ela não é voto Não. Proposta de emenda à Constituição precisa do Sim de "
             f"três quintos da Casa ({base.quorum('cd', 'PEC')} deputados; {base.quorum('sf', 'PEC')} senadores) e projeto de lei complementar, da maioria absoluta "
             f"({base.quorum('cd', 'PLP')}; {base.quorum('sf', 'PLP')}), no texto e em cada destaque: a página mostra esse número ao lado do placar, porque um texto pode ter "
-            "mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes.",
+            "mais Sim do que Não e ser rejeitado. Nas demais matérias decide a maioria dos presentes."
+            + _metodo_fora_do_placar(m, lim),
         ),
         (
             "Com quem vota",

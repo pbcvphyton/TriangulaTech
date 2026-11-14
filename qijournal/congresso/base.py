@@ -146,6 +146,43 @@ class AnoVotos:
         return {p.id: i for i, p in enumerate(self.pessoas)}
 
 
+# ── o placar anunciado ───────────────────────────────────────────────────────
+
+_PLACAR = re.compile(r"\bSim:\s*(\d+)\s*;\s*N[ãa]o:\s*(\d+)", re.IGNORECASE)
+
+
+def placar_anunciado(descricao: str | None) -> tuple[int, int] | None:
+    """O Sim e o Não que a Mesa anunciou, quando a descrição oficial da votação os traz
+    ("... Sim: 252; Não: 176; Total: 428.")."""
+    achado = _PLACAR.search(descricao or "")
+    return (int(achado.group(1)), int(achado.group(2))) if achado else None
+
+
+def fora_do_placar(v: Votacao, tolerancia: int) -> bool:
+    """Se os votos um a um do registro não batem com o placar que a Mesa anunciou: a
+    diferença no Sim ou no Não passa de ``tolerancia`` (o que inclui a votação sem o voto de
+    ninguém, como a secreta da Câmara). Sem placar na descrição, não há o que conferir."""
+    anunciado = placar_anunciado(v.descricao)
+    if anunciado is None:
+        return False
+    conta = v.conta()
+    return max(abs(conta.get(SIM, 0) - anunciado[0]), abs(conta.get(NAO, 0) - anunciado[1])) > tolerancia
+
+
+def sem_as_que_nao_batem(ano: AnoVotos, tolerancia: int) -> list[Votacao]:
+    """Tira do ano as votações cujo registro individual não bate com o placar anunciado
+    (:func:`fora_do_placar`) e devolve as retiradas. O arquivo da base fica como veio; as
+    contas é que não as usam: um voto posto na votação errada viraria "votou contra o
+    partido" de quem não votou, e a votação sem o voto de ninguém viraria falta de todos."""
+    fora = [k for k, v in enumerate(ano.votacoes) if fora_do_placar(v, tolerancia)]
+    retiradas = [ano.votacoes[k] for k in fora]
+    for k in reversed(fora):
+        del ano.votacoes[k]
+        for pessoa in ano.pessoas:  # os índices das votações seguintes recuam um
+            pessoa.partidos = [(inicio - 1 if inicio > k else inicio, sigla) for inicio, sigla in pessoa.partidos]
+    return retiradas
+
+
 # ── normalização ─────────────────────────────────────────────────────────────
 
 _PARTIDO = {

@@ -1210,6 +1210,16 @@ def atualizar(
 
     votos, gravados = atualizar_base(coletor, regras, pasta / BASE, opcoes, avisos)
     resultado.gravados += gravados
+    # As votações cujo registro um a um não bate com o placar anunciado saem das contas (a base
+    # gravada fica como veio da fonte).
+    fora_do_placar = {
+        casa: [
+            {"id": v.id, "data": v.data, "prop": v.prop, "anunciado": list(base.placar_anunciado(v.descricao) or ()), "contado": [v.conta().get(base.SIM, 0), v.conta().get(base.NAO, 0)]}
+            for ano in anos
+            for v in base.sem_as_que_nao_batem(ano, regras.limiares.placar_tolerancia)
+        ]
+        for casa, anos in votos.items()
+    }
 
     # Câmara: quando cada deputado esteve em exercício (para a presença).
     intervalos = exercicio.ler(pasta / BASE)
@@ -1530,6 +1540,8 @@ def atualizar(
         "polos": {"esquerda": sorted(polos.esquerda), "direita": sorted(polos.direita)} if polos else {},
         "campos": [{"id": c.id, "nome": c.nome, "ate": c.ate} for c in regras.campos],
         "limiares": dict(regras.limiares.__dict__),
+        # As votações da legislatura que ficaram fora das contas: o registro um a um não bate com o placar anunciado.
+        "fora_do_placar": {casa: [v for v in lista if v["data"] >= legislatura.inicio] for casa, lista in fora_do_placar.items()},
         "relevancia": {
             "pesos": dict(regras.relevancia.pesos),
             "origem": dict(regras.relevancia.origem),

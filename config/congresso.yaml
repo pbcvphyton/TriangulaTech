@@ -41,6 +41,7 @@ limiares:
   escolha_fidelidade: 80    # atalho "vota diferente do partido": votou com a maioria do partido em menos que isto (%)
   escolha_presenca: 60      # atalho "votou em menos de X% das votações" (%)
   frente_poucas: 20         # votações do tema abaixo disto: o cartão da frente avisa que são poucas
+  placar_tolerancia: 20     # votação em que os votos um a um diferem do placar que a Mesa anunciou por mais que isto (no Sim ou no Não) fica fora das contas
   voto_apertado: 30         # realce "diferença pequena": menos que isto entre o Sim e o Não, na Câmara (no Senado, a mesma proporção das cadeiras: 5)
 
 # Faixas do "campo" (pelo saldo: −100 = sempre com a esquerda, +100 = sempre com a

@@ -443,3 +443,29 @@ def test_o_placar_separa_a_obstrucao_do_nao_e_diz_o_quorum(r: regras.Regras):
     urgencia = base.Votacao(id="v2", data="2026-03-03", orgao=base.PLENARIO, descricao="Aprovado o Requerimento de Urgência.", tipo=base.URGENCIA, prop="PEC 3/2021", votos="SSSNNNS")
     ano.votacoes.append(urgencia)
     assert "q" not in materias.votacao(urgencia, ano, 1, r) and perfil.resumo_da_votacao(urgencia, ano, 1, r)["quorum"] == 0
+
+
+def test_a_votacao_que_nao_bate_com_o_placar_anunciado_sai_das_contas():
+    """A Câmara publica o placar na descrição e, à parte, o voto de cada um. Quando os dois
+    não batem (ou não há voto de ninguém), a votação sai; os índices dos partidos recuam."""
+    assert base.placar_anunciado("Rejeitada a Emenda nº 40. Sim: 35; não: 375; total: 410.") == (35, 375)
+    assert base.placar_anunciado("Aprovado o Requerimento de Urgência.") is None
+    pessoas = [base.Pessoa(1, "Ana", "SP", [(0, "PT")]), base.Pessoa(2, "Bia", "SP", [(0, "PL"), (2, "PP"), (3, "MDB")]), base.Pessoa(3, "Caio", "RJ", [(0, "PL")])]
+
+    def votacao(k: int, descricao: str, votos: str) -> base.Votacao:
+        return base.Votacao(id=f"v{k}", data=f"2026-03-{k + 1:02d}", orgao=base.PLENARIO, descricao=descricao, tipo=base.MERITO, votos=votos)
+
+    ano = base.AnoVotos(casa="cd", ano=2026, pessoas=pessoas, votacoes=[
+        votacao(0, "Aprovado o Projeto. Sim: 2; Não: 1; Total: 3.", "SSN"),  # bate
+        votacao(1, "Rejeitada a Emenda. Sim: 35; Não: 375; Total: 410.", "SSN"),  # os votos são de outra votação
+        votacao(2, "Aprovado o Projeto. Sim: 3; Não: 2; Total: 5.", "SSN"),  # diferença dentro da tolerância
+        votacao(3, "Escolhido o ministro. Sim: 404; Não: 61; Total: 465.", "---"),  # secreta: sem o voto de ninguém
+        votacao(4, "Aprovado o Projeto.", "SNN"),  # sem placar na descrição: nada a conferir
+    ])
+    assert [base.fora_do_placar(v, 2) for v in ano.votacoes] == [False, True, False, True, False]
+    retiradas = base.sem_as_que_nao_batem(ano, 2)
+    assert [v.id for v in retiradas] == ["v1", "v3"] and [v.id for v in ano.votacoes] == ["v0", "v2", "v4"]
+    # Bia entrou no PP na votação v2 (que agora é a de índice 1) e no MDB na v3, que saiu: o MDB passa a valer a partir da v4 (índice 2)
+    assert pessoas[1].partidos == [(0, "PL"), (1, "PP"), (2, "MDB")]
+    assert [pessoas[1].partido_em(k) for k in range(3)] == ["PL", "PP", "MDB"]
+    assert base.sem_as_que_nao_batem(ano, 2) == []  # nada mais a tirar
