@@ -306,40 +306,263 @@ def _celula(par: list[int] | None, campos: list[dict[str, Any]], sigla: str, tem
     return Celula(_saldo(saldo), classe_do_saldo(saldo, campos), f"{sigla} · {tema}: saldo {_saldo(saldo)} ({lado}) em {n} votações divisivas")
 
 
-def _votacao(v: Mapping[str, Any], casa: str) -> dict[str, Any]:
-    partidos = []
-    dissidentes = []
+# ── as folhas da aba "Votações e matérias" ───────────────────────────────────
+# Cada matéria é uma folha (o documento: a Casa, o tipo, o número, a ementa, a autoria) com o
+# resultado da votação em carimbo; ao lado, os dados da votação. Os dados vêm de
+# :func:`qijournal.congresso.materias.folhas`; aqui só se arruma para mostrar.
+
+PILHA = 3  # folhas desenhadas atrás da capa, no máximo (quantas votações a matéria teve vai escrito)
+EMENTA_LONGA = 420  # caracteres: acima disso a folha em foco recolhe a ementa (com script; sem ele sai inteira)
+# O carimbo: o que foi a voto → (como se diz, o Sim venceu, o Sim perdeu). O mesmo quadro está em
+# congresso_materias.js.j2 (CARIMBOS), para as folhas montadas pelo script.
+CARIMBOS = {
+    "texto": ("o texto principal", "Aprovado", "Rejeitado"),
+    "redacao": ("a redação final", "Aprovada", "Rejeitada"),
+    "trecho": ("o trecho destacado", "Mantido", "Retirado"),
+    "emenda": ("a emenda", "Aprovada", "Rejeitada"),
+    "destaque": ("o destaque", "Aprovado", "Rejeitado"),
+    "urgencia": ("a urgência", "Aprovada", "Rejeitada"),
+    "requerimento": ("o requerimento", "Aprovado", "Rejeitado"),
+    "recurso": ("o recurso", "Aprovado", "Rejeitado"),
+    "autoridade": ("a indicação", "Aprovada", "Rejeitada"),
+    "outro": ("o que foi a voto", "Aprovado", "Rejeitado"),
+}
+# O que cada tipo de votação quer dizer, em uma frase (aparece junto da votação, na primeira vez que o termo surge).
+O_QUE_E = {
+    "redacao": "Redação final: o texto já foi aprovado; aqui o Plenário só confirma como ele ficou escrito.",
+    "trecho": "Destaque: pedido para votar um trecho em separado do resto do texto.",
+    "emenda": "Emenda: proposta de mudar um ponto do texto. Vai a voto em separado quando alguém pede (o destaque).",
+    "destaque": "Destaque: pedido para votar um trecho ou uma emenda em separado do resto do texto.",
+    "urgencia": "Urgência: pedido para a matéria ser votada logo no Plenário, sem esperar as comissões.",
+    "requerimento": "Requerimento de procedimento: pedido sobre o andamento da votação (tirar de pauta, adiar, encerrar a discussão), não sobre o conteúdo.",
+    "recurso": "Recurso: pedido para o Plenário rever uma decisão.",
+    "autoridade": "Escolha de autoridade: o Plenário aprova ou rejeita um nome indicado para um cargo. O voto é secreto.",
+}
+SENTIDO_DO_SIM = {
+    "texto": "O Sim era para aprovar o texto em votação.",
+    "emenda": "O Sim era para aprovar a emenda.",
+    "trecho": "O Sim era para manter no texto o trecho destacado; o Não, para retirá-lo.",
+    "requerimento": "O Sim era para aprovar o requerimento.",
+}
+# Como a votação se chama na aba dela e no selo (as demais levam o nome do tipo, de base.TIPOS).
+ROTULOS = {"redacao": "redação final", "trecho": "trecho em destaque", "emenda": "emenda em destaque"}
+
+
+def objeto_do_voto(tipo: str, sentido: str = "", redacao: bool = False) -> str:
+    """O que foi a voto, na chave de :data:`CARIMBOS`: o tipo da votação e, no destaque, o que
+    o Sim queria dizer (manter um trecho ou aprovar uma emenda)."""
+    if tipo == base.MERITO:
+        return "redacao" if redacao else "texto"
+    if tipo == base.DESTAQUE:
+        return sentido if sentido in ("trecho", "emenda") else "destaque"
+    return {base.URGENCIA: "urgencia", base.PROCEDIMENTO: "requerimento", base.RECURSO: "recurso", base.AUTORIDADE: "autoridade"}.get(tipo, "outro")
+
+
+def carimbo(objeto: str, aprovada: bool | None, turno: int | None = None) -> dict[str, str] | None:
+    """O carimbo de uma votação: a palavra ("Aprovado", "Retirado"), sobre o quê ("o texto
+    principal, em 2º turno") e a classe de cor. ``None`` quando o registro não diz o resultado."""
+    if aprovada is None:
+        return None
+    que, sim, nao = CARIMBOS.get(objeto, CARIMBOS["outro"])
+    return {"palavra": sim if aprovada else nao, "que": que + (f", em {turno}º turno" if turno else ""), "classe": "ok" if aprovada else "no"}
+
+
+def exigencia(casa: str, sigla: str, quorum: int) -> str:
+    """De onde vem o número de votos Sim exigido (a PEC e a lei complementar têm número fixo)."""
+    quem = "deputados" if casa == "cd" else "senadores"
+    cadeiras = base.CADEIRAS.get(casa, 0)
+    if sigla == "PEC":
+        return f"três quintos dos {cadeiras} {quem}, exigidos para mudar a Constituição"
+    return f"mais da metade dos {cadeiras} {quem}, exigida para lei complementar"
+
+
+def _placar(v: Mapping[str, Any], casa: str, sigla: str) -> dict[str, Any]:
+    """O placar como a Mesa anuncia: Sim e Não, a obstrução e a abstenção à parte, e a barra
+    nas cadeiras da Casa (o Sim cresce da esquerda; o Não e a obstrução, da direita), com a
+    marca dos votos Sim exigidos quando há número fixo. Quando a Mesa anunciou um placar um
+    pouco diferente da contagem dos votos um a um (``an``), vale o anunciado (é ele que decide
+    o resultado) e a contagem do registro vai em ``registrado``, para a página mostrar os dois."""
+    sim, nao = int(v.get("sim") or 0), int(v.get("nao") or 0)
+    obstrucao, abstencao = int(v.get("obstrucao") or 0), int(v.get("abstencao") or 0)
+    an = v.get("an")
+    registrado = None
+    if isinstance(an, list | tuple) and len(an) >= 2 and (int(an[0]), int(an[1])) != (sim, nao):
+        registrado = {"sim": sim, "nao": nao}
+        sim, nao = int(an[0]), int(an[1])
+    quorum = int(v.get("quorum") or 0)
+    cadeiras = base.CADEIRAS.get(casa, 0)
+    total = max(cadeiras, sim + nao + obstrucao, 1)
+    tem_placar = bool(sim + nao + obstrucao + abstencao)
+    falta = max(quorum - sim, 0) if quorum and tem_placar else 0
+    conteudo = (v.get("tipo") or "") in (base.MERITO, base.DESTAQUE)
+    return {
+        "sim": sim,
+        "nao": nao,
+        "obstrucao": obstrucao,
+        "abstencao": abstencao,
+        "quorum": quorum,
+        "secreta": bool(v.get("secreta") or v.get("sec")),
+        "tem_placar": tem_placar,
+        "registrado": registrado,  # a contagem dos votos um a um, quando difere do placar anunciado
+        "votaram": int(v.get("votaram") or 0),
+        "cadeiras": cadeiras,
+        "w_sim": round(100 * sim / total, 2),
+        "w_nao": round(100 * nao / total, 2),
+        "w_obs": round(100 * obstrucao / total, 2),
+        "q_left": round(100 * quorum / total, 2) if quorum else 0,
+        "exigencia": exigencia(casa, sigla, quorum) if quorum else "",
+        "faltaram": falta,
+        "passou_do_quorum": bool(quorum and tem_placar and sim >= quorum),
+        "sem_numero": conteudo and not quorum and tem_placar,  # texto e destaque sem número fixo: decide a maioria dos votos
+    }
+
+
+def _votacao(v: Mapping[str, Any], casa: str, sigla: str = "") -> dict[str, Any]:
+    """Uma votação para pôr ao lado da folha: o que se votou, o carimbo, o placar, os lados e,
+    por partido, o lado da maioria e quem saiu da linha (os nomes onde o partido votou fechado;
+    onde ele se dividiu, só a contagem)."""
+    partidos, dissidentes, divididos = [], [], []
     for p in v.get("partidos") or []:
-        partidos.append({"sigla": p["sigla"], "lado": LADO.get(p["lado"], p["lado"]), "classe": "s" if p["lado"] == "S" else "n", "coesao": p["coesao"], "votos": p["votos"]})
+        lado = LADO.get(p["lado"], p["lado"])
+        partidos.append({"sigla": p["sigla"], "lado": lado, "classe": "s" if p["lado"] == "S" else "n", "coesao": p["coesao"], "votos": p["votos"]})
         contra = p.get("contra")
         if isinstance(contra, list) and contra:
-            dissidentes.append({"sigla": p["sigla"], "lado": LADO.get(p["lado"], ""), "nomes": [{"k": f"{casa}-{c['id']}", "nome": c["nome"]} for c in contra if c.get("nome")]})
+            nomes = [{"k": f"{casa}-{c['id']}", "nome": c["nome"]} for c in contra if c.get("nome")]
+            if nomes:
+                dissidentes.append({"sigla": p["sigla"], "lado": lado, "nomes": nomes, "mais": int(p.get("mais") or 0)})
+        elif isinstance(contra, int) and contra:
+            divididos.append({"sigla": p["sigla"], "lado": lado, "coesao": p["coesao"], "n": contra})
     aprovada = v.get("aprovada")
+    tipo = v.get("tipo") or ""
+    turno = v.get("tu") or (base.turno(v.get("descricao") or "") if tipo in (base.MERITO, base.DESTAQUE) else None)
+    objeto = objeto_do_voto(tipo, v.get("ss") or "", bool(v.get("rf")))
+    placar = _placar(v, casa, sigla or (v.get("prop") or "").split(" ")[0])
+    esquerda, direita = v.get("esquerda") or "", v.get("direita") or ""
     return {
         "id": v.get("id"),
         "data": _data(v.get("data")),
+        "data_ano": _data(v.get("data"), ano=True),
+        "data_iso": str(v.get("data") or "")[:10],
         "hora": v.get("hora") or "",
-        "tipo": base.TIPOS.get(v.get("tipo") or "", "votação"),
+        "tipo": base.TIPOS.get(tipo, "votação"),
+        "tipo_id": tipo,
+        "rotulo": (ROTULOS.get(objeto) or base.TIPOS.get(tipo, "votação")) + (f", {turno}º turno" if turno else ""),
+        "objeto": objeto,
+        "o_que_e": O_QUE_E.get(objeto, ""),
+        "sentido": SENTIDO_DO_SIM.get(v.get("ss") or "", ""),
+        "pediu": v.get("dq") or "",
+        "abertura": (v.get("ab") or "") if (tipo == base.DESTAQUE or v.get("dq")) else "",
         "prop": v.get("prop") or "",
         "apelido": v.get("apelido") or "",
         "descricao": v.get("descricao") or "",
         "ementa": v.get("ementa") or "",
         "resultado": "" if aprovada is None else ("Aprovada" if aprovada else "Rejeitada"),
         "classe": "" if aprovada is None else ("ok" if aprovada else "no"),
-        "secreta": bool(v.get("secreta")),
-        "sim": v.get("sim") or 0,
-        "nao": v.get("nao") or 0,
-        "obstrucao": v.get("obstrucao") or 0,
-        "quorum": v.get("quorum") or 0,
-        "abstencao": v.get("abstencao") or 0,
-        "governo": LADO.get(v.get("governo") or "", ""),
-        "esquerda": LADO.get(v.get("esquerda") or "", ""),
-        "direita": LADO.get(v.get("direita") or "", ""),
+        "carimbo": carimbo(objeto, aprovada, turno),
+        "secreta": placar["secreta"],
+        "placar": placar,
+        "sim": placar["sim"],
+        "nao": placar["nao"],
+        "obstrucao": placar["obstrucao"],
+        "quorum": placar["quorum"],
+        "abstencao": placar["abstencao"],
+        # Sim ou Não; vazio quando o Governo não orientou Sim nem Não ou o polo não teve maioria clara.
+        "governo": LADO.get(v.get("governo") or "", "") if v.get("governo") else "",
+        "esquerda": LADO.get(esquerda, "") if esquerda else "",
+        "direita": LADO.get(direita, "") if direita else "",
         "divisiva": bool(v.get("divisiva")),
-        "racha": [f"{sigla} com a {com}" for sigla, com in sorted((v.get("racha") or {}).items())],
+        "juntos": bool(esquerda and esquerda == direita),
+        "racha": [f"{sigla_} com a {com}" for sigla_, com in sorted((v.get("racha") or {}).items())],
         "partidos": partidos,
+        "partidos_sim": [p for p in partidos if p["classe"] == "s"],
+        "partidos_nao": [p for p in partidos if p["classe"] == "n"],
         "dissidentes": dissidentes,
+        "divididos": divididos,
+        "fora_da_linha": sum(len(g["nomes"]) + g["mais"] for g in dissidentes),
     }
+
+
+def _folhas_das_ultimas(ultimas: list[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """Dados gravados antes das folhas: uma folha por matéria das últimas votações, só com o
+    que a votação diz (a ementa curta, os temas), na ordem em que aparecem."""
+    por: dict[str, dict[str, Any]] = {}
+    for v in ultimas:
+        titulo = materias.titulo_da_materia(v.get("prop") or "")
+        nome = titulo or f"#{v.get('id')}"
+        folha = por.setdefault(nome, {"t": titulo, "e": v.get("ementa") or "", "tm": list(v.get("temas") or []), "ap": v.get("apelido") or "", "vot": []})
+        folha["vot"].insert(0, dict(v))  # as últimas vêm da mais recente; a folha guarda em ordem
+    for folha in por.values():
+        folha["n"] = len(folha["vot"])
+        folha["cp"] = materias.capa({"id": v.get("id"), "t": v.get("tipo")} for v in folha["vot"])
+    return list(por.values())
+
+
+def _folha(f: Mapping[str, Any], casa: str, temas: Mapping[str, Mapping[str, Any]], oferecidos: frozenset[str] | set[str]) -> dict[str, Any]:
+    """Uma folha: o documento (cabeçalho, ementa, autoria), a votação da capa e as demais."""
+    titulo = str(f.get("t") or "")
+    sigla, _, numero = titulo.partition(" ")
+    chave = materias.chave(casa, titulo)
+    votos = [_votacao(v, casa, sigla) for v in f.get("vot") or []]
+    capa = next((v for v in votos if v["id"] == f.get("cp")), votos[-1] if votos else None)
+    ordem = ([capa] if capa else []) + [v for v in reversed(votos) if v is not capa]  # a capa; depois, da mais recente
+    meus = [t for t in f.get("tm") or [] if t in temas]
+    n = int(f.get("n") or len(votos))
+    no_dia: dict[str, int] = {}
+    for v in ordem:
+        no_dia[v["data_iso"]] = no_dia.get(v["data_iso"], 0) + 1
+    for v in ordem:
+        # Na aba de cada votação: o dia; quando a matéria teve mais de uma no mesmo dia, a hora.
+        v["quando"] = v["hora"] if v["hora"] and no_dia[v["data_iso"]] > 1 else v["data"]
+        # "Ver quem votou, um a um": a aba "Onde cada um está" só abre votações de conteúdo que opuseram os polos.
+        tema_do_link = next((t for t in meus if t in oferecidos), "")
+        v["um_a_um"] = f"#v=posicoes&c={casa}&t={tema_do_link}&m={chave}&vt={v['id']}" if chave and tema_do_link and v["divisiva"] and v["tipo_id"] in (base.MERITO, base.DESTAQUE) else ""
+        v["ancora"] = f"cg-vo-{casa}-{v['id']}"
+        v["na_capa"] = v is capa
+    ementa = str(f.get("e") or "")
+    return {
+        "id": f"cg-fo-{chave}" if chave else f"cg-fo-{casa}-{capa['id'] if capa else 'x'}",
+        "chave": chave,
+        "titulo": titulo,
+        "sigla": sigla,
+        "numero": numero,
+        "casa": base.CASAS.get(casa, ""),
+        "tipo": projetos.NOMES_SIGLA.get(sigla, ""),
+        "apelido": f.get("ap") or "",
+        "ementa": ementa,
+        "ementa_longa": len(ementa) > EMENTA_LONGA,
+        "ementa_mudou": bool(f.get("eo")),
+        "autoria": f.get("au") or "",
+        "autoria_k": f.get("auk") or "",
+        "origem": relevancia.ORIGENS.get(f.get("o") or "", ""),
+        "partidos_autores": ", ".join(f.get("pa") or []),
+        "apresentada": _data(f.get("da"), ano=True),
+        "situacao": f.get("sit") or "",
+        "relator": f.get("rl") or "",
+        "relator_k": f.get("rlk") or "",
+        "url": filters.safe_url(f.get("u") or "") or "",
+        "integra": filters.safe_url(f.get("ut") or "") or "",
+        "tema": meus[0] if meus else "",
+        "temas": [{"id": t, "nome": temas[t].get("curto") or temas[t].get("nome") or t, "longo": temas[t].get("nome") or ""} for t in meus],
+        "temas_ids": " ".join(meus),
+        "n": n,
+        "n_txt": "1 votação nominal" if n == 1 else f"{n} votações nominais",
+        "pilha": min(max(n - 1, 0), PILHA),
+        "fechado": int(f.get("fechado") or 80),  # % do partido do mesmo lado para ele contar como fechado
+        "outras": max(n - len(votos), 0),
+        "capa": capa,
+        "votos": ordem,
+    }
+
+
+def _folhas(painel: Mapping[str, Any], casa: str, temas_meta: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """As folhas da aba "Votações e matérias" (``painel["folhas"]``; em dados antigos, montadas
+    das últimas votações)."""
+    brutas = painel.get("folhas")
+    if brutas is None:
+        brutas = _folhas_das_ultimas(painel.get("ultimas") or [])
+    temas = {t["id"]: t for t in temas_meta if t.get("id")}
+    oferecidos = {t["id"] for t in _temas_faixa(painel.get("temas") or {}) if not t["poucas"]}
+    return [_folha(f, casa, temas, oferecidos) for f in brutas if f.get("vot")]
 
 
 # O gráfico "o que espera × o que passou": nota (0 a 100) × tempo desde o protocolo, em escala log.
@@ -783,7 +1006,7 @@ def _casa(
         jornal_voto=_jornal_voto((painel.get("listas") or {}).get("jornal_voto") or []),
         fila=_fila(painel.get("fila") or {}, casa),
         furaram=_furaram(painel.get("furaram") or {}),
-        ultimas=[_votacao(v, casa) for v in painel.get("ultimas") or []],
+        ultimas=_folhas(painel, casa, temas_meta or []),  # as últimas matérias votadas, cada uma numa folha
         listas=_listas(painel.get("listas") or {}),
         escolha=_escolha(casa, pessoas, temas_meta or [], campos, governo),
         frentes=_frentes(painel.get("frentes") or {}, temas_meta or [], campos, int(painel.get("em_exercicio") or 0), int((limiares or {}).get("frente_poucas") or FRENTE_POUCAS)),

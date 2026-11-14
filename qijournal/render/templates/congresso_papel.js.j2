@@ -1,0 +1,159 @@
+{#- Aba Congresso: a mesa de "Votações e matérias" (incluído por congresso.js.j2, dentro da mesma
+    função). Sem script, as folhas das últimas matérias votadas saem inteiras, uma depois da outra.
+    Aqui a mesa passa a mostrar UMA folha por vez (‹ ›, as miniaturas, as setas do teclado) e, na
+    folha, UMA votação por vez (a da capa primeiro): o carimbo da folha acompanha a votação
+    escolhida. O endereço guarda o foco (#v=votacoes&c=cd&m=cd-PLP-281-2019&vt=…). Nada é
+    montado aqui: o script só mostra e esconde o que já veio no HTML. -#}
+  /* ════ Votações e matérias: a mesa ════ */
+  var mesas = {};
+  lista(root.querySelectorAll('[data-mesa]')).forEach(function (mesa) {
+    var casa = mesa.getAttribute('data-mesa');
+    var itens = lista(mesa.querySelectorAll('.cg-me-i')), minis = lista(mesa.querySelectorAll('.cg-mi'));
+    var topo = mesa.querySelector('.cg-me-t'), fita = mesa.querySelector('.cg-mi-l');
+    if (!itens.length || !topo) return;
+    var atual = -1;
+    var ant = h('button', { cls: 'cg-me-b', type: 'button', 'aria-label': 'Matéria anterior', title: 'Matéria anterior (seta para a esquerda)', text: '‹' });
+    var prox = h('button', { cls: 'cg-me-b', type: 'button', 'aria-label': 'Próxima matéria', title: 'Próxima matéria (seta para a direita)', text: '›' });
+    var onde = h('span', { cls: 'cg-me-c', role: 'status' });
+    topo.appendChild(h('div', { cls: 'cg-me-nv', role: 'group', 'aria-label': 'Trocar de matéria' }, [ant, onde, prox]));
+    mesa.classList.add('cg-me-on');
+
+    function chaveDe(item) { return (item.id || '').replace(/^cg-fo-/, ''); }
+    function capaDe(item) {
+      var s = item.querySelector('.cg-vo-capa') || item.querySelector('.cg-vo');
+      return s ? s.getAttribute('data-vt') : '';
+    }
+    /* A votação à vista numa folha: os dados dela ao lado e o carimbo dela na folha. */
+    function verVotacao(item, id) {
+      var secoes = lista(item.querySelectorAll('.cg-vo'));
+      if (!secoes.some(function (s) { return s.getAttribute('data-vt') === id; })) id = capaDe(item);
+      secoes.forEach(function (s) { s.hidden = s.getAttribute('data-vt') !== id; });
+      lista(item.querySelectorAll('.cg-cb[data-vt]')).forEach(function (c) { c.hidden = c.getAttribute('data-vt') !== id; });
+      lista(item.querySelectorAll('.cg-vo-c')).forEach(function (a) {
+        if (a.getAttribute('data-vt') === id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+      item._vt = id;
+    }
+    function guardar() {
+      if (vistaAtual !== 'votacoes' || aberto || atual < 0 || !w.history || !w.history.replaceState) return;
+      var item = itens[atual], vt = item._vt || '';
+      w.history.replaceState(null, '', '#v=votacoes&c=' + casa + '&m=' + encodeURIComponent(chaveDe(item)) + (vt && vt !== capaDe(item) ? '&vt=' + encodeURIComponent(vt) : ''));
+    }
+    /* A folha em foco. Ao chegar numa folha, ela abre na votação da capa (ou na pedida). */
+    function ver(i, vt, comEndereco) {
+      i = Math.max(0, Math.min(itens.length - 1, i));
+      itens.forEach(function (li, k) { li.hidden = k !== i; });
+      minis.forEach(function (a, k) { if (k === i) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
+      ant.disabled = i === 0;
+      prox.disabled = i === itens.length - 1;
+      onde.textContent = (i + 1) + ' de ' + itens.length;
+      if (i !== atual || vt) verVotacao(itens[i], vt || '');
+      atual = i;
+      alinharFita();
+      if (comEndereco) guardar();
+    }
+    /* A miniatura da vez fica à vista na fita (só a fita rola, nunca a página). Com a aba fechada
+       não há medida: a mesa alinha de novo quando a aba abre. */
+    function alinharFita() {
+      var mini = minis[atual];
+      if (!fita || !mini || fita.scrollWidth <= fita.clientWidth) return;
+      var caixa = fita.getBoundingClientRect(), r = mini.getBoundingClientRect();
+      if (r.left < caixa.left + 8) fita.scrollLeft += r.left - caixa.left - 8;
+      else if (r.right > caixa.right - 8) fita.scrollLeft += r.right - caixa.right + 8;
+    }
+    function indiceDe(chave) {
+      for (var k = 0; k < itens.length; k++) if (chaveDe(itens[k]) === chave) return k;
+      return -1;
+    }
+    ant.addEventListener('click', function () { ver(atual - 1, '', true); });
+    prox.addEventListener('click', function () { ver(atual + 1, '', true); });
+    mesa.addEventListener('click', function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || !ev.target.closest) return;
+      var mini = ev.target.closest('.cg-mi'), aba = ev.target.closest('.cg-vo-c'), mais = ev.target.closest('.cg-fo-eb');
+      if (mini) {  // a miniatura traz a folha para o foco (sem script, o link desce até ela)
+        ev.preventDefault();
+        ev.stopPropagation();
+        ver(minis.indexOf(mini), '', true);
+      } else if (aba) {  // outra votação da mesma matéria
+        ev.preventDefault();
+        ev.stopPropagation();
+        verVotacao(itens[atual], aba.getAttribute('data-vt'));
+        guardar();
+      } else if (mais) {  // a ementa longa: inteira ou recolhida
+        var caixa = mais.parentNode, inteira = !caixa.classList.contains('cg-fo-e-a');
+        caixa.classList.toggle('cg-fo-e-a', inteira);
+        mais.setAttribute('aria-expanded', inteira ? 'true' : 'false');
+        mais.textContent = inteira ? 'recolher a ementa' : 'ler a ementa inteira';
+      }
+    });
+    /* As setas do teclado: entre as votações (com o foco nas abas delas) ou entre as matérias. */
+    mesa.addEventListener('keydown', function (ev) {
+      var passo = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0, alvo = ev.target;
+      if (!passo || ev.altKey || ev.metaKey || ev.ctrlKey || !alvo.closest || alvo.closest('input, select, textarea, summary')) return;
+      var aba = alvo.closest('.cg-vo-c');
+      if (aba) {
+        var abas = lista(aba.parentNode.querySelectorAll('.cg-vo-c')), outra = abas[abas.indexOf(aba) + passo];
+        if (!outra) return;
+        ev.preventDefault();
+        verVotacao(itens[atual], outra.getAttribute('data-vt'));
+        outra.focus();
+        guardar();
+        return;
+      }
+      if (atual + passo < 0 || atual + passo >= itens.length) return;
+      ev.preventDefault();
+      var naFita = !!alvo.closest('.cg-mi');
+      ver(atual + passo, '', true);
+      if (naFita && minis[atual]) minis[atual].focus();
+    });
+    /* A ementa longa sai recolhida na folha em foco; um botão a abre inteira. */
+    lista(mesa.querySelectorAll('.cg-fo-e-l')).forEach(function (caixa) {
+      caixa.appendChild(h('button', { cls: 'cg-fo-eb', type: 'button', 'aria-expanded': 'false', text: 'ler a ementa inteira' }));
+    });
+    lista(mesa.querySelectorAll('[data-com-script]')).forEach(function (el) { el.hidden = false; });
+    mesas[casa] = {
+      alinhar: alinharFita,
+      ir: function (chave, vt) {
+        var i = indiceDe(chave);
+        if (i >= 0) ver(i, vt || '', false);
+        return i >= 0;
+      },
+      /* Um bloco de dentro da mesa pelo id (as âncoras que valem sem script): a folha ou uma votação dela. */
+      irAoId: function (id) {
+        var alvo = id ? d.getElementById(id) : null;
+        if (!alvo || !mesa.contains(alvo)) return false;
+        var item = alvo.closest('.cg-me-i');
+        if (!item) return false;
+        ver(itens.indexOf(item), alvo.classList.contains('cg-vo') ? alvo.getAttribute('data-vt') : '', false);
+        return true;
+      }
+    };
+    ver(0, '', false);
+  });
+  /* #v=votacoes&c=cd&m=cd-PLP-281-2019&vt=2236186-60: abre a mesa na matéria e na votação pedidas. */
+  aoEndereco.votacoes = function (q) {
+    var p = {};
+    (q || '').split('&').forEach(function (par) {
+      var i = par.indexOf('=');
+      if (i > 0) { try { p[par.slice(0, i)] = decodeURIComponent(par.slice(i + 1)); } catch (erro) { /* parâmetro malformado: ignorado */ } }
+    });
+    var casa = p.c === 'sf' ? 'sf' : 'cd';
+    if (!p.m || !mesas[casa]) return;
+    if (casas && !casas.hidden && root.getAttribute('data-ver') !== casa) verCasa(casa);
+    mesas[casa].ir(p.m, p.vt || '');
+  };
+  /* Quando a aba abre (ou a Casa muda), a fita de miniaturas passa a ter medida: mostra a da vez. */
+  var aoAbrirAsMaterias = aoAbrirVista.votacoes;
+  aoAbrirVista.votacoes = function () {
+    if (aoAbrirAsMaterias) aoAbrirAsMaterias();
+    Object.keys(mesas).forEach(function (casa) { mesas[casa].alinhar(); });
+  };
+  /* As âncoras de sem script (#cg-fo-…, #cg-vo-…) chegam por um link de fora: a folha vem para o foco
+     antes de a página rolar até ela. */
+  function mesaDoEndereco() {
+    var id = /^#(cg-(?:fo|vo)-[\w.-]+)$/.exec(w.location.hash || '');
+    if (!id) return false;
+    return Object.keys(mesas).some(function (casa) { return mesas[casa].irAoId(id[1]); });
+  }
+  mesaDoEndereco();
+  w.addEventListener('hashchange', function () { if (mesaDoEndereco()) irPara((w.location.hash || '').slice(1)); });

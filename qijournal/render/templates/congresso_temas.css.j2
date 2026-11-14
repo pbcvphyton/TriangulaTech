@@ -1,0 +1,25 @@
+/* ── As cores dos temas (qualquer aba do Congresso pode usar) ──
+   Uma cor por tema, para reconhecer de relance: ouro para a economia, o azul da carteira de trabalho,
+   o vermelho da cruz na saúde, o laranja do ônibus escolar, o azul-marinho da farda, o verde do meio
+   ambiente, a terra do agro, o vinho da toga... O NOME do tema vai sempre escrito ao lado: treze cores
+   não se distinguem todas entre si (com daltonismo, menos ainda), então a cor ajuda e o rótulo garante.
+   Texto nunca veste a cor do tema: ela pinta uma faixa, uma aba ou um quadradinho.
+   Uso: class="cg-t-<id>" põe a cor em --cg-t; o próprio elemento (ou um filho) pinta com var(--cg-t).
+   Os ids são os de config/congresso.yaml; --cg-t-0 é "sem tema".
+   Conferidas com o validador da skill dataviz (validate_palette.js), no claro e no escuro: luminosidade
+   dentro da faixa do modo, croma de 0,10 ou mais, contraste de 3:1 ou mais contra o papel da folha
+   (--cg-fo-papel), contra a página (--paper) e contra o fundo suave (--soft), e vizinhas na ordem da
+   legenda (a do arquivo de configuração) distinguíveis com e sem daltonismo (ΔE de 8 ou mais simulado;
+   de 15 ou mais com visão normal). tests/test_congresso_papel.py refaz a conta do contraste. */
+:root{--cg-t-economia:#a28a30;--cg-t-trabalho:#176aea;--cg-t-saude:#bd022f;--cg-t-educacao:#de6a0b;--cg-t-seguranca:#4743a8;--cg-t-direitos:#ad67b8;--cg-t-ambiente:#298d41;
+  --cg-t-agro:#864c0a;--cg-t-cidades:#009896;--cg-t-politica:#901557;--cg-t-exterior:#2397de;--cg-t-tecnologia:#7956d3;--cg-t-homenagens:#e64d9d;--cg-t-0:#7b8494}
+:root[data-theme="dark"]{--cg-t-economia:#a3933f;--cg-t-trabalho:#0e78d8;--cg-t-saude:#d92141;--cg-t-educacao:#d77b04;--cg-t-seguranca:#6162f4;--cg-t-direitos:#b865b7;--cg-t-ambiente:#40a763;
+  --cg-t-agro:#a95a03;--cg-t-cidades:#08aaa8;--cg-t-politica:#b25874;--cg-t-exterior:#459ad8;--cg-t-tecnologia:#895bbb;--cg-t-homenagens:#de658e;--cg-t-0:#8d95a3}
+.cg-t-economia{--cg-t:var(--cg-t-economia)}.cg-t-trabalho{--cg-t:var(--cg-t-trabalho)}.cg-t-saude{--cg-t:var(--cg-t-saude)}.cg-t-educacao{--cg-t:var(--cg-t-educacao)}
+.cg-t-seguranca{--cg-t:var(--cg-t-seguranca)}.cg-t-direitos{--cg-t:var(--cg-t-direitos)}.cg-t-ambiente{--cg-t:var(--cg-t-ambiente)}.cg-t-agro{--cg-t:var(--cg-t-agro)}
+.cg-t-cidades{--cg-t:var(--cg-t-cidades)}.cg-t-politica{--cg-t:var(--cg-t-politica)}.cg-t-exterior{--cg-t:var(--cg-t-exterior)}.cg-t-tecnologia{--cg-t:var(--cg-t-tecnologia)}
+.cg-t-homenagens{--cg-t:var(--cg-t-homenagens)}
+/* O rótulo de um tema: o quadradinho na cor e o nome em cor de texto. */
+.cg-tr{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cg-tr>i{flex:none;width:9px;height:9px;border-radius:2px;background:var(--cg-t,var(--cg-t-0))}
+

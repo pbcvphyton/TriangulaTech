@@ -154,7 +154,7 @@
     var nos = [h('p', { cls: 'cg-vl-k' }, [
       h('time', { text: dataBr(v.d) }), h('span', { cls: 'az-selo', text: tipoDaVotacao(v) }),
       res ? h('span', { cls: 'cg-res cg-res-' + (v.apv ? 'ok' : 'no'), text: res }) : null,
-      h('span', { cls: 'cg-vl-pl', text: num(v.s) + ' Sim × ' + num(v.n) + ' Não' + (v.o ? ' · ' + num(v.o) + ' em obstrução' : '') + (v.q ? ' · precisava de ' + num(v.q) + ' Sim' : '') }),
+      h('span', { cls: 'cg-vl-pl', text: num(v.s) + ' Sim × ' + num(v.n) + ' Não' + (v.o ? ' · ' + num(v.o) + ' em obstrução' : '') + (v.q ? ' · precisava de ' + num(v.q) + ' Sim' : '') + (v.an ? ' · a Mesa anunciou ' + num(v.an[0]) + ' × ' + num(v.an[1]) : '') }),
       chipDosPolos(v),
       opts.curto && v.ss ? h('span', { cls: 'cg-vl-ss', text: SENTIDO_CURTO[v.ss] }) : null
     ])];
@@ -213,10 +213,16 @@
     if (m.u) link(m.u, 'Página oficial ↗', true);
     if (m.ut) link(m.ut, 'Texto integral ↗', true);
     link(M.pesquisa + '?q=' + encodeURIComponent('"' + (m.ap || titulo) + '"'), 'O que o jornal publicou →', false);
-    nos.push(h('div', { cls: 'cg-mf-h' }, [
-      h('p', { cls: 'cg-d-k', text: (casa === 'cd' ? 'Câmara dos Deputados' : 'Senado Federal') + ' · ' + ((M.siglas || {})[sigla] || 'matéria') + (m.est ? ' · ' + ((M.estados || {})[m.est] || m.est) : '') }),
-      h('h2', { cls: 'cg-d-t', id: 'cgDossieT' }, [titulo, m.ap ? h('span', { cls: 'cg-apel', text: m.ap }) : null]),
-      links
+    /* O cabeçalho, como o da folha: a faixa na cor do tema, os temas escritos e o carimbo da votação da capa. */
+    var temasDaFicha = (m.tm || []).filter(function (t) { return (M.temas || {})[t]; }), capaDaFicha = votacaoDaCapa(m);
+    nos.push(h('div', { cls: 'cg-mf-h cg-mf-fo' + (temasDaFicha.length ? ' cg-t-' + temasDaFicha[0] : '') }, [
+      h('div', { cls: 'cg-mf-fo-a' }, [
+        linhaDosTemas(temasDaFicha),
+        h('p', { cls: 'cg-d-k', text: (casa === 'cd' ? 'Câmara dos Deputados' : 'Senado Federal') + ' · ' + ((M.siglas || {})[sigla] || 'matéria') + (m.est ? ' · ' + ((M.estados || {})[m.est] || m.est) : '') }),
+        h('h2', { cls: 'cg-d-t', id: 'cgDossieT' }, [titulo, m.ap ? h('span', { cls: 'cg-apel', text: m.ap }) : null]),
+        links
+      ]),
+      capaDaFicha ? carimboDaVotacao(capaDaFicha) : null
     ]));
 
     /* Sobre o quê. */
@@ -484,14 +490,77 @@
     });
   });
 
-  /* ── As matérias votadas: procurar pelo nome, pelo apelido ou pelo assunto ── */
-  var MB_PAGINA = 30;
+  /* ── As matérias votadas: procurar pelo nome, pelo apelido ou pelo assunto ──
+     A busca devolve folhas pequenas: a aba na cor do tema (com o nome escrito), o tipo por extenso,
+     o número, a ementa oficial e o carimbo da votação da capa. A legenda das cores filtra por tema. */
+  /* O carimbo: o que foi a voto → [como se diz, o Sim venceu, o Sim perdeu]. O mesmo quadro de
+     qijournal/render/congresso.py (CARIMBOS); tests/test_congresso_papel.py confere que são iguais. */
+  var CARIMBOS = {
+    texto: ['o texto principal', 'Aprovado', 'Rejeitado'],
+    redacao: ['a redação final', 'Aprovada', 'Rejeitada'],
+    trecho: ['o trecho destacado', 'Mantido', 'Retirado'],
+    emenda: ['a emenda', 'Aprovada', 'Rejeitada'],
+    destaque: ['o destaque', 'Aprovado', 'Rejeitado'],
+    urgencia: ['a urgência', 'Aprovada', 'Rejeitada'],
+    requerimento: ['o requerimento', 'Aprovado', 'Rejeitado'],
+    recurso: ['o recurso', 'Aprovado', 'Rejeitado'],
+    autoridade: ['a indicação', 'Aprovada', 'Rejeitada'],
+    outro: ['o que foi a voto', 'Aprovado', 'Rejeitado']
+  };
+  function objetoDoVoto(v) {
+    if (v.t === 'merito') return v.rf ? 'redacao' : 'texto';
+    if (v.t === 'destaque') return v.ss === 'trecho' || v.ss === 'emenda' ? v.ss : 'destaque';
+    return { urgencia: 'urgencia', procedimento: 'requerimento', recurso: 'recurso', autoridade: 'autoridade' }[v.t] || 'outro';
+  }
+  /* O carimbo de uma votação, em texto de verdade: a palavra e sobre o quê. */
+  function carimboDaVotacao(v) {
+    var objeto = objetoDoVoto(v), q = CARIMBOS[objeto], cls = 'cg-cb' + (objeto === 'texto' ? '' : ' cg-cb-p');
+    if (v.apv == null) return h('p', { cls: cls + ' cg-cb-0' }, [h('b', { text: 'Votado' }), h('span', { text: 'o registro não diz o resultado' })]);
+    return h('p', { cls: cls + (v.apv ? ' cg-cb-ok' : ' cg-cb-no') }, [h('b', { text: v.apv ? q[1] : q[2] }), h('span', { text: q[0] + (v.tu ? ', em ' + v.tu + 'º turno' : '') })]);
+  }
+  /* A votação que vai na capa da folha: a que os dados marcam (m.cp); com uma só, é ela. */
+  function votacaoDaCapa(m) {
+    var votos = m.vot || [], achada = null;
+    if (m.cp) votos.forEach(function (v) { if (v.id === m.cp) achada = v; });
+    return achada || votos[votos.length - 1] || null;
+  }
+  function nomeCurtoDoTema(t) { return (M.temasCurtos || {})[t] || nomeDoTema(t); }
+  /* O rótulo de um tema: o quadradinho na cor e o nome, sempre escrito, em cor de texto. */
+  function rotuloDoTema(t, primeiro) {
+    return h('span', { cls: 'cg-tr cg-t-' + t + (primeiro ? ' cg-tr-1' : ''), title: nomeDoTema(t) }, [h('i', { 'aria-hidden': 'true' }), nomeCurtoDoTema(t)]);
+  }
+  function linhaDosTemas(temas) {
+    temas = (temas || []).filter(function (t) { return (M.temas || {})[t]; });
+    if (!temas.length) return h('p', { cls: 'cg-fo-tm' }, [h('span', { cls: 'cg-tr cg-tr-0', text: 'sem tema no registro' })]);
+    return h('p', { cls: 'cg-fo-tm' }, temas.slice(0, 2).map(function (t, i) { return rotuloDoTema(t, i === 0); }));
+  }
+  /* Uma folha pequena: a matéria inteira num cartão, que abre a ficha completa. */
+  function folhaPequena(casa, x) {
+    var m = x.m, capa = votacaoDaCapa(m), sigla = x.t.split(' ')[0], temas = (m.tm || []).filter(function (t) { return (M.temas || {})[t]; });
+    var pilha = [];
+    for (var i = 1; i <= Math.min(x.n - 1, 2); i++) pilha.push(h('i', { cls: 'cg-fo-s cg-fo-s' + i, 'aria-hidden': 'true' }));
+    var conta = [h('b', { text: x.n === 1 ? '1 votação' : num(x.n) + ' votações' }), h('br'), capa ? dataBr(capa.d) : ''];
+    if (x.div) conta.push(h('br'), x.div === 1 ? '1 dividiu os polos' : num(x.div) + ' dividiram os polos');
+    return h('li', { cls: 'cg-fp-i' }, [h('div', { cls: 'cg-fo-w cg-3d', 'data-3d': '3' }, pilha.concat([
+      h('div', { cls: 'cg-fo cg-fo-q' + (temas.length ? ' cg-t-' + temas[0] : '') }, [
+        linhaDosTemas(temas),
+        h('p', { cls: 'cg-fp-k', text: (M.siglas || {})[sigla] || 'Matéria' }),
+        h('h5', { cls: 'cg-fp-n' }, [linkDaMateria(casa, x.t)]),
+        m.ap ? h('p', { cls: 'cg-fo-ap' }, ['conhecida como ', h('b', { text: m.ap })]) : null,
+        h('p', { cls: 'cg-fp-e' + (m.e ? '' : ' cg-fo-sem'), text: m.e ? curto(m.e, 300) : 'O registro não traz a ementa.' }),
+        h('div', { cls: 'cg-fp-r' }, [h('p', { cls: 'cg-fp-x' }, conta), capa ? carimboDaVotacao(capa) : null])
+      ])
+    ]))]);
+  }
+  var MB_PAGINA = 12;
   function iniciarBuscador(bloco) {
     if (bloco._pronto) return;
     bloco._pronto = true;
     var casa = bloco.getAttribute('data-materias');
-    var q = bloco.querySelector('input[type="search"]'), sel = bloco.querySelector('select'), so = bloco.querySelector('input[type="checkbox"]');
-    var conta = bloco.querySelector('.az-fil-n'), ol = bloco.querySelector('.cg-mb-l');
+    var q = bloco.querySelector('input[type="search"]'), so = bloco.querySelector('input[type="checkbox"]');
+    var conta = bloco.querySelector('.az-fil-n'), ol = bloco.querySelector('.cg-mb-l'), legenda = bloco.querySelector('.cg-lg');
+    var aviso = bloco.querySelector('.cg-mb-v'), chave = bloco.querySelector('.cg-mb-k');
+    if (!q || !so || !conta || !ol || !legenda) return;
     bloco.hidden = false;
     conta.textContent = 'carregando…';
     materiasDa(casa, function (erro, mat) {
@@ -500,43 +569,49 @@
       Object.keys(mat.materias).forEach(function (t) {
         var m = mat.materias[t], votos = m.vot || [];
         if (!votos.length) return;
-        var conteudo = votos.filter(function (v) { return v.t === 'merito' || v.t === 'destaque'; });
         todas.push({
           t: t, m: m, n: votos.length, div: votos.filter(function (v) { return v.dv; }).length, ultima: votos[votos.length - 1],
-          conteudo: conteudo.length, busca: semAcento([t, m.ap || '', m.e || '', m.ex || '', (m.kw || []).join(' ')].join(' '))
+          busca: semAcento([t, m.ap || '', m.e || '', m.ex || '', (m.kw || []).join(' ')].join(' '))
         });
       });
       todas.sort(function (a, b) { return a.ultima.d < b.ultima.d ? 1 : a.ultima.d > b.ultima.d ? -1 : 0; });
-      var temas = {};
-      todas.forEach(function (x) { (x.m.tm || []).forEach(function (t) { temas[t] = (temas[t] || 0) + 1; }); });
-      Object.keys(temas).sort(function (a, b) { return temas[b] - temas[a]; }).forEach(function (t) {
-        sel.appendChild(h('option', { value: t, text: nomeDoTema(t) + ' (' + temas[t] + ')' }));
+      /* A legenda: um botão por tema, na ordem do arquivo de escolhas, com quantas matérias há em cada um. */
+      var porTema = {}, tema = '', botoes = [];
+      todas.forEach(function (x) { (x.m.tm || []).forEach(function (t) { porTema[t] = (porTema[t] || 0) + 1; }); });
+      function botaoDaLegenda(t, nome, n) {
+        var b = h('button', { cls: 'cg-lg-b' + (t ? ' cg-t-' + t : ' cg-lg-0'), type: 'button', 'aria-pressed': t === tema ? 'true' : 'false', 'data-tema-f': t, title: t ? nomeDoTema(t) : null }, [t ? h('i', { 'aria-hidden': 'true' }) : null, nome + ' ', h('b', { text: num(n) })]);
+        botoes.push(b);
+        return b;
+      }
+      legenda.appendChild(h('span', { cls: 'cg-lg-k', text: 'Tema' }));
+      legenda.appendChild(botaoDaLegenda('', 'Todos', todas.length));
+      Object.keys(M.temas || {}).forEach(function (t) { if (porTema[t]) legenda.appendChild(botaoDaLegenda(t, nomeCurtoDoTema(t), porTema[t])); });
+      legenda.addEventListener('click', function (ev) {
+        var b = ev.target.closest ? ev.target.closest('button[data-tema-f]') : null;
+        if (!b) return;
+        var pedido = b.getAttribute('data-tema-f');
+        tema = pedido === tema ? '' : pedido;  // clicar de novo no tema escolhido volta a "Todos"
+        botoes.forEach(function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-tema-f') === tema ? 'true' : 'false'); });
+        refazer();
       });
       var mostrados = MB_PAGINA;
       function desenhar() {
-        var termos = semAcento(q.value).split(/\s+/).filter(Boolean), tema = sel.value, soDiv = so.checked;
+        var termos = semAcento(q.value).split(/\s+/).filter(Boolean), soDiv = so.checked;
+        while (ol.firstChild) ol.removeChild(ol.firstChild);
+        /* Sem palavra, sem tema e sem filtro, as mais recentes já estão na mesa acima: a busca espera um pedido. */
+        var parada = !termos.length && !tema && !soDiv;
+        if (aviso) aviso.hidden = !parada;
+        if (chave) chave.hidden = parada;
+        if (parada) { conta.textContent = plural(todas.length, 'matéria', 'matérias') + ' nesta legislatura'; return; }
         var achadas = todas.filter(function (x) {
           return (!tema || (x.m.tm || []).indexOf(tema) >= 0) && (!soDiv || x.div) && termos.every(function (t) { return x.busca.indexOf(t) >= 0; });
         });
-        while (ol.firstChild) ol.removeChild(ol.firstChild);
-        achadas.slice(0, mostrados).forEach(function (x) {
-          var u = x.ultima, res = resultadoDaVotacao(u);
-          var extras = [h('span', { cls: 'cg-chip' }, [h('b', { text: num(x.n) }), x.n === 1 ? ' votação nominal' : ' votações nominais'])];
-          if (x.div) extras.push(h('span', { cls: 'cg-div', text: x.div === 1 ? '1 dividiu os polos' : x.div + ' dividiram os polos' }));
-          var lados = ladosNoTexto(x.m);
-          if (lados) extras.push(h('span', { cls: 'cg-td-lado', text: lados }));
-          ol.appendChild(h('li', { cls: 'cg-td-m' }, [
-            cabecaDaMateria(casa, x.t, x.m, extras),
-            h('p', { cls: 'cg-mh-e', text: curto(x.m.e, 260) }),
-            h('p', { cls: 'cg-mh-u', text: 'Última votação: ' + dataBr(u.d) + ' · ' + tipoDaVotacao(u) + (res ? ' · ' + res : '') + ' · ' + num(u.s) + ' × ' + num(u.n) + ((x.m.tm || []).length ? ' · ' + x.m.tm.map(nomeDoTema).join(', ') : '') })
-          ]));
-        });
+        achadas.slice(0, mostrados).forEach(function (x) { ol.appendChild(folhaPequena(casa, x)); });
         if (achadas.length > mostrados) ol.appendChild(h('li', { cls: 'cg-mb-m' }, [botaoMais('mostrar mais ' + Math.min(MB_PAGINA, achadas.length - mostrados) + ' de ' + (achadas.length - mostrados), function () { mostrados += MB_PAGINA; desenhar(); })]));
-        conta.textContent = plural(achadas.length, 'matéria', 'matérias');
+        conta.textContent = achadas.length ? plural(achadas.length, 'matéria', 'matérias') + ', da votada por último' : 'nenhuma matéria com esse pedido';
       }
       function refazer() { mostrados = MB_PAGINA; desenhar(); }
       q.addEventListener('input', refazer);
-      sel.addEventListener('change', refazer);
       so.addEventListener('change', refazer);
       desenhar();
     });

@@ -27,6 +27,8 @@
 {% include "analitico.css.j2" %}
 {% include "congresso.css.j2" %}
 {% include "congresso_tema.css.j2" %}
+{% include "congresso_temas.css.j2" %}
+{% include "congresso_papel.css.j2" %}
 {% endblock %}
 
 {#- Nome que abre o dossiê (com script) ou a busca do nome no jornal (sem script). -#}
@@ -457,65 +459,189 @@
     {% endfor %}
   </section>
 
-  {#- Votações e matérias -#}
+  {#- Votações e matérias: cada matéria é uma FOLHA (o documento: a Casa, o tipo, o número, a ementa
+      oficial, a autoria) com o resultado em carimbo; ao lado, os dados da votação (o placar como a
+      Mesa anuncia, os lados, os partidos e quem saiu da linha). Sem script, as folhas das últimas
+      matérias votadas saem inteiras, uma depois da outra; com script, uma em foco por vez
+      (congresso_papel.js.j2) e a busca devolve folhas pequenas (congresso_materias.js.j2).
+      Estilos: congresso_papel.css.j2; as cores dos temas: congresso_temas.css.j2. -#}
+  {% macro cg_temas(f) -%}
+  <p class="cg-fo-tm">{% for t in f.temas %}<span class="cg-tr cg-t-{{ t.id }}{% if loop.first %} cg-tr-1{% endif %}"{% if t.longo %} title="{{ t.longo }}"{% endif %}><i aria-hidden="true"></i>{{ t.nome }}</span>{% else %}<span class="cg-tr cg-tr-0">sem tema no registro</span>{% endfor %}</p>
+  {%- endmacro %}
+  {% macro cg_carimbo(v, casa, escondido=false) -%}
+  {% if v.carimbo %}<p class="cg-cb cg-cb-{{ v.carimbo.classe }}{% if v.objeto != "texto" %} cg-cb-p{% endif %}" data-vt="{{ v.id }}"{% if escondido %} hidden{% endif %}><b>{{ v.carimbo.palavra }}</b><span>{{ v.carimbo.que }}</span><small>Plenário {{ "da Câmara" if casa.id == "cd" else "do Senado" }} · {{ v.data_ano }}</small></p>{% else %}<p class="cg-cb cg-cb-0" data-vt="{{ v.id }}"{% if escondido %} hidden{% endif %}><b>Votado</b><span>o registro não diz o resultado</span><small>Plenário {{ "da Câmara" if casa.id == "cd" else "do Senado" }} · {{ v.data_ano }}</small></p>{% endif %}
+  {%- endmacro %}
+  {#- A folha: o documento. -#}
+  {% macro cg_folha(f, casa) -%}
+  <div class="cg-fo-w cg-3d" data-3d="2.5">
+    {% for i in range(f.pilha) %}<i class="cg-fo-s cg-fo-s{{ loop.index }}" aria-hidden="true"></i>{% endfor %}
+    <div class="cg-fo{% if f.tema %} cg-t-{{ f.tema }}{% endif %}">
+      {{ cg_temas(f) }}
+      <div class="cg-fo-h">
+        <p class="cg-fo-casa">{{ f.casa }}</p>
+        {% if f.tipo %}<p class="cg-fo-tipo">{{ f.tipo }}</p>{% endif %}
+        <h5 class="cg-fo-n">{% if f.titulo %}{% if f.chave %}{{ materia(casa.id, f.titulo, f.url) }}{% else %}{{ f.titulo }}{% endif %}{% else %}Votação sem matéria numerada{% endif %}</h5>
+        {% if f.apelido %}<p class="cg-fo-ap">conhecida como <b>{{ f.apelido }}</b></p>{% endif %}
+      </div>
+      <div class="cg-fo-e{% if f.ementa_longa %} cg-fo-e-l{% endif %}">
+        <p class="cg-fo-ek"><span data-dica="Ementa: o resumo oficial do que a matéria faz, escrito por quem a apresentou ou pela Casa. A página não resume: mostra o registro." tabindex="0">Ementa</span></p>
+        {% if f.ementa %}<p class="cg-fo-et">{{ f.ementa }}</p>{% else %}<p class="cg-fo-et cg-fo-sem">O registro não traz a ementa desta matéria.</p>{% endif %}
+        {% if f.ementa_mudou %}<p class="cg-fo-en">A ementa mudou no caminho: esta é a que vale hoje.</p>{% endif %}
+      </div>
+      <dl class="cg-fo-d">
+        {% if f.autoria %}<div><dt>Autoria</dt><dd>{% if f.autoria_k %}{{ pessoa(f.autoria_k, f.autoria) }}{% else %}{{ f.autoria }}{% endif %}{% if f.partidos_autores %} <small>{{ f.partidos_autores }}</small>{% endif %}</dd></div>{% endif %}
+        {% if f.apresentada %}<div><dt>Apresentada em</dt><dd>{{ f.apresentada }}</dd></div>{% endif %}
+        {% if f.relator %}<div><dt>Relator</dt><dd>{% if f.relator_k %}{{ pessoa(f.relator_k, f.relator) }}{% else %}{{ f.relator }}{% endif %}</dd></div>{% endif %}
+        {% if f.situacao %}<div><dt>Situação hoje</dt><dd>{{ f.situacao }}</dd></div>{% endif %}
+      </dl>
+      <div class="cg-fo-p">
+        {% for v in f.votos %}{{ cg_carimbo(v, casa, not v.na_capa) }}{% endfor %}
+        <p class="cg-fo-f">{% if f.integra %}<a href="{{ f.integra }}" target="_blank" rel="noopener noreferrer">Texto integral&nbsp;↗</a>{% endif %}{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener noreferrer">Página oficial&nbsp;↗</a>{% endif %}</p>
+      </div>
+    </div>
+  </div>
+  <p class="cg-fo-pl">{% if f.n > 1 %}<b>{{ f.n_txt }}</b> desta matéria no Plenário nesta legislatura: por isso a pilha. Na capa, {{ "a do texto principal" if f.capa.objeto == "texto" else "a de " ~ f.capa.rotulo }}.{% else %}Uma votação nominal no Plenário nesta legislatura.{% endif %}</p>
+  {%- endmacro %}
+  {#- Os dados de uma votação, para pôr ao lado da folha. -#}
+  {% macro cg_dados(v, f, casa) -%}
+  {% set p = v.placar %}
+  <section class="cg-vo{% if v.na_capa %} cg-vo-capa{% endif %}" id="{{ v.ancora }}" data-vt="{{ v.id }}" aria-label="Votação de {{ v.data_ano }}: {{ v.rotulo }}">
+    <p class="cg-vo-k"><span class="az-selo">{{ v.rotulo }}</span><time datetime="{{ v.data_iso }}">{{ v.data_ano }}{% if v.hora %} · {{ v.hora }}{% endif %}</time>{% if v.carimbo %}<span class="cg-res cg-res-{{ v.carimbo.classe }}">{{ v.carimbo.palavra|lower }} {{ v.carimbo.que }}</span>{% endif %}</p>
+    <div class="cg-vo-b">
+      <h6 class="cg-vo-h">O que se votou</h6>
+      <p class="cg-vo-x">{% if v.pediu %}<b>Destaque pedido por {{ v.pediu }}.</b> {% endif %}{{ v.descricao or "O registro não descreve a votação." }}</p>
+      {% if v.abertura %}<p class="cg-vo-s">A Mesa pôs em votação: {{ v.abertura }}</p>{% endif %}
+      {% if v.o_que_e or v.sentido %}<p class="cg-vo-s">{{ v.o_que_e }}{% if v.o_que_e and v.sentido %} {% endif %}{{ v.sentido }}</p>{% endif %}
+    </div>
+    <div class="cg-vo-b cg-pc">
+      <h6 class="cg-vo-h">O placar <span>como a Mesa anuncia: a obstrução e a abstenção ficam à parte</span></h6>
+      {% if p.tem_placar %}
+      <p class="cg-pc-n"><span class="cg-pc-s"><i class="cg-pv cg-pv-s" aria-hidden="true"></i><b>{{ p.sim|num }}</b> Sim</span><span class="cg-pc-nn">Não <b>{{ p.nao|num }}</b><i class="cg-pv cg-pv-n" aria-hidden="true"></i></span></p>
+      <div class="cg-pc-b{% if p.quorum %} cg-pc-bq{% endif %}" role="img" aria-label="{{ p.sim|num }} Sim e {{ p.nao|num }} Não{% if p.obstrucao %}, {{ p.obstrucao|num }} em obstrução{% endif %}, nas {{ p.cadeiras }} cadeiras{% if p.quorum %}; precisava de {{ p.quorum }} Sim{% endif %}"><i class="cg-pc-bs" style="width:{{ p.w_sim }}%"></i><i class="cg-pc-bm"></i>{% if p.obstrucao %}<i class="cg-pc-bo" style="width:{{ p.w_obs }}%"></i>{% endif %}<i class="cg-pc-bn" style="width:{{ p.w_nao }}%"></i>{% if p.quorum %}<i class="cg-pc-q" style="left:{{ p.q_left }}%"><b>{{ p.quorum }} exigidos</b></i>{% endif %}</div>
+      {% if p.quorum %}<p class="cg-pc-x cg-pc-xq{% if p.faltaram %} cg-pc-falta{% endif %}">Precisava de <b>{{ p.quorum }} Sim</b> ({{ p.exigencia }}): {% if p.faltaram %}<b>{{ "faltou 1 voto" if p.faltaram == 1 else "faltaram " ~ p.faltaram ~ " votos" }}</b>{% if p.sim > p.nao %}. O Sim teve mais votos que o Não, mas não chegou ao número exigido{% endif %}.{% else %}teve {{ p.sim|num }}.{% endif %}</p>{% elif p.sem_numero %}<p class="cg-pc-x">Aqui não há número fixo de votos: decide a maioria de quem votou.</p>{% endif %}
+      {% if p.obstrucao or p.abstencao %}<p class="cg-pc-x">Fora do Sim e do Não: {% if p.obstrucao %}<b>{{ p.obstrucao|num }}</b> em <span class="cg-tm" data-dica="Obstrução: a bancada declara que não vota, para tentar que falte o número mínimo de presentes e a votação não valha. Fica fora do Sim e do Não." tabindex="0">obstrução</span> (a bancada declara que não vota, para a votação não alcançar o número mínimo){% endif %}{% if p.obstrucao and p.abstencao %}; {% endif %}{% if p.abstencao %}<b>{{ p.abstencao|num }}</b> {{ "abstenção" if p.abstencao == 1 else "abstenções" }}{% endif %}.</p>{% endif %}
+      {% if p.registrado %}<p class="cg-pc-x">O placar acima é o que a Mesa anunciou. No registro do voto de cada um aparecem {{ p.registrado.sim|num }} Sim e {{ p.registrado.nao|num }} Não: os partidos e os nomes abaixo vêm desse registro.</p>{% endif %}
+      <p class="cg-pc-l">A barra são as {{ p.cadeiras }} cadeiras {{ "da Câmara" if casa.id == "cd" else "do Senado" }}: o Sim cresce da esquerda; o Não{% if p.obstrucao %} e a obstrução (em contorno){% endif %}, da direita. O vão do meio é quem não votou Sim nem Não.</p>
+      {% else %}
+      <p class="cg-pc-x cg-pc-sec">{% if p.secreta %}<b>Votação secreta.</b> {% if p.votaram %}{{ p.votaram|num }} {{ "deputados" if casa.id == "cd" else "senadores" }} votaram; o{% else %}O{% endif %} registro não traz o placar nem diz como cada um votou.{% else %}O registro não traz o voto de cada um nesta votação.{% endif %}</p>
+      {% endif %}
+    </div>
+    {% if v.governo or v.esquerda or v.direita or v.partidos %}
+    <div class="cg-vo-b cg-ld">
+      <h6 class="cg-vo-h">De que lado ficaram</h6>
+      <ul class="cg-ld-l">
+        <li><span class="cg-ld-k">Governo</span>{% if v.governo %}<b class="cg-ld-v"><i class="cg-pv cg-pv-{{ "s" if v.governo == "Sim" else "n" }}" aria-hidden="true"></i>{{ v.governo }}</b>{% else %}<b class="cg-ld-v cg-ld-0">sem orientação Sim ou Não no registro</b>{% endif %}</li>
+        {% if v.partidos %}
+        <li><span class="cg-ld-k"><i class="cg-ld-p cg-e3" aria-hidden="true"></i>Esquerda</span>{% if v.esquerda %}<b class="cg-ld-v"><i class="cg-pv cg-pv-{{ "s" if v.esquerda == "Sim" else "n" }}" aria-hidden="true"></i>{{ v.esquerda }}</b>{% else %}<b class="cg-ld-v cg-ld-0">sem maioria clara</b>{% endif %}</li>
+        <li><span class="cg-ld-k"><i class="cg-ld-p cg-d3" aria-hidden="true"></i>Direita</span>{% if v.direita %}<b class="cg-ld-v"><i class="cg-pv cg-pv-{{ "s" if v.direita == "Sim" else "n" }}" aria-hidden="true"></i>{{ v.direita }}</b>{% else %}<b class="cg-ld-v cg-ld-0">sem maioria clara</b>{% endif %}</li>
+        {% endif %}
+      </ul>
+      {% if v.divisiva %}<p class="cg-vo-s"><span class="cg-div">dividiu os polos</span> Esquerda ({{ c.polos.esquerda }}) e direita ({{ c.polos.direita }}) votaram em lados opostos.</p>{% elif v.racha %}<p class="cg-vo-s"><span class="cg-div cg-div-r">racha</span> {{ v.racha|join(", ") }}: um partido de um polo votou com o outro.</p>{% elif v.juntos %}<p class="cg-vo-s"><span class="cg-div cg-div-j">os polos votaram juntos</span> A maioria da esquerda e a da direita ficaram do mesmo lado.</p>{% endif %}
+    </div>
+    {% endif %}
+    {% if v.partidos %}
+    <div class="cg-vo-b cg-pa">
+      <h6 class="cg-vo-h">Os partidos <span>o lado da maioria de cada um; a porcentagem diz quanto do partido votou assim</span></h6>
+      {% if v.partidos_sim %}<p class="cg-pa-l"><span class="cg-pa-k"><i class="cg-pv cg-pv-s" aria-hidden="true"></i>Sim</span>{% for x in v.partidos_sim %}<span class="cg-pb cg-pb-s" title="{{ x.sigla }}: {{ x.coesao }}% votaram Sim ({{ x.votos }} votos)">{{ x.sigla }}{% if x.coesao < 100 %} <i>{{ x.coesao }}%</i>{% endif %}</span>{% endfor %}</p>{% endif %}
+      {% if v.partidos_nao %}<p class="cg-pa-l"><span class="cg-pa-k"><i class="cg-pv cg-pv-n" aria-hidden="true"></i>Não</span>{% for x in v.partidos_nao %}<span class="cg-pb cg-pb-n" title="{{ x.sigla }}: {{ x.coesao }}% votaram Não ({{ x.votos }} votos)">{{ x.sigla }}{% if x.coesao < 100 %} <i>{{ x.coesao }}%</i>{% endif %}</span>{% endfor %}</p>{% endif %}
+    </div>
+    <div class="cg-vo-b cg-sl">
+      <h6 class="cg-vo-h">Quem saiu da linha <span>votou diferente do próprio partido, onde {{ f.fechado }}% ou mais dele votaram do mesmo lado</span></h6>
+      {% if v.dissidentes %}
+      <details class="cg-sl-d"{% if v.fora_da_linha <= 8 %} open{% endif %}>
+        <summary><b>{{ v.fora_da_linha }}</b> {{ "votou" if v.fora_da_linha == 1 else "votaram" }} diferente do próprio partido</summary>
+        <ul>{% for g in v.dissidentes %}<li><b>{{ g.sigla }}</b> <small>a maioria votou {{ g.lado }}</small> {% for n in g.nomes %}{{ pessoa(n.k, n.nome) }}{% if not loop.last %}, {% endif %}{% endfor %}{% if g.mais %} e mais {{ g.mais }}{% endif %}</li>{% endfor %}</ul>
+      </details>
+      {% else %}
+      <p class="cg-vo-s">Ninguém: nos partidos que votaram fechados, todos acompanharam a maioria.</p>
+      {% endif %}
+      {% if v.divididos %}<p class="cg-vo-s">Partidos divididos (menos de {{ f.fechado }}% do mesmo lado: aqui não há linha de que sair): {% for x in v.divididos %}<b>{{ x.sigla }}</b> {{ x.coesao }}% {{ x.lado }}{% if not loop.last %} · {% endif %}{% endfor %}.</p>{% endif %}
+    </div>
+    {% endif %}
+    {% if f.chave or v.um_a_um %}
+    <p class="cg-vo-l" data-com-script hidden>{% if f.chave %}<a href="#m={{ f.chave }}" data-m="{{ f.chave }}">Ficha completa da matéria&nbsp;→</a>{% endif %}{% if v.um_a_um %}<a href="{{ v.um_a_um }}">Ver quem votou, um a um&nbsp;→</a>{% endif %}</p>
+    {% endif %}
+  </section>
+  {%- endmacro %}
   <section class="az-sec cg-vista" data-vista="votacoes" aria-labelledby="cg-plenario-h">
     <header class="az-lh" id="cg-plenario">
       <p class="az-ln">Votações e matérias</p>
       <h3 class="az-lt" id="cg-plenario-h">O que foi votado, e quem saiu da linha</h3>
-      <p class="az-ld">Procure qualquer matéria votada nominalmente no Plenário nesta legislatura e abra a ficha dela. Abaixo, as últimas votações de cada Casa: o que era, como ficou, de que lado estavam o governo e os polos e, em cada partido que votou fechado, quem votou diferente.</p>
+      <p class="az-ld">Cada folha é uma matéria: o que ela é, nas palavras do registro oficial, e o carimbo com o que o Plenário decidiu. Ao lado da folha, o placar, de que lado ficaram o governo e os polos, e quem votou diferente do próprio partido.</p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
       <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.ultimas %}
+      <div class="cg-me" id="cg-mesa-{{ casa.id }}" data-mesa="{{ casa.id }}">
+        <div class="cg-me-t">
+          <h4 class="az-h cg-vs-h">As últimas matérias votadas <span>as {{ casa.ultimas|length }} que foram a voto nominal no Plenário por último, da mais recente</span></h4>
+        </div>
+        <nav class="cg-mi-n" aria-label="As últimas matérias votadas: {{ casa.curto }}">
+          <ol class="cg-mi-l">
+            {% for f in casa.ultimas %}
+            <li><a class="cg-mi{% if f.tema %} cg-t-{{ f.tema }}{% endif %}" href="#{{ f.id }}" data-folha="{{ f.id }}"><b>{{ f.titulo or "Votação" }}</b><span class="cg-mi-t">{{ f.temas[0].nome if f.temas else "sem tema" }}</span>{% if f.capa.carimbo %}<em class="cg-mi-r cg-mi-{{ f.capa.carimbo.classe }}">{{ f.capa.carimbo.palavra|lower }}{% if f.capa.objeto != "texto" %} {{ f.capa.carimbo.que }}{% endif %}</em>{% endif %}<time datetime="{{ f.capa.data_iso }}">{{ f.capa.data }}</time></a></li>
+            {% endfor %}
+          </ol>
+        </nav>
+        <ol class="cg-me-l" id="cg-votacoes-{{ casa.id }}">
+          {% for f in casa.ultimas %}
+          <li class="cg-me-i" id="{{ f.id }}" data-chave="{{ f.chave }}" data-temas="{{ f.temas_ids }}">
+            <div class="cg-me-g">
+              <div class="cg-me-f">
+                {{ cg_folha(f, casa) }}
+              </div>
+              <div class="cg-me-d">
+                {% if f.votos|length > 1 %}
+                <nav class="cg-vo-n" aria-label="As votações de {{ f.titulo }}">
+                  <span class="cg-vo-nk">{{ f.votos|length }} votações{% if f.outras %} de {{ f.n }}{% endif %}:</span>
+                  {% for v in f.votos %}<a class="cg-vo-c" href="#{{ v.ancora }}" data-vt="{{ v.id }}">{{ v.rotulo }} <small>{{ v.quando }}</small></a>{% endfor %}
+                </nav>
+                {% endif %}
+                {% for v in f.votos %}{{ cg_dados(v, f, casa) }}{% endfor %}
+                {% if f.outras %}<p class="cg-vo-s cg-vo-o">As outras {{ f.outras }} votações desta matéria estão na ficha completa{% if f.url %} e na <a href="{{ f.url }}" target="_blank" rel="noopener noreferrer">página oficial&nbsp;↗</a>{% endif %}.</p>{% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        <details class="cg-gl">
+          <summary>As palavras desta página</summary>
+          <dl>
+            <div><dt>Texto principal</dt><dd>O conjunto da matéria que vai a voto. Muitas vezes é o substitutivo: a versão reescrita pelo relator.</dd></div>
+            <div><dt>Parecer</dt><dd>A opinião escrita do relator sobre a matéria, com o voto que ele recomenda. O Plenário vota “nos termos do parecer”.</dd></div>
+            <div><dt>Destaque</dt><dd>Pedido para votar um trecho ou uma emenda em separado do resto do texto.</dd></div>
+            <div><dt>Emenda</dt><dd>Proposta de mudar um ponto do texto.</dd></div>
+            <div><dt>Urgência</dt><dd>Pedido para a matéria ser votada logo no Plenário, sem esperar as comissões.</dd></div>
+            <div><dt>Obstrução</dt><dd>A bancada declara que não vota, para tentar que falte o número mínimo de presentes e a votação não valha. Fica fora do Sim e do Não.</dd></div>
+            <div><dt>Quórum</dt><dd>O número de votos Sim que a Constituição exige: três quintos da Casa para mudar a Constituição (PEC); mais da metade da Casa para lei complementar (PLP). Nas outras matérias decide a maioria de quem votou.</dd></div>
+            <div><dt>Votação nominal</dt><dd>A que registra o voto de cada um. A maioria das votações é simbólica e não deixa esse registro: não aparece aqui.</dd></div>
+          </dl>
+        </details>
+      </div>
+      {% else %}
+      <p class="term-note">Sem votações nominais de Plenário nesta atualização.</p>
+      {% endif %}
       <div class="az-blk cg-mb" id="cg-materias-{{ casa.id }}" data-materias="{{ casa.id }}" hidden>
-        <h4 class="az-h">As matérias votadas <span>todas as que tiveram votação nominal no Plenário nesta legislatura: ache pelo nome, pelo apelido ou pelo assunto</span></h4>
+        <h4 class="az-h">Procurar outra matéria <span>todas as que tiveram votação nominal no Plenário nesta legislatura, cada uma numa folha pequena</span></h4>
         <div class="cg-mb-f">
           <label class="sr-only" for="cgMbQ-{{ casa.id }}">Procurar matéria</label>
           <input class="az-fil-in" id="cgMbQ-{{ casa.id }}" type="search" autocomplete="off" spellcheck="false" placeholder="Procurar: licenciamento, imposto, PL 2159, escala 6x1…">
-          <label class="sr-only" for="cgMbT-{{ casa.id }}">Tema</label>
-          <select class="cg-fx-s" id="cgMbT-{{ casa.id }}"><option value="">Todos os temas</option></select>
           <label class="az-fil-ck"><input type="checkbox" id="cgMbD-{{ casa.id }}"> só as que dividiram esquerda e direita</label>
           <span class="az-fil-n" role="status"></span>
         </div>
-        <ol class="cg-mb-l"></ol>
-        <p class="az-dek">Clique numa matéria para abrir a ficha: o que ela é e muda (a ementa e a explicação oficiais), quem propôs, e cada votação com o lado de cada polo e a contagem de cada partido.</p>
+        <div class="cg-lg" role="group" aria-label="Filtrar por tema"></div>
+        <p class="cg-mb-v">As mais recentes estão nas folhas acima. Para ver outras, escreva uma palavra ou escolha um tema: cada cor é um tema, e o nome vai sempre escrito.</p>
+        <ol class="cg-mb-l cg-fp-g"></ol>
+        <p class="az-dek cg-mb-k">A cor da aba é o tema da matéria (o nome vai sempre escrito); o carimbo é o resultado da votação da capa; a pilha, quantas votações nominais ela teve. Clique numa folha para abrir a ficha completa: a ementa e a explicação oficiais, quem propôs e cada votação, com a contagem de cada partido.</p>
       </div>
-      <h4 class="az-h cg-vs-h">As últimas votações <span>com quem votou diferente do próprio partido</span></h4>
-      <ol class="cg-vs" id="cg-votacoes-{{ casa.id }}">
-        {% for v in casa.ultimas %}
-        <li class="cg-v">
-          <div class="cg-v-h">
-            <p class="cg-v-k"><time>{{ v.data }}{% if v.hora %} · {{ v.hora }}{% endif %}</time><span class="az-selo">{{ v.tipo }}</span>{% if v.resultado %}<span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}{% if v.racha %}<span class="cg-div cg-div-r">racha: {{ v.racha|join(", ") }}</span>{% endif %}{% if v.divisiva %}<span class="cg-div">dividiu os polos</span>{% endif %}</p>
-            <h5 class="cg-v-t">{% if v.prop %}<b>{{ materia(casa.id, v.prop) }}</b> {% endif %}{% if v.apelido %}<span class="cg-apel">{{ v.apelido }}</span> {% endif %}{{ v.descricao }}</h5>
-            {% if v.ementa %}<p class="cg-v-e">{{ v.ementa }}</p>{% endif %}
-          </div>
-          <div class="cg-v-p">
-            {% if v.secreta %}
-            <p class="cg-v-n">Votação secreta: {{ v.sim }} Sim, {{ v.nao }} Não.</p>
-            {% else %}
-            <p class="cg-v-n"><b class="cg-s">{{ v.sim }}</b> Sim <span aria-hidden="true">×</span> <b class="cg-n">{{ v.nao }}</b> Não{% if v.obstrucao %} · {{ v.obstrucao }} em obstrução{% endif %}{% if v.abstencao %} · {{ v.abstencao }} abst.{% endif %}{% if v.quorum %} · precisava de {{ v.quorum }} Sim{% endif %}</p>
-            <p class="cg-v-o">Governo: <b>{{ v.governo or "—" }}</b> · Esquerda: <b>{{ v.esquerda or "—" }}</b> · Direita: <b>{{ v.direita or "—" }}</b></p>
-            {% endif %}
-          </div>
-          {% if v.partidos %}
-          <p class="cg-v-b">{% for p in v.partidos %}<span class="cg-pb cg-pb-{{ p.classe }}" title="{{ p.sigla }}: {{ p.coesao }}% votaram {{ p.lado }} ({{ p.votos }} votos)">{{ p.sigla }} <b>{{ p.lado }}</b>{% if p.coesao < 100 %} <i>{{ p.coesao }}%</i>{% endif %}</span>{% endfor %}</p>
-          {% endif %}
-          {% if v.dissidentes %}
-          <details class="cg-v-d">
-            <summary>Quem votou diferente do próprio partido</summary>
-            <ul>{% for g in v.dissidentes %}<li><b>{{ g.sigla }}</b> (a maioria votou {{ g.lado }}): {% for n in g.nomes %}{{ pessoa(n.k, n.nome) }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% endfor %}</ul>
-          </details>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ol>
       {% if casa.comissoes %}{% set cm = casa.comissoes %}
-      <div class="az-blk" id="cg-comissoes-{{ casa.id }}">
-        <h4 class="az-h">Nas comissões <span>as votações nominais, em que cada voto fica registrado</span></h4>
+      <details class="az-blk cg-cm-d" id="cg-comissoes-{{ casa.id }}">
+        <summary><span class="cg-cm-s">Nas comissões</span> <span class="cg-cm-n">{{ cm.votacoes }} votações nominais nesta legislatura; {{ cm.divididas }} com votos dos dois lados</span></summary>
         <p class="az-ph">Nesta legislatura, <b>{{ cm.votacoes }}</b> votações nominais nas comissões {{ "da Câmara" if casa.id == "cd" else "do Senado" }}; {{ cm.conteudo }} sobre o conteúdo (as demais são requerimentos de pauta) e <b>{{ cm.divididas }}</b> com votos dos dois lados. A maioria das decisões das comissões é simbólica e não registra quem votou o quê.{% if cm.por_comissao %} Por comissão: {{ cm.por_comissao|join(" · ") }}.{% endif %}</p>
         {% if cm.casos %}
         <h5 class="az-h5">Mudou de voto entre a comissão e o Plenário</h5>
-        <p class="cg-lt-d">O mesmo parecer votado duas vezes: na comissão e, depois, no Plenário. Entra a última votação da comissão que aprovou o parecer (é ele que o Plenário vota) e quem votou Sim ou Não nas duas.</p>
+        <p class="cg-lt-d">O mesmo parecer (a opinião escrita do relator, com o voto que ele recomenda) votado duas vezes: na comissão e, depois, no Plenário. Entra a última votação da comissão que aprovou o parecer (é ele que o Plenário vota) e quem votou Sim ou Não nas duas.</p>
         <ol class="cg-ls cg-cm-c">{% for c in cm.casos %}<li><p class="cg-ls-k"><b>{{ materia(casa.id, c.prop) }}</b> <span>{{ c.comissao }} em {{ c.dc }} · Plenário em {{ c.dp }}{% if c.parecer %} · parecer {{ c.parecer }}{% endif %}</span></p><p class="cg-ls-x">{{ c.mudaram }} de {{ c.ambas }} que votaram nas duas mudaram: {% for m in c.quem %}{{ pessoa(m.k, m.nome) }} <small>{{ m.legenda }}</small> ({{ m.vc }} → {{ m.vp }}){% if not loop.last %}; {% endif %}{% endfor %}.</p></li>{% endfor %}</ol>
         {% if cm.casos_sem %}<p class="az-dek">{% if cm.casos_sem == 1 %}Em outro parecer votado nas duas, ninguém mudou de voto.{% else %}Em outros {{ cm.casos_sem }} pareceres votados nas duas, ninguém mudou de voto.{% endif %}</p>{% endif %}
         {% endif %}
@@ -524,7 +650,7 @@
         <ol class="cg-ls cg-cm-u">{% for v in cm.ultimas %}<li><p class="cg-ls-k">{% if v.prop %}<b>{{ v.prop }}</b> {% endif %}<span>{{ v.comissao }} · {{ v.data }}{% if v.parecer %} · parecer {{ v.parecer }}{% endif %} · {{ v.sim }} Sim × {{ v.nao }} Não{% if v.abst %} · {{ v.abst }} abst.{% endif %}</span>{% if v.resultado %} <span class="cg-res cg-res-{{ v.classe }}">{{ v.resultado }}</span>{% endif %}</p><p class="cg-ls-x">{{ v.x }}</p></li>{% endfor %}</ol>
         {% endif %}
         <p class="az-dek">{% if casa.id == "cd" %}Na Câmara, a votação nominal da comissão é sobre o parecer do relator: Sim é aprovar o parecer, que pode concluir pela rejeição do projeto (a conclusão aparece ao lado, quando o registro a traz). Só aparece quem votou: os dados abertos não registram ausência nem obstrução nas comissões.{% else %}No Senado, o registro não diz se o item era terminativo nem o resultado: a página mostra a descrição oficial e o placar, sem dizer o que o Sim queria dizer.{% endif %}</p>
-      </div>
+      </details>
       {% endif %}
     </div>
     {% endfor %}

@@ -1516,6 +1516,8 @@ def atualizar(
             fichas={pid: c.chave for pid, c in cadastros[casa].items()},
             detalhe=detalhe,
         )
+        # As folhas da aba "Votações e matérias": as matérias votadas por último, cada uma como documento.
+        paineis[casa]["folhas"] = materias.folhas(votos[casa], regras, legislatura.numero, fichas_das_materias[casa].get("materias") or {}, nomes_casa)
 
     # O saldo pesado pela relevância da matéria (a nota das fichas das matérias).
     for casa in ("cd", "sf"):
