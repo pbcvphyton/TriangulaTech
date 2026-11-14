@@ -97,11 +97,14 @@
       m.r.forEach(function (r) {
         var col = vt ? colunaDe(vt, r.id) : null, c = { S: 0, N: 0, O: 0, A: 0, P: 0, E: 0 };
         var v = { r: r, i: V.length, M: m, col: col == null ? -1 : col, por: null };
-        /* O placar é a contagem dos votos registrados (a obstrução à parte, como no texto oficial). */
+        /* O placar é a contagem dos votos registrados (a obstrução à parte, como no texto oficial);
+           sem o arquivo dos votos, vale o placar da ficha da matéria (n = Não, o = obstrução). */
         if (v.col >= 0) chaves.forEach(function (k) { var x = vt.votos[k].charAt(v.col); if (c[x] != null) c[x] += 1; });
         v.s = v.col >= 0 ? c.S : (r.s || 0);
         v.n = v.col >= 0 ? c.N : (r.n || 0);
-        v.o = c.O; v.a = v.col >= 0 ? c.A : (r.a || 0); v.pe = c.P + c.E;
+        v.o = v.col >= 0 ? c.O : (r.o || 0);
+        v.a = v.col >= 0 ? c.A : (r.a || 0);
+        v.pe = c.P + c.E;
         v.reg = c.S + c.N + c.O + c.A + c.P + c.E;
         v.lado = r.apv == null || !r.e ? '' : ((r.apv ? 'S' : 'N') === r.e ? 'e' : 'd');  // de que polo era o lado que prevaleceu
         v.gperdeu = !!r.g && r.apv != null && ((r.g === 'S') !== !!r.apv);
@@ -123,7 +126,9 @@
         if (p === 'S' || p === 'N') { if (p === v.r.dr) dir += 1; else if (p === v.r.e) esq += 1; }
       });
       if (!algum) return;
-      var p = pessoaDe(k), n = dir + esq, s = n >= 5 ? Math.round(100 * (dir - esq) / n) : null;
+      /* Arredonda como o resto da página (o meio vai para o par), para o número ser o mesmo dos outros quadros. */
+      var p = pessoaDe(k), n = dir + esq, bruto = 100 * (dir - esq) / (n || 1);
+      var s = n < 5 ? null : (Math.abs(bruto % 1) === 0.5 ? 2 * Math.round(bruto / 2) : Math.round(bruto));
       G[k] = { k: k, nome: p.nome, uf: p.uf, partido: p.partido, fora: p.fora, s: s, n: n, cls: s == null ? 'na' : classe(s) };
       todos.push(k);
     });
@@ -396,6 +401,9 @@
       if (v.a) outras.push(plural(v.a, 'abstenção', 'abstenções'));
       if (v.pe) outras.push(plural(v.pe, 'presente sem voto', 'presentes sem voto'));
       if (semReg > 0) outras.push(num(semReg) + ' sem registro (ausentes ou fora do exercício)');
+      /* O texto oficial costuma trazer o placar: se ele não bate com os votos registrados um a um, a tela diz. */
+      var simX = /Sim:\s*(\d+)/i.exec(r.x || ''), naoX = /N[ãa]o:\s*(\d+)/i.exec(r.x || '');
+      var difere = v.col >= 0 && simX && naoX && (parseInt(simX[1], 10) !== v.s || parseInt(naoX[1], 10) !== v.n);
       nos.push(h('div', { cls: 'cg-tv-pl' }, [
         h('p', { cls: 'cg-tv-pl-n' }, [h('span', {}, [h('b', { text: num(v.s) }), ' Sim']), h('span', {}, ['Não ', h('b', { text: num(v.n) })])]),
         h('div', { cls: 'cg-tv-pl-b', role: 'img', 'aria-label': placarDe(v, ', ') + (v.o ? ', ' + num(v.o) + ' em obstrução' : '') + ', de ' + cadeiras + ' cadeiras' }, [
@@ -403,7 +411,8 @@
         ]),
         h('p', { cls: 'cg-tv-pl-x' }, [
           q ? h('b', { text: 'Traço laranja: ' + q[0] + ' Sim para ' + (r.ss === 'trecho' ? 'manter o trecho' : r.ss === 'emenda' ? 'aprovar a emenda' : 'aprovar') + ' (' + q[1] + '). ' }) : null,
-          v.col >= 0 ? 'A barra são as ' + cadeiras + ' cadeiras.' + (outras.length ? ' Fora do Sim e do Não: ' + outras.join(', ') + '.' : '') : 'A barra são as ' + cadeiras + ' cadeiras.'
+          'A barra são as ' + cadeiras + ' cadeiras.' + (v.col >= 0 && outras.length ? ' Fora do Sim e do Não: ' + outras.join(', ') + '.' : ''),
+          difere ? h('b', { text: ' O texto oficial diz ' + simX[1] + ' Sim e ' + naoX[1] + ' Não; os votos registrados um a um somam ' + placarDe(v, ' e ') + '.' }) : null
         ])
       ]));
       esvaziar(card);
@@ -592,7 +601,7 @@
           h('span', { text: ' · ' + VOTO_NO_TEMA[votoDe(k, v)] + (v.contra[k] ? ', contra o partido' : '') })
         ];
         if (o) linhas.push(h('br'), h('span', { cls: 'cg-tv-mn', text: pt + ': ' + o.S.length + ' Sim × ' + (o.N.length + o.O.length) + ' Não' }));
-        linhas.push(h('br'), g.s == null ? 'Poucas votações no tema para ter saldo' : 'No tema: saldo ' + saldo(g.s) + ' em ' + num(g.n), h('br'), como + ': abre o dossiê');
+        linhas.push(h('br'), g.s == null ? 'Poucas votações no tema para ter saldo' : 'No tema: saldo ' + saldo(g.s) + ' em ' + plural(g.n, 'votação', 'votações'), h('br'), como + ': abre o dossiê');
         return [retratoDe(casa, k, g.nome), h('span', {}, linhas)];
       }, x, y);
     }
@@ -716,7 +725,19 @@
       montarCartao(v);
       if (!semMovimento) { card.classList.remove('cg-tv-vira'); void card.offsetWidth; card.classList.add('cg-tv-vira'); }
       montarPlenario(v);
+      ajustarCartao();
       if (comEndereco) endereco();
+    }
+    /* O cartão não deve passar da altura do plenário (o bloco tem de caber em mais ou menos uma tela):
+       se passar, a ementa cede linhas, de 6 até 3. O texto inteiro está na ficha da matéria. */
+    function ajustarCartao() {
+      var em = card.querySelector('.cg-tv-c-e');
+      card.style.removeProperty('--cg-tv-em');
+      if (!em || w.innerWidth <= 1000 || nomes.hidden || !pn.offsetParent || !cw.offsetParent) return;  // uma coluna só: cada face tem a sua altura
+      var sobra = pn.getBoundingClientRect().bottom - nomes.getBoundingClientRect().bottom;  // quanto o cartão passa do plenário
+      var linha = parseFloat(w.getComputedStyle(em).lineHeight) || 24.5, usadas = Math.round(em.getBoundingClientRect().height / linha);
+      var demais = Math.floor(sobra / linha);  // só linhas inteiras: o cartão nunca fica menor que o plenário
+      if (demais >= 1 && usadas > 3) card.style.setProperty('--cg-tv-em', String(Math.max(3, usadas - demais)));
     }
     /* O endereço guarda o tema, a matéria, a votação e quem se segue, para a tela poder ser enviada. */
     function endereco() {
@@ -764,10 +785,11 @@
     mostrarVotacao(inicial, false);
     if (pedido && pedido.s && G[pedido.s]) seguir(pedido.s, true);
     anotar();
+    ajustarCartao();
     if (!pedido) endereco();  // o tema foi escolhido na página: o endereço passa a dizer o que está na tela
     /* A fita e os pontos se refazem quando a largura muda (ou quando a Casa ou a aba voltam a aparecer). */
     var espera = 0, vigia = null;
-    function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); medir(); }, 80); }
+    function remedir() { w.clearTimeout(espera); espera = w.setTimeout(function () { if (cols.isConnected === false) return; anotar(); ajustarCartao(); medir(); }, 80); }
     if (w.ResizeObserver) { vigia = new w.ResizeObserver(remedir); vigia.observe(cols); vigia.observe(plot); }
     w.addEventListener('resize', remedir);
     temaMontado[casa] = {
