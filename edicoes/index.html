@@ -895,8 +895,15 @@ body.modal-open .btt{visibility:hidden}
 .mcg-f{margin-top:8px;padding-top:9px;border-top:1px solid var(--rl);font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
 .mcg-f a{font-weight:700;color:var(--link);white-space:nowrap}
 .mcg-f a:hover{text-decoration:underline}
+/* No celular, o Congresso é o único botão com o nome (sem ele, o ícone sozinho não
+   se acha): Buscar e Escuro ficam só com o ícone, e o Edições também abaixo de 350 px.
+   O nome some só da tela (o leitor de tela continua a lê-lo). */
 @media (max-width:480px){
-  .tool.tool-cg span,.tool.tool-an span{display:none}
+  .tool.tool-an span{display:none}
+  .mast-tools a[href$="pesquisa.html"] span,#dmBtn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@media (max-width:350px){
+  .mast-tools a[title="Edições anteriores"] span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
 
 /* ── Computador (a partir de 1024 px): primeira página no desenho de jornal ──
@@ -1390,6 +1397,7 @@ body.modal-open .btt{visibility:hidden}
   </div>
   <h3 class="arch-m">Novembro de 2026</h3>
   <ol class="arch-list">
+    <li><a href="2026-11-14.html"><time datetime="2026-11-14">Sábado, 14 de novembro de 2026</time><span class="arch-t">Governo acelera tramitação do pacote fiscal de até R$ 60 bilhões em meio a resistências</span></a><span class="badge" title="Edição gerada por IA">IA</span></li>
     <li><a href="2026-11-13.html"><time datetime="2026-11-13">Sexta-feira, 13 de novembro de 2026</time><span class="arch-t">Senado aprova texto-base de pacote fiscal e gera forte reação de entidades</span></a><span class="badge" title="Edição gerada por IA">IA</span></li>
     <li><a href="2026-11-12.html"><time datetime="2026-11-12">Quinta-feira, 12 de novembro de 2026</time><span class="arch-t">Governo envia ao Congresso pacote de ajuste fiscal com impacto de até R$ 60 bilhões em 2027</span></a><span class="badge" title="Edição gerada por IA">IA</span></li>
     <li><a href="2026-11-11.html"><time datetime="2026-11-11">Quarta-feira, 11 de novembro de 2026</time><span class="arch-t">Anthropic inicia roadshow de IPO com avaliação de US$ 1,4 trilhão</span></a><span class="badge" title="Edição gerada por IA">IA</span></li>
@@ -1446,7 +1454,7 @@ body.modal-open .btt{visibility:hidden}
 </section>
 </main>
 <footer class="ft">
-  <p><strong>Triangula</strong> · 46 edições no arquivo</p>
+  <p><strong>Triangula</strong> · 47 edições no arquivo</p>
   <p class="ft-links"><a href="../">Edição mais recente</a> · <a href="https://github.com/pbcvphyton/TriangulaTech" rel="noopener">Código-fonte</a></p>
 </footer>
 </div>
