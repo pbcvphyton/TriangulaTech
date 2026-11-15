@@ -1,0 +1,2536 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-15",
+ "analises": [
+  {
+   "id": "ae247b14f52e",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/15/agenda-de-politica-senado-deve-concluir-analise-do-projeto-do-governo-com-medidas-de-ajuste-fiscal.ghtml",
+   "titulo": "Agenda de política: Senado deve concluir análise do projeto do governo com medidas de ajuste fiscal",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-conclui-nesta-semana-a-votacao-de-destaqu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Texto traz a agenda institucional e legislativa da semana dos Três Poderes, focando em votações de ajuste fiscal, regulação e decisões de tribunais superiores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1101,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Votação pendente de destaques fiscais e temas legislativos e judiciais cruciais na semana.",
+    "causa": "Prazos orçamentários e calendário do Congresso e do Judiciário para o encerramento do ano.",
+    "vitima": "nenhum",
+    "culpado": "nenhum",
+    "solucao": "Deliberação dos projetos pelas comissões e plenários do Congresso e julgamentos pelos tribunais.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Por se tratar de um guia factual de agenda legislativa e judiciária, o texto manteria a mesma estrutura e tom informativo independentemente de quem estivesse no governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Congresso Nacional",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro das Relações Institucionais, José Guimarães",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "meta de superávit primário de 0,5% do PIB em 2027",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Menciona a meta oficial de superávit com base temporal e percentual claros, sem distorção.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9b8f8183e8a8",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/governo-lanca-ofensiva-para-aprovar-na-camara-regulacao-de-big-techs.shtml",
+   "titulo": "Governo lança ofensiva para aprovar na Câmara regulação de big techs",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-prepara-votacao-do-pl-das-big-techs-sob-o",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de disputa política e regulatória sobre o projeto de lei de concorrência em mercados digitais envolvendo o governo Lula e a oposição bolsonarista."
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1021,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.45,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -2.45,
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Polarização e embate legislativo em torno da regulação concorrencial de grandes empresas de tecnologia.",
+    "causa": "Divergência entre defensores da ampliação do poder regulatório prévio do Cade e opositores que apontam risco de censura ou intervenção excessiva.",
+    "vitima": "Mercado digital e usuários, disputados entre alegações de práticas anticompetitivas ou risco de aumento de custos e perda de inovação.",
+    "culpado": "Práticas anticompetitivas das big techs para os defensores da regulação; ativismo intervencionista do governo para a oposição.",
+    "solucao": "Aprovação do PL 4.675/2025 ou sua rejeição/modificação para evitar excesso regulatório.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "Se o governo fosse de direita propondo a medida e a esquerda alegasse censura, a reportagem provavelmente manteria o confronto de fontes técnicas e políticas, mas talvez ajustasse a formulação sobre 'desmontar discurso'.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Aliel Machado",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Bancada bolsonarista / Oposição",
+     "campo": "direita"
+    },
+    {
+     "nome": "Setor empresarial de tecnologia e comércio",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Mário Frias (PL-SP)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rafael Zanatta, diretor-executivo da Data Privacy Brasil",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "relator do texto, deputado Aliel Machado (PV-PR)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputada Any Ortiz (PP-RS)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": false
+    },
+    {
+     "rotulo": "Igor Luna, consultor jurídico da Câmara Brasileira da Economia Digital (camara-e.net)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 54,
+     "ultima": false
+    },
+    {
+     "rotulo": "Nicolo Zingales, professor da FGV Direito do Rio",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 40,
+    "direita": 114
+   },
+   "falas": 9,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "É preciso provar que essas empresas realmente têm ação predatória no mercado, o simples fato de elas serem grandes não deveria permitir ao Cade fazer exigências",
+     "paragrafo": "P19",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta a fundamentação técnica e jurídica dos opositores ao projeto, equilibrando com os argumentos governistas de P2 e P16.",
+     "intensidade": 1,
+     "certeza": 0.85,
+     "eixo": "economico",
+     "favorece": "Setor empresarial de tecnologia e comércio"
+    },
+    {
+     "id": "E2",
+     "criterio": "ROTULOS",
+     "citacao": "para desmontar o discurso bolsonarista de que o projeto de regulação dos mercados digitais, o PL 4.675/2025, é censura",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -2.45,
+     "explicacao": "Assume na voz da redação a expressão 'desmontar o discurso' como objetivo legítimo da ação do governo contra a oposição.",
+     "intensidade": 1,
+     "certeza": 0.75,
+     "eixo": "instituicoes",
+     "favorece": "Governo Lula / Aliel Machado",
+     "desfavorece": "Bancada bolsonarista / Oposição",
+     "ressalva": "Pode ser interpretado como descrição factual do esforço de comunicação do Planalto."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e9632d581252",
+   "url": "https://www.infomoney.com.br/mundo/spacex-avanca-em-foguete-reutilizavel-com-primeira-captura-da-starship-entenda/",
+   "titulo": "SpaceX avança em “foguete reutilizável” com primeira captura da Starship; entenda",
+   "veiculo": "InfoMoney",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "spacex-captura-parte-superior-da-starship-com-br",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Texto sobre avanço tecnológico e teste aeroespacial da empresa SpaceX, sem controvérsia político-ideológica pública."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 644,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "nenhum",
+    "causa": "nenhum",
+    "vitima": "nenhum",
+    "culpado": "nenhum",
+    "solucao": "nenhum",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Não se aplica por não envolver polarização política.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "6760c4688d0d",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/15/lula-diz-que-buscou-novos-parceiros-em-vez-de-ficar-chorando-apos-tarifaco-dos-eua.ghtml",
+   "titulo": "Lula diz que buscou novos parceiros em vez de 'ficar chorando' após tarifaço dos EUA",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura das declarações do presidente Lula sobre comércio exterior frente às tarifas dos EUA, transição energética e política doméstica."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 63,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 544,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": 0.0,
+    "FONTES": -3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tarifas comerciais impostas pelos EUA ao comércio internacional.",
+    "causa": "Protecionismo dos EUA.",
+    "vitima": "Comércio exterior e economias emergentes.",
+    "culpado": "Governo americano.",
+    "solucao": "Ampliação de laços bilaterais com países asiáticos e multilateralismo.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Caso fosse um presidente de direita discursando no exterior contra barreiras comerciais de outro país, a cobertura de coletiva tenderia a adotar padrão similar de transcrição de declarações.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo dos Estados Unidos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Luiz Inácio Lula da Silva (PT)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 72,
+     "ultima": true
+    },
+    {
+     "rotulo": "ministro das Relações Exteriores, Mauro Vieira",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 72,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Lula diz que buscou novos parceiros em vez de 'ficar chorando' após tarifaço dos EUA",
+     "paragrafo": "P0",
+     "direcao": "esquerda",
+     "contribuicao": -3.14,
+     "explicacao": "O texto se limita a reproduzir as falas e a narrativa do presidente sem ouvir analistas de comércio exterior ou contraponto diplomático.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Luiz Inácio Lula da Silva",
+     "ressalva": "Trata-se de cobertura de entrevista coletiva presidencial em viagem oficial."
+    },
+    {
+     "id": "E2",
+     "criterio": "ROTULOS",
+     "citacao": "impedir o que chamou de \"volta do retrocesso\"",
+     "paragrafo": "P16",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A redação utiliza 'o que chamou de' e coloca entre aspas a expressão política 'volta do retrocesso', atribuindo-a estritamente à fala do ator.",
+     "intensidade": 1,
+     "certeza": 0.85,
+     "eixo": "instituicoes",
+     "favorece": "Luiz Inácio Lula da Silva"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f9cf5623f9e3",
+   "url": "https://www.seudinheiro.com/2026/economia/magazine-luiza-mglu3-vira-foguete-enquanto-csn-csna3-derrete-veja-o-que-rolou-no-ibovespa-davs/",
+   "titulo": "Magazine Luiza (MGLU3) vira foguete, enquanto CSN (CSNA3) despenca; veja o que rolou no Ibovespa na semana",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Resumo semanal do mercado financeiro que analisa os impactos do pacote fiscal do governo sobre os juros e a reação de analistas."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1054,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 3.14,
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incerteza fiscal e volatilidade nos mercados financeiros.",
+    "causa": "Medidas de ajuste consideradas insuficientes para os problemas estruturais do orçamento a longo prazo.",
+    "vitima": "Ativos do mercado de capitais e trajetória de queda da taxa de juros.",
+    "culpado": "Falta de ajuste estrutural e piora das expectativas inflacionárias.",
+    "solucao": "Ancoragem consistente das contas públicas para permitir a queda sustentável dos juros.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sendo um resumo setorial de mercado, as fontes consultadas seriam invariavelmente analistas financeiros e economistas de bancos, independentemente da orientação ideológica do governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Fazenda",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Mercado Financeiro / Analistas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "economista Fábio Serrano, do BTG Pactual",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rafael Dadoorian, cofundador e head de renda fixa da Convexa Investimentos",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 27
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "o mercado enxerga que o pacote não deve resolver os problemas estruturais do orçamento brasileiro",
+     "paragrafo": "P7",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "Expressa a avaliação cética do mercado financeiro sem trazer a resposta ou a defesa da equipe econômica sobre os impactos das medidas.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Mercado Financeiro / Analistas",
+     "desfavorece": "Governo Lula / Fazenda",
+     "ressalva": "Em resumos de fechamento de mercado, o foco costuma ser a repercussão entre investidores."
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "transformar um déficit primário de R$ 20 bilhões (0,14% do PIB) em um superávit de R$ 7,9 bilhões (0,05% do PIB)",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados quantitativos contextualizados com valores absolutos, proporção do PIB e fonte explicitada.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "19b721a9fcfd",
+   "url": "https://neofeed.com.br/finde/alerta-de-apagao-nos-escritorios-o-videogame-gta-vi-vem-ai/",
+   "titulo": "Alerta de “apagão” nos escritórios: o videogame GTA VI vem aí",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata do impacto do lançamento de um videogame (GTA VI) no ambiente de trabalho, produtividade e folgas de funcionários, tocando de forma branda nas relações de trabalho sem disputa partidária ou ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1385,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O risco de 'apagão' de produtividade nos escritórios devido ao lançamento mundial do videogame GTA VI.",
+    "causa": "O enorme apelo cultural do jogo e o desejo de trabalhadores de tirar folga ou faltar ao expediente para jogar.",
+    "vitima": "Empresas que perdem horas de trabalho e funcionários que enfrentam rigidez de horários.",
+    "culpado": "nenhum",
+    "solucao": "Flexibilização do trabalho, concessão de folgas remuneradas planejadas ou integração de atividades de lazer pelas empresas.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "Por se tratar de cobertura comportamental/cultural sobre o mercado de games e trabalho, uma troca de posições ideológicas não se aplica diretamente.",
+   "atores": [
+    {
+     "nome": "Trabalhadores e gamers",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Empresas e empregadores",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Hanneke Faber, CEO da Logitech",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 13,
+     "ultima": false
+    },
+    {
+     "rotulo": "Michel Jasper, fundador e CEO da startup",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": false
+    },
+    {
+     "rotulo": "Carlos Silva, professor de Game Business da ESPM e CEO da consultoria GoGamers",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 54,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 12,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "aumento médio de 13% nas solicitações de dispensa para 19 de novembro, ante as mesmas datas de 2024 e 2025",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dado quantitativo contextualizado com base amostral e período de comparação claro.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4c668d6d0a42",
+   "url": "https://www.cnnbrasil.com.br/politica/associacao-de-internet-aponta-falta-de-clareza-no-pl-das-big-techs/",
+   "titulo": "Associação de Internet aponta falta de clareza no PL das big techs",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-prepara-votacao-do-pl-das-big-techs-sob-o",
+   "origem": "materia",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Discute a regulação econômica de grandes plataformas digitais (big techs) no Congresso Nacional e poderes concorrenciais do Cade."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1032,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0,
+    "HIERARQUIA": 2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O debate sobre a regulação concorrencial de grandes empresas de tecnologia e a iminência de votação do PL na Câmara.",
+    "causa": "Concentração de mercado das big techs versus riscos de insegurança jurídica e excesso regulatório.",
+    "vitima": "Consumidores e concorrentes menores (segundo defensores do PL) ou o ambiente de inovação e investimentos (segundo as empresas).",
+    "culpado": "Regulação mal delineada (segundo a ALAI) ou condutas anticompetitivas das big techs (segundo os apoiadores).",
+    "solucao": "Mais debates e critérios claros antes da votação, ou aprovação ágil do PL para dotar o Cade de poderes preventivos.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Se o título desse destaque aos defensores da regulação, o texto ainda manteria equilíbrio substantivo, já que ambos os pontos de vista foram cobertos em detalhe.",
+   "atores": [
+    {
+     "nome": "ALAI e Big Techs",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo e Deputado Aliel Machado",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Entidades da sociedade civil e economistas pró-PL",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ALAI (Associação Latino-Americana de Internet)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "fontes do governo à CNN",
+     "campo": "centro_esquerda",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "22 economistas e professores",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "organizações e empresas em defesa da aprovação do texto",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HIERARQUIA",
+     "citacao": "Associação de Internet aponta falta de clareza no PL das big techs",
+     "paragrafo": "P0",
+     "direcao": "direita",
+     "contribuicao": 2.61,
+     "explicacao": "O título e a primeira metade do texto destacam a crítica das empresas de internet, embora o texto traga ampla seção em favor da proposta mais abaixo.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "ALAI e Big Techs",
+     "desfavorece": "Governo e Deputado Aliel Machado",
+     "ressalva": "A manifestação da ALAI era o fato novo noticioso, e a matéria dedica extenso bloco posterior para detalhar o PL e o apoio de economistas e sociedade civil."
+    },
+    {
+     "id": "E2",
+     "criterio": "FONTES",
+     "citacao": "Uma série de manifestações em defesa da aprovação do PL 4.675/2025 foi divulgada nesta sexta-feira (13)",
+     "paragrafo": "P19",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação equilibrada dos dois lados da disputa, conferindo espaço expressivo tanto aos críticos quanto aos defensores do projeto.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Entidades da sociedade civil e economistas pró-PL"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c2b4a2ad01f0",
+   "url": "https://www.poder360.com.br/poder-congresso/infracoes-no-inquerito-das-fake-news-nao-podem-ser-esquecidas-diz-amin/",
+   "titulo": "Infrações no inquérito das fake news não podem ser esquecidas, diz Amin",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "encerramento-do-inquerito-das-fake-news-no-stf-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de críticas de um senador ao encerramento e à condução do Inquérito das Fake News no STF pelo ministro Alexandre de Moraes."
+   },
+   "estado": "ok",
+   "T": 7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 79,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 351,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 6.67,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 6.67
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possíveis infrações e irregularidades cometidas ao longo do Inquérito das Fake News que não deveriam ser esquecidas com seu arquivamento.",
+    "causa": "Uso indevido do artigo 43 do regimento interno do STF e condução sem sorteio ou delimitação clara.",
+    "vitima": "O devido processo legal e o equilíbrio institucional.",
+    "culpado": "Ministro Alexandre de Moraes e STF.",
+    "solucao": "Investigação pelo Congresso, exame pela OAB e alteração do regimento interno para impedir novos inquéritos semelhantes.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se o discurso fosse de um senador governista elogiando o inquérito e criticando a oposição, a Agência Senado e a transcrição do Poder360 provavelmente manteriam o mesmo formato de registro unilateral da tribuna.",
+   "atores": [
+    {
+     "nome": "Esperidião Amin",
+     "campo": "direita"
+    },
+    {
+     "nome": "Alexandre de Moraes e STF",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "senador Esperidião Amin (PP-SC)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 29
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Em pronunciamento no Plenário na 3ª feira (10.nov.2026), o senador Esperidião Amin (PP-SC) comentou o encerramento do Inquérito",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 6.67,
+     "explicacao": "A matéria consiste no relato unilateral do discurso do senador da tribuna sem apresentar posicionamento da defesa de Moraes ou do STF.",
+     "intensidade": 2,
+     "certeza": 0.85,
+     "eixo": "instituicoes",
+     "favorece": "Esperidião Amin",
+     "desfavorece": "Alexandre de Moraes e STF",
+     "ressalva": "O texto é uma cobertura protocolar de discurso parlamentar, originalmente produzido pela Agência Senado, cujo escopo é relatar as falas do plenário."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9d4eeb99a1f2",
+   "url": "https://www.moneytimes.com.br/dividas-rurais-renegociacao-avanca-em-meio-a-crise-de-credito-e-a-pressao-sobre-o-banco-do-brasil-pads/",
+   "titulo": "Dívidas rurais: renegociação avança em meio à crise de crédito e à pressão sobre o Banco do Brasil",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "governo-aposta-em-renegociacao-de-dividas-do-cam",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Coluna de opinião com defesa explícita dos interesses do agronegócio e dos produtores rurais na renegociação de dívidas e crédito rural."
+   },
+   "estado": "ok",
+   "T": 22,
+   "rotulo": "Leve à direita",
+   "confianca": "media",
+   "motivos_confianca": [
+    "3 critérios concordantes em 2 famílias"
+   ],
+   "resumo": "Leve à direita (confiança média). Principais sinais: premissas de fundo (E3), rótulos e aspas (E2) e carga avaliativa (E1).",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 56,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1051,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 22.03,
+    "divergente": false
+   },
+   "por_eixo": {
+    "economico": 22.03
+   },
+   "criterios": {
+    "ROTULOS": 5.88,
+    "ADJETIVOS": 4.97,
+    "ENQUADRAMENTO": 11.18
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O endividamento do produtor rural e o risco de estigmatização da inadimplência do setor.",
+    "causa": "Eventos climáticos extremos, quebra de safras, queda de preços e insuficiência de medidas de socorro de crédito.",
+    "vitima": "Os produtores rurais que produzem alimentos e sustentam o país.",
+    "culpado": "Políticas de crédito restritivas e uma 'caça às bruxas' contra o agronegócio.",
+    "solucao": "Ampliação da renegociação de dívidas, menos burocracia e apoio governamental financeiro aos produtores.",
+    "motor_moral": "lealdade"
+   },
+   "teste_inversao": "Caso fosse uma coluna pró-consumidores ou pró-fiscalização fiscal, o endividamento rural seria tratado como subsídio excessivo ou calote ao Banco do Brasil, invertendo o polo de simpatia.",
+   "atores": [
+    {
+     "nome": "Produtores rurais e agronegócio",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo Federal e Banco do Brasil",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fontes do Senado Federal",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 1,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "O produtor rural e o empreendedor do campo estão com o grito de liberdade entalado na garganta.",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 4.97,
+     "explicacao": "Uso de linguagem lírica e emotiva pelo colunista para exaltar a dor e o esforço do produtor rural.",
+     "intensidade": 2,
+     "certeza": 0.95,
+     "eixo": "economico",
+     "favorece": "Produtores rurais e agronegócio",
+     "ressalva": "Trata-se de texto opinativo/coluna, gênero que permite juízos de valor explícitos."
+    },
+    {
+     "id": "E2",
+     "criterio": "ROTULOS",
+     "citacao": "a divulgação desses resultados acabou alimentando uma espécie de \"caça às bruxas\" contra os produtores rurais.",
+     "paragrafo": "P19",
+     "direcao": "direita",
+     "contribuicao": 5.88,
+     "explicacao": "Enquadra as críticas ou cobranças aos inadimplentes como perseguição injusta ('caça às bruxas').",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Produtores rurais e agronegócio",
+     "desfavorece": "Governo Federal e Banco do Brasil",
+     "ressalva": "Artigo de opinião assinado."
+    },
+    {
+     "id": "E3",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "insistem em atormentar quem quer apenas trabalhar, produzir e entregar produtos de qualidade ao mercado, suprindo com competência e correção",
+     "paragrafo": "P20",
+     "direcao": "direita",
+     "contribuicao": 11.18,
+     "explicacao": "Moralização absoluta em favor dos produtores, atribuindo-lhes retidão incontestável em face de adversários externos.",
+     "intensidade": 3,
+     "certeza": 0.95,
+     "eixo": "economico",
+     "favorece": "Produtores rurais e agronegócio",
+     "ressalva": "Espaço de opinião declarada."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c8f3d8a75374",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/inmet-chuvas-e-tempestades-predominam-no-pais-neste-fim-de-semana",
+   "titulo": "Inmet: chuvas e tempestades predominam no país, neste fim de semana",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Boletim puramente meteorológico da previsão do tempo emitido pelo Inmet, sem qualquer conteúdo político, ideológico ou controvérsia social."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 404,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Ocorrência de tempestades e instabilidades climáticas em várias regiões do país durante o fim de semana.",
+    "causa": "Convergência de umidade e formação de área de baixa pressão atmosférica.",
+    "vitima": "nenhum",
+    "culpado": "nenhum",
+    "solucao": "Previsão e acompanhamento das condições do tempo pelo órgão meteorológico.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Texto estritamente técnico e factual sobre o clima, imune a variações ideológicas de perspectiva.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d267b0a3e6e2",
+   "url": "https://umsoplaneta.globo.com/clima/cop/noticia/2026/11/14/cop31-primeira-semana-termina-com-impasse-sobre-fosseis-e-financiamento-como-principal-entrave.ghtml",
+   "titulo": "COP31: primeira semana termina com impasse sobre fósseis e financiamento como principal entrave",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "primeira-semana-da-cop31-termina-em-impasse-sobr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata das negociações multilaterais de clima na COP31, com impasses sobre financiamento internacional, transição de combustíveis fósseis e obrigações de países desenvolvidos e produtores de petróleo."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1279,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.14,
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A primeira semana da COP31 termina em impasse sobre o abandono de combustíveis fósseis e o financiamento de medidas climáticas.",
+    "causa": "Resistência de países produtores de fósseis e recuo no envio de recursos por países desenvolvidos.",
+    "vitima": "Países em desenvolvimento e populações vulneráveis afetadas pelas mudanças climáticas.",
+    "culpado": "Grandes emissores, produtores de fósseis e nações ricas que não cumprem promessas de financiamento.",
+    "solucao": "Garantir financiamento obrigatório e previsível e estabelecer compromissos efetivos de transição justa e adaptação.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Caso adotasse uma perspectiva pró-indústria ou voltada à segurança energética, o texto enfatizaria os riscos econômicos da transição rápida e as justificativas dos países produtores para manter flexibilidade energética.",
+   "atores": [
+    {
+     "nome": "Organizações da sociedade civil e ambientalistas",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Grandes produtores e consumidores de combustíveis fósseis (Arábia Saudita, Rússia, EUA…",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo brasileiro / Presidência da COP30",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Instituto Talanoa",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": false
+    },
+    {
+     "rotulo": "Alden Meyer, do centro de estudos E3G",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Guterres",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    },
+    {
+     "rotulo": "Simon Stiell, secretário-executivo da ONU Clima",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "Murat Kurum, ministro do Meio Ambiente da Turquia e presidente da COP31",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": false
+    },
+    {
+     "rotulo": "Karen Oliveira, diretora de Políticas Públicas da The Nature Conservancy (TNC) Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 102,
+     "ultima": false
+    },
+    {
+     "rotulo": "Tatiana Oliveira, líder de Estratégia Internacional do WWF-Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 49,
+     "ultima": false
+    },
+    {
+     "rotulo": "Flávia Martinelli, especialista em Mudanças Climáticas do WWF-Brasil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": false
+    },
+    {
+     "rotulo": "Amiera Sawas, diretora de Políticas e Pesquisa da Iniciativa do Tratado sobre Combustíveis…",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 56,
+     "ultima": false
+    },
+    {
+     "rotulo": "André Corrêa do Lago, presidente da COP30",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 123,
+    "direita": 0
+   },
+   "falas": 21,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Segundo observadores ouvidos pela agência Reuters, grandes produtores e consumidores de combustíveis fósseis resistem a qualquer acordo com metas firmes",
+     "paragrafo": "P3",
+     "direcao": "esquerda",
+     "contribuicao": -3.14,
+     "explicacao": "A reportagem ouve amplamente ONGs socioambientais que criticam países produtores e desenvolvidos, sem apresentar falas em defesa dos países criticados.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Organizações da sociedade civil e ambientalistas",
+     "desfavorece": "Grandes produtores e consumidores de combustíveis fósseis (Arábia Saudita, Rússia, EUA…",
+     "ressalva": "Trata-se de cobertura de diplomacia climática multilateral baseada em despachos de agências e fontes da sociedade civil organizada."
+    },
+    {
+     "id": "E2",
+     "criterio": "NUMEROS",
+     "citacao": "Uma análise do site Carbon Brief mostra que o financiamento público prometido a países em desenvolvimento caiu mais de 70% em 2026, para US$ 11,7 bilhões por ano",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dado contextualizado com indicação de fonte primária de análise, período e termos comparativos claros.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9c44eb9c03b6",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/idosos-com-70-anos-ou-mais-sao-4-de-cada-10-novos-eleitores-no-2o-turno.shtml",
+   "titulo": "Idosos com 70 anos ou mais são 4 em cada 10 novos eleitores no 2º turno",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "eleitores-a-partir-de-70-anos-respondem-por-40-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Analisa dados oficiais do TSE sobre o comparecimento de idosos no segundo turno da eleição presidencial de 2026 e seu impacto no resultado."
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 758,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -2.29,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HIERARQUIA": -2.29,
+    "NUMEROS": 0.0,
+    "ENQUADRAMENTO": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Compreender a dinâmica de virada e a mobilização de eleitores de voto facultativo no 2º turno.",
+    "causa": "O comparecimento massivo de pessoas com 70 anos ou mais e a queda de brancos e nulos.",
+    "vitima": "nenhum",
+    "culpado": "nenhum",
+    "solucao": "nenhum",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se o candidato de oposição tivesse obtido a maioria dos novos votos no segundo turno, o texto provavelmente destacaria seus discursos de agradecimento e a mobilização de sua base de forma análoga.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva (PT)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro (PL)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Eleitores idosos (70 anos ou mais)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "TSE (Tribunal Superior Eleitoral)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "O presidente reeleito",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 49,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 49,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "No primeiro turno, 51% dos eleitores com 70 anos ou mais compareceram às urnas. Já no segundo, 58%. É o maior aumento de comparecimento entre todas as faixas etárias.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso rigoroso de estatísticas oficiais com indicação de universo e base de comparação.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    },
+    {
+     "id": "E2",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "Os dados não permitem saber em quem esses eleitores votaram, já que o voto é secreto.",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A reportagem faz a ressalva metodológica de que a correlação demográfica não implica necessariamente identificação do voto individual.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    },
+    {
+     "id": "E3",
+     "criterio": "HIERARQUIA",
+     "citacao": "Cenas de eleitores idosos indo votar viralizaram no segundo turno, especialmente entre apoiadores de Lula (PT).",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -2.29,
+     "explicacao": "Embora o voto seja secreto, o texto destaca a apropriação simbólica e as declarações de Lula, sem trazer o impacto ou reações da campanha adversária.",
+     "intensidade": 1,
+     "certeza": 0.7,
+     "eixo": "instituicoes",
+     "favorece": "Luiz Inácio Lula da Silva (PT)",
+     "desfavorece": "Flávio Bolsonaro (PL)",
+     "ressalva": "O dado objetivo subsequente mostra que Lula de fato capturou a maioria ampla dos novos votos no segundo turno."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "40400ff92879",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/14/fux-interrompe-julgamento-sobre-fim-da-6x1-e-leva-caso-ao-plenario-fisico-do-stf.ghtml",
+   "titulo": "Fux interrompe julgamento sobre fim da 6x1 e leva caso ao plenário físico do STF",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "fux-pede-destaque-e-transfere-ao-plenario-fisico",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Reporta a tramitação judicial no STF a respeito de regras trabalhistas constitucionais (escala 6x1) e pedidos de destaque de ministros."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 682,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Julgamento da transição para o fim da jornada 6x1 é interrompido no STF após pedido de destaque.",
+    "causa": "Pedido de destaque do ministro Luiz Fux para levar o tema do plenário virtual para o plenário físico.",
+    "vitima": "nenhum",
+    "culpado": "nenhum",
+    "solucao": "Retomada do julgamento com placar zerado pelo presidente do STF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto é estritamente descritivo de procedimentos judiciais e do teor de uma decisão liminar, mantendo a mesma estrutura qualquer que fosse o posicionamento dos ministros.",
+   "atores": [
+    {
+     "nome": "Luiz Fux",
+     "campo": "centro"
+    },
+    {
+     "nome": "Flávio Dino",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Representantes do comércio e da indústria",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministro do Supremo Tribunal Federal (STF) Luiz Fux",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Flávio Dino",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O ministro do Supremo Tribunal Federal (STF) Luiz Fux pediu destaque neste sábado (14) no julgamento que trata da transição para o fim da escala 6x1.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo estritamente factual e descritivo dos procedimentos do Supremo Tribunal Federal.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d3cd281690db",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/15/avioes-colidem-no-aeroporto-de-miami-nos-eua.ghtml",
+   "titulo": "Aviões de carga e de passageiros colidem no aeroporto de Miami, nos EUA",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto aborda um incidente aéreo de colisão em solo sem vítimas graves no aeroporto de Miami e problemas técnicos em sistemas de aviação civil nos Estados Unidos."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 598,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Colisão entre aeronaves em taxiamento no aeroporto de Miami em meio a transtornos operacionais no tráfego aéreo dos EUA.",
+    "causa": "Possível falha de comunicação ou procedimentos de taxiamento sob apuração da FAA.",
+    "vitima": "Passageiros e tripulantes envolvidos e viajantes afetados por cancelamentos.",
+    "culpado": "nenhum",
+    "solucao": "Investigação oficial pelas autoridades e modernização da infraestrutura aeroviária.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é um relato factual de acidente de transporte e falha de infraestrutura sem viés político-ideológico.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c839f612e60f",
+   "url": "https://www.cnnbrasil.com.br/internacional/lula-sobre-tarifaco-em-vez-chorar-a-gente-procurou-outros-parceiros/",
+   "titulo": "Lula sobre tarifaço: “Em vez chorar, a gente procurou outros parceiros”",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Declarações do presidente da República em viagem internacional sobre política externa comercial, tarifas dos EUA e estratégias de industrialização."
+   },
+   "estado": "ok",
+   "T": -8,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "10 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 57,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 486,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -7.66,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -7.66,
+    "OMISSAO": 0.0
+   },
+   "aplicaveis": 10,
+   "enquadramento": {
+    "problema": "Impactos do tarifaço imposto pelo governo americano de Donald Trump nas exportações brasileiras.",
+    "causa": "Medidas protecionistas dos Estados Unidos.",
+    "vitima": "Comércio e exportadores brasileiros.",
+    "culpado": "Governo dos EUA (Donald Trump).",
+    "solucao": "Procurar novos parceiros comerciais na Ásia, atrair investimentos em terras raras e exportar produtos de maior valor agregado.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "Se o discurso fosse de um presidente de direita em visita ao exterior, um veículo crítico buscaria economistas ou setores do agronegócio para contestar o impacto real do tarifaço e a viabilidade da produção nacional de baterias.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Donald Trump / Governo dos EUA",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o presidente Lula",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 165,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 165,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Durante o encerramento da viagem a Manila, nas Filipinas, o presidente Lula destacou a importância dos países asiáticos como parceiros comerciais",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -7.66,
+     "explicacao": "A reportagem consiste quase integralmente no registro sem contraponto ou questionamento das declarações do presidente Lula.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Luiz Inácio Lula da Silva",
+     "ressalva": "É uma cobertura de viagem oficial e coletiva/discurso do presidente no exterior."
+    },
+    {
+     "id": "E2",
+     "criterio": "OMISSAO",
+     "citacao": "As Filipinas são o principal destino da exportação de carnes suínas do Brasil - e, recentemente, anunciaram uma suspensão de dois meses nas importações. O governo brasileiro afirmou que encara a medida como temporária",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto pontua o revés prático com as Filipinas (suspensão de carnes), inserindo dado de contexto que tensiona o discurso otimista do presidente.",
+     "intensidade": 1,
+     "certeza": 0.7,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e426843a3269",
+   "url": "https://www.moneytimes.com.br/magazine-luiza-mglu3-lidera-ganhos-com-alta-de-mais-de-39-enquanto-csn-csna3-e-a-pior-acao-da-semana-veja-o-que-rolou-no-ibovespa-davs/",
+   "titulo": "Magazine Luiza (MGLU3) vira foguete, enquanto CSN (CSNA3) derrete; veja o que rolou no Ibovespa",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Resumo semanal dos mercados financeiros destacando a aprovação do pacote de ajuste fiscal pelo Senado, a ata do Copom e a reação a balanços corporativos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 815,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Volatilidade do mercado acionário e incerteza fiscal que pressiona os juros futuros.",
+    "causa": "Dúvidas quanto à capacidade do pacote fiscal de sanar problemas orçamentários estruturais e inflação resiliente.",
+    "vitima": "Investidores e economia brasileira.",
+    "culpado": "Incerteza na condução da política fiscal e inflação persistente.",
+    "solucao": "Garantir trajetória sustentável para as contas públicas.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Sendo um resumo técnico semanal de mercado financeiro, a estrutura e o vocabulário se manteriam idênticos sob qualquer governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Fazenda",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Mercado financeiro / Analistas",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Fábio Serrano, do BTG Pactual",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rafael Dadoorian, cofundador e head de renda fixa da Convexa Investimentos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O pacote prevê um impacto fiscal entre R$ 50 bilhões e R$ 60 bilhões no ano que vem, valor que deve ser ampliado nos anos seguintes.",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta com clareza as cifras e prazos previstos pelo pacote fiscal aprovado.",
+     "intensidade": 1,
+     "certeza": 0.85,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "bb68f3c7b773",
+   "url": "https://www.infomoney.com.br/mercados/xp-restricoes-a-data-centers-nos-eua-podem-atrasar-mas-nao-travar-boom-da-ia/",
+   "titulo": "XP: Restrições a data centers nos EUA podem atrasar, mas não travar boom da IA",
+   "veiculo": "InfoMoney",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-15",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Análise setorial de investimentos em data centers e inteligência artificial nos EUA após resultados eleitorais e plebiscitos locais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 563,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Restrições estaduais e plebiscitos locais nos EUA que retardam a instalação de data centers.",
+    "causa": "Rejeição popular e gargalos na geração e infraestrutura de energia elétrica.",
+    "vitima": "Projetos de expansão rápida de inteligência artificial.",
+    "culpado": "Pausas regulatórias e limites técnicos de fornecimento de energia.",
+    "solucao": "Adaptação geográfica dos projetos e geração própria de energia.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é um relatório descritivo de análise de mercado financeiro sobre infraestrutura de IA e não mudaria com outra conjuntura política.",
+   "atores": [
+    {
+     "nome": "XP Investimentos",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Empresas de tecnologia (Big Techs)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "analistas da XP Investimentos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "reduzam de 1% a 5% o capex de inteligência artificial das oito empresas que lideram a construção nos EUA.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta métricas e bases de cálculo explicitadas pelos analistas do relatório.",
+     "intensidade": 1,
+     "certeza": 0.85,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "94b5a278801b",
+   "url": "https://www.seudinheiro.com/2026/economia/banco-central-tira-instituicoes-do-mercado-banco-do-brasil-bbas3-decepciona-no-3t26-e-renda-fixa-volta-a-brilhar-veja-o-que-bombou-na-semana-davs/",
+   "titulo": "Banco Central tira instituições do mercado, Banco do Brasil (BBAS3) decepciona no 3T26 e renda fixa volta a brilhar: veja o que bombou na semana",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Compilado de matérias da semana do portal sobre balanços de empresas, decisões do BC, renda fixa e mercado editorial."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 921,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Eventos de destaque no mercado na semana, incluindo liquidações pelo BC e queda de lucro em bancos.",
+    "causa": "Irregularidades em cooperativas, aumento da inadimplência e revisões de expectativas de juros.",
+    "vitima": "Investidores e cooperados.",
+    "culpado": "Gestão irregular em instituições liquidadas e inadimplência no crédito.",
+    "solucao": "Intervenção regulatória e ajuste nos modelos de negócios.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sendo uma newsletter/resumo dos artigos mais lidos da semana, o texto reproduz fatos corporativos e de mercado de forma neutra.",
+   "atores": [
+    {
+     "nome": "Banco Central do Brasil",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Banco do Brasil",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "comunicado do BC",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "No 3T26, o banco registrou lucro líquido recorrente de R$ 1,3 bilhão, uma derrocada de 66,5% em relação ao mesmo período de 2025",
+     "paragrafo": "P12",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados numéricos balizados por período e base comparativa oficial de balanço.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "249cb5e86d4c",
+   "url": "https://valor.globo.com/legislacao/noticia/2026/11/14/stj-farmacias-e-drogarias-devem-manter-farmaceutico-presente-durante-todo-o-horario-de-funcionamento.ghtml",
+   "titulo": "STJ: Farmácias e drogarias devem manter farmacêutico presente durante todo o horário de funcionamento",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "stj-decide-que-farmacias-devem-manter-farmaceuti",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Cobertura jurídica de julgamento no STJ sobre a obrigatoriedade da presença física de farmacêuticos em drogarias."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 695,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tentativa de substituição de farmacêuticos presenciais por atendimento remoto em redes de drogarias.",
+    "causa": "Interpretações divergentes entre a lei sanitária específica e normas gerais sobre telessaúde.",
+    "vitima": "Usuários de medicamentos e a tutela da saúde pública.",
+    "culpado": "Estabelecimentos que deixavam de manter profissional habilitado presencialmente.",
+    "solucao": "Manutenção obrigatória de farmacêutico fisicamente presente durante todo o horário de funcionamento.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um acórdão judicial e as teses de ambas as partes em disputa de forma puramente técnica.",
+   "atores": [
+    {
+     "nome": "Superior Tribunal de Justiça (STJ) / Ministro Marco Aurélio Bellizze",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministério Público de Minas Gerais (MPMG)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Rede de drogarias",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro Marco Aurélio Bellizze",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 85,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Para o tribunal estadual, a exigência da lei estaria sendo atendida por farmacêuticos em regime de plantão centralizado",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A matéria resume detalhadamente as teses e argumentos acolhidos anteriormente em favor da empresa antes de explicar a reversão pelo STJ.",
+     "intensidade": 1,
+     "certeza": 0.85,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "210f8e0eae4c",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/manifestantes-tomam-ruas-da-franca-e-protestam-contra-inflacao-e-policia-pelo-quinto-sabado-seguido.shtml",
+   "titulo": "Manifestantes tomam ruas da França e protestam contra inflação e polícia pelo quinto sábado seguido",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "franca-enfrenta-quinto-sabado-seguido-de-protest",
+   "origem": "materia",
+   "data_publicacao": "2026-11-14",
+   "analisado_em": "2026-11-15",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Matéria sobre grandes manifestações de rua na França contra inflação e projeto de lei de proteção policial, com impacto na disputa eleitoral entre Macron, a esquerda e a extrema direita."
+   },
+   "estado": "ok",
+   "T": -15,
+   "rotulo": "Leve à esquerda",
+   "confianca": "baixa",
+   "motivos_confianca": [
+    "2 critérios concordantes em 2 famílias"
+   ],
+   "resumo": "Leve à esquerda (confiança baixa). Principais sinais: empatia desigual (E1, E2) e fontes e espaço (E3).",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 926,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": -14.51,
+    "divergente": false
+   },
+   "por_eixo": {
+    "seguranca": -10.59
+   },
+   "criterios": {
+    "FONTES": -6.67,
+    "NUMEROS": 0.0,
+    "HUMANIZACAO": -7.84
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insatisfação popular crescente na França com o custo de vida e com proposta de presunção de legítima defesa para policiais.",
+    "causa": "Crise inflacionária, desgaste político do governo Macron e violência policial.",
+    "vitima": "População francesa, manifestantes e estudantes reprimidos.",
+    "culpado": "Governo Macron e defensores da impunidade policial da extrema direita.",
+    "solucao": "Interrupção do projeto de lei da polícia e aumento real de salários.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o texto buscasse simetria, policiais ou cidadãos favoráveis a maior segurança teriam recebido nomes, histórias pessoais e falas diretas para justificar o projeto de lei, em vez de ficarem restritos a uma menção genérica ligada à extrema direita.",
+   "atores": [
+    {
+     "nome": "Manifestantes / Sindicatos / Coletes Amarelos",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Emmanuel Macron e Governo Francês",
+     "campo": "centro"
+    },
+    {
+     "nome": "Marine Le Pen e defensores da polícia",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério do Interior",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sindicatos estudantis",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Adrien, 20, violoncelista de uma orquestra voluntária presente no ato em Paris",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": false
+    },
+    {
+     "rotulo": "Josette, 72",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 65,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kenza, 28, especialista em direito de asilo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "Advogados",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 1,
+     "ultima": true
+    },
+    {
+     "rotulo": "autoridades locais",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 99,
+    "direita": 0
+   },
+   "falas": 12,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HUMANIZACAO",
+     "citacao": "Adrien, 20, violoncelista de uma orquestra voluntária presente no ato em Paris, diz que o foco do dia era um novo projeto de lei",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -3.92,
+     "explicacao": "Concede nome, idade, profissão simpática e espaço expressivo para humanizar os manifestantes contrários ao projeto policial.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "seguranca",
+     "favorece": "Manifestantes / Sindicatos / Coletes Amarelos",
+     "desfavorece": "Marine Le Pen e defensores da polícia"
+    },
+    {
+     "id": "E2",
+     "criterio": "HUMANIZACAO",
+     "citacao": "Na cidade de Bordeaux, no sudoeste do país, Josette, 72, entoou a canção de protesto \"tenho duas paixões: bandas de metais e revolução\".",
+     "paragrafo": "P13",
+     "direcao": "esquerda",
+     "contribuicao": -3.92,
+     "explicacao": "Outro perfil afetivo e personalizado de manifestante (idosa de 72 anos que apoia os jovens contra a extrema direita), sem contraponto similar do outro lado.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "costumes",
+     "favorece": "Manifestantes / Sindicatos / Coletes Amarelos",
+     "desfavorece": "Marine Le Pen e defensores da polícia"
+    },
+    {
+     "id": "E3",
+     "criterio": "FONTES",
+     "citacao": "Os defensores do novo projeto de lei sobre a polícia —incluindo o partido de extrema direita da principal candidata à Presidência, Marine Le Pen— afirmam",
+     "paragrafo": "P9",
+     "direcao": "esquerda",
+     "contribuicao": -6.67,
+     "explicacao": "O lado favorável ao projeto não tem fontes nomeadas nem fala direta, sendo associado em bloco à extrema direita, enquanto o lado manifestante tem múltiplos personagens ouvidos.",
+     "intensidade": 2,
+     "certeza": 0.85,
+     "eixo": "seguranca",
+     "favorece": "Manifestantes / Sindicatos / Coletes Amarelos",
+     "desfavorece": "Marine Le Pen e defensores da polícia"
+    },
+    {
+     "id": "E4",
+     "criterio": "NUMEROS",
+     "citacao": "Cerca de 106 mil pessoas foram às ruas em todo o país, incluindo 24 mil em Paris, segundo o Ministério do Interior, no menor comparecimento das últimas semanas. Sindicatos estudantis estimaram o número de manifestantes em 200 mil",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta tanto a estimativa oficial do Ministério do Interior quanto a estimativa dos sindicatos sobre a contagem de manifestantes.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-15T11:34:07+00:00",
+   "provedor": "gemini",
+   "modelo": "gemini-flash-latest",
+   "candidatos": 120,
+   "textos_curtos": 28,
+   "falhas": 40,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 37551,
+    "saida": 20950
+   },
+   "analises": [
+    "ae247b14f52e",
+    "9b8f8183e8a8",
+    "e9632d581252",
+    "6760c4688d0d",
+    "f9cf5623f9e3",
+    "19b721a9fcfd",
+    "4c668d6d0a42",
+    "c2b4a2ad01f0",
+    "9d4eeb99a1f2",
+    "c8f3d8a75374",
+    "d267b0a3e6e2",
+    "9c44eb9c03b6",
+    "40400ff92879",
+    "d3cd281690db",
+    "c839f612e60f",
+    "e426843a3269",
+    "bb68f3c7b773",
+    "94b5a278801b",
+    "249cb5e86d4c",
+    "210f8e0eae4c"
+   ]
+  }
+ ]
+}
