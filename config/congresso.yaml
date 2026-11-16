@@ -352,3 +352,62 @@ frentes:
   - {titulo: "Frente Parlamentar Católica", nome: "Católica", tema: todas}
   - {titulo: "Frente Parlamentar em defesa do Estado Laico", nome: "Estado Laico e Liberdade Religiosa", tema: todas}
   - {titulo: "Frente Parlamentar Conservadora", nome: "Conservadora", tema: todas}
+
+# A cota parlamentar (aba "Cota parlamentar"): escolhas de apresentação. Nenhuma muda uma
+# soma: são os nomes com que as despesas aparecem, quantos meses do fim da série ainda
+# recebem notas e a tabela do limite mensal por estado.
+cota:
+  # Quantos meses fechados do fim da série aparecem mais claros, com o aviso "ainda recebem
+  # notas": as notas chegam depois do mês da despesa, e sem o aviso os últimos meses parecem
+  # queda de gasto. É escolha prudente, não o prazo oficial de apresentação da nota (que não
+  # foi conferido): na dúvida, aumentar.
+  meses_recentes: 3
+  # O limite mensal da cota muda por estado. A tabela oficial NÃO FOI CONFERIDA na fonte
+  # oficial (o ato e o anexo de cada Casa): por isso fica nula, e a página sai sem nenhuma
+  # marca, percentual ou frase com valor de limite. Não preencher de memória nem de
+  # reportagem. Depois de conferir cada valor com a fonte aberta ao lado, o formato é:
+  #   cd:
+  #     fonte: "o ato e o anexo de onde os valores saíram"
+  #     url: "o endereço oficial conferido"
+  #     vigencias:
+  #       - desde: "AAAA-MM"                # o primeiro mês em que os valores valem
+  #         valores: {AC: ..., AL: ..., ...}   # as 27 UFs, em R$ por mês
+  # Vigência sem as 27 UFs, sem fonte ou sem endereço desliga a tabela inteira e vira aviso.
+  tetos:
+    cd: null    # falta conferir na fonte oficial
+    sf: null    # falta conferir na fonte oficial
+  # Nome oficial da despesa (como vem no registro) → id estável (vai no endereço da página e
+  # no arquivo de dados) e nome curto (o que a página mostra). O casamento é pelo nome sem
+  # acento, em minúsculas e sem pontuação. Despesa nova, sem rótulo aqui, aparece com o nome
+  # oficial e ganha um id feito dele.
+  rotulos:
+    cd:
+      - {oficial: "DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.", id: divulgacao, curto: "Divulgação do mandato"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE VEÍCULOS AUTOMOTORES", id: veiculos, curto: "Aluguel de veículos"}
+      - {oficial: "MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR", id: escritorio, curto: "Escritório"}
+      - {oficial: "COMBUSTÍVEIS E LUBRIFICANTES.", id: combustivel, curto: "Combustível"}
+      - {oficial: "HOSPEDAGEM ,EXCETO DO PARLAMENTAR NO DISTRITO FEDERAL.", id: hospedagem, curto: "Hospedagem"}
+      - {oficial: "TELEFONIA", id: telefonia, curto: "Telefonia"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE AERONAVES", id: aeronaves, curto: "Aluguel de aeronaves"}
+      - {oficial: "COMPLEMENTAÇÃO DO AUXÍLIO-MORADIA", id: moradia, curto: "Complemento do auxílio-moradia"}
+      - {oficial: "SERVIÇO DE SEGURANÇA PRESTADO POR EMPRESA ESPECIALIZADA.", id: seguranca, curto: "Segurança privada"}
+      - {oficial: "SERVIÇO DE TÁXI, PEDÁGIO E ESTACIONAMENTO", id: taxi, curto: "Táxi, pedágio e estacionamento"}
+      - {oficial: "PASSAGEM AÉREA - REEMBOLSO", id: aereas-reembolso, curto: "Passagens aéreas (reembolso)"}
+      - {oficial: "PASSAGEM AÉREA - RPA", id: aereas-rpa, curto: "Passagens aéreas (requisição)"}
+      - {oficial: "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR", id: alimentacao, curto: "Alimentação"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE EMBARCAÇÕES", id: embarcacoes, curto: "Aluguel de embarcações"}
+      - {oficial: "PASSAGENS TERRESTRES, MARÍTIMAS OU FLUVIAIS", id: terrestres, curto: "Passagens de ônibus e barco"}
+      - {oficial: "ASSINATURA DE PUBLICAÇÕES", id: publicacoes, curto: "Assinaturas"}
+      - {oficial: "SERVIÇOS POSTAIS", id: postais, curto: "Correios"}
+      - {oficial: "PARTICIPAÇÃO EM CURSO, PALESTRA OU EVENTO SIMILAR", id: cursos, curto: "Cursos e eventos"}
+      - {oficial: "AQUISIÇÃO DE TOKENS E CERTIFICADOS DIGITAIS", id: certificados, curto: "Certificados digitais"}
+      - {oficial: "CONSULTORIAS, PESQUISAS E TRABALHOS TÉCNICOS.", id: consultorias, curto: "Consultorias e pesquisas"}
+      - {oficial: "PASSAGEM AÉREA - MISSÃO OFICIAL", id: aereas-missao, curto: "Passagens aéreas (missão oficial)"}
+    sf:
+      - {oficial: "Locomoção, hospedagem, alimentação, combustíveis e lubrificantes", id: locomocao, curto: "Locomoção, hospedagem e combustível"}
+      - {oficial: "Contratação de consultorias, assessorias, pesquisas, trabalhos técnicos e outros serviços de apoio ao exercício do mandato parlamentar", id: consultorias, curto: "Consultorias e assessorias"}
+      - {oficial: "Passagens aéreas, aquáticas e terrestres nacionais", id: passagens, curto: "Passagens"}
+      - {oficial: "Divulgação da atividade parlamentar", id: divulgacao, curto: "Divulgação do mandato"}
+      - {oficial: "Aluguel de imóveis para escritório político, compreendendo despesas concernentes a eles.", id: escritorio, curto: "Aluguel de escritório"}
+      - {oficial: "Aquisição de material de consumo para uso no escritório político, inclusive aquisição ou locação de software, despesas postais, aquisição de publicações, locação de móveis e de equipamentos.", id: material, curto: "Material e equipamentos de escritório"}
+      - {oficial: "Serviços de Segurança Privada", id: seguranca, curto: "Segurança privada"}

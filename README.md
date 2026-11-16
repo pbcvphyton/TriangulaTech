@@ -622,10 +622,27 @@ o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
   assina** (a base de comparação) e os que mais votam diferente do coordenador. O cartão
   abre a **ficha da frente** (`#f=<id>`), com todos os que assinam, um a um. Só a Câmara
   registra quem assina.
-- **Cota parlamentar**: quem gasta mais e menos (média por mês), para onde vai o dinheiro,
-  os fornecedores que mais recebem e de quantos gabinetes, quem pagou um quarto ou mais da
-  própria cota a uma empresa só, **a mesma nota em mais de um gabinete** (com o link de
-  cada nota) e o que a Casa recusou (glosa).
+- **Cota parlamentar**: um painel com período e, no fim, as listas de apuração. No alto, a
+  frase **"Você está vendo"** diz a Casa, a janela (de início, a legislatura até o último mês
+  fechado) e cada filtro, com um ✕ para tirar cada um; ela acompanha a rolagem enquanto o
+  painel está na tela. Abaixo: **três números** (quanto no período, quanto por mês gasta o
+  parlamentar do meio, a parte da maior despesa), **Quando** (uma coluna por mês; os últimos
+  meses, que ainda recebem notas, mais claros), **Com o quê** (uma barra por despesa),
+  **Quem** (um ponto por parlamentar em exercício, com a mediana e a faixa do meio), o
+  **cartão em foco** (por mês com despesa, total em N de M meses, "Antes de comparar", as
+  despesas, o mês a mês, os fornecedores), **as pontas** e **a tabela de todos**. Os filtros
+  (período: legislatura, cada ano, últimos 12 meses, de/até; despesa; estado; partido; os
+  10% que menos ou mais gastam) refazem tudo isso no navegador a partir de
+  `cota-<casa>.json`; a pessoa em foco (clique no ponto, setas, "Achar um nome") muda só o
+  cartão. O estado vai no endereço
+  (`#v=cota&c=cd&de=2025-01&ate=2025-12&cat=divulgacao&uf=SP&pt=PL&g=menos&k=cd-204536`).
+  Cada número leva a unidade e a janela; nenhum valor de pessoa aparece sem o total e os
+  meses. O limite mensal por estado fica fora enquanto a tabela oficial não for conferida
+  (`cota.tetos` em `config/congresso.yaml`, nulo). **Para conferir**, sempre da legislatura
+  inteira: os fornecedores que mais recebem e de quantos gabinetes, quem pagou um quarto ou
+  mais da própria cota a uma empresa só, **a mesma nota em mais de um gabinete** (com o
+  link de cada nota) e o que a Casa recusou (glosa). Sem script, a aba mostra o estado
+  padrão inteiro.
 - **Escolha o seu candidato**: quem tem mandato pelo seu estado, um **cartão com a foto
   oficial** cada: de que lado vota (a régua), a presença e o voto com o partido (com a
   mediana da Casa), a **exceção** (o tema em que vota do lado oposto ao seu padrão), se
@@ -768,6 +785,7 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, a pauta (`pauta`: os sinais das aprovadas, a direção por tema e as semanas), as folhas da mesa (`folhas`), listas, no jornal × no voto, últimas votações, a cobertura do saldo pesado, as frentes, a cota e as comissões) |
 | `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação, e o **partido de cada um no dia de cada votação** (`partidos`: só de quem mudou) (o comparativo, os votos por tema e o plenário em pontos leem quando abrem) |
 | `frentes-cd.json` | a ficha de cada frente de causa: todos os que assinam e estão em exercício, com o saldo no tema e quanto votaram igual ao coordenador (lido quando a ficha da frente abre) |
+| `cota-cd.json`, `cota-sf.json` | a cota de cada um mês a mês e despesa a despesa, em centavos inteiros, uma pessoa por linha: quem teve lançamento em mês fechado da legislatura (em exercício ou não), com as séries `[despesa, primeiro mês, centavos de cada mês seguido…]` e, na Câmara, as passagens da agência por ano. Somando as células de uma pessoa volta-se ao total da ficha dela; o mês em curso fica fora. É o que a aba "Cota parlamentar" precisa para mudar o período e cruzar filtros. Os nomes curtos das despesas, quantos meses do fim ainda recebem notas e a tabela do limite mensal por estado (nula enquanto não for conferida na fonte oficial: sem ela, nada de limite aparece) ficam em `cota`, em `config/congresso.yaml` |
 | `materias-cd.json`, `materias-sf.json` | a ficha de cada matéria votada no Plenário na legislatura e de cada ponto de "o que espera × o que passa", uma por linha: sobre o quê, autoria, situação, nota e cada votação com os lados (lido quando um detalhe abre) |
 | `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
 

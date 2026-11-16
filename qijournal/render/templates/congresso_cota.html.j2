@@ -1,0 +1,297 @@
+{#- Aba Congresso: "Cota parlamentar" (incluído por congresso.html.j2). Duas zonas por Casa.
+    Zona A, o painel: a frase "Você está vendo" (a janela e os filtros), três números, "Quando"
+    (colunas por mês), "Com o quê" (barras), "Quem" (um ponto por parlamentar), o cartão em
+    foco, as pontas e a tabela de todos. Aqui sai o estado padrão inteiro (a legislatura, todas
+    as despesas, todos), pronto em casa.cota.painel: sem script, é o que a página mostra. Com
+    script (congresso_cota.js.j2), o arquivo cota-<casa>.json refaz as mesmas contas para outro
+    período, despesa, estado, partido ou faixa. Zona B, "Para conferir": as listas de apuração,
+    sempre da legislatura inteira, e dizendo isso.
+    Cada número leva a unidade e a janela. Pontos e linhas usam data-p (o clique põe em foco);
+    data-k fica só nos nomes, que abrem o dossiê. As colunas usam data-mes (data-m, no clique
+    geral da página, abre a ficha de uma matéria). Do limite mensal por estado só sai alguma
+    coisa se a tabela conferida estiver em config/congresso.yaml (pn.tetos); sem ela, nada.
+    Estilos: congresso_cota.css.j2 (cg-co-…). -#}
+{% macro pes(k, nome) -%}
+<a class="cg-p" href="#p={{ k }}" data-k="{{ k }}">{{ nome }}</a>
+{%- endmacro %}
+{% macro info(texto) -%}
+<button type="button" class="cg-i" aria-label="O que é isto" data-dica="{{ texto }}">i</button>
+{%- endmacro %}
+{#- Uma linha de "Com o quê": o nome e a parte em cima, a barra embaixo (a barra cheia é o total). -#}
+{% macro barra(l) -%}
+<li><button type="button" class="cg-co-b" data-cat="{{ l.id }}" data-dica="Nome oficial: {{ l.oficial }}" aria-pressed="false"{% if l.neg %} data-neg="1"{% endif %}><span class="cg-co-bn">{{ l.curto }}</span><span class="cg-co-bv">{{ l.texto }}</span><span class="cg-co-bb" aria-hidden="true"><i style="width:{{ l.w }}%"></i></span></button></li>
+{%- endmacro %}
+{#- Uma pessoa nas pontas: a medida por mês nunca vai sem o total e os meses. -#}
+{% macro ponta(x) -%}
+<li data-p="{{ x.p }}"{% if x.foco %} class="cg-co-f"{% endif %}><span class="cg-co-pn">{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-co-pv"><b>{{ x.valor }}</b> {{ x.un }}</span><span class="cg-co-px">{{ x.extra }}</span></li>
+{%- endmacro %}
+
+  <section class="az-sec cg-vista" data-vista="cota" aria-labelledby="cg-cota-h">
+    <header class="az-lh" id="cg-cota">
+      <p class="az-ln">Cota parlamentar</p>
+      <h3 class="az-lt" id="cg-cota-h">Quanto cada um gasta, com o quê e com quem</h3>
+      <p class="az-ld">A cota paga o que o mandato custa além do salário: escritório, carro, combustível, divulgação, passagens. O parlamentar gasta, apresenta a nota e a Casa reembolsa, até um limite por mês que muda conforme o estado. Aqui: quanto, quando, com o quê e quem. No fim, o que vale conferir nota a nota.</p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}" id="cg-cota-{{ casa.id }}">
+      {% if casa.cota and casa.cota.painel %}{% set ct = casa.cota %}{% set pn = ct.painel %}
+      {% set qd = pn.quando %}{% set oq = pn.com_o_que %}{% set q = pn.quem %}{% set ca = pn.cartao %}{% set pt = pn.pontas %}{% set tb = pn.tabela %}{% set cf = pn.conferir %}{% set nm = pn.numeros %}
+      <div class="cg-co" data-cota="{{ casa.id }}" data-nome="{{ pn.casa }}" data-um="{{ pn.um }}" data-uns="{{ pn.uns }}" data-rec="{{ pn.janela.recentes_texto }}" data-limite="{{ pn.textos.sem_teto }}">
+
+        {#- ════ Zona A: o painel. Tudo aqui obedece à janela e aos filtros escritos na frase. ════ -#}
+        <div class="cg-co-a">
+          {#- Os filtros: só com script, depois que o arquivo mensal chega (as opções vêm dele). -#}
+          <form class="cg-co-fil" aria-label="Período e filtros da cota" hidden>
+            <button type="button" class="cg-co-mob" aria-expanded="false">Mudar o período e os filtros</button>
+            <div class="cg-co-fl">
+              <div class="cg-co-f1" role="group" aria-label="Período">
+                <span class="cg-pa-fk">Período</span>
+                <span class="cg-co-pers"><button type="button" class="cg-pa-f" data-per="leg" aria-pressed="true">Legislatura</button></span>
+                <label class="cg-co-sel"><span>de</span> <select data-f="de" aria-label="Primeiro mês do período"></select></label>
+                <label class="cg-co-sel"><span>até</span> <select data-f="ate" aria-label="Último mês do período"></select></label>
+              </div>
+              <div class="cg-co-f2">
+                <label class="cg-co-sel"><span>Despesa</span> <select data-f="cat"><option value="">todas</option></select></label>
+                <label class="cg-co-sel"><span>Estado</span> <select data-f="uf"><option value="">todos</option></select></label>
+                <label class="cg-co-sel"><span>Partido</span> <select data-f="pt"><option value="">todos</option></select></label>{{ info(pn.textos.partido_dica) }}
+                <span class="cg-co-fx" role="group" aria-label="Faixa">
+                  <span class="cg-pa-fk">Faixa</span>
+                  <button type="button" class="cg-pa-f" data-g="menos" aria-pressed="false">os {{ pn.filtros.faixa_pct }}% que menos gastam</button>
+                  <button type="button" class="cg-pa-f" data-g="mais" aria-pressed="false">os {{ pn.filtros.faixa_pct }}% que mais gastam</button>{{ info(pn.filtros.faixa_dica) }}
+                </span>
+                <button type="button" class="cg-pa-limpa cg-co-limpa" hidden>Limpar</button>
+              </div>
+            </div>
+          </form>
+          <p class="cg-co-falha" role="status" hidden>{{ pn.textos.falha }}</p>
+          <p class="cg-co-ve" role="status" aria-live="polite"><b>Você está vendo:</b> <span class="cg-co-ve-t">{{ pn.frase|join(" · ") }}{% if pn.janela.recentes_texto %} · <i>{{ pn.janela.recentes_texto }}</i>{% endif %}</span></p>
+          <p class="cg-co-vz" role="status" hidden></p>
+
+          {#- Os três números: quanto, quem (o do meio) e com o quê. A unidade vai na linha do número. -#}
+          <ul class="cg-pa-ms cg-co-ns">
+            <li><div class="cg-pa-m cg-co-n" data-n="quanto"><span class="cg-pa-m-n"><b>{{ nm.quanto.n }}</b> no período</span>{% for l in nm.quanto.linhas %}<span class="{{ "cg-pa-m-f" if loop.first else "cg-pa-m-x" }}">{{ l }}</span>{% endfor %}</div>{{ info(nm.quanto.dica) }}</li>
+            <li><button type="button" class="cg-pa-m cg-co-n" data-n="quem"><span class="cg-pa-m-n"><b>{{ nm.quem.n }}</b> {{ nm.quem.un }}</span>{% for l in nm.quem.linhas %}<span class="{{ "cg-pa-m-f" if loop.first else "cg-pa-m-x" }}">{{ l }}</span>{% endfor %}{% if nm.quem.teto %}<span class="cg-pa-m-x">{{ nm.quem.teto }}</span>{% endif %}<span class="cg-pa-m-ir" aria-hidden="true">ver no gráfico</span></button>{{ info(nm.quem.dica ~ ((" " ~ pn.textos.sem_teto) if pn.textos.sem_teto else "")) }}</li>
+            <li><button type="button" class="cg-pa-m cg-co-n" data-n="oque" data-cat="{{ nm.com_o_que.cat }}" aria-pressed="false"><span class="cg-pa-m-n"><b>{{ nm.com_o_que.n }}</b> do total</span>{% for l in nm.com_o_que.linhas %}<span class="{{ "cg-pa-m-f" if loop.first else "cg-pa-m-x" }}">{{ l }}{% if loop.last %} no período{% endif %}</span>{% endfor %}<span class="cg-pa-m-ir" aria-hidden="true">ver só esta despesa</span></button></li>
+          </ul>
+
+          <div class="cg-co-2">
+            {#- Quando: uma coluna por mês fechado; as somam o primeiro número. -#}
+            <div class="az-blk cg-co-qd">
+              <h4 class="az-h">Quando <span><span data-t="quando">{{ qd.titulo }}</span>{{ info(pn.textos.quando_dica) }}</span></h4>
+              <figure class="cg-co-fig">
+                <p class="cg-co-un" aria-hidden="true">{{ qd.unidade }}</p>
+                <div class="cg-co-plot cg-co-pq" data-plot="quando">
+                  <div class="cg-co-gr" aria-hidden="true">{% for m in qd.marcas %}<span style="bottom:{{ m.y }}%"><b>{{ m.rot }}</b></span>{% endfor %}</div>
+                  {% if qd.recentes %}<span class="cg-co-rec" style="left:{{ qd.recentes.x }}%;width:{{ qd.recentes.w }}%" aria-hidden="true"><b>{{ qd.recentes.rot }}</b></span>{% endif %}
+                  <div class="cg-co-cols">{% for x in qd.colunas %}<i data-mes="{{ x.m }}"{% if x.recente %} class="cg-co-r"{% endif %} style="left:{{ x.x }}%;width:{{ x.w }}%;bottom:{{ x.y }}%;height:{{ x.h }}%"></i>{% endfor %}</div>
+                  {% if qd.pico %}<span class="cg-co-pico{% if qd.pico.cx > 50 %} cg-co-esq{% endif %}" style="left:{{ qd.pico.cx }}%;bottom:{{ qd.pico.y }}%">{{ qd.pico.texto }}</span>{% endif %}
+                </div>
+                <div class="cg-co-ex" aria-hidden="true">{% for x in qd.colunas if x.ano %}<span style="left:{{ x.x }}%"><b class="cg-co-pc">{{ x.ano }}</b><b class="cg-co-cel">{{ x.ano2 }}</b></span>{% endfor %}{% for mc in qd.marcos %}<span class="cg-co-marco{% if mc.cx > 80 %} cg-co-esq{% endif %}" style="left:{{ mc.cx }}%">{{ mc.rot }}</span>{% endfor %}</div>
+                <div class="cg-gr-dica cg-co-dica" role="status" hidden></div>
+                <figcaption class="sr-only">Colunas: {{ qd.titulo }}, de {{ pn.janela.curta }}. A tabela logo abaixo tem todos os meses.{% for mc in qd.marcos %} {{ mc.titulo }}.{% endfor %}</figcaption>
+              </figure>
+              <details class="cg-co-tbd" data-tab="meses">
+                <summary>Mês a mês, em tabela</summary>
+                <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-co-t">
+                  <thead><tr><th scope="col">Mês</th><th scope="col">R$ no mês</th><th scope="col">Quantos tiveram despesa</th></tr></thead>
+                  <tbody>{% for r in qd.tabela %}<tr><th scope="row">{{ r.mes }}{% if r.recente %} <small>ainda recebe notas</small>{% endif %}</th><td>{{ r.valor }}</td><td>{{ r.n }}</td></tr>{% endfor %}</tbody>
+                </table></div>
+              </details>
+            </div>
+
+            {#- Com o quê: as maiores despesas à vista, na ordem da Casa; as demais em "Outras". -#}
+            <div class="az-blk cg-co-oq">
+              <h4 class="az-h">Com o quê <span data-t="oque">{{ oq.janela }}</span></h4>
+              <ul class="cg-co-bs">{% for l in oq.linhas %}{{ barra(l) }}{% endfor %}</ul>
+              {% if oq.outras %}
+              <details class="cg-co-out">
+                <summary><span class="cg-co-bn">{{ oq.outras.rot }}</span><span class="cg-co-bv">{{ oq.outras.texto }}</span></summary>
+                <ul class="cg-co-bs">{% for l in oq.outras.linhas %}{{ barra(l) }}{% endfor %}</ul>
+              </details>
+              {% endif %}
+              {% if pn.textos.fora %}<p class="az-dek cg-co-sem">{{ pn.textos.fora }}</p>{% endif %}
+            </div>
+          </div>
+
+          <div class="cg-co-3">
+            {#- Quem: um ponto por parlamentar em exercício, empilhado em faixas de reais por mês. -#}
+            <div class="az-blk cg-co-qm">
+              <h4 class="az-h">Quem <span><span data-t="quem">{{ q.titulo }}</span>{{ info(pn.textos.medida_dica) }}</span></h4>
+              <form class="cg-co-ach" role="search" hidden><label><span>Achar um nome</span> <input class="az-fil-in" type="search" list="cgCoNomes-{{ casa.id }}" autocomplete="off" spellcheck="false" placeholder="Nome do {{ pn.um }}…"></label><datalist id="cgCoNomes-{{ casa.id }}"></datalist></form>
+              {% set fp = (q.pontos|selectattr("foco")|list|first) if q.foco else none %}
+              {% set fino = q.n > 150 %}
+              <figure class="cg-co-fig">
+                <p class="cg-co-un" aria-hidden="true">{{ q.unidade }}</p>
+                <div class="cg-co-plot cg-co-pp" data-plot="quem" data-faixa="{{ q.faixa }}" data-eixo="{{ q.eixo }}" style="--pilha:{{ q.pilha }};{% if fino %}--dd:5px;--dy:7px;--dd2:2.6px;--dy2:3.2px{% else %}--dd:8px;--dy:9.5px;--dd2:4.5px;--dy2:6px{% endif %}">
+                  {% if q.metade %}<span class="cg-co-met" style="left:{{ q.metade.x1 }}%;width:{{ (q.metade.x2 - q.metade.x1)|round(3) }}%" aria-hidden="true"></span>{% endif %}
+                  {% if q.teto %}<span class="cg-co-lim" style="left:{{ q.teto.x1 }}%;width:{{ (q.teto.x2 - q.teto.x1)|round(3) }}%" aria-hidden="true"></span>{% endif %}
+                  {% if q.mediana %}<span class="cg-co-med{% if q.mediana.x > 66 %} cg-co-esq{% endif %}" style="left:{{ q.mediana.x }}%" aria-hidden="true"><b>{{ q.mediana.rot }}</b></span>{% endif %}
+                  <div class="cg-co-pts" aria-hidden="true">{% for p in q.pontos %}<i data-p="{{ p.p }}"{% if p.foco %} class="cg-co-pf"{% endif %} style="--x:{{ p.x }};--n:{{ p.n }}"></i>{% endfor %}</div>
+                  {% if fp and ca %}<span class="cg-co-fio{% if fp.x > 50 %} cg-co-esq{% endif %}" style="--x:{{ fp.x }};--t:{{ q.pontos|selectattr("x", "equalto", fp.x)|list|length }}" aria-hidden="true"><b>{{ ca.nome }} · {{ ca.valor }}</b></span>{% endif %}
+                </div>
+                <div class="cg-co-ex cg-co-exq" aria-hidden="true">{% for m in q.marcas %}<span style="left:{{ m.x }}%">{{ m.rot }}</span>{% endfor %}</div>
+                {% if q.metade %}<div class="cg-co-ch" aria-hidden="true"><span style="left:{{ q.metade.x1 }}%;width:{{ (q.metade.x2 - q.metade.x1)|round(3) }}%"><b>{{ q.metade.rot }}</b></span></div>{% endif %}
+                {% if q.teto %}<p class="cg-co-lim-t">{{ q.teto.rot }}</p>{% endif %}
+                <div class="cg-gr-dica cg-co-dica" role="status" hidden></div>
+                <figcaption class="sr-only">{% if q.n %}Pontos: {{ q.n }} {{ pn.uns if q.n != 1 else pn.um }} em exercício, pela média de reembolso por mês com despesa, de {{ pn.janela.curta }}.{% if q.mediana %} {{ q.mediana.rot[:1]|upper }}{{ q.mediana.rot[1:] }}{% if q.metade %}; metade fica entre {{ q.metade.de }} e {{ q.metade.a }}{% endif %}.{% endif %} A tabela de todos, mais abaixo, tem o nome e o valor de cada um.{% else %}Nenhum {{ pn.um }} em exercício tem despesa em meses bastantes para entrar no gráfico.{% endif %}</figcaption>
+              </figure>
+              <div class="cg-co-fo">{% if q.fora %}{% if q.fora.nomes %}<details><summary>{{ q.fora.texto }}</summary><p>{% for x in q.fora.nomes %}{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if not loop.last %}, {% endif %}{% endfor %}</p></details>{% else %}<p>{{ q.fora.texto }}</p>{% endif %}{% endif %}</div>
+            </div>
+
+            {#- O cartão em foco: de início, o parlamentar do meio. -#}
+            <div class="cg-pa-cw cg-co-cw">
+              <div class="cg-pa-nav cg-co-nav" hidden><button type="button" class="cg-pa-ant" aria-label="Quem gasta menos">‹ <span>gasta menos</span></button><span class="cg-pa-pos" aria-live="polite">{{ ca.pos if ca else "" }}</span><button type="button" class="cg-pa-prox" aria-label="Quem gasta mais"><span>gasta mais</span> ›</button></div>
+              <article class="cg-pa-card cg-co-card" aria-label="{{ pn.um|capitalize }} em foco">
+                {% if ca %}
+                <p class="cg-co-c-k"><i class="cg-co-bola" aria-hidden="true"></i><b>Em foco</b><span>{{ ca.origem }}</span><span class="cg-co-c-pos">{{ ca.pos }}{% if ca.pos_uf %} · {{ ca.pos_uf }}{% endif %}</span></p>
+                <p class="cg-co-c-n">{{ pes(ca.k, ca.nome) }} <small>{{ ca.legenda }}</small></p>
+                <p class="cg-co-c-v"><b>{{ ca.valor }}</b> {{ ca.un }}</p>
+                <p class="cg-co-c-r">{{ ca.resto }}{% if ca.teto %} · {{ ca.teto }}{% endif %}</p>
+                {% if ca.antes %}
+                <h5 class="cg-pa-c-h">Antes de comparar</h5>
+                <ul class="cg-co-c-a">{% for t in ca.antes %}<li>{{ t }}</li>{% endfor %}</ul>
+                {% endif %}
+                <h5 class="cg-pa-c-h">Com o quê <b>parte do total · o risco é a parte {{ "na Câmara" if casa.id == "cd" else "no Senado" }}</b></h5>
+                <ul class="cg-co-c-b">
+                  {% for b in ca.cats %}<li><span class="cg-co-bn">{{ b.curto }}</span><span class="cg-co-bv">{{ b.pct }} · {{ b.valor }}{% if b.casa %}<span class="sr-only"> (na Casa: {{ b.casa }})</span>{% endif %}</span><span class="cg-co-bb" aria-hidden="true"><i style="width:{{ b.w }}%"></i>{% if b.casa %}<u style="left:{{ b.casa_w }}%"></u>{% endif %}</span></li>{% endfor %}
+                  {% if ca.outras %}<li><span class="cg-co-bn">{{ ca.outras.rot }}</span><span class="cg-co-bv">{{ ca.outras.pct }} · {{ ca.outras.valor }}</span><span class="cg-co-bb" aria-hidden="true"><i style="width:{{ ca.outras.w }}%"></i></span></li>{% endif %}
+                </ul>
+                <h5 class="cg-pa-c-h">Mês a mês <b>R$ em cada mês</b></h5>
+                <div class="cg-co-mini" role="img" aria-label="{{ ca.serie.aria }}">{% for x in ca.serie.colunas %}<i{% if x.recente %} class="cg-co-r"{% endif %} style="height:{{ x.h }}%"></i>{% endfor %}</div>
+                <p class="cg-co-mini-x" aria-hidden="true"><span>{{ qd.colunas[0].rot if qd.colunas else "" }}</span><span>{{ qd.colunas[-1].rot if qd.colunas else "" }}</span></p>
+                <div class="cg-co-c-q">
+                  {% if ca.fornecedores %}
+                  <h5 class="cg-pa-c-h">Com quem, na legislatura inteira</h5>
+                  <ol class="cg-co-c-f">{% for f in ca.fornecedores %}<li><span>{{ f.nome }}</span><b>{{ f.valor }}{% if f.pct %} · {{ f.pct }}{% endif %}</b></li>{% endfor %}</ol>
+                  {% endif %}
+                  {% if ca.glosa %}<p class="cg-pa-c-o">{{ ca.glosa }}</p>{% endif %}
+                </div>
+                <p class="cg-pa-c-l"><a class="cg-p" href="#p={{ ca.k }}" data-k="{{ ca.k }}">Abrir o dossiê</a></p>
+                {% else %}
+                <p class="cg-pa-c-o">Nenhum {{ pn.um }} em exercício tem despesa em meses bastantes para entrar no gráfico.</p>
+                {% endif %}
+              </article>
+            </div>
+
+            {#- As pontas: quem mais e quem menos gasta, pela medida do gráfico. -#}
+            <div class="az-blk cg-co-pt">
+              <h4 class="az-h">As pontas <span data-t="pontas">{{ pt.titulo }}</span></h4>
+              <div class="cg-co-pls{% if pt.uma %} cg-co-pl1{% endif %}">
+                {% if not pt.mais %}<p class="cg-co-pv0">Nenhum {{ pn.um }} em exercício tem despesa em meses bastantes para entrar nas listas.</p>{% else %}
+                <div class="cg-co-pl" data-lista="mais">
+                  <h5 class="az-h5">{% if pt.uma %}Todos os {{ pt.mais|length }}, do que mais gasta ao que menos gasta{% else %}Os {{ pt.mais|length }} que mais gastam{% endif %}</h5>
+                  <ol>{% for x in pt.mais %}{{ ponta(x) }}{% endfor %}</ol>
+                </div>
+                {% if not pt.uma %}
+                <div class="cg-co-pl" data-lista="menos">
+                  <h5 class="az-h5">Os {{ pt.menos|length }} que menos gastam</h5>
+                  <ol>{% for x in pt.menos %}{{ ponta(x) }}{% endfor %}</ol>
+                </div>
+                {% endif %}
+                {% endif %}
+              </div>
+              {% if ct.sem_despesa %}<p class="az-dek">Não pediram reembolso nenhum na legislatura: {% for x in ct.sem_despesa %}{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if not loop.last %}, {% endif %}{% endfor %}.</p>{% endif %}
+            </div>
+
+            {#- Todos, em tabela: a gêmea do gráfico de pontos. -#}
+            <details class="cg-co-tb" data-tab="todos"{% if not tb.linhas %} hidden{% endif %}>
+              <summary>{{ tb.titulo }}</summary>
+              <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-co-t cg-co-tt">
+                <thead><tr><th scope="col" data-ord="pos">Posição</th><th scope="col" data-ord="nome">Nome</th><th scope="col" data-ord="leg">Partido-UF</th><th scope="col" data-ord="v">R$ por mês com despesa</th><th scope="col" data-ord="m">Meses com despesa</th><th scope="col" data-ord="t">R$ no período</th>{% if tb.teto %}<th scope="col" data-ord="lim">% do teto</th>{% endif %}<th scope="col" data-ord="cat">Maior despesa</th></tr></thead>
+                <tbody>{% for x in tb.linhas %}<tr{% if x.foco %} class="cg-co-f"{% endif %}><td>{{ x.pos }}º</td><th scope="row"><a href="#p={{ x.k }}">{{ x.nome }}</a></th><td>{{ x.legenda }}</td><td>{{ x.valor }}</td><td>{{ x.meses }}</td><td>{{ x.total }}</td>{% if tb.teto %}<td>{{ x.pct_teto }}</td>{% endif %}<td>{{ x.maior }}</td></tr>{% endfor %}</tbody>
+              </table></div>
+            </details>
+          </div>
+        </div>
+
+        {#- ════ Zona B: para conferir. Sempre a legislatura inteira; não muda com o período nem com os filtros. ════ -#}
+        <div class="cg-co-z" id="cg-cota-conferir-{{ casa.id }}">
+          <h4 class="cg-co-zh">Para conferir <span>{{ cf.frase }}</span></h4>
+          {% if ct.fornecedores %}
+          <details class="cg-co-zd" open>
+            <summary><b>Quem mais recebe</b> <i>({{ cf.fornecedores_n }})</i> <span>os fornecedores, pelo CNPJ, na {{ cf.janela }}, e quantos gabinetes pagaram a cada um</span></summary>
+            <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-ct-f">
+              <thead><tr><th scope="col">Fornecedor</th><th scope="col">CNPJ</th><th scope="col">Recebeu <small>R$ na legislatura</small></th><th scope="col">Gabinetes</th><th scope="col">Notas</th><th scope="col">Principal despesa</th></tr></thead>
+              <tbody>{% for f in ct.fornecedores %}<tr><th scope="row">{{ f.nome }}</th><td>{{ f.cnpj }}</td><td>{{ f.valor }}</td><td>{{ f.gabinetes }}</td><td>{{ f.n }}</td><td class="cg-co-zc">{{ f.categoria }}</td></tr>{% endfor %}</tbody>
+            </table></div>
+          </details>
+          {% endif %}
+          {% if ct.concentrados %}
+          <details class="cg-co-zd" open>
+            <summary><b>Um fornecedor só</b> <i>({{ cf.concentrados_titulo }})</i> <span>quem pagou um quarto ou mais da própria cota a uma empresa, na {{ cf.janela }}</span></summary>
+            <ol class="cg-ls cg-ct-o">{% for x in ct.concentrados %}<li><p class="cg-ls-k"><b>{{ pes(x.k, x.nome) }}</b> <span>{{ x.legenda }}</span></p><p class="cg-ls-x"><b>{{ x.pct }}</b> do total ({{ x.valor }} de {{ x.total }}) para {{ x.fornecedor }}{% if x.cnpj %} <small>{{ x.cnpj }}</small>{% endif %}.</p></li>{% endfor %}</ol>
+          </details>
+          {% endif %}
+          {% if ct.repetidas %}
+          <details class="cg-co-zd" open>
+            <summary><b>A mesma nota em mais de um gabinete</b> <i>({{ cf.repetidas_n }})</i> <span>mesmo fornecedor, número, data e valor, reembolsada a mais de uma pessoa, na {{ cf.janela }}</span></summary>
+            <p class="az-dek">O registro não diz por quê: pode ser despesa dividida, erro de digitação ou outra coisa. Os links abrem cada nota como a Casa a guardou, para conferir.</p>
+            <ol class="cg-ls cg-ct-o">{% for r in ct.repetidas %}<li><p class="cg-ls-k"><b>{{ r.fornecedor }}</b> <span>nota {{ r.numero }} · {{ r.data }} · {{ r.valor }}{% if r.cnpj %} · {{ r.cnpj }}{% endif %}</span></p><p class="cg-ls-x">{% for x in r.docs %}{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if x.url %} <a href="{{ x.url }}" target="_blank" rel="noopener noreferrer">nota ↗</a>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</p></li>{% endfor %}</ol>
+          </details>
+          {% endif %}
+          {% if ct.glosas %}
+          <details class="cg-co-zd" open>
+            <summary><b>O que a Casa recusou</b> <i>({{ cf.glosas_n }})</i> <span>valor glosado, a parte das notas apresentadas que a própria Casa não reembolsou, na {{ cf.janela }}</span></summary>
+            <div class="cg-lt cg-co-zg"><ol>{% for x in ct.glosas %}<li><span class="cg-lt-n">{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b> <small>{{ x.extra }}</small></span></li>{% endfor %}</ol></div>
+          </details>
+          {% endif %}
+          <p class="az-dek cg-co-como"><b>Como esta conta é feita.</b> {{ pn.textos.como }} O resto está em <a href="#cg-metodo">Como ler</a>.</p>
+        </div>
+      </div>
+
+      {% elif casa.cota %}{% set ct = casa.cota %}
+      {#- Dados gravados antes da aba com período: o desenho antigo, inteiro. -#}
+      <p class="az-ph">De {{ ct.desde }} a {{ ct.ate }}, <b>{{ ct.pessoas }}</b> {{ ct.quem }} pediram <b>{{ ct.total }}</b> de reembolso da cota. Na mediana, um {{ "deputado" if casa.id == "cd" else "senador" }} em exercício gasta <b>{{ ct.mediana }}</b> por mês.{% if ct.sem %} Fora da conta: {{ ct.sem }}.{% endif %}</p>
+      <div class="cg-lts cg-ct-l">
+        <div class="cg-lt">
+          <h4 class="az-h5">Quem mais gasta</h4>
+          <p class="cg-lt-d">A média por mês com despesa na legislatura (6 meses ou mais).</p>
+          <ol>{% for x in ct.mais %}<li><span class="cg-lt-n">{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b> <small>{{ x.extra }}</small></span></li>{% endfor %}</ol>
+        </div>
+        <div class="cg-lt">
+          <h4 class="az-h5">Quem menos gasta</h4>
+          <p class="cg-lt-d">A mesma média, do menor para o maior.{% if ct.sem_despesa %} Não pediram reembolso nenhum na legislatura: {% for x in ct.sem_despesa %}{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
+          <ol>{% for x in ct.menos %}<li><span class="cg-lt-n">{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b> <small>{{ x.extra }}</small></span></li>{% endfor %}</ol>
+        </div>
+        {% if ct.glosas %}
+        <div class="cg-lt">
+          <h4 class="az-h5">O que a Casa recusou</h4>
+          <p class="cg-lt-d">Valor glosado: a parte das notas apresentadas que a própria Casa não reembolsou.</p>
+          <ol>{% for x in ct.glosas %}<li><span class="cg-lt-n">{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small></span><span class="cg-lt-v"><b>{{ x.valor }}</b> <small>{{ x.extra }}</small></span></li>{% endfor %}</ol>
+        </div>
+        {% endif %}
+      </div>
+      {% if ct.categorias %}
+      <div class="az-blk">
+        <h4 class="az-h">Para onde vai <span>o total da legislatura, por tipo de despesa</span></h4>
+        <ul class="cg-ct-cat">{% for c in ct.categorias %}<li><span class="cg-ct-cn">{{ c.nome|lower|capitalize }}</span><span class="cg-ct-cb" aria-hidden="true"><i style="width:{{ c.w }}%"></i></span><span class="cg-ct-cv"><b>{{ c.valor }}</b> <small>{{ c.pct }}</small></span></li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+      {% if ct.fornecedores %}
+      <div class="az-blk">
+        <h4 class="az-h">Quem mais recebe <span>os fornecedores, pelo CNPJ, e quantos gabinetes pagaram a cada um</span></h4>
+        <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-ct-f">
+          <thead><tr><th scope="col">Fornecedor</th><th scope="col">CNPJ</th><th scope="col">Recebeu</th><th scope="col">Gabinetes</th><th scope="col">Notas</th></tr></thead>
+          <tbody>{% for f in ct.fornecedores %}<tr><th scope="row">{{ f.nome }}</th><td>{{ f.cnpj }}</td><td>{{ f.valor }}</td><td>{{ f.gabinetes }}</td><td>{{ f.n }}</td></tr>{% endfor %}</tbody>
+        </table></div>
+      </div>
+      {% endif %}
+      {% if ct.concentrados %}
+      <div class="az-blk">
+        <h4 class="az-h">Um fornecedor só <span>quem pagou um quarto ou mais da própria cota a uma empresa</span></h4>
+        <ol class="cg-ls cg-ct-o">{% for x in ct.concentrados %}<li><p class="cg-ls-k"><b>{{ pes(x.k, x.nome) }}</b> <span>{{ x.legenda }}</span></p><p class="cg-ls-x"><b>{{ x.pct }}</b> do total ({{ x.valor }} de {{ x.total }}) para {{ x.fornecedor }}{% if x.cnpj %} <small>{{ x.cnpj }}</small>{% endif %}.</p></li>{% endfor %}</ol>
+      </div>
+      {% endif %}
+      {% if ct.repetidas %}
+      <div class="az-blk">
+        <h4 class="az-h">A mesma nota em mais de um gabinete <span>mesmo fornecedor, número, data e valor, reembolsada a mais de uma pessoa</span></h4>
+        <p class="az-dek">O registro não diz por quê: pode ser despesa dividida, erro de digitação ou outra coisa. Os links abrem cada nota como a Casa a guardou, para conferir.</p>
+        <ol class="cg-ls cg-ct-o">{% for r in ct.repetidas %}<li><p class="cg-ls-k"><b>{{ r.fornecedor }}</b> <span>nota {{ r.numero }} · {{ r.data }} · {{ r.valor }}{% if r.cnpj %} · {{ r.cnpj }}{% endif %}</span></p><p class="cg-ls-x">{% for x in r.docs %}{{ pes(x.k, x.nome) }} <small>{{ x.legenda }}</small>{% if x.url %} <a href="{{ x.url }}" target="_blank" rel="noopener noreferrer">nota ↗</a>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</p></li>{% endfor %}</ol>
+      </div>
+      {% endif %}
+      {% else %}
+      <p class="az-ph">Os dados da cota {{ "da Câmara" if casa.id == "cd" else "do Senado" }} não puderam ser lidos nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>

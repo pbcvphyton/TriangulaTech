@@ -1,5 +1,7 @@
 """As escolhas editoriais do analítico do Congresso (``config/congresso.yaml``):
-legislaturas, governos, polos, limiares, faixas do campo e macrotemas.
+legislaturas, governos, polos, limiares, faixas do campo, macrotemas e a apresentação
+da cota parlamentar (os nomes curtos das despesas, os meses que ainda recebem notas e a
+tabela do limite mensal por estado, que só vale depois de conferida na fonte oficial).
 
 Nada disto é dado oficial: são as réguas com que os registros oficiais são lidos.
 Por isso ficam num arquivo só, à vista, e vão escritas na seção "Como ler" da aba.
@@ -8,6 +10,7 @@ Por isso ficam num arquivo só, à vista, e vão escritas na seção "Como ler" 
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -171,6 +174,69 @@ class Pauta:
     calendario: tuple[Marco, ...] = ()
 
 
+# As 27 unidades da federação: a tabela do limite mensal da cota só vale com todas.
+UFS = (
+    "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA", "MG", "MS", "MT", "PA",
+    "PB", "PE", "PI", "PR", "RJ", "RN", "RO", "RR", "RS", "SC", "SE", "SP", "TO",
+)  # fmt: skip
+MESES_RECENTES = 3  # sem o bloco "cota" no arquivo: os três últimos meses fechados ainda recebem notas
+
+
+@dataclass(frozen=True)
+class RotuloDeDespesa:
+    """O nome de uma despesa da cota na página (config/congresso.yaml, ``cota.rotulos``)."""
+
+    oficial: str  # o nome oficial normalizado (sem acento, minúsculas, sem pontuação): é por ele que se casa
+    id: str  # estável: é o que vai no endereço da página e no arquivo de dados
+    curto: str  # o que a página mostra ("Divulgação do mandato")
+
+
+@dataclass(frozen=True)
+class TetosDaCota:
+    """A tabela do limite mensal da cota de uma Casa, por estado, em centavos. Só existe
+    depois de conferida na fonte oficial (``fonte`` e ``url`` dizem qual); cada vigência
+    traz as 27 UFs."""
+
+    fonte: str
+    url: str
+    vigencias: tuple[tuple[str, Mapping[str, int]], ...]  # (desde AAAA-MM, {UF: centavos por mês}), da mais antiga à mais nova
+
+    def em(self, uf: str, mes: str) -> int | None:
+        """O limite do estado ``uf`` no mês ``AAAA-MM``, em centavos (``None`` antes da
+        primeira vigência ou para uma UF que a tabela não conhece)."""
+        valor = None
+        for desde, valores in self.vigencias:
+            if desde <= mes:
+                valor = valores.get(uf)
+        return valor
+
+
+@dataclass(frozen=True)
+class Cota:
+    """A apresentação da cota parlamentar (config/congresso.yaml, ``cota``). Nada aqui muda
+    uma soma: são os nomes com que as despesas aparecem, quantos meses do fim da série
+    ainda recebem notas e, se conferida, a tabela do limite mensal por estado. Sem a
+    tabela (o padrão), a página não mostra limite nenhum."""
+
+    meses_recentes: int = MESES_RECENTES
+    rotulos: Mapping[str, tuple[RotuloDeDespesa, ...]] = field(default_factory=dict)  # casa → rótulos
+    tetos: Mapping[str, TetosDaCota] = field(default_factory=dict)  # casa → tabela (só as conferidas e completas)
+    avisos: tuple[str, ...] = ()  # o que o arquivo trazia e não pôde valer (tabela incompleta)
+
+    def rotulo(self, casa: str, oficial: str) -> tuple[str, str]:
+        """``(id, nome curto)`` da despesa de nome ``oficial``. Sem rótulo no arquivo: o id é
+        o nome normalizado com hífens e o nome curto, o oficial só com a inicial maiúscula."""
+        chave = text.normalize(oficial)
+        for r in self.rotulos.get(casa) or ():
+            if r.oficial == chave:
+                return r.id, r.curto
+        limpo = re.sub(r"\s*([,;:])\s*", r"\1 ", re.sub(r"\s+", " ", oficial)).strip(" .")
+        return chave.replace(" ", "-") or "despesa", (limpo[:1].upper() + limpo[1:].lower()) or oficial
+
+    def teto(self, casa: str) -> TetosDaCota | None:
+        return self.tetos.get(casa)
+
+
 CAMPOS_PADRAO = (
     Campo("esquerda", "com a esquerda", -60),
     Campo("centro_esquerda", "mais com a esquerda", -20),
@@ -193,6 +259,7 @@ class Regras:
     frentes: tuple[FrenteDeCausa, ...] = ()  # as frentes parlamentares de causa (só a Câmara registra quem assina)
     fusoes: dict[str, str] = field(default_factory=dict)  # partido que deixou de existir → o sucessor (siglas normalizadas)
     pauta: Pauta = field(default_factory=Pauta)  # os sinais das aprovadas, o calendário e as "regras do próprio jogo"
+    cota: Cota = field(default_factory=Cota)  # a apresentação da cota: nomes curtos, meses recentes e o limite por estado
 
     def __post_init__(self) -> None:
         self._tema_camara = {cod: t.id for t in self.temas for cod in t.camara}
@@ -307,6 +374,74 @@ def _pauta(bruto: Any) -> Pauta:
     return Pauta(**campos)
 
 
+def _centavos(bruto: Any) -> int | None:
+    """R$ do arquivo → centavos inteiros; vazio, negativo, zero ou ilegível não é valor."""
+    if isinstance(bruto, bool) or bruto is None:
+        return None
+    try:
+        valor = round(float(bruto) * 100)
+    except (TypeError, ValueError):
+        return None
+    return valor if valor > 0 else None
+
+
+def _tetos(bruto: Any, casa: str) -> tuple[TetosDaCota | None, str]:
+    """A tabela do limite mensal de uma Casa e, se ela não puder valer, o aviso que diz por
+    quê. Vale só inteira: fonte, endereço e as 27 UFs com valor em toda vigência. Tabela
+    pela metade compararia uns estados e não outros; então fica desligada."""
+    if bruto is None:
+        return None, ""
+    onde = f"config/{ARQUIVO}, cota.tetos.{casa}"
+    if not isinstance(bruto, dict):
+        return None, f"{onde}: fora do formato; a página sai sem o limite mensal"
+    fonte, url = str(bruto.get("fonte") or "").strip(), str(bruto.get("url") or "").strip()
+    vigencias: list[tuple[str, dict[str, int]]] = []
+    for v in bruto.get("vigencias") or []:
+        desde = str((v or {}).get("desde") or "")[:7] if isinstance(v, dict) else ""
+        valores = v.get("valores") if isinstance(v, dict) else None
+        if not re.fullmatch(r"\d{4}-\d{2}", desde) or not isinstance(valores, dict):
+            return None, f"{onde}: vigência sem \"desde\" (AAAA-MM) ou sem \"valores\"; a página sai sem o limite mensal"
+        centavos = {str(uf).strip().upper(): _centavos(valor) for uf, valor in valores.items()}
+        faltam = [uf for uf in UFS if not centavos.get(uf)]
+        if faltam:
+            return None, f"{onde}: a vigência de {desde} não traz {', '.join(faltam)}; a página sai sem o limite mensal"
+        vigencias.append((desde, {uf: int(centavos[uf] or 0) for uf in UFS}))
+    if not vigencias or not fonte or not url:
+        return None, f"{onde}: falta a fonte, o endereço ou a vigência; a página sai sem o limite mensal"
+    return TetosDaCota(fonte=fonte, url=url, vigencias=tuple(sorted(vigencias, key=lambda par: par[0]))), ""
+
+
+def _cota(bruto: Any) -> Cota:
+    if not isinstance(bruto, dict):
+        return Cota()
+    campos: dict[str, Any] = {}
+    if bruto.get("meses_recentes") is not None:
+        campos["meses_recentes"] = max(0, int(bruto["meses_recentes"]))
+    rotulos: dict[str, tuple[RotuloDeDespesa, ...]] = {}
+    for casa, lista in (bruto.get("rotulos") or {}).items():
+        itens = []
+        for r in lista or []:
+            if isinstance(r, dict) and r.get("oficial") and r.get("id"):
+                itens.append(RotuloDeDespesa(oficial=text.normalize(str(r["oficial"])), id=str(r["id"]).strip(), curto=str(r.get("curto") or r["oficial"]).strip()))
+        ids = [r.id for r in itens]
+        repetidos = sorted({i for i in ids if ids.count(i) > 1})
+        if repetidos:  # o id vai no endereço: repetido, dois filtros virariam um
+            raise ValueError(f"config/{ARQUIVO}, cota.rotulos.{casa}: id repetido ({', '.join(repetidos)})")
+        rotulos[str(casa)] = tuple(itens)
+    campos["rotulos"] = rotulos
+    tetos: dict[str, TetosDaCota] = {}
+    avisos: list[str] = []
+    for casa, tabela in (bruto.get("tetos") or {}).items():
+        lido, aviso = _tetos(tabela, str(casa))
+        if lido is not None:
+            tetos[str(casa)] = lido
+        elif aviso:
+            avisos.append(aviso)
+    campos["tetos"] = tetos
+    campos["avisos"] = tuple(avisos)
+    return Cota(**campos)
+
+
 def de_dict(bruto: dict[str, Any]) -> Regras:
     limiares = Limiares(**{k: v for k, v in (bruto.get("limiares") or {}).items() if k in Limiares.__dataclass_fields__})
     campos = tuple(
@@ -359,6 +494,7 @@ def de_dict(bruto: dict[str, Any]) -> Regras:
             if de
         },
         pauta=_pauta(bruto.get("pauta")),
+        cota=_cota(bruto.get("cota")),
     )
 
 

@@ -38,6 +38,7 @@ from typing import Any
 from .. import text
 from ..config import Config
 from ..congresso import VERSAO, base, dados, ficha, jornal, materias, pauta, peso, projetos, relevancia
+from ..congresso import cota as cota_mod
 from ..models import Edition
 from . import filters
 from .web import brand_view
@@ -1478,7 +1479,14 @@ def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
             for c in (ct.get("categorias") or [])[:12]
         ],
         "fornecedores": [
-            {"nome": f.get("nome") or "", "cnpj": _cnpj(f.get("cnpj")), "valor": reais(f.get("total")), "gabinetes": _num(f.get("gabinetes")), "n": _num(f.get("n"))}
+            {
+                "nome": f.get("nome") or "",
+                "cnpj": _cnpj(f.get("cnpj")),
+                "valor": reais(f.get("total")),
+                "gabinetes": _num(f.get("gabinetes")),
+                "n": _num(f.get("n")),
+                "categoria": f.get("categoria") or "",  # a despesa em que mais recebeu (a coluna "Principal despesa")
+            }
             for f in (ct.get("fornecedores") or [])[:15]
         ],
         "concentrados": [
@@ -1499,6 +1507,655 @@ def _cota(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
         "glosas": [pessoa_(x, valor=reais(x.get("valor")), extra=f"{_num(x.get('n'))} notas") for x in (ct.get("glosas") or [])[:10]],
         "sem_despesa": [pessoa_(x) for x in ct.get("sem_despesa") or []],
         "parte_maior": _pct(100 * float(((ct.get("categorias") or [{}])[0]).get("total") or 0) / total) if ct.get("categorias") else "—",
+        # A aba repensada (período, gráficos, cartão): o estado padrão inteiro, com os textos prontos.
+        # ``None`` com dados gravados antes dela: o modelo cai no desenho antigo.
+        "painel": _cota_painel(ct, casa),
+    }
+
+
+# ── a aba "Cota parlamentar" com período: o estado padrão, pronto para o modelo ──
+# Tudo aqui sai do painel da Casa (casa-<casa>.json, campo "cota"), que traz a legislatura
+# inteira. É o que a página mostra sem script e antes de alguém mexer nos filtros; com o
+# script, o arquivo mensal (cota-<casa>.json) refaz as mesmas contas para outro período.
+
+MESES_EXTENSO = ("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro")
+# "de SP", "do PR", "da BA": a preposição de cada estado (e, dela, "em SP", "no PR", "na BA").
+UF_DE = {
+    "AC": "do", "AL": "de", "AM": "do", "AP": "do", "BA": "da", "CE": "do", "DF": "do", "ES": "do", "GO": "de",
+    "MA": "do", "MG": "de", "MS": "de", "MT": "de", "PA": "do", "PB": "da", "PE": "de", "PI": "do", "PR": "do",
+    "RJ": "do", "RN": "do", "RO": "de", "RR": "de", "RS": "do", "SC": "de", "SE": "de", "SP": "de", "TO": "do",
+}  # fmt: skip
+UF_EM = {"de": "em", "do": "no", "da": "na"}
+COTA_FAIXA = {"cd": 500, "sf": 1000}  # "Quem": reais por faixa do gráfico de pontos (a pilha de cada faixa é um ponto por pessoa)
+COTA_EIXO = 55_000  # "Quem": o eixo vai de 0 a R$ 55 mil; estica de R$ 5 mil em R$ 5 mil se alguém passar
+COTA_EIXO_PASSO = 5_000
+COTA_MARCA = 10_000  # "Quem": uma marca no eixo a cada R$ 10 mil
+COTA_PILHA_PX = 7  # "Quem": distância vertical entre dois pontos da mesma pilha (sugestão para o desenho estático)
+COTA_BARRAS = 6  # "Com o quê": despesas à vista antes de "Outras"
+COTA_PONTAS = 10  # "As pontas": quantos em cada lista
+COTA_PONTAS_UMA = 20  # com tantos pontos ou menos, uma lista só
+COTA_CARTAO_BARRAS = 4  # despesas da pessoa no cartão antes de "outras"
+COTA_ANTES = 3  # frases de "Antes de comparar", no máximo
+COTA_UMA_DESPESA = 60  # "X% em uma despesa só": a maior despesa passa disto (% do total da pessoa)
+COTA_UM_FORNECEDOR = 25  # "X% para um fornecedor só": o maior fornecedor com CNPJ tem isto ou mais (% do total)
+COTA_FAIXA_PCT = 10  # o filtro "os 10% que menos/mais gastam"
+COTA_COLUNA = 72  # "Quando": a coluna ocupa 72% do passo de um mês
+
+
+def cota_regras() -> dict[str, Any]:
+    """As réguas da aba da cota que o script precisa repetir (vão no manifesto da página): com
+    elas, a conta feita no navegador para outro período é a mesma do estado padrão."""
+    return {
+        "v": cota_mod.VERSAO_ARQUIVO,  # o formato de cota-<casa>.json que o script sabe ler
+        "minimoMeses": cota_mod.MINIMO_MESES,  # ponto: em exercício e despesa em min(6, ⌈meses da janela ÷ 2⌉) meses
+        "anoSigepa": cota_mod.ANO_SIGEPA,  # "fora da conta" nas listas: o último ano inteiro com passagens da agência
+        "faixa": dict(COTA_FAIXA),
+        "eixo": COTA_EIXO,
+        "eixoPasso": COTA_EIXO_PASSO,
+        "marca": COTA_MARCA,
+        "pilhaPx": COTA_PILHA_PX,
+        "coluna": COTA_COLUNA,
+        "barras": COTA_BARRAS,
+        "pontas": COTA_PONTAS,
+        "pontasUma": COTA_PONTAS_UMA,
+        "cartaoBarras": COTA_CARTAO_BARRAS,
+        "antes": COTA_ANTES,
+        "umaDespesa": COTA_UMA_DESPESA,
+        "umFornecedor": COTA_UM_FORNECEDOR,
+        "faixaPct": COTA_FAIXA_PCT,
+        "ufDe": dict(UF_DE),  # "de SP", "do PR", "da BA" (e, daí, "em", "no", "na")
+    }
+
+
+def reais_sinal(valor: Any) -> str:
+    """Como :func:`reais`, com o sinal de menos na frente do cifrão ("−R$ 113.787")."""
+    try:
+        v = float(valor)
+    except (TypeError, ValueError):
+        return "—"
+    return ("−" if v < 0 else "") + reais(abs(v))
+
+
+def reais_curto(valor: Any) -> str:
+    """Valor da Casa ou de um recorte: a partir de R$ 1 milhão, "R$ 774,7 milhões"; de
+    R$ 10 mil a R$ 1 milhão, "R$ 84,8 mil"; abaixo disso, por extenso, como :func:`reais`."""
+    try:
+        v = float(valor)
+    except (TypeError, ValueError):
+        return "—"
+    sinal, a = ("−" if v < 0 else ""), abs(v)
+    if a >= 999_950:  # R$ 999.950 já arredondaria para "1.000,0 mil"
+        milhoes = round(a / 1e6, 1)
+        return f"{sinal}R$ {text.format_number_pt(milhoes, 1)} {'milhão' if milhoes < 2 else 'milhões'}"
+    if a >= 10_000:
+        return f"{sinal}R$ {text.format_number_pt(a / 1000, 1)} mil"
+    return sinal + reais(a)
+
+
+def _pct1(valor: Any) -> str:
+    """Percentual com uma casa ("3,0%"): as partes de um mês no período."""
+    return "—" if valor is None else f"{text.format_number_pt(float(valor), 1)}%"
+
+
+def _inicial_minuscula(nome: str) -> str:
+    return nome[:1].lower() + nome[1:]
+
+
+def janela_da_cota(de: str, ate: str, n: int, *, fechados: bool = False) -> tuple[str, str]:
+    """O intervalo, curto e com a contagem: ("fev/2023 a out/2026", "fev/2023 a out/2026
+    (45 meses fechados)"); no mesmo ano, "jan a dez/2025 (12 meses)"; um mês, "dez/2025 (1 mês)"."""
+    if de == ate:
+        return _mes(de), f"{_mes(de)} (1 mês)"
+    curta = f"{MESES[int(de[5:7]) - 1]} a {_mes(ate)}" if de[:4] == ate[:4] else f"{_mes(de)} a {_mes(ate)}"
+    return curta, f"{curta} ({_num(n)} meses{' fechados' if fechados else ''})"
+
+
+def _passo_do_eixo(maximo: float) -> float:
+    """O passo das marcas do eixo: o maior entre 5, 2 e 1 × 10^k que deixa ao menos duas
+    marcas acima do zero (R$ 23,8 milhões → de 10 em 10 milhões)."""
+    if maximo <= 0:
+        return 1.0
+    k = 10.0 ** math.floor(math.log10(maximo))
+    return next((passo for passo in (5 * k, 2 * k, k, k / 2) if maximo / passo >= 2), k / 5)
+
+
+def _cota_quando(ct: Mapping[str, Any], nome_casa: str, uns: str) -> dict[str, Any]:
+    """As colunas de "Quando": uma por mês fechado, a partir do zero, com o eixo em três ou
+    quatro marcas redondas, os meses recentes marcados, o maior mês fora eles (o único
+    rótulo direto) e as datas cheias do calendário que caem no eixo. Posições em % da área
+    do gráfico: ``x``/``w`` na horizontal; ``y`` (de baixo para cima) e ``h`` na vertical."""
+    meses = ct.get("meses") or []
+    total = float(ct.get("total") or 0)
+    n, recentes = len(meses), int(ct.get("recentes") or 0)
+    valores = [float(m.get("total") or 0) for m in meses]
+    maximo, minimo = max(valores, default=0.0), min(0.0, min(valores, default=0.0))
+    passo_eixo = _passo_do_eixo(maximo)
+    topo, fundo = (maximo * 1.08 or 1.0), minimo * 1.08
+    altura = topo - fundo
+    zero = 100 * (0 - fundo) / altura
+    divisor, unidade = (1e6, "R$ milhões por mês") if maximo >= 1e6 else (1e3, "R$ mil por mês") if maximo >= 1e3 else (1.0, "R$ por mês")
+    marcas, v = [], 0.0
+    while v <= topo:
+        marcas.append({"v": v, "rot": text.format_number_pt(v / divisor, 1).removesuffix(",0"), "y": round(zero + 100 * v / altura, 2)})
+        v += passo_eixo
+    passo = 100 / n if n else 100.0
+    colunas = []
+    for i, (m, valor) in enumerate(zip(meses, valores, strict=True)):
+        am = m["m"]
+        h = 100 * abs(valor) / altura
+        rot = _mes(am)
+        colunas.append(
+            {
+                "m": am,
+                "rot": rot,
+                "v": valor,
+                "valor": reais_curto(valor),
+                "n": int(m.get("n") or 0),
+                "pct": _pct1(100 * valor / total) if total else "—",
+                "x": round(i * passo + passo * (100 - COTA_COLUNA) / 200, 3),
+                "w": round(passo * COTA_COLUNA / 100, 3),
+                "cx": round((i + 0.5) * passo, 3),
+                "y": round(zero if valor >= 0 else zero - h, 2),
+                "h": round(h, 2),
+                "neg": valor < 0,
+                "recente": i >= n - recentes,
+                # O ano sob janeiro e o primeiro mês por extenso sob a primeira coluna; no celular, o ano com dois dígitos.
+                "ano": rot if i == 0 else am[:4] if am[5:7] == "01" else "",
+                "ano2": am[2:4] if i == 0 or am[5:7] == "01" else "",
+                "dica": f"{rot} · {reais_curto(valor)} · {_num(m.get('n') or 0)} {uns} com despesa · {_pct1(100 * valor / total) if total else '—'} do período",
+            }
+        )
+    por_mes = {c["m"]: c for c in colunas}
+    pico = por_mes.get((ct.get("pico") or {}).get("m") or "")
+    return {
+        "titulo": f"quanto {'a' if nome_casa == 'Câmara' else 'o'} {nome_casa} reembolsou em cada mês",
+        "unidade": unidade,
+        "divisor": divisor,
+        "topo": topo,
+        "fundo": fundo,
+        "zero": round(zero, 2),
+        "marcas": marcas,
+        "passo": round(passo, 3),
+        "colunas": colunas,
+        "pico": {"m": pico["m"], "cx": pico["cx"], "y": round(pico["y"] + pico["h"], 2), "texto": f"{pico['rot']}: {pico['valor']}"} if pico else None,
+        "recentes": {"n": recentes, "x": round((n - recentes) * passo, 3), "w": round(recentes * passo, 3), "rot": "ainda recebem notas"} if recentes else None,
+        "marcos": [
+            {
+                "m": mc["m"],
+                "cx": por_mes[mc["m"]]["cx"],
+                "rot": "eleição" if "eleiç" in str(mc.get("nome") or "").lower() else str(mc.get("nome") or ""),
+                "titulo": f"{mc.get('nome') or ''}, {_data(mc.get('d'), ano=True)}".strip(", "),
+            }
+            for mc in ct.get("marcos") or []
+            if mc.get("m") in por_mes
+        ],
+        "tabela": [{"m": c["m"], "mes": c["rot"], "valor": reais_sinal(c["v"]), "n": _num(c["n"]), "recente": c["recente"]} for c in colunas],
+    }
+
+
+def _cota_despesa(c: Mapping[str, Any], total: float) -> dict[str, Any]:
+    """Uma linha de "Com o quê": a parte da despesa no total (a barra cheia é 100% do total)."""
+    valor = float(c.get("total") or 0)
+    parte = 100 * valor / total if total else 0.0
+    negativa = valor < 0
+    return {
+        "id": c.get("id") or "",
+        "curto": c.get("curto") or c.get("nome") or "",
+        "oficial": c.get("nome") or "",
+        "v": valor,
+        "valor": f"{reais_curto(valor)} (devoluções)" if negativa else reais_curto(valor),
+        "pct": "" if negativa else _pct(parte),
+        "p": round(parte, 2),
+        "w": 0.0 if negativa else round(max(0.0, min(100.0, parte)), 2),
+        "neg": negativa,  # saldo negativo (mais devolução do que despesa): sem barra e fora do filtro
+        "texto": f"{reais_curto(valor)} (devoluções)" if negativa else f"{_pct(parte)} · {reais_curto(valor)}",
+    }
+
+
+def _cota_com_o_que(ct: Mapping[str, Any], curta: str) -> dict[str, Any]:
+    """As barras de "Com o quê", na ordem da Casa na legislatura: as maiores à vista e as
+    demais dentro de "Outras N despesas" (com sete ou menos, todas à vista)."""
+    total = float(ct.get("total") or 0)
+    todas = [_cota_despesa(c, total) for c in ct.get("categorias") or []]
+    a_vista = todas if len(todas) <= COTA_BARRAS + 1 else todas[:COTA_BARRAS]
+    resto = todas[len(a_vista):]
+    outras = None
+    if resto:
+        soma = sum(c["v"] for c in resto)
+        parte = 100 * soma / total if total else 0.0
+        outras = {
+            "n": len(resto),
+            "rot": f"Outras {_num(len(resto))} despesas",
+            "v": soma,
+            "valor": reais_curto(soma),
+            "pct": _pct(parte),
+            "w": round(max(0.0, min(100.0, parte)), 2),
+            "texto": f"{_pct(parte)} · {reais_curto(soma)}",
+            "linhas": resto,
+        }
+    return {"janela": f"parte do total, de {curta}", "linhas": a_vista, "outras": outras, "todas": todas}
+
+
+def _cota_teto_de(x: Mapping[str, Any]) -> str:
+    """ "9% do teto de SP": só com a tabela conferida (sem ela, vazio)."""
+    if x.get("pct_teto") is None or not x.get("uf"):
+        return ""
+    return f"{_pct(x['pct_teto'])} do teto {UF_DE.get(x['uf'], 'de')} {x['uf']}"
+
+
+def _cota_fora_da_conta(x: Mapping[str, Any], sigepa_ate: str, *, curta: bool) -> str:
+    """As passagens compradas pela agência da Câmara, que ficam fora da conta. Na lista
+    (``curta``), só o último ano inteiro em que o arquivo as trouxe; no cartão, todos os anos."""
+    anos = {ano: float(v or 0) for ano, v in (x.get("sigepa") or {}).items() if v}
+    if curta:
+        valor = anos.get(str(cota_mod.ANO_SIGEPA), 0.0)
+        return f"fora da conta: {reais(valor)} em passagens da agência em {cota_mod.ANO_SIGEPA}" if valor > 0 else ""
+    soma = sum(anos.values())
+    if soma <= 0:
+        return ""
+    # O arquivo oficial parou de trazer essas passagens no meio de um ano: o último mês com bilhete vai escrito.
+    ate = f", até {MESES_EXTENSO[int(sigepa_ate[5:7]) - 1]}" if len(sigepa_ate) == 7 and sigepa_ate[5:7] != "12" else ""
+
+    def quando(ano: str) -> str:
+        return f"em {ano}{ate if ano == sigepa_ate[:4] else ''}"
+
+    if len(anos) == 1:
+        ano, valor = next(iter(anos.items()))
+        return f"Fora desta conta: {reais(valor)} em passagens compradas pela agência da Câmara {quando(ano)}."
+    partes = ", ".join(f"{reais_sinal(v)} {quando(ano)}" for ano, v in sorted(anos.items()))
+    return f"Fora desta conta: {reais(soma)} em passagens compradas pela agência da Câmara ({partes})."
+
+
+def _cota_linha(x: Mapping[str, Any], n_meses: int, sigepa_ate: str, foco: str, despesas: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    """Uma pessoa nas pontas e na tabela: a medida por mês nunca vai sem o total e os meses."""
+    despesa = despesas.get(x.get("cat") or "") or {}
+    partes = [f"{reais_sinal(x.get('total'))} em {_num(x.get('meses'))} de {_num(n_meses)} meses"]
+    teto = _cota_teto_de(x)
+    if teto:
+        partes.append(teto)
+    fora = _cota_fora_da_conta(x, sigepa_ate, curta=True)
+    if fora:
+        partes.append(fora)
+    return {
+        "p": x.get("k") or "",  # data-p: o clique na linha põe em foco (não abre o dossiê)
+        "k": x.get("k") or "",  # data-k: só no nome, que abre o dossiê
+        "nome": x.get("nome") or "",
+        "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-"),
+        "partido": x.get("partido") or "",
+        "uf": x.get("uf") or "",
+        "pos": int(x.get("pos") or 0),
+        "v": float(x.get("media") or 0),
+        "valor": reais_sinal(x.get("media")),
+        "un": "por mês",
+        "extra": " · ".join(partes),
+        "t": float(x.get("total") or 0),
+        "total": reais_sinal(x.get("total")),
+        "m": int(x.get("meses") or 0),
+        "meses": f"{_num(x.get('meses'))} de {_num(n_meses)}",
+        "pct_teto": _pct(x["pct_teto"]) if x.get("pct_teto") is not None else "",
+        "teto": teto,
+        "cat": x.get("cat") or "",
+        # A maior despesa da pessoa e a parte dela no total: "Escritório · 49%".
+        "maior": " · ".join(t for t in (despesa.get("curto") or "", _pct(x["pct_cat"]) if x.get("pct_cat") is not None else "") if t),
+        "foco": (x.get("k") or "") == foco,
+    }
+
+
+def _cota_quem(ct: Mapping[str, Any], casa: str, um: str, uns: str, curta: str) -> dict[str, Any]:
+    """Os pontos de "Quem": um por parlamentar em exercício com despesa em 6 meses ou mais,
+    empilhados em faixas de reais por mês. ``x`` é o centro da faixa em % do eixo; ``n``, o
+    nível na pilha (0 embaixo). ``x2``/``n2`` são os mesmos com a faixa dobrada, para a tela
+    estreita. A mediana e a faixa do meio (do 1º ao 3º quartil) vão na posição exata."""
+    todos = ct.get("todos") or []
+    tetos = ct.get("tetos") or None
+    maior = max([float(x.get("media") or 0) for x in todos] + [float(((tetos or {}).get("max") or {}).get("valor") or 0)], default=0.0)
+    eixo = max(COTA_EIXO, math.ceil(maior / COTA_EIXO_PASSO) * COTA_EIXO_PASSO)
+    faixa = COTA_FAIXA.get(casa, 1000)
+
+    def empilhar(largura: int) -> tuple[list[tuple[float, int]], int]:
+        pilha: dict[int, int] = defaultdict(int)
+        saida = []
+        for x in todos:  # já vêm da menor média para a maior
+            indice = min(max(int(float(x.get("media") or 0) // largura), 0), eixo // largura - 1)
+            saida.append((round(100 * (indice + 0.5) * largura / eixo, 3), pilha[indice]))
+            pilha[indice] += 1
+        return saida, max(pilha.values(), default=0)
+
+    larga, pilha = empilhar(faixa)
+    estreita, pilha2 = empilhar(faixa * 2)
+    meio = (ct.get("meio") or {}).get("k") or ""
+    pontos = [
+        {"p": x.get("k") or "", "v": float(x.get("media") or 0), "x": px, "n": pn, "y": pn * COTA_PILHA_PX, "x2": px2, "n2": pn2, "foco": (x.get("k") or "") == meio}
+        for x, (px, pn), (px2, pn2) in zip(todos, larga, estreita, strict=True)
+    ]
+    mediana, q1, q3 = ct.get("mediana"), ct.get("q1"), ct.get("q3")
+    fora = ct.get("fora") or []
+    minimo = cota_mod.MINIMO_MESES
+    marcas = [
+        {"v": v, "x": round(100 * v / eixo, 3), "rot": text.format_number_pt(v / 1000, 0) + (" mil" if v + COTA_MARCA > eixo else "")}
+        for v in range(0, eixo + 1, COTA_MARCA)
+    ]
+    return {
+        "titulo": f"cada ponto é um {um} em exercício · R$ por mês com despesa, de {curta}",
+        "unidade": "R$ por mês com despesa",
+        "n": len(todos),
+        "faixa": faixa,
+        "eixo": eixo,
+        "marcas": marcas,
+        "passo_px": COTA_PILHA_PX,
+        "pilha": pilha,
+        "pilha2": pilha2,
+        "altura": pilha * COTA_PILHA_PX + 34,
+        "altura2": pilha2 * COTA_PILHA_PX + 34,
+        "pontos": pontos,
+        "mediana": {"v": float(mediana), "x": round(100 * float(mediana) / eixo, 3), "rot": f"mediana {reais(mediana)}"} if mediana is not None else None,
+        "metade": (
+            {"x1": round(100 * float(q1) / eixo, 3), "x2": round(100 * float(q3) / eixo, 3), "rot": f"metade dos {uns}", "de": reais_curto(q1), "a": reais_curto(q3)}
+            if q1 is not None and q3 is not None
+            else None
+        ),
+        # O colchete do teto sob o eixo: só com a tabela conferida.
+        "teto": (
+            {
+                "x1": round(100 * float(tetos["min"]["valor"]) / eixo, 3),
+                "x2": round(100 * float(tetos["max"]["valor"]) / eixo, 3),
+                "rot": f"teto, conforme o estado: de {reais(tetos['min']['valor'])} ({tetos['min']['uf']}) a {reais(tetos['max']['valor'])} ({tetos['max']['uf']})",
+            }
+            if tetos
+            else None
+        ),
+        "foco": meio,
+        "fora": (
+            {
+                "n": len(fora),
+                "texto": f"{_num(len(fora))} {um if len(fora) == 1 else uns} em exercício fora do gráfico: despesa em menos de {minimo} meses do período.",
+                "nomes": [{"k": x.get("k") or "", "nome": x.get("nome") or "", "legenda": f"{x.get('partido', '')}-{x.get('uf', '')}".strip("-")} for x in fora]
+                if len(fora) <= 20
+                else [],
+            }
+            if fora
+            else None
+        ),
+        "aria": (
+            f"Gráfico: um ponto por {um} em exercício, pela média de reembolso por mês com despesa, de {curta}. "
+            f"As setas andam de quem gasta menos para quem gasta mais; Enter abre o dossiê; o {um} em foco aparece no cartão ao lado."
+        ),
+    }
+
+
+def _cota_cartao(ct: Mapping[str, Any], casa: str, um: str, n_meses: int, sigepa_ate: str) -> dict[str, Any] | None:
+    """O cartão em foco de quando a página abre: o parlamentar do meio. Os três números
+    sempre juntos (por mês com despesa, total e meses), "Antes de comparar" (frases de
+    registro, geradas por regra, nunca com "porque"), as despesas dele ao lado da parte da
+    Casa, a série mês a mês e os maiores fornecedores."""
+    meio = ct.get("meio") or {}
+    todos = ct.get("todos") or []
+    x = next((t for t in todos if t.get("k") == meio.get("k")), None)
+    if x is None:
+        return None
+    da_casa = {c.get("id"): c for c in ct.get("categorias") or []}
+    total = float(x.get("total") or 0)
+    uf = x.get("uf") or ""
+    na_uf = [t for t in todos if (t.get("uf") or "") == uf]
+    pos_uf = 1 + sum(1 for t in na_uf if float(t.get("media") or 0) > float(x.get("media") or 0))
+
+    cats = meio.get("cats") or []
+
+    def barra(cid: str, valor: float, pct: float | None) -> dict[str, Any]:
+        c = da_casa.get(cid) or {}
+        return {
+            "id": cid,
+            "curto": c.get("curto") or cid,
+            "v": valor,
+            "valor": reais_sinal(valor),
+            "pct": _pct(pct) if pct is not None else "",
+            "w": round(max(0.0, min(100.0, float(pct or 0))), 2),
+            "casa": _pct(c.get("pct")) if c else "",  # o risco: a parte da mesma despesa na Casa
+            "casa_w": round(max(0.0, min(100.0, float(c.get("pct") or 0))), 2),
+        }
+
+    barras = [barra(cid, float(valor or 0), pct) for cid, valor, pct in cats[:COTA_CARTAO_BARRAS]]
+    resto = cats[COTA_CARTAO_BARRAS:]
+    outras = None
+    if resto:
+        soma = sum(float(valor or 0) for _cid, valor, _pct_ in resto)
+        parte = 100 * soma / total if total > 0 else None
+        outras = {"n": len(resto), "rot": f"outras {_num(len(resto))}", "v": soma, "valor": reais_sinal(soma), "pct": _pct(parte) if parte is not None else "", "w": round(max(0.0, min(100.0, parte or 0)), 2)}
+
+    # Antes de comparar: só as verdadeiras, nesta prioridade, até três.
+    antes = []
+    fora = _cota_fora_da_conta(x, sigepa_ate, curta=False)
+    if fora:
+        antes.append(fora)
+    if int(x.get("meses") or 0) < n_meses:
+        antes.append(f"Teve despesa em {_num(x.get('meses'))} dos {_num(n_meses)} meses do período.")
+    duas = [c for c in (ct.get("categorias") or [])[:2] if c.get("id")]
+    gastou = {cid for cid, valor, _pct_ in cats if float(valor or 0) > 0}
+    if cats and cats[0][2] is not None and float(cats[0][2]) > COTA_UMA_DESPESA:
+        antes.append(f"{_pct(cats[0][2])} em uma despesa só: {_inicial_minuscula((da_casa.get(cats[0][0]) or {}).get('curto') or cats[0][0])}.")
+    elif len(duas) == 2 and not any(c["id"] in gastou for c in duas):
+        antes.append(
+            f"Nada em {_inicial_minuscula(duas[0].get('curto') or '')} nem em {_inicial_minuscula(duas[1].get('curto') or '')}, as duas maiores despesas da Casa."
+        )
+    fornecedores = meio.get("fornecedores") or []
+    empresa = next((f for f in fornecedores if f.get("cnpj")), None)
+    if empresa and empresa.get("pct") is not None and float(empresa["pct"]) >= COTA_UM_FORNECEDOR:
+        antes.append(f"{_pct(empresa['pct'])} para um fornecedor só, na legislatura inteira: {empresa.get('nome') or ''}.")
+
+    serie = [float(v or 0) for v in meio.get("serie") or []]
+    meses = [m["m"] for m in ct.get("meses") or []]
+    maximo = max(serie, default=0.0)
+    recentes = int(ct.get("recentes") or 0)
+    maior_mes = meses[serie.index(maximo)] if serie and maximo > 0 and len(meses) == len(serie) else ""
+    glosa = meio.get("glosa") or {}
+    teto = _cota_teto_de(x)
+    return {
+        "k": x.get("k") or "",
+        "nome": x.get("nome") or "",
+        "legenda": f"{x.get('partido', '')}-{uf}".strip("-"),
+        "origem": f"o {um} do meio",
+        "pos": f"{_num(x.get('pos'))}º de {_num(len(todos))}",
+        "pos_uf": f"{_num(pos_uf)}º de {_num(len(na_uf))} {UF_EM[UF_DE.get(uf, 'de')]} {uf}" if casa == "cd" and uf else "",
+        "valor": reais_sinal(x.get("media")),
+        "un": "por mês com despesa",
+        "resto": f"{reais_sinal(total)} no período, em {_num(x.get('meses'))} de {_num(n_meses)} meses",
+        "teto": f"{teto} ({reais(x.get('teto'))} por mês)" if teto and x.get("teto") is not None else "",
+        "antes": antes[:COTA_ANTES],
+        "cats": barras,
+        "outras": outras,
+        "serie": {
+            "colunas": [
+                {"m": m, "v": v, "h": round(100 * v / maximo, 1) if maximo > 0 and v > 0 else 0.0, "neg": v < 0, "recente": i >= len(serie) - recentes}
+                for i, (m, v) in enumerate(zip(meses, serie, strict=False))
+            ],
+            "aria": f"Despesa mês a mês, de {_mes(meses[0])} a {_mes(meses[-1])}; maior em {_mes(maior_mes)}, {reais(maximo)}." if maior_mes else "Despesa mês a mês.",
+        },
+        "fornecedores": [
+            {"nome": f.get("nome") or "", "valor": reais_sinal(f.get("valor")), "pct": _pct(f["pct"]) if f.get("pct") is not None else ""} for f in fornecedores
+        ],
+        "glosa": (
+            f"A Casa recusou {reais(glosa.get('valor'))} em {_num(glosa.get('n'))} {'nota' if glosa.get('n') == 1 else 'notas'}, na legislatura inteira."
+            if float(glosa.get("valor") or 0) > 0
+            else ""
+        ),
+    }
+
+
+def _cota_painel(ct: Mapping[str, Any], casa: str) -> dict[str, Any] | None:
+    """O estado padrão da aba "Cota parlamentar" repensada (o que aparece sem script e antes
+    de qualquer filtro): a legislatura inteira, todas as despesas, todos os parlamentares.
+
+    Devolve, com os textos já formatados e cada número com a unidade e a janela:
+    ``janela`` e ``frase`` (a frase "Você está vendo"), ``numeros`` (os três), ``quando``
+    (colunas por mês), ``com_o_que`` (barras), ``quem`` (pontos, mediana e faixa do meio),
+    ``cartao`` (o parlamentar do meio), ``pontas``, ``tabela`` ("Todos, em tabela"),
+    ``conferir`` (os títulos da zona "Para conferir"), ``filtros`` (as opções) e ``textos``.
+
+    Do teto só há alguma coisa (``tetos``, ``numeros.quem.teto``, ``quem.teto``, o trecho do
+    teto em cada pessoa) se a tabela conferida estiver no painel; sem ela, esses campos vêm
+    vazios e nenhum texto daqui fala em teto. ``None`` se o painel não traz a série mensal
+    (dados gravados antes desta aba)."""
+    meses = ct.get("meses") or []
+    if not meses or "todos" not in ct:
+        return None
+    camara = casa == "cd"
+    nome_casa, um, uns = ("Câmara", "deputado", "deputados") if camara else ("Senado", "senador", "senadores")
+    de, ate, n = meses[0]["m"], meses[-1]["m"], len(meses)
+    curta, longa = janela_da_cota(de, ate, n, fechados=True)
+    recentes = int(ct.get("recentes") or 0)
+    total = float(ct.get("total") or 0)
+    todos = ct.get("todos") or []
+    tetos = ct.get("tetos") or None
+    sigepa_ate = str(ct.get("sigepa_ate") or "")
+    minimo = cota_mod.MINIMO_MESES
+    recentes_texto = (
+        ("o último mês ainda recebe notas" if recentes == 1 else f"os {_num(recentes)} últimos meses ainda recebem notas") if recentes else ""
+    )
+    categorias = ct.get("categorias") or []
+    maior = categorias[0] if categorias else {}
+    mediana, q1, q3 = ct.get("mediana"), ct.get("q1"), ct.get("q3")
+    meio = (ct.get("meio") or {}).get("k") or ""
+
+    numero_quem: dict[str, Any] = {"n": "—", "un": "", "linhas": [], "teto": "", "k": meio}
+    if mediana is not None:
+        numero_quem["n"], numero_quem["un"] = reais(mediana), "por mês"
+        if len(todos) == 1:
+            numero_quem["linhas"] = [f"1 {um}"]
+        else:
+            numero_quem["linhas"] = [f"gasta o {um} do meio", f"metade fica entre {reais_curto(q1)} e {reais_curto(q3)}"]
+        if tetos:
+            numero_quem["teto"] = (
+                f"teto: de {reais(tetos['min']['valor'])} ({tetos['min']['uf']}) a {reais(tetos['max']['valor'])} ({tetos['max']['uf']}), conforme o estado"
+            )
+    numero_quem["dica"] = (
+        f"Metade gasta mais, metade gasta menos. É a média por mês com despesa de quem está em exercício e teve despesa em {minimo} meses ou mais."
+    )
+
+    por_id = {str(c.get("id") or ""): c for c in categorias}
+    # Do que mais gasta para o que menos gasta (1º = quem mais gasta, como no dossiê); empate, pelo nome.
+    linhas = sorted((_cota_linha(x, n, sigepa_ate, meio, por_id) for x in todos), key=lambda x: (x["pos"], -x["v"], text.normalize(x["nome"])))
+    uma_lista = len(linhas) <= COTA_PONTAS_UMA
+    n_faixa = round(len(todos) * COTA_FAIXA_PCT / 100)
+    anos = sorted({m["m"][:4] for m in meses})
+    medidas = (
+        "R$ no período (a soma); R$ por mês (a soma de cada mês); R$ por mês com despesa (o total da pessoa dividido pelos meses em que ela teve "
+        f"reembolso; entra no gráfico quem teve despesa em {minimo} meses ou mais, ou em metade do período, se ele for mais curto)"
+    )
+    if tetos:
+        como_medidas = (
+            f"Quatro medidas, sempre escritas ao lado do número: {medidas}; % do teto do estado (o total dividido pela soma dos tetos mensais do "
+            f"estado nesses meses; fonte: {tetos.get('fonte') or ''})."
+        )
+    else:
+        como_medidas = f"Três medidas, sempre escritas ao lado do número: {medidas}. O limite mensal muda por estado e não entra nesta conta."
+    valor_e = (
+        "Cada valor é o que a Casa reembolsou: a nota, menos o que foi recusado e o que foi devolvido."
+        if camara
+        else "Cada valor é o que a Casa reembolsou, já com os estornos descontados."
+    )
+    return {
+        "casa": nome_casa,
+        "um": um,
+        "uns": uns,
+        "janela": {
+            "de": de,
+            "ate": ate,
+            "n": n,
+            "curta": curta,  # "fev/2023 a out/2026"
+            "texto": longa,  # "fev/2023 a out/2026 (45 meses fechados)"
+            "aberto": _mes(ct.get("aberto")),
+            "recentes": recentes,
+            "recentes_texto": recentes_texto,
+        },
+        # A frase "Você está vendo:", em trechos (o modelo junta com " · ").
+        "frase": [nome_casa, longa, "todas as despesas", f"todos os {uns}"],
+        "numeros": {
+            "quanto": {
+                "n": reais_curto(total),
+                "linhas": [f"reembolsados em {_num(n)} meses fechados", f"{reais_curto(total / n)} por mês"],
+                "dica": (
+                    ("O que a Casa reembolsou, já sem o que recusou e o que foi devolvido. " if camara else "O que a Casa reembolsou, já com os estornos descontados. ")
+                    + f"Entram os {_num(ct.get('pessoas'))} {uns} que tiveram despesa na legislatura, inclusive quem já saiu. O mês em curso fica fora."
+                ),
+            },
+            "quem": numero_quem,
+            "com_o_que": {
+                "n": _pct(100 * float(maior.get("total") or 0) / total) if maior and total else "—",
+                "linhas": [f"vai para {_inicial_minuscula(maior.get('curto') or maior.get('nome') or '')}", reais_curto(maior.get("total"))] if maior else [],
+                "cat": maior.get("id") or "",
+                "curto": maior.get("curto") or "",
+            },
+        },
+        "quando": _cota_quando(ct, nome_casa, uns),
+        "com_o_que": _cota_com_o_que(ct, curta),
+        "quem": _cota_quem(ct, casa, um, uns, curta),
+        "cartao": _cota_cartao(ct, casa, um, n, sigepa_ate),
+        "pontas": {
+            "titulo": f"R$ por mês com despesa, de {curta}",
+            "uma": uma_lista,  # recorte pequeno: uma lista só, com todos
+            "mais": linhas if uma_lista else linhas[:COTA_PONTAS],
+            "menos": [] if uma_lista else list(reversed(linhas[-COTA_PONTAS:])),
+        },
+        "tabela": {"titulo": f"Todos os {_num(len(linhas))}, em tabela", "teto": bool(tetos), "linhas": linhas},
+        "conferir": {
+            "janela": f"legislatura inteira ({curta})",
+            "frase": f"achados da legislatura inteira ({curta}). Não mudam com o período nem com os filtros acima.",
+            "fornecedores_n": len((ct.get("fornecedores") or [])[:15]),
+            "concentrados_n": len((ct.get("concentrados") or [])[:15]),
+            "concentrados_de": int(ct.get("n_concentrados") or 0),
+            "concentrados_titulo": f"os {_num(len((ct.get('concentrados') or [])[:15]))} maiores de {_num(ct.get('n_concentrados'))}",
+            "repetidas_n": len((ct.get("repetidas") or [])[:20]),
+            "glosas_n": len((ct.get("glosas") or [])[:10]),
+        },
+        "filtros": {
+            "anos": [{"ano": ano, "de": next(m["m"] for m in meses if m["m"][:4] == ano), "ate": next(m["m"] for m in reversed(meses) if m["m"][:4] == ano)} for ano in anos],
+            "ultimos": {"n": min(12, n), "de": meses[-min(12, n)]["m"], "ate": ate, "rot": f"Últimos {min(12, n)} meses"},
+            "meses": [{"m": m["m"], "rot": _mes(m["m"])} for m in meses],
+            "despesas": [{"id": c.get("id") or "", "curto": c.get("curto") or c.get("nome") or ""} for c in categorias if float(c.get("total") or 0) > 0],
+            "ufs": sorted({x.get("uf") for x in todos if x.get("uf")}),
+            "partidos": sorted({x.get("partido") for x in todos if x.get("partido")}),
+            "faixa_n": n_faixa,
+            "faixa_pct": COTA_FAIXA_PCT,  # o rótulo dos dois botões: "os 10% que menos gastam"
+            "faixa_dica": (
+                f"Os {_num(n_faixa)} de menor (ou de maior) gasto por mês no período, entre os {_num(len(todos))} do gráfico. "
+                "A faixa não muda quando você escolhe uma despesa."
+            ),
+        },
+        "tetos": (
+            {
+                "fonte": tetos.get("fonte") or "",
+                "url": filters.safe_url(tetos.get("url")) or "",
+                "min": f"{reais(tetos['min']['valor'])} ({tetos['min']['uf']})",
+                "max": f"{reais(tetos['max']['valor'])} ({tetos['max']['uf']})",
+                "dica": (
+                    f"O teto é o máximo mensal da cota e muda por estado (fonte: {tetos.get('fonte') or ''}). "
+                    + ("As passagens compradas pela agência da Câmara estão fora desta conta: a parte usada do teto pode ser maior do que a mostrada." if camara else "")
+                ).strip(),
+            }
+            if tetos
+            else None
+        ),
+        "textos": {
+            "fora": f"Fora desta conta: {ct.get('sem')}." if ct.get("sem") else "",
+            "quando_dica": (
+                "Cada coluna é a soma do que foi reembolsado naquele mês (o mês da despesa, não o do pagamento)."
+                + (f" {recentes_texto[:1].upper()}{recentes_texto[1:]}: o número pode subir." if recentes_texto else "")
+            ),
+            "medida_dica": (
+                "Por mês com despesa: o total do período dividido pelos meses em que houve reembolso. Quem entrou no meio do mandato tem menos "
+                "meses; por isso o número de meses vem sempre ao lado."
+            ),
+            "partido_dica": "O partido de hoje, não o do mês da despesa.",
+            "como": (
+                f"{valor_e} O período padrão vai do começo da legislatura ao último mês fechado; o mês em curso fica fora"
+                + (f", e {recentes_texto}" if recentes_texto else "")
+                + f". {como_medidas} O partido é o de hoje. Os totais contam também quem já saiu do mandato; os pontos, só quem está em exercício. "
+                "No dossiê, o total de cada ano inclui o mês em curso."
+                + (f" Fora da conta: {ct.get('sem')}." if ct.get("sem") else "")
+            ),
+            "falha": "Não foi possível carregar os dados para mudar o período e os filtros. A página mostra a legislatura inteira.",
+            "sem_teto": "" if tetos else "O limite mensal da cota muda por estado e não entra nesta conta.",
+        },
     }
 
 
@@ -1862,6 +2519,8 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
     )
     jor = m.get("jornal") or {}
     corte = corte_do_centro([c for c in m.get("campos") or [] if isinstance(c, dict)])
+    # quantos meses fechados do fim ainda recebem notas da cota (o mesmo número nas duas Casas; vale o de quem tiver)
+    recentes_cota = max((int(((casa or {}).get("cota") or {}).get("recentes") or 0) for casa in d.casas.values()), default=0)
     return [
         (
             "De onde vem",
@@ -2110,6 +2769,24 @@ def _metodo(d: Dados) -> list[tuple[str, str]]:
             "Senado lança no mesmo arquivo mas não conta como cota. O teto da cota muda por estado e não está nos dados abertos.",
         ),
         (
+            "A aba da cota: período, medidas e filtros",
+            "De início, a aba mostra a legislatura inteira até o último mês fechado; o mês em curso fica fora"
+            + (f", e os {_num(recentes_cota)} últimos meses ainda recebem notas (o valor deles pode subir)" if recentes_cota else "")
+            + ". Escolhido um período, uma despesa, um estado, um partido (o de hoje, não o do mês da despesa) ou uma faixa, tudo o que "
+            "está acima de “Para conferir” é refeito para esse recorte; “Para conferir” é sempre a legislatura inteira. Três medidas, "
+            "sempre escritas ao lado do número: R$ no período (a soma do que foi reembolsado nos meses do período); R$ por mês (a "
+            "soma de cada mês; no total, a soma dividida pelos meses do período); R$ por mês com despesa (o total da pessoa no "
+            "período dividido pelos meses do período em que ela teve reembolso, sempre com “N de M meses” ao lado). Entra no "
+            f"gráfico de pontos quem está em exercício e teve despesa em {cota_mod.MINIMO_MESES} meses ou mais, ou em metade do período, se ele for "
+            "mais curto; os totais contam também quem já saiu do mandato. Com uma despesa escolhida, a medida de cada pessoa é o "
+            "total dela naquela despesa dividido pelos mesmos meses com despesa: as partes somam o todo. “Os "
+            f"{COTA_FAIXA_PCT}% que menos (ou mais) gastam” são os de menor (ou maior) gasto por mês no total do período, entre os que "
+            "estão no gráfico. O parlamentar do meio é o de gasto mais próximo da mediana: metade gasta mais, metade gasta menos. "
+            "“Antes de comparar”, no cartão, traz só registros: o que ficou fora da conta, em quantos meses houve despesa, a "
+            "despesa ou o fornecedor que concentra o gasto. Gastar pouco não é virtude e gastar muito não é desvio: a página não dá "
+            "nota. O limite mensal da cota muda por estado e não entra em nenhuma conta desta aba.",
+        ),
+        (
             "Escolha o seu candidato",
             "Não é lista de candidatos: é quem está no mandato hoje, um cartão cada, com os mesmos números do resto da página: o "
             "estado, o partido, de que lado vota (a régua), a presença e quanto vota com o próprio partido (com a mediana da Casa "
@@ -2155,6 +2832,10 @@ def congresso_view(d: Dados, config: Config) -> CongressoView:
         "hoje": str(d.meta.get("hoje") or ""),
         "base": f"../data/{dados.PASTA}/{dados.FICHAS}/",
         "votosArq": f"../data/{dados.PASTA}/" + dados.VOTOS.replace("{casa}.json", ""),
+        # A cota mês a mês e despesa a despesa (cota-<casa>.json), lida quando a aba "Cota parlamentar" abre.
+        "cotaArq": f"../data/{dados.PASTA}/" + dados.COTA.replace("{casa}.json", ""),
+        # As réguas da aba da cota, para o script refazer as contas do estado padrão com os mesmos números.
+        "cotaRegras": cota_regras(),
         "materiasArq": f"../data/{dados.PASTA}/" + materias.ARQUIVO.replace("{casa}.json", ""),
         "frentesArq": f"../data/{dados.PASTA}/{dados.FRENTES}",
         # O endereço da foto oficial de cada um, pela chave ({id}): para os cartões e as dicas montados pelo script.
