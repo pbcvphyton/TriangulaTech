@@ -1,0 +1,577 @@
+{#- Aba Congresso, visão por parlamentar, segunda metade (incluído no fim de congresso_lp.js.j2,
+    dentro da mesma função): "Na hora do voto" (#v=decide) e "Pessoa ou partido?" (#v=cruzar).
+    As duas usam o mesmo componente, as faixas por partido (lpFaixas): uma faixa por partido, um
+    ponto por parlamentar, o traço da mediana e a banda da metade do meio, numa medida de
+    M.lp.medidas_tela (o nome, a unidade, a escala e as colunas de autores-<casa>.json de cada
+    uma vêm do manifesto). Os pontos vêm de autores-<casa>.json quando a vista abre; os votos de
+    cada um, de decide-<casa>.json quando o cartão abre. O HTML já traz os números, as barras, as
+    tabelas e as listas. Onde menos gente do que a régua pede (M.lp.cortes.min_pessoas) pode ser
+    medida, não há pontos: a tela diz "não dá para responder por pessoa".
+    Nenhum nome de faixa, alavanca, marca ou código é escrito aqui. Sempre com textContent. -#}
+  /* ════ A visão por parlamentar: "Na hora do voto" e "Pessoa ou partido?" ════ */
+  var LPMED = LPM.medidas_tela || {}, LPF = LPM.fiscal || {};
+  /* O valor de uma pessoa numa medida: a coluna, ou a parte de um todo, quando o todo é bastante (a mesma regra de render/congresso_lp_voto.py). */
+  function lpValor(q, def) {
+    var c = def.col;
+    if (c.length === 3) return (q[c[1]] || 0) >= Math.max(1, c[2]) ? 100 * (q[c[0]] || 0) / q[c[1]] : null;
+    return q[c[0]] != null ? q[c[0]] : (def.padrao != null ? def.padrao : null);
+  }
+  function lpEscrito(v, def) { return v == null ? '—' : def.un === '%' ? pct(v) : def.un === 'saldo' ? saldo(v) : def.un === 'reais' ? 'R$ ' + num(v) : lpDec(v); }
+  function lpQuantil(ord, q) { var pos = (ord.length - 1) * q, b = Math.floor(pos), a = Math.min(b + 1, ord.length - 1); return ord[b] + (ord[a] - ord[b]) * (pos - b); }
+  function lpLegenda(q) { return [q.pt, q.uf].filter(Boolean).join('-'); }
+  /* "Achar um nome": o primeiro que casa por inteiro, senão o primeiro que tem todos os termos. */
+  function lpAchar(campo, Q, achou) {
+    function achar() {
+      var termos = semAcento(campo.value).split(/\s+/).filter(Boolean), exato = null, parcial = null;
+      if (!termos.length) return;
+      Q().forEach(function (q) {
+        var nome = semAcento(q.nome);
+        if (nome === termos.join(' ') && !exato) exato = q;
+        else if (!parcial && termos.every(function (t) { return nome.indexOf(t) >= 0; })) parcial = q;
+      });
+      if (exato || parcial) achou(exato || parcial);
+    }
+    campo.addEventListener('change', achar);
+    campo.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); achar(); } });
+  }
+
+  /* ── As faixas por partido: o componente das duas vistas ──
+     o = { fig, dica, longe (destaca quem está longe da mediana do partido), escolher(q), texto(q, def) → a segunda linha da dica } */
+  function lpFaixas(caixa, o) {
+    var PISTAS = [0, -1, 1, -2, 2], PASSO = 6, COLUNA = 7, MIN_PT = LPC.min_partido || 5, MIN_PES = LPC.min_pessoas || 50, LONGE = LPC.longe || 20;
+    var def = null, ordem = [], emFoco = null, rotulo = null, sobre = null, toque = false, X0 = 0, X1 = 100, LOG = false;
+    function xp(v) {
+      var a = LOG ? Math.log(Math.max(v, X0)) : v, lo = LOG ? Math.log(X0) : X0, hi = LOG ? Math.log(X1) : X1;
+      return hi > lo ? Math.max(0, Math.min(100, 100 * (a - lo) / (hi - lo))) : 50;
+    }
+    function redondo(v) {  // o teto do eixo: 1, 2, 2,5 ou 5 vezes uma potência de 10
+      var p = Math.pow(10, Math.floor(Math.log(v) / Math.LN10)), m = v / p;
+      return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p;
+    }
+    function marcas() {
+      var saida = [], i;
+      if (LOG) { for (i = X0; i <= X1 * 1.0001; i *= 10) saida.push(i); if (saida[saida.length - 1] < X1 * 0.6) saida.push(X1); return saida; }
+      for (i = 0; i <= 4; i++) saida.push(X0 + (X1 - X0) * i / 4);
+      return saida;
+    }
+    /* Os rótulos da régua não encostam um no outro. O da ponta esquerda começa na marca dele, o da direita termina nela e os do
+       meio ficam centrados (é o que o estilo faz). Se não cabem todos, a escala linear escreve um sim, um não; a logarítmica
+       deixa de escrever a potência de 10 que encostaria no teto (ou na anterior). A linha de cada marca continua no gráfico. */
+    function semEncostar(rotulos, ms, largura) {
+      var FOLGA = 5, ultimo = rotulos.length - 1, todos = [], ficam = [];
+      var cx = rotulos.map(function (el, i) {
+        var larg = el.getBoundingClientRect().width || el.textContent.length * 6.4, x = xp(ms[i]) * largura / 100;
+        todos.push(i);
+        return i === 0 ? [x, x + larg] : i === ultimo ? [x - larg, x] : [x - larg / 2, x + larg / 2];
+      });
+      function cabem(quais) { for (var j = 1; j < quais.length; j++) if (cx[quais[j]][0] - cx[quais[j - 1]][1] < FOLGA) return false; return true; }
+      if (cabem(todos)) return;
+      if (!LOG) ficam = todos.filter(function (i) { return i % 2 === 0; });
+      if (LOG || !cabem(ficam)) {
+        ficam = [];
+        todos.forEach(function (i) { if (i === 0 || i === ultimo || (cx[i][0] - cx[ficam[ficam.length - 1]][1] >= FOLGA && cx[ultimo][0] - cx[i][1] >= FOLGA)) ficam.push(i); });
+      }
+      rotulos.forEach(function (el, i) { el.hidden = ficam.indexOf(i) < 0; });
+    }
+    /* nasContas: quantas pessoas as contas mediram nesta medida, quando a vista sabe (é o número que a barra diz). */
+    function desenhar(Q, medida, um, uns, nasContas) {
+      def = LPMED[medida] || null;
+      ordem = [];
+      emFoco = null;
+      rotulo = null;
+      sobre = null;
+      esvaziar(caixa);
+      if (!def) return false;
+      var medidos = 0, maior = 0;
+      /* Cada desenho recomeça do zero: a medida que não chega a ser desenhada não herda o grupo (nem a mediana) da anterior. */
+      Q.forEach(function (q) { q._v = lpValor(q, def); q._el = null; q._g = null; q._longe = false; if (q._v != null) { medidos += 1; maior = Math.max(maior, q._v); } });
+      if (nasContas != null) medidos = nasContas;
+      if (medidos < MIN_PES) {
+        caixa.appendChild(h('p', { cls: 'cg-lp-fx-so', text: 'Não dá para responder por pessoa nesta medida: ' + (medidos ? 'só ' + num(medidos) + ' ' + (medidos === 1 ? um + ' pode ser medido' : uns + ' podem ser medidos') : 'nenhum ' + um + ' pode ser medido') + ' (a régua pede ao menos ' + MIN_PES + '). A tabela mostra o que há por partido, sem concluir que “é o partido”.' }));
+        return false;
+      }
+      LOG = !!def.log;
+      X0 = def.min != null ? def.min : 0;
+      X1 = def.max != null ? def.max : redondo(Math.max(maior, LOG ? 10 : 1));
+      var conta = {}, grupos = {}, nomes = [];
+      Q.forEach(function (q) { if (q.pt) conta[q.pt] = (conta[q.pt] || 0) + 1; });
+      Q.forEach(function (q) {
+        var g = q.pt && conta[q.pt] >= MIN_PT ? q.pt : (LPM.outros || 'Outros');
+        if (!grupos[g]) { grupos[g] = { nome: g, n: 0, q: [], outros: g !== q.pt, med: null }; nomes.push(g); }
+        grupos[g].n += 1;
+        q._g = grupos[g];
+        if (q._v != null) grupos[g].q.push(q);
+      });
+      nomes.forEach(function (g) {
+        var G = grupos[g], vals;
+        G.q.sort(function (a, b) { return a._v - b._v || (a.nome < b.nome ? -1 : 1); });
+        if (G.q.length < MIN_PT) return;
+        vals = G.q.map(function (q) { return q._v; });
+        G.q1 = lpQuantil(vals, 0.25);
+        G.med = lpQuantil(vals, 0.5);
+        G.q3 = lpQuantil(vals, 0.75);
+      });
+      nomes.sort(function (a, b) {
+        var A = grupos[a], B = grupos[b];
+        return (A.outros - B.outros) || ((A.med == null) - (B.med == null)) || (B.med - A.med) || (a < b ? -1 : 1);
+      });
+      var maiores = nomes.slice().sort(function (a, b) { return grupos[b].n - grupos[a].n; }).slice(0, 8), ms = marcas();
+      /* O rótulo de cada marca diz onde ela está: a marca em 6,25 não sai "6". E, no eixo logarítmico, quem está abaixo do piso
+         (0 projetos, com o piso em 1) é desenhado na primeira marca: quando há alguém assim, ela diz "até 1". */
+      var abaixoDoPiso = LOG && Q.some(function (q) { return q._v != null && q._v < X0; });
+      var rotulos = ms.map(function (m, i) {
+        var escrito = m === Math.round(m) ? num(m) : String(Math.round(m * 100) / 100).replace('.', ',');
+        if (abaixoDoPiso && i === 0) escrito = 'até ' + escrito;
+        return h('span', { style: 'left:' + xp(m).toFixed(2) + '%', text: def.un === '%' ? Math.round(m) + '%' : def.un === 'saldo' ? saldo(m) : def.un === 'reais' ? 'R$ ' + num(m) : escrito });
+      }), regua = h('div', null, rotulos);
+      caixa.appendChild(h('div', { cls: 'cg-lp-fx-r', 'aria-hidden': 'true' }, [regua]));
+      var largura = Math.max(160, regua.getBoundingClientRect().width || 560);  // a largura da pista, medida: é ela que diz quantos pontos cabem lado a lado
+      semEncostar(rotulos, ms, largura);
+      nomes.forEach(function (g) {
+        var G = grupos[g], pista = h('div', { cls: 'cg-lp-fx-p' }), cheias = {}, cabeca;
+        ms.forEach(function (m) { pista.appendChild(h('i', { cls: 'cg-lp-fx-g' + (def.zero && m === 0 ? ' cg-lp-fx-z' : ''), style: 'left:' + xp(m).toFixed(2) + '%' })); });
+        if (G.med != null) {
+          pista.appendChild(h('i', { cls: 'cg-lp-fx-b', style: 'left:' + xp(G.q1).toFixed(2) + '%;width:' + Math.max(0.4, xp(G.q3) - xp(G.q1)).toFixed(2) + '%' }));
+          pista.appendChild(h('i', { cls: 'cg-lp-fx-m', style: 'left:' + xp(G.med).toFixed(2) + '%' }));
+        }
+        G.q.forEach(function (q) {
+          var x = xp(q._v), col = Math.round(x * largura / 100 / COLUNA), n = cheias[col] || 0;
+          cheias[col] = n + 1;
+          q._x = x;
+          q._dy = PISTAS[n % PISTAS.length] * PASSO;
+          q._pista = pista;
+          q._longe = !!o.longe && G.med != null && Math.abs(q._v - G.med) >= LONGE;
+          q._el = h('i', { cls: 'cg-lp-pt' + (!o.longe || q._longe ? ' cg-lp-pt-a' : ''), style: 'left:' + x.toFixed(2) + '%;margin-top:' + (q._dy - 3.5) + 'px', 'data-q': q.k });
+          pista.appendChild(q._el);
+          ordem.push(q);
+        });
+        if (G.med != null) cabeca = 'mediana ' + lpEscrito(G.med, def) + ' · metade entre ' + lpEscrito(G.q1, def) + ' e ' + lpEscrito(G.q3, def);
+        else cabeca = G.q.length ? 'poucos medidos: sem mediana' : 'ninguém medido';
+        caixa.appendChild(h('div', { cls: 'cg-lp-fx-l' + (maiores.indexOf(g) < 0 ? ' cg-lp-fx-mais' : ''), 'data-pt': g }, [h('div', { cls: 'cg-lp-fx-n' }, [h('b', { text: g }), h('em', { text: num(G.q.length) + (G.q.length < G.n ? ' de ' + num(G.n) : '') }), h('span', { text: cabeca })]), pista]));
+      });
+      if (nomes.length > maiores.length) {
+        var todos = h('button', { type: 'button', cls: 'cg-pa-limpa cg-lp-fx-vt', text: 'Ver todos os ' + nomes.length + ' partidos' });
+        todos.addEventListener('click', function () { caixa.classList.add('cg-lp-ab'); });
+        caixa.appendChild(todos);
+      }
+      return true;
+    }
+    function focar(q) {
+      if (emFoco && emFoco._el) emFoco._el.classList.remove('cg-lp-em');
+      if (rotulo && rotulo.parentNode) rotulo.parentNode.removeChild(rotulo);
+      rotulo = null;
+      emFoco = q && q._el && ordem.indexOf(q) >= 0 ? q : null;
+      if (!emFoco) return;
+      emFoco._el.classList.add('cg-lp-em');
+      rotulo = h('span', { cls: 'cg-lp-fx-nm' + (emFoco._x > 58 ? ' cg-lp-fx-nm-e' : ''), text: emFoco.nome });
+      rotulo.style.left = emFoco._x.toFixed(2) + '%';
+      rotulo.style.marginTop = emFoco._dy + 'px';
+      emFoco._pista.appendChild(rotulo);
+      if (emFoco._pista.parentNode.classList.contains('cg-lp-fx-mais')) caixa.classList.add('cg-lp-ab');
+    }
+    function maisPerto(ev, raio) {
+      var pista = ev.target && ev.target.closest ? ev.target.closest('.cg-lp-fx-p') : null;
+      if (!pista) return null;
+      var r = pista.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top - r.height / 2, melhor = null, dist = raio * raio;
+      ordem.forEach(function (q) {
+        if (q._pista !== pista) return;
+        var dx = q._x * r.width / 100 - mx, dy = q._dy - my, d2 = dx * dx + dy * dy;
+        if (d2 >= raio * raio) return;
+        d2 -= q._longe ? 9 : 0;  // na dúvida, quem está em destaque
+        if (d2 < dist) { dist = d2; melhor = q; }
+      });
+      return melhor;
+    }
+    function apagarDica() { if (sobre && sobre._el) sobre._el.classList.remove('on'); sobre = null; o.dica.hidden = true; }
+    caixa.addEventListener('pointerdown', function (ev) { toque = ev.pointerType === 'touch'; });
+    caixa.addEventListener('pointermove', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      var q = maisPerto(ev, 14);
+      if (!q) { apagarDica(); return; }
+      if (q !== sobre) {
+        if (sobre && sobre._el) sobre._el.classList.remove('on');
+        sobre = q;
+        q._el.classList.add('on');
+        esvaziar(o.dica);
+        o.dica.appendChild(h('b', { text: q.nome + ' (' + lpLegenda(q) + ')' }));
+        o.dica.appendChild(h('span', { text: o.texto(q, def) + ' · clique para ver' }));
+      }
+      var fora = o.fig.getBoundingClientRect(), r = q._el.getBoundingClientRect(), x = r.left - fora.left + 14, y = r.top - fora.top - 6;
+      o.dica.hidden = false;
+      if (x + o.dica.offsetWidth > fora.width) x = Math.max(0, x - o.dica.offsetWidth - 24);
+      o.dica.style.left = x + 'px';
+      o.dica.style.top = Math.max(0, y - o.dica.offsetHeight) + 'px';
+    });
+    caixa.addEventListener('pointerleave', apagarDica);
+    caixa.addEventListener('click', function (ev) {
+      var q = maisPerto(ev, toque ? 24 : 20);
+      if (q) o.escolher(q);
+    });
+    caixa.setAttribute('tabindex', '0');
+    caixa.setAttribute('role', 'group');
+    return {
+      desenhar: desenhar, focar: focar,
+      ordem: function () { return ordem; },
+      passo: function (delta) {
+        if (!ordem.length) return null;
+        var i = emFoco ? ordem.indexOf(emFoco) : -1;
+        return ordem[i < 0 ? (delta > 0 ? 0 : ordem.length - 1) : Math.max(0, Math.min(ordem.length - 1, i + delta))];
+      },
+      tecla: function (ev) {
+        if (ev.target && ev.target.closest && ev.target.closest('a, select, input, summary, button')) return 0;
+        var delta = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : ev.key === 'Home' ? -1e6 : ev.key === 'End' ? 1e6 : 0;
+        if (delta) ev.preventDefault();
+        return delta;
+      }
+    };
+  }
+  /* A frase de uma pessoa numa medida, ao lado da mediana do partido dela. */
+  function lpNaMedida(q, def) {
+    if (q._v == null) return 'sem número nesta medida (poucos votos ou poucos projetos)';
+    return lpEscrito(q._v, def) + (q._g && q._g.med != null ? ' · mediana ' + (q._g.outros ? 'de ' : 'do ') + q._g.nome + ': ' + lpEscrito(q._g.med, def) : '');
+  }
+
+  /* ════ Na hora do voto: as faixas por partido, o cartão com os votos de cada um e a tabela das votações ════ */
+  (function () {
+    var vista = lpVista('decide'), MINIMO = LPC.min_votos || 10;
+    lista(root.querySelectorAll('[data-lp="decide"]')).forEach(function (bloco) {
+      var casa = bloco.getAttribute('data-casa'), UM = bloco.getAttribute('data-um') || 'parlamentar', UNS = bloco.getAttribute('data-uns') || 'parlamentares';
+      var MEDS = (bloco.getAttribute('data-med') || '').split(' ').filter(function (m) { return LPMED[m]; });
+      var fig = bloco.querySelector('.cg-lp-fig'), caixa = bloco.querySelector('.cg-lp-fxs'), cw = bloco.querySelector('.cg-lp-cw'), fs = bloco.querySelector('.cg-lp-fs');
+      var st = bloco.querySelector('.cg-lp-st'), dica = bloco.querySelector('.cg-lp-dica'), leg = bloco.querySelector('.cg-lp-leg'), det = bloco.querySelector('[data-lp-tab="decide"]');
+      if (!fig || !caixa || !cw || !fs || !MEDS.length) return;
+      var card = cw.querySelector('.cg-lp-card'), navEl = cw.querySelector('.cg-pa-nav'), titulo = bloco.querySelector('.cg-lp-ht');
+      var ant = navEl.querySelector('.cg-pa-ant'), prox = navEl.querySelector('.cg-pa-prox'), posEl = navEl.querySelector('.cg-pa-pos');
+      var limpar = fs.querySelector('.cg-pa-limpa'), busca = fs.querySelector('input[data-f="nome"]'), nomes = fs.querySelector('datalist'), meds = lista(fs.querySelectorAll('button[data-med]'));
+      var tabela = bloco.querySelector('.cg-lp-tv'), vmais = bloco.querySelector('.cg-lp-vmais'), avisos = lista(bloco.querySelectorAll('.cg-lp-av[data-so-med]'));
+      var janela = lpJanela(bloco), parado = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var Q = [], porChave = {}, estado = 0, pendente = null, PADRAO = MEDS[0], F = { med: MEDS[0] }, emFoco = null, noCartao = '', temPontos = false;
+      var faixas = lpFaixas(caixa, {
+        fig: fig, dica: dica, longe: true, escolher: function (q) { irA(q); },
+        texto: function (q, def) { return def.nome + ': ' + (F.med === 'vf' ? num(q.va) + ' de ' + num(q.vn) + ' votos (' + pct(q._v) + ')' : pct(q._v)) + (q._g && q._g.med != null ? ' · mediana ' + (q._g.outros ? 'de ' : 'do ') + q._g.nome + ': ' + pct(q._g.med) : ''); }
+      });
+      caixa.setAttribute('aria-label', 'Gráfico do voto, partido a partido. As setas do teclado andam pelos nomes, partido a partido; quem está em foco aparece no cartão ao lado.');
+
+      function endereco() { return '#v=decide&c=' + casa + (F.med !== PADRAO ? '&med=' + F.med : '') + (LP.eixo ? '&eixo=' + LP.eixo : '') + (LP.quem ? '&quem=' + LP.quem : ''); }
+      function gravarEndereco() {
+        if (estado !== 2 || vistaAtual !== 'decide' || aberto || !w.history || !w.history.replaceState) return;
+        if (lpCasaDaVez() && lpCasaDaVez() !== casa) return;
+        if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
+      }
+      function atualizarPasso() {
+        var ordem = faixas.ordem(), i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
+        ant.disabled = !n || i === 0;
+        prox.disabled = !n || i === n - 1;
+        if (!emFoco) posEl.textContent = n ? num(n) + ' ' + (n === 1 ? UM : UNS) + ' no gráfico' : 'sem pontos nesta medida';
+        else if (!temPontos) posEl.textContent = emFoco.nome + ' · sem pontos nesta medida';  // a medida não foi desenhada: o número dele, se há, está no cartão
+        else if (i < 0) posEl.textContent = emFoco.nome + ' · fora do gráfico (sem número nesta medida)';
+        else posEl.textContent = emFoco.nome + ' · ' + num(i + 1) + ' de ' + num(n);
+      }
+      function desenhar() {
+        temPontos = faixas.desenhar(Q, F.med, UM, UNS);
+        if (titulo) titulo.textContent = LPMED[F.med].nome + ', partido a partido';
+        if (leg) leg.hidden = !temPontos;
+        avisos.forEach(function (a) { a.hidden = a.getAttribute('data-so-med') !== F.med; });
+        if (det) det.open = !temPontos;  // sem pontos, a tabela por partido é o que há
+        faixas.focar(emFoco);
+      }
+      function aplicar(semEndereco) {
+        if (estado !== 2) return;
+        var fichas = [];
+        meds.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-med') === F.med ? 'true' : 'false'); });
+        if (tabela) lista(tabela.tBodies[0].rows).forEach(function (tr) { tr.classList.toggle('cg-lp-off', !!LP.eixo && tr.getAttribute('data-ex') !== LP.eixo); });
+        if (F.med !== PADRAO) fichas.push(['Medida: ' + LPMED[F.med].nome, function () { trocarMedida(PADRAO); aplicar(); }]);
+        if (LP.eixo) fichas.push(['Na tabela das votações: ' + lpEixo(LP.eixo), function () { LP.eixo = ''; aplicar(); }]);
+        if (emFoco) fichas.push(['Em foco: ' + emFoco.nome, function () { irA(null); }]);
+        limpar.hidden = !fichas.length;
+        janela(fichas.length ? [temPontos ? num(faixas.ordem().length) + ' ' + UNS + ' medidos' : 'sem pontos nesta medida'] : null, fichas, limparTudo, 'No gráfico: ');
+        atualizarPasso();
+        if (!semEndereco) gravarEndereco();
+      }
+      function trocarMedida(med) {
+        if (!LPMED[med] || MEDS.indexOf(med) < 0 || med === F.med) return;
+        F.med = med;
+        desenhar();
+      }
+      function limparTudo() { LP.eixo = ''; trocarMedida(PADRAO); irA(null, { semEndereco: true }); aplicar(); }
+
+      /* ── O cartão: o que se conta da pessoa neste universo e, de decide-<casa>.json, os votos um a um ── */
+      function item(filhos) { return h('li', null, filhos); }
+      function marcaFiscal(mf) {
+        var x = mf === 1 ? LPF.mais : mf === -1 ? LPF.menos : null;
+        return x ? [lpForma(x.forma), x.n] : [];
+      }
+      function osVotos(q, alvo) {
+        lpArquivo('decide', casa, function (erro, D) {
+          if (noCartao !== q.k) return;
+          esvaziar(alvo);
+          if (erro) { alvo.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Não foi possível abrir os votos agora. Os números acima e a tabela das votações continuam valendo.' })); return; }
+          var cols = {}, votos = (D.votos || {})[q.k] || '', contra = (D.contra || {})[q.k] || [], linhas = [];
+          D.cols.forEach(function (c, i) { cols[c] = i; });
+          D.votacoes.forEach(function (v, i) {
+            var voto = votos.charAt(i) || '-', mf = v[cols.mf], votou = voto === 'S' || voto === 'N', marcas = [];
+            if (voto === '-') return;  // fora do mandato dele: sem registro
+            if (votou && mf) marcas.push(h('span', { cls: 'cg-lp-vt' + ((voto === 'S') === (mf === 1) ? ' cg-lp-vt-f' : ''), text: (voto === 'S') === (mf === 1) ? 'do lado do caixa' : 'do outro lado' }));
+            if (contra.indexOf(i) >= 0) marcas.push(h('span', { cls: 'cg-lp-vt', text: 'contra o partido' }));
+            linhas.push(h('li', null, [
+              h('time', { text: dataBr(v[cols.d]) }),
+              h('span', null, [lpMateria(v[cols.k], v[cols.t], '', v[cols.f])]),
+              h(votou ? 'b' : 'span', { cls: votou ? null : 'cg-lp-v-fora', text: (M.votos || {})[voto] || voto }),
+              h('em', null, ['peso ' + v[cols.w] + (mf ? ' · ' : '')].concat(marcaFiscal(mf)).concat(marcas))
+            ]));
+          });
+          if (!linhas.length) { alvo.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Sem voto registrado nestas votações.' })); return; }
+          alvo.appendChild(h('p', { cls: 'cg-pa-c-o', text: num(linhas.length) + ' de ' + num(D.votacoes.length) + ' votações que entram pegam o mandato; da mais recente para a mais antiga.' }));
+          alvo.appendChild(h('ol', { cls: 'cg-lp-vl' }, linhas));
+        });
+      }
+      function cartaoDe(q) {
+        var nos = [], vf = LPMED.vf ? lpValor(q, LPMED.vf) : null, G = q._g, lista2 = [], votos = h('div');
+        nos.push(h('div', { cls: 'cg-lp-pes' }, [retratoDe(casa, q.k, q.nome), h('div', null, [h('p', { cls: 'cg-lp-pes-n' }, [lpPessoa(q.k, q.nome)]), h('p', { cls: 'cg-lp-pes-l', text: lpLegenda(q) })])]));
+        nos.push(h('p', { cls: 'cg-pa-c-h' }, ['Voto fiscal ', lpSelo()]));
+        if (!q.vn) nos.push(h('p', { cls: 'cg-lp-fr', text: 'Não deu voto (Sim ou Não) nas votações do voto fiscal.' }));
+        else nos.push(h('p', { cls: 'cg-lp-fr' }, [
+          'Votou do lado do caixa em ', h('b', { text: num(q.va) + ' de ' + num(q.vn) }), q.vn === 1 ? ' voto' : ' votos',
+          vf != null ? ' (' + pct(vf) + ').' : ': pouco para medir (são precisos ' + MINIMO + ' votos dados).',
+          vf != null && F.med === 'vf' && G && G.med != null ? ' A mediana ' + (G.outros ? 'de ' : 'do ') + G.nome + ' é ' + pct(G.med) + (q._longe ? ': está a ' + num(Math.abs(vf - G.med)) + ' pontos dela.' : '.') : ''
+        ]));
+        nos.push(h('p', { cls: 'cg-pa-c-h' }, ['Quando pesa ', lpSelo()]));
+        lista2.push(item(q.pp != null
+          ? ['Presença: votou em ', h('b', { text: pct(q.pp) }), ' das ' + num(q.pp_n) + ' votações de matéria de peso ' + (LPC.voto_peso || 20) + ' ou mais em que podia votar' + (q.pd != null ? '; nas demais, ' + pct(q.pd) + ' de ' + num(q.pd_n) + '.' : '.')]
+          : ['Presença: poucas votações de peso em que podia votar (' + num(q.pp_n || 0) + '; são precisas ' + MINIMO + ').']));
+        lista2.push(item(q.fp != null
+          ? ['Com o partido: ', h('b', { text: pct(q.fp) }), ' dos ' + num(q.fp_n) + ' votos nas de peso' + (q.fd != null ? '; nas demais, ' + pct(q.fd) + ' de ' + num(q.fd_n) + '.' : '.')]
+          : ['Com o partido: poucos votos de peso com posição do partido (' + num(q.fp_n || 0) + '; são precisos ' + MINIMO + ').']));
+        nos.push(h('ul', { cls: 'cg-lp-tx' }, lista2));
+        nos.push(h('p', { cls: 'cg-pa-c-h', text: 'Contra o próprio partido fechado' }));
+        nos.push(h('ul', { cls: 'cg-lp-tx' }, [item([h('b', { text: num(q.div) + (q.div === 1 ? ' vez' : ' vezes') }), ' em ' + num(q.wn) + (q.wn === 1 ? ' voto dado' : ' votos dados') + ' nas votações que entram' + (q.div_cont ? '; em ' + num(q.div_cont) + ' delas, do lado do caixa.' : '.')])]));
+        nos.push(h('p', { cls: 'cg-pa-c-h', text: 'Os votos, um a um' }));
+        votos.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Carregando os votos…' }));
+        nos.push(votos);
+        var saidas = [h('a', { href: '#p=' + q.k, 'data-k': q.k, text: 'Abrir o dossiê' }), ' · ', lpIr('autores', q.k, 'O perfil pelos projetos →')];
+        if ((LPM.abas || []).indexOf('cruzar') >= 0) { saidas.push(' · '); saidas.push(lpIr('cruzar', q.k, 'Pessoa ou partido? →')); }
+        nos.push(h('p', { cls: 'cg-pa-c-l' }, saidas));
+        osVotos(q, votos);
+        return nos;
+      }
+      function mostrarCartao(q) {
+        if (q.k === noCartao) return;
+        noCartao = q.k;
+        esvaziar(card);
+        cartaoDe(q).forEach(function (no) { if (no) card.appendChild(no); });
+        if (parado) return;
+        card.classList.remove('cg-pa-vira');
+        void card.offsetWidth;
+        card.classList.add('cg-pa-vira');
+      }
+      function irA(q, o) {
+        o = o || {};
+        emFoco = q || null;
+        LP.quem = q ? q.k : '';
+        faixas.focar(emFoco);
+        if (q) mostrarCartao(q);
+        else { noCartao = ''; esvaziar(card); card.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Escolha um ponto do gráfico ou ache um nome para ver os votos de cada um.' })); }
+        aplicar(true);
+        if (busca && q && !o.daBusca) busca.value = '';
+        if (!o.semEndereco) gravarEndereco();
+      }
+      function teclas(ev) {
+        var delta = estado === 2 ? faixas.tecla(ev) : 0, alvo = delta ? faixas.passo(delta) : null;
+        if (alvo && alvo !== emFoco) irA(alvo);
+      }
+      caixa.addEventListener('keydown', teclas);
+      cw.addEventListener('keydown', function (ev) { if (!(ev.target.closest && ev.target.closest('.cg-lp-vl'))) teclas(ev); });
+      ant.addEventListener('click', function () { var q = faixas.passo(-1); if (q && q !== emFoco) irA(q); });
+      prox.addEventListener('click', function () { var q = faixas.passo(1); if (q && q !== emFoco) irA(q); });
+      meds.forEach(function (b) { b.addEventListener('click', function () { if (estado !== 2) return; trocarMedida(b.getAttribute('data-med')); aplicar(); }); });
+      limpar.addEventListener('click', limparTudo);
+      if (busca) lpAchar(busca, function () { return Q; }, function (q) { if (q !== emFoco) irA(q, { daBusca: true }); });
+
+      /* ── A tabela das votações: 10 à vista; "mostrar todas" traz as demais de decide-<casa>.json ── */
+      if (vmais && tabela) {
+        vmais.hidden = false;
+        vmais.addEventListener('click', function () {
+          tabela.classList.add('cg-lp-ab');
+          vmais.hidden = true;
+          lpArquivo('decide', casa, function (erro, D) {
+            var corpo = tabela.tBodies[0], cols = {};
+            if (erro) { corpo.parentNode.parentNode.parentNode.insertBefore(h('p', { cls: 'cg-lp-st', text: 'Não foi possível abrir as demais votações agora. Acima, as mais recentes.' }), vmais); return; }
+            D.cols.forEach(function (c, i) { cols[c] = i; });
+            D.votacoes.slice(corpo.rows.length).forEach(function (v) {
+              var mf = v[cols.mf];
+              corpo.appendChild(h('tr', { 'data-ex': v[cols.ex], cls: LP.eixo && v[cols.ex] !== LP.eixo ? 'cg-lp-off' : null }, [
+                h('td', { text: dataBr(v[cols.d]) }), h('th', { scope: 'row' }, [lpMateria(v[cols.k], v[cols.t], '', v[cols.f]), h('small', { text: v[cols.e] })]),
+                h('td', null, [v[cols.pes] ? h('b', { text: String(v[cols.w]) }) : String(v[cols.w])]), h('td', { text: lpEixo(v[cols.ex]) }),
+                h('td', null, mf ? marcaFiscal(mf) : [h('span', { cls: 'cg-lp-fora-vf', text: 'fora' })]), h('td', { text: v[cols.res] || '—' }),
+                h('td', { text: num(v[cols.sim]) + ' × ' + num(v[cols.nao]) }), h('td', { text: num(v[cols.contra_partido]) })
+              ]));
+            });
+          });
+        });
+      }
+
+      function montar(arq) {
+        Q = lpLinhas(arq);
+        porChave = {};
+        Q.forEach(function (q) { porChave[q.k] = q; nomes.appendChild(h('option', { value: q.nome, label: lpLegenda(q) })); });
+        /* a medida de entrada: a primeira em que gente bastante pode ser medida (as outras dizem por que não têm pontos) */
+        var boas = MEDS.filter(function (m) { return Q.filter(function (q) { return lpValor(q, LPMED[m]) != null; }).length >= (LPC.min_pessoas || 50); });
+        PADRAO = boas[0] || MEDS[0];
+        F.med = PADRAO;
+        caixa.hidden = false;
+        cw.hidden = false;
+        desenhar();
+      }
+      function doPedido() {
+        var p = pendente;
+        pendente = null;
+        if (p) {
+          trocarMedida(MEDS.indexOf(p.med) >= 0 ? p.med : PADRAO);
+          LP.eixo = lpRotulo(LPM.eixos, p.eixo) ? p.eixo : '';
+          LP.quem = /^(cd|sf)-\d+$/.test(p.quem || '') && p.quem.slice(0, 2) === casa ? p.quem : '';
+        }
+        var alvo = LP.quem ? porChave[LP.quem] : null;
+        if ((alvo || null) !== emFoco) irA(alvo, { semEndereco: true });
+        aplicar();
+      }
+      vista[casa] = {
+        abrir: function () {
+          if (LP.quem && LP.quem.slice(0, 2) !== casa) LP.quem = '';
+          if (estado === 2) { doPedido(); return; }
+          if (estado === 1) return;
+          estado = 1;
+          st.hidden = false;
+          st.textContent = 'Carregando os pontos…';
+          lpArquivo('autores', casa, function (erro, arq) {
+            if (erro) { estado = 0; st.textContent = 'Não foi possível abrir os pontos agora. A tabela por partido e a das votações trazem os mesmos números.'; return; }
+            try { montar(arq); } catch (falha) {
+              if (w.console && w.console.error) w.console.error(falha);
+              estado = 0;
+              st.textContent = 'Não foi possível abrir os pontos agora. A tabela por partido e a das votações trazem os mesmos números.';
+              return;
+            }
+            estado = 2;
+            st.hidden = true;
+            fs.hidden = false;
+            navEl.hidden = false;
+            doPedido();
+          });
+        },
+        doEndereco: function (p) { pendente = p; }
+      };
+    });
+  })();
+
+  /* ════ Pessoa ou partido?: a barra escolhida vira faixas por partido, ao lado ════ */
+  (function () {
+    var vista = lpVista('cruzar');
+    lista(root.querySelectorAll('[data-lp="cruzar"]')).forEach(function (bloco) {
+      var casa = bloco.getAttribute('data-casa'), UM = bloco.getAttribute('data-um') || 'parlamentar', UNS = bloco.getAttribute('data-uns') || 'parlamentares';
+      var PADRAO = bloco.getAttribute('data-x') || '', fig = bloco.querySelector('.cg-lp-xfig2'), barras = lista(bloco.querySelectorAll('.cg-lp-xb'));
+      if (!fig || !LPMED[PADRAO]) return;
+      var caixa = fig.querySelector('.cg-lp-fxs'), st = fig.querySelector('.cg-lp-st'), dica = fig.querySelector('.cg-lp-dica'), titulo = fig.querySelector('.cg-lp-ht'), fq = fig.querySelector('.cg-lp-fq');
+      var leg = fig.querySelector('.cg-lp-leg'), busca = fig.querySelector('input[data-f="nome"]'), nomes = fig.querySelector('datalist'), tb = bloco.querySelector('.cg-lp-xtb');
+      var janela = lpJanela(bloco), Q = [], porChave = {}, estado = 0, pendente = null, X = PADRAO, emFoco = null;
+      var faixas = lpFaixas(caixa, { fig: fig, dica: dica, longe: false, escolher: function (q) { irA(q); }, texto: function (q, def) { return def.nome + ': ' + lpNaMedida(q, def); } });
+      caixa.setAttribute('aria-label', 'Gráfico da medida escolhida, partido a partido. As setas do teclado andam pelos nomes; a frase acima do gráfico diz quem está em foco.');
+
+      function endereco() { return '#v=cruzar&c=' + casa + (X !== PADRAO ? '&x=' + X : '') + (LP.quem ? '&quem=' + LP.quem : ''); }
+      function gravarEndereco() {
+        if (estado !== 2 || vistaAtual !== 'cruzar' || aberto || !w.history || !w.history.replaceState) return;
+        if (lpCasaDaVez() && lpCasaDaVez() !== casa) return;
+        if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
+      }
+      function desenhar() {
+        var daVez = barras.filter(function (b) { return b.getAttribute('data-x') === X; })[0], n = daVez ? parseInt(daVez.getAttribute('data-n'), 10) : NaN;
+        var tem = faixas.desenhar(Q, X, UM, UNS, isNaN(n) ? null : n), def = LPMED[X];
+        if (titulo) { esvaziar(titulo); titulo.appendChild(d.createTextNode(def.nome + ', partido a partido ')); if (def.selo) titulo.appendChild(lpSelo()); }
+        if (leg) leg.hidden = !tem;
+        faixas.focar(emFoco);
+      }
+      function aplicar(semEndereco) {
+        if (estado !== 2) return;
+        var def = LPMED[X], fichas = [];
+        barras.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-x') === X ? 'true' : 'false'); });
+        esvaziar(fq);
+        fq.hidden = !emFoco;
+        if (emFoco) {
+          fq.appendChild(h('b', { text: emFoco.nome }));
+          fq.appendChild(d.createTextNode(' (' + lpLegenda(emFoco) + '), ' + def.nome.charAt(0).toLowerCase() + def.nome.slice(1) + ': ' + lpNaMedida(emFoco, def) + '. '));
+          fq.appendChild(lpIr('autores', emFoco.k, 'O perfil pelos projetos →'));
+          fq.appendChild(d.createTextNode(' · '));
+          fq.appendChild(lpIr('decide', emFoco.k, 'Como vota quando pesa →'));
+          fichas.push(['Em foco: ' + emFoco.nome, function () { irA(null); }]);
+        }
+        if (X !== PADRAO) fichas.push(['Ao lado: ' + def.nome, function () { trocar(PADRAO); aplicar(); }]);
+        janela(fichas.length ? [num(Q.length) + ' ' + UNS + ' · todas as alavancas'] : null, fichas, function () { trocar(PADRAO); irA(null, { semEndereco: true }); aplicar(); }, 'Pessoa ou partido? ');
+        if (!semEndereco) gravarEndereco();
+      }
+      function trocar(x) {
+        if (!LPMED[x] || x === X) return;
+        X = x;
+        if (estado === 2) desenhar();
+      }
+      function irA(q, o) {
+        o = o || {};
+        emFoco = q || null;
+        LP.quem = q ? q.k : '';
+        faixas.focar(emFoco);
+        aplicar(true);
+        if (busca && q && !o.daBusca) busca.value = '';
+        if (!o.semEndereco) gravarEndereco();
+      }
+      barras.forEach(function (b) {
+        b.addEventListener('click', function () {
+          trocar(b.getAttribute('data-x'));
+          aplicar();
+          if (w.innerWidth <= 1000 && estado === 2 && barraFixa) w.scrollTo(0, Math.max(0, w.pageYOffset + fig.getBoundingClientRect().top - barraFixa.offsetHeight - 10));
+        });
+      });
+      caixa.addEventListener('keydown', function (ev) {
+        var delta = estado === 2 ? faixas.tecla(ev) : 0, alvo = delta ? faixas.passo(delta) : null;
+        if (alvo && alvo !== emFoco) irA(alvo);
+      });
+      if (busca) lpAchar(busca, function () { return Q; }, function (q) { if (q !== emFoco) irA(q, { daBusca: true }); });
+
+      function doPedido() {
+        var p = pendente;
+        pendente = null;
+        if (p) {
+          trocar(LPMED[p.x] && barras.some(function (b) { return b.getAttribute('data-x') === p.x; }) ? p.x : PADRAO);
+          LP.quem = /^(cd|sf)-\d+$/.test(p.quem || '') && p.quem.slice(0, 2) === casa ? p.quem : '';
+        }
+        var alvo = LP.quem ? porChave[LP.quem] : null;
+        if ((alvo || null) !== emFoco) irA(alvo, { semEndereco: true });
+        aplicar();
+      }
+      vista[casa] = {
+        abrir: function () {
+          if (LP.quem && LP.quem.slice(0, 2) !== casa) LP.quem = '';
+          if (estado === 2) { doPedido(); return; }
+          if (estado === 1) return;
+          estado = 1;
+          fig.hidden = false;
+          st.hidden = false;
+          st.textContent = 'Carregando os pontos…';
+          lpArquivo('autores', casa, function (erro, arq) {
+            if (erro) { estado = 0; st.textContent = 'Não foi possível abrir os pontos agora. As barras e a tabela trazem os mesmos números.'; return; }
+            try {
+              Q = lpLinhas(arq);
+              Q.forEach(function (q) { porChave[q.k] = q; nomes.appendChild(h('option', { value: q.nome, label: lpLegenda(q) })); });
+              desenhar();
+            } catch (falha) {
+              if (w.console && w.console.error) w.console.error(falha);
+              estado = 0;
+              st.textContent = 'Não foi possível abrir os pontos agora. As barras e a tabela trazem os mesmos números.';
+              return;
+            }
+            estado = 2;
+            st.hidden = true;
+            if (tb) tb.open = false;
+            doPedido();
+          });
+        },
+        doEndereco: function (p) { pendente = p; }
+      };
+    });
+  })();

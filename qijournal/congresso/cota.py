@@ -36,26 +36,40 @@ tem CNPJ aparece como "pessoa física".
 
 As contas do painel (:func:`resumir`) são somas e contagens sobre o registro oficial,
 em centavos inteiros, sem amostra e sem IA: cada documento aponta para a nota.
+
+Para a aba "Cota parlamentar" escolher o período e cruzar filtros, :func:`analisar` devolve
+também o **arquivo mensal** de cada Casa (``cota-<casa>.json``): o que cada pessoa teve de
+reembolso em cada mês fechado e em cada despesa, em centavos inteiros. É a mesma soma do
+painel, só que sem juntar os meses: somando as células de uma pessoa volta-se ao total da
+ficha dela. Fornecedores e notas não vão nesse arquivo (ficam nas fichas).
+
+O **limite mensal por estado** (o "teto") não está nos dados abertos: só entra se a tabela
+conferida estiver em ``config/congresso.yaml`` (``cota.tetos``). Sem ela, nenhum campo de
+teto é preenchido. Com ela, vale um aviso que a página repete: as passagens da agência usam
+o mesmo limite e estão fora da conta, então a parte usada aparece menor do que é.
 """
 
 from __future__ import annotations
 
 import csv
 import io
+import json
 import logging
 import re
 import statistics
 import zipfile
 import zlib
+from bisect import bisect_right
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from .. import text
 from . import fontes
+from . import regras as regras_mod
 from .fontes import Coletor
 
 log = logging.getLogger(__name__)
@@ -85,6 +99,8 @@ POR_PESSOA = 6  # fornecedores e maiores documentos de cada um
 MINIMO_MESES = 6  # meses com despesa para a média mensal entrar nas listas e na mediana
 CONCENTRACAO_PCT = 25  # fatia do próprio total paga a um fornecedor só
 CONCENTRACAO_MINIMO = 50_000  # reais pagos a esse fornecedor
+VERSAO_ARQUIVO = 1  # o formato de cota-<casa>.json: quem lê (o script da página) confere antes de usar
+MEIO_FORNECEDORES = 3  # fornecedores no cartão do parlamentar do meio
 
 # CNPJs de mentira que a Câmara usa para agrupar despesas sem fornecedor de verdade:
 # 01 celular funcional, 02 linha direta, 06 ramal, 07 Correios, 10 fornecedor do exterior.
@@ -473,6 +489,7 @@ class _Conta:
     total: int = 0  # daqui para baixo, só os meses fechados da legislatura
     meses: Counter[str] = field(default_factory=Counter)
     categorias: Counter[str] = field(default_factory=Counter)
+    cubo: Counter[tuple[str, str]] = field(default_factory=Counter)  # (despesa, mês) → centavos: o que o arquivo mensal guarda
     fornecedores: Counter[str] = field(default_factory=Counter)
     notas: Counter[str] = field(default_factory=Counter)
     glosa: int = 0
@@ -489,6 +506,66 @@ class _Conta:
         return self.total / self.n_meses if self.n_meses else 0.0
 
 
+class Analise(NamedTuple):
+    """O que :func:`analisar` devolve."""
+
+    painel: dict[str, Any]  # o painel da Casa (vai em casa-<casa>.json, campo "cota")
+    por_pessoa: dict[int, dict[str, Any]]  # o resumo de cada pessoa (vai na ficha, campo "cota")
+    arquivo: dict[str, Any]  # o arquivo mensal (cota-<casa>.json; :func:`serializar`)
+
+
+def meses_entre(de: str, ate: str) -> list[str]:
+    """Os meses ``AAAA-MM`` de ``de`` a ``ate``, os dois dentro (vazio se ``ate`` vem antes)."""
+    if not de or not ate or ate < de:
+        return []
+    ano, mes = int(de[:4]), int(de[5:7])
+    saida = []
+    while f"{ano:04d}-{mes:02d}" <= ate:
+        saida.append(f"{ano:04d}-{mes:02d}")
+        ano, mes = (ano + 1, 1) if mes == 12 else (ano, mes + 1)
+    return saida
+
+
+def _quartis(valores: list[float]) -> tuple[float, float] | None:
+    """O primeiro e o terceiro quartil, por interpolação linear na posição (n − 1)·p (o
+    método "inclusivo", o mesmo que o script da página usa). Com um valor só, os dois são ele."""
+    if not valores:
+        return None
+    if len(valores) == 1:
+        return valores[0], valores[0]
+    q1, _q2, q3 = statistics.quantiles(valores, n=4, method="inclusive")
+    return q1, q3
+
+
+def _series(celulas: Mapping[tuple[str, str], int], despesas: Mapping[str, int], meses: Mapping[str, int]) -> list[list[int]]:
+    """As células (despesa, mês) de uma pessoa no formato compacto do arquivo mensal: meses
+    seguidos com valor diferente de zero numa despesa formam uma série ``[índice da
+    despesa, índice do primeiro mês, centavos de cada mês seguido…]``; um zero no meio abre
+    outra. Na ordem das despesas e, dentro delas, dos meses."""
+    por_despesa: dict[int, dict[int, int]] = defaultdict(dict)
+    for (despesa, mes), centavos in celulas.items():
+        if centavos and despesa in despesas and mes in meses:
+            por_despesa[despesas[despesa]][meses[mes]] = centavos
+    saida: list[list[int]] = []
+    for despesa in sorted(por_despesa):
+        valores = por_despesa[despesa]
+        anterior = None
+        for mes in sorted(valores):
+            if anterior is not None and mes == anterior + 1:
+                saida[-1].append(valores[mes])
+            else:
+                saida.append([despesa, mes, valores[mes]])
+            anterior = mes
+    return saida
+
+
+def serializar(arquivo: Mapping[str, Any]) -> str:
+    """O arquivo mensal com uma pessoa por linha (o git guarda só o que mudou)."""
+    cabeca = json.dumps({k: v for k, v in arquivo.items() if k != "pessoas"}, ensure_ascii=False, separators=(",", ":"))[:-1]
+    linhas = ",\n".join(json.dumps(pessoa, ensure_ascii=False, separators=(",", ":")) for pessoa in arquivo.get("pessoas") or [])
+    return f'{cabeca},"pessoas":[\n{linhas}\n]}}\n'
+
+
 def resumir(
     despesas: Iterable[Despesa],
     *,
@@ -496,8 +573,26 @@ def resumir(
     inicio: str,
     hoje: str,
     pessoas: Mapping[int, Mapping[str, Any]],
+    escolhas: regras_mod.Cota | None = None,
+    marcos: Iterable[regras_mod.Marco] = (),
 ) -> tuple[dict[str, Any], dict[int, dict[str, Any]]]:
-    """O painel da cota de uma Casa e o resumo de cada pessoa.
+    """O painel da cota de uma Casa e o resumo de cada pessoa: :func:`analisar` sem o
+    arquivo mensal."""
+    analise = analisar(despesas, casa=casa, inicio=inicio, hoje=hoje, pessoas=pessoas, escolhas=escolhas, marcos=marcos)
+    return analise.painel, analise.por_pessoa
+
+
+def analisar(
+    despesas: Iterable[Despesa],
+    *,
+    casa: str,
+    inicio: str,
+    hoje: str,
+    pessoas: Mapping[int, Mapping[str, Any]],
+    escolhas: regras_mod.Cota | None = None,
+    marcos: Iterable[regras_mod.Marco] = (),
+) -> Analise:
+    """O painel da cota de uma Casa, o resumo de cada pessoa e o arquivo mensal.
 
     Só conta quem está em ``pessoas`` (id → ``{"k", "nome", "partido", "uf", "ex"}``).
     As somas (totais, meses, média mensal, categorias, fornecedores, concentração, glosas)
@@ -515,13 +610,44 @@ def resumir(
 
     Na Câmara, as passagens SIGEPA ficam fora de tudo isso; cada pessoa ganha o total
     delas em cada ano da legislatura em que o arquivo ainda as traz (``sigepa``), e as
-    listas de quem mais e menos gasta, o de :data:`ANO_SIGEPA` (``sigepa_2024``)."""
+    listas de quem mais e menos gasta, o de :data:`ANO_SIGEPA` (``sigepa_2024``).
+
+    Para a aba que deixa escolher o período, o painel traz ainda (tudo sobre os mesmos
+    meses fechados, e nada disto muda um campo que já existia):
+
+    - ``meses``: a soma de cada mês fechado e quantas pessoas tiveram saldo positivo nele
+      (somam o ``total``); ``recentes``: quantos meses do fim ainda recebem notas
+      (``escolhas.meses_recentes``); ``pico``: o maior mês fora esses;
+    - ``todos``: os **pontos** do gráfico, da menor média para a maior: quem está em
+      exercício e teve despesa em :data:`MINIMO_MESES` meses ou mais (os mesmos da mediana e
+      das listas). ``q1`` e ``q3`` são os quartis das médias deles; ``n_pontos``, quantos
+      são; ``pos``, a posição de cada um contando de quem mais gasta (com empate, a mesma,
+      como no ranking do dossiê); ``fora``, quem está em exercício, teve despesa e não
+      chegou aos meses mínimos;
+    - ``meio``: o parlamentar do meio (o ponto de média mais próxima da mediana; no empate,
+      o de média menor e, depois, o nome), com as despesas, a série mês a mês, os maiores
+      fornecedores e a glosa dele, para o cartão que a página mostra antes de alguém escolher;
+    - cada despesa ganha ``id`` e ``curto`` (``escolhas.rotulos``); cada fornecedor,
+      ``categoria`` (a despesa em que mais recebeu); ``n_concentrados``, a contagem inteira
+      da lista "um fornecedor só";
+    - ``tetos`` e, em cada ponto, ``teto`` e ``pct_teto``: nulos sem a tabela conferida
+      (``escolhas.tetos``). Com ela, ``pct_teto`` é o total dividido pela soma dos limites
+      do estado nos meses em que a pessoa teve despesa;
+    - ``marcos``: as datas cheias do calendário oficial (``marcos``, de ``pauta.calendario``)
+      que caem num mês fechado, para a anotação no gráfico por mês. Só a data, sem dizer causa.
+
+    O arquivo mensal (:class:`Analise`, ``arquivo``) guarda, de cada pessoa com lançamento em
+    mês fechado da legislatura, em exercício ou não, o saldo de cada despesa em cada mês, em
+    centavos (:func:`_series`), e na Câmara as passagens da agência por ano."""
+    escolhas = escolhas or regras_mod.Cota()
     desde, aberto = inicio[:7], hoje[:7]
     ano_inicio = int(desde[:4])
     camara = casa == "cd"
     contas: dict[int, _Conta] = {}
     nomes: dict[str, Counter[str]] = defaultdict(Counter)  # CNPJ → grafias do nome
     anos_sigepa: set[int] = set()
+    sigepa_ate = ""  # o último mês da legislatura em que o arquivo trouxe um bilhete comprado pela agência
+    cat_cnpj: dict[str, Counter[str]] = defaultdict(Counter)  # CNPJ → despesa → centavos
     total = 0
     ultimo = ""
     categorias: Counter[str] = Counter()
@@ -541,6 +667,8 @@ def resumir(
             c.sigepa[d.ano] += centavos
             if d.ano >= ano_inicio:
                 anos_sigepa.add(d.ano)
+                if centavos > 0:  # depois do último bilhete ainda chegam cancelamentos (negativos), que não marcam o mês
+                    sigepa_ate = max(sigepa_ate, f"{d.ano:04d}-{d.mes:02d}")
             continue
         c.anos[d.ano] += centavos
         mes = f"{d.ano:04d}-{d.mes:02d}"
@@ -568,6 +696,7 @@ def resumir(
         c.total += centavos
         c.meses[mes] += centavos
         c.categorias[d.categoria] += centavos
+        c.cubo[(d.categoria, mes)] += centavos
         if d.glosa > 0:
             c.glosa += round(d.glosa * 100)
             c.glosas += 1
@@ -578,6 +707,7 @@ def resumir(
         if empresa:
             nomes[chave][d.fornecedor] += 1
             por_cnpj[chave] += centavos
+            cat_cnpj[chave][d.categoria] += centavos
             gabinetes[chave].add(d.pessoa)
             if centavos > 0:
                 notas_cnpj[chave] += 1
@@ -641,6 +771,135 @@ def resumir(
 
     glosados = sorted((pid for pid in em_exercicio if contas[pid].glosa > 0), key=lambda pid: (-contas[pid].glosa, ordem_nome(pid)))
 
+    # ── o que a aba com período precisa (campos novos; nada acima muda) ──────
+    meses = meses_entre(desde, ultimo)  # só meses fechados, sem buraco: o índice é a posição
+    indice_mes = {mes: i for i, mes in enumerate(meses)}
+    por_mes: Counter[str] = Counter()
+    gente_no_mes: Counter[str] = Counter()
+    for c in contas.values():
+        for mes, v in c.meses.items():
+            por_mes[mes] += v
+            if v > 0:
+                gente_no_mes[mes] += 1
+    recentes = min(max(0, escolhas.meses_recentes), len(meses))
+    firmes = meses[: len(meses) - recentes]  # os meses que já não recebem notas
+    pico = max(firmes, key=lambda mes: (por_mes[mes], -indice_mes[mes]), default="")
+
+    # As despesas na ordem da Casa (a do painel), com o id estável e o nome curto.
+    ordem_despesas = [nome for nome, _v in sorted(categorias.items(), key=lambda t: (-t[1], t[0]))]
+    rotulos: dict[str, tuple[str, str]] = {}
+    usados: set[str] = set()
+    for nome in ordem_despesas:
+        rid, curto = escolhas.rotulo(casa, nome)
+        base_id, n = rid, 1
+        while rid in usados:  # dois nomes oficiais que dão o mesmo id: o segundo ganha um número
+            n += 1
+            rid = f"{base_id}-{n}"
+        usados.add(rid)
+        rotulos[nome] = (rid, curto)
+    indice_despesa = {nome: i for i, nome in enumerate(ordem_despesas)}
+
+    tetos = escolhas.teto(casa)
+    mes_do_teto = ultimo or aberto  # o limite "de hoje": o que vale no último mês fechado
+    if tetos is not None and any(tetos.em(uf, mes_do_teto) is None for uf in regras_mod.UFS):
+        tetos = None  # a tabela só começa a valer depois do último mês fechado: ainda não há o que mostrar
+
+    def teto_de(pid: int) -> tuple[float | None, float | None]:
+        """O limite mensal do estado da pessoa (em reais) e a parte dele que o total dela
+        ocupa: total ÷ soma dos limites do estado nos meses em que ela teve despesa. Se
+        algum desses meses vem antes da primeira vigência da tabela, a parte fica sem valor:
+        dividir só pelos meses com limite daria um percentual maior do que o verdadeiro."""
+        uf = str(pessoas[pid].get("uf") or "")
+        if tetos is None or tetos.em(uf, mes_do_teto) is None:
+            return None, None
+        c = contas[pid]
+        limites_dos_meses = [tetos.em(uf, mes) for mes, v in c.meses.items() if v > 0]
+        soma = sum(v or 0 for v in limites_dos_meses)
+        parte = round(100 * c.total / soma, 1) if soma and all(v is not None for v in limites_dos_meses) else None
+        return _reais(tetos.em(uf, mes_do_teto) or 0), parte
+
+    def maior_despesa(c: _Conta) -> tuple[str, float | None]:
+        """O id da despesa em que a pessoa mais gastou e a parte dela no total."""
+        if not c.categorias:
+            return "", None
+        nome, v = min(c.categorias.items(), key=lambda t: (-t[1], t[0]))
+        return rotulos[nome][0], (round(100 * v / c.total, 1) if c.total > 0 else None)
+
+    def sigepa_de(c: _Conta) -> dict[str, float]:
+        return {str(ano): _reais(c.sigepa[ano]) for ano in sorted(anos_sigepa) if c.sigepa[ano]}
+
+    arredondadas = sorted(_reais(contas[pid].media) for pid in regulares)  # como no ranking do dossiê
+
+    def ponto(pid: int) -> dict[str, Any]:
+        c = contas[pid]
+        cat, pct_cat = maior_despesa(c)
+        teto, pct_teto = teto_de(pid)
+        extra: dict[str, Any] = {"sigepa": sigepa_de(c)} if camara else {}
+        return linha(
+            pid,
+            media=_reais(c.media),
+            total=_reais(c.total),
+            meses=c.n_meses,
+            pos=len(arredondadas) - bisect_right(arredondadas, _reais(c.media)) + 1,
+            cat=cat,
+            pct_cat=pct_cat,
+            **extra,
+            teto=teto,
+            pct_teto=pct_teto,
+        )
+
+    quartis = _quartis(sorted(contas[pid].media for pid in regulares))
+    # O parlamentar do meio: a média mais próxima da mediana (empate: a menor, depois o nome).
+    do_meio = (
+        min(regulares, key=lambda pid: (round(abs(contas[pid].media - mediana), 6), contas[pid].media, ordem_nome(pid)))
+        if regulares and mediana is not None
+        else None
+    )
+    meio: dict[str, Any] | None = None
+    if do_meio is not None:
+        c = contas[do_meio]
+        meio = {
+            "k": pessoas[do_meio]["k"],
+            "cats": [
+                [rotulos[nome][0], _reais(v), round(100 * v / c.total, 1) if c.total > 0 else None]
+                for nome, v in sorted(c.categorias.items(), key=lambda t: (-t[1], t[0]))
+                if v
+            ],
+            "serie": [_reais(c.meses.get(mes, 0)) for mes in meses],
+            "fornecedores": [
+                {
+                    "nome": nome_fornecedor(chave),
+                    "cnpj": "" if chave.startswith("~") else chave,
+                    "valor": _reais(v),
+                    "pct": round(100 * v / c.total, 1) if c.total > 0 else None,
+                }
+                for chave, v in sorted(c.fornecedores.items(), key=lambda t: (-t[1], t[0]))[:MEIO_FORNECEDORES]
+                if v > 0
+            ],
+            "glosa": {"valor": _reais(c.glosa), "n": c.glosas},
+        }
+    fora = sorted((pid for pid, c in contas.items() if pessoas[pid].get("ex") and c.meses and c.n_meses < MINIMO_MESES), key=ordem_nome)
+
+    def categoria_do_fornecedor(chave: str) -> str:
+        """O nome curto da despesa em que o fornecedor mais recebeu."""
+        if not cat_cnpj[chave]:
+            return ""
+        nome = min(cat_cnpj[chave].items(), key=lambda t: (-t[1], t[0]))[0]
+        return rotulos[nome][1] if nome in rotulos else ""
+
+    limites = None
+    if tetos is not None:
+        vigentes = [(tetos.em(uf, mes_do_teto) or 0, uf) for uf in regras_mod.UFS]
+        menor, maior = min(vigentes), max(vigentes, key=lambda t: (t[0], [-ord(ch) for ch in t[1]]))
+        limites = {
+            "fonte": tetos.fonte,
+            "url": tetos.url,
+            "desde": max((de for de, _valores in tetos.vigencias if de <= mes_do_teto), default=tetos.vigencias[0][0]),
+            "min": {"uf": menor[1], "valor": _reais(menor[0])},
+            "max": {"uf": maior[1], "valor": _reais(maior[0])},
+            "ufs": {uf: _reais(valor) for valor, uf in sorted(vigentes, key=lambda t: t[1])},
+        }
+
     painel: dict[str, Any] = {
         "desde": desde,
         "ate": ultimo,
@@ -651,11 +910,18 @@ def resumir(
         "mais_gastam": [gasto(pid) for pid in mais[:LISTA]],
         "menos_gastam": [gasto(pid) for pid in menos[:LISTA]],
         "categorias": [
-            {"nome": nome, "total": _reais(v), "pct": round(100 * v / total, 1) if total else 0.0}
+            {"nome": nome, "total": _reais(v), "pct": round(100 * v / total, 1) if total else 0.0, "id": rotulos[nome][0], "curto": rotulos[nome][1]}
             for nome, v in sorted(categorias.items(), key=lambda t: (-t[1], t[0]))
         ],
         "fornecedores": [
-            {"nome": nome_fornecedor(chave), "cnpj": chave, "total": _reais(v), "gabinetes": len(gabinetes[chave]), "n": notas_cnpj[chave]}
+            {
+                "nome": nome_fornecedor(chave),
+                "cnpj": chave,
+                "total": _reais(v),
+                "gabinetes": len(gabinetes[chave]),
+                "n": notas_cnpj[chave],
+                "categoria": categoria_do_fornecedor(chave),
+            }
             for chave, v in sorted(por_cnpj.items(), key=lambda t: (-t[1], t[0]))[:LISTA]
             if v > 0
         ],
@@ -672,7 +938,26 @@ def resumir(
         ],
         "repetidas": repetidas[:REPETIDAS],
         "glosas": [linha(pid, valor=_reais(contas[pid].glosa), n=contas[pid].glosas) for pid in glosados[:GLOSAS]],
+        # Daqui para baixo, o que a aba com período usa.
+        "aberto": aberto,
+        "meses": [{"m": mes, "total": _reais(por_mes[mes]), "n": gente_no_mes[mes]} for mes in meses],
+        "recentes": recentes,
+        "pico": {"m": pico, "total": _reais(por_mes[pico])} if pico else None,
+        "marcos": sorted(
+            ({"m": m.de[:7], "d": m.de, "nome": m.nome} for m in marcos if len(m.de) == 10 and m.de[:7] in indice_mes),
+            key=lambda m: (m["d"], m["nome"]),
+        ),
+        "q1": _reais(quartis[0]) if quartis else None,
+        "q3": _reais(quartis[1]) if quartis else None,
+        "n_pontos": len(regulares),
+        "todos": [ponto(pid) for pid in menos],
+        "fora": [linha(pid, media=_reais(contas[pid].media), total=_reais(contas[pid].total), meses=contas[pid].n_meses) for pid in fora],
+        "meio": meio,
+        "n_concentrados": len(concentrados),
+        "tetos": limites,
     }
+    if camara:
+        painel["sigepa_ate"] = sigepa_ate
 
     por_pessoa: dict[int, dict[str, Any]] = {}
     for pid, c in sorted(contas.items()):
@@ -706,4 +991,34 @@ def resumir(
             "glosa": {"valor": _reais(c.glosa), "n": c.glosas},
         }
         por_pessoa[pid] = resumo
-    return painel, por_pessoa
+
+    # O arquivo mensal: quem tem lançamento em mês fechado da legislatura, em ordem de nome.
+    arquivo: dict[str, Any] = {
+        "v": VERSAO_ARQUIVO,
+        "casa": casa,
+        "meses": meses,
+        "recentes": recentes,
+        "aberto": aberto,
+        "sem": SEM.get(casa, ""),
+    }
+    if camara:
+        arquivo["sigepa_ate"] = sigepa_ate
+    arquivo["cats"] = [[rotulos[nome][0], rotulos[nome][1], nome] for nome in ordem_despesas]
+    arquivo["tetos"] = (
+        {"fonte": tetos.fonte, "url": tetos.url, "vig": [[de, dict(valores)] for de, valores in tetos.vigencias]} if tetos is not None else None
+    )
+    arquivo["pessoas"] = []
+    for pid in sorted((pid for pid, c in contas.items() if c.meses), key=ordem_nome):
+        c, quem = contas[pid], pessoas[pid]
+        registro: list[Any] = [
+            quem["k"],
+            quem["nome"],
+            quem.get("partido") or "",
+            quem.get("uf") or "",
+            1 if quem.get("ex") else 0,
+            _series(c.cubo, indice_despesa, indice_mes),
+        ]
+        if camara:
+            registro.append({str(ano): c.sigepa[ano] for ano in sorted(anos_sigepa) if c.sigepa[ano]})
+        arquivo["pessoas"].append(registro)
+    return Analise(painel, por_pessoa, arquivo)

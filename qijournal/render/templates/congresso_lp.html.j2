@@ -1,0 +1,292 @@
+{#- Aba Congresso: a visão por parlamentar (incluído por congresso.html.j2, logo antes de "Como
+    ler", só quando há c.lp). Uma seção por vista: "Os projetos" (#v=projetos) e "Quem propõe"
+    (#v=autores). Tudo o que está aqui vem pronto de render/congresso_lp.py (casa.lp): sem script,
+    cada vista traz a janela, os números, as cabeças das faixas, o cartão em foco, as listas, as
+    tabelas e a caixa do que não dá para concluir. Com script (congresso_lp.js.j2), os pontos
+    vêm de projetos-<casa>.json e autores-<casa>.json quando a vista abre.
+    Nenhum nome de faixa, alavanca, marca ou código é escrito aqui: os rótulos vêm do config.
+    Os pontos não levam data-k nem data-m (a página abre o dossiê ou a ficha a qualquer clique
+    nesses atributos): ponto de projeto usa data-t; ponto de pessoa, data-q.
+    Estilos: congresso_lp.css.j2 (cg-lp-…) e os da pauta (cg-pa-…). -#}
+{% set L = c.lp %}
+{#- O selo de tudo o que depende da leitura. A explicação (M.lp.selo_dica) é posta pelo script, uma vez só no HTML. -#}
+{% macro selo() -%}
+<button class="az-selo cg-lp-selo" type="button">{{ L.selo }}</button>
+{%- endmacro %}
+{% macro info(texto) -%}
+<button type="button" class="cg-i" aria-label="O que é isto" data-dica="{{ texto }}">i</button>
+{%- endmacro %}
+{% macro pes(k, nome) -%}
+{% if k %}<a class="cg-p" href="#p={{ k }}" data-k="{{ k }}">{{ nome }}</a>{% else %}{{ nome }}{% endif %}
+{%- endmacro %}
+{#- O número de um projeto: abre a ficha (com script, se ela existe) ou a página oficial. -#}
+{% macro mat(k, t, u, f) -%}
+{% if f %}<a class="cg-mt" href="{{ u or ("#m=" ~ k) }}" data-m="{{ k }}"{% if u %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ t }}</a>{% elif u %}<a class="cg-mt" href="{{ u }}" target="_blank" rel="noopener noreferrer">{{ t }}</a>{% else %}{{ t }}{% endif %}
+{%- endmacro %}
+{#- A Janela: o conjunto, a unidade e a contagem; com filtro, o script escreve o que está realçado. -#}
+{% macro janela(partes) -%}
+<p class="cg-lp-jan" role="status" aria-live="polite"><span class="cg-lp-jan-t">{% for t, forte in partes %}{% if forte %}<b>{{ t }}</b>{% else %}{{ t }}{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</span></p>
+{%- endmacro %}
+{% macro numero(n) -%}
+<li><button type="button" class="cg-pa-m cg-lp-n" data-f="{{ n.filtro }}" aria-pressed="false"><span class="cg-pa-m-n"><b>{{ n.n }}</b> {{ n.un }}</span><span class="cg-pa-m-f">{{ n.f }}</span>{% for x in n.x %}<span class="cg-pa-m-x">{{ x }}</span>{% endfor %}<span class="cg-pa-m-ir" aria-hidden="true">{{ n.ir }}</span></button></li>
+{%- endmacro %}
+{#- O cartão de um projeto. O script monta o mesmo, com as mesmas classes, para os demais. -#}
+{% macro cartao(x) -%}
+<p class="cg-pa-c-k"><span class="cg-pa-c-q">tramitando</span>{{ mat(x.k, x.t, x.u, x.f) }}<span class="cg-lp-tag{% if not x.confirmado %} cg-lp-tag-ac{% endif %}">{{ x.estado }}</span><span class="cg-pa-c-n">peso <b>{{ x.peso }}</b></span></p>
+<p class="cg-pa-c-e">{{ x.ementa }}</p>
+<p class="cg-pa-c-h">A leitura {{ selo() }}</p>
+<p class="cg-pa-c-o"><b>{{ x.estado }}</b>: {{ x.estado_x }}.</p>
+<dl class="cg-lp-cod">
+  <div><dt>{{ x.alavanca[0] }}</dt><dd>{{ x.alavanca[1] }}{% if x.alavanca[2] %} <small>{{ x.alavanca[2] }}</small>{% endif %}</dd></div>
+  {% for campo, codigo in x.cod %}
+  <div><dt>{{ campo }}</dt><dd>{{ codigo }}</dd></div>
+  {% endfor %}
+  <div><dt>Marca de {{ x.contas.marca|lower }}</dt><dd><i class="cg-lp-g cg-lp-{{ x.contas.forma }}" aria-hidden="true"></i>{{ x.contas.rotulo }}</dd></div>
+</dl>
+{% if x.porque %}<p class="cg-lp-pq">{{ x.porque }}</p>{% endif %}
+{% if x.conta %}<p class="cg-lp-conta"><span>A conta do peso:</span> {{ x.conta }}</p>{% endif %}
+<p class="cg-pa-c-o">{{ x.fonte }}{% if x.confianca %} · confiança do leitor: {{ x.confianca }} de 3{% endif %}</p>
+{% if x.alertas %}<p class="cg-lp-al">{% for a in x.alertas %}<span class="cg-chip">{{ a }}</span>{% endfor %}</p>{% endif %}
+<p class="cg-pa-c-h">Onde parou</p>
+<p class="cg-pa-c-o"><b>{{ x.porta[:1]|upper }}{{ x.porta[1:] }}</b>{% if x.orgao %} · {{ x.orgao }}{% endif %}{% if x.sem_andar %} · sem andar há {{ x.sem_andar }} (último andamento em {{ x.ultimo }}){% endif %}.</p>
+{% if x.relator or x.segura %}<p class="cg-pa-c-o">Com quem está: {% if x.relator %}o relator, {{ pes(x.relator.k, x.relator.nome) }}{% else %}{{ x.segura }}{% endif %}.</p>{% endif %}
+<p class="cg-pa-c-h">De quem é</p>
+<p class="cg-pa-c-o">{% if x.autor.nome %}{{ pes(x.autor.k, x.autor.nome) }}{% if x.autor.legenda %} ({{ x.autor.legenda }}){% endif %}{% elif x.autor.legenda %}{{ x.autor.legenda }}{% endif %}{% if x.origem %}{% if x.autor.nome or x.autor.legenda %} · {% endif %}{{ x.origem }}{% endif %}{% if x.apresentada %} · apresentado em {{ x.apresentada }}{% endif %}{% if x.autor.k %} · <a class="cg-lp-ir" href="#v=autores&amp;c={{ x.autor.k[:2] }}&amp;quem={{ x.autor.k }}">ver o perfil de projetos →</a>{% endif %}</p>
+<p class="cg-pa-c-l">{% if x.f %}<a href="#m={{ x.k }}" data-m="{{ x.k }}">Abrir a ficha</a> · {% endif %}{% if x.u %}<a href="{{ x.u }}" target="_blank" rel="noopener noreferrer">Página oficial</a>{% endif %}{% if x.contestar %} · <a href="{{ x.contestar }}" target="_blank" rel="noopener noreferrer">Contestar esta leitura</a>{% endif %}</p>
+{%- endmacro %}
+
+  {#- ════ Os projetos: o que mais pesa, e em que porta parou ════ -#}
+  <section class="az-sec cg-vista cg-lp-v" data-vista="projetos" aria-labelledby="cg-projetos-h">
+    <header class="az-lh" id="cg-projetos">
+      <p class="az-ln">Os projetos</p>
+      <h3 class="az-lt" id="cg-projetos-h">O que mais pesa para o país, e em que porta parou</h3>
+      <p class="az-ld">Cada projeto de lei foi lido e pesado pelo quanto mexe na estrutura do país, em relação a um objetivo declarado: {{ L.objetivo }}. Aqui estão os de maior peso que ainda tramitam, a porta em que cada um parou e com quem está. A porta e o tempo vêm do registro oficial; o peso é leitura. {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.lp and casa.lp.projetos %}{% set P = casa.lp.projetos %}
+      <div class="cg-pa cg-lp" id="cg-lp-proj-{{ casa.id }}" data-lp="projetos" data-casa="{{ casa.id }}" data-foco="{{ P.foco_k }}" data-um="{{ casa.lp.um }}" data-uns="{{ casa.lp.uns }}">
+        {{ janela(P.janela) }}
+        <ul class="cg-pa-ms cg-lp-ns">
+          {% for n in P.numeros %}
+          {{ numero(n) }}
+          {% endfor %}
+        </ul>
+
+        {#- Os filtros: uma fila só, acima de tudo o que ela recorta. Só com script. -#}
+        <div class="cg-lp-fs" role="group" aria-label="Filtros do gráfico" hidden>
+          {% if P.eixos %}
+          <div class="cg-pa-fs">
+            <span class="cg-pa-fk">Onde mexe</span>
+            <span class="cg-pa-chips cg-lp-fx-e">{% for x in P.eixos %}<button type="button" class="cg-pa-f" data-f="eixo:{{ x.id }}" aria-pressed="false">{{ x.nome }} <b>{{ x.topo }}</b></button>{% endfor %}</span>
+            <label class="cg-lp-sel cg-lp-sel-e"><select data-f="eixo" aria-label="Em que sistema o projeto mexe"><option value="">tudo</option>{% for x in P.eixos %}<option value="{{ x.id }}">{{ x.nome }} ({{ x.topo }})</option>{% endfor %}</select></label>
+          </div>
+          {% endif %}
+          {% if P.direcoes %}
+          <div class="cg-pa-fs">
+            <span class="cg-pa-fk">{{ L.marca_do_caixa }}{{ info(L.dicas.caixa) }}</span>
+            <span class="cg-pa-chips">{% for x in P.direcoes %}<button type="button" class="cg-pa-f" data-f="dir:{{ x.id }}" aria-pressed="false"><i class="cg-lp-g cg-lp-{{ x.forma }}" aria-hidden="true"></i>{{ x.nome }} <b>{{ x.n }}</b></button>{% endfor %}</span>
+          </div>
+          {% endif %}
+          <div class="cg-pa-fs">
+            <span class="cg-pa-fk">Leitura{{ info(L.dicas.topo) }}</span>
+            <span class="cg-pa-chips">{% if P.tem_a_confirmar %}<button type="button" class="cg-pa-f" data-f="conf:1" aria-pressed="false"><i class="cg-lp-g cg-lp-cheio" aria-hidden="true"></i>confirmados por dois leitores <b>{{ P.confirmados }}</b></button><button type="button" class="cg-pa-f" data-f="conf:0" aria-pressed="false"><i class="cg-lp-g cg-lp-cheio cg-lp-ac" aria-hidden="true"></i>a confirmar <b>{{ P.so_ementa }}</b></button>{% else %}<span class="cg-lp-todos-c"><i class="cg-lp-g cg-lp-cheio" aria-hidden="true"></i>todos confirmados por dois leitores</span>{% endif %}<button type="button" class="cg-pa-f cg-lp-f-par" data-f="par" aria-pressed="false">parados há mais de um ano <b>{{ P.parados }}</b></button></span>
+            <button type="button" class="cg-pa-limpa" hidden>Limpar</button>
+          </div>
+        </div>
+
+        <div class="cg-pa-foco cg-lp-foco">
+          <figure class="cg-pa-fig cg-lp-fig">
+            <figcaption class="az-h cg-lp-h">Em que porta parou o que mais pesa <span>cada ponto é um projeto do topo da régua; quanto mais à direita, mais tempo sem andar{{ info(L.dicas.sem_andar) }}</span></figcaption>
+            <div class="cg-lp-eixo" aria-hidden="true" hidden><div>{% for t in L.tempo %}<span style="left:{{ t.x }}%"{% if not t.cel %} class="cg-lp-so-pc"{% endif %}><b class="cg-pa-pc">{{ t.rot }}</b><b class="cg-pa-cel">{{ t.cel }}</b></span>{% endfor %}<i style="left:{{ L.parado_x }}%">parado: mais de 1 ano sem andar →</i></div></div>
+            <ol class="cg-lp-portas" style="--lp-parado:{{ L.parado_x }}%">
+              {% for b in P.portas %}
+              <li class="cg-lp-pl" data-porta="{{ b.id }}">
+                <button type="button" class="cg-lp-porta" data-f="porta:{{ b.id }}" aria-pressed="false" title="{{ b.longo[:1]|upper }}{{ b.longo[1:] }}">
+                  <b>{{ b.nome }}</b>
+                  {% if b.vazia %}<span>nenhum projeto do topo nesta porta</span>{% else %}<span><em class="cg-lp-pc">{{ b.topo }}</em> {{ b.resto }}</span>{% if b.mediana %}<span>metade sem andar há mais de {{ b.mediana }}</span>{% endif %}{% endif %}
+                  <small>de {{ b.total }} nesta porta</small>
+                </button>
+                <div class="cg-lp-pista" hidden></div>
+              </li>
+              {% endfor %}
+            </ol>
+            <p class="cg-lp-semjs">O gráfico de pontos precisa de script; as listas e a tabela trazem os mesmos números.</p>
+            <p class="cg-lp-st" role="status" hidden></p>
+            <div class="cg-gr-dica cg-lp-dica" role="status" hidden></div>
+            <p class="cg-leg cg-lp-leg" hidden><span><i class="cg-lp-g cg-lp-cheio"></i>{{ L.rot.topo }}: confirmado por dois leitores</span>{% if P.tem_a_confirmar %}<span><i class="cg-lp-g cg-lp-cheio cg-lp-ac"></i>a confirmar: um leitor só</span>{% endif %}{% for x in L.direcoes %}<span><i class="cg-lp-g cg-lp-{{ x.forma }} cg-lp-mu"></i>{{ x.nome }}</span>{% endfor %}</p>
+            <details class="cg-rv-tb cg-pa-tb cg-lp-tb">
+              <summary>Ver como tabela: porta a porta</summary>
+              <div class="an-tbl-wrap"><table class="an-tbl cg-tb">
+                <thead><tr><th scope="col">Porta</th><th scope="col">Tramitam</th><th scope="col">Com leitura</th><th scope="col">{{ L.rot.meio|capitalize }}</th><th scope="col">Topo da régua, pela ementa</th><th scope="col">{{ L.rot.topo|capitalize }} confirmado</th><th scope="col">Metade do topo sem andar há mais de</th><th scope="col">Topo parado há mais de um ano</th><th scope="col">Confirmados parados</th></tr></thead>
+                <tbody>
+                  {% for b in P.portas %}
+                  <tr><th scope="row">{{ b.nome }}</th><td>{{ b.total }}</td><td>{{ b.lidos }}</td><td>{{ b.meio }}</td><td>{{ b.topo }}</td><td>{{ b.estr }}</td><td>{{ b.mediana or "—" }}</td><td>{{ b.topo_parados }}</td><td>{{ b.estr_parados }}</td></tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot><tr><th scope="row">A Casa</th><td>{{ P.tabela.tramitando }}</td><td>{{ P.tabela.lidos }}</td><td>{{ P.tabela.meio }}</td><td>{{ P.tabela.topo }}</td><td>{{ P.tabela.estr }}</td><td>—</td><td>{{ P.tabela.topo_parados }}</td><td>{{ P.tabela.estr_parados }}</td></tr></tfoot>
+              </table></div>
+              <p class="az-dek">O que ainda não foi confirmado por dois leitores conta, por ora, na coluna “{{ L.rot.meio }}”.</p>
+            </details>
+            {% for nota in P.notas %}
+            <p class="az-dek cg-lp-nota">{{ nota }}</p>
+            {% endfor %}
+          </figure>
+          <div class="cg-pa-cw cg-lp-cw">
+            <div class="cg-pa-card cg-lp-card">
+              {% if P.foco %}{{ cartao(P.foco) }}{% else %}<p class="cg-pa-c-o">Nenhum projeto do topo da régua tramita nesta Casa.</p>{% endif %}
+            </div>
+            <div class="cg-pa-nav" hidden><button type="button" class="cg-pa-ant" aria-label="Projeto anterior">‹</button><span class="cg-pa-pos" aria-live="polite"></span><button type="button" class="cg-pa-prox" aria-label="Próximo projeto">›</button></div>
+          </div>
+        </div>
+
+        {% if P.top %}
+        <div class="az-blk cg-lp-top">
+          <h4 class="az-h">Os que mais pesam e não andam <span>do topo da régua, sem andamento oficial há mais de um ano; do maior peso para o menor {{ selo() }}</span></h4>
+          <ol class="cg-ls cg-lp-ls">
+            {% for i in P.top %}
+            <li{% if loop.index > 5 %} class="cg-lp-mais"{% endif %}{% if i.no_grafico %} data-ver="{{ i.k }}"{% endif %}>
+              <p class="cg-ls-k"><b>{{ mat(i.k, i.t, i.u, i.f) }}</b><span class="cg-rv-n">peso {{ i.peso }}</span><span class="cg-lp-tag{% if i.a_confirmar %} cg-lp-tag-ac{% endif %}">{{ "a confirmar" if i.a_confirmar else L.rot.topo }}</span><span>{{ i.sinal }} {{ i.dir }}</span></p>
+              <p class="cg-ls-x">{{ i.e }}</p>
+              <p class="cg-rv-q">{% if i.autor.nome %}de {{ pes(i.autor.k, i.autor.nome) }}{% if i.autor.legenda %} ({{ i.autor.legenda }}){% endif %} · {% elif i.autor.legenda %}{{ i.autor.legenda }} · {% endif %}{{ i.porta }}{% if i.orgao %}, {{ i.orgao }}{% endif %}{% if i.relator %} · com o relator, {{ pes(i.relator.k, i.relator.nome) }}{% elif i.segura %} · com {{ i.segura }}{% endif %}{% if i.sem_andar %} · sem andar há {{ i.sem_andar }}{% endif %}</p>
+            </li>
+            {% endfor %}
+          </ol>
+          {% if P.top|length > 5 %}<button type="button" class="cg-pa-limpa cg-lp-mm" hidden>Mostrar os {{ P.top|length }}</button>{% endif %}
+        </div>
+        {% endif %}
+
+        {% if P.orgaos or P.relatores %}
+        <div class="az-blk">
+          <h4 class="az-h">Com quem está <span>os órgãos e os relatores com mais projetos do topo da régua na mão, primeiro pelos confirmados; o registro diz a porta e quem está com ela, não o motivo {{ selo() }}</span></h4>
+          <div class="az-2c">
+            {% if P.orgaos %}
+            <div class="az-col"><div class="an-tbl-wrap"><table class="an-tbl cg-tb">
+              <thead><tr><th scope="col">Órgão</th><th scope="col">Confirmados</th><th scope="col">Do topo, pela ementa</th><th scope="col">O mais antigo, sem andar há</th>{% if casa.id == "cd" %}<th scope="col">Quem preside</th>{% endif %}</tr></thead>
+              <tbody>{% for o in P.orgaos %}<tr><th scope="row">{{ o.org }}</th><td>{{ o.estr }}</td><td>{{ o.topo }}</td><td>{{ o.desde }}</td>{% if casa.id == "cd" %}<td>{{ pes(o.presidente_k, o.presidente) if o.presidente else "—" }}</td>{% endif %}</tr>{% endfor %}</tbody>
+            </table></div></div>
+            {% endif %}
+            {% if P.relatores %}
+            <div class="az-col"><div class="an-tbl-wrap"><table class="an-tbl cg-tb">
+              <thead><tr><th scope="col">Relator</th><th scope="col">Confirmados</th><th scope="col">Do topo, pela ementa</th><th scope="col">O mais antigo, sem andar há</th></tr></thead>
+              <tbody>{% for r in P.relatores %}<tr><th scope="row">{{ pes(r.k, r.nome) }}{% if r.legenda %} <small>{{ r.legenda }}</small>{% endif %}</th><td>{{ r.estr }}</td><td>{{ r.topo }}</td><td>{{ r.desde }}</td></tr>{% endfor %}</tbody>
+            </table></div></div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if P.exn %}{% set X = P.exn %}
+        <div class="az-blk cg-lp-exn">
+          <h4 class="az-h">O que espera × o que virou norma <span>a parte de cada faixa de peso, nos projetos de {{ casa.lp.uns }} com leitura {{ selo() }}</span></h4>
+          {% if X.norma %}
+          <p class="cg-lp-frase">Do que virou norma, <b>{{ X.norma.baixo_pct }}</b> é da faixa {{ X.baixas }}; do que espera, <b>{{ X.espera.baixo_pct }}</b>.</p>
+          {% else %}
+          <p class="cg-lp-frase">Só {{ X.poucas }} projetos de {{ casa.lp.uns }} viraram norma na legislatura: pouco para comparar. Do que espera, <b>{{ X.espera.baixo_pct }}</b> é da faixa {{ X.baixas }}.</p>
+          {% endif %}
+          {% for lado in (X.espera, X.norma) if lado %}
+          <div class="cg-lp-bl">
+            <p class="cg-lp-bn"><b>{{ lado.nome }}</b> <span>{{ lado.n }} projetos com leitura</span></p>
+            <div class="cg-lp-bar" aria-hidden="true">{% for s in lado.segs %}<i class="{{ s.cls }}" style="width:{{ s.w }}%"></i>{% endfor %}</div>
+            <p class="cg-lp-bv">{% for s in lado.segs %}<span><i class="{{ s.cls }}" aria-hidden="true"></i>{{ s.rotulo }} <b>{{ s.pct }}</b> <small>{{ s.n }}</small></span>{% endfor %}{% if lado.a_confirmar %}<span class="cg-lp-bx">a confirmar, por ora em “{{ L.rot.meio }}”: {{ lado.a_confirmar }}</span>{% endif %}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="cg-lp-nao">
+          <h4>O que não dá para concluir</h4>
+          <p>O peso diz quanto o texto mexe na estrutura; não diz se o texto é bom, nem se seria aprovado: um projeto do topo também pode afrouxar. A porta e quem está com a matéria vêm do registro; o motivo de não andar, o registro não diz, e a porta é de outro, não do autor. A marca de {{ L.marca_do_caixa|lower }} diz o que a ementa enuncia, não que falta fonte. A leitura vê a ementa, não o texto inteiro; “a confirmar” é a leitura de um leitor só.</p>
+        </div>
+        {% if L.abas|length > 1 %}<p class="cg-lp-seguir"><a href="#cg-autores" data-lp-ir="autores">A seguir: quem propõe o que pesa →</a></p>{% endif %}
+      </div>
+      {% else %}
+      <p class="cg-lp-vz">Sem a leitura dos projetos desta Casa nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ════ Quem propõe: o perfil de cada um pelos projetos ════ -#}
+  <section class="az-sec cg-vista cg-lp-v" data-vista="autores" aria-labelledby="cg-autores-h">
+    <header class="az-lh" id="cg-autores">
+      <p class="az-ln">O perfil pelos projetos</p>
+      <h3 class="az-lt" id="cg-autores-h">O projeto que cada um propõe é o perfil dele</h3>
+      <p class="az-ld">Um ponto por parlamentar. Quanto mais à direita, mais projetos apresentou; quanto mais alto, maior a parte deles que são {{ L.rot.topo_pl }} confirmados (peso do topo da régua, com duas leituras). Acaso é sorte: a faixa cinza é o que a sorte sozinha daria a um parlamentar médio; dentro dela, não dá para afirmar diferença. Só conta a autoria principal: relatoria, emenda e negociação ficam de fora. {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.lp and casa.lp.autores %}{% set A = casa.lp.autores %}
+      <div class="cg-pa cg-lp" id="cg-lp-aut-{{ casa.id }}" data-lp="autores" data-casa="{{ casa.id }}" data-um="{{ casa.lp.um }}" data-uns="{{ casa.lp.uns }}">
+        {{ janela(A.janela) }}
+        <ul class="cg-pa-ms cg-lp-ns cg-lp-ns3">
+          {% for n in A.numeros %}
+          {{ numero(n) }}
+          {% endfor %}
+        </ul>
+
+        <div class="cg-pa-fs cg-lp-fs" role="group" aria-label="Medida e filtros do gráfico" hidden>
+          <span class="cg-pa-fk">Medida</span>
+          <span class="cg-lp-med" role="group" aria-label="Medida"><button type="button" class="cg-lente-b" data-med="topo" aria-pressed="true">Parte de {{ L.rot.topo_pl }} confirmados</button><button type="button" class="cg-lente-b" data-med="sb" aria-pressed="false">Parte na faixa “{{ L.rot.piso }}”</button></span>
+          <label class="cg-lp-sel cg-lp-achar"><span class="cg-pa-fk">Achar um nome</span> <input class="az-fil-in" type="search" data-f="nome" list="cg-lp-nomes-{{ casa.id }}" autocomplete="off" spellcheck="false" placeholder="Nome do {{ casa.lp.um }}…"></label>
+          <datalist id="cg-lp-nomes-{{ casa.id }}"></datalist>
+          <label class="cg-lp-sel"><span class="cg-pa-fk">Partido</span> <select data-f="pt"><option value="">todos</option></select></label>
+          <label class="cg-lp-sel"><span class="cg-pa-fk">UF</span> <select data-f="uf"><option value="">todas</option></select></label>
+          <label class="cg-lp-sel"><span class="cg-pa-fk">Onde mexe</span> <select data-f="eixo" aria-label="Quem tem projeto do topo da régua neste sistema"><option value="">tudo</option></select></label>
+          <button type="button" class="cg-pa-limpa" hidden>Limpar</button>
+        </div>
+
+        <div class="cg-pa-foco cg-lp-foco">
+          <figure class="cg-pa-fig cg-lp-fig">
+            <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht">A parte dos projetos de cada um que são {{ L.rot.topo_pl }} confirmados</span> <span>pelo número de projetos lidos; a faixa cinza é o que o acaso explica{{ info(A.dica_acaso) }}</span></figcaption>
+            <p class="cg-pa-ey cg-lp-ey" aria-hidden="true" hidden></p>
+            <div class="cg-pa-plot cg-lp-plot" hidden><svg class="cg-pa-svg cg-lp-svg" role="img" aria-label="Um ponto por {{ casa.lp.um }}: a parte dos projetos que são {{ L.rot.topo_pl }} confirmados, pelo número de projetos lidos"></svg></div>
+            <p class="cg-pa-ex cg-lp-ex" aria-hidden="true" hidden>projetos lidos, de autoria principal (escala logarítmica) →</p>
+            <p class="cg-lp-semjs">O gráfico de pontos precisa de script; as listas abaixo trazem os mesmos números.</p>
+            <p class="cg-lp-st" role="status" hidden></p>
+            <div class="cg-gr-dica cg-lp-dica" role="status" hidden></div>
+            <p class="cg-leg cg-lp-leg" hidden><span><i class="cg-lp-g cg-lp-cheio"></i>acima do que o acaso explica</span><span><i class="cg-lp-g cg-lp-vazado"></i>abaixo</span><span><i class="cg-lp-g cg-lp-cheio cg-lp-cz"></i>dentro da faixa: pode ser acaso</span><span><i class="cg-pa-lf"></i>a faixa do acaso</span></p>
+            {% if A.fora %}<p class="az-dek cg-lp-nota">{{ A.fora }} {{ A.universo }}</p>{% else %}<p class="az-dek cg-lp-nota">{{ A.universo }}</p>{% endif %}
+            <details class="cg-rv-tb cg-pa-tb cg-lp-tb" data-lp-tab="autores" hidden>
+              <summary>Ver como tabela: todos os do gráfico</summary>
+              <div class="an-tbl-wrap"></div>
+            </details>
+          </figure>
+          <div class="cg-pa-cw cg-lp-cw" hidden>
+            <div class="cg-pa-card cg-lp-card"><p class="cg-pa-c-o">Escolha um ponto do gráfico ou ache um nome para ver o perfil pelos projetos.</p></div>
+            <div class="cg-pa-nav" hidden><button type="button" class="cg-pa-ant" aria-label="{{ casa.lp.um|capitalize }} anterior">‹</button><span class="cg-pa-pos" aria-live="polite"></span><button type="button" class="cg-pa-prox" aria-label="Próximo {{ casa.lp.um }}">›</button></div>
+          </div>
+        </div>
+
+        <div class="cg-lts cg-lp-lts">
+          {% for b in A.listas %}
+          <div class="az-blk">
+            <h4 class="az-h">{{ b.titulo }} <span>{{ b.sub }} {{ selo() }}</span></h4>
+            {% if b.itens %}
+            <ol class="cg-ls cg-lp-ls">
+              {% for i in b.itens %}
+              <li{% if loop.index > 5 %} class="cg-lp-mais"{% endif %}><p class="cg-ls-k"><b>{{ pes(i.k, i.nome) }}</b><span>{{ i.legenda }}</span><span class="cg-lp-val">{{ i.valor }}</span></p>{% if i.extra %}<p class="cg-rv-q">{{ i.extra }}</p>{% endif %}</li>
+              {% endfor %}
+            </ol>
+            {% if b.itens|length > 5 %}<button type="button" class="cg-pa-limpa cg-lp-mm" hidden>Mostrar os {{ b.itens|length }}</button>{% endif %}
+            {% else %}
+            <p class="cg-lp-vz">{{ b.vazio }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="cg-lp-nao">
+          <h4>O que não dá para concluir</h4>
+          <p>Propor é barato: quase nenhum projeto de parlamentar vira norma, e protocolar ementa ambiciosa é fácil. Relatoria, emenda e negociação não entram aqui; só a autoria principal. Perfil de faixa baixa é o padrão em todos os partidos: compare com a Casa, não com o ideal. Volume não é mérito, e a faixa depende do objetivo declarado, que é escolha editorial. Quem está na borda da faixa cinza não deve ser lido como fora dela.</p>
+        </div>
+      </div>
+      {% else %}
+      <p class="cg-lp-vz">Sem a leitura dos projetos desta Casa nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+{% include "congresso_lp_voto.html.j2" %}

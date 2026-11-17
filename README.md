@@ -552,15 +552,23 @@ placar).
 O botão **Congresso** do cabeçalho (no celular, o único com o nome escrito: Buscar e o
 botão do tema ficam só com o ícone) abre `edicoes/congresso.html`: o que cada
 deputado e senador **vota, propõe e deixa parado**, lido dos registros oficiais
-das duas Casas. **Nenhuma IA entra nas contas**: é contagem sobre voto nominal,
-proposição e relatoria, com as réguas à vista em
-[`config/congresso.yaml`](config/congresso.yaml). Cobre todos os que estão em
+das duas Casas. Nas abas da **visão por partido** (as de sempre), **nenhuma IA entra
+nas contas**: é contagem sobre voto nominal, proposição e relatoria, com as réguas à
+vista em [`config/congresso.yaml`](config/congresso.yaml). A **visão por parlamentar**
+é a exceção, e vem carimbada: ali o conteúdo de cada projeto de lei é **lido por IA,
+com uma régua pública**, e cada número que depende dessa leitura leva o selo que diz
+isso (ver [A visão por parlamentar](#a-visão-por-parlamentar-leitura-por-ia-com-régua-pública)).
+Cobre todos os que estão em
 exercício (513 deputados e 81 senadores) e quem passou pela legislatura, com o
 histórico de votos desde 2019.
 
 A página é feita de **abas**. No alto fica a Casa (Câmara ou Senado) e, logo abaixo,
 o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
 (`congresso.html#v=partidos`). Sem script, as abas saem todas em sequência.
+Quando há leitura dos projetos, a linha da Casa ganha o interruptor **Ver por**
+(Partido · Parlamentar), depois dos botões da Casa e da frase de ajuda, que não mudam
+de lugar; no celular, ele ocupa uma linha só dele. As abas abaixo são as da visão por
+partido; as da visão por parlamentar estão descritas mais adiante.
 
 - **Resumo**: a leitura do dia (a manchete é o achado de maior peso, com o número e o
   link para a prova; abaixo, os demais), o mapa do que tem em cada aba e a caixa que
@@ -622,10 +630,27 @@ o que ver dela; só a aba escolhida aparece, e cada uma tem endereço próprio
   assina** (a base de comparação) e os que mais votam diferente do coordenador. O cartão
   abre a **ficha da frente** (`#f=<id>`), com todos os que assinam, um a um. Só a Câmara
   registra quem assina.
-- **Cota parlamentar**: quem gasta mais e menos (média por mês), para onde vai o dinheiro,
-  os fornecedores que mais recebem e de quantos gabinetes, quem pagou um quarto ou mais da
-  própria cota a uma empresa só, **a mesma nota em mais de um gabinete** (com o link de
-  cada nota) e o que a Casa recusou (glosa).
+- **Cota parlamentar**: um painel com período e, no fim, as listas de apuração. No alto, a
+  frase **"Você está vendo"** diz a Casa, a janela (de início, a legislatura até o último mês
+  fechado) e cada filtro, com um ✕ para tirar cada um; ela acompanha a rolagem enquanto o
+  painel está na tela. Abaixo: **três números** (quanto no período, quanto por mês gasta o
+  parlamentar do meio, a parte da maior despesa), **Quando** (uma coluna por mês; os últimos
+  meses, que ainda recebem notas, mais claros), **Com o quê** (uma barra por despesa),
+  **Quem** (um ponto por parlamentar em exercício, com a mediana e a faixa do meio), o
+  **cartão em foco** (por mês com despesa, total em N de M meses, "Antes de comparar", as
+  despesas, o mês a mês, os fornecedores), **as pontas** e **a tabela de todos**. Os filtros
+  (período: legislatura, cada ano, últimos 12 meses, de/até; despesa; estado; partido; os
+  10% que menos ou mais gastam) refazem tudo isso no navegador a partir de
+  `cota-<casa>.json`; a pessoa em foco (clique no ponto, setas, "Achar um nome") muda só o
+  cartão. O estado vai no endereço
+  (`#v=cota&c=cd&de=2025-01&ate=2025-12&cat=divulgacao&uf=SP&pt=PL&g=menos&k=cd-204536`).
+  Cada número leva a unidade e a janela; nenhum valor de pessoa aparece sem o total e os
+  meses. O limite mensal por estado fica fora enquanto a tabela oficial não for conferida
+  (`cota.tetos` em `config/congresso.yaml`, nulo). **Para conferir**, sempre da legislatura
+  inteira: os fornecedores que mais recebem e de quantos gabinetes, quem pagou um quarto ou
+  mais da própria cota a uma empresa só, **a mesma nota em mais de um gabinete** (com o
+  link de cada nota) e o que a Casa recusou (glosa). Sem script, a aba mostra o estado
+  padrão inteiro.
 - **Escolha o seu candidato**: quem tem mandato pelo seu estado, um **cartão com a foto
   oficial** cada: de que lado vota (a régua), a presença e o voto com o partido (com a
   mediana da Casa), a **exceção** (o tema em que vota do lado oposto ao seu padrão), se
@@ -672,6 +697,105 @@ paradas, as relatorias sem parecer e o link para o dossiê. O nome só casa inte
 feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da legenda
 ("(PL-SP)") ao lado, para não confundir com homônimos.
 
+### A visão por parlamentar (leitura por IA, com régua pública)
+
+O interruptor **Ver por**, ao lado da Casa, troca as abas: **Partido** (como votam: tudo
+o que está acima, intacto) e **Parlamentar** (o que propõem). A visão por parlamentar é
+feita da **leitura dos projetos de lei** de cada um e responde a quatro perguntas, uma
+por aba. Ela só aparece quando há leituras em `data/congresso/leitura/` e o bloco
+`projeto_de_pais` em `config/congresso.yaml`; sem um dos dois, a página sai como sempre
+foi, sem o interruptor.
+
+**A premissa é declarada.** A régua mede cada projeto em relação a um objetivo escrito
+no config (`projeto_de_pais.objetivo`: infraestrutura, educação e economia que cresce,
+com câmbio e custo de vida sob controle) e às alavancas do **núcleo** desse objetivo
+(contas públicas e tributos, infraestrutura, educação, mercados e produtividade,
+máquina pública). É escolha editorial: saúde, segurança, meio ambiente e regras
+políticas ficam no entorno e pesam menos por escolha, não por valerem menos. O método é
+o mesmo nos dois sentidos (gastar e cortar, regular e desregular caem na mesma faixa).
+
+**A régua.** Um leitor de IA lê a **ementa** de cada PL, PLP e PEC (e das medidas
+provisórias votadas), sem ver número, autor, partido nem origem, e marca seis campos
+de códigos fechados: em que sistema mexe (a alavanca), quem a mudança alcança, o que o
+projeto faz, o que a ementa faz com o caixa, para quem a regra é diferente e se aperta
+ou afrouxa o controle. Daí saem:
+
+- o **peso** (0 a 100) = 100 × nível da alavanca × alcance × mecanismo. Multiplica de
+  propósito: só pesa quando os três coincidem. Separa prateleiras, não posições, e não
+  diz se o projeto é bom;
+- a **faixa**: mínimo (0 a 9), pontual (10 a 19), médio alcance (20 a 59) e
+  estruturante (60 ou mais, só em alavanca do núcleo);
+- três **marcas**, cada uma +1, 0 ou −1, lado a lado e nunca somadas nem multiplicadas
+  pelo peso: contas, isonomia e controle. A marca −1 de contas diz que a ementa enuncia
+  despesa, renúncia ou carimbo; não diz que falta fonte.
+
+Os rótulos, os valores e os cortes ficam todos no config: nenhum nome de faixa,
+alavanca, marca ou código está escrito no modelo nem no script da página.
+
+**Quem leu.** Três leitores de IA, um sem ver o outro: o mais barato leu tudo, às
+cegas; um intermediário releu o que o primeiro pôs no topo da régua e as matérias
+votadas; o mais forte desempatou onde os dois divergiram. **"Estruturante" é palavra
+reservada ao projeto confirmado por dois leitores**; o que só uma leitura pôs no topo
+aparece como "a confirmar" e conta na faixa de baixo. A auditoria publicada em
+`meta.json` (`leitura_projetos.auditoria`: as perguntas de controle escondidas em cada
+lote, o piloto com dois leitores nas mesmas ementas, a segunda leitura) vai inteira no
+Como ler, com a ressalva: mede a constância entre leitores de IA; não foi conferida
+contra codificação humana.
+
+As abas:
+
+- **Os projetos** (`#v=projetos`): do que tramita, quantos estruturantes esperam,
+  quantos estão parados há mais de um ano e em que porta. Uma faixa por porta, um
+  ponto por projeto (quanto mais à direita, mais tempo sem andar; a forma do ponto é a
+  marca de contas), com o **cartão do projeto**: a ementa, os seis códigos, a conta do
+  peso por extenso, a justificativa do leitor, onde parou, com quem está, de quem é e o
+  link **Contestar esta leitura**. Abaixo, os que mais pesam e não andam, as comissões e
+  os relatores com mais deles na mão, e o que espera × o que virou norma, por faixa.
+- **Quem propõe** (`#v=autores`): um ponto por parlamentar num funil (quantos projetos
+  lidos × a parte deles que é estruturante confirmada, ou a parte na faixa mínima), com
+  a **faixa do acaso** desenhada: dentro dela, a diferença para a Casa pode ser só
+  acaso. O cartão de cada um traz a composição por faixa, as três marcas, o saldo de
+  contas, a taxa de exceção, os três de maior peso, o que andou e todos os projetos com
+  a leitura de cada um.
+- **Na hora do voto** (`#v=decide`): só as votações nominais do texto principal no
+  Plenário, uma por matéria. Abre com a resposta (de cada 100 votos, quantos seguiram o
+  partido fechado), mostra de onde sai o universo passo a passo (quantas matérias,
+  quantas ficam sem as quase unânimes, quantas de matéria de peso, quantas entram no
+  voto fiscal e por que as outras não), **quando pesa** (presença e voto com o partido
+  nas matérias de peso 20 ou mais, ao lado das demais) e as **faixas por partido**: um
+  ponto por parlamentar, com a mediana e a metade do meio; nuvem apertada é o partido,
+  ponto longe é a pessoa. O cartão de cada um lista os votos, um a um. A tabela das
+  votações é a prova: a matéria, o peso, a marca, o resultado, o placar e quantos
+  votaram contra o próprio partido.
+- **Pessoa ou partido?** (`#v=cruzar`): o título é a resposta, gerada dos números
+  ("No voto, o partido diz quase tudo. No que cada um propõe, ..."). Uma barra por
+  medida diz **quanto o partido explica** da diferença entre as pessoas, com o
+  intervalo de 95% e o traço do que daria por acaso; barra cujo intervalo encosta no
+  acaso sai em cinza, com "não se distingue do acaso". Clicar numa barra abre a medida
+  em faixas por partido. Abaixo, **o que anda junto** (pares de medidas, em frase, com
+  a mesma conta dentro de cada partido) e a tabela das medianas por partido.
+- **Como ler** ganha o bloco **A leitura dos projetos**: a premissa, a régua campo a
+  campo (com a definição de cada código), quem leu e a auditoria (com a data dela), a
+  leitura de todo dia (como é feita e, quando o registro existe, os números do período
+  e quem respondeu), a cobertura, o que a régua não mede, os cinco erros de leitura e
+  os limites. "O que o acaso explica" vem dito em palavras simples (acaso é sorte) na
+  abertura e na dica do gráfico de "Quem propõe", na dica das barras de "Pessoa ou
+  partido?" e no Como ler. A seção é das duas visões, e o endereço diz de qual:
+  `#v=metodo` abre o Como ler da visão por partido, como sempre; `#cg-lp-metodo`, o da
+  visão por parlamentar, direto neste bloco.
+
+A pessoa em foco (`quem=cd-160976`) e a alavanca (`eixo=fiscal`) atravessam as quatro
+abas, e o endereço reproduz o estado (`#v=decide&c=cd&med=fp&quem=cd-160976`). Seleção
+realça: o que não passa fica esmaecido, não some. Os pontos vêm de arquivos pequenos
+lidos quando a aba abre; sem script, cada aba traz os números, as tabelas e as listas.
+
+**Onde não dá para concluir, a página diz.** Percentual por pessoa só com 10 projetos
+lidos ou 10 votos dados; com menos de 50 pessoas medidas, "não dá para responder por
+pessoa", e fica só o que há por partido (é o caso do voto fiscal no Senado). Quando
+quase todas as matérias do voto fiscal são de uma marca só (na Câmara, em 17/11/2026,
+14 de marca −1 contra 4 de marca +1), o aviso vai colado ao gráfico: a medida conta quase só quem
+disse Não a matéria que pesa no caixa e se confunde com ser oposição.
+
 ### As contas
 
 | Conta | Como é feita |
@@ -717,6 +841,18 @@ feitos de prenomes comuns) precisam do cargo ("deputado", "senadora") ou da lege
 | Escolha o seu candidato | os números da página, filtrados: lado no tema = saldo do tema até −20 (esquerda), acima de −20 até +20 (dividido), acima de +20 (direita), com 5 ou mais votações no tema; "propôs sobre" = autoria principal; cota = até a mediana ou o primeiro quartil do estado (Câmara, porque o teto muda por estado) ou da Casa (Senado). A ordem "mais perto do que escolhi" é a média do saldo no sentido escolhido. Exceção = quem tem lado no geral e, num tema com 5 votações ou mais, vota do lado oposto (o tema de mais votações). Mudou de partido = o partido anterior e o mês do primeiro registro de votação pelo partido atual; só com registro pelos dois partidos nesta legislatura, e fusão ou incorporação (`fusoes` em `config/congresso.yaml`: Patriota e PTB → PRD, PSC → Podemos, PROS → Solidariedade) não conta como troca. Atalhos: vota com a maioria do partido em menos de 80% das vezes (`limiares.escolha_fidelidade`); votou em menos de 60% das votações (`limiares.escolha_presenca`) |
 | O placar | como a Mesa anuncia: Sim, Não, abstenção e, à parte, a obstrução (no lado de cada um ela vale como Não; no placar, não é voto Não). Nas votações de conteúdo de PEC e de projeto de lei complementar, o número de Sim que a Constituição exige (três quintos: 308 e 49; maioria absoluta: 257 e 41) vai ao lado do placar |
 | Votação que não bate com o placar | a Câmara publica o placar na descrição da votação e, à parte, o voto de cada deputado; quando os dois diferem em mais de 20 votos no Sim ou no Não (`limiares.placar_tolerancia`; inclui a votação sem voto individual, como a secreta), a votação sai de todas as contas e fica listada em `meta.json` (`fora_do_placar`) e no "Como ler". A base gravada continua como veio da fonte |
+| A leitura dos projetos (visão por parlamentar) | cada PL, PLP e PEC (e as medidas provisórias votadas) é lido por IA pela ementa, às cegas, em seis campos de códigos fechados (`projeto_de_pais.campos` em `config/congresso.yaml`); as instruções ao leitor estão em `config/leitura_projetos.txt`. Entram o que cada um propõe na legislatura, o que tramita e as matérias com votação nominal do texto principal. Sem leitura (a ementa não permite dizer um dos três fatores do peso, ou os leitores não se entenderam): fora de toda conta, contada na cobertura |
+| Peso e faixa | peso = 100 × nível da alavanca (núcleo 1; entorno 0,6; fora 0,3) × alcance × mecanismo, arredondado. Faixas: mínimo (0 a 9), pontual (10 a 19), médio alcance (20 a 59), estruturante (60 ou mais, só no núcleo). **Estruturante confirmado**: duas leituras independentes na mesma faixa, ou a terceira decidiu; com uma leitura só, "a confirmar", e conta como médio alcance. O que compara pessoas conta só o confirmado |
+| As três marcas | contas, isonomia e controle: +1, 0 ou −1 pelo código lido, ou "a ementa não permite dizer". Nunca somadas entre si nem multiplicadas pelo peso |
+| Os projetos: parado e porta | do que tramita e tem leitura: sem andamento oficial há mais de 365 dias é "parado"; a porta e quem está com a matéria vêm da situação oficial, como em "A fila". A apensada segue a principal e não entra nas faixas. No gráfico, até 600 projetos por Casa, os de maior peso |
+| Quem propõe: o perfil | PL, PLP e PEC de autoria principal (quem assina primeiro), apresentados na legislatura, com leitura. Ementa idêntica à de proposição anterior na Casa conta uma vez, para quem apresentou primeiro; projeto de bancada (10 coautores do mesmo partido, ou metade dela) fica fora. Percentuais só com 10 lidos ou mais. Saldo de contas = (projetos de marca +1 − de marca −1) ÷ projetos com marca ±1, de −100 a +100, com 5 ou mais. Taxa de exceção = a parte dos lidos que abre exceção para profissão, setor ou lugar |
+| A faixa do acaso (funil) | para cada número de projetos lidos, o intervalo em que a parte da pessoa (de estruturantes confirmados, ou da faixa mínima) pode diferir da taxa da Casa só por acaso: binomial exata, 99% de confiança, já contando todas as pessoas comparadas |
+| Na hora do voto: o universo | as votações nominais abertas do texto principal no Plenário, desde 2019, uma por matéria (na PEC, o último turno); fora a redação final, a mudança feita pela outra Casa e as quase unânimes (90% ou mais do Sim + Não do mesmo lado). Só Sim e Não contam como voto: obstrução, aqui, não é voto |
+| Quando pesa | nas votações de matéria de peso 20 ou mais, a presença (votou ÷ podia votar) e o voto com a maioria do partido do dia, ao lado dos mesmos números nas demais votações do universo. Não depende de marca |
+| Voto fiscal | só matéria com a leitura confirmada por dois leitores e marca legível (contas +1 ou −1, ou controle +1 ou −1 na alavanca das contas públicas), de peso 20 ou mais, ou da alavanca das contas públicas com qualquer peso (menos a de um caso só); matéria com marca +1 e −1 ao mesmo tempo fica fora, e também a que tem a marca das contas em disputa entre os leitores (a justificativa termina em `[leitores divergem na marca de contas]`), ainda que a de controle seja legível: é voto fiscal o Sim em matéria de marca +1 e o Não em matéria de marca −1, em % dos votos dados, com 10 votos ou mais. Diz de que lado do caixa a pessoa votou, não se votou certo. Com menos de 50 pessoas medidas: "não dá para responder por pessoa" |
+| Contra o próprio partido fechado | voto diferente do da maioria do partido do dia quando ela reuniu 80% ou mais do Sim + Não. Por pessoa, só contagem: sem teste, porque com tão poucas votações nenhum teria força |
+| Quanto o partido explica | da variação entre pessoas em cada medida, a parte que fica entre os partidos, descontado o que qualquer divisão em tantos grupos explicaria. A medida "quantos projetos apresentou na legislatura" conta os PL, PLP e PEC de autoria principal do perfil de "Quem propõe" (apresentados na legislatura, com ou sem leitura, fora os de ementa repetida e os de bancada), não o total do dossiê. O intervalo de 95% sai reamostrando as pessoas 2.000 vezes; "o que daria por acaso", embaralhando os partidos entre as pessoas 1.000 vezes (semente fixa: o resultado não muda de um dia para o outro com os mesmos dados). 70% ou mais: diz quase tudo; de 30% a 70%: diz parte; abaixo: diz pouco. Intervalo que encosta no acaso: "não se distingue do acaso" |
+| O que anda junto | correlação de postos (Spearman) entre duas medidas, na Casa e dentro dos partidos; só vira afirmação o que passa do acaso a 99%, contando todos os pares (Holm) |
 
 Os polos (hoje PT, PSOL e PCdoB × PL e NOVO), os governos, os limiares, as faixas
 do campo, os macrotemas, os pesos da nota de relevância e os **apelidos dos
@@ -734,6 +870,18 @@ tem o que tramita; nomes muito comuns podem deixar de casar nas matérias (o
 contrário, casar errado, é o que a regra evita). Na nota de relevância, uma matéria
 mais antiga teve mais tempo para juntar projetos parecidos, e "último andamento" é a
 data da situação oficial, que muda também quando a matéria é pautada e não votada.
+
+**Limites da visão por parlamentar**: a leitura é da **ementa**, não do texto integral
+(o jabuti sob "e dá outras providências", a fonte prevista no articulado e o que o
+substitutivo mudou ficam de fora); na matéria votada, lê-se a ementa do registro, não o
+texto que foi a voto; não houve codificação por pessoas para servir de padrão (a
+auditoria mede se leitores de IA diferentes chegam à mesma faixa, e dois leitores que
+concordam podem errar juntos); o topo da régua só é procurado entre o que a primeira
+leitura pôs lá; o peso não diz se o projeto é bom, a marca negativa não diz que falta
+fonte, e "parado" não é culpa do autor (a porta é de outro); só a autoria principal
+entra (relatoria, emenda e negociação, não); o voto fiscal se confunde com apoiar ou
+não o governo; e as medidas que saem da leitura herdam o erro dela, o que puxa para
+baixo tanto o que o partido explica quanto as correlações.
 
 ### Dados e atualização
 
@@ -768,8 +916,15 @@ data da situação oficial, que muda também quando a matéria é pautada e não
 | `casa-cd.json`, `casa-sf.json` | os painéis de cada Casa (bancadas, temas, rachas, fila, o que espera × o que passa, a pauta (`pauta`: os sinais das aprovadas, a direção por tema e as semanas), as folhas da mesa (`folhas`), listas, no jornal × no voto, últimas votações, a cobertura do saldo pesado, as frentes, a cota e as comissões) |
 | `votos-cd.json`, `votos-sf.json` | os votos de cada um nas votações de conteúdo da legislatura, um caractere por votação e uma pessoa por linha, com a data, o tipo, os temas e o turno (na PEC) de cada votação, e o **partido de cada um no dia de cada votação** (`partidos`: só de quem mudou) (o comparativo, os votos por tema e o plenário em pontos leem quando abrem) |
 | `frentes-cd.json` | a ficha de cada frente de causa: todos os que assinam e estão em exercício, com o saldo no tema e quanto votaram igual ao coordenador (lido quando a ficha da frente abre) |
+| `cota-cd.json`, `cota-sf.json` | a cota de cada um mês a mês e despesa a despesa, em centavos inteiros, uma pessoa por linha: quem teve lançamento em mês fechado da legislatura (em exercício ou não), com as séries `[despesa, primeiro mês, centavos de cada mês seguido…]` e, na Câmara, as passagens da agência por ano. Somando as células de uma pessoa volta-se ao total da ficha dela; o mês em curso fica fora. É o que a aba "Cota parlamentar" precisa para mudar o período e cruzar filtros. Os nomes curtos das despesas, quantos meses do fim ainda recebem notas e a tabela do limite mensal por estado (nula enquanto não for conferida na fonte oficial: sem ela, nada de limite aparece) ficam em `cota`, em `config/congresso.yaml` |
 | `materias-cd.json`, `materias-sf.json` | a ficha de cada matéria votada no Plenário na legislatura e de cada ponto de "o que espera × o que passa", uma por linha: sobre o quê, autoria, situação, nota e cada votação com os lados (lido quando um detalhe abre) |
-| `achados.json`, `meta.json` | a leitura do dia e as réguas usadas |
+| `achados.json`, `meta.json` | a leitura do dia e as réguas usadas; com a visão por parlamentar, `meta.json` leva também `leitura_projetos`: a versão das instruções ao leitor, os cortes, a cobertura por Casa (quantas proposições as contas pedem, quantas têm leitura, quantas confirmadas) e a auditoria da leitura |
+| `leitura/<casa>-AAAA.json`, `leitura/auditoria.json` | **a guarda da leitura dos projetos** (não é gerada pela atualização: é por onde as leituras de IA entram, com `python -m qijournal congresso leitura importar`): um arquivo por Casa e ano da proposição, uma proposição por linha, com os seis códigos, o alerta de iniciativa, a confiança, a justificativa e o estado da leitura (1 = uma leitura; 2 = duas na mesma faixa; 3 = a terceira decidiu; 0 = instável). `auditoria.json` é escrita por fora e só repassada a `meta.json`. A leitura diária grava na mesma pasta `diario.json` (o registro de cada dia) e `a_decidir.json` (as segundas leituras que divergiram da primeira e esperam a terceira) |
+| `casa-cd.json`, `casa-sf.json` → `lp` | o bloco da visão por parlamentar dentro dos painéis de cada Casa (só com leituras): o estoque por faixa, por porta e por alavanca, os números de quem propõe, `decide` (o universo do voto, quando pesa, o voto fiscal por partido, as votações e quem mais divergiu) e `cruzar` (quanto o partido explica de cada medida, os pares e as medianas por partido). É o que a página mostra sem script |
+| `projetos-cd.json`, `projetos-sf.json` | os projetos do topo da régua que tramitam, com tudo o que o cartão mostra: a ementa, a porta, o tempo sem andar, o peso, os códigos, a conta, a justificativa e os alertas (lido ao abrir "Os projetos") |
+| `autores-cd.json`, `autores-sf.json` | uma linha por parlamentar em exercício: a composição por faixa, as marcas, o saldo de contas, a taxa de exceção, a faixa do acaso do funil e as medidas de voto (lido ao abrir "Quem propõe", "Na hora do voto" e "Pessoa ou partido?") |
+| `decide-cd.json`, `decide-sf.json` | as votações que entram em "Na hora do voto" e o voto de cada um nelas, um caractere por votação, com as posições em que votou contra o próprio partido fechado (lido quando o cartão de uma pessoa abre) |
+| `autoria/<casa>-<id>.json` | todos os projetos lidos de cada parlamentar, com a leitura de cada um (lido ao abrir "Todos os projetos" no cartão da pessoa) |
 
 - **Desligar**: `congresso.enabled: false` em `config/site.yaml`, ou a variável
   **`QIJ_NO_CONGRESSO`** = `1` (o botão e os blocos somem; os dados ficam).
@@ -778,14 +933,117 @@ data da situação oficial, que muda também quando a matéria é pautada e não
   mandato; `projetos.py` proposições, relatorias e fila; `relevancia.py` a nota de relevância; `pauta.py` os sinais das aprovadas, a direção e as semanas; `materias.py` a ficha de
   cada matéria e as folhas da mesa; `peso.py` o saldo pesado pela relevância; `frentes.py` as frentes × o voto; `cota.py` a cota parlamentar;
   `comissoes.py` os votos nas comissões; `jornal.py` os nomes no banco do jornal; `ficha.py` o dossiê; `dados.py` a atualização; `cli.py` os
-  comandos) e `qijournal/render/congresso.py` com os modelos `congresso.*.j2`
+  comandos; e, da visão por parlamentar, `leitura.py` a guarda da leitura e a conta do peso, `pais.py` o estoque e o perfil de quem propõe,
+  `pais_voto.py` o voto quando pesa e o voto fiscal, `pais_cruzar.py` e `pais_estat.py` quanto o partido explica e o que anda junto) e
+  `qijournal/render/congresso.py` com os modelos `congresso.*.j2`
   (`congresso_materias.js.j2` é o script das fichas das matérias e da busca;
   `congresso_cartoes.js.j2`, o dos cartões que inclinam e da ficha das frentes;
   `congresso_tema.js.j2`, o das votações de um tema, em fita, cartão e plenário;
   `congresso_pauta.js.j2`, o de "O que espera × o que passa"; `congresso_papel.js.j2`, o
   das folhas de "Votações e matérias"; `congresso_escolha.js.j2`, o de "Escolha o seu
   candidato"; os estilos de cada um em `congresso_tema.css.j2`, `congresso_pauta.css.j2`,
-  `congresso_papel.css.j2` e as cores dos temas em `congresso_temas.css.j2`).
+  `congresso_papel.css.j2` e as cores dos temas em `congresso_temas.css.j2`). A tela da
+  visão por parlamentar fica à parte: `qijournal/render/congresso_lp.py` ("Os projetos" e
+  "Quem propõe"), `congresso_lp_voto.py` ("Na hora do voto" e "Pessoa ou partido?") e
+  `congresso_lp_metodo.py` (o bloco do Como ler), com os modelos `congresso_lp*.j2`.
+
+### Leitura diária dos projetos de lei (`congresso ler`)
+
+A visão por parlamentar da aba Congresso usa a leitura, por IA, de cada projeto de lei
+(PL, PLP, PEC) com a régua pública de `config/congresso.yaml` (`projeto_de_pais`): o
+leitor marca seis campos com códigos fechados e a nota sai da fórmula. As cerca de 40 mil
+proposições que existiam foram lidas de uma vez e estão em
+`data/congresso/leitura/<casa>-<ano>.json` (a guarda, uma proposição por linha). Chegam
+umas 25 proposições por dia e matérias novas vão a voto: a leitura diária mantém a
+cobertura.
+
+- **Onde roda.** Num fluxo à parte, *Leitura dos projetos* (`leitura.yml`), que dispara
+  quando a *Edição diária* termina: a edição, o e-mail e o Instagram não esperam a
+  leitura, e a edição usa as IAs primeiro. A *Edição diária* termina de hora em hora
+  (em segundos, quando não há edição nova); por isso o primeiro passo do fluxo decide:
+  só lê se a edição de hoje já saiu e o registro ainda não tem a linha de hoje, e nas
+  outras horas a execução termina em segundos. A leitura usa o cache do que a edição
+  baixou do Congresso (só restaura, não grava); sem ele, não lê e avisa. O que foi lido
+  entra nas contas na atualização seguinte do Congresso (a do dia seguinte, ou a do
+  fluxo *Congresso*, à mão). Para rodar à mão: *Actions → **Leitura dos projetos** → Run workflow* lê na
+  hora, mesmo que já tenha lido hoje (o teto de leituras é opcional; `0` só diz o que
+  leria).
+- **Como publica.** Num commit próprio, só de `data/congresso/leitura/` (*Publicar a
+  leitura*), que nunca desfaz nem apaga o que outro enviou: leva só o que a leitura
+  gravou e, se o repositório andou enquanto ela lia, é reaplicado por cima; se alguém
+  mexeu nas mesmas linhas da guarda, nada é publicado, o passo avisa e a execução
+  seguinte lê de novo. O contrário não vale: o passo *Publicar* da *Edição diária* e do
+  *Congresso* refaz o commit com a cópia de `data/` do início da execução quando o push
+  é recusado, e por isso o que chegar à guarda no meio de uma execução deles pode ser
+  desfeito: as leituras importadas à mão e enviadas nessa hora (têm de ser enviadas de
+  novo) e as leituras do dia, se forem publicadas nesse meio, o que só acontece quando
+  um dos três fluxos é disparado à mão enquanto outro roda (são lidas de novo na
+  execução seguinte).
+- **O que lê.** O passo *Ler os projetos novos* roda
+  `python -m qijournal congresso ler --dir . --cache DIR [--max N] [--now ISO]`.
+  Primeiro, o que ainda não tem leitura: as matérias votadas, depois os projetos de quem
+  está no mandato, depois o resto do que tramita, sempre dos mais novos para os mais
+  antigos. Depois, a segunda leitura do que muda a conta: os projetos de peso 60 ou mais
+  e as matérias votadas (o topo e o voto fiscal só contam com duas leituras).
+- **Com que IA.** A cadeia do jornal (`llm.providers`, com as mesmas chaves da edição):
+  quando uma estoura o limite, a seguinte assume. Cada pedido leva as instruções inteiras
+  (`config/leitura_projetos.txt`: as regras, os erros comuns e 50 exemplos resolvidos) e
+  um lote cego: tipo, ementa, ementa detalhada, palavras-chave e tema. O leitor não vê
+  número, autor, partido nem Casa.
+- **Perguntas de controle.** Em cada lote de 30 vão 10 proposições de
+  `config/leitura_referencia.jsonl` (185 proposições reais que dois leitores
+  classificaram igual), misturadas e sem aviso. Se o leitor põe menos de 7 delas na
+  faixa certa, o lote inteiro é descartado: nada dele entra na guarda, e as proposições
+  voltam no dia seguinte. Mais da metade das 185 cai numa faixa só; por isso nenhum lote
+  leva mais de 6 perguntas da mesma faixa (o mínimo menos um): o leitor que responde a
+  mesma coisa para tudo nunca chega aos 7 acertos. As perguntas não se repetem no dia
+  dentro das 12 chamadas de uma rodada. No lote aceito, a resposta que falta ou traz código que não
+  existe também volta.
+- **Segunda leitura.** É uma chamada nova, que não vê a primeira. Quando a primeira foi
+  feita na mesma rodada, a segunda vai a outra IA da cadeia, se houver. Quando a
+  primeira é de outro dia, a guarda não diz que IA a fez: a segunda evita a primeira IA
+  da cadeia (a que costuma fazer as primeiras leituras), sem garantia de que seja outra.
+  Com uma IA só na cadeia, ela faz as duas. Mesma faixa: leitura confirmada. Faixas
+  diferentes: uma terceira leitura decide (duas de três), feita por uma IA que ainda
+  não leu a proposição, se houver (com duas IAs na cadeia, volta a uma das duas); se as
+  três divergem, a proposição fica sem leitura ("leitura instável"). Sem terceira
+  possível no dia, a leitura fica como estava e a segunda, que divergiu, fica guardada
+  em `data/congresso/leitura/a_decidir.json`, com as IAs que já leram a proposição: na
+  rodada seguinte não se pede outra segunda, a leitura nova é a terceira (de uma IA que
+  ainda não leu, se houver) e vale a regra dos três. Sem isso, a segunda que divergia
+  era esquecida e pedida de novo a cada dia, até uma concordar. Se esse arquivo não for
+  lido inteiro (ilegível, de outra versão das instruções ou com linha fora do formato),
+  a rodada não o regrava e não faz segundas leituras até o conserto. O que as leituras
+  confirmam é a faixa; os outros códigos são os do primeiro leitor que caiu nela. A
+  exceção é a marca das contas da matéria votada, que decide o voto fiscal: se os
+  leitores da faixa não chegaram à mesma marca, o custo fica "a ementa não permite
+  dizer", a justificativa termina em `[leitores divergem na marca de contas]` e a
+  matéria fica fora do voto fiscal (a regra da leitura inicial; a diária anota também
+  quando o primeiro leitor já não via marca e o outro via).
+- **Limites** (`projeto_de_pais.leitura.diaria`): 150 primeiras e 60 segundas leituras
+  por rodada, lotes de 30, 12 chamadas e 8 minutos. A guarda é gravada a cada lote: o
+  que foi lido não se perde se o tempo acabar. O passo é acessório (`continue-on-error`,
+  12 minutos): sem chave de IA, registra "sem IA: nada lido". Nenhuma leitura gravada é
+  apagada. O arquivo da guarda que a rodada não consegue ler inteiro (de outra versão
+  das instruções, ilegível, ou com uma linha que não valida, por exemplo com um código
+  que a régua não tem mais) não é regravado: as proposições daquele ano e daquela Casa
+  ficam sem leitura nova até o conserto, e o registro do dia avisa.
+- **O registro.** `data/congresso/leitura/diario.json`, uma linha por dia (os últimos
+  60): quantas leu, os lotes e os descartados, os acertos nos controles, as confirmadas,
+  as decididas pela terceira e as instáveis, o que ficou pendente (sem leitura, à
+  espera da segunda e, dessas, as que esperam a terceira) e as IAs que
+  responderam. Também quantas segundas foram feitas pela mesma IA que fez a primeira
+  na rodada (`mesmo_editor`), quantas eram de primeira leitura de outra rodada, em que
+  não se sabe (`de_outra_rodada`), e quantas terceiras foram feitas por uma IA que se
+  sabe que já tinha lido a proposição (`terceira_de_quem_leu`; da primeira leitura de
+  outra rodada também não se sabe a IA, e a terceira feita por ela não entra na conta). O resumo
+  vai a `meta.json` (`leitura_projetos.diaria`) e ao resumo do passo no Actions.
+- **Desligar**: variável **`QIJ_NO_LEITURA`** = `1` no GitHub, ou `ligada: false` no
+  bloco do config (`QIJ_NO_CONGRESSO` também a desliga). A opção *Gerar sem IA* da
+  *Edição diária* não vale para a leitura, que roda no fluxo dela. À mão, `--max 0` só
+  diz o que leria.
+- **Código**: `qijournal/congresso/ler.py` (a rodada) e `leitura.py` (a guarda e a
+  conta); testes em `tests/test_congresso_ler.py`.
 
 ---
 
@@ -887,6 +1145,11 @@ fontes com erro e os links da edição.
 *Actions → **Congresso** → Run workflow* atualiza só os dados e a aba do
 Congresso (opção **Carga completa**: refaz tudo desde 2019).
 
+*Actions → **Leitura dos projetos** → Run workflow* lê por IA os projetos de lei
+novos na hora, mesmo que a leitura do dia já tenha rodado (campo opcional: o teto de
+leituras da rodada; `0` só diz o que leria). No dia a dia ela roda sozinha, depois
+da edição.
+
 ### No computador
 
 Requer Python 3.11 ou mais novo.
@@ -914,6 +1177,7 @@ Todos os comandos (`python -m qijournal <comando> --help` mostra os detalhes):
 | `check-sources` | testa cada fonte e mostra quais estão respondendo |
 | `congresso atualizar [--dir DIR] [--cache DIR] [--completo] [--now ISO]` | baixa os dados da Câmara e do Senado, refaz as contas, `data/congresso/` e a aba Congresso (o que baixa fica em `.cache/congresso`, fora do git) |
 | `congresso pagina [--dir DIR]` | só refaz a aba Congresso a partir de `data/congresso/`, sem internet |
+| `congresso ler [--dir DIR] [--cache DIR] [--max N] [--now ISO]` | a leitura diária dos projetos de lei: a cadeia de IAs lê as proposições novas e relê as que mudam a conta, e grava em `data/congresso/leitura/` (sem chave de IA, não lê nada; `--max 0` só diz o que leria); no GitHub, roda no fluxo *Leitura dos projetos*, depois da edição |
 
 Códigos de saída: `0` sucesso; `1` erro; `2` dados insuficientes (edição não
 publicada) ou argumentos inválidos.
@@ -1028,6 +1292,7 @@ Cada peça passa por um lint antes de sair e, reprovada, cai para um substituto;
 | `QIJ_BRAND` | variável | marca (`tech` ou `pbcv`) |
 | `QIJ_NO_TERMOMETRO` | variável | `1` desliga o Termômetro de Viés e a aba Analítico Político |
 | `QIJ_NO_CONGRESSO` | variável | `1` desliga a aba Congresso e as fichas nas matérias |
+| `QIJ_NO_LEITURA` | variável | `1` desliga a leitura diária dos projetos de lei por IA (`congresso ler`, no fluxo *Leitura dos projetos*) |
 | `QIJ_MODEL` | variável | modelo do Claude |
 | `QIJ_GEMINI_MODEL`, `QIJ_GEMINI_LITE_MODEL`, `QIJ_AIML_MODEL`, `QIJ_SENSENOVA_MODEL`, `QIJ_MISTRAL_MODEL`, `QIJ_KIMI_MODEL` | variáveis | modelo de cada editor (padrões na tabela de editores acima) |
 
@@ -1055,6 +1320,15 @@ publicado normalmente.
   jeito, com os dados do Congresso da véspera (o passo é acessório e tem 15
   minutos). O *Summary* da execução lista os avisos (fonte fora do ar, por
   exemplo). Para refazer: *Actions → Congresso → Run workflow*.
+- **A leitura dos projetos de lei não leu ou não publicou:** a edição não depende
+  dela. O *Summary* da execução do fluxo *Leitura dos projetos* diz o que foi lido, o
+  motivo quando nada foi lido ("sem IA: nada lido", o prazo, o teto de chamadas) e os
+  avisos. Se ela leu e não conseguiu publicar (o passo *Publicar a leitura* avisa), a
+  execução seguinte lê de novo. Se o aviso é "Sem o cache do Congresso", o fluxo não
+  achou o que a *Edição diária* baixou (o cache do Actions expirou ou não foi gravado)
+  e não leu, para não baixar tudo de novo a cada hora: a leitura volta sozinha depois
+  da próxima edição, ou de uma execução do fluxo *Congresso*, que gravam o cache. Para
+  ler na hora: *Actions → Leitura dos projetos → Run workflow*.
 - **O agendamento atrasou ou não rodou:** o GitHub atrasa ou descarta
   agendamentos (em outubro de 2026, o das 05:07 chegava entre 10h e 14h). Por
   isso o workflow é agendado de hora em hora: a primeira execução que chega a
@@ -1123,6 +1397,7 @@ data/                     cada edição em JSON; em data/termometro/, as anális
 tests/                    testes automáticos
 .github/workflows/        daily.yml (edição diária), congresso.yml (Congresso, à
                           mão), instagram.yml (posts do Instagram) e ci.yml (testes)
+                          e leitura.yml (leitura dos projetos de lei, depois da edição)
 ```
 
 `index.html`, `edicoes/` e `data/` são escritos pelo robô — não edite à mão.

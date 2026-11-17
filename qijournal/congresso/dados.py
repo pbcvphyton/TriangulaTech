@@ -10,6 +10,7 @@
       casa-cd.json, casa-sf.json        o painel de cada Casa: bancadas, temas, votações, fila, listas
       achados.json                      a leitura: o que os dados têm a dizer hoje
       fichas/<casa>-<id>.json           o dossiê de cada parlamentar (aberto sob demanda)
+      cota-cd.json, cota-sf.json        a cota de cada um, mês a mês e despesa a despesa, em centavos (para a aba mudar o período)
 
 Tudo é montado em memória e só então gravado, arquivo a arquivo, de forma atômica.
 Um arquivo só é reescrito quando o conteúdo muda (o commit diário leva só a
@@ -53,6 +54,7 @@ META = "meta.json"
 ACHADOS = "achados.json"
 FRENTES = "frentes-cd.json"  # os membros em exercício de cada frente de causa, com o voto de cada um no tema (lido quando a ficha da frente abre)
 VOTOS = "votos-{casa}.json"  # os votos de cada um nas votações de conteúdo da legislatura (para o comparativo)
+COTA = "cota-{casa}.json"  # a cota de cada um, mês a mês e despesa a despesa, em centavos (lido quando a aba "Cota parlamentar" abre)
 ULTIMAS = 14  # votações nominais mais recentes no painel de cada Casa
 LISTA = 15  # tamanho das listas do painel
 MINIMO_FIDELIDADE = 50  # votações com posição do partido para entrar nas listas de dissidência
@@ -1337,14 +1339,23 @@ def atualizar(
 
     # A cota parlamentar, nota a nota: quanto cada um pede de reembolso, com o quê e com quem.
     paineis_cota: dict[str, dict[str, Any]] = {}
+    arquivos_cota: dict[str, str] = {}  # o arquivo mensal de cada Casa, já em texto (cota-<casa>.json)
+    avisos.extend(regras.cota.avisos)  # a tabela do limite por estado que não pôde valer
     for casa, coletar_cota in (("cd", cota.camara), ("sf", cota.senado)):
         try:
             despesas = coletar_cota(coletor, regras.anos(), ano_corrente=corrente)
             pessoas_casa = {
                 pid: {"k": c.chave, "nome": c.nome, "partido": c.partido, "uf": c.uf, "ex": bool(c.exercicio)} for pid, c in cadastros[casa].items()
             }
-            paineis_cota[casa], por_pessoa = cota.resumir(despesas, casa=casa, inicio=legislatura.inicio, hoje=hoje, pessoas=pessoas_casa)
-            del despesas  # mais de um milhão de lançamentos na Câmara: libera a memória antes de seguir
+            analise = cota.analisar(
+                despesas, casa=casa, inicio=legislatura.inicio, hoje=hoje, pessoas=pessoas_casa, escolhas=regras.cota, marcos=regras.pauta.calendario
+            )
+            paineis_cota[casa], por_pessoa = analise.painel, analise.por_pessoa
+            try:
+                arquivos_cota[casa] = cota.serializar(analise.arquivo)
+            except Exception as exc:  # noqa: BLE001 — acessório: sem o arquivo mensal, a aba mostra só a legislatura inteira
+                avisos.append(f"{_nome_casa(casa)}: arquivo mensal da cota não gravado ({exc})")
+            del despesas, analise  # mais de um milhão de lançamentos na Câmara: libera a memória antes de seguir
             for f in fichas[casa]:
                 if f["id"] in por_pessoa:
                     f["cota"] = por_pessoa[f["id"]]
@@ -1581,6 +1592,21 @@ def atualizar(
         "legislatura": legislatura.numero,
         "pessoas": [ficha.linha(f, legislatura.numero, legislatura.inicio, regras.fusoes) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
     }
+    # A visão por parlamentar: os projetos de cada um, lidos pela régua "Projeto de país" (o bloco "lp" de
+    # cada Casa e os arquivos dela). Acessório: sem leituras na guarda, nada novo sai; um erro vira aviso.
+    try:
+        from . import pais  # import tardio: só esta parte usa a leitura dos projetos
+
+        resultado.gravados += pais.integrar(
+            root, pasta, regras, hoje, paineis, meta, avisos, gravar=_gravar,
+            props={"cd": props_cd, "sf": props_sf}, autoria=autoria, relatorias=relatorias, comissoes=das_comissoes,
+            cadastros=cadastros, votos=votos, resumo=resumo["pessoas"], fichas_das_materias=fichas_das_materias,
+            exercicio=exercicio.fechados(intervalos, hoje) if intervalos else None, presidencia=exercicio.fechados(presidentes, hoje),
+        )
+    except Exception as exc:  # noqa: BLE001 — acessório: sem esta parte, a aba sai como sempre saiu
+        log.exception("Congresso: visão por parlamentar indisponível")
+        avisos.append(f"Visão por parlamentar indisponível ({exc})")
+        meta["avisos"] = list(avisos)
     atuais = set()
     for casa in ("cd", "sf"):
         for f in fichas[casa]:
@@ -1599,6 +1625,8 @@ def atualizar(
             pasta / VOTOS.format(casa=casa), _json_por_linha(votos_da_legislatura(votos[casa], regras, legislatura.numero, chaves, casa))
         )
         resultado.gravados += _gravar(pasta / materias.ARQUIVO.format(casa=casa), materias.serializar(fichas_das_materias[casa]))
+        if casa in arquivos_cota and casa in paineis_cota:  # sem a cota de hoje, o arquivo de ontem fica como está
+            resultado.gravados += _gravar(pasta / COTA.format(casa=casa), arquivos_cota[casa])
     if detalhe_frentes:
         resultado.gravados += _gravar(pasta / FRENTES, _frentes_por_linha({"v": VERSAO, "casa": "cd", "legislatura": legislatura.numero, "frentes": detalhe_frentes}))
     resultado.gravados += _gravar(pasta / RESUMO, _json(resumo))

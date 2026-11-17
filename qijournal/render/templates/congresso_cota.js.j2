@@ -1,0 +1,1177 @@
+{#- Aba Congresso: "Cota parlamentar" (incluído por congresso.js.j2, dentro da mesma função).
+    O HTML já traz o estado padrão inteiro (a legislatura, todas as despesas, todos). Quando a
+    aba abre, este script lê cota-<casa>.json (uma célula por pessoa, despesa e mês, em
+    centavos) e passa a refazer as mesmas contas para o que a pessoa escolher: o período, uma
+    despesa, um estado, um partido, uma faixa. Filtro muda tudo o que está na zona A; a pessoa
+    em foco muda só o cartão. Um painel não se filtra pela própria dimensão: "Quando" mostra
+    sempre todos os meses, "Com o quê" todas as despesas, "Quem" todos os pontos; o que está
+    fora da seleção fica cinza. A zona "Para conferir" não muda nunca.
+
+    A conta (igual à do gerador, qijournal/congresso/cota.py): para cada pessoa, o total é a
+    soma das células da janela; os meses com despesa são os de saldo positivo; a medida é o
+    total (ou o da despesa escolhida) dividido por esses meses; entra no gráfico quem está em
+    exercício e teve despesa em min(6, metade da janela) meses; os totais contam também quem
+    já saiu. Arredonda-se só ao mostrar, do mesmo jeito que o gerador (empate vai para o par),
+    para o estado padrão sair igual ao HTML.
+
+    O endereço guarda só o que foge do padrão:
+    #v=cota&c=cd&de=2025-01&ate=2025-12&cat=divulgacao&uf=SP&pt=PL&g=menos&k=cd-204536.
+    Sempre com textContent: nada do arquivo vira HTML. -#}
+  /* ════ Cota parlamentar ════ */
+  var cotaDaCasa = {};  // Casa → { abrir(), doEndereco(parâmetros) }
+  (function () {
+    var CR = M.cotaRegras || {};
+    var MES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+    var MES_EXT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    var semMovimento = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Os números por escrito, como o gerador os escreve (render/congresso.py). */
+    function nPt(v, casasDec) {
+      var s = Math.abs(v).toFixed(casasDec), partes = s.split('.');
+      return (v < 0 && parseFloat(s) !== 0 ? '-' : '') + partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (partes[1] ? ',' + partes[1] : '');
+    }
+    function parInt(v) {  // o inteiro mais próximo; no empate, o par (como o round do gerador)
+      var r = Math.round(v);
+      return Math.abs(v % 1) === 0.5 && r % 2 !== 0 ? r - 1 : r;
+    }
+    function r1(v) { return Number(v.toFixed(1)); }
+    function r2(v) { return Number(v.toFixed(2)); }
+    function reaisC(v) { return v == null || isNaN(v) ? '—' : 'R$ ' + (Math.abs(v) < 1000 ? nPt(v, 2) : nPt(parInt(v), 0)); }
+    function reaisS(v) { return v == null || isNaN(v) ? '—' : (v < 0 ? '−' : '') + reaisC(Math.abs(v)); }
+    function reaisK(v) {  // valor da Casa ou de um recorte: "R$ 774,7 milhões", "R$ 84,8 mil"
+      if (v == null || isNaN(v)) return '—';
+      var a = Math.abs(v), sinal = v < 0 ? '−' : '';
+      if (a >= 999950) { var mi = r1(a / 1e6); return sinal + 'R$ ' + nPt(mi, 1) + (mi < 2 ? ' milhão' : ' milhões'); }
+      if (a >= 10000) return sinal + 'R$ ' + nPt(a / 1000, 1) + ' mil';
+      return sinal + reaisC(a);
+    }
+    function pctC(v) {
+      if (v == null || isNaN(v)) return '—';
+      if ((v >= 99.5 && v < 100) || (v > 0 && v < 0.5)) return nPt(v, 1) + '%';
+      return parInt(v) + '%';
+    }
+    function pct1(v) { return v == null || isNaN(v) ? '—' : nPt(v, 1) + '%'; }
+    function mesBr(am) { return MES[parseInt(am.slice(5, 7), 10) - 1] + '/' + am.slice(0, 4); }
+    function minusc(t) { return t ? t.charAt(0).toLowerCase() + t.slice(1) : ''; }
+    function limitar(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function passoDoEixo(maximo) {  // o maior entre 5, 2 e 1 × 10^k que deixa duas marcas acima do zero
+      if (!(maximo > 0)) return 1;
+      var k = Math.pow(10, Math.floor(Math.log(maximo) / Math.LN10 + 1e-9)), opcoes = [5 * k, 2 * k, k, k / 2];
+      for (var i = 0; i < opcoes.length; i++) if (maximo / opcoes[i] >= 2) return opcoes[i];
+      return k / 5;
+    }
+    function quantil(a, parte) {  // interpolação linear na posição (n − 1)·parte
+      if (!a.length) return null;
+      var pos = (a.length - 1) * parte, i = Math.floor(pos), resto = pos - i;
+      return i + 1 < a.length ? a[i] + (a[i + 1] - a[i]) * resto : a[i];
+    }
+    function cmpNome(a, b) { return a.b < b.b ? -1 : a.b > b.b ? 1 : a.k < b.k ? -1 : a.k > b.k ? 1 : 0; }
+    function zeros(n) { var a = []; for (var i = 0; i < n; i++) a.push(0); return a; }
+    function texto(no, t) { if (no && no.textContent !== t) no.textContent = t; }
+
+    lista(d.querySelectorAll('[data-cota]')).forEach(function (bloco) {
+      var casa = bloco.getAttribute('data-cota');
+      var NOME = bloco.getAttribute('data-nome') || '', UM = bloco.getAttribute('data-um') || 'parlamentar', UNS = bloco.getAttribute('data-uns') || 'parlamentares';
+      var REC_TXT = bloco.getAttribute('data-rec') || '', NA_CASA = casa === 'cd' ? 'na Câmara' : 'no Senado';
+      var form = bloco.querySelector('.cg-co-fil'), falhaEl = bloco.querySelector('.cg-co-falha');
+      var ve = bloco.querySelector('.cg-co-ve'), veT = bloco.querySelector('.cg-co-ve-t'), vz = bloco.querySelector('.cg-co-vz');
+      var nQuanto = bloco.querySelector('[data-n="quanto"]'), nQuem = bloco.querySelector('[data-n="quem"]'), nOque = bloco.querySelector('[data-n="oque"]');
+      var pq = bloco.querySelector('[data-plot="quando"]'), pp = bloco.querySelector('[data-plot="quem"]');
+      var oq = bloco.querySelector('.cg-co-oq'), card = bloco.querySelector('.cg-co-card'), navEl = bloco.querySelector('.cg-co-nav');
+      var tabMeses = bloco.querySelector('[data-tab="meses"]'), tabTodos = bloco.querySelector('[data-tab="todos"]');
+      var blocoPontas = bloco.querySelector('.cg-co-pls'), foraEl = bloco.querySelector('.cg-co-fo'), acharF = bloco.querySelector('.cg-co-ach');
+      if (!form || !ve || !veT || !nQuanto || !nQuem || !nOque || !pq || !pp || !oq || !card || !navEl || !blocoPontas) return;
+      var figQd = pq.parentNode, figQm = pp.parentNode;
+      var cols = lista(pq.querySelectorAll('.cg-co-cols i')), grade = pq.querySelector('.cg-co-gr'), picoEl = pq.querySelector('.cg-co-pico');
+      var unQd = figQd.querySelector('.cg-co-un'), dicaQd = figQd.querySelector('.cg-co-dica'), capQd = figQd.querySelector('figcaption');
+      var pts = pp.querySelector('.cg-co-pts'), unQm = figQm.querySelector('.cg-co-un'), dicaQm = figQm.querySelector('.cg-co-dica'), capQm = figQm.querySelector('figcaption');
+      var eixoQm = figQm.querySelector('.cg-co-exq'), chaveQm = figQm.querySelector('.cg-co-ch');
+      var botoes = lista(oq.querySelectorAll('.cg-co-b')), outras = oq.querySelector('.cg-co-out');
+      var ant = navEl.querySelector('.cg-pa-ant'), prox = navEl.querySelector('.cg-pa-prox'), posEl = navEl.querySelector('.cg-pa-pos');
+      var iQuanto = nQuanto.parentNode.querySelector('.cg-i'), iQuem = nQuem.parentNode.querySelector('.cg-i'), iFaixa = form.querySelector('.cg-co-fx .cg-i');
+      var dicaPadrao = { quanto: iQuanto ? iQuanto.getAttribute('data-dica') : '', quem: iQuem ? iQuem.getAttribute('data-dica') : '', faixa: iFaixa ? iFaixa.getAttribute('data-dica') : '' };
+      var SEM_LIMITE = bloco.getAttribute('data-limite') || '';  // "o limite mensal muda por estado e não entra nesta conta"
+      var tit = {};
+      lista(bloco.querySelectorAll('[data-t]')).forEach(function (el) { tit[el.getAttribute('data-t')] = { el: el, padrao: el.textContent }; });
+      var cabTodos = tabTodos ? tabTodos.querySelector('summary') : null;
+      /* O cartão que veio no HTML (o parlamentar do meio): os fornecedores dele já estão ali; servem até a ficha chegar. */
+      var doHtml = { k: '', nos: [] };
+      (function () {
+        var a = card.querySelector('a[data-k]'), q = card.querySelector('.cg-co-c-q');
+        if (a && q) { doHtml.k = a.getAttribute('data-k'); doHtml.nos = lista(q.childNodes).map(function (no) { return no.cloneNode(true); }); }
+      })();
+
+      var D = null, R = null, carregando = false, falhou = false, pendente = null;
+      var S = { i0: 0, i1: 0, cat: -1, uf: '', pt: '', g: '', k: '' };
+      var els = {};  // chave da pessoa → o ponto dela
+      lista(pts.querySelectorAll('i')).forEach(function (el) { els[el.getAttribute('data-p')] = el; });
+      var ordTab = { chave: 'pos', sobe: true }, sujo = { meses: false, todos: false };
+      var cursorMes = -1, sobre = null, vezFicha = 0;
+
+      /* ── O arquivo: uma pessoa por registro, as despesas em séries de meses seguidos ── */
+      function preparar(x) {
+        var nm = x.meses.length, nc = x.cats.length, por = {};
+        var P = x.pessoas.map(function (r) {
+          var cubo = new Int32Array(nc * nm), mes = new Int32Array(nm);
+          (r[5] || []).forEach(function (s) {
+            for (var i = 2; i < s.length; i++) { cubo[s[0] * nm + s[1] + i - 2] = s[i]; mes[s[1] + i - 2] += s[i]; }
+          });
+          var p = { k: r[0], nome: r[1], pt: r[2] || '', uf: r[3] || '', ex: r[4] === 1, cubo: cubo, mes: mes, cw: new Int32Array(nc), sig: r[6] || null, b: semAcento(r[1]).replace(/[^a-z0-9&]+/g, ' ').trim() };
+          var tot = 0, n = 0;
+          for (var m = 0; m < nm; m++) { tot += mes[m]; if (mes[m] > 0) n++; }
+          p.v0 = r2((n ? tot / n : 0) / 100);  // a medida do estado padrão (a altura do gráfico não encolhe abaixo dele)
+          p.ponto0 = p.ex && n >= Math.min(CR.minimoMeses || 6, Math.ceil(nm / 2));
+          por[p.k] = p;
+          return p;
+        });
+        D = {
+          meses: x.meses, nm: nm, nc: nc, P: P, por: por, recentes: Math.min(x.recentes || 0, nm), sigAte: x.sigepa_ate || '',
+          cats: x.cats.map(function (c) { return { id: c[0], curto: c[1], oficial: c[2] }; })
+        };
+        D.catPorId = {};
+        D.cats.forEach(function (c, i) { D.catPorId[c.id] = i; });
+        S.i0 = 0; S.i1 = nm - 1;
+      }
+
+      /* ── A conta ── */
+      function calcular() {
+        var nm = D.nm, nc = D.nc, P = D.P, i0 = S.i0, i1 = S.i1, nW = i1 - i0 + 1, cat = S.cat;
+        var minimo = Math.min(CR.minimoMeses || 6, Math.ceil(nW / 2)), comGrupo = !!(S.uf || S.pt || S.g);
+        var i, m, c, p, v, casaPts = [];
+        for (i = 0; i < P.length; i++) {
+          p = P[i];
+          var tot = 0, nmes = 0;
+          for (m = i0; m <= i1; m++) { v = p.mes[m]; tot += v; if (v > 0) nmes++; }
+          for (c = 0; c < nc; c++) {
+            var s = 0, base = c * nm;
+            for (m = i0; m <= i1; m++) s += p.cubo[base + m];
+            p.cw[c] = s;
+          }
+          p.tot = tot; p.nmes = nmes; p.val = cat < 0 ? tot : p.cw[cat];
+          p.pmT = nmes ? tot / nmes : 0;  // centavos por mês com despesa, no total (a régua da faixa)
+          p.pm = nmes ? p.val / nmes : 0;  // na medida do eixo (o total ou a despesa escolhida)
+          p.v = r2(p.pm / 100);  // em reais, como a página mostra
+          p.ponto = p.ex && nmes >= minimo;
+          p.fx = '';
+          if (p.ponto) casaPts.push(p);
+        }
+        /* A faixa: os 10% de menor e de maior gasto por mês no total, entre os pontos da Casa. */
+        var nf = parInt(casaPts.length * (CR.faixaPct || 10) / 100);
+        var porTotal = casaPts.slice().sort(function (a, b) { return a.pmT - b.pmT || cmpNome(a, b); });
+        if (nf * 2 <= porTotal.length) {
+          for (i = 0; i < nf; i++) { porTotal[i].fx = 'menos'; porTotal[porTotal.length - 1 - i].fx = 'mais'; }
+        }
+        /* Quem conta: o estado, o partido de hoje e a faixa, juntos. */
+        var somaMes = zeros(nm), nMes = zeros(nm), grCat = zeros(nc), casaCat = zeros(nc), nGente = 0;
+        for (i = 0; i < P.length; i++) {
+          p = P[i];
+          p.gr = (!S.uf || p.uf === S.uf) && (!S.pt || p.pt === S.pt) && (!S.g || p.fx === S.g);
+          for (c = 0; c < nc; c++) { casaCat[c] += p.cw[c]; if (p.gr) grCat[c] += p.cw[c]; }
+          if (!p.gr) continue;
+          if (p.val !== 0) nGente++;
+          for (m = 0; m < nm; m++) { v = cat < 0 ? p.mes[m] : p.cubo[cat * nm + m]; somaMes[m] += v; if (v > 0) nMes[m]++; }
+        }
+        var casaAll = 0, grAll = 0;
+        for (c = 0; c < nc; c++) { casaAll += casaCat[c]; grAll += grCat[c]; }
+        /* Os pontos, de quem gasta menos para quem gasta mais; a posição conta de cima (1º = quem mais gasta). */
+        var ord = casaPts.slice().sort(function (a, b) { return a.pm - b.pm || cmpNome(a, b); });
+        var valores = ord.map(function (x) { return x.v; }).sort(function (a, b) { return a - b; });
+        ord.forEach(function (x) {
+          var lo = 0, hi = valores.length;
+          while (lo < hi) { var mid = (lo + hi) >> 1; if (valores[mid] <= x.v) lo = mid + 1; else hi = mid; }
+          x.pos = valores.length - lo + 1;
+        });
+        var grPts = ord.filter(function (x) { return x.gr; }), exatos = grPts.map(function (x) { return x.pm; });
+        var med = null, q1 = null, q3 = null, meio = null;
+        if (exatos.length) {
+          var n = exatos.length;
+          med = n % 2 ? exatos[(n - 1) / 2] : (exatos[n / 2 - 1] + exatos[n / 2]) / 2;
+          q1 = n === 1 ? exatos[0] : quantil(exatos, 0.25);
+          q3 = n === 1 ? exatos[0] : quantil(exatos, 0.75);
+          /* O do meio: a medida mais próxima da mediana (empate: a menor, depois o nome). */
+          grPts.forEach(function (x) {
+            x.dm = Number(Math.abs(x.pm - med).toFixed(6));
+            if (!meio || x.dm < meio.dm || (x.dm === meio.dm && (x.pm < meio.pm || (x.pm === meio.pm && cmpNome(x, meio) < 0)))) meio = x;
+          });
+        }
+        var casaMed = null;
+        if (comGrupo && ord.length) casaMed = ord.length % 2 ? ord[(ord.length - 1) / 2].pm : (ord[ord.length / 2 - 1].pm + ord[ord.length / 2].pm) / 2;
+        R = {
+          nW: nW, minimo: minimo, comGrupo: comGrupo, padrao: !comGrupo && cat < 0 && i0 === 0 && i1 === nm - 1,
+          somaMes: somaMes, nMes: nMes, grCat: grCat, casaCat: casaCat, casaAll: casaAll, grAll: grAll,
+          total: cat < 0 ? grAll : grCat[cat], casaTotal: cat < 0 ? casaAll : casaCat[cat],
+          ord: ord, grPts: grPts, med: med, q1: q1, q3: q3, meio: meio, casaMed: casaMed, nGente: nGente, nFaixa: nf * 2 <= porTotal.length ? nf : 0,
+          fora: P.filter(function (x) { return x.ex && !x.ponto && (!S.uf || x.uf === S.uf) && (!S.pt || x.pt === S.pt); }).sort(cmpNome)
+        };
+      }
+
+      /* ── Os textos do recorte ── */
+      function deUf(uf) { return ((CR.ufDe || {})[uf] || 'de') + ' ' + uf; }
+      function emUf(uf) { var x = (CR.ufDe || {})[uf] || 'de'; return (x === 'do' ? 'no' : x === 'da' ? 'na' : 'em') + ' ' + uf; }
+      function janela(longa) {
+        var de = D.meses[S.i0], ate = D.meses[S.i1], n = S.i1 - S.i0 + 1, inteira = S.i0 === 0 && S.i1 === D.nm - 1;
+        if (de === ate) return mesBr(de) + (longa ? ' (1 mês)' : '');
+        var curta = de.slice(0, 4) === ate.slice(0, 4) ? MES[parseInt(de.slice(5, 7), 10) - 1] + ' a ' + mesBr(ate) : mesBr(de) + ' a ' + mesBr(ate);
+        return longa ? curta + ' (' + num(n) + ' meses' + (inteira ? ' fechados' : '') + ')' : curta;
+      }
+      function deJanela() { return (S.i0 === S.i1 ? 'em ' : 'de ') + janela(false); }
+      function catCurto() { return S.cat >= 0 ? D.cats[S.cat].curto : ''; }
+      function rotuloFaixa() { return 'os ' + (CR.faixaPct || 10) + '% que ' + (S.g === 'mais' ? 'mais' : 'menos') + ' gastam'; }
+      function grupoTxt() {  // "deputados do PL de SP · os 10% que menos gastam"
+        var t = [];
+        if (S.pt || S.uf) t.push(UNS + (S.pt ? ' do ' + S.pt : '') + (S.uf ? ' ' + deUf(S.uf) : ''));
+        if (S.g) t.push(rotuloFaixa());
+        return t.join(' · ');
+      }
+      function temFiltro() { return !!(S.cat >= 0 || S.uf || S.pt || S.g || S.i0 !== 0 || S.i1 !== D.nm - 1); }
+      function unidade() { return S.cat >= 0 ? 'R$ por mês com ' + minusc(catCurto()) : 'R$ por mês com despesa'; }
+
+      /* ── A frase "Você está vendo": cada trecho filtrado é um botão que tira só aquele filtro ── */
+      function trecho(txt, tirar) {
+        var b = h('button', { type: 'button', cls: 'cg-co-x', 'aria-label': 'Tirar o filtro: ' + txt }, [txt + ' ', h('span', { 'aria-hidden': 'true', text: '✕' })]);
+        b.addEventListener('click', function () { tirar(); mudou(); });
+        return b;
+      }
+      function limparTudo() { S.i0 = 0; S.i1 = D.nm - 1; S.cat = -1; S.uf = ''; S.pt = ''; S.g = ''; }
+      function botaoLimpar() {
+        var b = h('button', { type: 'button', cls: 'cg-pa-limpa', text: 'Limpar' });
+        b.addEventListener('click', function () { limparTudo(); mudou(); });
+        return b;
+      }
+      function renderFrase() {
+        var nos = [NOME], inteira = S.i0 === 0 && S.i1 === D.nm - 1;
+        function mais(no) { nos.push(' · '); nos.push(no); }
+        mais(inteira ? janela(true) : trecho(janela(true), function () { S.i0 = 0; S.i1 = D.nm - 1; }));
+        mais(S.cat < 0 ? 'todas as despesas' : trecho('só ' + minusc(catCurto()), function () { S.cat = -1; }));
+        if (!R.comGrupo) mais('todos os ' + UNS);
+        if (S.pt) mais(trecho(UNS + ' do ' + S.pt, function () { S.pt = ''; }));
+        if (S.uf) mais(trecho((S.pt ? '' : UNS + ' ') + deUf(S.uf), function () { S.uf = ''; }));
+        if (S.g) mais(trecho(rotuloFaixa(), function () { S.g = ''; }));
+        if (REC_TXT && S.i1 >= D.nm - D.recentes) mais(h('i', { text: REC_TXT }));
+        if (temFiltro()) { nos.push(' · '); nos.push(botaoLimpar()); }
+        esvaziar(veT);
+        nos.forEach(function (no) { veT.appendChild(typeof no === 'string' ? d.createTextNode(no) : no); });
+        /* Recorte vazio: a frase diz o recorte; os gráficos mantêm a moldura. */
+        if (vz) {
+          var vazio = !R.grPts.length && R.total === 0;
+          vz.hidden = !vazio;
+          if (vazio) {
+            esvaziar(vz);
+            vz.appendChild(d.createTextNode('Nenhum ' + UM + (S.pt ? ' do ' + S.pt : '') + (S.uf ? ' ' + deUf(S.uf) : '') + (S.g ? ' entre ' + rotuloFaixa() : '') + ' teve despesa' + (S.cat >= 0 ? ' com ' + minusc(catCurto()) : '') + ' ' + deJanela() + '. Aumente o período ou tire um filtro. '));
+            vz.appendChild(botaoLimpar());
+          }
+        }
+      }
+
+      /* A parte do recorte no total da Casa, no mesmo período (só quando os dois saldos são positivos). */
+      function parteDaCasa() { return R.casaAll > 0 && R.total >= 0 ? 100 * R.total / R.casaAll : null; }
+
+      /* ── Os três números ── */
+      function numero(el, n, un, linhas, acao) {
+        esvaziar(el);
+        el.appendChild(h('span', { cls: 'cg-pa-m-n' }, [h('b', { text: n }), un ? ' ' + un : null]));
+        linhas.forEach(function (t, i) { if (t) el.appendChild(h('span', { cls: i ? 'cg-pa-m-x' : 'cg-pa-m-f', text: t })); });
+        if (acao) el.appendChild(h('span', { cls: 'cg-pa-m-ir', 'aria-hidden': 'true', text: acao }));
+      }
+      function renderNumeros() {
+        var nW = R.nW, total = R.total / 100, filtros = [];
+        if (S.cat >= 0) filtros.push('só ' + minusc(catCurto()));
+        if (R.comGrupo) filtros.push(grupoTxt());
+        var parte = parteDaCasa(), quantos = nW === 1 ? '1 mês' : num(nW) + ' meses' + (S.i0 === 0 && S.i1 === D.nm - 1 ? ' fechados' : '');
+        numero(nQuanto, reaisK(total), 'no período', [
+          R.total < 0 ? 'é o saldo de ' + quantos + ': as devoluções passaram dos reembolsos' : 'reembolsados em ' + quantos,
+          reaisK(total / nW) + ' por mês',
+          filtros.length ? filtros.join(' · ') + (parte != null ? ' · ' + pct1(parte) + ' do total ' + (casa === 'cd' ? 'da Câmara' : 'do Senado') + ' no período' : '') : ''
+        ]);
+        var n = R.grPts.length, com = S.cat >= 0 ? ' com ' + minusc(catCurto()) : '', naCasa = R.casaMed != null ? 'na Casa: ' + reaisC(r2(R.casaMed / 100)) + ' por mês' : '';
+        if (!n) numero(nQuem, '—', '', ['nenhum ' + UM + ' no gráfico', naCasa], 'ver no gráfico');
+        else if (n === 1) numero(nQuem, reaisC(r2(R.med / 100)), 'por mês', ['1 ' + UM, naCasa], 'ver no gráfico');
+        else numero(nQuem, reaisC(r2(R.med / 100)), 'por mês', [
+          'gasta' + com + ' o ' + UM + ' do meio' + (R.comGrupo ? ' do grupo' : ''),
+          'metade fica entre ' + reaisK(r2(R.q1 / 100)) + ' e ' + reaisK(r2(R.q3 / 100)),
+          naCasa
+        ], 'ver no gráfico');
+        /* O terceiro: a maior despesa do recorte (ou a escolhida) e a parte dela no total. */
+        var c = S.cat, maior = -1;
+        if (c < 0) for (var i = 0; i < D.nc; i++) if (R.grCat[i] > 0 && (maior < 0 || R.grCat[i] > R.grCat[maior])) maior = i;
+        if (c < 0) c = maior;
+        if (c < 0 || !R.grAll) {
+          numero(nOque, '—', '', ['sem despesa neste recorte'], S.cat >= 0 ? 'ver todas as despesas' : '');
+          nOque.setAttribute('data-cat', S.cat >= 0 ? D.cats[S.cat].id : '');
+        } else if (R.grAll < 0 || R.grCat[c] <= 0) {  // mais devolução do que despesa: não há parte do total a mostrar
+          numero(nOque, '—', '', [
+            S.cat < 0 ? 'neste recorte, as devoluções passaram das despesas' : R.grCat[c] < 0 ? 'em ' + minusc(D.cats[c].curto) + ', as devoluções passaram das despesas' : 'sem despesa com ' + minusc(D.cats[c].curto) + ' neste recorte',
+            reaisK((S.cat < 0 ? R.grAll : R.grCat[c]) / 100) + ' no período'
+          ], S.cat >= 0 ? 'ver todas as despesas' : '');
+          nOque.setAttribute('data-cat', S.cat >= 0 ? D.cats[c].id : '');
+        } else {
+          numero(nOque, pctC(100 * R.grCat[c] / R.grAll), 'do total', [
+            'vai para ' + minusc(D.cats[c].curto),
+            reaisK(R.grCat[c] / 100) + ' no período' + (R.comGrupo && R.casaAll ? ' · na Casa: ' + pctC(100 * R.casaCat[c] / R.casaAll) : '')
+          ], S.cat >= 0 ? 'ver todas as despesas' : 'ver só esta despesa');
+          nOque.setAttribute('data-cat', D.cats[c].id);
+        }
+        nOque.setAttribute('aria-pressed', S.cat >= 0 ? 'true' : 'false');
+        /* As dicas dizem a regra deste recorte: quantos entram no total, o mínimo de meses, o tamanho da faixa. */
+        var meses = function (k) { return num(k) + (k === 1 ? ' mês' : ' meses'); };
+        if (iQuanto) iQuanto.setAttribute('data-dica', R.padrao ? dicaPadrao.quanto : dicaPadrao.quanto.replace(/Entram [^.]*\./, 'Entram ' + (R.nGente === 1 ? 'o único ' + UM + (R.comGrupo ? ' do grupo' : '') + ' que teve' : 'os ' + num(R.nGente) + ' ' + UNS + (R.comGrupo ? ' do grupo' : '') + ' que tiveram') + ' despesa' + (S.cat >= 0 ? ' com ' + minusc(catCurto()) : '') + ' ' + deJanela() + ', inclusive quem já saiu.'));
+        if (iQuem) iQuem.setAttribute('data-dica', R.padrao ? dicaPadrao.quem : 'Metade gasta mais, metade gasta menos. É a média por mês com despesa' + (S.cat >= 0 ? ' (aqui, só a parte de ' + minusc(catCurto()) + ')' : '') + ' de quem está em exercício' + (R.comGrupo ? ', é do grupo escolhido' : '') + ' e teve despesa em ' + meses(R.minimo) + ' ou mais do período.' + (SEM_LIMITE ? ' ' + SEM_LIMITE : ''));
+        if (iFaixa) iFaixa.setAttribute('data-dica', R.padrao ? dicaPadrao.faixa : 'Os ' + num(R.nFaixa) + ' de menor (ou de maior) gasto por mês no período, entre os ' + num(R.ord.length) + ' do gráfico. A faixa não muda quando você escolhe uma despesa.');
+      }
+
+      /* ── Quando: uma coluna por mês; fora do período, cinza ── */
+      var qd = null;  // a escala e os valores do último desenho
+      function renderQuando() {
+        var nm = D.nm, valores = R.somaMes.map(function (x) { return x / 100; });
+        var maximo = Math.max.apply(null, valores.concat([0])), minimoV = Math.min.apply(null, valores.concat([0]));
+        var topo = maximo * 1.08 || 1, fundo = minimoV * 1.08, altura = topo - fundo, zero = 100 * (0 - fundo) / altura;
+        var divisor = maximo >= 1e6 ? 1e6 : maximo >= 1e3 ? 1e3 : 1, un = maximo >= 1e6 ? 'R$ milhões por mês' : maximo >= 1e3 ? 'R$ mil por mês' : 'R$ por mês';
+        var passo = passoDoEixo(maximo);
+        esvaziar(grade);
+        for (var v = 0; v <= topo; v += passo) {
+          var linha = h('span', {}, [h('b', { text: nPt(v / divisor, 1).replace(/,0$/, '') })]);
+          linha.style.bottom = (zero + 100 * v / altura).toFixed(2) + '%';
+          grade.appendChild(linha);
+        }
+        texto(unQd, un);
+        var pico = -1;
+        cols.forEach(function (el, m) {
+          if (m >= nm) return;
+          var x = valores[m], alt = 100 * Math.abs(x) / altura, dentro = m >= S.i0 && m <= S.i1, recente = m >= nm - D.recentes;
+          el.style.bottom = (x >= 0 ? zero : zero - alt).toFixed(2) + '%';
+          el.style.height = alt.toFixed(2) + '%';
+          el.className = (recente ? 'cg-co-r' : '') + (dentro ? '' : ' cg-co-off') + (x < 0 ? ' cg-co-neg' : '') + (m === cursorMes ? ' on' : '');
+          if (dentro && !recente && x > 0 && (pico < 0 || x > valores[pico])) pico = m;
+        });
+        if (!picoEl) { picoEl = h('span', { cls: 'cg-co-pico' }); pq.appendChild(picoEl); }
+        picoEl.hidden = pico < 0;
+        if (pico >= 0) {
+          var cx = 100 * (pico + 0.5) / nm;
+          picoEl.textContent = mesBr(D.meses[pico]) + ': ' + reaisK(valores[pico]);
+          picoEl.className = 'cg-co-pico' + (cx > 50 ? ' cg-co-esq' : '');
+          picoEl.style.left = cx.toFixed(3) + '%';
+          picoEl.style.bottom = (zero + 100 * valores[pico] / altura).toFixed(2) + '%';
+        }
+        qd = { valores: valores };
+        var parte = parteDaCasa();
+        var t = R.comGrupo ? 'quanto foi reembolsado ' + (S.pt || S.uf ? 'aos ' + UNS + (S.pt ? ' do ' + S.pt : '') + (S.uf ? ' ' + deUf(S.uf) : '') + (S.g ? ' entre ' + rotuloFaixa() : '') : 'a' + rotuloFaixa()) + ' em cada mês' : tit.quando.padrao;
+        if (S.cat >= 0) t += ', só com ' + minusc(catCurto());
+        if ((R.comGrupo || S.cat >= 0) && parte != null) t += ' · ' + pct1(parte) + ' do total da Casa no período';
+        texto(tit.quando.el, t);
+        if (capQd) texto(capQd, 'Colunas: ' + t + '. Em cor, o período escolhido: ' + janela(true) + '. A tabela logo abaixo tem todos os meses.');
+        if (tabMeses) { if (tabMeses.open) tabelaMeses(); else sujo.meses = true; }
+      }
+      function gente(n) { return num(n) + ' ' + (n === 1 ? UM : UNS) + ' com despesa'; }
+      function tabelaMeses() {
+        sujo.meses = false;
+        var corpo = tabMeses.querySelector('tbody');
+        if (!corpo || !qd) return;
+        esvaziar(corpo);
+        D.meses.forEach(function (am, m) {
+          var recente = m >= D.nm - D.recentes, dentro = m >= S.i0 && m <= S.i1;
+          corpo.appendChild(h('tr', { cls: dentro ? null : 'cg-co-fd' }, [
+            h('th', { scope: 'row' }, [mesBr(am), recente ? ' ' : null, recente ? h('small', { text: 'ainda recebe notas' }) : null, dentro ? null : ' ', dentro ? null : h('small', { text: 'fora do período' })]),
+            h('td', { text: reaisS(qd.valores[m]) }), h('td', { text: num(R.nMes[m]) })
+          ]));
+        });
+      }
+      function dicaDoMes(m) {
+        if (!dicaQd || !qd || m < 0 || m >= D.nm) return;
+        var dentro = m >= S.i0 && m <= S.i1, so = S.i0 === m && S.i1 === m;
+        esvaziar(dicaQd);
+        dicaQd.appendChild(h('b', { text: mesBr(D.meses[m]) }));
+        dicaQd.appendChild(h('span', { text: [
+          reaisK(qd.valores[m]), gente(R.nMes[m]),
+          dentro && R.total ? pct1(100 * R.somaMes[m] / R.total) + ' do período' : dentro ? '' : 'fora do período',
+          m >= D.nm - D.recentes ? 'ainda recebe notas' : '',
+          so ? 'clique ou Enter para voltar à legislatura' : 'clique ou Enter para ver só este mês'
+        ].filter(Boolean).join(' · ') }));
+        var caixa = figQd.getBoundingClientRect(), r = cols[m].getBoundingClientRect();
+        dicaQd.hidden = false;
+        var x = r.left - caixa.left + r.width + 8, y = r.top - caixa.top - 8;
+        if (x + dicaQd.offsetWidth > caixa.width) x = Math.max(0, r.left - caixa.left - dicaQd.offsetWidth - 8);
+        dicaQd.style.left = x + 'px';
+        dicaQd.style.top = Math.max(0, y - dicaQd.offsetHeight) + 'px';
+      }
+      function cursorNoMes(m) {
+        if (cursorMes >= 0 && cols[cursorMes]) cols[cursorMes].classList.remove('on');
+        cursorMes = m;
+        if (m >= 0 && cols[m]) { cols[m].classList.add('on'); dicaDoMes(m); } else if (dicaQd) dicaQd.hidden = true;
+      }
+      function escolherMes(m) {
+        if (S.i0 === m && S.i1 === m) { S.i0 = 0; S.i1 = D.nm - 1; } else { S.i0 = m; S.i1 = m; }
+        mudou();
+        if (cursorMes >= 0) dicaDoMes(cursorMes);
+      }
+      function mesDoPonteiro(ev) {
+        var r = pq.getBoundingClientRect();
+        return r.width ? limitar(Math.floor((ev.clientX - r.left) / r.width * D.nm), 0, D.nm - 1) : -1;
+      }
+
+      /* ── Com o quê: a parte de cada despesa no total do recorte; o risco é a parte na Casa ── */
+      function renderOque() {
+        var resto = 0, nResto = 0;
+        botoes.forEach(function (b) {
+          var c = D.catPorId[b.getAttribute('data-cat')];
+          if (c == null) return;
+          var v = R.grCat[c], parte = R.grAll > 0 ? 100 * v / R.grAll : 0, neg = v < 0;
+          var barra = b.querySelector('.cg-co-bb'), cheio = barra ? barra.querySelector('i') : null, risco = barra ? barra.querySelector('u') : null;
+          var naCasa = R.casaAll > 0 ? 100 * R.casaCat[c] / R.casaAll : 0;
+          texto(b.querySelector('.cg-co-bv'), neg ? reaisK(v / 100) + ' (devoluções)' : v === 0 ? 'R$ 0' : (R.grAll > 0 ? pctC(parte) + ' · ' : '') + reaisK(v / 100));
+          if (cheio) cheio.style.width = (neg ? 0 : limitar(parte, 0, 100)).toFixed(2) + '%';
+          if (R.comGrupo && barra) {
+            if (!risco) { risco = h('u'); barra.appendChild(risco); }
+            risco.style.left = limitar(naCasa, 0, 100).toFixed(2) + '%';
+            risco.hidden = false;
+          } else if (risco) risco.hidden = true;
+          b.setAttribute('aria-pressed', S.cat === c ? 'true' : 'false');
+          if (neg) b.setAttribute('data-neg', '1'); else b.removeAttribute('data-neg');
+          b.setAttribute('data-dica', 'Nome oficial: ' + D.cats[c].oficial + (R.comGrupo ? ' · ' + NA_CASA + ': ' + pctC(naCasa) + ' do total' : ''));
+          if (outras && outras.contains(b)) { resto += v; nResto++; }
+        });
+        if (outras && nResto) texto(outras.querySelector('summary .cg-co-bv'), resto < 0 ? reaisK(resto / 100) + ' (devoluções)' : (R.grAll > 0 ? pctC(100 * resto / R.grAll) : '0%') + ' · ' + (resto === 0 ? 'R$ 0' : reaisK(resto / 100)));
+        if (S.cat >= 0) oq.setAttribute('data-sel', '1'); else oq.removeAttribute('data-sel');
+        if (outras && S.cat >= 0 && outras.querySelector('[aria-pressed="true"]')) outras.open = true;
+        texto(tit.oque.el, 'parte do total, ' + deJanela() + (R.comGrupo ? ' · ' + grupoTxt() : ''));
+      }
+
+      /* ── Quem: os pontos em faixas; o recorte na base de cada pilha, o resto por cima, cinza ── */
+      var qm = null;  // a geometria do último desenho (para o ponteiro)
+      var pilhaPadrao = {};
+      function pilhaDoPadrao(nb, eixo) {  // a pilha mais alta do estado padrão com estas faixas
+        var chave = nb + ':' + eixo;
+        if (pilhaPadrao[chave] == null) {
+          var niveis = zeros(nb), maior = 0;
+          D.P.forEach(function (p) { if (p.ponto0) maior = Math.max(maior, ++niveis[limitar(Math.floor(p.v0 / (eixo / nb)), 0, nb - 1)]); });
+          pilhaPadrao[chave] = maior;
+        }
+        return pilhaPadrao[chave];
+      }
+      function focoAtual() { return (S.k && D.por[S.k]) || R.meio; }
+      function renderQuem() {
+        var W = pp.clientWidth || 600, ord = R.ord, i, maior = 0;
+        ord.forEach(function (p) { if (p.v > maior) maior = p.v; });
+        var faixa = (CR.faixa || {})[casa] || 1000, eixo, passoMarca, nb;
+        if (S.cat < 0) {
+          var eixoPasso = CR.eixoPasso || 5000;
+          eixo = Math.max(CR.eixo || 55000, Math.ceil(maior / eixoPasso) * eixoPasso);
+          passoMarca = CR.marca || 10000;
+          /* um mês fora da curva estica o eixo: as marcas rareiam (10, 20, 50, 100 mil…) para não se atropelarem */
+          for (var vez = 0, fator = [2, 2.5, 2]; eixo / passoMarca > (W < 500 ? 6 : 8); vez++) passoMarca *= fator[vez % 3];
+          if (passoMarca > (CR.marca || 10000)) eixo = Math.ceil(eixo / passoMarca) * passoMarca;
+          nb = Math.round(eixo / faixa);
+        } else {
+          passoMarca = maior > 0 ? passoDoEixo(maior) : 200;
+          eixo = maior > 0 ? Math.ceil(maior / passoMarca) * passoMarca : 1000;
+          nb = Math.round((CR.eixo || 55000) / faixa);
+        }
+        while (W / nb < 6 && nb > 12) nb = Math.ceil(nb / 2);  // faixa estreita demais: dobra
+        var passo = W / nb, dd = limitar(Math.floor(passo - 1.5), 3, 8), dyNat = Math.min(Math.round(passo), dd + 1.5);
+        var larg = eixo / nb, niveis = zeros(nb), pilha = 0;
+        function empilhar(p) {
+          p.bx = limitar(Math.floor(p.v / larg), 0, nb - 1);
+          p.bn = niveis[p.bx]++;
+          if (niveis[p.bx] > pilha) pilha = niveis[p.bx];
+        }
+        ord.forEach(function (p) { if (p.gr) empilhar(p); });
+        ord.forEach(function (p) { if (!p.gr) empilhar(p); });
+        var alturaMax = W < 500 ? 250 : 280, dy = pilha ? Math.min(dyNat, alturaMax / pilha) : dyNat;
+        var base = S.cat < 0 ? Math.min(alturaMax, pilhaDoPadrao(nb, eixo) * dyNat) : 0;
+        var alturaPx = Math.max(base, pilha * dy, 60) + 46;
+        pp.classList.add('cg-co-js');
+        pp.style.setProperty('--dd', dd + 'px');
+        pp.style.setProperty('--dy', dy.toFixed(3) + 'px');
+        pp.style.height = Math.round(alturaPx) + 'px';
+        var f = focoAtual();
+        D.P.forEach(function (p) {
+          var el = els[p.k];
+          if (!p.ponto) { if (el) el.hidden = true; return; }
+          if (!el) { el = h('i', { 'data-p': p.k }); els[p.k] = el; pts.appendChild(el); }
+          el.hidden = false;
+          el.style.setProperty('--x', (100 * (p.bx + 0.5) / nb).toFixed(3));
+          el.style.setProperty('--n', p.bn);
+          el.className = (p.gr ? '' : 'cg-co-off') + (p === f ? ' cg-co-pf' : '') + (p === sobre ? ' on' : '');
+          p.cx = (p.bx + 0.5) / nb * W;
+          p.cy = p.bn * dy + 1 + dd / 2;
+        });
+        qm = { W: W, nb: nb, eixo: eixo, dd: dd, dy: dy, niveis: niveis };
+        /* A mediana do recorte e a faixa do meio (do 1º ao 3º quartil). */
+        var medEl = pp.querySelector('.cg-co-med:not(.cg-co-casa)'), metEl = pp.querySelector('.cg-co-met'), casaEl = pp.querySelector('.cg-co-casa');
+        if (R.med != null && R.grPts.length > 1) {
+          var xm = limitar(100 * r2(R.med / 100) / eixo, 0, 100);
+          if (!medEl) { medEl = h('span', { cls: 'cg-co-med', 'aria-hidden': 'true' }, [h('b')]); pp.insertBefore(medEl, pts); }
+          medEl.hidden = false;
+          medEl.className = 'cg-co-med' + (xm > 66 ? ' cg-co-esq' : '');
+          medEl.style.left = xm.toFixed(3) + '%';
+          texto(medEl.querySelector('b'), 'mediana ' + reaisC(r2(R.med / 100)));
+          var x1 = limitar(100 * r2(R.q1 / 100) / eixo, 0, 100), x2 = limitar(100 * r2(R.q3 / 100) / eixo, 0, 100);
+          if (!metEl) { metEl = h('span', { cls: 'cg-co-met', 'aria-hidden': 'true' }); pp.insertBefore(metEl, pp.firstChild); }
+          metEl.hidden = false;
+          metEl.style.left = x1.toFixed(3) + '%';
+          metEl.style.width = Math.max(0, x2 - x1).toFixed(3) + '%';
+          if (chaveQm) {
+            var colchete = chaveQm.querySelector('span') || chaveQm.appendChild(h('span', {}, [h('b')]));
+            chaveQm.hidden = false;
+            colchete.style.left = x1.toFixed(3) + '%';
+            colchete.style.width = Math.max(0, x2 - x1).toFixed(3) + '%';
+            var rot = colchete.querySelector('b'), centro = (x1 + x2) / 2 / 100 * W;
+            texto(rot, R.comGrupo ? 'metade do grupo' : 'metade dos ' + UNS);
+            /* o rótulo fica sob a faixa, sem sair do gráfico */
+            var meia = rot.offsetWidth / 2, desvio = centro - meia < 0 ? meia - centro : centro + meia > W ? W - centro - meia : 0;
+            rot.style.marginLeft = desvio ? Math.round(desvio) + 'px' : '';
+          }
+        } else {
+          if (medEl) medEl.hidden = true;
+          if (metEl) metEl.hidden = true;
+          if (chaveQm) chaveQm.hidden = true;
+        }
+        /* Com um grupo escolhido, um tique cinza marca a mediana da Casa. */
+        if (R.casaMed != null) {
+          if (!casaEl) { casaEl = h('span', { cls: 'cg-co-med cg-co-casa', 'aria-hidden': 'true' }); pp.insertBefore(casaEl, pts); }
+          casaEl.hidden = false;
+          casaEl.style.left = limitar(100 * r2(R.casaMed / 100) / eixo, 0, 100).toFixed(3) + '%';
+          casaEl.setAttribute('title', 'mediana ' + NA_CASA + ': ' + reaisC(r2(R.casaMed / 100)));
+        } else if (casaEl) casaEl.hidden = true;
+        /* O eixo. */
+        if (eixoQm) {
+          esvaziar(eixoQm);
+          for (var v = 0; v <= eixo + passoMarca / 1000; v += passoMarca) {
+            var ultimo = v + passoMarca > eixo + passoMarca / 1000, rotulo;
+            if (passoMarca >= 1000) rotulo = nPt(v / 1000, passoMarca % 1000 ? 1 : 0) + (ultimo ? ' mil' : '');
+            else rotulo = nPt(v, passoMarca < 1 ? 2 : 0);
+            var marca = h('span', { text: rotulo, cls: v / eixo > 0.97 ? 'cg-co-fim' : null });  // a última marca, na borda, escreve para dentro
+            marca.style.left = (100 * v / eixo).toFixed(3) + '%';
+            eixoQm.appendChild(marca);
+          }
+        }
+        texto(unQm, unidade());
+        var t = 'cada ponto é um ' + UM + ' em exercício · ' + unidade() + ', ' + deJanela() + (R.comGrupo ? ' · em cor, ' + grupoTxt() : '');
+        texto(tit.quem.el, t);
+        pp.setAttribute('aria-label', 'Gráfico: um ponto por ' + UM + ' em exercício, em ' + unidade() + ', ' + deJanela() + '. As setas andam de quem gasta menos para quem gasta mais; Enter abre o dossiê; Esc volta ao ' + UM + ' do meio. O ' + UM + ' em foco aparece no cartão ao lado.');
+        if (capQm) texto(capQm, 'Pontos: ' + num(R.grPts.length) + ' ' + (R.grPts.length === 1 ? UM : UNS) + (R.comGrupo ? ' do grupo escolhido' : ' em exercício') + ', em ' + unidade() + ', ' + deJanela() + '.' + (R.med != null ? ' Mediana: ' + reaisC(r2(R.med / 100)) + '.' : '') + ' A tabela de todos, mais abaixo, tem o nome e o valor de cada um.');
+        /* Quem está em exercício e ficou fora do gráfico. */
+        if (foraEl) {
+          esvaziar(foraEl);
+          var nf = R.fora.length;
+          if (nf) {
+            var frase = num(nf) + ' ' + (nf === 1 ? UM : UNS) + (S.pt ? ' do ' + S.pt : '') + (S.uf ? ' ' + deUf(S.uf) : '') + ' em exercício fora do gráfico: ' + (R.minimo === 1 ? 'sem despesa ' + deJanela() + '.' : 'despesa em menos de ' + num(R.minimo) + ' meses do período.');
+            if (nf <= 20) {
+              var nomes = h('p');
+              R.fora.forEach(function (p, j) {
+                if (j) nomes.appendChild(d.createTextNode(', '));
+                nomes.appendChild(h('a', { cls: 'cg-p', href: '#p=' + p.k, 'data-k': p.k, text: p.nome }));
+                nomes.appendChild(d.createTextNode(' '));
+                nomes.appendChild(h('small', { text: (p.pt + '-' + p.uf).replace(/^-|-$/g, '') }));
+              });
+              foraEl.appendChild(h('details', {}, [h('summary', { text: frase }), nomes]));
+            } else foraEl.appendChild(h('p', { text: frase }));
+          }
+          if (!R.grPts.length && R.total !== 0) foraEl.appendChild(h('p', { cls: 'cg-co-pv0', text: 'Nenhum ' + UM + ' deste recorte entra no gráfico: é preciso estar em exercício e ter despesa em ' + (R.minimo === 1 ? 'algum mês' : num(R.minimo) + ' meses') + ' do período.' }));
+        }
+        marcarFoco();
+      }
+      /* O ponto em foco: laranja, com anel, e o nome por um fio até o alto da pilha dele. */
+      function marcarFoco() {
+        var f = focoAtual(), fio = pp.querySelector('.cg-co-fio');
+        D.P.forEach(function (p) { var el = els[p.k]; if (el) el.classList.toggle('cg-co-pf', p === f && p.ponto); });
+        if (!f || !f.ponto || !qm) { if (fio) fio.hidden = true; ladosDosRotulos(); return; }
+        if (!fio) { fio = h('span', { cls: 'cg-co-fio', 'aria-hidden': 'true' }, [h('b')]); pp.appendChild(fio); }
+        var x = 100 * (f.bx + 0.5) / qm.nb;
+        fio.hidden = false;
+        fio.className = 'cg-co-fio' + (x > 50 ? ' cg-co-esq' : '');
+        fio.style.setProperty('--x', x.toFixed(3));
+        fio.style.setProperty('--t', qm.niveis[f.bx]);
+        texto(fio.querySelector('b'), f.nome + ' · ' + reaisS(f.v));
+        ladosDosRotulos();
+      }
+      /* O rótulo do foco e o da mediana: cada um para o lado em que cabe; perto um do outro, um para cada lado. */
+      function ladosDosRotulos() {
+        var W = qm ? qm.W : 0, medEl = pp.querySelector('.cg-co-med:not(.cg-co-casa)'), fio = pp.querySelector('.cg-co-fio');
+        var temMed = !!medEl && !medEl.hidden, temFio = !!fio && !fio.hidden;
+        if (!W || !temMed) return;
+        var xm = parseFloat(medEl.style.left) / 100 * W, lm = medEl.querySelector('b').offsetWidth + 8, esqM = xm + lm > W;
+        if (temFio) {
+          var xf = parseFloat(fio.style.getPropertyValue('--x')) / 100 * W, lf = fio.querySelector('b').offsetWidth + 2;
+          var esqF = xf > W / 2 ? xf - lf >= 0 : xf + lf > W;
+          fio.classList.toggle('cg-co-esq', esqF);
+          if (Math.abs(xm - xf) < Math.max(lm, lf)) {
+            if (esqF && xm + lm <= W) esqM = false; else if (!esqF && xm - lm >= 0) esqM = true;
+          }
+        }
+        medEl.classList.toggle('cg-co-esq', esqM);
+      }
+      function legenda(p) { return (p.pt + '-' + p.uf).replace(/^-|-$/g, ''); }
+      function mesesDe(p) { return num(p.nmes) + ' de ' + num(R.nW) + (R.nW === 1 ? ' mês' : ' meses'); }
+      function dicaDoPonto(p) {
+        if (!dicaQm || !qm) return;
+        esvaziar(dicaQm);
+        dicaQm.appendChild(h('b', { text: p.nome }));
+        dicaQm.appendChild(h('span', { text: [legenda(p), reaisS(p.v) + ' por mês com ' + (S.cat >= 0 ? minusc(catCurto()) : 'despesa'), reaisS(p.tot / 100) + ' em ' + mesesDe(p), p === focoAtual() ? 'em foco' : 'clique para ver'].join(' · ') }));
+        var caixa = figQm.getBoundingClientRect(), r = pp.getBoundingClientRect();
+        var x = r.left - caixa.left + p.cx + 12, y = r.top - caixa.top + pp.clientHeight - p.cy - 8;
+        dicaQm.hidden = false;
+        if (x + dicaQm.offsetWidth > caixa.width) x = Math.max(0, x - dicaQm.offsetWidth - 24);
+        dicaQm.style.left = x + 'px';
+        dicaQm.style.top = Math.max(0, y - dicaQm.offsetHeight) + 'px';
+      }
+      function apagarDicaDoPonto() {
+        if (sobre && els[sobre.k]) els[sobre.k].classList.remove('on');
+        sobre = null;
+        if (dicaQm) dicaQm.hidden = true;
+      }
+      function maisPerto(ev, raio) {
+        if (!qm) return null;
+        var r = pp.getBoundingClientRect(), mx = ev.clientX - r.left - pp.clientLeft, my = r.top + pp.clientTop + pp.clientHeight - ev.clientY;
+        var melhor = null, dist = raio * raio;
+        R.ord.forEach(function (p) {
+          var dx = p.cx - mx, dyp = p.cy - my, d2 = dx * dx + dyp * dyp;
+          if (d2 >= raio * raio) return;
+          d2 += R.comGrupo && !p.gr ? 16 : 0;  // na dúvida, o ponto do grupo escolhido
+          if (d2 < dist) { dist = d2; melhor = p; }
+        });
+        return melhor;
+      }
+
+      /* ── O cartão em foco ── */
+      function foraDaConta(p, curta) {  // as passagens compradas pela agência da Câmara, nos anos que tocam o período
+        if (!p.sig) return '';
+        var anoDe = D.meses[S.i0].slice(0, 4), anoAte = D.meses[S.i1].slice(0, 4);
+        var anos = Object.keys(p.sig).filter(function (a) { return p.sig[a] && a >= anoDe && a <= anoAte; }).sort();
+        if (curta) {
+          var ano = String(CR.anoSigepa || ''), v = anos.indexOf(ano) >= 0 ? p.sig[ano] / 100 : 0;
+          return v > 0 ? 'fora da conta: ' + reaisC(v) + ' em passagens da agência em ' + ano : '';
+        }
+        var soma = 0;
+        anos.forEach(function (a) { soma += p.sig[a]; });
+        if (soma <= 0) return '';
+        var ate = D.sigAte.length === 7 && D.sigAte.slice(5, 7) !== '12' ? ', até ' + MES_EXT[parseInt(D.sigAte.slice(5, 7), 10) - 1] : '';
+        function quando(a) { return 'em ' + a + (a === D.sigAte.slice(0, 4) ? ate : ''); }
+        if (anos.length === 1) return 'Fora desta conta: ' + reaisC(p.sig[anos[0]] / 100) + ' em passagens compradas pela agência da Câmara ' + quando(anos[0]) + '.';
+        return 'Fora desta conta: ' + reaisC(soma / 100) + ' em passagens compradas pela agência da Câmara (' + anos.map(function (a) { return reaisS(p.sig[a] / 100) + ' ' + quando(a); }).join(', ') + ').';
+      }
+      function despesasDe(p) {  // as despesas da pessoa na janela, da maior para a menor: [índice, centavos, % do total dela]
+        var saida = [];
+        for (var c = 0; c < D.nc; c++) if (p.cw[c]) saida.push([c, p.cw[c], p.tot > 0 ? r1(100 * p.cw[c] / p.tot) : null]);
+        return saida.sort(function (a, b) { return b[1] - a[1] || (D.cats[a[0]].oficial < D.cats[b[0]].oficial ? -1 : 1); });
+      }
+      function maiorFornecedor(ficha) {  // dos três maiores, o primeiro com CNPJ: [o fornecedor, % do total da legislatura]
+        var c = ficha && ficha.cota, total = c && c.leg ? c.leg.total : 0;
+        var lista3 = ((c && c.fornecedores) || []).filter(function (x) { return x.valor > 0; }).slice(0, 3);
+        for (var i = 0; i < lista3.length; i++) if (/^\d{14}$/.test(lista3[i].cnpj || '')) return [lista3[i], total > 0 ? r1(100 * lista3[i].valor / total) : null];
+        return null;
+      }
+      function antesDeComparar(p, ficha) {  // só frases de registro, nesta prioridade, até três
+        var a = [], t = foraDaConta(p, false), cats = despesasDe(p);
+        if (t) a.push(t);
+        if (p.tot < 0) a.push('O saldo do período é negativo: as devoluções passaram das despesas.');
+        else if (p.nmes < R.nW) a.push(R.nW === 1 ? 'Não teve despesa em ' + janela(false) + '.' : 'Teve despesa em ' + num(p.nmes) + ' dos ' + num(R.nW) + ' meses do período.');
+        if (cats.length && cats[0][2] != null && cats[0][2] > (CR.umaDespesa || 60)) a.push(pctC(cats[0][2]) + ' em uma despesa só: ' + minusc(D.cats[cats[0][0]].curto) + '.');
+        else if (D.nc >= 2 && !(p.cw[0] > 0) && !(p.cw[1] > 0)) a.push('Nada em ' + minusc(D.cats[0].curto) + ' nem em ' + minusc(D.cats[1].curto) + ', as duas maiores despesas da Casa.');
+        var f = maiorFornecedor(ficha);
+        if (f && f[1] != null && f[1] >= (CR.umFornecedor || 25)) a.push(pctC(f[1]) + ' para um fornecedor só, na legislatura inteira: ' + (f[0].nome || '') + '.');
+        return a.slice(0, CR.antes || 3);
+      }
+      function comQuem(ficha) {  // os três maiores fornecedores e o que a Casa recusou, da ficha (a legislatura inteira)
+        var c = ficha && ficha.cota, nos = [];
+        if (!c) return nos;
+        var total = c.leg ? c.leg.total : 0, tres = (c.fornecedores || []).filter(function (x) { return x.valor > 0; }).slice(0, 3);
+        if (tres.length) {
+          nos.push(h('h5', { cls: 'cg-pa-c-h', text: 'Com quem, na legislatura inteira' }));
+          nos.push(h('ol', { cls: 'cg-co-c-f' }, tres.map(function (x) {
+            return h('li', {}, [h('span', { text: x.nome }), h('b', { text: reaisS(x.valor) + (total > 0 ? ' · ' + pctC(r1(100 * x.valor / total)) : '') })]);
+          })));
+        }
+        if (c.glosa && c.glosa.valor > 0) nos.push(h('p', { cls: 'cg-pa-c-o', text: 'A Casa recusou ' + reaisC(c.glosa.valor) + ' em ' + num(c.glosa.n) + (c.glosa.n === 1 ? ' nota' : ' notas') + ', na legislatura inteira.' }));
+        return nos;
+      }
+      function renderCartao() {
+        var p = focoAtual(), minha = ++vezFicha;
+        esvaziar(card);
+        if (!p) {
+          card.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Nenhum ' + UM + ' deste recorte entra no gráfico neste período.' }));
+          return;
+        }
+        var origem = !S.k || !D.por[S.k] ? 'o ' + UM + ' do meio' + (R.comGrupo ? ' do grupo' : '') : !p.ex ? 'fora do exercício: não entra no gráfico' : !p.ponto ? 'fora do gráfico neste período' : !p.gr ? 'fora do grupo escolhido' : 'escolhido';
+        var posicao = '';
+        if (p.ponto) {
+          posicao = num(p.pos) + 'º de ' + num(R.ord.length);
+          if (casa === 'cd' && p.uf) {
+            var naUf = R.ord.filter(function (x) { return x.uf === p.uf; }), acima = naUf.filter(function (x) { return x.v > p.v; }).length;
+            posicao += ' · ' + num(acima + 1) + 'º de ' + num(naUf.length) + ' ' + emUf(p.uf);
+          }
+        }
+        card.appendChild(h('p', { cls: 'cg-co-c-k' }, [h('i', { cls: 'cg-co-bola', 'aria-hidden': 'true' }), h('b', { text: 'Em foco' }), h('span', { text: origem }), posicao ? h('span', { cls: 'cg-co-c-pos', text: posicao }) : null]));
+        card.appendChild(h('p', { cls: 'cg-co-c-n' }, [h('a', { cls: 'cg-p', href: '#p=' + p.k, 'data-k': p.k, text: p.nome }), ' ', h('small', { text: legenda(p) })]));
+        var com = S.cat >= 0 ? minusc(catCurto()) : '';
+        card.appendChild(h('p', { cls: 'cg-co-c-v' }, [h('b', { text: reaisS(p.v) }), ' por mês com ' + (com || 'despesa')]));
+        card.appendChild(h('p', { cls: 'cg-co-c-r', text: com
+          ? reaisS(p.val / 100) + ' com ' + com + ' no período; no total, ' + reaisS(p.tot / 100) + ', em ' + mesesDe(p)
+          : reaisS(p.tot / 100) + ' no período, em ' + mesesDe(p) }));
+        var caixaAntes = h('div');
+        card.appendChild(caixaAntes);
+        function porAntes(ficha) {
+          var frases = antesDeComparar(p, ficha);
+          esvaziar(caixaAntes);
+          if (!frases.length) return;
+          caixaAntes.appendChild(h('h5', { cls: 'cg-pa-c-h', text: 'Antes de comparar' }));
+          caixaAntes.appendChild(h('ul', { cls: 'cg-co-c-a' }, frases.map(function (t) { return h('li', { text: t }); })));
+        }
+        /* Com o quê: as maiores despesas da pessoa na janela; o risco é a parte da mesma despesa na Casa. */
+        var cats = despesasDe(p), nb = CR.cartaoBarras || 4;
+        if (cats.length) {
+          card.appendChild(h('h5', { cls: 'cg-pa-c-h' }, ['Com o quê ', h('b', { text: 'parte do total · o risco é a parte ' + NA_CASA })]));
+          var linhasCat = cats.slice(0, nb).map(function (x) {
+            var naCasa = R.casaAll > 0 ? r1(100 * R.casaCat[x[0]] / R.casaAll) : null;
+            var cheio = h('i'), risco = naCasa != null ? h('u') : null;
+            cheio.style.width = limitar(x[2] || 0, 0, 100).toFixed(2) + '%';
+            if (risco) risco.style.left = limitar(naCasa, 0, 100).toFixed(2) + '%';
+            return h('li', {}, [
+              h('span', { cls: 'cg-co-bn', text: D.cats[x[0]].curto }),
+              h('span', { cls: 'cg-co-bv' }, [x[1] < 0 ? reaisS(x[1] / 100) + ' (devoluções)' : (x[2] != null ? pctC(x[2]) + ' · ' : '') + reaisS(x[1] / 100), naCasa != null ? h('span', { cls: 'sr-only', text: ' (na Casa: ' + pctC(naCasa) + ')' }) : null]),
+              h('span', { cls: 'cg-co-bb', 'aria-hidden': 'true' }, [cheio, risco])
+            ]);
+          });
+          var resto = cats.slice(nb);
+          if (resto.length) {
+            var soma = 0;
+            resto.forEach(function (x) { soma += x[1]; });
+            var parte = p.tot > 0 ? 100 * soma / p.tot : null, cheioR = h('i');
+            cheioR.style.width = limitar(parte || 0, 0, 100).toFixed(2) + '%';
+            linhasCat.push(h('li', {}, [
+              h('span', { cls: 'cg-co-bn', text: 'outras ' + num(resto.length) }),
+              h('span', { cls: 'cg-co-bv', text: soma < 0 ? reaisS(soma / 100) + ' (devoluções)' : (parte != null ? pctC(parte) + ' · ' : '') + reaisS(soma / 100) }),
+              h('span', { cls: 'cg-co-bb', 'aria-hidden': 'true' }, [cheioR])
+            ]));
+          }
+          card.appendChild(h('ul', { cls: 'cg-co-c-b' }, linhasCat));
+        }
+        /* Mês a mês: todos os meses; os do período em cor, os de fora em cinza. */
+        var serie = [], maximo = 0, maiorMes = -1;
+        for (var m = 0; m < D.nm; m++) {
+          var v = (S.cat < 0 ? p.mes[m] : p.cubo[S.cat * D.nm + m]) / 100;
+          serie.push(v);
+          if (v > maximo) { maximo = v; maiorMes = m; }
+        }
+        card.appendChild(h('h5', { cls: 'cg-pa-c-h' }, ['Mês a mês ', h('b', { text: 'R$ em cada mês' + (com ? ', com ' + com : '') })]));
+        card.appendChild(h('div', { cls: 'cg-co-mini', role: 'img', 'aria-label': maiorMes >= 0 ? 'Despesa mês a mês, de ' + mesBr(D.meses[0]) + ' a ' + mesBr(D.meses[D.nm - 1]) + '; maior em ' + mesBr(D.meses[maiorMes]) + ', ' + reaisC(maximo) + '.' : 'Despesa mês a mês.' }, serie.map(function (x, i) {
+          var el = h('i', { cls: ((i >= D.nm - D.recentes ? 'cg-co-r' : '') + (i >= S.i0 && i <= S.i1 ? '' : ' cg-co-off')).trim() || null });
+          el.style.height = (maximo > 0 && x > 0 ? r1(100 * x / maximo) : 0) + '%';
+          return el;
+        })));
+        card.appendChild(h('p', { cls: 'cg-co-mini-x', 'aria-hidden': 'true' }, [h('span', { text: mesBr(D.meses[0]) }), h('span', { text: mesBr(D.meses[D.nm - 1]) })]));
+        var caixaQuem = h('div', { cls: 'cg-co-c-q' });
+        card.appendChild(caixaQuem);
+        card.appendChild(h('p', { cls: 'cg-pa-c-l' }, [h('a', { cls: 'cg-p', href: '#p=' + p.k, 'data-k': p.k, text: 'Abrir o dossiê' })]));
+        /* Com quem: da ficha da pessoa (o mesmo arquivo do dossiê). Até chegar, o que veio no HTML ou "Carregando…". */
+        var chegou = false;
+        fichaDe(p.k, function (erro, ficha) {
+          chegou = true;
+          if (minha !== vezFicha) return;
+          esvaziar(caixaQuem);
+          if (erro || !ficha) { porAntes(null); caixaQuem.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Não foi possível abrir os fornecedores agora.' })); return; }
+          porAntes(ficha);
+          comQuem(ficha).forEach(function (no) { caixaQuem.appendChild(no); });
+        });
+        if (!chegou) {
+          porAntes(null);
+          if (p.k === doHtml.k) doHtml.nos.forEach(function (no) { caixaQuem.appendChild(no.cloneNode(true)); });
+          else caixaQuem.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Carregando…' }));
+        }
+      }
+      function atualizarPasso() {
+        var f = focoAtual(), g = R.grPts, i = f ? g.indexOf(f) : -1;
+        ant.disabled = !g.length || i === 0 || (i < 0 && f && !g.some(function (x) { return x.pm < f.pm; }));
+        prox.disabled = !g.length || i === g.length - 1 || (i < 0 && f && !g.some(function (x) { return x.pm > f.pm; }));
+        texto(posEl, !f ? '' : f.ponto ? num(f.pos) + 'º de ' + num(R.ord.length) : 'fora do gráfico');
+      }
+      function passoFoco(delta) {  // anda pelos pontos do recorte, por valor
+        var g = R.grPts, f = focoAtual();
+        if (!g.length) return null;
+        var i = f ? g.indexOf(f) : -1, alvo;
+        if (i >= 0) alvo = limitar(i + delta, 0, g.length - 1);
+        else if (f && delta < 0) { alvo = -1; g.forEach(function (x, j) { if (x.pm < f.pm) alvo = j; }); if (alvo < 0) alvo = 0; }
+        else if (f) { alvo = g.length - 1; for (var j = g.length - 1; j >= 0; j--) if (g[j].pm > f.pm) alvo = j; }
+        else alvo = delta > 0 ? 0 : g.length - 1;
+        if (g[alvo] !== f) focar(g[alvo].k);
+        return g[alvo];
+      }
+
+      /* ── As pontas e a tabela de todos ── */
+      function extraDe(p) {
+        var partes = [];
+        if (S.cat >= 0) partes.push(reaisS(p.val / 100) + ' com ' + minusc(catCurto()) + ' no período');
+        partes.push((S.cat >= 0 ? 'no total, ' : '') + reaisS(p.tot / 100) + ' em ' + mesesDe(p));
+        var f = S.cat < 0 ? foraDaConta(p, true) : '';
+        if (f) partes.push(f);
+        return partes.join(' · ');
+      }
+      function maiorDe(p) {  // "Escritório · 49%"
+        var cats = despesasDe(p);
+        return cats.length ? D.cats[cats[0][0]].curto + (cats[0][2] != null ? ' · ' + pctC(cats[0][2]) : '') : '';
+      }
+      function doMaiorParaOMenor(a, b) { return a.pos - b.pos || b.v - a.v || cmpNome(a, b); }
+      function linkDe(p) { return h('a', { cls: 'cg-p', href: '#p=' + p.k, 'data-k': p.k, text: p.nome }); }
+      function itemDaPonta(p, f) {
+        return h('li', { 'data-p': p.k, cls: p === f ? 'cg-co-f' : null }, [
+          h('span', { cls: 'cg-co-pn' }, [linkDe(p), ' ', h('small', { text: legenda(p) })]),
+          h('span', { cls: 'cg-co-pv' }, [h('b', { text: reaisS(p.v) }), ' por mês']),
+          h('span', { cls: 'cg-co-px', text: extraDe(p) })
+        ]);
+      }
+      function renderPontas() {
+        var linhasP = R.grPts.slice().sort(doMaiorParaOMenor), n = linhasP.length, f = focoAtual();
+        var uma = n <= (CR.pontasUma || 20), k = CR.pontas || 10;
+        function listaDe(titulo, itens, nome) {
+          return h('div', { cls: 'cg-co-pl', 'data-lista': nome }, [h('h5', { cls: 'az-h5', text: titulo }), h('ol', {}, itens.map(function (p) { return itemDaPonta(p, f); }))]);
+        }
+        esvaziar(blocoPontas);
+        blocoPontas.className = 'cg-co-pls' + (uma ? ' cg-co-pl1' : '');
+        if (!n) blocoPontas.appendChild(h('p', { cls: 'cg-co-pv0', text: 'Nenhum ' + UM + ' deste recorte entra no gráfico neste período.' }));
+        else if (uma) blocoPontas.appendChild(listaDe(n === 1 ? 'O único do recorte' : 'Todos os ' + num(n) + ', do que mais gasta ao que menos gasta', linhasP, 'mais'));
+        else {
+          blocoPontas.appendChild(listaDe('Os ' + k + ' que mais gastam', linhasP.slice(0, k), 'mais'));
+          blocoPontas.appendChild(listaDe('Os ' + k + ' que menos gastam', linhasP.slice(n - k).reverse(), 'menos'));
+        }
+        texto(tit.pontas.el, unidade() + ', ' + deJanela() + (R.comGrupo ? ' · ' + grupoTxt() : ''));
+        if (cabTodos) texto(cabTodos, (R.comGrupo ? 'Os ' + num(n) + ' do grupo' : 'Todos os ' + num(n)) + ', em tabela');
+        if (tabTodos) { tabTodos.hidden = !n; if (tabTodos.open) tabelaTodos(); else sujo.todos = true; }
+      }
+      function tabelaTodos() {
+        sujo.todos = false;
+        var corpo = tabTodos.querySelector('tbody'), cab = tabTodos.querySelector('thead');
+        if (!corpo) return;
+        var f = focoAtual(), chave = ordTab.chave, sinal = ordTab.sobe ? 1 : -1;
+        var linhasT = R.grPts.slice().sort(doMaiorParaOMenor);
+        if (chave !== 'pos' || !ordTab.sobe) {
+          linhasT.forEach(function (p) { p.mc = chave === 'cat' ? maiorDe(p) : ''; });
+          linhasT.sort(function (a, b) {
+            var x = chave === 'nome' ? cmpNome(a, b) : chave === 'leg' ? (legenda(a) < legenda(b) ? -1 : legenda(a) > legenda(b) ? 1 : 0) : chave === 'cat' ? (a.mc < b.mc ? -1 : a.mc > b.mc ? 1 : 0)
+              : chave === 'v' ? a.pm - b.pm : chave === 'm' ? a.nmes - b.nmes : chave === 't' ? a.tot - b.tot : a.pos - b.pos;
+            return sinal * x || doMaiorParaOMenor(a, b);
+          });
+        }
+        if (cab) {
+          lista(cab.querySelectorAll('th[data-ord]')).forEach(function (th) {
+            if (th.getAttribute('data-ord') === chave) th.setAttribute('aria-sort', ordTab.sobe ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort');
+            if (th.getAttribute('data-ord') === 'v') texto(th, 'R$ por mês com ' + (S.cat >= 0 ? minusc(catCurto()) : 'despesa'));
+          });
+        }
+        esvaziar(corpo);
+        linhasT.forEach(function (p) {
+          corpo.appendChild(h('tr', { 'data-p': p.k, cls: p === f ? 'cg-co-f' : null }, [
+            h('td', { text: num(p.pos) + 'º' }), h('th', { scope: 'row' }, [linkDe(p)]), h('td', { text: legenda(p) }), h('td', { text: reaisS(p.v) }),
+            h('td', { text: num(p.nmes) + ' de ' + num(R.nW) }), h('td', { text: reaisS(p.tot / 100) }), h('td', { text: maiorDe(p) })
+          ]));
+        });
+      }
+      function marcarLinhas() {
+        var f = focoAtual(), k = f ? f.k : '';
+        lista(bloco.querySelectorAll('.cg-co-pl li, .cg-co-tt tbody tr')).forEach(function (el) { el.classList.toggle('cg-co-f', !!k && el.getAttribute('data-p') === k); });
+      }
+
+      /* ── Os filtros ── */
+      var selDe = form.querySelector('[data-f="de"]'), selAte = form.querySelector('[data-f="ate"]'), selCat = form.querySelector('[data-f="cat"]');
+      var selUf = form.querySelector('[data-f="uf"]'), selPt = form.querySelector('[data-f="pt"]'), pers = form.querySelector('.cg-co-pers');
+      var limpar = form.querySelector('.cg-co-limpa'), mob = form.querySelector('.cg-co-mob'), botoesG = lista(form.querySelectorAll('[data-g]'));
+      function opcoes(sel, pares) { pares.forEach(function (x) { sel.appendChild(h('option', { value: x[0], text: x[1] })); }); }
+      function montarFiltros() {
+        var anos = {}, ordem = [], ufs = {}, pts_ = {}, totalCat = zeros(D.nc);
+        D.meses.forEach(function (am, i) {
+          var a = am.slice(0, 4);
+          if (!anos[a]) { anos[a] = [i, i]; ordem.push(a); } else anos[a][1] = i;
+        });
+        ordem.forEach(function (a) { pers.appendChild(h('button', { type: 'button', cls: 'cg-pa-f', 'data-per': anos[a][0] + ':' + anos[a][1], 'aria-pressed': 'false', text: a })); });
+        var n12 = Math.min(12, D.nm);
+        if (D.nm > n12) pers.appendChild(h('button', { type: 'button', cls: 'cg-pa-f', 'data-per': (D.nm - n12) + ':' + (D.nm - 1), 'aria-pressed': 'false', text: 'Últimos ' + n12 + ' meses' }));
+        var meses = D.meses.map(function (am, i) { return [String(i), mesBr(am)]; });
+        opcoes(selDe, meses); opcoes(selAte, meses);
+        D.P.forEach(function (p) {
+          for (var c = 0; c < D.nc; c++) for (var m = 0; m < D.nm; m++) totalCat[c] += p.cubo[c * D.nm + m];
+          if (!p.ex) return;
+          if (p.uf) ufs[p.uf] = 1;
+          if (p.pt) pts_[p.pt] = 1;
+        });
+        opcoes(selCat, D.cats.filter(function (c, i) { return totalCat[i] > 0; }).map(function (c) { return [c.id, c.curto]; }));
+        opcoes(selUf, Object.keys(ufs).sort().map(function (x) { return [x, x]; }));
+        opcoes(selPt, Object.keys(pts_).sort().map(function (x) { return [x, x]; }));
+      }
+      function renderFiltros() {
+        var chave = S.i0 + ':' + S.i1, inteira = S.i0 === 0 && S.i1 === D.nm - 1;
+        lista(pers.querySelectorAll('button')).forEach(function (b) {
+          var per = b.getAttribute('data-per');
+          b.setAttribute('aria-pressed', (per === 'leg' ? inteira : !inteira && per === chave) ? 'true' : 'false');
+        });
+        selDe.value = String(S.i0); selAte.value = String(S.i1);
+        selCat.value = S.cat >= 0 ? D.cats[S.cat].id : '';
+        selUf.value = S.uf; selPt.value = S.pt;
+        botoesG.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-g') === S.g ? 'true' : 'false'); });
+        if (limpar) limpar.hidden = !temFiltro();
+      }
+
+      /* ── O endereço ── */
+      function endereco() {
+        var q = '';
+        if (S.i0 !== 0 || S.i1 !== D.nm - 1) q += '&de=' + D.meses[S.i0] + '&ate=' + D.meses[S.i1];
+        if (S.cat >= 0) q += '&cat=' + D.cats[S.cat].id;
+        if (S.uf) q += '&uf=' + S.uf;
+        if (S.pt) q += '&pt=' + encodeURIComponent(S.pt);
+        if (S.g) q += '&g=' + S.g;
+        if (S.k && D.por[S.k]) q += '&k=' + S.k;
+        return '#v=cota' + (q || casa !== 'cd' ? '&c=' + casa : '') + q;
+      }
+      function visivel() { return !casas || casas.hidden || root.getAttribute('data-ver') === casa; }
+      function gravar() {
+        if (!D || vistaAtual !== 'cota' || aberto || !w.history || !w.history.replaceState || !visivel()) return;
+        if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
+      }
+      function doEndereco(p) {
+        if (!D) { pendente = p; return; }
+        var i0 = D.meses.indexOf(p.de || ''), i1 = D.meses.indexOf(p.ate || '');
+        if (i0 < 0) i0 = 0;
+        if (i1 < 0) i1 = D.nm - 1;
+        if (i0 > i1) { var troca = i0; i0 = i1; i1 = troca; }
+        S.i0 = i0; S.i1 = i1;
+        S.cat = p.cat && D.catPorId[p.cat] != null ? D.catPorId[p.cat] : -1;
+        S.uf = p.uf && lista(selUf.options).some(function (o) { return o.value === p.uf; }) ? p.uf : '';
+        S.pt = p.pt && lista(selPt.options).some(function (o) { return o.value === p.pt; }) ? p.pt : '';
+        S.g = p.g === 'menos' || p.g === 'mais' ? p.g : '';
+        S.k = p.k && D.por[p.k] ? p.k : '';
+        mudou(true);
+      }
+
+      /* ── Tudo de novo: um filtro mudou. O foco muda só o cartão e as marcas. ── */
+      function mudou(semEndereco) {
+        calcular();
+        renderFiltros();
+        renderFrase();
+        renderNumeros();
+        renderQuando();
+        renderOque();
+        renderQuem();
+        renderCartao();
+        atualizarPasso();
+        renderPontas();
+        if (!semEndereco) gravar();
+      }
+      function focar(k, semEndereco) {
+        S.k = k && D.por[k] ? k : '';
+        marcarFoco();
+        renderCartao();
+        atualizarPasso();
+        marcarLinhas();
+        if (!semEndereco) gravar();
+      }
+      function rolarAte(el) {
+        if (!el || !barraFixa) return;
+        var topo = w.pageYOffset + el.getBoundingClientRect().top - barraFixa.offsetHeight - ve.offsetHeight - 10;
+        try { w.scrollTo({ top: Math.max(0, topo), behavior: semMovimento ? 'auto' : 'smooth' }); } catch (erro) { w.scrollTo(0, Math.max(0, topo)); }
+      }
+      function medirTopo() { if (barraFixa) root.style.setProperty('--cg-topo', barraFixa.offsetHeight + 'px'); }
+
+      /* ── Os controles (ligados uma vez, quando o arquivo chega) ── */
+      function ligar() {
+        /* O limite mensal por estado só existe no HTML se a tabela conferida estiver no arquivo de escolhas, e este script
+           não refaz essa conta para outro período: ao assumir, tira as marcas estáticas dela (a coluna, o colchete, a frase). */
+        lista(bloco.querySelectorAll('.cg-co-a th[data-ord="lim"], .cg-co-a .cg-co-lim, .cg-co-a .cg-co-lim-t')).forEach(function (el) { el.parentNode.removeChild(el); });
+        form.addEventListener('submit', function (ev) { ev.preventDefault(); });
+        pers.addEventListener('click', function (ev) {
+          var b = ev.target.closest ? ev.target.closest('button[data-per]') : null;
+          if (!b) return;
+          var per = b.getAttribute('data-per').split(':');
+          if (per.length === 2) { S.i0 = parseInt(per[0], 10); S.i1 = parseInt(per[1], 10); } else { S.i0 = 0; S.i1 = D.nm - 1; }
+          mudou();
+        });
+        selDe.addEventListener('change', function () { S.i0 = parseInt(selDe.value, 10) || 0; if (S.i0 > S.i1) S.i1 = S.i0; mudou(); });
+        selAte.addEventListener('change', function () { S.i1 = parseInt(selAte.value, 10) || 0; if (S.i1 < S.i0) S.i0 = S.i1; mudou(); });
+        selCat.addEventListener('change', function () { S.cat = selCat.value && D.catPorId[selCat.value] != null ? D.catPorId[selCat.value] : -1; mudou(); });
+        selUf.addEventListener('change', function () { S.uf = selUf.value; mudou(); });
+        selPt.addEventListener('change', function () { S.pt = selPt.value; mudou(); });
+        botoesG.forEach(function (b) { b.addEventListener('click', function () { var g = b.getAttribute('data-g'); S.g = S.g === g ? '' : g; mudou(); }); });
+        if (limpar) limpar.addEventListener('click', function () { limparTudo(); mudou(); });
+        if (mob) mob.addEventListener('click', function () { mob.setAttribute('aria-expanded', mob.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'); });
+        /* No celular, a frase grudada leva o botão que abre os filtros. */
+        var mudar = h('button', { type: 'button', cls: 'cg-co-mudar', text: 'Mudar' });
+        mudar.addEventListener('click', function () {
+          if (mob) mob.setAttribute('aria-expanded', 'true');
+          var topo = w.pageYOffset + form.getBoundingClientRect().top - (barraFixa ? barraFixa.offsetHeight : 0) - 8;
+          w.scrollTo(0, Math.max(0, topo));
+          if (mob) mob.focus();
+        });
+        ve.appendChild(mudar);
+
+        /* Os números: o segundo leva ao gráfico, com o do meio em foco; o terceiro liga e desliga a despesa. */
+        nQuem.addEventListener('click', function () { focar(''); rolarAte(bloco.querySelector('.cg-co-qm')); });
+        nOque.addEventListener('click', function () {
+          var c = D.catPorId[nOque.getAttribute('data-cat')];
+          S.cat = S.cat >= 0 || c == null ? -1 : c;
+          mudou();
+        });
+        /* Com o quê: cada linha escolhe a despesa; de novo, desmarca. */
+        oq.addEventListener('click', function (ev) {
+          var b = ev.target.closest ? ev.target.closest('.cg-co-b') : null, c = b ? D.catPorId[b.getAttribute('data-cat')] : null;
+          if (c == null || (b.hasAttribute('data-neg') && S.cat !== c)) return;
+          S.cat = S.cat === c ? -1 : c;
+          mudou();
+        });
+
+        /* Quando: a dica da coluna sob o ponteiro; o clique escolhe o mês; as setas andam pelos meses. */
+        pq.setAttribute('tabindex', '0');
+        pq.setAttribute('role', 'group');
+        pq.setAttribute('aria-label', 'Gráfico: quanto foi reembolsado em cada mês. As setas andam pelos meses; Enter mostra só o mês escolhido; Esc volta à legislatura.');
+        pq.addEventListener('pointermove', function (ev) { if (ev.pointerType !== 'touch') { var m = mesDoPonteiro(ev); if (m !== cursorMes) cursorNoMes(m); } });
+        pq.addEventListener('pointerleave', function () { cursorNoMes(-1); });
+        pq.addEventListener('blur', function () { cursorNoMes(-1); });
+        pq.addEventListener('click', function (ev) { var m = mesDoPonteiro(ev); if (m >= 0) { escolherMes(m); if (ev.pointerType === 'touch') cursorNoMes(-1); } });
+        pq.addEventListener('keydown', function (ev) {
+          var atual = cursorMes >= 0 ? cursorMes : S.i1;
+          if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') { ev.preventDefault(); cursorNoMes(cursorMes < 0 ? atual : limitar(atual + (ev.key === 'ArrowRight' ? 1 : -1), 0, D.nm - 1)); }
+          else if (ev.key === 'Home') { ev.preventDefault(); cursorNoMes(0); }
+          else if (ev.key === 'End') { ev.preventDefault(); cursorNoMes(D.nm - 1); }
+          else if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); escolherMes(atual); cursorNoMes(atual); }
+          else if (ev.key === 'Escape' && (S.i0 !== 0 || S.i1 !== D.nm - 1)) { ev.stopPropagation(); S.i0 = 0; S.i1 = D.nm - 1; mudou(); cursorNoMes(-1); }
+        });
+
+        /* Quem: a dica do ponto mais perto; o clique põe em foco (não abre o dossiê); as setas andam por valor. */
+        pp.setAttribute('tabindex', '0');
+        pp.setAttribute('role', 'group');
+        pp.addEventListener('pointermove', function (ev) {
+          if (ev.pointerType === 'touch') return;
+          var p = maisPerto(ev, 14);
+          if (!p) { apagarDicaDoPonto(); return; }
+          if (p !== sobre) {
+            if (sobre && els[sobre.k]) els[sobre.k].classList.remove('on');
+            sobre = p;
+            els[p.k].classList.add('on');
+          }
+          dicaDoPonto(p);
+        });
+        pp.addEventListener('pointerleave', apagarDicaDoPonto);
+        pp.addEventListener('blur', apagarDicaDoPonto);
+        pp.addEventListener('click', function (ev) { var p = maisPerto(ev, 20); if (p) { focar(p.k); if (sobre) dicaDoPonto(sobre); } });
+        function teclas(ev) {
+          if (ev.target && ev.target.closest && ev.target.closest('a, select, input, button, summary')) return;
+          var delta = ev.key === 'ArrowRight' || ev.key === 'ArrowUp' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowDown' ? -1 : ev.key === 'Home' ? -1e6 : ev.key === 'End' ? 1e6 : 0;
+          if (delta) {
+            ev.preventDefault();
+            var p = passoFoco(delta);
+            if (p && ev.currentTarget === pp) { apagarDicaDoPonto(); dicaDoPonto(p); }
+          } else if (ev.key === 'Enter' && ev.currentTarget === pp) { var f = focoAtual(); if (f) { ev.preventDefault(); abrir(f.k); } }
+          else if (ev.key === 'Escape' && S.k) { ev.stopPropagation(); focar(''); apagarDicaDoPonto(); }
+        }
+        pp.addEventListener('keydown', teclas);
+        card.addEventListener('keydown', teclas);
+        navEl.hidden = false;
+        ant.addEventListener('click', function () { passoFoco(-1); });
+        prox.addEventListener('click', function () { passoFoco(1); });
+
+        /* Achar um nome: escolhe o foco (não filtra). */
+        if (acharF) {
+          var campo = acharF.querySelector('input'), nomes = acharF.querySelector('datalist');
+          if (nomes) D.P.slice().sort(cmpNome).forEach(function (p) { nomes.appendChild(h('option', { value: p.nome, label: legenda(p) + (p.ex ? '' : ' · fora do exercício') })); });
+          acharF.hidden = false;
+          var achar = function () {
+            var alvo = semAcento(campo.value || '').replace(/[^a-z0-9&]+/g, ' ').trim(), exato = null, parcial = null;
+            if (!alvo) return;
+            D.P.forEach(function (p) { if (p.b === alvo && !exato) exato = p; else if (!parcial && p.b.indexOf(alvo) >= 0) parcial = p; });
+            if (exato || parcial) { focar((exato || parcial).k); rolarAte(bloco.querySelector('.cg-co-qm')); }
+          };
+          acharF.addEventListener('submit', function (ev) { ev.preventDefault(); achar(); });
+          campo.addEventListener('change', achar);
+        }
+
+        /* As pontas e a tabela: o clique na linha (fora do nome) põe em foco. */
+        function cliqueNaLinha(ev) {
+          if (ev.target.closest && ev.target.closest('a, button, summary, th[data-ord]')) return;
+          var el = ev.target.closest ? ev.target.closest('[data-p]') : null;
+          if (el && D.por[el.getAttribute('data-p')]) focar(el.getAttribute('data-p'));
+        }
+        blocoPontas.addEventListener('click', cliqueNaLinha);
+        if (tabTodos) {
+          tabTodos.addEventListener('click', cliqueNaLinha);
+          tabTodos.addEventListener('toggle', function () { if (tabTodos.open && sujo.todos) tabelaTodos(); });
+          var cab = tabTodos.querySelector('thead');
+          if (cab) cab.addEventListener('click', function (ev) {
+            var th = ev.target.closest ? ev.target.closest('th[data-ord]') : null;
+            if (!th) return;
+            var chave = th.getAttribute('data-ord'), sobeDeInicio = chave === 'nome' || chave === 'leg' || chave === 'cat' || chave === 'pos';
+            ordTab = { chave: chave, sobe: ordTab.chave === chave ? !ordTab.sobe : sobeDeInicio };
+            tabelaTodos();
+          });
+        }
+        if (tabMeses) tabMeses.addEventListener('toggle', function () { if (tabMeses.open && sujo.meses) tabelaMeses(); });
+
+        /* A largura mudou: os pontos se reempilham. */
+        var espera = 0;
+        w.addEventListener('resize', function () {
+          w.clearTimeout(espera);
+          espera = w.setTimeout(function () { medirTopo(); seALarguraMudou(); }, 150);
+        });
+        /* No celular, os três últimos blocos de "Para conferir" começam fechados (a contagem fica no título). */
+        if (w.matchMedia && w.matchMedia('(max-width:760px)').matches) {
+          var alvo = (w.location.hash || '').slice(1);
+          lista(bloco.querySelectorAll('.cg-co-zd')).forEach(function (det, i) { if (i && !(alvo && det.id === alvo)) det.open = false; });
+        }
+      }
+
+      function falha() {
+        falhou = true;
+        if (falhaEl) falhaEl.hidden = false;
+      }
+      var desenhado = false;
+      /* Os pontos são empilhados para a largura do gráfico. Se ela mudou (a janela, o celular deitado), inclusive
+         enquanto outra aba ou a outra Casa estava na tela, eles se reempilham; senão a dica e o clique errariam o ponto. */
+      function seALarguraMudou() {
+        if (D && R && qm && pp.clientWidth && pp.clientWidth !== qm.W) renderQuem();
+      }
+      function abrirCota() {
+        medirTopo();
+        if (D) {
+          /* A aba pode ter chegado antes de aparecer (largura zero): os pontos se desenham de novo agora. */
+          if (!desenhado && pp.clientWidth) { desenhado = true; mudou(true); } else seALarguraMudou();
+          gravar();
+          return;
+        }
+        if (carregando || falhou) return;
+        if (!M.cotaArq || !w.Int32Array) { falha(); return; }
+        carregando = true;
+        buscar(M.cotaArq + casa + '.json', function (erro, x) {
+          carregando = false;
+          if (erro || !x || x.v !== CR.v || !x.meses || !x.meses.length || !x.pessoas || !x.cats || x.meses.length !== cols.length) { falha(); return; }
+          try {
+            preparar(x);
+            montarFiltros();
+            ligar();
+            form.hidden = false;
+            bloco.classList.add('cg-co-on');
+            desenhado = !!pp.clientWidth;
+            if (pendente) { var p = pendente; pendente = null; doEndereco(p); } else mudou(true);
+            gravar();
+          } catch (falhaDoScript) {
+            if (w.console && w.console.error) w.console.error(falhaDoScript);
+            D = null;
+            form.hidden = true;
+            bloco.classList.remove('cg-co-on');
+            falha();
+          }
+        });
+      }
+      cotaDaCasa[casa] = { abrir: abrirCota, doEndereco: doEndereco };
+    });
+  })();
+  aoAbrirVista.cota = function () {
+    var ver = casas && !casas.hidden ? root.getAttribute('data-ver') : '';
+    Object.keys(cotaDaCasa).forEach(function (casa) { if (!ver || ver === casa) cotaDaCasa[casa].abrir(); });
+  };
+  /* #v=cota&c=cd&de=2025-01&ate=2025-12&cat=divulgacao&uf=SP&pt=PL&g=menos&k=cd-204536: a Casa, o período, os filtros e a pessoa em foco. */
+  aoEndereco.cota = function (q) {
+    var p = {}, algum = false;
+    (q || '').split('&').forEach(function (par) {
+      var i = par.indexOf('=');
+      if (i > 0) { try { p[par.slice(0, i)] = decodeURIComponent(par.slice(i + 1)); algum = true; } catch (erro) { /* parâmetro malformado: ignorado */ } }
+    });
+    if (!algum) return;
+    var casa = p.c === 'sf' || (!p.c && /^sf-/.test(p.k || '')) ? 'sf' : p.c === 'cd' || /^cd-/.test(p.k || '') ? 'cd' : (casas && !casas.hidden && root.getAttribute('data-ver')) || 'cd';
+    if (!cotaDaCasa[casa]) return;
+    if (casas && !casas.hidden && root.getAttribute('data-ver') !== casa) verCasa(casa);
+    cotaDaCasa[casa].doEndereco(p);
+  };

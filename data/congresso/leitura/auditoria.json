@@ -1,0 +1,127 @@
+{
+ "data": "2026-11-16",
+ "o_que_e": "O que se mediu sobre a leitura dos projetos por IA. Mede a constância entre leitores de IA; não foi conferida contra codificação feita por pessoas.",
+ "lidas": 40106,
+ "leitores": {
+  "primeira": "o modelo de IA mais barato da família leu todas as proposições, às cegas (sem número, autor, partido nem origem), em lotes por tema",
+  "segunda": "um modelo intermediário releu, sem ver a primeira leitura, o que a primeira pôs no topo da régua e as matérias votadas",
+  "terceira": "o modelo mais forte leu, sem ver as outras duas, só o que as duas primeiras puseram em faixas diferentes; vale a faixa em que dois dos três caíram"
+ },
+ "controles": {
+  "o_que_e": "Em cada lote da primeira leitura iam escondidas 10 proposições que o modelo mais forte e o intermediário já tinham lido e classificado igual. A nota do lote é em quantas delas o leitor caiu na mesma faixa; lote abaixo de 7 em 10 foi relido.",
+  "lotes": 263,
+  "perguntas": 2630,
+  "mesma_faixa": 2361,
+  "mesma_faixa_pct": 89.8,
+  "campos_iguais_pct": 91.0,
+  "lotes_relidos": 5
+ },
+ "piloto": {
+  "o_que_e": "Concordância entre dois leitores de IA independentes, lendo as mesmas ementas às cegas com a mesma régua (piloto de 16/11/2026). Mede constância entre leitores; não foi conferida contra codificação humana.",
+  "amostra": 334,
+  "composicao": "150 proposições ao acaso; 90 PLP e PEC; 60 matérias votadas; 34 ao acaso",
+  "por_campo": {
+   "alavanca": {
+    "igual_pct": 91,
+    "kappa": 0.89
+   },
+   "escopo": {
+    "igual_pct": 87,
+    "kappa": 0.73
+   },
+   "mecanismo": {
+    "igual_pct": 83,
+    "kappa": 0.79
+   },
+   "custo": {
+    "igual_pct": 84,
+    "kappa": 0.79
+   },
+   "contas": {
+    "igual_pct": 86,
+    "kappa": 0.77
+   },
+   "isonomia": {
+    "igual_pct": 88,
+    "kappa": 0.7
+   },
+   "controle": {
+    "igual_pct": 94,
+    "kappa": 0.77
+   }
+  },
+  "faixa": {
+   "igual_pct": 82,
+   "kappa": 0.74
+  },
+  "depois_do_ajuste_das_instrucoes": {
+   "amostra": 184,
+   "composicao": "a parte mais difícil: PLP, PEC e matérias votadas",
+   "faixa": {
+    "igual_pct": 84,
+    "kappa": 0.77
+   },
+   "por_campo": {
+    "alavanca": {
+     "igual_pct": 92,
+     "kappa": 0.9
+    },
+    "escopo": {
+     "igual_pct": 88,
+     "kappa": 0.79
+    },
+    "mecanismo": {
+     "igual_pct": 78,
+     "kappa": 0.72
+    },
+    "contas": {
+     "igual_pct": 79,
+     "kappa": 0.69
+    },
+    "isonomia": {
+     "igual_pct": 85,
+     "kappa": 0.68
+    },
+    "controle": {
+     "igual_pct": 90,
+     "kappa": 0.72
+    }
+   }
+  },
+  "pares_espelho": {
+   "total": 8,
+   "na_mesma_faixa": 7,
+   "nota": "o par que difere é uma ementa só com o título (\"novo marco de...\"), que a regra manda deixar sem leitura"
+  }
+ },
+ "segunda_leitura": {
+  "lidas": 2146,
+  "mesma_faixa": 811,
+  "mesma_faixa_pct": 37.8,
+  "topo": {
+   "n": 1448,
+   "mesma_faixa": 341
+  },
+  "votadas": {
+   "n": 698,
+   "mesma_faixa": 470
+  },
+  "confirmadas_por_duas": 811,
+  "decididas_pelo_terceiro": 1112,
+  "instaveis": 223,
+  "esperam_o_terceiro": 0,
+  "votadas_com_marca_de_contas_em_disputa": 93
+ },
+ "estado_das_leituras": {
+  "uma_leitura": 37960,
+  "duas_na_mesma_faixa": 811,
+  "decidida_pelo_terceiro": 1112,
+  "instavel": 223
+ },
+ "limites": [
+  "A leitura é da ementa (e, quando há, da ementa detalhada e das palavras-chave), não do texto integral.",
+  "Não houve codificação por pessoas para servir de padrão: os números medem se leitores de IA diferentes chegam à mesma faixa.",
+  "O topo da régua só é procurado entre o que a primeira leitura pôs lá: projeto que ela deixou logo abaixo não é relido.",
+  "Na matéria votada, lê-se a ementa do registro, não o substitutivo que foi a voto."
+ ]
+}

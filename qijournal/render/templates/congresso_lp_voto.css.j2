@@ -1,0 +1,208 @@
+/* ── A visão por parlamentar, segunda metade (congresso_lp_voto.html.j2, congresso_lp_voto.js.j2): "Na hora do voto" e "Pessoa ou partido?". As mesmas duas tintas: --cg-esp para o que a tela afirma (a barra que se distingue do acaso, o ponto longe dos colegas) e cinza (--cg-lp-cz) para o contexto e para o que não se distingue do acaso. Nenhuma cor nova. ── */
+
+/* Os números do universo: passos de um funil, não botões */
+.cg-lp-us{counter-reset:lpu}
+.cg-lp-u{border-top-color:var(--mute2);box-shadow:none;cursor:default}
+.cg-abas .cg-lp-u{cursor:default}
+.cg-lp-u .cg-pa-m-n{font-size:12.5px}
+.cg-lp-u .cg-pa-m-f{font-size:14.5px}
+.cg-lp-us li{position:relative}
+.cg-lp-us li+li::before{content:"→";position:absolute;top:18px;left:-14px;font-family:var(--ss);font-size:13px;color:var(--faint)}
+
+/* Quando pesa: duas barras por medida (de peso × demais), na mesma escala de 0 a 100% */
+.cg-lp-resp{max-width:920px;margin:12px 0 4px;font-family:var(--sf);font-size:24px;line-height:1.3;color:var(--ink)}
+.cg-lp-resp span{display:block;margin-top:5px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.cg-lp-qps{display:grid;grid-template-columns:repeat(2,minmax(0,420px));gap:14px 44px;margin-top:12px}
+.cg-lp-qb{display:grid;grid-template-columns:56px minmax(0,1fr) 50px;align-items:center;gap:0 8px;margin-top:5px;font-family:var(--ss);font-size:12px;color:var(--ink)}
+.cg-lp-qb span{color:var(--muted)}
+.cg-lp-qb i{display:block;height:10px;border-radius:3px;background:var(--cg-trk)}
+.cg-lp-qb i b{display:block;height:100%;border-radius:3px;background:var(--cg-esp)}
+.cg-lp-qb-d i b{background:var(--cg-lp-cz)}
+.cg-lp-qb em{font-family:var(--mn);font-style:normal;font-weight:600;text-align:right}
+.cg-lp-qd{margin-top:5px;font-family:var(--ss);font-size:12px;color:var(--muted)}
+
+/* As faixas por partido: um ponto por pessoa, a mediana (traço) e a metade do meio (banda) */
+.cg-lp-fxs[hidden]{display:none}
+.cg-lp-fxs:focus-visible{outline:2px solid var(--link);outline-offset:3px}
+.cg-lp-fx-r>div{position:relative;height:18px;margin:0 8px;font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-lp-fx-r span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.cg-lp-fx-r span:first-child{transform:none}
+.cg-lp-fx-r span:last-child{transform:translateX(-100%)}
+.cg-lp-fx-l{border-top:1px solid var(--rl)}
+.cg-lp-fx-l:last-of-type{border-bottom:1px solid var(--rl)}
+/* a cabeça de cada partido vai acima da pista, numa linha: o nome, quantos entram, a mediana e a metade do meio */
+.cg-lp-fx-n{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 9px;padding:5px 0 0;font-family:var(--ss);font-size:12.5px;line-height:1.25;color:var(--ink)}
+.cg-lp-fx-n b{font-weight:700}
+.cg-lp-fx-n em{font-family:var(--mn);font-size:10.5px;font-style:normal;color:var(--muted)}
+.cg-lp-fx-n span{font-size:11.5px;color:var(--muted)}
+.cg-lp-fx-p{position:relative;height:28px;margin:0 8px;cursor:pointer}
+.cg-lp-fx-g{position:absolute;top:0;bottom:0;width:1px;background:var(--rl)}
+.cg-lp-fx-z{background:var(--mute2)}
+.cg-lp-fx-b{position:absolute;top:7px;bottom:7px;border-radius:3px;background:var(--cg-lp-fx)}
+.cg-lp-fx-m{position:absolute;z-index:2;top:2px;bottom:2px;width:2px;margin-left:-1px;background:var(--ink);box-shadow:0 0 0 1px var(--paper)}
+.cg-lp-pt{position:absolute;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;background:var(--cg-lp-cz);box-shadow:0 0 0 1px var(--paper);pointer-events:none}
+.cg-lp-pt-a{z-index:1;background:var(--cg-esp)}
+.cg-lp-pt.cg-lp-off{opacity:.15}
+.cg-lp-pt.on{z-index:2;outline:2px solid var(--link);outline-offset:1px}
+.cg-lp-pt.cg-lp-em{z-index:3;opacity:1;box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.cg-lp-fx-nm{position:absolute;z-index:3;top:50%;padding:0 3px;border-radius:3px;background:var(--paper);font-family:var(--ss);font-size:11px;font-weight:600;line-height:1.3;white-space:nowrap;color:var(--ink);transform:translate(9px,-50%);pointer-events:none}
+.cg-lp-fx-nm-e{transform:translate(calc(-100% - 9px),-50%)}
+.cg-lp-fx-lm{width:2px !important;height:12px !important;border-radius:0 !important;background:var(--ink)}
+.cg-lp-fx-lb{width:16px !important;height:9px !important;background:var(--cg-lp-fx);box-shadow:inset 0 0 0 1px var(--rl)}
+.cg-lp-fx-so{padding:6px 0;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--muted)}
+.cg-lp-fq{margin:8px 0 6px;font-family:var(--ss);font-size:13px;line-height:1.5;color:var(--body)}
+.cg-lp-fq b{color:var(--ink)}
+.cg-lp-fq[hidden]{display:none}
+.cg-lp-fx-vt{display:none}
+/* O aviso que vai colado ao gráfico: o que a medida conta de fato, com os números */
+.cg-lp-av{max-width:920px;margin:2px 0 12px;padding:9px 14px 10px;border-left:3px solid var(--ink);background:var(--soft);font-family:var(--ss);font-size:13px;line-height:1.55;color:var(--body)}
+.cg-lp-av b{color:var(--ink)}
+.cg-lp-av-k{margin-right:6px;font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}
+.cg-lp-av[hidden]{display:none}
+
+/* A tabela por partido e a das votações */
+.cg-lp-tpt small,.cg-lp-tv small{font-family:var(--mn);font-size:10.5px;font-weight:400;color:var(--muted)}
+.cg-lp-tv th[scope="row"],.cg-lp-tv thead th:nth-child(2){min-width:250px;white-space:normal;text-align:left}
+.cg-lp-tv th[scope="row"] small{display:block;margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.4}
+.cg-lp-tv td:nth-child(4){white-space:normal}
+.cg-lp-tv .cg-lp-g{vertical-align:0}
+.cg-lp-fora-vf{color:var(--faint)}
+.cg-abas .cg-lp-tv:not(.cg-lp-ab) .cg-lp-tr-mais{display:none}
+.cg-lp-tv tr.cg-lp-off{opacity:.3}
+.cg-lp-vmais{margin-top:6px}
+.cg-lp-vmais[hidden],.cg-abas .cg-lp-semjs-i,.cg-lp-so-js{display:none}
+.cg-abas .cg-lp-so-js{display:inline}
+.cg-lp-ls2{max-width:1180px;columns:2;column-gap:44px}
+.cg-lp-ls2 li{break-inside:avoid}
+
+/* O cartão dos votos de cada um */
+.cg-lp-vl{list-style:none;max-height:330px;margin-top:6px;overflow:auto;border-top:1px solid var(--rl)}
+.cg-lp-vl li{display:grid;grid-template-columns:62px minmax(0,1fr) auto;align-items:baseline;gap:1px 8px;padding:5px 2px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12px;line-height:1.4;color:var(--body)}
+.cg-lp-vl time{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-lp-vl .cg-mt,.cg-lp-vl .cg-pa-c-t{font-family:var(--mn);font-size:12px;font-weight:600;color:var(--ink)}
+.cg-lp-vl a.cg-mt{color:var(--link)}
+.cg-lp-vl b{font-weight:700;color:var(--ink)}
+.cg-lp-vl em{display:block;grid-column:2/-1;font-style:normal;font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-lp-vl em .cg-lp-vt{font-family:var(--ss)}
+.cg-lp-vl .cg-lp-v-fora{color:var(--faint)}
+.cg-lp-vt{margin-left:5px;padding:0 5px;border:1px solid var(--rule);border-radius:3px;font-size:10px;white-space:nowrap;color:var(--ink)}
+.cg-lp-vt-f{border-color:var(--ink)}
+
+/* Pessoa ou partido?: a resposta no título (uma por Casa), as barras e as faixas da medida escolhida */
+.cg-lp-v .cg-lp-xh{display:block}
+.cg-lp-v .cg-lp-xh+.cg-lp-xh{margin-top:8px}
+.cg-lp-xc{font-family:var(--ss);font-size:.6em;font-weight:700;color:var(--muted)}
+.az-ld .cg-lp-xc{font-size:1em}
+.cg[data-ver] .cg-lp-xc{display:none}
+.cg-lp-xfoco{display:grid;grid-template-columns:minmax(0,11fr) minmax(0,9fr);gap:0 36px;align-items:start;margin-top:18px}
+.cg-lp-xfig,.cg-lp-xfig2{position:relative;min-width:0;margin:0}
+.cg-lp-xfig2[hidden]{display:none}
+.cg-lp-xg{margin:12px 0 2px;font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.cg-lp-xs{list-style:none}
+.cg-lp-xb{display:grid;grid-template-columns:178px minmax(0,1fr) 196px;align-items:center;gap:0 12px;width:100%;padding:5px 6px 5px 0;border:0;border-top:1px solid var(--rl);background:none;font-family:var(--ss);font-size:12.5px;line-height:1.3;text-align:left;color:var(--ink);cursor:default}
+.cg-abas .cg-lp-xb{cursor:pointer}
+.cg-abas .cg-lp-xb:hover .cg-lp-xn{text-decoration:underline}
+.cg-lp-xb[aria-pressed="true"]{padding-left:9px;box-shadow:inset 3px 0 0 var(--ink);background:var(--soft)}
+.cg-lp-xb:focus-visible{outline:2px solid var(--link);outline-offset:-2px}
+.cg-lp-xn{font-weight:600}
+.cg-lp-xn .cg-lp-tag{margin-left:4px;cursor:help}
+.cg-lp-xt{position:relative;display:block;height:12px;border-radius:3px;background:var(--cg-trk)}
+.cg-lp-xt i{position:absolute;top:0;bottom:0;left:0;min-width:2px;border-radius:3px;background:var(--cg-esp)}
+.cg-lp-xt u{position:absolute;top:5px;height:2px;min-width:2px;background:var(--ink)}
+.cg-lp-xt u::before,.cg-lp-xt u::after{content:"";position:absolute;top:-3px;width:1.5px;height:8px;background:var(--ink)}
+.cg-lp-xt u::before{left:0}
+.cg-lp-xt u::after{right:0}
+.cg-lp-xt s{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--ink)}
+.cg-lp-xb-cz .cg-lp-xt i{background:var(--cg-lp-cz)}
+.cg-lp-xv{color:var(--body)}
+.cg-lp-xv b{margin-right:3px;font-family:var(--mn);font-size:14px;font-weight:600;color:var(--ink)}
+.cg-lp-xb-cz .cg-lp-xv{color:var(--muted)}
+.cg-lp-xd{grid-column:1/-1;margin-top:2px;font-family:var(--mn);font-size:10px;color:var(--muted)}
+.cg-lp-xleg i.cg-lp-xl-b{width:16px;height:9px;background:var(--cg-esp)}
+.cg-lp-xleg i.cg-lp-xl-cz{background:var(--cg-lp-cz)}
+.cg-lp-xleg i.cg-lp-xl-a{width:2px;height:13px;border-radius:0;background:var(--paper);box-shadow:inset 0 0 0 1px var(--ink)}
+.cg-lp-xleg i.cg-lp-xl-i{width:16px;height:2px;border-radius:0;background:var(--ink)}
+.cg-lp-xbusca{margin:0 0 6px}
+
+/* O que anda junto: a pergunta, a barra a partir do zero (de −1 a +1) e a resposta */
+.cg-lp-pares{list-style:none;max-width:1180px;margin-top:8px}
+.cg-lp-pares li{display:grid;grid-template-columns:minmax(0,5fr) 150px minmax(0,7fr);align-items:center;gap:0 16px;padding:7px 0;border-top:1px solid var(--rl);font-family:var(--ss);font-size:13px;line-height:1.4}
+.cg-lp-pp{font-weight:600;color:var(--ink)}
+.cg-lp-pb{position:relative;display:block;height:10px;border-radius:3px;background:var(--cg-trk)}
+.cg-lp-pb::after{content:"";position:absolute;top:-3px;bottom:-3px;left:50%;width:1px;background:var(--mute2)}
+.cg-lp-pb i{position:absolute;top:0;bottom:0;min-width:2px;background:var(--cg-esp)}
+.cg-lp-pb-p{left:50%;border-radius:0 3px 3px 0}
+.cg-lp-pb-n{right:50%;border-radius:3px 0 0 3px}
+.cg-lp-pr{color:var(--body)}
+.cg-lp-pr b{margin-right:4px;font-family:var(--mn);font-weight:600;color:var(--ink)}
+.cg-lp-pr small{display:block;font-size:11.5px;color:var(--muted)}
+.cg-lp-par-cz .cg-lp-pb i{background:var(--cg-lp-cz)}
+.cg-lp-par-cz .cg-lp-pp,.cg-lp-par-cz .cg-lp-pr,.cg-lp-par-cz .cg-lp-pr b{color:var(--muted)}
+.cg-lp-xtb{margin-top:22px}
+
+@media (max-width:1180px){
+  .cg-lp-us li+li::before{display:none}
+  .cg-lp-xb{grid-template-columns:150px minmax(0,1fr) 170px}
+}
+@media (max-width:1000px){
+  .cg-lp-xfoco{grid-template-columns:minmax(0,1fr);gap:22px 0}
+}
+@media (max-width:760px){
+  .cg-lp-qps{grid-template-columns:minmax(0,1fr)}
+  .cg-lp-resp{font-size:20px}
+  .cg-abas .cg-lp-fxs:not(.cg-lp-ab) .cg-lp-fx-mais{display:none}
+  .cg-lp-fxs:not(.cg-lp-ab) .cg-lp-fx-vt{display:inline-block}
+  .cg-lp-ls2{columns:1}
+  .cg-lp-xb{grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;padding:7px 0}
+  .cg-lp-xn{grid-column:1/-1}
+  .cg-lp-xv{text-align:right}
+  .cg-lp-pares li{grid-template-columns:minmax(0,1fr);gap:5px 0}
+  .cg-lp-pb{max-width:220px}
+}
+
+/* No mapa das abas do Resumo, o item da visão por parlamentar leva a cada aba dela: os links ficam acima do link que cobre o item inteiro */
+a.hit[href="#cg-projetos"]~p a{position:relative;z-index:2;font:inherit;color:var(--link);text-decoration:underline;text-underline-offset:2px}
+
+/* ── O Como ler da visão por parlamentar (congresso_lp_metodo.html.j2): a premissa, os termos, a régua do config, quem leu e a auditoria, a cobertura, o que a régua não mede ── */
+.cg-lp-met{margin-top:38px;scroll-margin-top:128px}
+.cg-lp-met .cg-lp-av{margin-top:12px}
+.cg-lp-met-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:34px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--rule);font-family:var(--sf);font-size:17px;font-weight:700;line-height:1.3;color:var(--ink)}
+.cg-lp-met-h span{flex:1 1 280px;font-family:var(--ss);font-size:12.5px;font-weight:400;line-height:1.45;color:var(--muted)}
+.cg-lp-met-f,.cg-lp-met-x{max-width:920px;margin-top:8px;font-family:var(--ss);font-size:13px;line-height:1.6;color:var(--body)}
+.cg-lp-met-f b,.cg-lp-met-x b{color:var(--ink)}
+.cg-lp-met-k{margin-top:16px;font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink)}
+.cg-lp-met-t{margin-top:10px}
+.cg-lp-met-t td,.cg-lp-met-t th{white-space:normal;text-align:left;vertical-align:top}
+.cg-lp-met-t td{font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--body)}
+.cg-lp-met-t th[scope="row"],.cg-lp-met-t th[scope="rowgroup"]{min-width:150px;max-width:210px}
+.cg-lp-met-t td:nth-child(2){min-width:150px}
+.cg-lp-met-t small,.cg-lp-met-cb small,.cg-lp-met-l small{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-lp-met-d{margin-top:8px}
+.cg-lp-met-d .an-tbl-wrap{max-height:none}
+.cg-lp-met-2,.cg-lp-met-as{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 44px;max-width:1180px}
+.cg-lp-met-as{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cg-lp-met-l,.cg-lp-met-lim,.cg-lp-met-q,.cg-lp-met-e{max-width:920px;margin-top:6px;font-family:var(--ss);font-size:13px;line-height:1.55;color:var(--body)}
+.cg-lp-met-l{list-style:none}
+.cg-lp-met-l li{padding:5px 0;border-top:1px solid var(--rl)}
+.cg-lp-met-l b,.cg-lp-met-q b,.cg-lp-met-e b{color:var(--ink)}
+.cg-lp-met-l span{color:var(--muted)}
+.cg-lp-met-v{display:block;color:var(--body) !important}
+.cg-lp-met-v small{display:inline-block;min-width:18px;margin:0 4px 0 2px}
+.cg-lp-met-q,.cg-lp-met-e,.cg-lp-met-lim{padding-left:20px}
+.cg-lp-met-q li,.cg-lp-met-e li,.cg-lp-met-lim li{margin-top:4px}
+.cg-lp-met-c{margin-top:8px}
+.cg-lp-met-c th[scope="row"]{white-space:normal;text-align:left}
+@media (max-width:1000px){
+  .cg-lp-met-as{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:760px){
+  .cg-lp-met-2{grid-template-columns:minmax(0,1fr)}
+  .cg-lp-met-h{font-size:16px}
+  .cg-lp-met-h span{flex-basis:100%}
+  /* a régua, campo a campo: no celular cada linha da tabela vira um bloco (o campo, o papel na conta, os códigos) */
+  .cg-lp-met-t thead{display:none}
+  .cg-lp-met-t,.cg-lp-met-t tbody,.cg-lp-met-t tr,.cg-lp-met-t th,.cg-lp-met-t td{display:block;min-width:0 !important;max-width:none !important}
+  .cg-lp-met-t tr{padding:7px 0;border-top:1px solid var(--rl)}
+  .cg-lp-met-t th,.cg-lp-met-t td{padding:1px 0;border:0}
+  .cg-lp-met-t th[scope="rowgroup"]{margin-bottom:4px;font-size:13px}
+}

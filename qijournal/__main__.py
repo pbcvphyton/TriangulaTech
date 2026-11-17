@@ -11,6 +11,7 @@ Comandos:
 - ``instagram publicar``: publica pela API do Instagram o que já venceu na fila.
 - ``congresso atualizar``: baixa os dados da Câmara e do Senado, refaz as contas e a aba Congresso.
 - ``congresso pagina``: só refaz a aba Congresso a partir de ``data/congresso/``.
+- ``congresso ler``: a leitura diária dos projetos de lei novos, com a cadeia de IAs do jornal.
 
 Códigos de saída: 0 = sucesso; 1 = erro; 2 = dados insuficientes (a edição
 não foi publicada e a anterior continua no ar) ou argumentos inválidos.

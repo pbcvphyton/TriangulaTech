@@ -342,8 +342,9 @@ def test_painel_fornecedores_sem_pseudo_cnpj(resumo):
     fornecedores = painel["fornecedores"]
     assert CELULAR not in {f["cnpj"] for f in fornecedores}
     assert [f["cnpj"] for f in fornecedores] == ["66666666000191", X, Z, W, Y, IZA, "77777777000191"]
-    assert fornecedores[1] == {"nome": "XIS", "cnpj": X, "total": 460_000.0, "gabinetes": 2, "n": 14}  # 8 notas da Davi, 6 da Ana
-    assert fornecedores[3] == {"nome": "ML LOCAÇÕES", "cnpj": W, "total": 23_600.0, "gabinetes": 2, "n": 4}  # a grafia mais frequente
+    # "categoria": a despesa em que o fornecedor mais recebeu, com o nome curto (sem rótulo no arquivo de escolhas, o oficial só com a inicial maiúscula)
+    assert fornecedores[1] == {"nome": "XIS", "cnpj": X, "total": 460_000.0, "gabinetes": 2, "n": 14, "categoria": "Divulgação"}  # 8 notas da Davi, 6 da Ana
+    assert fornecedores[3] == {"nome": "ML LOCAÇÕES", "cnpj": W, "total": 23_600.0, "gabinetes": 2, "n": 4, "categoria": "Locação"}  # a grafia mais frequente
 
 
 def test_painel_concentracao(resumo):

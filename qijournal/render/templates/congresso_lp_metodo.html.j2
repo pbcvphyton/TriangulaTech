@@ -1,0 +1,117 @@
+{#- Aba Congresso, visão por parlamentar: o bloco "A leitura dos projetos" do Como ler (incluído
+    por congresso.html.j2 no fim da seção "Como ler", só quando há c.lp). Tudo vem pronto de
+    render/congresso_lp_metodo.py (c.lp.metodo): a premissa, os termos, a régua (os seis campos,
+    a conta do peso, as faixas e as três marcas, do config), quem leu e a auditoria publicada
+    em meta.json, a leitura de todo dia (como é feita e, se o registro veio, os números dela),
+    a cobertura, o que a régua não mede, os cinco erros de leitura e os limites.
+    Nenhum nome de faixa, alavanca, marca ou código é escrito aqui: os rótulos vêm do config. -#}
+{% set Y = c.lp.metodo %}
+    <div class="az-blk cg-lp-met" id="cg-lp-metodo">
+      <h4 class="az-h">A leitura dos projetos <span>só na visão por parlamentar ({% for aba in c.lp.abas %}{{ aba.nome }}{% if not loop.last %}, {% endif %}{% endfor %}); na visão por partido, nenhuma IA entra nas contas <button class="az-selo cg-lp-selo" type="button">{{ c.lp.selo }}</button></span></h4>
+      <p class="cg-lp-av"><b class="cg-lp-av-k">A premissa</b> {{ Y.premissa }}</p>
+      <dl class="az-dl">
+        {% for termo, texto in Y.itens %}
+        <div><dt>{{ termo }}</dt><dd>{{ texto }}</dd></div>
+        {% endfor %}
+      </dl>
+
+      <h5 class="cg-lp-met-h">A régua <span>os seis campos que o leitor marca, a conta do peso, as faixas e as três marcas; tudo escrito em config/congresso.yaml{% if Y.versao %}, versão {{ Y.versao }} das instruções ao leitor (config/leitura_projetos.txt){% endif %}</span></h5>
+      <p class="cg-lp-met-f"><b>{{ Y.regua.formula }}</b>{% if Y.regua.exemplo %} Por exemplo: {{ Y.regua.exemplo }}.{% endif %} Se a ementa não permite dizer um dos três fatores, o projeto fica sem leitura: fora das contas, contado na cobertura.</p>
+      <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-met-t">
+        <thead><tr><th scope="col">O campo</th><th scope="col">Na conta</th><th scope="col">Os códigos, com o que cada um vale</th></tr></thead>
+        <tbody>
+          {% for campo in Y.regua.campos %}
+          <tr><th scope="row">{{ campo.rotulo }}</th><td>{{ campo.papel }}</td><td>{% for cod in campo.codigos %}{{ cod.rotulo }} <small>{{ cod.vale }}</small>{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+      <details class="cg-rv-tb cg-lp-met-d">
+        <summary>Ver a definição de cada um dos {{ Y.regua.n_codigos }} códigos</summary>
+        <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-met-t">
+          <thead><tr><th scope="col">O campo</th><th scope="col">O código</th><th scope="col">Vale</th><th scope="col">O que entra</th></tr></thead>
+          <tbody>
+            {% for campo in Y.regua.campos %}{% for cod in campo.codigos %}
+            <tr>{% if loop.first %}<th scope="rowgroup" rowspan="{{ campo.codigos|length }}">{{ campo.rotulo }}</th>{% endif %}<td>{{ cod.rotulo }}</td><td>{{ cod.vale }}</td><td>{{ cod.definicao }}</td></tr>
+            {% endfor %}{% endfor %}
+          </tbody>
+        </table></div>
+        <p class="az-dek">Em qualquer campo o leitor pode marcar “{{ Y.regua.nd }}”.</p>
+      </details>
+      <div class="cg-lp-met-2">
+        <div>
+          <p class="cg-lp-met-k">As faixas do peso</p>
+          <ul class="cg-lp-met-l">
+            {% for f in Y.regua.faixas %}
+            <li><b>{{ f.rotulo }}</b> <small>{{ f.pesos }}</small>{% if f.nota %} <span>{{ f.nota }}</span>{% endif %}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <p class="cg-lp-met-k">As três marcas</p>
+          <ul class="cg-lp-met-l">
+            {% for marca in Y.regua.marcas %}
+            <li><b>{{ marca.rotulo }}</b> {% for v in marca.valores %}<span class="cg-lp-met-v"><i class="cg-lp-g cg-lp-{{ v.forma }}" aria-hidden="true"></i><small>{{ v.n }}</small> {{ v.rotulo }}</span>{% endfor %}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <h5 class="cg-lp-met-h">Quem leu, e quanto os leitores concordam <span>três leitores de IA, um sem ver o outro{% if Y.auditoria and Y.auditoria.data %}; auditoria de {{ Y.auditoria.data }}, publicada em data/congresso/meta.json{% endif %}</span></h5>
+      {% if Y.auditoria %}{% set A = Y.auditoria %}
+      {% if A.quem %}
+      <ol class="cg-lp-met-q">
+        {% for q in A.quem %}
+        <li><b>{{ q.nome }}.</b> {{ q.texto[:1]|upper }}{{ q.texto[1:] }}.</li>
+        {% endfor %}
+      </ol>
+      {% endif %}
+      {% if A.estados %}<p class="cg-lp-met-x">{% if A.lidas %}Das {{ A.lidas }} proposições lidas{% if A.data %} até {{ A.data }}{% endif %}: {% endif %}{{ A.estados }}.</p>{% endif %}
+      <div class="cg-lp-met-as">
+        {% for b in A.blocos %}
+        <div>
+          <p class="cg-lp-met-k">{{ b.titulo }}</p>
+          <p class="cg-lp-met-x">{{ b.texto }}</p>
+          {% if b.tabela %}
+          <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-met-c">
+            <thead><tr><th scope="col">Os dois leitores, lado a lado</th><th scope="col">Leituras iguais</th><th scope="col">Kappa</th></tr></thead>
+            <tbody>{% for l in b.tabela %}<tr><th scope="row">{% if l.forte %}<b>{{ l.nome }}</b>{% else %}{{ l.nome }}{% endif %}</th><td>{{ l.igual }}</td><td>{{ l.kappa }}</td></tr>{% endfor %}</tbody>
+          </table></div>
+          <p class="az-dek">Kappa: a concordância já descontado o que dois leitores acertariam por acaso (1 é concordância total; 0, só acaso).{% if b.depois %} {{ b.depois }}{% endif %}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="cg-lp-met-x">A auditoria da leitura não veio nesta atualização.</p>
+      {% endif %}
+      <p class="cg-lp-met-k" id="cg-lp-diaria">A leitura de todo dia</p>
+      <p class="cg-lp-met-x">{{ Y.diaria.como }}{% if Y.diaria.numeros %} <b>{{ Y.diaria.numeros }}</b>{% endif %}{% if Y.diaria.quem %} {{ Y.diaria.quem }}{% endif %}</p>
+      <p class="cg-lp-av"><b class="cg-lp-av-k">O que isto mede</b> Tudo isto {{ Y.constancia }}. Dois leitores de IA que concordam podem errar juntos.</p>
+
+      {% if Y.cobertura %}
+      <h5 class="cg-lp-met-h">A cobertura <span>quantas proposições as contas pedem e quantas têm leitura{% if Y.data %}, em {{ Y.data }}{% endif %}; a que fica sem leitura está fora de toda conta</span></h5>
+      <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-met-cb">
+        <thead><tr><th scope="col">Casa</th><th scope="col">As contas pedem</th><th scope="col">Com leitura</th><th scope="col">Sem leitura</th><th scope="col">Com duas leituras ou mais</th><th scope="col">No perfil de quem propõe</th><th scope="col">No que espera</th><th scope="col">Nas matérias votadas</th></tr></thead>
+        <tbody>
+          {% for l in Y.cobertura %}
+          <tr><th scope="row">{{ l.casa }}</th><td>{{ l.total }}</td><td><b>{{ l.lidos }}</b> <small>{{ l.pct }}</small></td><td>{{ l.sem }}</td><td>{{ l.confirmados }}</td><td>{{ l.perfil }}</td><td>{{ l.espera }}</td><td>{{ l.voto }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+      <p class="az-dek">Nas três últimas colunas: com leitura, de quantas. Sem leitura: a ementa não permite dizer um dos três fatores do peso, ou os leitores não se entenderam.{% for l in Y.cobertura if l.nota %} {{ l.nota }}{% endfor %}</p>
+      {% endif %}
+
+      <h5 class="cg-lp-met-h">O que a régua não mede <span>e cinco jeitos de ler errado</span></h5>
+      <p class="cg-lp-met-x">{{ Y.nao_mede }}</p>
+      <ol class="cg-lp-met-e">
+        {% for titulo, texto in Y.erros %}
+        <li><b>{{ titulo }}</b> {{ texto }}</li>
+        {% endfor %}
+      </ol>
+      <p class="cg-lp-met-k">Os limites desta leitura</p>
+      <ul class="cg-lp-met-lim">
+        {% for l in Y.limites %}
+        <li>{{ l }}</li>
+        {% endfor %}
+      </ul>
+    </div>

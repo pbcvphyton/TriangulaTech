@@ -1,0 +1,287 @@
+/* ── Cota parlamentar (congresso_cota.html.j2 e congresso_cota.js.j2): os filtros, a frase "Você está vendo", os três números, "Quando" (colunas), "Com o quê" (barras), "Quem" (pontos), o cartão em foco, as pontas, a tabela de todos e "Para conferir". Três papéis de cor: --link é o que a seleção conta, --cg-c0 é o que ficou fora dela, --qc marca só a pessoa em foco. O texto fica em --ink e --muted. Sem script, tudo aparece no estado padrão; os botões só ganham mão com o arquivo carregado (.cg-co-on). ── */
+.cg-co{max-width:1216px}
+.cg-co button{font-family:inherit}
+.cg-co-b:focus-visible,.cg-co-x:focus-visible,.cg-co-mob:focus-visible,.cg-co-plot:focus-visible,.cg-co-sel select:focus-visible,.cg-co-nav button:focus-visible,.cg-co-n:focus-visible,.cg-co summary:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+
+/* 1. Os filtros: uma barra só, acima de tudo o que ela governa */
+.cg-co-fil{margin-top:14px;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--soft);font-family:var(--ss)}
+.cg-co-fil[hidden]{display:none}
+.cg-co-mob{display:none}
+.cg-co-f1,.cg-co-f2{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.cg-co-f2{margin-top:8px}
+.cg-co-pers{display:contents}
+.cg-co-sel{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.cg-co-sel select{max-width:230px;padding:4px 8px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);font:inherit;font-size:12.5px;color:var(--ink)}
+.cg-co-f1 .cg-co-sel:first-of-type{margin-left:8px}
+.cg-co-fx{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-left:6px}
+.cg-co-fil .cg-i{margin-left:-4px}
+.cg-co-fil .cg-pa-f{cursor:pointer}
+.cg-co-fil .cg-pa-f:hover{border-color:var(--ink)}
+.cg-co-limpa{margin-left:auto}
+
+/* 2. A frase da janela: gruda sob as abas enquanto a zona A está na tela (só com script, que mede a barra) */
+.cg-co-ve{margin-top:12px;padding:7px 12px;border-left:3px solid var(--qc);background:var(--paper);font-family:var(--ss);font-size:13px;line-height:1.7;color:var(--body)}
+.cg-co-ve>b{color:var(--ink)}
+.cg-co-ve i{font-style:normal;color:var(--muted)}
+.cg-co-on .cg-co-ve{position:sticky;top:var(--cg-topo,0px);z-index:39;box-shadow:0 1px 0 var(--rl),0 8px 10px -10px rgba(16,24,40,.25)}
+.cg-co-x{display:inline-flex;align-items:baseline;gap:6px;padding:0 8px;border:1px solid var(--ink);border-radius:999px;background:var(--ink);font-size:12px;font-weight:600;line-height:1.55;color:var(--paper);white-space:nowrap;cursor:pointer}
+.cg-co-x span{font-size:10px;font-weight:400}
+.cg-co-ve .cg-pa-limpa{padding:0 2px}
+.cg-co-mudar{display:none}
+.cg-co-falha,.cg-co-vz{margin-top:10px;padding:8px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--soft);font-family:var(--ss);font-size:13px;line-height:1.5;color:var(--body)}
+.cg-co-falha[hidden],.cg-co-vz[hidden]{display:none}
+.cg-co-vz b{color:var(--ink)}
+
+/* 3. Os três números (o molde é o das manchetes de "O que espera × o que passa") */
+.cg-co-ns{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cg-co-ns li{position:relative}
+.cg-co-ns .cg-i{position:absolute;top:11px;right:12px}
+.cg-co-n .cg-pa-m-n{padding-right:18px;font-size:12.5px}
+.cg-co-n .cg-pa-m-n b{font-size:30px;white-space:nowrap}
+div.cg-co-n{cursor:default}
+.cg-co:not(.cg-co-on) .cg-co-n{cursor:default}
+.cg-co:not(.cg-co-on) .cg-co-n .cg-pa-m-ir{display:none}
+
+/* 4. Quando e Com o quê, lado a lado. O subtítulo de cada painel (a janela e os filtros que valem ali) quebra ao lado do título, com o "i" no fim do texto */
+.cg-co-a .az-h>span{flex:1 1 0;min-width:min(240px,100%);line-height:1.45}
+.cg-co-2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 40px;align-items:start}
+.cg-co-fig{position:relative;min-width:0;margin:10px 0 0}
+.cg-co-un{font-family:var(--ss);font-size:11px;color:var(--muted)}
+.cg-co-qd .cg-co-un{padding-right:120px}
+.cg-co-plot{position:relative;border-radius:2px}
+.cg-co-on .cg-co-plot{cursor:pointer}
+
+/* Quando: uma coluna por mês, a partir do zero; fora do período, cinza; os meses que ainda recebem notas, mais claros */
+.cg-co-pq{height:190px;margin:10px 0 0 28px;border-bottom:1px solid var(--rule)}
+.cg-co-gr span{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--rl)}
+.cg-co-gr b{position:absolute;right:100%;top:-8px;margin-right:6px;font-family:var(--mn);font-size:11px;font-weight:400;color:var(--muted);white-space:nowrap}
+.cg-co-cols i{position:absolute;min-height:1px;border-radius:2px 2px 0 0;background:var(--link)}
+.cg-co-cols i.cg-co-r{opacity:.45}
+.cg-co-cols i.cg-co-off{background:var(--cg-c0)}
+.cg-co-cols i.cg-co-neg{border-radius:0 0 2px 2px}
+.cg-co-cols i.on{opacity:1;box-shadow:0 0 0 1.5px var(--paper),0 0 0 3px var(--ink)}
+.cg-co-rec{position:absolute;top:-7px;height:5px;border:1px solid var(--muted);border-bottom:0}
+.cg-co-rec b{position:absolute;right:0;bottom:100%;margin-bottom:3px;font-family:var(--ss);font-size:11px;font-weight:400;color:var(--muted);white-space:nowrap}
+.cg-co-pico{position:absolute;margin-bottom:3px;font-family:var(--ss);font-size:11px;font-weight:600;line-height:1.2;color:var(--ink);white-space:nowrap;transform:translateX(-5px);pointer-events:none}
+.cg-co-pico.cg-co-esq{transform:translateX(calc(-100% + 5px))}
+.cg-co-ex{position:relative;height:20px;margin:0 0 0 28px;font-family:var(--mn);font-size:11px;color:var(--muted)}
+.cg-co-ex span{position:absolute;top:5px;padding-left:4px;white-space:nowrap}
+.cg-co-ex span::before{content:"";position:absolute;left:0;top:-5px;height:9px;border-left:1px solid var(--rule)}
+.cg-co-ex b{font-weight:400}
+.cg-co-cel{display:none}
+.cg-co-ex .cg-co-marco{font-family:var(--ss);color:var(--ink)}
+.cg-co-ex .cg-co-marco::before{border-left-color:var(--ink)}
+.cg-co-ex .cg-co-marco.cg-co-esq{padding:0 4px 0 0;transform:translateX(-100%)}
+.cg-co-ex .cg-co-marco.cg-co-esq::before{left:auto;right:0}
+.cg-co-dica{pointer-events:none}
+.cg-co-tbd,.cg-co-tb{margin-top:12px}
+.cg-co-tb[hidden]{display:none}
+.cg-co-tbd>summary,.cg-co-tb>summary,.cg-co-fo summary{cursor:pointer;font-family:var(--ss);font-size:13px;color:var(--link)}
+.cg-co-tbd .an-tbl-wrap{max-height:300px;margin-top:8px;overflow:auto}
+.cg-co-tb .an-tbl-wrap{max-height:560px;margin-top:8px;overflow:auto}
+.cg-co-t td{font-family:var(--mn);font-size:12px;white-space:nowrap}
+.cg-co-t tbody th small{display:inline;margin-left:6px;font-size:10.5px;color:var(--muted)}
+.cg-co-t tr.cg-co-fd td,.cg-co-t tr.cg-co-fd th{color:var(--muted)}
+
+/* Com o quê: o nome e a parte em cima, a barra embaixo; a barra cheia é o total do que está sendo visto */
+.cg-co-bs{list-style:none;margin-top:4px;font-family:var(--ss)}
+.cg-co-b,.cg-co-out>summary,.cg-co-c-b li{display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:3px 10px;align-items:baseline}
+.cg-co-b{width:100%;padding:6px 6px 8px;border:0;border-bottom:1px solid var(--rl);background:none;text-align:left;color:var(--ink);cursor:default}
+.cg-co-on .cg-co-b{cursor:pointer}
+.cg-co-on .cg-co-b:hover{background:var(--hover)}
+.cg-co-b[aria-pressed="true"]{background:var(--hl)}
+.cg-co-b[data-neg],.cg-co-on .cg-co-b[data-neg]{cursor:default}
+.cg-co-bn{min-width:0;font-size:13px;line-height:1.3;color:var(--ink)}
+.cg-co-bv{font-family:var(--mn);font-size:11.5px;text-align:right;white-space:nowrap;color:var(--ink)}
+.cg-co-bb{grid-column:1/-1;position:relative;display:block;height:9px;border-radius:2px;background:var(--cg-trk)}
+.cg-co-bb i{display:block;height:100%;max-width:100%;border-radius:2px;background:var(--link)}
+.cg-co-oq[data-sel] .cg-co-b:not([aria-pressed="true"]) .cg-co-bb i{background:var(--cg-c0)}
+/* o risco: a parte da mesma despesa na Casa inteira */
+.cg-co-bb u{position:absolute;top:-3px;bottom:-3px;width:0;margin-left:-1px;border-left:2px solid var(--ink);text-decoration:none}
+.cg-co-out>summary{padding:7px 6px;border-bottom:1px solid var(--rl);font-family:var(--ss);list-style:none;cursor:pointer}
+.cg-co-out>summary::-webkit-details-marker{display:none}
+.cg-co-out>summary .cg-co-bn{color:var(--link)}
+.cg-co-out>summary .cg-co-bn::before{content:"▸";display:inline-block;width:14px;font-size:11px;color:var(--muted)}
+.cg-co-out[open]>summary .cg-co-bn::before{content:"▾"}
+.cg-co-out>.cg-co-bs{margin:0 0 0 14px}
+.cg-co-sem{margin-top:10px}
+
+/* 5. Quem: um ponto por parlamentar, empilhado por faixa de reais por mês; ao lado, o cartão em foco */
+.cg-co-3{display:grid;grid-template-columns:minmax(0,1fr) 432px;grid-template-rows:auto auto 1fr;gap:0 28px;align-items:start}
+.cg-co-qm{grid-column:1;grid-row:1}
+.cg-co-cw{grid-column:2;grid-row:1/span 3;margin-top:28px}
+.cg-co-pt{grid-column:1;grid-row:2}
+.cg-co-tb{grid-column:1;grid-row:3}
+.cg-co-ach{margin-top:10px;font-family:var(--ss);font-size:12px;color:var(--muted)}
+.cg-co-ach[hidden]{display:none}
+.cg-co-ach label{display:inline-flex;align-items:center;gap:8px}
+.cg-co-ach input{flex:none;width:260px;max-width:100%}
+.cg-co-pp{height:calc(var(--pilha)*var(--dy) + 46px);margin-top:8px;border-bottom:1px solid var(--rule)}
+.cg-co-met{position:absolute;top:0;bottom:0;background:var(--cg-trk)}
+.cg-co-med{position:absolute;top:0;bottom:0;width:0;border-left:1px solid var(--ink)}
+.cg-co-med b{position:absolute;top:-1px;left:5px;font-family:var(--ss);font-size:11px;font-weight:400;line-height:1.2;color:var(--ink);white-space:nowrap}
+.cg-co-med.cg-co-esq b{left:auto;right:6px}
+.cg-co-med.cg-co-casa{top:auto;height:9px;border-left:2px solid var(--muted)}
+.cg-co-pts i{position:absolute;left:calc(var(--x)*1%);bottom:calc(var(--n)*var(--dy) + 1px);width:var(--dd);height:var(--dd);margin-left:calc(var(--dd)/-2);border-radius:50%;background:var(--link)}
+.cg-co-pts i[hidden]{display:none}
+.cg-co-pts i.cg-co-off{background:var(--cg-c0)}
+.cg-co-pts i.cg-co-pf{z-index:2;background:var(--qc);box-shadow:0 0 0 2px var(--paper);transform:scale(1.4)}
+.cg-co-pts i.on{z-index:3;box-shadow:0 0 0 1.5px var(--paper),0 0 0 3px var(--ink)}
+.cg-co-fio{position:absolute;left:calc(var(--x)*1%);top:17px;bottom:calc(var(--t)*var(--dy) + 4px);width:0;border-left:1px solid var(--ink);pointer-events:none}
+.cg-co-fio b{position:absolute;top:-3px;left:-1px;padding:0 5px;border-left:1px solid var(--ink);background:var(--paper);font-family:var(--ss);font-size:11.5px;font-weight:600;line-height:1.3;color:var(--ink);white-space:nowrap}
+.cg-co-fio.cg-co-esq b{left:auto;right:0;border-left:0;border-right:1px solid var(--ink)}
+.cg-co-exq{margin-left:0}
+.cg-co-exq span{padding:0;transform:translateX(-50%)}
+.cg-co-exq span::before{left:50%}
+.cg-co-exq span.cg-co-fim{transform:translateX(-100%)}
+.cg-co-exq span.cg-co-fim::before{left:100%;margin-left:-1px}
+.cg-co-ch{position:relative;height:24px;margin-top:1px}
+.cg-co-ch span{position:absolute;top:0;height:5px;border:1px solid var(--muted);border-top:0}
+.cg-co-ch b{position:absolute;top:8px;left:50%;font-family:var(--ss);font-size:11px;font-weight:400;line-height:1.2;color:var(--muted);white-space:nowrap;transform:translateX(-50%)}
+.cg-co-lim{position:absolute;bottom:-4px;height:7px;border:1.5px solid var(--ink);border-top:0}
+.cg-co-lim-t{margin-top:4px;font-family:var(--ss);font-size:11px;color:var(--muted)}
+.cg-co-fo{margin-top:8px;font-family:var(--ss);font-size:12px;line-height:1.5;color:var(--muted)}
+.cg-co-fo summary{font-size:12px;color:var(--muted)}
+.cg-co-fo p small{font-family:var(--mn);font-size:10.5px}
+.cg-co-pv0{margin-top:10px;font-family:var(--ss);font-size:12.5px;color:var(--body)}
+
+/* O cartão em foco */
+.cg-co-nav{margin:0 0 10px}
+.cg-co-nav button{width:auto;min-width:44px;padding:0 12px;font-size:16px}
+.cg-co-nav button span{font-size:12px;vertical-align:1px}
+.cg-co-card{min-height:0}
+.cg-co-c-k{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:11.5px;color:var(--muted)}
+.cg-co-c-k b{font-size:10.5px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink)}
+.cg-co-bola{flex:none;width:9px;height:9px;border-radius:50%;background:var(--qc)}
+.cg-co-c-pos{margin-left:auto;font-family:var(--mn);font-size:11px}
+.cg-co-c-n{margin-top:9px;font-family:var(--sf);font-size:21px;font-weight:700;line-height:1.2}
+.cg-co-c-n small{margin-left:4px;font-family:var(--mn);font-size:11px;font-weight:400;color:var(--muted)}
+.cg-co-c-v{margin-top:8px;font-size:13px;color:var(--body)}
+.cg-co-c-v b{margin-right:3px;font-family:var(--sf);font-size:25px;font-weight:700;line-height:1.1;color:var(--ink)}
+.cg-co-c-r{margin-top:2px;font-size:12.5px;line-height:1.45;color:var(--body)}
+.cg-co-c-a{list-style:none;margin-top:6px}
+.cg-co-c-a li{position:relative;padding:2px 0 2px 14px;font-size:12.5px;line-height:1.45;color:var(--body)}
+.cg-co-c-a li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:1px;background:var(--ink)}
+.cg-co-card .cg-pa-c-h b{font-family:var(--ss);font-size:11px;font-weight:400;color:var(--muted)}
+.cg-co-c-b{list-style:none;margin-top:4px}
+.cg-co-c-b li{padding:4px 0 5px}
+.cg-co-c-b .cg-co-bn{font-size:12.5px}
+.cg-co-c-b .cg-co-bb{height:7px}
+.cg-co-mini{display:flex;align-items:flex-end;gap:1px;height:48px;margin-top:10px;border-bottom:1px solid var(--rule)}
+.cg-co-mini i{flex:1 1 0;min-width:0;border-radius:1px 1px 0 0;background:var(--link)}
+.cg-co-mini i.cg-co-r{opacity:.45}
+.cg-co-mini i.cg-co-off{background:var(--cg-c0)}
+.cg-co-mini-x{display:flex;justify-content:space-between;margin-top:2px;font-family:var(--mn);font-size:10px;color:var(--muted)}
+.cg-co-c-f{list-style:none;margin-top:5px}
+.cg-co-c-f li{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:2px 0;font-size:12px;line-height:1.4;color:var(--body)}
+.cg-co-c-f span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cg-co-c-f b{flex:none;font-family:var(--mn);font-size:11.5px;font-weight:400;color:var(--ink)}
+
+/* 6. As pontas e a tabela de todos: a medida por mês nunca vai sem o total e os meses */
+.cg-co-pls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px}
+.cg-co-pl1{grid-template-columns:minmax(0,1fr)}
+.cg-co-pl .az-h5{margin-top:12px}
+.cg-co-pl ol{list-style:none;counter-reset:cgco}
+.cg-co-pl li{counter-increment:cgco;position:relative;display:grid;grid-template-columns:minmax(0,1fr) max-content;gap:1px 10px;align-items:baseline;padding:6px 6px 7px 26px;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px}
+.cg-co-pl li::before{content:counter(cgco);position:absolute;left:6px;top:8px;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.cg-co-pn{min-width:0}
+.cg-co-pn small{font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+.cg-co-pv{font-family:var(--mn);font-size:11px;text-align:right;white-space:nowrap;color:var(--body)}
+.cg-co-pv b{font-size:12.5px;color:var(--ink)}
+.cg-co-px{grid-column:1/-1;font-size:11.5px;line-height:1.45;color:var(--muted)}
+.cg-co-on .cg-co-pl li,.cg-co-on .cg-co-tt tbody tr{cursor:pointer}
+.cg-co-on .cg-co-pl li:hover,.cg-co-on .cg-co-tt tbody tr:hover{background:var(--hover)}
+.cg-co-pl li.cg-co-f,.cg-co-t tr.cg-co-f{background:var(--hover);box-shadow:inset 3px 0 0 var(--qc)}
+.cg-co-tt th:nth-child(1),.cg-co-tt td:nth-child(1),.cg-co-tt th:nth-child(2),.cg-co-tt th:nth-child(3),.cg-co-tt td:nth-child(3),.cg-co-tt th:last-child,.cg-co-tt td:last-child{text-align:left}
+.cg-co-tt td:last-child{padding-left:14px;font-family:var(--ss);white-space:normal}
+.cg-co-tt th:last-child{padding-left:14px}
+.cg-co-tt thead th{vertical-align:bottom;white-space:normal;line-height:1.35}
+.cg-co-tt thead th:nth-child(4),.cg-co-tt thead th:nth-child(5){max-width:92px}
+.cg-co-tt thead th:first-child{white-space:nowrap}
+.cg-co-tt tbody a{font-weight:600;color:var(--link)}
+.cg-co-tt tbody a:hover{text-decoration:underline}
+.cg-co-on .cg-co-tt th[data-ord]{cursor:pointer}
+.cg-co-tt th[aria-sort="ascending"]::after{content:" ↑"}
+.cg-co-tt th[aria-sort="descending"]::after{content:" ↓"}
+
+/* 7. Para conferir: outra janela (a legislatura inteira), por isso o fio grosso */
+.cg-co-z{margin-top:48px;padding-top:14px;border-top:4px solid var(--ink)}
+.cg-co-zh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;font-family:var(--sf);font-size:21px;font-weight:700;line-height:1.3;color:var(--ink)}
+.cg-co-zh span{font-family:var(--ss);font-size:12.5px;font-weight:400;color:var(--muted)}
+.cg-co-zd{margin-top:24px}
+.cg-co-zd>summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 8px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-family:var(--sf);font-size:17px;line-height:1.3;color:var(--ink);list-style:none;cursor:pointer}
+.cg-co-zd>summary::-webkit-details-marker{display:none}
+.cg-co-zd>summary::before{content:"▸";width:12px;font-size:12px;color:var(--muted)}
+.cg-co-zd[open]>summary::before{content:"▾"}
+.cg-co-zd>summary i{font-family:var(--mn);font-size:12px;font-style:normal;font-weight:400;color:var(--muted)}
+.cg-co-zd>summary span{font-family:var(--ss);font-size:12px;font-weight:400;color:var(--muted)}
+.cg-co-zc{font-family:var(--ss) !important;white-space:nowrap}
+.cg-co-zg{max-width:560px}
+.cg-co-como{margin-top:28px}
+.cg-co-como a{color:var(--link);text-decoration:underline}
+
+@media (min-width:1001px) and (min-height:780px){
+  .cg-co-on .cg-co-cw{position:sticky;top:calc(var(--cg-topo,0px) + 48px)}
+}
+@media (max-width:1000px){
+  .cg-co-2{grid-template-columns:minmax(0,1fr)}
+  .cg-co-3{display:block}
+  .cg-co-cw{margin-top:16px}
+}
+@media (max-width:760px){
+  /* os filtros ficam fechados, atrás de um botão; abrem no lugar, com controles nativos */
+  .cg-co-fil{padding:0;border:0;background:none}
+  .cg-co-mob{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--soft);font-size:13.5px;font-weight:600;text-align:left;color:var(--ink);cursor:pointer}
+  .cg-co-mob::after{content:"▾";color:var(--muted)}
+  .cg-co-mob[aria-expanded="true"]::after{content:"▴"}
+  .cg-co-fl{display:none;margin-top:6px;padding:10px 12px;border:1px solid var(--rule);border-radius:8px;background:var(--soft)}
+  .cg-co-mob[aria-expanded="true"]+.cg-co-fl{display:block}
+  .cg-co-f1,.cg-co-f2{gap:8px 8px}
+  .cg-co-f1 .cg-co-sel:first-of-type{margin-left:0}
+  .cg-co-sel{flex:1 1 44%}
+  .cg-co-sel select{flex:1 1 auto;min-width:0;max-width:none;padding:8px 8px;font-size:13.5px}
+  .cg-co-fil .cg-pa-f{padding:7px 12px;font-size:12.5px;white-space:normal}
+  .cg-co-fx{margin-left:0}
+  /* a frase grudada cabe em uma linha, com reticências, e leva o botão que abre os filtros */
+  .cg-co-on .cg-co-ve{display:flex;align-items:baseline;gap:8px;margin-left:-16px;margin-right:-16px;padding:6px 16px;border-left-width:4px}
+  .cg-co-on .cg-co-ve>b{display:none}
+  .cg-co-on .cg-co-ve-t{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cg-co-mudar{display:inline;flex:none;padding:0;border:0;background:none;font-size:12.5px;font-weight:600;color:var(--link);text-decoration:underline;cursor:pointer}
+  .cg-co-ns{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cg-co-ns li:first-child{grid-column:1/-1}
+  .cg-co-ns .cg-i{top:8px;right:8px}
+  .cg-co-n .cg-pa-m-n{padding-right:14px}
+  .cg-co-n .cg-pa-m-n b{font-size:25px}
+  .cg-co-pq{height:150px}
+  .cg-co-pc{display:none}
+  .cg-co-cel{display:inline}
+  /* sem script, os pontos encolhem para as mesmas faixas caberem na tela estreita */
+  .cg-co-pp:not(.cg-co-js){--dd:var(--dd2);--dy:var(--dy2)}
+  .cg-co-ach label{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+  .cg-co-ach input{width:100%}
+  .cg-co-nav button{height:44px}
+  .cg-co-pls{grid-template-columns:minmax(0,1fr)}
+  .cg-co-tb .an-tbl-wrap{max-height:70vh}
+  /* a tabela de todos, na tela estreita: o nome e o valor por mês na primeira linha, o resto embaixo, sem rolagem lateral (o cabeçalho sai; cada célula diz a própria unidade) */
+  .cg-co-tt,.cg-co-tt tbody{display:block}
+  .cg-co-tt thead{display:none}
+  .cg-co-tt tbody tr{position:relative;display:flex;flex-wrap:wrap;align-items:baseline;gap:1px 7px;padding:7px 4px 8px 32px;border-bottom:1px solid var(--rl)}
+  .cg-co-tt tbody tr::before{content:"";order:2;flex:0 0 100%;height:0}
+  .cg-co-tt tbody th,.cg-co-tt tbody td{display:block;padding:0;border:0;text-align:left;white-space:normal}
+  .cg-co-tt tbody td:nth-child(1){position:absolute;left:4px;top:10px;font-size:10px;color:var(--faint)}
+  .cg-co-tt tbody th{order:1;flex:1 1 0;min-width:0;font-size:13px}
+  .cg-co-tt tbody td:nth-child(4){order:1;flex:none;font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap}
+  .cg-co-tt tbody td:nth-child(4)::after{content:" por mês";font-size:11px;font-weight:400;color:var(--muted)}
+  .cg-co-tt tbody td:nth-child(3),.cg-co-tt tbody td:nth-child(5),.cg-co-tt tbody td:nth-child(6),.cg-co-tt tbody td:last-child{order:3;flex:none;max-width:100%;padding:0;font-family:var(--ss);font-size:11px;line-height:1.45;color:var(--muted)}
+  .cg-co-tt tbody td:nth-child(5)::before{content:"· em "}
+  .cg-co-tt tbody td:nth-child(5)::after{content:" meses"}
+  .cg-co-tt tbody td:nth-child(6)::before{content:"· "}
+  .cg-co-tt tbody td:nth-child(6)::after{content:" no período"}
+  .cg-co-tt tbody td:last-child{flex:0 0 100%}
+  .cg-co-z{margin-top:36px}
+  .cg-co-zh{font-size:19px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .cg-co-js .cg-co-pts i{transition:left .28s ease-out,bottom .28s ease-out}
+  .cg-co-cols i{transition:height .2s ease-out,bottom .2s ease-out}
+}

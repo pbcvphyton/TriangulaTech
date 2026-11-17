@@ -70,6 +70,9 @@
   var vistas = lista(root.querySelectorAll('.cg-vista'));
   var vistaAtual = '', aoAbrirVista = {};  // nome → função chamada quando a vista aparece
   var aoEndereco = {};  // nome → função que recebe o resto do endereço (#v=escolha&uf=SP → "uf=SP")
+{% if c.lp %}
+  var aoTrocarVista = null;  // chamada a cada troca de vista, com o nome (a visão por parlamentar acerta o interruptor "Ver por")
+{% endif %}
   function vistaDe(el) {
     while (el && el !== root) {
       if (el.classList && el.classList.contains('cg-vista')) return el.getAttribute('data-vista');
@@ -80,6 +83,9 @@
   function verVista(nome, semRolar) {
     if (!vistas.some(function (v) { return v.getAttribute('data-vista') === nome; })) return false;
     vistaAtual = nome;
+{% if c.lp %}
+    if (aoTrocarVista) aoTrocarVista(nome);
+{% endif %}
     vistas.forEach(function (v) { v.classList.toggle('on', v.getAttribute('data-vista') === nome); });
     abas.forEach(function (a) {
       if (a.getAttribute('data-vista') === nome) {
@@ -665,6 +671,10 @@
       if ((a.andando || []).length) colB.push(h('h4', { cls: 'az-h5', text: 'As que andaram por último' }), h('ol', { cls: 'cg-ls' }, a.andando.map(function (i) { return propItem(i, (i.s || '') + ' · ' + dataBr(i.m || i.d)); })));
       if ((a.paradas || []).length) colB.push(h('h4', { cls: 'az-h5', text: 'Paradas há mais tempo (' + num(a.paradas_n) + ' no total)' }), h('ol', { cls: 'cg-ls' }, a.paradas.map(function (i) { return propItem(i, 'parada há ' + tempo(dias(i.m || i.d)) + ' · ' + ((M.filas || {})[i.f] || i.s || '') + (i.o ? ' · ' + i.o : '')); })));
       blocos.push(h('div', { cls: 'cg-d-2c' }, [h('div', {}, colA), h('div', {}, colB)]));
+{% if c.lp %}
+      /* A visão por parlamentar: o perfil pelos projetos de quem está em exercício (só o link; o dossiê não ganha dado novo). */
+      if (M.lp && f.exercicio) blocos.push(h('p', { cls: 'cg-d-n' }, [h('a', { cls: 'cg-lp-ir', href: '#v=autores&c=' + f.k.slice(0, 2) + '&quem=' + f.k, text: 'Perfil pelos projetos (' + (M.lp.selo || '').replace(/^./, function (c) { return c.toLowerCase(); }) + ') →' })]));
+{% endif %}
       nos.push(secao('O que propõe', num(a.total) + ' proposições de autoria principal' + (a.desde ? ' desde ' + a.desde.slice(0, 4) : ''), blocos));
     }
     var secFr = secaoFrentes(f);
@@ -1114,7 +1124,11 @@
 {% include "congresso_cartoes.js.j2" %}
 {% include "congresso_tema.js.j2" %}
 {% include "congresso_pauta.js.j2" %}
+{% include "congresso_cota.js.j2" %}
 {% include "congresso_escolha.js.j2" %}
+{% if c.lp %}
+{% include "congresso_lp.js.j2" %}
+{% endif %}
   if (abas.length) verVista(vistaPadrao, true);
   doEndereco();
 })();

@@ -308,6 +308,235 @@ apelidos:
   "PL 2338/2023": ["PL da Inteligência Artificial", "PL da IA"]
   "MPV 1303/2025": ["MP do IOF"]
 
+# Régua "Projeto de país": quanto cada proposição (PL, PLP, PEC) mexe em regra de sistema nas
+# alavancas do objetivo declarado (PESO, 0 a 100) e três marcas do que a ementa enuncia (SINAL):
+# contas, isonomia e controle. Um leitor de IA marca seis campos e um alerta; a nota sai desta
+# fórmula. NÃO diz se o projeto é bom nem se falta fonte: diz o que a ementa enuncia. As áreas
+# do núcleo e os valores das marcas são escolha editorial.
+# As leituras ficam em data/congresso/leitura/ (um arquivo por Casa e ano, uma proposição por
+# linha) e entram por "python -m qijournal congresso leitura importar"; as instruções que o
+# leitor recebe estão em config/leitura_projetos.txt e citam exatamente os códigos daqui.
+# Mudar peso, valor ou corte neste bloco não exige reler; mudar as instruções exige (leitura.versao).
+# O que a régua pede e esta entrega NÃO faz (a página não pode dizer que fez): não há padrão
+# codificado à mão (mede-se a concordância entre duas leituras independentes de IA); a segunda
+# leitura é da ementa, por outro leitor, e não do texto integral; a matéria votada é lida pela
+# ementa do registro, não pelo texto votado; o parecer da CFT não é lido; e "reapresentada" é a
+# ementa igual, depois de normalizada, à de proposição anterior na mesma Casa.
+projeto_de_pais:
+  objetivo: "infraestrutura, educação e economia que cresce, com câmbio e custo de vida sob controle"
+  nivel: {nucleo: 1.0, entorno: 0.6, fora: 0.3}     # peso de cada nível de alavanca
+  nivel_rotulo: {nucleo: "núcleo", entorno: "entorno", fora: "fora do objetivo"}   # como o nível aparece na conta do peso
+  campos:
+    alavanca:
+      chave: a
+      rotulo: "Em que sistema mexe"
+      codigos:
+        - {id: fiscal, nivel: nucleo, rotulo: "Contas públicas e tributos", def: "regra fiscal, orçamento, emendas, dívida, tributos e benefícios fiscais, aposentadorias e pensões"}
+        - {id: infra, nivel: nucleo, rotulo: "Infraestrutura", def: "transporte, energia, saneamento, telecomunicações, concessões"}
+        - {id: educacao, nivel: nucleo, rotulo: "Educação e qualificação", def: "aprendizagem, avaliação, financiamento, vagas, carreira docente, primeira infância, ensino técnico"}
+        - {id: produtividade, nivel: nucleo, rotulo: "Mercados e produtividade", def: "regra econômica de empresas, crédito, concorrência, comércio exterior, trabalho, contratos, propriedade e registros, inovação"}
+        - {id: estado, nivel: nucleo, rotulo: "Máquina pública", def: "gestão, compras públicas, servidores, controle e transparência"}
+        - {id: social, nivel: entorno, rotulo: "Saúde e proteção social", def: "SUS, assistência, benefícios pagos a pessoas (BPC, Bolsa Família, seguro-desemprego)"}
+        - {id: justica, nivel: entorno, rotulo: "Segurança e Justiça", def: "crime, pena, polícia, processo civil e penal, Judiciário"}
+        - {id: ambiente, nivel: entorno, rotulo: "Meio ambiente e território", def: "licenciamento, clima, uso da terra"}
+        - {id: institucional, nivel: entorno, rotulo: "Regras políticas", def: "eleições, partidos, mandatos, Poderes, federação"}
+        - {id: outro, nivel: fora, rotulo: "Fora do objetivo", def: "costumes, família, proteção de crianças e adolescentes, conteúdo na internet, cultura, esporte, trânsito, homenagens"}
+    escopo:
+      chave: e
+      rotulo: "Quem a mudança alcança"
+      codigos:
+        - {id: geral, peso: 1.0, rotulo: "Todos", def: "toda a população, todos os contribuintes, empresas ou trabalhadores, todo o orçamento, todos os entes de um nível, ou a rede nacional inteira de uma alavanca"}
+        - {id: setor, peso: 0.6, rotulo: "Um segmento inteiro", def: "uma atividade econômica, um modal, uma etapa de ensino, um tributo ou um programa orçamentário inteiro"}
+        - {id: grupo, peso: 0.4, rotulo: "Um grupo ou objeto", def: "categoria, perfil de beneficiário, porte ou tipo de empresa, produto, doença, crime, rito ou região"}
+        - {id: local, peso: 0.1, rotulo: "Um caso", def: "município, estado, entidade, pessoa, data ou evento nomeado"}
+    mecanismo:
+      chave: m
+      rotulo: "O que o projeto faz"
+      codigos:
+        - {id: sistema, peso: 1.0, rotulo: "Regra de sistema", def: "cria, substitui ou revoga a regra geral de um sistema, e a ementa diz qual: a norma ou o modelo de provisão e financiamento de uma rede"}
+        - {id: ajuste, peso: 0.6, rotulo: "Ajuste de regra", def: "muda limite, critério, procedimento ou competência de uma regra geral"}
+        - {id: servico, peso: 0.5, rotulo: "Serviço ou estrutura", def: "manda o Estado prestar um atendimento com destinatário nomeado, ou cria unidade, órgão, cargo ou cadastro"}
+        - {id: conduta, peso: 0.4, rotulo: "Obriga, proíbe ou permite", def: "obriga, proíbe ou permite uma conduta de pessoas, empresas, profissionais ou órgãos, sem mudar regra de sistema"}
+        - {id: beneficio, peso: 0.4, rotulo: "Benefício ou exceção", def: "dá, amplia, restringe ou retira isenção, gratuidade, aposentadoria especial, piso, regime favorecido ou reserva; inclui regulamentar profissão"}
+        - {id: pena, peso: 0.4, rotulo: "Crime e pena", def: "cria crime ou muda pena, prescrição ou execução penal"}
+        - {id: diretriz, peso: 0.15, rotulo: "Política declaratória", def: "política, programa, plano ou campanha só com princípios, diretrizes e objetivos"}
+        - {id: simbolico, peso: 0.0, rotulo: "Simbólico", def: "data, título, denominação, homenagem"}
+    custo:
+      chave: ct
+      marca: contas
+      rotulo: "O que a ementa faz com o caixa"
+      codigos:
+        - {id: gasto, valor: -1, rotulo: "Cria despesa (fonte não aparece na ementa)", def: "benefício, serviço obrigatório, órgão, cargo, piso ou inclusão em programa, pagos pelo poder público"}
+        - {id: renuncia, valor: -1, rotulo: "Cria renúncia (compensação não aparece na ementa)", def: "isenção, alíquota ou tabela favorecida, dedução, regime ampliado, perdão ou parcelamento de dívida"}
+        - {id: vincula, valor: -1, rotulo: "Carimba recurso", def: "vinculação, percentual mínimo, fundo ou destinação obrigatória"}
+        - {id: repassa, valor: -1, rotulo: "Repassa o custo a terceiros", def: "gratuidade, desconto, folga ou benefício a grupo determinado, pago por empregador, concessionário ou demais usuários"}
+        - {id: investe, valor: 0, rotulo: "Investe em rede do núcleo", def: "obra, equipamento, vaga nova ou expansão de rede, só em infra ou educacao"}
+        - {id: prisional, valor: 0, rotulo: "Custo prisional (não aparece na ementa)", def: "crime novo com prisão, pena maior, regime ou progressão mais duros"}
+        - {id: fonte, valor: 0, rotulo: "Com fonte dita", def: "cria custo, e a ementa nomeia a receita ou o corte que o cobre, ou cobra de quem dá causa"}
+        - {id: neutro, valor: 0, rotulo: "Sem custo legível", def: "simbólico, rito, regra de conduta ou norma geral cujo custo fica com o obrigado"}
+        - {id: corta, valor: 1, rotulo: "Contém despesa", def: "reduz, limita, focaliza ou desvincula despesa ou renúncia"}
+        - {id: arrecada, valor: 1, rotulo: "Amplia receita", def: "cria ou aumenta tributo ou amplia a base, sem abrir exceção"}
+    isonomia:
+      chave: is
+      marca: isonomia
+      rotulo: "Para quem a regra é diferente"
+      codigos:
+        - {id: profissao, valor: -1, rotulo: "Para uma profissão", def: "regime, piso, reserva, aposentadoria ou exigência de entrada próprios de uma categoria profissional; inclui regulamentar profissão"}
+        - {id: ramo, valor: -1, rotulo: "Para um setor ou tipo de empresa", def: "regime, isenção, dispensa ou reserva próprios de setor, porte ou tipo de empresa, produto ou entidade"}
+        - {id: territorio, valor: -1, rotulo: "Para um lugar", def: "regime, incentivo ou destinação próprios de município, estado ou região"}
+        - {id: pessoal, valor: 0, rotulo: "Por condição da pessoa", def: "benefício ou regime definido por renda, idade, deficiência, doença, raça, gênero, vitimização ou conduta"}
+        - {id: neutro, valor: 0, rotulo: "Não diferencia", def: "a regra não cria nem desfaz tratamento diferente"}
+        - {id: iguala, valor: 1, rotulo: "Desfaz exceção", def: "revoga, reduz ou estende a todos um regime, isenção, reserva ou exigência de entrada restrita a categoria, setor, empresa ou lugar"}
+    controle:
+      chave: co
+      marca: controle
+      rotulo: "Aperta ou afrouxa o controle"
+      conjuntos: ["regra fiscal e orçamentária", "licitação, contratação e transparência", "responsabilização de agente público", "contrato vigente e efeito retroativo"]
+      codigos:
+        - {id: afrouxa, valor: -1, rotulo: "Afrouxa", def: "excepciona, dispensa, exclui do limite, permite o que a regra veda, anistia ou veda sanção a agente público ou ente, retroage sobre contrato"}
+        - {id: neutro, valor: 0, rotulo: "Não mexe", def: "fora dos quatro conjuntos"}
+        - {id: aperta, valor: 1, rotulo: "Aperta", def: "limita ou condiciona gasto, exige transparência, competição ou avaliação, cria sanção ou quarentena para agente público"}
+  nd: "a ementa não permite dizer"   # aceito em todo campo; em alavanca, escopo ou mecanismo: sem leitura
+  arredonda: meio_para_cima          # peso = 100 x nível x escopo x mecanismo
+  faixas:                            # sobre o peso já arredondado
+    - {id: minimo, rotulo: "mínimo", de: 0, descricao: "simbólico, declaratório, de um caso só ou fora do objetivo"}
+    - {id: pontual, rotulo: "pontual", de: 10}
+    - {id: medio, rotulo: "médio alcance", de: 20}
+    - {id: estruturante, rotulo: "estruturante", de: 60, so_nivel: nucleo}   # 60 no entorno fica em médio alcance
+  # Sinal: três marcas lado a lado (contas, isonomia, controle), cada uma com o valor do seu código.
+  # Nunca somadas entre si nem multiplicadas pelo peso. Não há rótulo único.
+  # Como a página escreve cada valor de cada marca (+1, 0, -1 e sem valor). "forma" é a do ponto
+  # nos gráficos (cheio, vazado, losango). A marca negativa não diz "ruim" nem "sem fonte": diz o
+  # que a ementa enuncia.
+  marcas:
+    contas:
+      rotulo: "Contas"
+      valores:
+        - {id: poupa, valor: 1, rotulo: "alivia o caixa", forma: cheio}
+        - {id: neutro, valor: 0, rotulo: "sem efeito legível no caixa", forma: vazado}
+        - {id: onera, valor: -1, rotulo: "pesa no caixa (fonte não aparece na ementa)", forma: losango}
+        - {id: nd, rotulo: "a ementa não permite dizer", forma: vazado}
+    isonomia:
+      rotulo: "Isonomia"
+      valores:
+        - {id: iguala, valor: 1, rotulo: "desfaz exceção", forma: cheio}
+        - {id: neutro, valor: 0, rotulo: "sem exceção para profissão, setor ou lugar", forma: vazado}
+        - {id: excecao, valor: -1, rotulo: "abre exceção para profissão, setor ou lugar", forma: losango}
+        - {id: nd, rotulo: "a ementa não permite dizer", forma: vazado}
+    controle:
+      rotulo: "Controle"
+      valores:
+        - {id: aperta, valor: 1, rotulo: "aperta o controle", forma: cheio}
+        - {id: neutro, valor: 0, rotulo: "não mexe em regra de controle", forma: vazado}
+        - {id: afrouxa, valor: -1, rotulo: "afrouxa o controle", forma: losango}
+        - {id: nd, rotulo: "a ementa não permite dizer", forma: vazado}
+  sensibilidade:                     # escolhas discutíveis: a página publica o que muda com a alternativa
+    - {campo: custo, codigo: arrecada, padrao: 1, alternativa: 0}
+    - {campo: custo, codigo: investe, padrao: 0, alternativa: -1}
+    - {campo: custo, codigo: prisional, padrao: 0, alternativa: -1}
+    - {campo: custo, codigo: vincula, padrao: -1, alternativa: 0}
+  alerta_iniciativa: {chave: in, origem: parlamentar, tipos: [PL, PLP]}   # art. 61, § 1º, II, a, c, e
+  alertas:                           # os avisos que acompanham uma leitura, como a página os escreve
+    iniciativa: "pode tratar de matéria de iniciativa do Executivo (pista, não parecer jurídico)"
+    a_confirmar: "estruturante pela ementa, à espera da segunda leitura"   # até lá, conta na faixa de baixo
+    duvida: "a ementa admite outra leitura, e só um leitor leu"
+  # De onde vem cada leitura. Toda leitura é de IA e fica guardada em data/congresso/leitura/; a
+  # proposição que ainda não está lá fica sem leitura. "ia2": duas leituras de IA, ou mais, na mesma
+  # faixa (a faixa do topo e o voto fiscal só contam com "ia2"). "regra" é o encaixe de um leitor de
+  # regras (sem IA), que não foi construído: hoje nenhuma leitura vem dele.
+  fontes:
+    regra: "lido por regras"
+    ia: "lido por IA"
+    ia2: "lido por IA, duas vezes"
+  selo: "Leitura por IA, com régua pública"   # o selo da tela
+  cft: [adequada, inadequada, nao_implica, sem_parecer]   # do histórico da Câmara, sem IA; só "inadequada" autoriza "sem fonte". Ainda não é lido: nada na página sai deste campo
+  segunda_leitura:                   # a régua pede o inteiro teor; por ora é outra leitura, independente, da mesma ementa
+    peso_minimo: 60
+    nd_tipos: [PEC, PLP]             # só com o inteiro teor (reler a mesma ementa daria "nd" de novo): ainda não se aplica
+    nd_prontas_e_votadas: true       # idem
+  autoria:
+    reapresentada_similaridade: 0.9  # ementa igual à de proposição anterior de qualquer autor na Casa
+    bancada_coautores: 10            # coautores do mesmo partido: "de bancada", conta só no partido
+    bancada_fracao: 0.5
+    onde_mira_sem: [beneficio]
+  limiares:
+    perfil_minimo: 10        # lidos para percentuais, mediana e rankings
+    perfil_lista: 3          # de 3 a 9: a lista e a ponta
+    ponta: 3                 # média dos 3 maiores pesos (protocolada e que andou); nunca em ranking
+    saldo_minimo: 5          # projetos com contas +1 ou -1 para o saldo de contas
+    partido_minimo: 5        # perfis para a mediana do partido
+    andamento_peso: 20
+    voto_peso: 20            # "nas matérias de peso"
+    voto_minimo: 10
+    voto_fechado: 0.80       # com orientação Sim ou Não
+    voto_condicao: 5         # votações em cada condição e sob cada governo
+    voto_quase_unanime: 0.90 # fora de todos os itens
+    pessoas_minimo: 50       # abaixo disto: "não dá para responder por pessoa"
+    confianca: 0.95          # intervalo por partido, reamostragem de membros
+    longe_do_partido: 20     # só apresentação: a tantos pontos da mediana do próprio partido, o ponto da pessoa sai em destaque
+    teto_pontos: 600         # só apresentação: máximo de pontos por Casa no gráfico dos projetos (entram os de maior peso)
+  leitura:
+    cega: true               # sem autor, partido, origem nem número
+    id_opaco: true
+    piloto: 1000             # antes da leitura completa
+    faixa_alerta: 0.5        # faixa acima disto no piloto: o corte muda uma vez, por significado
+    padrao_a_mao: 300        # duas pessoas, independentes
+    fracao_plp_pec: 0.5      # no piloto e no padrão
+    concordancia_minima: 0.6 # por código; peso: fundem-se os códigos; sinal: o campo sai das contas
+    reler_confianca: 1       # cf 1 é relido; faixas diferentes: sem leitura
+    candidatas_peso: 60      # peso pela leitura de regras, em alavanca do núcleo, a partir do qual a proposição vai à IA (candidata ao topo)
+    versao: 1                # das instruções ao leitor (config/leitura_projetos.txt): sobe quando elas mudam de modo que exija reler, e as leituras gravadas com a versão antiga deixam de valer
+    tipos: [PL, PLP, PEC, PLS, PLC]   # o que se lê; PLS e PLC são os projetos de lei na numeração do Senado anterior a 2019
+    tipos_votadas: [MPV, PLV]         # a mais, só nas matérias com votação nominal do texto principal no Plenário
+    estados:                 # o estado de cada leitura gravada ("r") e como a página o diz
+      - {r: 1, rotulo: "lido na ementa, por um leitor"}
+      - {r: 2, rotulo: "lido na ementa, por dois leitores"}
+      - {r: 3, rotulo: "lido na ementa, por três leitores (os dois primeiros divergiram)"}
+      - {r: 0, rotulo: "leitura instável (os leitores não se entenderam): fica sem leitura"}
+    # A leitura diária (python -m qijournal congresso ler): todo dia, depois da edição diária, num
+    # fluxo à parte (.github/workflows/leitura.yml: a edição, o e-mail e o Instagram não esperam a
+    # leitura), a cadeia de IAs do jornal (llm.providers, em config/site.yaml) lê as proposições
+    # novas e as matérias que foram a voto, e relê o que muda a conta, com as instruções de
+    # config/leitura_projetos.txt. O que for lido entra nas contas na atualização seguinte do
+    # Congresso.
+    # Em cada lote vão, misturadas e sem aviso, perguntas de controle (config/leitura_referencia.jsonl:
+    # proposições reais que dois leitores classificaram igual); o lote que erra nelas é descartado.
+    # O registro de cada dia fica em data/congresso/leitura/diario.json. Desligar sem mexer aqui:
+    # QIJ_NO_LEITURA=1.
+    diaria:
+      ligada: true
+      primeiras: 150         # teto de primeiras leituras por rodada (chegam cerca de 25 proposições novas por dia)
+      segundas: 60           # teto de segundas leituras por rodada: só as que mudam a conta (peso do topo e matérias votadas)
+      lote: 30               # proposições por chamada à IA (os controles vão a mais)
+      controles: 10          # perguntas de controle em cada lote (a mesma régua de aceite da leitura inicial: 7 de 10)
+      controles_minimo: 7    # acertos (a faixa, pela fórmula) abaixo disto: o lote inteiro é descartado; e nenhum lote leva mais que isto menos um (6) perguntas da mesma faixa: quem responde a mesma coisa para tudo não passa
+      prazo_segundos: 480    # prazo da leitura, do primeiro lote ao último (8 min; cabe no timeout do passo)
+      chamadas: 12           # teto de chamadas à IA por rodada (150 primeiras = 5; 60 segundas = 2; o resto, terceiras leituras)
+      editores: []           # vazio: toda a cadeia de llm.providers; ou só estes, nesta ordem (ex.: [gemini, gemini_lite])
+      dias: 60               # dias guardados no registro
+  pares_espelho:            # teste de aceite: os dois lados têm de cair na mesma faixa
+    - {id: provisao_ou_norma, a: {caso: "tempo integral obrigatório em toda a educação básica", codigos: [educacao, geral, sistema]}, b: {caso: "substitui os tributos sobre o consumo por um imposto único", codigos: [fiscal, geral, sistema]}}
+    - {id: investir_ou_conceder, a: {caso: "plano de investimento público em ferrovias, com meta e fonte", codigos: [infra, setor, sistema]}, b: {caso: "novo marco de concessões do saneamento", codigos: [infra, setor, sistema]}}
+    - {id: cortar_gasto_ou_renuncia, a: {caso: "limita o crescimento de despesa obrigatória", codigos: [fiscal, geral, ajuste]}, b: {caso: "corta 10% dos benefícios tributários", codigos: [fiscal, geral, ajuste]}}
+    - {id: baixar_ou_criar_tributo, a: {caso: "reduz a alíquota geral de um imposto", codigos: [fiscal, geral, ajuste]}, b: {caso: "aumenta a alíquota geral de um imposto", codigos: [fiscal, geral, ajuste]}}
+    - {id: regular_ou_desregular, a: {caso: "cria regime de regulação econômica para um mercado", codigos: [produtividade, setor, sistema]}, b: {caso: "revoga o regime de regulação do mesmo mercado", codigos: [produtividade, setor, sistema]}}
+    - {id: jornada, a: {caso: "reduz a jornada máxima de todos os empregados", codigos: [produtividade, geral, ajuste]}, b: {caso: "amplia a jornada máxima de todos os empregados", codigos: [produtividade, geral, ajuste]}}
+    - {id: fundo_ou_teto, a: {caso: "torna permanente o fundo de financiamento da educação básica", codigos: [educacao, geral, sistema]}, b: {caso: "institui limite para a despesa primária", codigos: [fiscal, geral, sistema]}}
+    - {id: saude_ou_pena, a: {caso: "inclui um item em programa de medicamentos", codigos: [social, grupo, beneficio]}, b: {caso: "aumenta a pena de um crime", codigos: [justica, grupo, pena]}}
+  # As matérias votadas são lidas como as demais (pela ementa do registro, duas vezes) e as leituras
+  # ficam na mesma guarda, data/congresso/leitura/: não há lista de votadas neste arquivo.
+  # "Pessoa ou partido?": os cortes de quanto o partido explica (abaixo de 30% diz pouco; de 70% em
+  # diante, quase tudo), quantos sorteios fazem o traço do acaso (partidos embaralhados entre as
+  # pessoas) e o intervalo (pessoas reamostradas), e a semente que torna os sorteios repetíveis.
+  cruzar: {zonas: [30, 70], permutacoes: 1000, reamostras: 2000, semente: 57}
+  # Quem é quem nas contas da visão por parlamentar (qijournal/congresso/pais.py), para o Python
+  # não escrever nome de marca, de alavanca nem de escopo. "caixa": a marca que a tela mostra como
+  # direção e que dá o saldo de contas e o voto fiscal; "excecao": a da taxa de exceção;
+  # "controle": a que também conta no voto fiscal, só na alavanca "alavanca_do_caixa"; essa
+  # alavanca entra no voto fiscal com qualquer peso, menos nos escopos de
+  # "voto_fiscal_sem_escopo" (régua, seção 5, item B).
+  papeis: {caixa: contas, excecao: isonomia, controle: controle, alavanca_do_caixa: fiscal, voto_fiscal_sem_escopo: [local]}
+
 # Frentes parlamentares de causa: quem assina cada uma e como vota no tema dela. Só a Câmara
 # registra quem assina (o Senado não publica as frentes). "titulo": o começo do título
 # oficial (vale para qualquer legislatura em que a frente for registrada de novo com o mesmo
@@ -352,3 +581,62 @@ frentes:
   - {titulo: "Frente Parlamentar Católica", nome: "Católica", tema: todas}
   - {titulo: "Frente Parlamentar em defesa do Estado Laico", nome: "Estado Laico e Liberdade Religiosa", tema: todas}
   - {titulo: "Frente Parlamentar Conservadora", nome: "Conservadora", tema: todas}
+
+# A cota parlamentar (aba "Cota parlamentar"): escolhas de apresentação. Nenhuma muda uma
+# soma: são os nomes com que as despesas aparecem, quantos meses do fim da série ainda
+# recebem notas e a tabela do limite mensal por estado.
+cota:
+  # Quantos meses fechados do fim da série aparecem mais claros, com o aviso "ainda recebem
+  # notas": as notas chegam depois do mês da despesa, e sem o aviso os últimos meses parecem
+  # queda de gasto. É escolha prudente, não o prazo oficial de apresentação da nota (que não
+  # foi conferido): na dúvida, aumentar.
+  meses_recentes: 3
+  # O limite mensal da cota muda por estado. A tabela oficial NÃO FOI CONFERIDA na fonte
+  # oficial (o ato e o anexo de cada Casa): por isso fica nula, e a página sai sem nenhuma
+  # marca, percentual ou frase com valor de limite. Não preencher de memória nem de
+  # reportagem. Depois de conferir cada valor com a fonte aberta ao lado, o formato é:
+  #   cd:
+  #     fonte: "o ato e o anexo de onde os valores saíram"
+  #     url: "o endereço oficial conferido"
+  #     vigencias:
+  #       - desde: "AAAA-MM"                # o primeiro mês em que os valores valem
+  #         valores: {AC: ..., AL: ..., ...}   # as 27 UFs, em R$ por mês
+  # Vigência sem as 27 UFs, sem fonte ou sem endereço desliga a tabela inteira e vira aviso.
+  tetos:
+    cd: null    # falta conferir na fonte oficial
+    sf: null    # falta conferir na fonte oficial
+  # Nome oficial da despesa (como vem no registro) → id estável (vai no endereço da página e
+  # no arquivo de dados) e nome curto (o que a página mostra). O casamento é pelo nome sem
+  # acento, em minúsculas e sem pontuação. Despesa nova, sem rótulo aqui, aparece com o nome
+  # oficial e ganha um id feito dele.
+  rotulos:
+    cd:
+      - {oficial: "DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR.", id: divulgacao, curto: "Divulgação do mandato"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE VEÍCULOS AUTOMOTORES", id: veiculos, curto: "Aluguel de veículos"}
+      - {oficial: "MANUTENÇÃO DE ESCRITÓRIO DE APOIO À ATIVIDADE PARLAMENTAR", id: escritorio, curto: "Escritório"}
+      - {oficial: "COMBUSTÍVEIS E LUBRIFICANTES.", id: combustivel, curto: "Combustível"}
+      - {oficial: "HOSPEDAGEM ,EXCETO DO PARLAMENTAR NO DISTRITO FEDERAL.", id: hospedagem, curto: "Hospedagem"}
+      - {oficial: "TELEFONIA", id: telefonia, curto: "Telefonia"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE AERONAVES", id: aeronaves, curto: "Aluguel de aeronaves"}
+      - {oficial: "COMPLEMENTAÇÃO DO AUXÍLIO-MORADIA", id: moradia, curto: "Complemento do auxílio-moradia"}
+      - {oficial: "SERVIÇO DE SEGURANÇA PRESTADO POR EMPRESA ESPECIALIZADA.", id: seguranca, curto: "Segurança privada"}
+      - {oficial: "SERVIÇO DE TÁXI, PEDÁGIO E ESTACIONAMENTO", id: taxi, curto: "Táxi, pedágio e estacionamento"}
+      - {oficial: "PASSAGEM AÉREA - REEMBOLSO", id: aereas-reembolso, curto: "Passagens aéreas (reembolso)"}
+      - {oficial: "PASSAGEM AÉREA - RPA", id: aereas-rpa, curto: "Passagens aéreas (requisição)"}
+      - {oficial: "FORNECIMENTO DE ALIMENTAÇÃO DO PARLAMENTAR", id: alimentacao, curto: "Alimentação"}
+      - {oficial: "LOCAÇÃO OU FRETAMENTO DE EMBARCAÇÕES", id: embarcacoes, curto: "Aluguel de embarcações"}
+      - {oficial: "PASSAGENS TERRESTRES, MARÍTIMAS OU FLUVIAIS", id: terrestres, curto: "Passagens de ônibus e barco"}
+      - {oficial: "ASSINATURA DE PUBLICAÇÕES", id: publicacoes, curto: "Assinaturas"}
+      - {oficial: "SERVIÇOS POSTAIS", id: postais, curto: "Correios"}
+      - {oficial: "PARTICIPAÇÃO EM CURSO, PALESTRA OU EVENTO SIMILAR", id: cursos, curto: "Cursos e eventos"}
+      - {oficial: "AQUISIÇÃO DE TOKENS E CERTIFICADOS DIGITAIS", id: certificados, curto: "Certificados digitais"}
+      - {oficial: "CONSULTORIAS, PESQUISAS E TRABALHOS TÉCNICOS.", id: consultorias, curto: "Consultorias e pesquisas"}
+      - {oficial: "PASSAGEM AÉREA - MISSÃO OFICIAL", id: aereas-missao, curto: "Passagens aéreas (missão oficial)"}
+    sf:
+      - {oficial: "Locomoção, hospedagem, alimentação, combustíveis e lubrificantes", id: locomocao, curto: "Locomoção, hospedagem e combustível"}
+      - {oficial: "Contratação de consultorias, assessorias, pesquisas, trabalhos técnicos e outros serviços de apoio ao exercício do mandato parlamentar", id: consultorias, curto: "Consultorias e assessorias"}
+      - {oficial: "Passagens aéreas, aquáticas e terrestres nacionais", id: passagens, curto: "Passagens"}
+      - {oficial: "Divulgação da atividade parlamentar", id: divulgacao, curto: "Divulgação do mandato"}
+      - {oficial: "Aluguel de imóveis para escritório político, compreendendo despesas concernentes a eles.", id: escritorio, curto: "Aluguel de escritório"}
+      - {oficial: "Aquisição de material de consumo para uso no escritório político, inclusive aquisição ou locação de software, despesas postais, aquisição de publicações, locação de móveis e de equipamentos.", id: material, curto: "Material e equipamentos de escritório"}
+      - {oficial: "Serviços de Segurança Privada", id: seguranca, curto: "Segurança privada"}

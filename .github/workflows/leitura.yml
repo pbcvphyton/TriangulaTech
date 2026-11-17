@@ -1,0 +1,212 @@
+# Leitura diária dos projetos de lei (a visão por parlamentar da aba Congresso): a cadeia
+# de IAs do jornal lê as proposições novas e as matérias que foram a voto e relê o que
+# muda a conta (python -m qijournal congresso ler), e publica só a guarda das leituras e
+# o registro do dia (data/congresso/leitura/), num commit próprio.
+#
+# Roda num fluxo à parte, depois da "Edição diária": a edição, o e-mail e o Instagram
+# não esperam a leitura (o Instagram dispara quando a "Edição diária" termina), e a
+# edição usa as IAs primeiro. O que for lido entra nas contas na atualização seguinte
+# do Congresso. Limites em config/congresso.yaml (projeto_de_pais.leitura.diaria).
+# Desligar: variável QIJ_NO_LEITURA=1 (QIJ_NO_CONGRESSO=1 também a desliga).
+name: Leitura dos projetos
+
+on:
+  workflow_run:
+    # Logo depois de cada execução da edição diária. A de hora em hora também dispara
+    # (termina em segundos quando não há edição nova): por isso o passo "Verificar se
+    # há o que ler" decide, e esta execução também termina em segundos quando a edição
+    # de hoje ainda não saiu ou a leitura de hoje já está no registro.
+    workflows: ["Edição diária"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      max:
+        description: "Teto de leituras desta rodada, primeiras e segundas somadas (vazio: os tetos do config; 0: só diz o que leria)"
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  leitura:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # Uma leitura por vez, numa fila só deste fluxo (não a da edição diária: esta
+    # execução não toma o lugar de uma edição que espera a vez). No job (e não no
+    # workflow), para que execuções puladas pelo "if" acima não tomem o lugar de uma
+    # que está esperando. Quem espera a vez decide depois de a anterior publicar: não
+    # lê de novo o que ela leu.
+    concurrency:
+      group: leitura-projetos-${{ github.ref }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    # A leitura tem prazo de 8 min (projeto_de_pais.leitura.diaria.prazo_segundos), mais a
+    # carga das proposições; o resto é instalar, restaurar o cache e publicar.
+    timeout-minutes: 20
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v5
+        with:
+          # Ponta da branch no início do job (no disparo pela "Edição diária", a branch
+          # padrão), não o SHA do evento: uma execução que esperou na fila parte do que
+          # a anterior publicou.
+          ref: ${{ github.ref_name }}
+
+      - name: Verificar se há o que ler
+        # Depois da "Edição diária": só segue se a edição de hoje já saiu e o registro
+        # (data/congresso/leitura/diario.json) ainda não tem a linha de hoje. O disparo
+        # manual sempre lê. Com a leitura ou o Congresso desligados, nunca.
+        id: decidir
+        env:
+          EVENT: ${{ github.event_name }}
+          QIJ_NO_LEITURA: ${{ vars.QIJ_NO_LEITURA }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          # Entrada do disparo manual (vazia no disparo pela edição): passada por
+          # variável de ambiente, nunca interpolada direto no script.
+          INPUT_MAX: ${{ inputs.max }}
+        run: |
+          # Uma variável do repositório vale como "sim" do jeito que o Python a lê.
+          ativa() {
+            case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')" in
+              1|true|yes|sim|on) return 0 ;;
+            esac
+            return 1
+          }
+          today=$(TZ=America/Sao_Paulo date +%F)
+          edition=$(python3 -c 'import json; print(json.load(open("edicoes/latest.json")).get("date", ""))' 2>/dev/null || true)
+          lido=$(python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); print(any(isinstance(dia, dict) and dia.get("data") == sys.argv[2] for dia in d.get("dias", [])))' data/congresso/leitura/diario.json "$today" 2>/dev/null || echo False)
+          if ativa "$QIJ_NO_LEITURA"; then
+            echo "Leitura diária desligada (QIJ_NO_LEITURA); nada a fazer."
+            echo "ler=false" >> "$GITHUB_OUTPUT"
+          elif ativa "$QIJ_NO_CONGRESSO"; then
+            echo "Congresso desligado (QIJ_NO_CONGRESSO); nada a ler."
+            echo "ler=false" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            case "$INPUT_MAX" in
+              *[!0-9]*)
+                echo "::error::O teto de leituras tem de ser um número inteiro, zero ou mais."
+                exit 1
+                ;;
+            esac
+            echo "Disparo manual: lendo (teto: ${INPUT_MAX:-os do config})."
+            echo "ler=true" >> "$GITHUB_OUTPUT"
+          elif [ "$edition" != "$today" ]; then
+            echo "Edição de hoje ($today) ainda não saiu (última: ${edition:-nenhuma}); a leitura roda depois dela."
+            echo "ler=false" >> "$GITHUB_OUTPUT"
+          elif [ "$lido" = "True" ]; then
+            echo "A leitura de $today já está no registro; nada a fazer nesta execução."
+            echo "ler=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Edição de $today publicada e sem leitura no registro: lendo os projetos."
+            echo "ler=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configurar Python
+        if: steps.decidir.outputs.ler == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        if: steps.decidir.outputs.ler == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Dia do cache do Congresso
+        if: steps.decidir.outputs.ler == 'true'
+        id: cg
+        run: echo "dia=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Restaurar o cache do que foi baixado do Congresso
+        # O cache da "Edição diária" (a mesma chave do dia; parte do mais recente), só
+        # restaurado: a leitura aproveita o que a edição baixou e não grava de volta, para
+        # não criar uma entrada que concorra com a dela. Se nada for restaurado, o passo
+        # seguinte não lê.
+        if: steps.decidir.outputs.ler == 'true'
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/congresso
+          key: congresso-${{ steps.cg.outputs.dia }}
+          restore-keys: congresso-
+
+      - name: Ler os projetos novos
+        # É acessório: sem chave, com a IA fora do ar ou sem tempo, o que não foi lido
+        # fica para a próxima rodada. A guarda é gravada a cada lote: o que foi lido antes
+        # de o prazo acabar é publicado pelo passo seguinte.
+        if: steps.decidir.outputs.ler == 'true'
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          # Os mesmos editores por IA da edição (llm.providers), cada um com o seu segredo.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AIMLAPI_KEY: ${{ secrets.AIMLAPI_KEY }}
+          SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          QIJ_NO_LEITURA: ${{ vars.QIJ_NO_LEITURA }}
+          QIJ_MODEL: ${{ vars.QIJ_MODEL }}
+          QIJ_GEMINI_MODEL: ${{ vars.QIJ_GEMINI_MODEL }}
+          QIJ_GEMINI_LITE_MODEL: ${{ vars.QIJ_GEMINI_LITE_MODEL }}
+          QIJ_AIML_MODEL: ${{ vars.QIJ_AIML_MODEL }}
+          QIJ_SENSENOVA_MODEL: ${{ vars.QIJ_SENSENOVA_MODEL }}
+          QIJ_MISTRAL_MODEL: ${{ vars.QIJ_MISTRAL_MODEL }}
+          QIJ_KIMI_MODEL: ${{ vars.QIJ_KIMI_MODEL }}
+          INPUT_MAX: ${{ inputs.max }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: |
+          # Sem o cache da edição (nenhum arquivo restaurado), a leitura baixaria tudo de
+          # novo (os arquivos anuais da Câmara, cerca de 1,5 GB), estouraria o prazo deste
+          # passo antes de gravar a linha do dia no registro, e repetiria isso a cada hora.
+          if [ -z "$(find "$RUNNER_TEMP/congresso" -type f -print -quit 2>/dev/null)" ]; then
+            echo "::warning::Sem o cache do Congresso (nada foi restaurado), a leitura dos projetos não leu: baixaria tudo de novo e estouraria o prazo a cada hora. O cache é gravado pela Edição diária e pelo fluxo Congresso; a leitura volta sozinha na execução seguinte à que o gravar."
+            exit 0
+          fi
+          args=(--dir . --cache "$RUNNER_TEMP/congresso")
+          if [ -n "$INPUT_MAX" ]; then args+=(--max "$INPUT_MAX"); fi
+          python -m qijournal congresso ler "${args[@]}"
+
+      - name: Publicar a leitura (commit e push)
+        # Só a guarda das leituras e o registro do dia (data/congresso/leitura/). Este
+        # passo nunca desfaz nem apaga o que outro enviou: o commit leva só o que a
+        # leitura gravou (nenhuma remoção) e, se o remoto andou, é reaplicado sobre ele.
+        if: steps.decidir.outputs.ler == 'true'
+        env:
+          TZ: America/Sao_Paulo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          pasta=data/congresso/leitura
+          if [ ! -d "$pasta" ]; then
+            echo "Sem a pasta das leituras ($pasta); nada a publicar."
+            exit 0
+          fi
+          # Sobra de uma gravação interrompida (arquivo temporário): não vai ao repositório.
+          rm -f "$pasta"/.*.tmp
+          git add --ignore-removal -- "$pasta"
+          if git diff --cached --quiet; then
+            echo "Nenhuma leitura nova para publicar."
+            exit 0
+          fi
+          git commit --quiet -m "📚 Leitura dos projetos de lei em $(date +%d/%m/%Y)"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then exit 0; fi
+            if [ "$attempt" -eq 3 ]; then break; fi
+            echo "::notice::Push recusado (tentativa ${attempt}/3); reaplicando o commit da leitura sobre o remoto."
+            sleep $((attempt * 5))
+            # O remoto andou: o commit da leitura (que só toca a guarda) é reaplicado
+            # sobre ele, e o que outros enviaram fica como está. Se o remoto mexeu nas
+            # mesmas linhas da guarda, não há como juntar sem desfazer o que foi
+            # enviado: nada é publicado, e a próxima execução lê de novo.
+            git fetch --quiet origin "${GITHUB_REF_NAME}"
+            if ! git rebase --quiet --autostash FETCH_HEAD; then
+              git rebase --abort || true
+              echo "::warning::A guarda das leituras mudou no repositório durante a leitura; as leituras desta execução não foram publicadas (a próxima execução lê de novo)."
+              exit 0
+            fi
+          done
+          echo "::warning::Projetos lidos, mas data/congresso/leitura/ não foi atualizado no repositório após 3 tentativas (a próxima execução lê de novo)."
