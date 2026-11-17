@@ -1,0 +1,12 @@
+{#- Aba Congresso: o interruptor "Ver por" (incluído por congresso.html.j2, na primeira linha da
+    barra, só quando há a visão por parlamentar). Fica fora de #cgCasas: a troca de Casa regrava
+    o aria-pressed de todos os botões de lá. A frase de ajuda vem para o fim da linha e nasce
+    escondida, como a Casa; o script (congresso_lp.js.j2) mostra os dois. -#}
+    <div class="cg-lente" id="cgLente" role="group" aria-label="Ver por" hidden>
+      <span class="cg-lente-r" aria-hidden="true">Ver por</span>
+      <div class="cg-lente-g">
+        <button type="button" class="cg-lente-b" data-lente="partido" aria-pressed="true">Partido <span>como votam</span></button>
+        <button type="button" class="cg-lente-b" data-lente="pessoa" aria-pressed="false">Parlamentar <span>o que propõem</span></button>
+      </div>
+    </div>
+    <span class="cg-casas-n" id="cgCasasN" hidden>Escolha a Casa e, abaixo, o que quer ver dela.</span>

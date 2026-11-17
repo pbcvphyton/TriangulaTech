@@ -1592,6 +1592,21 @@ def atualizar(
         "legislatura": legislatura.numero,
         "pessoas": [ficha.linha(f, legislatura.numero, legislatura.inicio, regras.fusoes) for casa in ("cd", "sf") for f in sorted(fichas[casa], key=lambda f: text.normalize(f["nome"]))],
     }
+    # A visão por parlamentar: os projetos de cada um, lidos pela régua "Projeto de país" (o bloco "lp" de
+    # cada Casa e os arquivos dela). Acessório: sem leituras na guarda, nada novo sai; um erro vira aviso.
+    try:
+        from . import pais  # import tardio: só esta parte usa a leitura dos projetos
+
+        resultado.gravados += pais.integrar(
+            root, pasta, regras, hoje, paineis, meta, avisos, gravar=_gravar,
+            props={"cd": props_cd, "sf": props_sf}, autoria=autoria, relatorias=relatorias, comissoes=das_comissoes,
+            cadastros=cadastros, votos=votos, resumo=resumo["pessoas"], fichas_das_materias=fichas_das_materias,
+            exercicio=exercicio.fechados(intervalos, hoje) if intervalos else None, presidencia=exercicio.fechados(presidentes, hoje),
+        )
+    except Exception as exc:  # noqa: BLE001 — acessório: sem esta parte, a aba sai como sempre saiu
+        log.exception("Congresso: visão por parlamentar indisponível")
+        avisos.append(f"Visão por parlamentar indisponível ({exc})")
+        meta["avisos"] = list(avisos)
     atuais = set()
     for casa in ("cd", "sf"):
         for f in fichas[casa]:

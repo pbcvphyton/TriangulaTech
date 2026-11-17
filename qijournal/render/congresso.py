@@ -242,6 +242,7 @@ class CasaView:
     cota: dict[str, Any] | None = None  # a cota parlamentar: quem gasta quanto, com o quê e com quem
     comissoes: dict[str, Any] | None = None  # as votações nominais nas comissões
     pauta: dict[str, Any] | None = None  # por onde passou o que foi aprovado: sinais, direção por tema, semanas
+    lp: dict[str, Any] | None = None  # a visão por parlamentar (render/congresso_lp.py); None sem o bloco "lp" nos dados
 
 
 @dataclass
@@ -258,6 +259,7 @@ class CongressoView:
     metodo: list[tuple[str, str]]
     manifesto: str
     totais: dict[str, Any]
+    lp: dict[str, Any] | None = None  # a visão por parlamentar: o que vale para as duas Casas (None: a página sai sem ela)
 
 
 def _faixas(casa: str, pessoas: list[dict[str, Any]], campos: list[dict[str, Any]]) -> list[Faixa]:
@@ -2924,6 +2926,9 @@ def render_congresso_page(config: Config, data_dir: Path, *, home_href: str, arc
     if d is None:
         return None
     view = congresso_view(d, config)
+    from . import congresso_lp  # import tardio: ele usa os utilitários deste módulo
+
+    congresso_lp.encaixar(view, d, config, data_dir)  # a visão por parlamentar (só com o bloco "lp" nos dados)
     config.congresso.publicado = True
     template = filters.environment().get_template("congresso.html.j2")
     html = template.render(

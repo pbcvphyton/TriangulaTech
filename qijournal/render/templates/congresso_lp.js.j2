@@ -1,0 +1,1032 @@
+{#- Aba Congresso: a visão por parlamentar (incluído por congresso.js.j2, dentro da mesma função,
+    só quando há c.lp). O interruptor "Ver por" (as abas de cada visão; a visão não entra no
+    endereço: sai da aba), o que as vistas novas têm em comum (os rótulos do manifesto, o leitor
+    de arquivos sob demanda, a Janela, a pessoa em foco e a alavanca, que atravessam as vistas) e
+    as duas primeiras: "Os projetos" (#v=projetos) e "Quem propõe" (#v=autores).
+    Os pontos vêm de projetos-<casa>.json e autores-<casa>.json quando a vista abre; o HTML já
+    traz os números, as cabeças das faixas, as listas e as tabelas. Seleção realça: o que não
+    passa fica esmaecido, não some, e nenhum ponto muda de lugar (só a troca de medida
+    redesenha). Nenhum nome de faixa, alavanca, marca ou código é escrito aqui: vêm de M.lp.
+    Sempre com textContent: nada do arquivo vira HTML. -#}
+  /* ════ A visão por parlamentar ════ */
+  var LPM = M.lp || {}, LPR = LPM.rot || {}, LPC = LPM.cortes || {};
+  var LP = { quem: '', eixo: '' };  // o que vale entre as vistas: a pessoa em foco e a alavanca
+  var lpVistas = {};  // vista → Casa → { abrir(), doEndereco(parâmetros), casaMudou() }
+
+  /* O interruptor "Ver por": as abas de hoje são a visão "partido"; as novas, a visão "pessoa". */
+  var lenteEl = d.getElementById('cgLente'), fraseDaBarra = d.getElementById('cgCasasN');
+  var LENTE = {}, lenteAtual = 'partido', carregando = true;
+  if (nav) lista(nav.querySelectorAll('ul')).forEach(function (ul) {
+    var l = ul.getAttribute('data-lente') || 'partido';
+    lista(ul.querySelectorAll('a[data-vista]')).forEach(function (a) {
+      var v = a.getAttribute('data-vista');
+      LENTE[v] = LENTE[v] && LENTE[v] !== l ? 'ambas' : l;
+    });
+  });
+  function guardar(chave, valor) { try { w.sessionStorage.setItem(chave, valor); } catch (erro) { /* sem armazenamento: vale só nesta página */ } }
+  function guardado(chave) { try { return w.sessionStorage.getItem(chave); } catch (erro) { return null; } }
+  function verLente(l) {
+    lenteAtual = l;
+    root.setAttribute('data-lente', l);
+    if (lenteEl) lista(lenteEl.querySelectorAll('button')).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lente') === l ? 'true' : 'false'); });
+    guardar('qij-lente', l);
+  }
+  aoTrocarVista = function (nome) {
+    if (LENTE[nome] && LENTE[nome] !== 'ambas' && LENTE[nome] !== lenteAtual) verLente(LENTE[nome]);
+    if (!(carregando && nome === vistaPadrao)) guardar('qij-vista-' + lenteAtual, nome);
+  };
+  w.setTimeout(function () { carregando = false; }, 0);
+  if (lenteEl && abas.length) {
+    lenteEl.hidden = false;
+    if (fraseDaBarra) fraseDaBarra.hidden = !casas || casas.hidden;
+    verLente('partido');
+    lenteEl.addEventListener('click', function (event) {
+      var b = event.target && event.target.closest ? event.target.closest('button[data-lente]') : null, l = b ? b.getAttribute('data-lente') : '';
+      if (!l || l === lenteAtual) return;
+      var destino = guardado('qij-vista-' + l);
+      if (!destino || (LENTE[destino] !== l && LENTE[destino] !== 'ambas')) destino = l === 'pessoa' ? (LPM.abas || [])[0] : vistaPadrao;
+      if (!destino) return;
+      if (w.history && w.history.pushState) w.history.pushState(null, '', '#v=' + destino);
+      verLente(l);
+      verVista(destino);
+    });
+  }
+
+  /* "Como ler", na visão por parlamentar, leva ao bloco da leitura dos projetos (no fim da seção que já existia). */
+  if (nav) nav.addEventListener('click', function (event) {
+    var a = event.target && event.target.closest ? event.target.closest('a[href="#cg-lp-metodo"]') : null, alvo = d.getElementById('cg-lp-metodo');
+    if (a && alvo) alvo.scrollIntoView();
+  });
+
+  /* ── O que as vistas novas têm em comum ── */
+  var lpCache = {}, lpFila = {};
+  /* Um arquivo da visão, lido uma vez: lpArquivo('projetos', 'cd', fn) ou lpArquivo('autoria', 'cd-204536', fn). */
+  function lpArquivo(tipo, qual, pronto) {
+    var chave = tipo + ':' + qual;
+    if (lpCache[chave]) { pronto(null, lpCache[chave]); return; }
+    if (lpFila[chave]) { lpFila[chave].push(pronto); return; }
+    lpFila[chave] = [pronto];
+    buscar((LPM.arq || {})[tipo] + qual + '.json', function (erro, x) {
+      var ok = !erro && x && x.cols && (x.linhas || x.votacoes);  // decide-<casa>.json traz "votacoes" no lugar de "linhas"
+      if (ok) lpCache[chave] = x;
+      var fila = lpFila[chave];
+      lpFila[chave] = null;
+      fila.forEach(function (fn) { fn(ok ? null : (erro || new Error('formato')), lpCache[chave]); });
+    });
+  }
+  /* As linhas de um arquivo (vetores) como objetos, pelas colunas dele. */
+  function lpLinhas(arq) {
+    return arq.linhas.map(function (l) {
+      var o = {};
+      arq.cols.forEach(function (c, i) { o[c] = l[i]; });
+      return o;
+    });
+  }
+  function lpParams(q) {
+    var p = {}, algum = false;
+    (q || '').split('&').forEach(function (par) {
+      var i = par.indexOf('=');
+      if (i > 0) { try { p[par.slice(0, i)] = decodeURIComponent(par.slice(i + 1)); algum = true; } catch (erro) { /* parâmetro malformado: ignorado */ } }
+    });
+    return algum ? p : null;
+  }
+  function lpCasaDaVez() { return casas && !casas.hidden ? root.getAttribute('data-ver') : ''; }
+  function lpDec(v) { return v == null ? '—' : String(Math.round(v * 10) / 10).replace('.', ','); }
+  function lpRotulo(listaDePares, id) {
+    for (var i = 0; i < (listaDePares || []).length; i++) if (listaDePares[i][0] === id) return listaDePares[i];
+    return null;
+  }
+  function lpEixo(id) { var e = lpRotulo(LPM.eixos, id); return e ? e[1] : id; }
+  function lpDir(id) { return lpRotulo(LPM.direcoes, id) || [id, id, 'vazado', null]; }
+  function lpFaixa(id) { var f = lpRotulo(LPM.faixas, id); return f ? f[1] : id; }
+  function lpNoTopo(faixa) { return ((LPM.grupos || {}).topo || []).indexOf(faixa) >= 0; }
+  function lpForma(forma, extra) { return h('i', { cls: 'cg-lp-g cg-lp-' + (forma || 'vazado') + (extra ? ' ' + extra : ''), 'aria-hidden': 'true' }); }
+  function lpSelo() { return h('button', { cls: 'az-selo cg-lp-selo', type: 'button', 'data-dica': LPM.selo_dica || null, text: LPM.selo || '' }); }
+  lista(root.querySelectorAll('.cg-lp-selo')).forEach(function (b) { b.setAttribute('data-dica', LPM.selo_dica || ''); });
+  function lpTag(confirmado) { return h('span', { cls: 'cg-lp-tag' + (confirmado ? '' : ' cg-lp-tag-ac'), text: confirmado ? LPR.topo : 'a confirmar' }); }
+  function lpMateria(k, t, u, f) {
+    if (f) return h('a', { cls: 'cg-mt', href: '#m=' + k, 'data-m': k, text: t });
+    return u ? h('a', { cls: 'cg-mt', href: u, target: '_blank', rel: 'noopener noreferrer', text: t }) : h('span', { cls: 'cg-pa-c-t', text: t });
+  }
+  function lpPessoa(k, nome) { return k ? h('a', { cls: 'cg-p', href: '#p=' + k, 'data-k': k, text: nome }) : d.createTextNode(nome || ''); }
+  function lpIr(vista, quem, texto) { return h('a', { cls: 'cg-lp-ir', href: '#v=' + vista + '&c=' + quem.slice(0, 2) + '&quem=' + quem, text: texto }); }
+  /* A Janela de uma vista: sem filtro, o texto do HTML; com filtro, "Realçados: n de total" (ou outro rótulo) e uma ficha por filtro, cada uma com o seu ×, e "Limpar". */
+  function lpJanela(bloco) {
+    var el = bloco.querySelector('.cg-lp-jan'), padrao = el ? lista(el.childNodes) : [];
+    return function (texto, fichas, limpar, rotulo) {
+      if (!el) return;
+      esvaziar(el);
+      if (!fichas || !fichas.length) {  // sem filtro: o texto do HTML (ou outro, se a vista trocou de medida)
+        if (texto) el.appendChild(h('span', { cls: 'cg-lp-jan-t' }, texto)); else padrao.forEach(function (no) { el.appendChild(no); });
+        return;
+      }
+      el.appendChild(h('b', { text: rotulo || 'Realçados: ' }));
+      el.appendChild(d.createTextNode(texto.join('') + ' · '));
+      fichas.forEach(function (f) {
+        var b = h('button', { type: 'button', cls: 'cg-lp-jan-x', 'aria-label': 'Tirar o filtro: ' + f[0], text: f[0] });
+        b.addEventListener('click', f[1]);
+        el.appendChild(b);
+      });
+      var tudo = h('button', { type: 'button', cls: 'cg-pa-limpa', text: 'Limpar' });
+      tudo.addEventListener('click', limpar);
+      el.appendChild(tudo);
+    };
+  }
+  /* No celular, a Janela ocupa uma linha, com reticências; o toque abre o texto inteiro. */
+  lista(root.querySelectorAll('.cg-lp-jan')).forEach(function (el) {
+    el.addEventListener('click', function (event) { if (!(event.target.closest && event.target.closest('button'))) el.classList.toggle('cg-lp-jan-ab'); });
+  });
+  /* As listas longas: no celular, 5 itens e "mostrar todos". */
+  lista(root.querySelectorAll('.cg-lp-mm')).forEach(function (b) {
+    b.hidden = false;
+    b.addEventListener('click', function () { var ls = b.parentNode.querySelector('.cg-lp-ls'); if (ls) ls.classList.add('cg-lp-ab'); b.hidden = true; });
+  });
+  /* Os links "→" entre as vistas (com a pessoa em foco) e a linha "A seguir". */
+  root.addEventListener('click', function (event) {
+    var a = event.target && event.target.closest ? event.target.closest('a[data-lp-ir]') : null;
+    if (!a) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var destino = '#v=' + a.getAttribute('data-lp-ir') + '&c=' + (lpCasaDaVez() || 'cd') + (LP.quem ? '&quem=' + LP.quem : '') + (LP.eixo ? '&eixo=' + LP.eixo : '');
+    if (w.history && w.history.pushState) { w.history.pushState(null, '', destino); doEndereco(); w.scrollTo(0, 0); } else w.location.hash = destino.slice(1);
+  }, true);
+  function lpVista(nome) {
+    lpVistas[nome] = {};
+    aoAbrirVista[nome] = function () {
+      var ver = lpCasaDaVez();
+      Object.keys(lpVistas[nome]).forEach(function (casa) { if (!ver || ver === casa) lpVistas[nome][casa].abrir(); });
+    };
+    aoEndereco[nome] = function (q) {
+      var p = lpParams(q);
+      if (!p) return;
+      var casa = p.c === 'sf' || p.c === 'cd' ? p.c : /^(cd|sf)-/.test(p.quem || p.m || '') ? (p.quem || p.m).slice(0, 2) : (lpCasaDaVez() || 'cd');
+      if (!lpVistas[nome][casa]) return;
+      if (casas && !casas.hidden && root.getAttribute('data-ver') !== casa) verCasa(casa);
+      lpVistas[nome][casa].doEndereco(p);
+    };
+    return lpVistas[nome];
+  }
+
+  /* ════ Os projetos: uma faixa por porta, um ponto por projeto do topo da régua ════ */
+  (function () {
+    var vista = lpVista('projetos');
+    var NIVEIS = w.innerWidth <= 760 ? 12 : 9, PASSO = 10, VIZINHAS = [0, 1, -1, 2, -2, 3, -3];  // no celular a coluna é mais larga: a pilha pode ser mais alta
+    var ESCALA = LPM.escala_tempo || [], TETO = LPM.tempo_teto || 98, PARADO = LPC.dias_parado || 365;
+    /* O tempo sem andar no eixo, em saltos (não é medida fina: o registro muda a data até quando a matéria é só pautada). */
+    function xDoTempo(n) {
+      if (n == null || n <= 0 || !ESCALA.length) return 0;
+      for (var i = 1; i < ESCALA.length; i++) {
+        if (n <= ESCALA[i][0]) return ESCALA[i - 1][1] + (n - ESCALA[i - 1][0]) / (ESCALA[i][0] - ESCALA[i - 1][0]) * (ESCALA[i][1] - ESCALA[i - 1][1]);
+      }
+      var fim = ESCALA[ESCALA.length - 1];
+      return Math.min(TETO, fim[1] + (n - fim[0]) / fim[0] * (TETO - fim[1]));
+    }
+    lista(root.querySelectorAll('[data-lp="projetos"]')).forEach(function (bloco) {
+      var casa = bloco.getAttribute('data-casa'), focoPadrao = bloco.getAttribute('data-foco') || '';
+      var portasEl = bloco.querySelector('.cg-lp-portas'), fig = bloco.querySelector('.cg-lp-fig'), cw = bloco.querySelector('.cg-lp-cw');
+      var fs = bloco.querySelector('.cg-lp-fs'), st = bloco.querySelector('.cg-lp-st'), dica = bloco.querySelector('.cg-lp-dica');
+      if (!portasEl || !fig || !cw || !fs) return;
+      var card = cw.querySelector('.cg-lp-card'), navEl = cw.querySelector('.cg-pa-nav');
+      var ant = navEl.querySelector('.cg-pa-ant'), prox = navEl.querySelector('.cg-pa-prox'), posEl = navEl.querySelector('.cg-pa-pos');
+      var limpar = fs.querySelector('.cg-pa-limpa'), selEixo = fs.querySelector('select[data-f="eixo"]');
+      var chips = lista(fs.querySelectorAll('.cg-pa-f')), numeros = lista(bloco.querySelectorAll('.cg-lp-n')), cabecas = lista(bloco.querySelectorAll('.cg-lp-porta'));
+      var janela = lpJanela(bloco), parado = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var P = [], porChave = {}, pistas = {}, estado = 0, pendente = null;  // estado: 0 sem os pontos, 1 carregando, 2 pronto
+      var F = { dir: '', conf: '', par: false, porta: '' };  // os filtros desta vista (a alavanca e a pessoa em foco ficam em LP)
+      var emFoco = null, noCartao = focoPadrao, ordem = [], temAConfirmar = false;
+      cabecas.forEach(function (b) { var c = b.querySelector('.cg-lp-pc'); b._n = c ? c.textContent : ''; });
+
+      function temFiltro() { return !!(F.dir || F.conf || F.par || F.porta || LP.eixo || LP.quem); }
+      function passa(p) {
+        if (F.dir && p.dir !== F.dir) return false;
+        if (F.conf && (F.conf === '1') !== p.conf) return false;
+        if (F.par && !p.par) return false;
+        if (F.porta && p.pp !== F.porta) return false;
+        if (LP.eixo && p.ex !== LP.eixo) return false;
+        if (LP.quem && p.a !== LP.quem) return false;
+        return true;
+      }
+      function ligado(f) {
+        var i = f.indexOf(':'), tipo = i < 0 ? f : f.slice(0, i), valor = i < 0 ? '' : f.slice(i + 1);
+        return tipo === 'dir' ? F.dir === valor : tipo === 'conf' ? F.conf === valor : tipo === 'par' ? F.par : tipo === 'porta' ? F.porta === valor : tipo === 'eixo' ? LP.eixo === valor : false;
+      }
+      function alternar(f, soEste) {
+        var i = f.indexOf(':'), tipo = i < 0 ? f : f.slice(0, i), valor = i < 0 ? '' : f.slice(i + 1), on = ligado(f);
+        if (soEste || tipo === 'todos') { F = { dir: '', conf: '', par: false, porta: '' }; LP.eixo = ''; LP.quem = ''; }
+        if (tipo === 'dir') F.dir = on ? '' : valor;
+        else if (tipo === 'conf') F.conf = on ? '' : valor;
+        else if (tipo === 'par') F.par = !on;
+        else if (tipo === 'porta') F.porta = on ? '' : valor;
+        else if (tipo === 'eixo') LP.eixo = on ? '' : valor;
+        if (tipo === 'todos') emFoco = null;
+        aplicar();
+      }
+      function endereco() {
+        return '#v=projetos&c=' + casa + (LP.eixo ? '&eixo=' + LP.eixo : '') + (F.porta ? '&porta=' + F.porta : '') + (F.dir ? '&dir=' + F.dir : '') + (F.conf ? '&conf=' + F.conf : '') +
+          (F.par ? '&par=1' : '') + (LP.quem ? '&quem=' + LP.quem : '') + (emFoco && emFoco.k !== focoPadrao ? '&m=' + emFoco.k : '');
+      }
+      function gravarEndereco() {
+        if (estado !== 2 || vistaAtual !== 'projetos' || aberto || !w.history || !w.history.replaceState) return;
+        if (lpCasaDaVez() && lpCasaDaVez() !== casa) return;
+        if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
+      }
+      function nomeDaPessoa(k) {
+        for (var i = 0; i < P.length; i++) if (P[i].a === k) return P[i].an;
+        return nomeDe(k);
+      }
+      function atualizarPasso() {
+        var i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
+        ant.disabled = !n || i === 0;
+        prox.disabled = !n || i === n - 1;
+        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? ' realçados' : ' projetos') : 'nada realçado';
+        else if (i < 0) posEl.textContent = emFoco.t + ' · fora do realce (' + num(n) + (n === 1 ? ' realçado)' : ' realçados)');
+        else posEl.textContent = emFoco.t + ' · ' + num(i + 1) + ' de ' + num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : '');
+      }
+      function aplicar(semEndereco) {
+        if (estado !== 2) return;
+        var filtro = temFiltro(), porPorta = {}, conf = 0;
+        ordem = [];
+        P.forEach(function (p) {
+          var ok = passa(p);
+          if (p.el) p.el.classList.toggle('cg-lp-off', !ok);
+          if (!ok) return;
+          ordem.push(p);
+          porPorta[p.pp] = (porPorta[p.pp] || 0) + 1;
+          if (p.conf) conf += 1;
+        });
+        chips.forEach(function (b) { b.setAttribute('aria-pressed', ligado(b.getAttribute('data-f') || '') ? 'true' : 'false'); });
+        numeros.forEach(function (b) {
+          var f = b.getAttribute('data-f') || '', on = ligado(f), aviso = b.querySelector('.cg-pa-m-ir');
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          if (aviso && f !== 'todos') aviso.textContent = on ? 'realçado no gráfico' : 'ver no gráfico';
+        });
+        cabecas.forEach(function (b) {
+          var id = (b.getAttribute('data-f') || '').slice(6), c = b.querySelector('.cg-lp-pc');
+          b.setAttribute('aria-pressed', F.porta === id ? 'true' : 'false');
+          if (c) c.textContent = filtro ? num(porPorta[id] || 0) + ' de ' + b._n : b._n;
+        });
+        if (selEixo) selEixo.value = LP.eixo;
+        limpar.hidden = !filtro;
+        var fichas = [];
+        if (LP.eixo) fichas.push([lpEixo(LP.eixo), function () { LP.eixo = ''; aplicar(); }]);
+        if (F.porta) fichas.push([(LPM.portas_nome || {})[F.porta] || F.porta, function () { F.porta = ''; aplicar(); }]);
+        if (F.dir) fichas.push([lpDir(F.dir)[1], function () { F.dir = ''; aplicar(); }]);
+        if (F.conf) fichas.push([F.conf === '1' ? 'confirmados por dois leitores' : 'a confirmar', function () { F.conf = ''; aplicar(); }]);
+        if (F.par) fichas.push(['parados há mais de um ano', function () { F.par = false; aplicar(); }]);
+        if (LP.quem) fichas.push(['Seguindo: ' + nomeDaPessoa(LP.quem), function () { LP.quem = ''; aplicar(); }]);
+        /* com algum projeto à espera da segunda leitura, o realce diz quantos são de cada estado */
+        janela(fichas.length ? [num(ordem.length) + ' de ' + num(P.length) + ' no gráfico' + (temAConfirmar ? ' (' + num(conf) + (conf === 1 ? ' confirmado' : ' confirmados') + ' e ' + num(ordem.length - conf) + ' a confirmar)' : '')] : null, fichas, limparTudo);
+        st.hidden = !!ordem.length;
+        if (!ordem.length) st.textContent = LP.quem && fichas.length === 1 ? 'Nenhum projeto de ' + nomeDaPessoa(LP.quem) + ' está entre os do topo da régua que tramitam.' : 'Nenhum projeto passa neste filtro.';
+        if (ordem.length && (!emFoco || ordem.indexOf(emFoco) < 0)) irAo(!filtro && porChave[focoPadrao] ? porChave[focoPadrao] : ordem[0], { semEndereco: true });
+        else atualizarPasso();
+        if (!semEndereco) gravarEndereco();
+      }
+      function limparTudo() { alternar('todos'); }
+
+      /* ── O cartão do projeto (o mesmo do HTML, montado aqui para os demais) ── */
+      function linhaDoCodigo(rotulo, filhos) { return h('div', null, [h('dt', { text: rotulo }), h('dd', null, filhos)]); }
+      function cartaoDe(p) {
+        var campos = LPM.campos || {}, d0 = lpDir(p.dir), nivel = lpRotulo(LPM.eixos, p.ex);
+        var nomeDoNivel = nivel ? lpRotulo(LPM.niveis, nivel[2]) : null, marca = lpRotulo(LPM.marcas, (LPM.papeis || {}).caixa);
+        var cod = [linhaDoCodigo(LPR.eixo || '', [lpEixo(p.ex), nomeDoNivel ? h('small', { text: ' ' + nomeDoNivel[1] }) : null])];
+        (p.cod || []).forEach(function (par) {
+          var c = campos[par[0]] || [par[0], {}];
+          cod.push(linhaDoCodigo(c[0], [par[1] === 'nd' ? (LPM.nd || '') : (c[1][par[1]] || par[1])]));
+        });
+        if (marca) cod.push(linhaDoCodigo('Marca de ' + marca[1].toLowerCase(), [lpForma(d0[2]), d0[1]]));
+        var porta = lpRotulo(LPM.portas, p.pp) || [p.pp, '', ''], comRelator = p.rln && p.pp === 'parecer', nd = dias(p.ult);
+        var frasePorta = porta[1] ? porta[1].charAt(0).toUpperCase() + porta[1].slice(1) : '';
+        var legenda = [p.ap, p.au].filter(Boolean).join('-'), deQuem = [];
+        if (p.an) { deQuem.push(lpPessoa(p.a, p.an)); if (legenda) deQuem.push(' (' + legenda + ')'); } else if (legenda) deQuem.push(legenda);
+        var origem = (LPM.origens || {})[p.og] || '';
+        if (origem) deQuem.push((deQuem.length ? ' · ' : '') + origem);
+        if (p.d) deQuem.push(' · apresentado em ' + dataBr(p.d));
+        if (p.a && (LPM.abas || []).indexOf('autores') >= 0) { deQuem.push(' · '); deQuem.push(lpIr('autores', p.a, 'ver o perfil de projetos →')); }
+        var rodape = [];
+        if (p.f) rodape.push(h('a', { href: '#m=' + p.k, 'data-m': p.k, text: 'Abrir a ficha' }));
+        if (p.u) { if (rodape.length) rodape.push(' · '); rodape.push(h('a', { href: p.u, target: '_blank', rel: 'noopener noreferrer', text: 'Página oficial' })); }
+        if (LPM.repo) { rodape.push(' · '); rodape.push(h('a', { href: LPM.repo.replace(/\/$/, '') + '/issues/new?title=' + encodeURIComponent('Leitura do ' + p.t), target: '_blank', rel: 'noopener noreferrer', text: 'Contestar esta leitura' })); }
+        return [
+          h('p', { cls: 'cg-pa-c-k' }, [h('span', { cls: 'cg-pa-c-q', text: 'tramitando' }), lpMateria(p.k, p.t, p.u, p.f), lpTag(p.conf), h('span', { cls: 'cg-pa-c-n' }, ['peso ', h('b', { text: String(p.w) })])]),
+          h('p', { cls: 'cg-pa-c-e', text: p.e }),
+          h('p', { cls: 'cg-pa-c-h' }, ['A leitura ', lpSelo()]),
+          h('p', { cls: 'cg-pa-c-o' }, [h('b', { text: p.conf ? LPR.topo : 'a confirmar' }), ': ' + (p.conf ? ((LPM.fontes || {})[p.fo] || '') : LPR.a_confirmar + '; por ora conta como ' + lpFaixa(p.fx)) + '.']),
+          h('dl', { cls: 'cg-lp-cod' }, cod),
+          p.j ? h('p', { cls: 'cg-lp-pq', text: p.j }) : null,
+          p.conta ? h('p', { cls: 'cg-lp-conta' }, [h('span', { text: 'A conta do peso:' }), ' ' + p.conta]) : null,
+          h('p', { cls: 'cg-pa-c-o', text: ((LPM.fontes || {})[p.fo] || '') + (p.cf ? ' · confiança do leitor: ' + p.cf + ' de 3' : '') }),
+          (p.al || []).length ? h('p', { cls: 'cg-lp-al' }, p.al.map(function (a) { return h('span', { cls: 'cg-chip', text: (LPM.alertas || {})[a] || a }); })) : null,
+          h('p', { cls: 'cg-pa-c-h', text: 'Onde parou' }),
+          h('p', { cls: 'cg-pa-c-o' }, [h('b', { text: frasePorta }), (p.org ? ' · ' + p.org : '') + (nd != null ? ' · sem andar há ' + tempo(nd) + ' (último andamento em ' + dataBr(p.ult) + ')' : '') + '.']),
+          comRelator || porta[2] ? h('p', { cls: 'cg-pa-c-o' }, comRelator ? ['Com quem está: o relator, ', lpPessoa(p.rl, p.rln), '.'] : ['Com quem está: ' + porta[2] + '.']) : null,
+          h('p', { cls: 'cg-pa-c-h', text: 'De quem é' }),
+          h('p', { cls: 'cg-pa-c-o' }, deQuem),
+          h('p', { cls: 'cg-pa-c-l' }, rodape)
+        ];
+      }
+      function desenhar(p) {
+        if (p.k === noCartao) return;
+        noCartao = p.k;
+        esvaziar(card);
+        cartaoDe(p).forEach(function (no) { if (no) card.appendChild(no); });
+        if (parado) return;
+        card.classList.remove('cg-pa-vira');
+        void card.offsetWidth;
+        card.classList.add('cg-pa-vira');
+      }
+      function rolarAte(el) {
+        if (!el || !barraFixa) return;
+        var topo = w.pageYOffset + el.getBoundingClientRect().top - barraFixa.offsetHeight - 10;
+        try { w.scrollTo({ top: Math.max(0, topo), behavior: parado ? 'auto' : 'smooth' }); } catch (erro) { w.scrollTo(0, Math.max(0, topo)); }
+      }
+      function irAo(p, o) {
+        o = o || {};
+        if (!p) return;
+        if (emFoco && emFoco.el) emFoco.el.classList.remove('cg-lp-em');
+        emFoco = p;
+        if (p.el) p.el.classList.add('cg-lp-em');
+        atualizarPasso();
+        desenhar(p);
+        if (!o.semEndereco) gravarEndereco();
+        if (o.rolar) rolarAte(fig);
+      }
+      /* Um atalho de fora do gráfico (a lista): se o filtro esconde o projeto, o filtro sai. */
+      function mostrar(k) {
+        var p = porChave[k];
+        if (!p) return;
+        if (temFiltro() && !passa(p)) { F = { dir: '', conf: '', par: false, porta: '' }; LP.eixo = ''; LP.quem = ''; aplicar(true); }
+        irAo(p, { rolar: true });
+      }
+      function passo(delta) {
+        if (!ordem.length) return;
+        var i = emFoco ? ordem.indexOf(emFoco) : -1;
+        var alvo = i < 0 ? (delta > 0 ? 0 : ordem.length - 1) : Math.max(0, Math.min(ordem.length - 1, i + delta));
+        if (ordem[alvo] !== emFoco) irAo(ordem[alvo]);
+      }
+      function teclas(ev) {
+        if (ev.target && ev.target.closest && ev.target.closest('a, select, input, summary')) return;
+        var delta = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : ev.key === 'Home' ? -1e6 : ev.key === 'End' ? 1e6 : 0;
+        if (!delta || estado !== 2) return;
+        ev.preventDefault();
+        passo(delta);
+      }
+
+      /* ── Os pontos: cada projeto na faixa da porta dele, empilhado na coluna do tempo sem andar ── */
+      function montar(arq) {
+        P = lpLinhas(arq);
+        porChave = {};
+        temAConfirmar = false;
+        var porPorta = {};
+        P.forEach(function (p) {
+          var n = dias(p.ult);
+          p.dias = n;
+          p.x = xDoTempo(n);
+          p.conf = lpNoTopo(p.fx);
+          if (!p.conf) temAConfirmar = true;
+          p.par = n != null && n > PARADO;
+          p.pp = p.pp || 'outra';
+          porChave[p.k] = p;
+          if (p.ult) (porPorta[p.pp] = porPorta[p.pp] || []).push(p);
+        });
+        /* A coluna do empilhamento: 1,4% da largura, ou o que um ponto de 9 px pede (até 2,2%, no celular). */
+        var largura = (portasEl.getBoundingClientRect().width || 600) - (w.innerWidth > 760 ? 220 : 6), COLUNA = Math.min(2.2, Math.max(1.4, 900 / Math.max(200, largura)));
+        lista(portasEl.querySelectorAll('.cg-lp-pl')).forEach(function (li) {
+          var id = li.getAttribute('data-porta'), pista = li.querySelector('.cg-lp-pista'), cheias = {}, alto = 0, sobra = {};
+          esvaziar(pista);
+          ESCALA.forEach(function (par) { if (par[1] > 0) pista.appendChild(h('span', { cls: 'cg-lp-tk', style: 'left:' + par[1] + '%' })); });
+          (porPorta[id] || []).slice().sort(function (a, b) { return a.x - b.x; }).forEach(function (p) {
+            var base = Math.round(p.x / COLUNA), col = null;
+            for (var i = 0; i < VIZINHAS.length && col == null; i++) {
+              var c = base + VIZINHAS[i];
+              if (c >= 0 && c * COLUNA <= TETO + COLUNA && (cheias[c] || 0) < NIVEIS) col = c;
+            }
+            if (col == null) { (sobra[base] = sobra[base] || []).push(p); p.el = null; p.pista = pista; return; }
+            p.nivel = cheias[col] || 0;
+            cheias[col] = p.nivel + 1;
+            alto = Math.max(alto, cheias[col]);
+            p.px = Math.min(TETO + 1, col * COLUNA);
+            p.pista = pista;
+            p.el = h('i', { cls: 'cg-lp-p cg-lp-' + (lpDir(p.dir)[2] || 'vazado') + (p.conf ? '' : ' cg-lp-ac'), style: 'left:' + p.px.toFixed(2) + '%;bottom:' + (p.nivel * PASSO + 5) + 'px' });
+            pista.appendChild(p.el);
+          });
+          Object.keys(sobra).forEach(function (c) {
+            var b = h('button', { type: 'button', cls: 'cg-lp-mn', style: 'left:' + (c * COLUNA).toFixed(2) + '%;bottom:' + (NIVEIS * PASSO + 4) + 'px', 'aria-label': 'Mais ' + sobra[c].length + ' projetos nesta coluna', text: '+' + sobra[c].length });
+            b.addEventListener('click', function (ev) { ev.stopPropagation(); irAo(sobra[c][0]); });
+            pista.appendChild(b);
+            alto = NIVEIS + 1.4;
+          });
+          pista.style.height = Math.max(34, alto * PASSO + 12) + 'px';
+          pista.hidden = false;
+        });
+        lista(bloco.querySelectorAll('.cg-lp-eixo, .cg-lp-leg')).forEach(function (el) { el.hidden = false; });
+      }
+      function maisPerto(ev, raio) {
+        var pista = ev.target && ev.target.closest ? ev.target.closest('.cg-lp-pista') : null;
+        if (!pista) return null;
+        var r = pista.getBoundingClientRect(), mx = ev.clientX - r.left, my = r.bottom - ev.clientY, melhor = null, dist = raio * raio, filtro = temFiltro();
+        P.forEach(function (p) {
+          if (p.pista !== pista || !p.el) return;
+          var dx = p.px * r.width / 100 - mx, dy = p.nivel * PASSO + 9 - my, d2 = dx * dx + dy * dy;
+          if (d2 >= raio * raio) return;
+          d2 += filtro && !passa(p) ? 64 : 0;  // na dúvida, o que está realçado
+          if (d2 < dist) { dist = d2; melhor = p; }
+        });
+        return melhor;
+      }
+      var sobre = null, toque = false;
+      function apagarDica() { if (sobre && sobre.el) sobre.el.classList.remove('on'); sobre = null; dica.hidden = true; }
+      portasEl.addEventListener('pointerdown', function (ev) { toque = ev.pointerType === 'touch'; });
+      portasEl.addEventListener('pointermove', function (ev) {
+        if (ev.pointerType === 'touch' || estado !== 2) return;
+        var p = maisPerto(ev, 14);
+        if (!p) { apagarDica(); return; }
+        if (p !== sobre) {
+          if (sobre && sobre.el) sobre.el.classList.remove('on');
+          sobre = p;
+          p.el.classList.add('on');
+          esvaziar(dica);
+          dica.appendChild(h('b', { text: p.t }));
+          dica.appendChild(h('span', { text: (p.conf ? LPR.topo : 'a confirmar') + ' · peso ' + p.w + ' · sem andar há ' + tempo(p.dias) + ' · clique para ver' }));
+        }
+        var caixa = fig.getBoundingClientRect(), r = p.el.getBoundingClientRect(), x = r.left - caixa.left + 14, y = r.top - caixa.top - 6;
+        dica.hidden = false;
+        if (x + dica.offsetWidth > caixa.width) x = Math.max(0, x - dica.offsetWidth - 24);
+        dica.style.left = x + 'px';
+        dica.style.top = Math.max(0, y - dica.offsetHeight) + 'px';
+      });
+      portasEl.addEventListener('pointerleave', apagarDica);
+      portasEl.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('.cg-lp-porta') : null;
+        if (b) { if (estado === 2) alternar(b.getAttribute('data-f') || ''); return; }
+        var p = estado === 2 ? maisPerto(ev, toque ? 24 : 20) : null;
+        if (p) irAo(p);
+      });
+      portasEl.setAttribute('tabindex', '0');
+      portasEl.setAttribute('role', 'group');
+      portasEl.setAttribute('aria-label', 'Gráfico dos projetos por porta. As setas do teclado andam pelos projetos realçados, do maior peso para o menor; o projeto em foco aparece no cartão ao lado.');
+      portasEl.addEventListener('keydown', teclas);
+      cw.addEventListener('keydown', teclas);
+      ant.addEventListener('click', function () { passo(-1); });
+      prox.addEventListener('click', function () { passo(1); });
+
+      /* ── Os filtros, os números e a lista ── */
+      chips.forEach(function (b) { b.addEventListener('click', function () { if (estado === 2) alternar(b.getAttribute('data-f') || ''); }); });
+      numeros.forEach(function (b) {
+        b.addEventListener('click', function () { if (estado !== 2) return; alternar(b.getAttribute('data-f') || '', true); rolarAte(fs); });
+      });
+      if (selEixo) selEixo.addEventListener('change', function () { LP.eixo = selEixo.value; aplicar(); });
+      limpar.addEventListener('click', limparTudo);
+      lista(bloco.querySelectorAll('.cg-lp-top li[data-ver]')).forEach(function (li) {
+        var b = h('button', { type: 'button', cls: 'cg-pa-ver cg-lp-ver', text: 'ver no gráfico' }), linha = li.querySelector('.cg-ls-k');
+        b.addEventListener('click', function () { if (estado === 2) mostrar(li.getAttribute('data-ver')); });
+        if (linha) linha.appendChild(b);
+      });
+
+      function doPedido() {
+        var p = pendente;
+        pendente = null;
+        if (!p) { aplicar(); return; }
+        F = {
+          dir: lpRotulo(LPM.direcoes, p.dir) ? p.dir : '', conf: p.conf === '1' || p.conf === '0' ? p.conf : '', par: p.par === '1',
+          porta: lpRotulo(LPM.portas, p.porta) ? p.porta : ''
+        };
+        LP.eixo = lpRotulo(LPM.eixos, p.eixo) ? p.eixo : '';
+        LP.quem = /^(cd|sf)-\d+$/.test(p.quem || '') && p.quem.slice(0, 2) === casa ? p.quem : '';
+        if (emFoco && emFoco.el) emFoco.el.classList.remove('cg-lp-em');
+        emFoco = null;
+        aplicar(true);
+        var alvo = /^(cd|sf)-[A-Z]+-\d+-\d{4}$/.test(p.m || '') ? porChave[p.m] : null;
+        if (alvo) irAo(alvo, { semEndereco: true });
+        gravarEndereco();
+      }
+      vista[casa] = {
+        abrir: function () {
+          if (LP.quem && LP.quem.slice(0, 2) !== casa) LP.quem = '';
+          if (estado === 2) { doPedido(); return; }
+          if (estado === 1) return;
+          estado = 1;
+          st.hidden = false;
+          st.textContent = 'Carregando os pontos…';
+          lpArquivo('projetos', casa, function (erro, arq) {
+            if (erro) { estado = 0; st.textContent = 'Não foi possível abrir os pontos agora. As listas abaixo trazem os mesmos números.'; return; }
+            try { montar(arq); } catch (falha) {
+              if (w.console && w.console.error) w.console.error(falha);
+              estado = 0;
+              st.textContent = 'Não foi possível abrir os pontos agora. As listas abaixo trazem os mesmos números.';
+              return;
+            }
+            estado = 2;
+            st.hidden = true;
+            fs.hidden = false;
+            navEl.hidden = false;
+            doPedido();
+          });
+        },
+        doEndereco: function (p) { pendente = p; }
+      };
+    });
+  })();
+
+  /* ════ Quem propõe: o funil (a parte dos projetos de cada um × quantos projetos) ════ */
+  (function () {
+    var vista = lpVista('autores');
+    var MINIMO = LPC.min_proj || 10, MEDIDAS = {}, NS = 'http://www.w3.org/2000/svg';
+    /* As medidas do funil e a coluna de onde sai a contagem de cada uma vêm das contas (M.lp.funil): a parte do topo conta só o confirmado. */
+    (LPM.funil || [['topo', 'estr'], ['sb', 'sb']]).forEach(function (par) { MEDIDAS[par[0]] = [par[1], 'fz_' + par[0]]; });
+    function s(tag, attrs, texto) {
+      var el = d.createElementNS(NS, tag), k;
+      for (k in attrs || {}) if (attrs[k] != null) el.setAttribute(k, attrs[k]);
+      if (texto != null) el.textContent = texto;
+      return el;
+    }
+    lista(root.querySelectorAll('[data-lp="autores"]')).forEach(function (bloco) {
+      var casa = bloco.getAttribute('data-casa'), UM = bloco.getAttribute('data-um') || 'parlamentar', UNS = bloco.getAttribute('data-uns') || 'parlamentares';
+      var fig = bloco.querySelector('.cg-lp-fig'), svg = bloco.querySelector('.cg-lp-svg'), plot = bloco.querySelector('.cg-lp-plot'), cw = bloco.querySelector('.cg-lp-cw');
+      var fs = bloco.querySelector('.cg-lp-fs'), st = bloco.querySelector('.cg-lp-st'), dica = bloco.querySelector('.cg-lp-dica');
+      if (!fig || !svg || !plot || !cw || !fs) return;
+      var card = cw.querySelector('.cg-lp-card'), navEl = cw.querySelector('.cg-pa-nav');
+      var ant = navEl.querySelector('.cg-pa-ant'), prox = navEl.querySelector('.cg-pa-prox'), posEl = navEl.querySelector('.cg-pa-pos');
+      var limpar = fs.querySelector('.cg-pa-limpa'), selPt = fs.querySelector('select[data-f="pt"]'), selUf = fs.querySelector('select[data-f="uf"]'), selEixo = fs.querySelector('select[data-f="eixo"]');
+      var busca = fs.querySelector('input[data-f="nome"]'), nomes = fs.querySelector('datalist'), meds = lista(fs.querySelectorAll('button[data-med]'));
+      var numeros = lista(bloco.querySelectorAll('.cg-lp-n')), titulo = bloco.querySelector('.cg-lp-ht'), eixoY = bloco.querySelector('.cg-lp-ey'), tabela = bloco.querySelector('[data-lp-tab]');
+      var janela = lpJanela(bloco), parado = w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var TITULOS = { topo: 'que são ' + (LPR.topo_pl || '') + ' confirmados', sb: 'na faixa “' + (LPR.piso || '') + '”' };
+      var A = null, Q = [], porChave = {}, estado = 0, pendente = null;
+      var F = { med: 'topo', pt: '', uf: '', tem: false, acima: false };
+      var emFoco = null, noCartao = '', ordem = [], halo = null, rotulos = null, XMAX = 100, YMAX = 20;
+
+      function parte(q, med) { return q.n ? 100 * q[MEDIDAS[med || F.med][0]] / q.n : 0; }
+      function fora(q, med) { return q[MEDIDAS[med || F.med][1]]; }
+      function xp(n) { return 100 * (Math.log(n) - Math.log(MINIMO)) / (Math.log(XMAX) - Math.log(MINIMO)); }
+      function yp(v) { return 100 - 96 * Math.min(v, YMAX) / YMAX; }
+      function temFiltro() { return !!(F.pt || F.uf || F.tem || F.acima || LP.eixo); }
+      function indiceDoEixo() { for (var i = 0; i < (LPM.eixos || []).length; i++) if (LPM.eixos[i][0] === LP.eixo) return i; return -1; }
+      function passa(q) {
+        if (F.pt && q.pt !== F.pt) return false;
+        if (F.uf && q.uf !== F.uf) return false;
+        if (F.tem && !q[MEDIDAS.topo[0]]) return false;
+        if (F.acima && fora(q) !== 1) return false;
+        if (LP.eixo && !((q.ex || [])[indiceDoEixo()] > 0)) return false;
+        return true;
+      }
+      function ligado(f) { return f === 'tem' ? F.tem : f === 'acima:topo' ? F.acima && F.med === 'topo' : f === 'acima:sb' ? F.acima && F.med === 'sb' : false; }
+      function zerar() { F = { med: F.med, pt: '', uf: '', tem: false, acima: false }; LP.eixo = ''; }
+      function endereco() {
+        return '#v=autores&c=' + casa + (F.med !== 'topo' ? '&med=' + F.med : '') + (F.pt ? '&pt=' + encodeURIComponent(F.pt) : '') + (F.uf ? '&uf=' + F.uf : '') + (LP.eixo ? '&eixo=' + LP.eixo : '') +
+          (F.tem ? '&tem=1' : '') + (F.acima ? '&acima=1' : '') + (LP.quem ? '&quem=' + LP.quem : '');
+      }
+      function gravarEndereco() {
+        if (estado !== 2 || vistaAtual !== 'autores' || aberto || !w.history || !w.history.replaceState) return;
+        if (lpCasaDaVez() && lpCasaDaVez() !== casa) return;
+        if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
+      }
+      function atualizarPasso() {
+        var i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
+        ant.disabled = !n || i === 0;
+        prox.disabled = !n || i === n - 1;
+        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? ' realçados' : ' ' + UNS + ' no gráfico') : 'ninguém realçado';
+        else if (i < 0) posEl.textContent = emFoco.nome + ' · fora do ' + (emFoco.n < MINIMO ? 'gráfico' : 'realce') + ' (' + num(n) + ')';
+        else posEl.textContent = emFoco.nome + ' · ' + num(i + 1) + ' de ' + num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : '');
+      }
+
+      /* ── O desenho: a faixa do acaso em degraus, a linha da Casa, um ponto por pessoa ── */
+      function desenhar() {
+        var taxa = (A.taxa || {})[F.med], degraus = (A.faixa || {})[F.med] || [], passo;
+        YMAX = (A.ymax || {})[F.med] || 20;
+        XMAX = Math.max(MINIMO * 2, (A.xmax || MINIMO * 2) * 1.07);
+        esvaziar(svg);
+        /* Um degrau por número de projetos que alguém tem, centrado nesse número (vai até o meio do caminho para os vizinhos):
+           cada ponto é julgado pelo degrau dele. A borda passa meio projeto além do último valor que cabe no acaso: quem está
+           dentro fica inteiro dentro do cinza, e quem está fora, inteiro fora. */
+        degraus.forEach(function (g, i) {
+          var x0 = i ? (xp(degraus[i - 1][0]) + xp(g[0])) / 2 : 0, x1 = i + 1 < degraus.length ? (xp(g[0]) + xp(degraus[i + 1][0])) / 2 : 100;
+          var meio = 50 / g[0], y0 = yp(Math.min(100, g[2] + meio)), y1 = yp(Math.max(0, g[1] - meio));
+          svg.appendChild(s('rect', { 'class': 'cg-lp-acaso', x: x0.toFixed(2) + '%', y: y0.toFixed(2) + '%', width: (x1 - x0 + 0.06).toFixed(2) + '%', height: Math.max(0, y1 - y0).toFixed(2) + '%' }));
+        });
+        passo = YMAX / (YMAX % 25 === 0 ? 4 : YMAX === 60 ? 3 : 4);
+        for (var v = 0; v <= YMAX + 0.01; v += passo) {
+          svg.appendChild(s('line', { 'class': 'cg-pa-grade', x1: '0', x2: '100%', y1: yp(v).toFixed(2) + '%', y2: yp(v).toFixed(2) + '%' }));
+          svg.appendChild(s('text', { 'class': 'cg-pa-ty', x: '0', dx: '-6', y: yp(v).toFixed(2) + '%', dy: '4' }, Math.round(v) + '%'));
+        }
+        [10, 20, 50, 100, 200, 500, 1000, 2000, 5000].forEach(function (n) {
+          if (n < MINIMO || n > XMAX) return;
+          svg.appendChild(s('line', { 'class': 'cg-pa-grade', x1: xp(n).toFixed(2) + '%', x2: xp(n).toFixed(2) + '%', y1: '100%', y2: '101.5%' }));
+          svg.appendChild(s('text', { 'class': 'cg-pa-tx' + (n === MINIMO ? ' cg-pa-tx-ini' : ''), x: xp(n).toFixed(2) + '%', y: '100%', dy: '18' }, num(n)));
+        });
+        if (taxa != null) {
+          svg.appendChild(s('line', { 'class': 'cg-lp-casa', x1: '0', x2: '100%', y1: yp(taxa).toFixed(2) + '%', y2: yp(taxa).toFixed(2) + '%' }));
+          svg.appendChild(s('text', { 'class': 'cg-pa-canto cg-pa-canto-d', x: '100%', dx: '-4', y: yp(taxa).toFixed(2) + '%', dy: yp(taxa) < 12 ? '14' : '-6' }, 'na Casa: ' + lpDec(taxa) + ' em cada 100'));
+        }
+        var pontos = s('g', { 'class': 'cg-lp-pts' });
+        Q.filter(function (q) { return q.n >= MINIMO; }).sort(function (a, b) { return Math.abs(fora(a) || 0) - Math.abs(fora(b) || 0); }).forEach(function (q) {
+          q.x = xp(q.n);
+          q.y = yp(parte(q));
+          q.el = s('circle', { 'class': 'cg-lp-q' + (fora(q) === 1 ? ' cg-lp-q-a' : fora(q) === -1 ? ' cg-lp-q-b' : ''), cx: q.x.toFixed(2) + '%', cy: q.y.toFixed(2) + '%', r: fora(q) === -1 ? '3.5' : '4', 'data-q': q.k });
+          pontos.appendChild(q.el);
+        });
+        svg.appendChild(pontos);
+        rotulos = s('g', { 'class': 'cg-lp-nms' });
+        svg.appendChild(rotulos);
+        halo = s('circle', { 'class': 'cg-pa-sel', r: '7.5', visibility: 'hidden' });
+        svg.appendChild(halo);
+        if (titulo) titulo.textContent = 'A parte dos projetos de cada um ' + TITULOS[F.med];
+        if (eixoY) eixoY.textContent = '↑ % dos projetos lidos de cada ' + UM + ' ' + TITULOS[F.med];
+        svg.setAttribute('aria-label', 'Um ponto por ' + UM + ': a parte dos projetos ' + TITULOS[F.med] + ' pelo número de projetos lidos. A tabela abaixo traz os mesmos números.');
+      }
+      /* Os nomes escritos no gráfico: quem sai da faixa do acaso (os 5 mais distantes de cada lado) e quem está em foco. */
+      function escrever() {
+        if (!rotulos) return;
+        esvaziar(rotulos);
+        var r = svg.getBoundingClientRect(), caixas = [], estreito = w.innerWidth <= 760, quem = [];
+        if (emFoco && emFoco.el) quem.push(emFoco);
+        if (!estreito) [1, -1].forEach(function (lado) {
+          var faixaDe = {};
+          ((A.faixa || {})[F.med] || []).forEach(function (g) { faixaDe[g[0]] = g; });
+          Q.filter(function (q) { return q.n >= MINIMO && fora(q) === lado && q !== emFoco; }).map(function (q) {
+            var g = faixaDe[q.n];
+            return [q, g ? (lado === 1 ? parte(q) - g[2] : g[1] - parte(q)) : 0];
+          }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 5).forEach(function (par) { quem.push(par[0]); });
+        });
+        quem.forEach(function (q) {
+          var px = q.x * r.width / 100, py = q.y * r.height / 100, larg = q.nome.length * 6.4 + 6, esq = px + 10 + larg > r.width, cx = null;
+          function caixaDe(aEsquerda) { return { x0: aEsquerda ? px - 10 - larg : px + 8, x1: aEsquerda ? px - 8 : px + 10 + larg, y0: py - 9, y1: py + 7 }; }
+          function bate(c) { return c.x0 < 0 || caixas.some(function (o) { return c.x0 < o.x1 && c.x1 > o.x0 && c.y0 < o.y1 && c.y1 > o.y0; }); }
+          cx = caixaDe(esq);
+          if (q !== emFoco && bate(cx)) {  // o nome bateria em outro: tenta do outro lado; se não couber, não é desenhado
+            if (esq || bate(caixaDe(true))) return;
+            esq = true;
+            cx = caixaDe(true);
+          }
+          caixas.push(cx);
+          rotulos.appendChild(s('text', { 'class': 'cg-lp-nm' + (esq ? ' cg-lp-nm-e' : ''), x: q.x.toFixed(2) + '%', dx: esq ? '-9' : '9', y: q.y.toFixed(2) + '%', dy: '4' }, q.nome));
+        });
+        if (halo) {
+          if (emFoco && emFoco.el) { halo.setAttribute('cx', emFoco.x.toFixed(2) + '%'); halo.setAttribute('cy', emFoco.y.toFixed(2) + '%'); halo.removeAttribute('visibility'); }
+          else halo.setAttribute('visibility', 'hidden');
+        }
+      }
+      function aplicar(semEndereco) {
+        if (estado !== 2) return;
+        var filtro = temFiltro(), fichas = [], noGrafico = 0;
+        ordem = [];
+        Q.forEach(function (q) {
+          if (q.n < MINIMO || !q.el) return;
+          noGrafico += 1;
+          var ok = passa(q);
+          q.el.classList.toggle('cg-lp-off', !ok);
+          if (ok) ordem.push(q);
+        });
+        ordem.sort(function (a, b) { return parte(b) - parte(a) || b.n - a.n || (a.nome < b.nome ? -1 : 1); });
+        meds.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-med') === F.med ? 'true' : 'false'); });
+        numeros.forEach(function (b) {
+          var on = ligado(b.getAttribute('data-f') || ''), aviso = b.querySelector('.cg-pa-m-ir');
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          if (aviso) aviso.textContent = on ? 'realçado no gráfico' : 'ver no gráfico';
+        });
+        selPt.value = F.pt;
+        selUf.value = F.uf;
+        selEixo.value = LP.eixo;
+        limpar.hidden = !(filtro || emFoco || F.med !== 'topo');
+        if (F.tem) fichas.push(['com ' + LPR.topo + ' confirmado', function () { F.tem = false; aplicar(); }]);
+        if (F.acima) fichas.push(['acima do que o acaso explica', function () { F.acima = false; aplicar(); }]);
+        if (F.pt) fichas.push([F.pt, function () { F.pt = ''; aplicar(); }]);
+        if (F.uf) fichas.push([F.uf, function () { F.uf = ''; aplicar(); }]);
+        if (LP.eixo) fichas.push(['com projeto do topo em ' + lpEixo(LP.eixo), function () { LP.eixo = ''; aplicar(); }]);
+        if (emFoco) fichas.push(['Em foco: ' + emFoco.nome, function () { irA(null); aplicar(); }]);
+        var taxa = (A.taxa || {})[F.med];
+        janela(fichas.length ? [filtro ? num(ordem.length) + ' de ' + num(noGrafico) + ' ' + UNS + ' no gráfico' : num(noGrafico) + ' ' + UNS + ', a parte dos projetos de cada um ' + TITULOS[F.med]] : F.med === 'topo' ? null : [
+          UNS.charAt(0).toUpperCase() + UNS.slice(1) + ' com ' + MINIMO + ' projetos lidos ou mais · a parte dos projetos de cada um ' + TITULOS[F.med] + ' · ',
+          h('b', { text: num(noGrafico) + ' de ' + num(Q.length) }), ' · na Casa: ' + lpDec(taxa) + ' em cada 100'
+        ], fichas, limparTudo, filtro ? '' : 'No gráfico: ');
+        var ninguem = !Q.some(function (q) { return q.n >= MINIMO && fora(q); });
+        st.hidden = !!ordem.length && !ninguem;
+        if (!ordem.length) st.textContent = 'Ninguém passa neste filtro.';
+        else if (ninguem) {
+          st.textContent = 'Nesta medida, nenhum ' + UM + ' sai da faixa cinza: a diferença de cada um para a Casa não se distingue do acaso. Por isso nenhum nome vai escrito no gráfico.';
+          /* Se na outra medida alguém sai da faixa, a frase leva até lá: o gráfico todo cinza não é o fim da resposta. */
+          meds.forEach(function (b) {
+            var med = b.getAttribute('data-med'), saem = MEDIDAS[med] && med !== F.med ? Q.filter(function (q) { return q.n >= MINIMO && fora(q, med); }).length : 0;
+            if (!saem) return;
+            st.appendChild(d.createTextNode(' Na outra medida, ' + (saem === 1 ? '1 sai' : num(saem) + ' saem') + ': '));
+            st.appendChild(h('button', { type: 'button', cls: 'cg-pa-limpa cg-lp-outra', text: 'ver ' + b.textContent.replace(/^./, function (c) { return c.toLowerCase(); }) })).addEventListener('click', function () { trocarMedida(med); aplicar(); });
+          });
+        }
+        escrever();
+        atualizarPasso();
+        if (!semEndereco) gravarEndereco();
+      }
+
+      /* ── O cartão da pessoa ── */
+      function linhaDeTexto(filhos) { return h('li', null, filhos); }
+      function acaso(z) { return z === 1 ? 'acima do que o acaso explica' : z === -1 ? 'abaixo do que o acaso explica' : 'dentro da faixa do acaso: a diferença para a Casa pode ser acaso'; }
+      function cartaoDe(q) {
+        var taxa = A.taxa || {}, ac = q.topo - q.estr, nos = [], marcas = LPM.marcas || [], caixa = lpRotulo(marcas, (LPM.papeis || {}).caixa);
+        nos.push(h('div', { cls: 'cg-lp-pes' }, [retratoDe(casa, q.k, q.nome), h('div', null, [h('p', { cls: 'cg-lp-pes-n' }, [lpPessoa(q.k, q.nome)]), h('p', { cls: 'cg-lp-pes-l', text: [q.pt, q.uf].filter(Boolean).join('-') })])]));
+        if (!q.n) nos.push(h('p', { cls: 'cg-lp-fr', text: 'Não tem projeto lido de autoria principal nesta legislatura' + (q.tot ? ' (apresentou ' + num(q.tot) + ', ainda sem leitura).' : '.') }));
+        else {
+          var medir = q.n >= MINIMO;
+          nos.push(h('p', { cls: 'cg-lp-fr' }, [
+            medir ? null : h('b', { text: 'Poucos projetos para medir (menos de ' + MINIMO + '). ' }),
+            'Apresentou ', h('b', { text: num(q.n) }), q.n === 1 ? ' projeto lido; ' : ' projetos lidos; ', h('b', { text: num(q.estr) }), q.estr === 1 ? ' é ' + LPR.topo + ' confirmado' : ' são ' + LPR.topo_pl + ' confirmados',
+            medir ? ' (' + lpDec(parte(q, 'topo')) + '%; na Casa, ' + lpDec(taxa.topo) + '%)' : '',
+            ac ? '; ' + (ac === 1 ? 'outro ' : 'outros ') + num(ac) + ' no topo da régua, a confirmar.' : '.'
+          ]));
+          if (medir) nos.push(h('ul', { cls: 'cg-lp-tx' }, [
+            linhaDeTexto([LPR.topo_pl.charAt(0).toUpperCase() + LPR.topo_pl.slice(1) + ' confirmados: ', h('b', { text: acaso(q.fz_topo) }), '.']),
+            linhaDeTexto(['Na faixa “' + LPR.piso + '”: ', h('b', { text: num(q.sb) + ' (' + lpDec(parte(q, 'sb')) + '%; na Casa, ' + lpDec(taxa.sb) + '%)' }), ', ' + acaso(q.fz_sb) + '.'])
+          ]));
+          /* a composição por faixa: três passos da mesma tinta, com os números ao lado */
+          var segs = [[q.simb, LPR.baixas, 'cg-lp-s1'], [q.set, LPR.meio, 'cg-lp-s2'], [q.estr, LPR.topo + ' confirmado', 'cg-lp-s3']];
+          nos.push(h('p', { cls: 'cg-pa-c-h' }, ['Por faixa de peso ', lpSelo()]));
+          nos.push(h('div', { cls: 'cg-lp-bar', 'aria-hidden': 'true' }, segs.map(function (g) { var i = h('i', { cls: g[2] }); i.style.width = (100 * g[0] / q.n) + '%'; return g[0] ? i : null; })));
+          nos.push(h('p', { cls: 'cg-lp-bv' }, segs.map(function (g) { return h('span', null, [h('i', { cls: g[2], 'aria-hidden': 'true' }), g[1] + ' ', h('b', { text: num(g[0]) })]); })));
+          nos.push(h('ul', { cls: 'cg-lp-tx' }, [
+            linhaDeTexto(['Na faixa “' + LPR.piso + '”: ' + num(q.sb) + (ac ? ' · a confirmar, por ora em “' + LPR.meio + '”: ' + num(ac) : '') + '.']),
+            linhaDeTexto(q.tip != null ? ['Mediana do peso: ', h('b', { text: lpDec(q.tip) }), ' (de 0 a 100).'] : ['Mediana do peso: não dá para calcular com menos de ' + MINIMO + ' lidos.'])
+          ]));
+          if (q.topo && caixa) {
+            var doTopo = ['Do topo da régua' + (ac ? ', confirmados ou não' : '') + ' (' + num(q.topo) + '), pela marca de ' + caixa[1].toLowerCase() + ': '];
+            (LPM.direcoes || []).forEach(function (x, i) { if ((q.de || [])[i]) { doTopo.push(lpForma(x[2])); doTopo.push(num(q.de[i]) + ' ' + x[1] + '  '); } });
+            nos.push(h('ul', { cls: 'cg-lp-tx' }, [linhaDeTexto(doTopo)]));
+          }
+          var maior = Math.max.apply(null, (q.ex || []).concat([1]));
+          if (q.topo) {
+            nos.push(h('p', { cls: 'cg-pa-c-h', text: 'Onde mexem os do topo' }));
+            nos.push(h('ul', { cls: 'cg-lp-ex' }, (LPM.eixos || []).map(function (e, i) {
+              if (!(q.ex || [])[i]) return null;
+              var b = h('i');
+              b.style.width = (100 * q.ex[i] / maior) + '%';
+              return h('li', null, [e[1], h('span', { 'aria-hidden': 'true' }, [b]), h('b', { text: num(q.ex[i]) })]);
+            })));
+          }
+          if ((q.top || []).length) {
+            nos.push(h('p', { cls: 'cg-pa-c-h', text: (q.top.length === 1 ? 'O' : 'Os ' + q.top.length) + ' de maior peso' }));
+            nos.push(h('ul', { cls: 'cg-lp-t3' }, q.top.map(function (t) {
+              var x = lpDir(t[3]);
+              return h('li', null, [h('span', null, ['peso ', h('b', { text: String(t[2]) }), lpMateria(t[0], t[1], '', t[5]), t[6] ? lpTag(false) : null, h('span', null, [lpForma(x[2]), x[1]])]), t[4]]);
+            })));
+          }
+          /* as marcas, em todos os lidos; o saldo e a taxa só com os mínimos da régua */
+          nos.push(h('p', { cls: 'cg-pa-c-h', text: 'As marcas, em todos os lidos' }));
+          nos.push(h('ul', { cls: 'cg-lp-tx' }, marcas.map(function (m, i) {
+            var c = (q.mk || [])[i] || [0, 0, 0, 0], por = {}, partes = [h('b', { text: m[1] + ': ' })];
+            m[2].forEach(function (v) { por[v[3] == null ? 'nd' : v[3]] = v; });
+            [[1, 0], [-1, 2], [0, 1], ['nd', 3]].forEach(function (par) {
+              var v = por[par[0]];
+              if (!v || (!c[par[1]] && (par[0] === 0 || par[0] === 'nd'))) return;
+              if (partes.length > 1) partes.push(' · ');
+              partes.push(lpForma(v[2], par[0] === 1 || par[0] === -1 ? '' : 'cg-lp-mu'));
+              partes.push(num(c[par[1]]) + ' ' + v[1]);
+            });
+            return linhaDeTexto(partes);
+          })));
+          var indices = [];
+          if (caixa) indices.push(linhaDeTexto(q.sc != null
+            ? [h('b', { text: 'Saldo de ' + caixa[1].toLowerCase() + ': ' + saldo(q.sc) }), ', de −100 a +100, em ' + num(q.sc_n) + ' projetos com marca +1 ou −1.']
+            : [h('b', { text: 'Saldo de ' + caixa[1].toLowerCase() + ': ' }), 'não dá para calcular (' + num(q.sc_n || 0) + ' com marca +1 ou −1; são precisos ' + (LPC.min_saldo || 5) + ').']));
+          if ((LPM.excecao_para || []).length) {
+            var para = (LPM.excecao_para || []).map(function (e, i) { return (q.tq || [])[i] ? num(q.tq[i]) + ' ' + e[1].toLowerCase() : ''; }).filter(Boolean).join(' · ');
+            indices.push(linhaDeTexto(q.tx != null
+              ? [h('b', { text: (LPR.taxa || 'Taxa') + ': ' + lpDec(q.tx) + '%' }), ' dos lidos' + (para ? ': ' + para : '') + '.']
+              : [h('b', { text: (LPR.taxa || 'Taxa') + ': ' }), 'não dá para calcular com menos de ' + MINIMO + ' lidos' + (para ? ' (' + para + ')' : '') + '.']));
+          }
+          if (indices.length) nos.push(h('ul', { cls: 'cg-lp-tx' }, indices));
+          var ad = q.ad || [0, 0, 0, 0, 0];
+          nos.push(h('p', { cls: 'cg-pa-c-h', text: 'O que andou' }));
+          nos.push(h('ul', { cls: 'cg-lp-tx' }, [
+            linhaDeTexto([(q.n === 1 ? 'Do único lido: ' : 'Dos ' + num(q.n) + ' lidos: '), h('b', { text: num(q.andou) }), (q.andou === 1 ? ' aprovado na Casa ou virou norma (' : ' aprovados na Casa ou viraram norma (') + num(q.norma) + (q.norma === 1 ? ' virou norma' : ' viraram norma') + ') · ', h('b', { text: num(q.parados) }), (q.parados === 1 ? ' parado' : ' parados') + ' há mais de um ano.']),
+            ad[0] ? linhaDeTexto([(ad[0] === 1 ? 'Do único de peso ' : 'Dos ' + num(ad[0]) + ' de peso ') + (LPC.de_peso || 20) + ' ou mais: ' + num(ad[1]) + (ad[1] === 1 ? ' virou norma' : ' viraram norma') + ' · ' + num(ad[2]) + (ad[2] === 1 ? ' aprovado' : ' aprovados') + ' na Casa · ' + num(ad[3]) + (ad[3] === 1 ? ' parado' : ' parados') + ' · ' + num(ad[4]) + (ad[4] === 1 ? ' anda' : ' andam') + ' junto com outra.']) : null
+          ]));
+        }
+        var foraDosNumeros = [];
+        if (q.rp) foraDosNumeros.push(num(q.rp) + ' com ementa igual à de proposição anterior');
+        if (q.bc) foraDosNumeros.push(num(q.bc) + ' de bancada');
+        if (q.sl) foraDosNumeros.push(lpDec(q.sl) + '% dos ' + num(q.tot) + ' sem leitura');
+        if (foraDosNumeros.length) nos.push(h('ul', { cls: 'cg-lp-tx' }, [linhaDeTexto(['Ficam fora dos números: ' + foraDosNumeros.join(' · ') + '.'])]));
+        if (q.saldo != null || q.fid != null || q.pres != null) {
+          nos.push(h('p', { cls: 'cg-pa-c-h', text: 'No voto (da visão por partido)' }));
+          nos.push(h('ul', { cls: 'cg-lp-tx' }, [linhaDeTexto([q.saldo != null ? 'De que lado vota: ' + saldo(q.saldo) + ' ' : '', q.saldo != null ? barra(q.saldo) : null, (q.saldo != null ? ' · ' : '') + 'com o partido em ' + pct(q.fid) + ' · votou em ' + pct(q.pres)])]));
+        }
+        var saidas = [h('a', { href: '#p=' + q.k, 'data-k': q.k, text: 'Abrir o dossiê' })];
+        if (q.topo) { saidas.push(' · '); saidas.push(lpIr('projetos', q.k, 'Os projetos dele nas portas →')); }
+        if ((LPM.abas || []).indexOf('decide') >= 0) { saidas.push(' · '); saidas.push(lpIr('decide', q.k, 'Como vota quando pesa →')); }
+        nos.push(h('p', { cls: 'cg-pa-c-l' }, saidas));
+        if (q.tot) nos.push(todosOsProjetos(q));
+        return nos;
+      }
+      /* "Todos os projetos": autoria/<casa>-<id>.json, lido quando alguém abre. */
+      function todosOsProjetos(q) {
+        var caixa = h('div', { cls: 'an-tbl-wrap' }), det = h('details', { cls: 'cg-lp-todos' }, [h('summary', { text: 'Todos os ' + num(q.tot) + ' projetos, com a leitura de cada um' }), caixa]), feito = false;
+        det.addEventListener('toggle', function () {
+          if (!det.open || feito) return;
+          feito = true;
+          caixa.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Carregando…' }));
+          lpArquivo('autoria', q.k, function (erro, arq) {
+            esvaziar(caixa);
+            if (erro) { feito = false; caixa.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Não foi possível abrir a lista agora. Tente de novo em instantes.' })); return; }
+            var motivos = { falta: 'ainda sem leitura', nd: LPM.nd || '', instavel: (LPM.leituras || {})['0'] || 'leitura instável' };
+            caixa.appendChild(h('table', { cls: 'an-tbl cg-tb' }, [
+              h('thead', null, [h('tr', null, ['Peso', 'Projeto e situação', 'A leitura'].map(function (c) { return h('th', { scope: 'col', text: c }); }))]),
+              h('tbody', null, lpLinhas(arq).map(function (p) {
+                var aConfirmar = lpNoTopo(p.fe) && !lpNoTopo(p.fx), x = lpDir(p.dir);
+                var leitura = p.sl ? [motivos[p.sl] || p.sl] : [lpFaixa(p.fx), aConfirmar ? h('small', { text: 'a confirmar' }) : null, h('small', { text: lpEixo(p.ex) }), h('small', null, [lpForma(x[2]), x[1]])];
+                var projeto = [lpMateria(p.k, p.t, p.u, p.f), h('small', { text: p.e }), h('small', { text: ((LPM.estados || {})[p.st] || p.st) + (p.pp ? ': ' + ((LPM.portas_nome || {})[p.pp] || p.pp).toLowerCase() : '') })];
+                if (p.x) projeto.push(h('small', { text: 'fora dos números: ' + (p.x === (LPM.fora_do_perfil || [])[0] ? 'ementa igual à de ' + (p.xo || 'proposição anterior') : 'projeto de bancada') }));
+                return h('tr', { cls: p.x || p.sl ? 'cg-lp-fora' : null }, [h('td', { text: p.w == null ? '—' : String(p.w) }), h('th', { scope: 'row' }, projeto), h('td', null, leitura)]);
+              }))
+            ]));
+          });
+        });
+        return det;
+      }
+      function mostrarCartao(q) {
+        if (q.k === noCartao) return;
+        noCartao = q.k;
+        esvaziar(card);
+        cartaoDe(q).forEach(function (no) { if (no) card.appendChild(no); });
+        if (parado) return;
+        card.classList.remove('cg-pa-vira');
+        void card.offsetWidth;
+        card.classList.add('cg-pa-vira');
+      }
+      function irA(q, o) {
+        o = o || {};
+        emFoco = q || null;
+        LP.quem = q ? q.k : '';
+        if (q) mostrarCartao(q);
+        else { noCartao = ''; esvaziar(card); card.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Escolha um ponto do gráfico ou ache um nome para ver o perfil pelos projetos.' })); }
+        aplicar(true);  // a Janela diz quem está em foco; o nome e o anel vão ao gráfico
+        if (busca && q && !o.daBusca) busca.value = '';
+        if (!o.semEndereco) gravarEndereco();
+      }
+      function passo(delta) {
+        if (!ordem.length) return;
+        var i = emFoco ? ordem.indexOf(emFoco) : -1;
+        var alvo = i < 0 ? (delta > 0 ? 0 : ordem.length - 1) : Math.max(0, Math.min(ordem.length - 1, i + delta));
+        if (ordem[alvo] !== emFoco) irA(ordem[alvo]);
+      }
+      function teclas(ev) {
+        if (ev.target && ev.target.closest && ev.target.closest('a, select, input, summary, table')) return;
+        var delta = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : ev.key === 'ArrowLeft' || ev.key === 'ArrowUp' ? -1 : ev.key === 'Home' ? -1e6 : ev.key === 'End' ? 1e6 : 0;
+        if (!delta || estado !== 2) return;
+        ev.preventDefault();
+        passo(delta);
+      }
+      function maisPerto(ev, raio) {
+        var r = svg.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, melhor = null, dist = raio * raio, filtro = temFiltro();
+        Q.forEach(function (q) {
+          if (q.n < MINIMO || !q.el) return;
+          var dx = q.x * r.width / 100 - mx, dy = q.y * r.height / 100 - my, d2 = dx * dx + dy * dy;
+          if (d2 >= raio * raio) return;
+          d2 += (fora(q) ? 0 : 9) + (filtro && !passa(q) ? 64 : 0);  // na dúvida, quem sai da faixa e quem está realçado
+          if (d2 < dist) { dist = d2; melhor = q; }
+        });
+        return melhor;
+      }
+      var sobre = null, toque = false, espera = 0;
+      function apagarDica() { if (sobre && sobre.el) sobre.el.classList.remove('on'); sobre = null; dica.hidden = true; }
+      plot.addEventListener('pointerdown', function (ev) { toque = ev.pointerType === 'touch'; });
+      plot.addEventListener('pointermove', function (ev) {
+        if (ev.pointerType === 'touch' || estado !== 2) return;
+        var q = maisPerto(ev, 14);
+        if (!q) { apagarDica(); return; }
+        if (q !== sobre) {
+          if (sobre && sobre.el) sobre.el.classList.remove('on');
+          sobre = q;
+          q.el.classList.add('on');
+          esvaziar(dica);
+          dica.appendChild(h('b', { text: q.nome + ' (' + [q.pt, q.uf].filter(Boolean).join('-') + ')' }));
+          dica.appendChild(h('span', { text: num(q[MEDIDAS[F.med][0]]) + ' de ' + num(q.n) + ' projetos ' + TITULOS[F.med] + ' (' + lpDec(parte(q)) + '%) · ' + (fora(q) ? acaso(fora(q)) : 'dentro da faixa do acaso') + ' · clique para ver' }));
+        }
+        var caixa = fig.getBoundingClientRect(), r = svg.getBoundingClientRect();
+        var x = r.left - caixa.left + q.x * r.width / 100 + 12, y = r.top - caixa.top + q.y * r.height / 100 - 8;
+        dica.hidden = false;
+        if (x + dica.offsetWidth > caixa.width) x = Math.max(0, x - dica.offsetWidth - 24);
+        dica.style.left = x + 'px';
+        dica.style.top = Math.max(0, y - dica.offsetHeight) + 'px';
+      });
+      plot.addEventListener('pointerleave', apagarDica);
+      plot.addEventListener('click', function (ev) {
+        var q = estado === 2 ? maisPerto(ev, toque ? 24 : 20) : null;
+        if (q) irA(q);
+      });
+      plot.setAttribute('tabindex', '0');
+      plot.setAttribute('role', 'group');
+      plot.setAttribute('aria-label', 'Gráfico de quem propõe. As setas do teclado andam pelos nomes realçados, da maior parte para a menor; quem está em foco aparece no cartão ao lado.');
+      plot.addEventListener('keydown', teclas);
+      cw.addEventListener('keydown', teclas);
+      ant.addEventListener('click', function () { passo(-1); });
+      prox.addEventListener('click', function () { passo(1); });
+      w.addEventListener('resize', function () { w.clearTimeout(espera); espera = w.setTimeout(function () { if (estado === 2 && vistaAtual === 'autores') escrever(); }, 150); });
+
+      /* ── A medida, os filtros, os números e a busca ── */
+      function trocarMedida(med) {
+        if (!MEDIDAS[med] || med === F.med) return;
+        F.med = med;
+        desenhar();
+      }
+      meds.forEach(function (b) { b.addEventListener('click', function () { if (estado !== 2) return; trocarMedida(b.getAttribute('data-med')); aplicar(); }); });
+      numeros.forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (estado !== 2) return;
+          var f = b.getAttribute('data-f') || '', on = ligado(f);
+          zerar();
+          if (!on && f === 'tem') F.tem = true;
+          if (!on && f.slice(0, 6) === 'acima:') { trocarMedida(f.slice(6)); F.acima = true; }
+          aplicar();
+        });
+      });
+      selPt.addEventListener('change', function () { F.pt = selPt.value; aplicar(); });
+      selUf.addEventListener('change', function () { F.uf = selUf.value; aplicar(); });
+      selEixo.addEventListener('change', function () { LP.eixo = selEixo.value; aplicar(); });
+      /* "Limpar" devolve a vista ao estado inicial: sem filtro, sem ninguém em foco, na primeira medida. */
+      function limparTudo() { zerar(); trocarMedida('topo'); irA(null, { semEndereco: true }); aplicar(); }
+      limpar.addEventListener('click', limparTudo);
+      function achar() {
+        var termos = semAcento(busca.value).split(/\s+/).filter(Boolean), exato = null, parcial = null;
+        if (!termos.length) return;
+        Q.forEach(function (q) {
+          var nome = semAcento(q.nome);
+          if (nome === termos.join(' ') && !exato) exato = q;
+          else if (!parcial && termos.every(function (t) { return nome.indexOf(t) >= 0; })) parcial = q;
+        });
+        if ((exato || parcial) && (exato || parcial) !== emFoco) irA(exato || parcial, { daBusca: true });  // quem já está em foco não redesenha (o campo dispara de novo ao perder o cursor)
+      }
+      busca.addEventListener('change', achar);
+      busca.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); achar(); } });
+      if (tabela) tabela.addEventListener('toggle', function () {
+        var caixa = tabela.querySelector('.an-tbl-wrap');
+        if (!tabela.open || estado !== 2 || caixa.firstChild) return;
+        caixa.appendChild(h('table', { cls: 'an-tbl cg-tb' }, [
+          h('thead', null, [h('tr', null, ['Nome', 'Partido e UF', 'Projetos lidos', LPR.topo_pl.charAt(0).toUpperCase() + LPR.topo_pl.slice(1) + ' confirmados', '%', 'Na faixa “' + LPR.piso + '”', '%', 'Mediana do peso'].map(function (c) { return h('th', { scope: 'col', text: c }); }))]),
+          h('tbody', null, Q.filter(function (q) { return q.n >= MINIMO; }).map(function (q) {
+            return h('tr', null, [
+              h('th', { scope: 'row' }, [lpPessoa(q.k, q.nome)]), h('td', { text: [q.pt, q.uf].filter(Boolean).join('-') }), h('td', { text: num(q.n) }),
+              h('td', { text: num(q[MEDIDAS.topo[0]]) + (q.fz_topo ? (q.fz_topo === 1 ? ' ▲' : ' ▽') : '') }), h('td', { text: lpDec(parte(q, 'topo')) + '%' }),
+              h('td', { text: num(q[MEDIDAS.sb[0]]) + (q.fz_sb ? (q.fz_sb === 1 ? ' ▲' : ' ▽') : '') }), h('td', { text: lpDec(parte(q, 'sb')) + '%' }), h('td', { text: q.tip == null ? '—' : lpDec(q.tip) })
+            ]);
+          }))
+        ]));
+        caixa.parentNode.appendChild(h('p', { cls: 'az-dek', text: '▲ acima e ▽ abaixo do que o acaso explica; sem marca, dentro da faixa do acaso.' }));
+      });
+
+      function montar(arq) {
+        A = arq;
+        Q = lpLinhas(arq);
+        porChave = {};
+        var partidos = {}, ufs = {}, comEixo = {};
+        Q.forEach(function (q) {
+          porChave[q.k] = q;
+          if (q.pt) partidos[q.pt] = 1;
+          if (q.uf) ufs[q.uf] = 1;
+          (q.ex || []).forEach(function (n, i) { if (n) comEixo[i] = 1; });
+          nomes.appendChild(h('option', { value: q.nome, label: [q.pt, q.uf].filter(Boolean).join('-') }));
+        });
+        Object.keys(partidos).sort().forEach(function (pt) { selPt.appendChild(h('option', { value: pt, text: pt })); });
+        Object.keys(ufs).sort().forEach(function (uf) { selUf.appendChild(h('option', { value: uf, text: uf })); });
+        (LPM.eixos || []).forEach(function (e, i) { if (comEixo[i]) selEixo.appendChild(h('option', { value: e[0], text: e[1] })); });
+        lista(bloco.querySelectorAll('.cg-lp-plot, .cg-lp-ey, .cg-lp-ex, .cg-lp-leg, .cg-lp-tb, .cg-lp-cw')).forEach(function (el) { el.hidden = false; });
+        desenhar();
+      }
+      function doPedido() {
+        var p = pendente;
+        pendente = null;
+        if (p) {
+          trocarMedida(MEDIDAS[p.med] ? p.med : 'topo');
+          F = { med: F.med, pt: Q.some(function (q) { return q.pt === p.pt; }) ? p.pt : '', uf: /^[A-Z]{2}$/.test(p.uf || '') ? p.uf : '', tem: p.tem === '1', acima: p.acima === '1' };
+          LP.eixo = lpRotulo(LPM.eixos, p.eixo) ? p.eixo : '';
+          LP.quem = /^(cd|sf)-\d+$/.test(p.quem || '') && p.quem.slice(0, 2) === casa ? p.quem : '';
+        }
+        var alvo = LP.quem ? porChave[LP.quem] : null;
+        if ((alvo || null) !== emFoco) irA(alvo, { semEndereco: true });
+        aplicar();
+      }
+      vista[casa] = {
+        abrir: function () {
+          if (LP.quem && LP.quem.slice(0, 2) !== casa) LP.quem = '';
+          if (estado === 2) { doPedido(); return; }
+          if (estado === 1) return;
+          estado = 1;
+          st.hidden = false;
+          st.textContent = 'Carregando os pontos…';
+          lpArquivo('autores', casa, function (erro, arq) {
+            if (erro) { estado = 0; st.textContent = 'Não foi possível abrir os pontos agora. As listas abaixo trazem os mesmos números.'; return; }
+            try { montar(arq); } catch (falha) {
+              if (w.console && w.console.error) w.console.error(falha);
+              estado = 0;
+              st.textContent = 'Não foi possível abrir os pontos agora. As listas abaixo trazem os mesmos números.';
+              return;
+            }
+            estado = 2;
+            st.hidden = true;
+            fs.hidden = false;
+            navEl.hidden = false;
+            doPedido();
+          });
+        },
+        doEndereco: function (p) { pendente = p; }
+      };
+    });
+  })();
+{% include "congresso_lp_voto.js.j2" %}

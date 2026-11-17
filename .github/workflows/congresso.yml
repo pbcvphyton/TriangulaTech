@@ -1,8 +1,10 @@
-# Analítico do Congresso, à mão: baixa os dados abertos da Câmara e do Senado, refaz as
-# contas e a aba Congresso (python -m qijournal congresso atualizar) e publica o que
-# mudou em data/congresso/ e edicoes/congresso.html.
+# Analítico do Congresso, à mão: lê por IA os projetos de lei novos (python -m qijournal
+# congresso ler), baixa os dados abertos da Câmara e do Senado, refaz as contas e a aba
+# Congresso (python -m qijournal congresso atualizar) e publica o que mudou em
+# data/congresso/ (com as leituras, em data/congresso/leitura/) e edicoes/congresso.html.
 #
-# No dia a dia isto roda dentro da "Edição diária", antes da edição. Este workflow serve
+# No dia a dia isto roda dentro da "Edição diária": a atualização antes da edição e a
+# leitura dos projetos por último, com a edição já publicada. Este workflow serve
 # para atualizar fora de hora ou refazer tudo ("carga completa": também os anos fechados
 # da base de votos e todos os anos de proposições, baixados de novo).
 name: Congresso
@@ -27,7 +29,8 @@ concurrency:
 jobs:
   congresso:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # A leitura dos projetos de lei novos (até 12 min; acessória) e a atualização.
+    timeout-minutes: 57
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v5
@@ -56,6 +59,38 @@ jobs:
           path: ${{ runner.temp }}/congresso
           key: congresso-${{ steps.cg.outputs.dia }}
           restore-keys: congresso-
+
+      - name: Ler os projetos novos
+        # A leitura diária dos projetos de lei (a visão por parlamentar da aba Congresso): a
+        # cadeia de IAs do jornal lê as proposições novas e as matérias que foram a voto e relê
+        # o que muda a conta, antes da atualização, que já usa as leituras do dia. É acessório:
+        # sem chave, com a IA fora do ar ou sem tempo, o que não foi lido fica para amanhã.
+        # Limites em config/congresso.yaml (projeto_de_pais.leitura.diaria: 8 min de leitura,
+        # mais a carga das proposições); o que for lido (data/congresso/leitura/) entra no
+        # commit deste fluxo. Desligar: variável QIJ_NO_LEITURA=1.
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          # Os mesmos editores por IA da edição (llm.providers), cada um com o seu segredo.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AIMLAPI_KEY: ${{ secrets.AIMLAPI_KEY }}
+          SENSENOVA_API_KEY: ${{ secrets.SENSENOVA_API_KEY }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          QIJ_NO_LEITURA: ${{ vars.QIJ_NO_LEITURA }}
+          QIJ_MODEL: ${{ vars.QIJ_MODEL }}
+          QIJ_GEMINI_MODEL: ${{ vars.QIJ_GEMINI_MODEL }}
+          QIJ_GEMINI_LITE_MODEL: ${{ vars.QIJ_GEMINI_LITE_MODEL }}
+          QIJ_AIML_MODEL: ${{ vars.QIJ_AIML_MODEL }}
+          QIJ_SENSENOVA_MODEL: ${{ vars.QIJ_SENSENOVA_MODEL }}
+          QIJ_MISTRAL_MODEL: ${{ vars.QIJ_MISTRAL_MODEL }}
+          QIJ_KIMI_MODEL: ${{ vars.QIJ_KIMI_MODEL }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: python -m qijournal congresso ler --dir . --cache "$RUNNER_TEMP/congresso"
 
       - name: Atualizar o Congresso
         env:

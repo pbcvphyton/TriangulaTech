@@ -31,6 +31,9 @@
 {% include "congresso_papel.css.j2" %}
 {% include "congresso_pauta.css.j2" %}
 {% include "congresso_cota.css.j2" %}
+{% if c.lp %}
+{% include "congresso_lp.css.j2" %}
+{% endif %}
 {% endblock %}
 
 {#- Nome que abre o dossiê (com script) ou a busca do nome no jornal (sem script). -#}
@@ -60,16 +63,32 @@
     <h2 class="kicker" id="cg-h">Congresso</h2>
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
-  {#- A barra fixa: a Casa e, logo abaixo, as vistas dela (uma de cada vez, com script; sem script, todas em sequência). -#}
+  {#- A barra fixa: a Casa e, logo abaixo, as vistas dela (uma de cada vez, com script; sem script, todas em sequência).
+      Com a visão por parlamentar (c.lp), a primeira linha ganha o interruptor "Ver por" e a frase de ajuda vai para o
+      fim dela; sem c.lp, a barra é a de sempre. -#}
   <div class="cg-barra" id="cgBarra">
+    {% if c.lp %}
+    <div class="cg-barra-1">
+    {% endif %}
     <div class="cg-casas" id="cgCasas" role="group" aria-label="Casa" hidden>
       {% for casa in c.casas %}
       <button class="cg-casa-b" type="button" data-casa="{{ casa.id }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ casa.curto }} <span>{{ casa.em_exercicio }}</span></button>
       {% endfor %}
+      {% if not c.lp %}
       <span class="cg-casas-n">Escolha a Casa e, abaixo, o que quer ver dela.</span>
+      {% endif %}
     </div>
+    {% if c.lp %}
+    {% include "congresso_lp_barra.html.j2" %}
+    </div>
+    {% endif %}
     <nav class="cg-vistas" id="cgNav" aria-label="O que ver">
+      {% if c.lp %}
+      <p class="cg-vistas-r">Visão por partido</p>
+      <ul data-lente="partido">
+      {% else %}
       <ul>
+      {% endif %}
         {% if c.leitura %}<li><a href="#cg-leitura" data-vista="resumo">Resumo</a></li>{% endif %}
         <li><a href="#cg-polos" data-vista="posicoes">Onde cada um está</a></li>
         <li><a href="#cg-partidos" data-vista="partidos">Partidos</a></li>
@@ -82,6 +101,15 @@
         <li><a href="#cg-escolha" data-vista="escolha">Escolha o seu candidato</a></li>
         <li><a href="#cg-metodo" data-vista="metodo">Como ler</a></li>
       </ul>
+      {% if c.lp %}
+      <p class="cg-vistas-r">Visão por parlamentar</p>
+      <ul data-lente="pessoa">
+        {% for aba in c.lp.abas %}
+        <li><a href="#{{ aba.ancora }}" data-vista="{{ aba.vista }}">{{ aba.nome }}</a></li>
+        {% endfor %}
+        <li><a href="#cg-lp-metodo" data-vista="metodo">Como ler</a></li>
+      </ul>
+      {% endif %}
     </nav>
   </div>
 
@@ -122,6 +150,9 @@
         <li><a class="hit" href="#cg-frentes">Frentes</a><p>Quem assina vota junto com quem coordena? Um cartão por frente de causa, com a comparação com quem não assina; e quem assina quase todas.</p></li>
         <li><a class="hit" href="#cg-cota">Cota parlamentar</a><p>Quanto cada um gasta da cota, com o quê e com quem; os fornecedores que mais recebem, a mesma nota em dois gabinetes e o que a Casa recusou.</p></li>
         <li><a class="hit" href="#cg-escolha">Escolha o seu candidato</a><p>Filtre quem está no mandato pelo estado, pelo lado em que vota em cada tema, pelo que propõe e pela presença; cada nome diz por que entrou.</p></li>
+        {% if c.lp %}
+        <li><a class="hit" href="#cg-projetos">Visão por parlamentar</a><p>Outra entrada, pelo botão “Ver por” no alto: o que cada um propõe, projeto a projeto. {% for aba in c.lp.abas %}<a href="#{{ aba.ancora }}">{{ aba.nome }}</a>{% if not loop.last %}, {% endif %}{% endfor %}: o que mais pesa para o país e em que porta parou; quem propõe o quê; como cada um vota quando a matéria pesa; e o que explica mais uma pessoa, os projetos dela ou o partido. É a única parte da página em que o conteúdo é lido, e vem marcada: {{ c.lp.selo[:1]|lower }}{{ c.lp.selo[1:] }} (<a href="#cg-lp-metodo">como ler</a>).</p></li>
+        {% endif %}
       </ol>
       <form class="cg-achar" id="cgAchar" role="search" hidden>
         <label class="az-lbl az-lbl-2" for="cgAcharQ">Abrir o dossiê de alguém</label>
@@ -997,6 +1028,9 @@
     <p class="az-dek">“De que lado vota” é o saldo na régua: −100, sempre com a esquerda ({{ c.polos.esquerda }}); +100, sempre com a direita ({{ c.polos.direita }}); conta só as votações de conteúdo em que os dois lados se opuseram. A régua mede com quem a pessoa vota, não o que ela diz ser. “Votou em” é a parte das votações nominais em que podia votar e votou (o registro não traz o motivo da ausência). “Com a maioria do partido” compara com o partido do dia de cada voto. “Exceção” é o tema, com 5 votações ou mais, em que a pessoa fica do lado oposto ao do seu padrão geral. O partido é o de hoje: para quem mudou na legislatura, o cartão diz desde quando vota pelo atual (a data do primeiro voto registrado por ele) e qual era o anterior. A cota se compara dentro do estado.</p>
   </section>
 
+{% if c.lp %}
+{% include "congresso_lp.html.j2" %}
+{% endif %}
   <section class="az-sec az-met cg-vista" data-vista="metodo" aria-labelledby="cg-metodo-h">
     <header class="az-lh" id="cg-metodo">
       <p class="az-ln">Método</p>
@@ -1018,6 +1052,9 @@
       </div>
       <p class="az-dek">Cada votação herda o tema da matéria votada. Na Câmara, a área temática é dada pelo Centro de Documentação e Informação; no Senado, é a classe do processo. Uma matéria pode ter mais de um tema.</p>
     </div>
+    {% endif %}
+    {% if c.lp and c.lp.metodo %}
+    {% include "congresso_lp_metodo.html.j2" %}
     {% endif %}
   </section>
 </section>

@@ -1,0 +1,215 @@
+{#- Aba Congresso, visão por parlamentar: "Na hora do voto" (#v=decide) e "Pessoa ou partido?"
+    (#v=cruzar). Incluído no fim de congresso_lp.html.j2, de quem usa as macros (selo, info, pes,
+    mat, janela) e o L (c.lp). Tudo vem pronto de render/congresso_lp_voto.py (casa.lp.decide e
+    casa.lp.cruzar): sem script, cada vista traz a janela, os números, as barras, as tabelas, as
+    listas e a caixa do que não dá para concluir. Com script (congresso_lp_voto.js.j2), as faixas
+    por partido (um ponto por parlamentar) vêm de autores-<casa>.json, e o cartão dos votos de
+    cada um, de decide-<casa>.json.
+    Nenhum nome de faixa, alavanca, marca ou código é escrito aqui: os rótulos vêm do config.
+    Os pontos não levam data-k nem data-m: ponto de pessoa usa data-q. -#}
+{% set F = L.fiscal %}
+{% macro marca_fiscal(x) -%}
+{% if x %}<i class="cg-lp-g cg-lp-{{ x.forma }}" aria-hidden="true"></i>{{ x.n }}{% else %}<span class="cg-lp-fora-vf">fora</span>{% endif %}
+{%- endmacro %}
+{% macro dist(x) -%}
+{% if x %}<b>{{ x.med }}</b> <small>{{ x.q1 }} a {{ x.q3 }} · {{ x.n }}</small>{% else %}—{% endif %}
+{%- endmacro %}
+
+  {#- ════ Na hora do voto: quando a matéria pesa, e de que lado do caixa ════ -#}
+  <section class="az-sec cg-vista cg-lp-v" data-vista="decide" aria-labelledby="cg-decide-h">
+    <header class="az-lh" id="cg-decide">
+      <p class="az-ln">Quando a matéria pesa</p>
+      <h3 class="az-lt" id="cg-decide-h">Na hora do voto, decide a pessoa ou a bancada?</h3>
+      <p class="az-ld">Só as votações nominais do texto principal no Plenário, uma por matéria. Duas medidas: quando a matéria pesa (peso {{ L.cortes.voto_peso }} ou mais pela régua), quem aparece e quem segue o partido; e o voto fiscal, de que lado do caixa cada um vota. Nuvem apertada é o partido decidindo; ponto longe dos colegas é a pessoa. O voto vem do registro; o peso e a marca são leitura. {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.lp and casa.lp.decide %}{% set V = casa.lp.decide %}
+      <div class="cg-pa cg-lp" id="cg-lp-dec-{{ casa.id }}" data-lp="decide" data-casa="{{ casa.id }}" data-um="{{ casa.lp.um }}" data-uns="{{ casa.lp.uns }}" data-med="{{ V.medidas|join(' ') }}">
+        {{ janela(V.janela) }}
+        {% if V.fechado.de100 %}
+        <p class="cg-lp-resp"><b>{{ V.fechado.de100 }} de cada 100</b> votos seguiram o partido fechado. <span>{{ V.fechado.pct }} dos {{ V.fechado.n }} votos dados, {{ V.fechado.onde }}, quando {{ V.fechado.corte }}% ou mais do partido votou do mesmo lado. Abaixo: de onde saem essas votações, o que muda quando a matéria pesa e quem foge do partido.</span></p>
+        {% endif %}
+        <ol class="cg-pa-ms cg-lp-ns cg-lp-us" aria-label="O universo, passo a passo">
+          {% for n in V.numeros %}
+          <li><div class="cg-pa-m cg-lp-u"><span class="cg-pa-m-n"><b>{{ n.n }}</b> {{ n.un }}</span><span class="cg-pa-m-f">{{ n.f }}{% if n.selo %} {{ selo() }}{% endif %}</span>{% for x in n.x %}<span class="cg-pa-m-x">{{ x }}</span>{% endfor %}</div></li>
+          {% endfor %}
+        </ol>
+        {% if V.fiscais.tem %}
+        <p class="cg-lp-frase">{% for t, forte in V.fiscais.frase %}{% if forte %}<b>{{ t }}</b>{% else %}{{ t }}{% endif %}{% endfor %} {{ selo() }}</p>
+        {% endif %}
+
+        {% if V.quando %}
+        <div class="az-blk cg-lp-qp">
+          <h4 class="az-h">Quando pesa <span>{{ V.quando_sub }} {{ selo() }}</span></h4>
+          <div class="cg-lp-qps">
+            {% for q in V.quando %}
+            <div class="cg-lp-qp1">
+              <p class="cg-lp-bn"><b>{{ q.nome }}</b> <span>{{ q.frase }}</span></p>
+              <p class="cg-lp-qb"><span>de peso</span><i aria-hidden="true"><b style="width:{{ q.w_peso }}%"></b></i><em>{{ q.peso }}</em></p>
+              <p class="cg-lp-qb cg-lp-qb-d"><span>demais</span><i aria-hidden="true"><b style="width:{{ q.w_demais }}%"></b></i><em>{{ q.demais }}</em></p>
+              <p class="cg-lp-qd">{{ q.dif }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="cg-pa-fs cg-lp-fs" role="group" aria-label="Medida e busca" hidden>
+          <span class="cg-pa-fk">Medida</span>
+          <span class="cg-lp-med" role="group" aria-label="Medida">{% for id in V.medidas %}<button type="button" class="cg-lente-b" data-med="{{ id }}" aria-pressed="{{ "true" if loop.first else "false" }}">{{ L.medidas[id].nome }}</button>{% endfor %}</span>
+          <label class="cg-lp-sel cg-lp-achar"><span class="cg-pa-fk">Achar um nome</span> <input class="az-fil-in" type="search" data-f="nome" list="cg-lp-nomes-v-{{ casa.id }}" autocomplete="off" spellcheck="false" placeholder="Nome do {{ casa.lp.um }}…"></label>
+          <datalist id="cg-lp-nomes-v-{{ casa.id }}"></datalist>
+          <button type="button" class="cg-pa-limpa" hidden>Limpar</button>
+        </div>
+
+        <div class="cg-pa-foco cg-lp-foco">
+          <figure class="cg-pa-fig cg-lp-fig">
+            <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht">{% if V.medidas %}{{ L.medidas[V.medidas[0]].nome }}, partido a partido{% else %}Partido a partido{% endif %}</span> <span>um ponto por {{ casa.lp.um }}; o traço é a mediana do partido e a banda, a metade do meio {{ selo() }}</span></figcaption>
+            {% if V.aviso %}<p class="cg-lp-av" data-so-med="vf"><b class="cg-lp-av-k">Antes de ler</b> {% for t, forte in V.aviso %}{% if forte %}<b>{{ t }}</b>{% else %}{{ t }}{% endif %}{% endfor %}</p>{% endif %}
+            {% if not V.pode.vf %}<p class="cg-lp-av"><b class="cg-lp-av-k">Voto fiscal</b> {{ V.potencia }}</p>{% endif %}
+            <div class="cg-lp-fxs" hidden></div>
+            <p class="cg-lp-semjs">O gráfico de pontos precisa de script; a tabela abaixo traz os mesmos números, partido a partido.</p>
+            <p class="cg-lp-st" role="status" hidden></p>
+            <div class="cg-gr-dica cg-lp-dica" role="status" hidden></div>
+            <p class="cg-leg cg-lp-leg" hidden><span><i class="cg-lp-g cg-lp-cheio"></i>a {{ L.cortes.longe }} pontos ou mais da mediana do próprio partido</span><span><i class="cg-lp-g cg-lp-cheio cg-lp-cz"></i>perto dos colegas</span><span><i class="cg-lp-fx-lm"></i>mediana do partido</span><span><i class="cg-lp-fx-lb"></i>metade do meio</span></p>
+            {% if V.pode.vf %}<p class="az-dek cg-lp-nota">{{ V.potencia }}</p>{% endif %}
+            <details class="cg-rv-tb cg-pa-tb cg-lp-tb" data-lp-tab="decide" open>
+              <summary>Ver como tabela: partido a partido</summary>
+              <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-tpt">
+                <thead><tr><th scope="col">Partido</th><th scope="col">Em exercício</th>{% if V.pode.vf %}<th scope="col">Voto fiscal: mediana</th>{% endif %}<th scope="col">Com o partido, quando pesa: mediana</th><th scope="col">Presença, quando pesa: mediana</th>{% if V.fiscais.tem %}<th scope="col">A maioria da bancada ficou do lado do caixa em</th>{% endif %}</tr></thead>
+                <tbody>
+                  {% for b in V.partidos %}
+                  <tr><th scope="row">{{ b.pt }}</th><td>{{ b.n }}</td>{% if V.pode.vf %}<td>{{ dist(b.vf) }}</td>{% endif %}<td>{{ dist(b.fp) }}</td><td>{{ dist(b.pp) }}</td>{% if V.fiscais.tem %}<td>{{ b.mm }}</td>{% endif %}</tr>
+                  {% endfor %}
+                </tbody>
+              </table></div>
+              <p class="az-dek">Em cada célula: a mediana do partido, a metade do meio (do 1º ao 3º quartil) e quantos entram na conta (só quem deu {{ V.minimo }} votos ou mais; mediana só com {{ L.cortes.min_partido }} pessoas medidas). {% if V.fiscais.tem %}A última coluna conta as votações do voto fiscal em que a maioria do partido, no dia, votou do lado do caixa.{% endif %}</p>
+            </details>
+          </figure>
+          <div class="cg-pa-cw cg-lp-cw" hidden>
+            <div class="cg-pa-card cg-lp-card"><p class="cg-pa-c-o">Escolha um ponto do gráfico ou ache um nome para ver os votos de cada um.</p></div>
+            <div class="cg-pa-nav" hidden><button type="button" class="cg-pa-ant" aria-label="{{ casa.lp.um|capitalize }} anterior">‹</button><span class="cg-pa-pos" aria-live="polite"></span><button type="button" class="cg-pa-prox" aria-label="Próximo {{ casa.lp.um }}">›</button></div>
+          </div>
+        </div>
+
+        {% if V.votacoes %}
+        <div class="az-blk cg-lp-vts">
+          <h4 class="az-h">{{ V.titulo_votacoes }} <span>da mais recente para a mais antiga; é a prova das medidas acima {{ selo() }}</span></h4>
+          <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-tv">
+            <thead><tr><th scope="col">Data</th><th scope="col">Matéria</th><th scope="col">Peso</th><th scope="col">Onde mexe</th><th scope="col">Marca fiscal</th><th scope="col">Resultado</th><th scope="col">Sim × Não</th><th scope="col">Contra o próprio partido</th></tr></thead>
+            <tbody>
+              {% for v in V.votacoes %}
+              <tr data-ex="{{ v.ex }}"{% if loop.index > 10 %} class="cg-lp-tr-mais"{% endif %}><td>{{ v.data }}</td><th scope="row">{{ mat(v.k, v.t, "", v.f) }}<small>{{ v.e }}</small></th><td>{% if v.de_peso %}<b>{{ v.peso }}</b>{% else %}{{ v.peso }}{% endif %}</td><td>{{ v.eixo }}</td><td>{{ marca_fiscal(v.marca) }}</td><td>{{ v.res }}</td><td>{{ v.sim }} × {{ v.nao }}</td><td>{{ v.contra }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table></div>
+          {% if V.votacoes|length > 10 or V.ha_mais %}<button type="button" class="cg-pa-limpa cg-lp-vmais" hidden>Mostrar as {{ V.n_votacoes }}</button>{% endif %}
+          <p class="az-dek">{% if V.ha_mais %}<span class="cg-lp-semjs-i">Aqui, as {{ V.votacoes|length }} mais recentes; as demais estão em data/congresso/decide-{{ casa.id }}.json. </span>{% endif %}Peso em negrito: matéria de peso {{ V.peso }} ou mais (entra em “quando pesa”). Marca fiscal: <i class="cg-lp-g cg-lp-{{ F.mais.forma }}" aria-hidden="true"></i>+1, “{{ F.mais.rot }}”: o voto fiscal é o Sim; <i class="cg-lp-g cg-lp-{{ F.menos.forma }}" aria-hidden="true"></i>−1, “{{ F.menos.rot }}”: o voto fiscal é o Não; “fora”: a matéria não entra no voto fiscal. “Contra o próprio partido”: votos diferentes do da maioria do partido, quando ela reuniu {{ V.fechado.corte }}% ou mais.</p>
+        </div>
+        {% endif %}
+
+        <div class="az-blk">
+          <h4 class="az-h">Quem mais votou contra o próprio partido fechado <span>nas votações que entram; em contagem, só quem deu {{ V.minimo }} votos ou mais; não é ranking de independência</span></h4>
+          {% if V.divergentes %}
+          <ol class="cg-ls cg-lp-ls cg-lp-ls2">
+            {% for i in V.divergentes %}
+            <li{% if loop.index > 5 %} class="cg-lp-mais"{% endif %}><p class="cg-ls-k"><b>{{ pes(i.k, i.nome) }}</b><span>{{ i.legenda }}</span><span class="cg-lp-val">{{ i.valor }}</span></p>{% if i.extra %}<p class="cg-rv-q">{{ i.extra }}</p>{% endif %}</li>
+            {% endfor %}
+          </ol>
+          {% if V.divergentes|length > 5 %}<button type="button" class="cg-pa-limpa cg-lp-mm" hidden>Mostrar os {{ V.divergentes|length }}</button>{% endif %}
+          {% else %}
+          <p class="cg-lp-vz">Nenhum {{ casa.lp.um }} com {{ V.minimo }} votos ou mais votou contra o próprio partido fechado nestas votações.</p>
+          {% endif %}
+        </div>
+
+        <div class="cg-lp-nao">
+          <h4>O que não dá para concluir</h4>
+          <p>São poucas votações, e voto nominal é amostra escolhida: o conflito costuma estar nos destaques, que ficam fora. O voto fiscal diz de que lado do caixa a pessoa votou, não se votou certo nem se é independente: matéria do Executivo domina o que vai a voto, e voto fiscal se confunde com apoiar ou não o governo. Seguir o partido quando ele está do lado do caixa não distingue ninguém. A marca vem da ementa do registro, não do substitutivo que foi a voto. Onde poucos têm votos bastantes, a tela mostra só o partido, sem concluir que “é o partido”.</p>
+        </div>
+        <p class="cg-lp-seguir"><a href="#cg-cruzar" data-lp-ir="cruzar">A seguir: pessoa ou partido? →</a></p>
+      </div>
+      {% else %}
+      <p class="cg-lp-vz">Sem a leitura das matérias votadas desta Casa nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ════ Pessoa ou partido?: quanto o partido explica de cada medida ════ -#}
+  <section class="az-sec cg-vista cg-lp-v" data-vista="cruzar" aria-labelledby="cg-cruzar-h">
+    <header class="az-lh" id="cg-cruzar">
+      <p class="az-ln">O cruzamento: pessoa ou partido?</p>
+      <h3 class="az-lt" id="cg-cruzar-h">{% for casa in c.casas if casa.lp and casa.lp.cruzar %}<span class="cg-c cg-lp-xh" data-casa="{{ casa.id }}"><small class="cg-lp-xc">{{ casa.curto }}. </small>{{ casa.lp.cruzar.titulo|join(" ") }}</span>{% else %}Pessoa ou partido?{% endfor %}</h3>
+      <p class="az-ld">{% for casa in c.casas if casa.lp and casa.lp.cruzar %}<span class="cg-c cg-lp-xh" data-casa="{{ casa.id }}"><small class="cg-lp-xc">{{ casa.curto }}. </small>{% for t, forte in casa.lp.cruzar.linha %}{% if forte %}<b>{{ t }}</b>{% else %}{{ t }}{% endif %}{% endfor %}</span>{% endfor %} {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
+    </header>
+    {% for casa in c.casas %}
+    <div class="cg-c" data-casa="{{ casa.id }}">
+      <h4 class="cg-ct">{{ casa.nome }}</h4>
+      {% if casa.lp and casa.lp.cruzar %}{% set X = casa.lp.cruzar %}
+      <div class="cg-pa cg-lp" id="cg-lp-cru-{{ casa.id }}" data-lp="cruzar" data-casa="{{ casa.id }}" data-um="{{ casa.lp.um }}" data-uns="{{ casa.lp.uns }}" data-x="{{ X.padrao }}">
+        {{ janela(X.janela) }}
+        <div class="cg-lp-xfoco">
+          <figure class="cg-lp-fig cg-lp-xfig">
+            <figcaption class="az-h cg-lp-h">Quanto o partido explica <span>de toda a diferença entre {{ casa.lp.uns }} em cada medida, a parte que some quando se sabe o partido; de 0 a 100%</span></figcaption>
+            {% for g in X.grupos %}
+            <p class="cg-lp-xg">{{ g.nome }}</p>
+            <ul class="cg-lp-xs">
+              {% for b in g.medidas %}
+              <li><button type="button" class="cg-lp-xb{% if b.cinza %} cg-lp-xb-cz{% endif %}" data-x="{{ b.id }}" aria-pressed="false"><span class="cg-lp-xn">{{ b.nome }}{% if b.regua %} <em class="cg-lp-tag cg-lp-tag-ac" title="Os polos são definidos por partidos: parte deste número vem da própria construção da medida.">régua</em>{% endif %}</span><span class="cg-lp-xt" aria-hidden="true"><i style="width:{{ b.w }}%"></i>{% if b.ic %}<u style="left:{{ b.ic[0] }}%;width:{{ (b.ic[1] - b.ic[0])|round(1) }}%"></u>{% endif %}{% if b.acaso is not none %}<s style="left:{{ b.acaso }}%"></s>{% endif %}</span><span class="cg-lp-xv">{% if b.e2 %}<b>{{ b.e2 }}</b> {% endif %}{{ b.palavra }}</span>{% if not b.sem %}<small class="cg-lp-xd">{{ b.n }} {{ casa.lp.uns }} em {{ b.k }} partidos · {{ b.ic_txt }} · {{ b.acaso_txt }}</small>{% endif %}</button></li>
+              {% endfor %}
+            </ul>
+            {% endfor %}
+            <p class="cg-leg cg-lp-leg cg-lp-xleg"><span><i class="cg-lp-xl-b"></i>quanto o partido explica</span><span><i class="cg-lp-xl-a"></i>o que daria por acaso</span><span><i class="cg-lp-xl-i"></i>intervalo de {{ X.confianca }}%</span><span><i class="cg-lp-xl-b cg-lp-xl-cz"></i>não se distingue do acaso</span></p>
+            <p class="az-dek cg-lp-nota">{{ X.zonas[1] }}% ou mais: o partido diz quase tudo; de {{ X.zonas[0] }}% a {{ X.zonas[1] }}%: diz parte; abaixo de {{ X.zonas[0] }}%: diz pouco. Barra cujo intervalo encosta no traço do acaso sai em cinza. Com menos de {{ X.pessoas_minimo }} pessoas medidas, não há número. <span class="cg-lp-so-js">Clique numa barra para ver os partidos ao lado.</span></p>
+          </figure>
+          <figure class="cg-pa-fig cg-lp-fig cg-lp-xfig2" hidden>
+            <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht"></span> <span>um ponto por {{ casa.lp.um }}; faixas apertadas e separadas: o partido explica; largas e sobrepostas: é a pessoa</span></figcaption>
+            <div class="cg-pa-fs cg-lp-fs cg-lp-xbusca"><label class="cg-lp-sel cg-lp-achar"><span class="cg-pa-fk">Achar um nome</span> <input class="az-fil-in" type="search" data-f="nome" list="cg-lp-nomes-x-{{ casa.id }}" autocomplete="off" spellcheck="false" placeholder="Nome do {{ casa.lp.um }}…"></label><datalist id="cg-lp-nomes-x-{{ casa.id }}"></datalist></div>
+            <p class="cg-lp-fq" role="status" aria-live="polite" hidden></p>
+            <div class="cg-lp-fxs"></div>
+            <p class="cg-lp-st" role="status" hidden></p>
+            <div class="cg-gr-dica cg-lp-dica" role="status" hidden></div>
+            <p class="cg-leg cg-lp-leg"><span><i class="cg-lp-fx-lm"></i>mediana do partido</span><span><i class="cg-lp-fx-lb"></i>metade do meio</span></p>
+          </figure>
+        </div>
+
+        {% if X.pares %}
+        <div class="az-blk cg-lp-xj">
+          <h4 class="az-h">O que anda junto <span>correlação de postos entre os {{ casa.lp.uns }}, de −1 a +1; andar junto não é causa {{ selo() }}</span></h4>
+          <ul class="cg-lp-pares">
+            {% for p in X.pares %}
+            <li{% if p.cinza %} class="cg-lp-par-cz"{% endif %}><p class="cg-lp-pp">{{ p.pergunta }}</p><span class="cg-lp-pb" aria-hidden="true">{% if not p.sem %}<i class="{{ "cg-lp-pb-n" if p.neg else "cg-lp-pb-p" }}" style="width:{{ p.w }}%"></i>{% endif %}</span><p class="cg-lp-pr">{% if p.rho %}<b>{{ p.rho }}</b> {% endif %}{{ p.resposta }}{% if p.dentro %} <small>{{ p.dentro }}</small>{% endif %}</p></li>
+            {% endfor %}
+          </ul>
+          <p class="az-dek">Só vira afirmação o par que passa do acaso a {{ X.pares_alfa }}%, já contando os {{ X.n_pares }} pares; os demais saem em cinza. “Dentro do mesmo partido” é a mesma conta com cada pessoa comparada só aos colegas de partido: se o número some ali, a diferença é entre partidos, não entre pessoas.</p>
+        </div>
+        {% endif %}
+
+        {% if X.tabela %}
+        <details class="cg-rv-tb cg-pa-tb cg-lp-tb cg-lp-xtb" open>
+          <summary>Ver como tabela: a mediana de cada medida, partido a partido</summary>
+          <div class="an-tbl-wrap"><table class="an-tbl cg-tb">
+            <thead><tr><th scope="col">Partido</th><th scope="col">Em exercício</th>{% for col in X.colunas %}<th scope="col">{{ col.nome }}</th>{% endfor %}</tr></thead>
+            <tbody>
+              {% for b in X.tabela %}
+              <tr><th scope="row">{{ b.pt }}</th><td>{{ b.n }}</td>{% for v in b.med %}<td>{{ v }}</td>{% endfor %}</tr>
+              {% endfor %}
+            </tbody>
+          </table></div>
+          <p class="az-dek">A mediana só sai com {{ L.cortes.min_partido }} pessoas medidas no partido; “—” quer dizer que faltam pessoas medidas.</p>
+        </details>
+        {% endif %}
+
+        <div class="cg-lp-nao">
+          <h4>O que não dá para concluir</h4>
+          <p>Andar junto não é causa. Em “De que lado vota”, parte do número vem da própria régua: os polos são definidos por partidos. As medidas que saem da leitura dos projetos herdam o erro dela, o que puxa para baixo tanto o que o partido explica quanto as correlações. Se a marca do caixa andar junto com um lado do voto, isso aparece aqui, e é a régua, que é escolha editorial, falando. Barra em cinza não quer dizer “é a pessoa”: quer dizer que, com estes dados, não dá para separar o partido do acaso.{% if casa.id == "sf" %} No Senado, com {{ X.janela[0][0] }}, quase nada se separa do acaso.{% endif %}</p>
+        </div>
+      </div>
+      {% else %}
+      <p class="cg-lp-vz">Sem a leitura dos projetos desta Casa nesta atualização.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
