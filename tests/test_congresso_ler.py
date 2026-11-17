@@ -1,14 +1,21 @@
 """A leitura diária dos projetos de lei novos (qijournal.congresso.ler): o que lê e em que
 ordem, os lotes cegos com perguntas de controle, a segunda e a terceira leitura, os limites,
-o registro do dia e o comando ``congresso ler``. Tudo com editores de mentira, sem rede."""
+o registro do dia e o comando ``congresso ler``. Tudo com editores de mentira, sem rede. No
+fim, o fluxo do GitHub que a roda (``leitura.yml``): o passo que decide e o que publica são
+rodados de verdade, em repositórios git locais."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import shutil
+import subprocess
 import time
+from collections import Counter
 from dataclasses import replace
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +24,7 @@ import yaml
 
 from qijournal import edit
 from qijournal.__main__ import main
-from qijournal.config import ROOT, load_config
+from qijournal.config import ROOT, _truthy, load_config
 from qijournal.congresso import cli, dados, fontes, leitura, ler, regras
 from qijournal.edit.chatapi import ChatBackend
 from qijournal.edit.llm import LLMUnavailable, _Usage
@@ -299,13 +306,25 @@ def test_le_na_ordem_e_respeita_os_tetos(plano, gabarito, tmp_path: Path):
     assert (registro.segundas, registro.confirmadas, registro.pendentes_segundas) == (1, 1, 2)
     assert guarda.de("cd", "50").r == leitura.DUAS and guarda.de("cd", "8").r == leitura.UMA
 
-    # --max 3: as três primeiras seguintes e nenhuma segunda; --max 0 só diz o que leria.
+    # --max 3: as três primeiras seguintes e nenhuma segunda.
     registro = ler.ler_universo(_com(plano, lote=2), tmp_path, itens, HOJE, agora=AGORA, editores=[ia], maximo=3)
     assert (registro.primeiras, registro.segundas, registro.pendentes_primeiras, registro.pendentes_segundas) == (3, 0, 2, 2)
-    chamadas = len(ia.calls)
-    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[ia], maximo=0)
+    # --max 0 só diz o que leria: não chama a IA e não grava nada (nem a guarda, nem o registro
+    # do dia, que continua com as duas rodadas que leram e o motivo da última).
+    def no_disco() -> dict[str, tuple[bytes, int]]:
+        return {a.name: (a.read_bytes(), a.stat().st_mtime_ns) for a in (tmp_path / "leitura").iterdir()}
+
+    antes, chamadas = no_disco(), len(ia.calls)
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora="2026-11-15T23:59:00+00:00", editores=[ia], maximo=0)
     assert len(ia.calls) == chamadas and registro.primeiras == 0 and "--max 0" in registro.motivo
     assert (registro.faltavam, registro.esperavam_segunda, registro.escolhidas) == (2, 2, [])
+    assert (registro.pendentes_primeiras, registro.pendentes_segundas, registro.gravados) == (2, 2, [])
+    assert no_disco() == antes and sorted(antes) == ["cd-2020.json", "cd-2026.json", "diario.json"]
+    (dia,) = _dias(tmp_path)
+    assert (dia["rodadas"], dia["primeiras"], dia["quando"], dia["motivo"]) == (2, 8, AGORA, "")
+    # Sem guarda nenhuma, nem a pasta é criada; e os editores nem são montados.
+    registro = ler.ler_universo(plano, tmp_path / "vazia", itens, HOJE, editores=lambda: pytest.fail("--max 0 não monta a cadeia de IAs"), maximo=0)
+    assert not (tmp_path / "vazia").exists() and (registro.faltavam, registro.pendentes_primeiras) == (10, 10)
 
 
 # ── o lote cego e os controles ───────────────────────────────────────────────
@@ -375,25 +394,72 @@ def test_os_controles_vao_misturados_e_saem_da_data_e_do_numero_do_lote(plano, g
     assert primeiros[0] not in sem_o_primeiro and len(sem_o_primeiro) == 10 and sem_o_primeiro[:9] == primeiros[1:]
 
 
-def test_os_controles_nao_se_repetem_nos_lotes_que_o_teto_de_chamadas_permite(plano):
-    """Com os limites de verdade (10 controles por lote, até 12 chamadas, 185 perguntas): nenhum
-    lote repete pergunta, e os 12 lotes de uma rodada levam 120 perguntas diferentes. A lista do
-    dia só dá a volta no 19º lote (os 18 primeiros gastam 180): ele leva as 5 últimas e as 5
-    primeiras, ou seja, repete perguntas do 1º lote, nunca duas vezes no mesmo lote."""
+def test_os_controles_tem_teto_por_faixa_e_nao_se_repetem_nos_lotes_que_o_teto_de_chamadas_permite(plano):
+    """Com os limites de verdade (10 controles por lote, mínimo de 7 certos, até 12 chamadas, 185
+    perguntas), em 200 datas: nenhum lote leva mais de 6 perguntas da mesma faixa (o mínimo
+    menos um) nem repete pergunta, e os 12 lotes de uma rodada levam 120 perguntas diferentes.
+    A pergunta que estouraria o teto da faixa não se perde: fica na fila e sai no lote seguinte.
+    A lista do dia só dá a volta depois do teto de chamadas; daí em diante as perguntas voltam,
+    nunca duas vezes no mesmo lote, e o teto continua valendo. O lote de um número é sempre o
+    mesmo, seja qual for a ordem das chamadas."""
     limites = plano.limites
-    rodada = ler.Rodada(plano=plano, data=HOJE, editores=[], registro=ler.Registro(data=HOJE), prazo=time.monotonic() + 60)
+    teto = limites.controles_minimo - 1
+    assert (limites.controles, limites.controles_minimo, limites.chamadas, teto) == (10, 7, 12, 6)
+    faixa_maior, quantas = Counter(c.faixa for c in plano.controles).most_common(1)[0]
+    assert quantas * 2 > len(plano.controles) == 185  # mais da metade das perguntas cai numa faixa só
 
     def chaves(controles) -> set[tuple[str, str]]:
         return {(c.item.casa, c.item.chave) for c in controles}
 
-    do_dia = [rodada.controles_do_lote(n, []) for n in range(1, limites.chamadas + 1)]
-    assert all(len(lote) == len(chaves(lote)) == limites.controles == 10 for lote in do_dia)
-    assert len(chaves(c for lote in do_dia for c in lote)) == limites.chamadas * limites.controles == 120 <= len(plano.controles)
-    inteiros = len(plano.controles) // limites.controles  # lotes que cabem na lista antes de ela dar a volta
-    assert inteiros == 18 > limites.chamadas
-    da_volta = rodada.controles_do_lote(inteiros + 1, [])
-    assert len(da_volta) == len(chaves(da_volta)) == 10 and da_volta[5:] == do_dia[0][:5] and not chaves(da_volta[:5]) & chaves(c for lote in do_dia for c in lote)
-    assert rodada.controles_do_lote(inteiros + 2, []) == do_dia[0][5:] + do_dia[1][:5]  # depois da volta, as fatias seguem de onde pararam
+    def da_faixa_maior(controles) -> list[ler.Controle]:
+        return [c for c in controles if c.faixa == faixa_maior]
+
+    deu_a_volta, estourariam = [], 0
+    for k in range(200):
+        data = (date(2026, 11, 15) + timedelta(days=k)).isoformat()
+        rodada = ler.Rodada(plano=plano, data=data, editores=[], registro=ler.Registro(data=data), prazo=0.0)
+        lotes = [rodada.controles_do_lote(n, []) for n in range(1, 23)]
+        assert all(len(lote) == len(chaves(lote)) == 10 and max(Counter(c.faixa for c in lote).values()) <= teto for lote in lotes), data
+        assert len(chaves(c for lote in lotes[: limites.chamadas] for c in lote)) == limites.chamadas * limites.controles == 120, data
+        deu_a_volta.append(next(n for n, lote in enumerate(lotes, 1) if chaves(lote) & chaves(c for antes in lotes[: n - 1] for c in antes)))
+        # As dez primeiras da lista do dia: as que passam do teto da faixa ficam para o lote 2, e entram as seguintes das outras faixas.
+        ordem = rodada._ordem_dos_controles
+        sobram = da_faixa_maior(ordem[:10])[teto:]
+        assert [c for c in lotes[0] if c in ordem[:10]] == [c for c in ordem[:10] if c not in sobram] and len(da_faixa_maior(lotes[0])) == min(teto, len(da_faixa_maior(ordem[:10])))
+        assert lotes[1][: len(sobram)] == sobram and not [c for c in lotes[0][10 - len(sobram) :] if c.faixa == faixa_maior]
+        estourariam += bool(sobram)
+        if k == 0:
+            outra = ler.Rodada(plano=plano, data=data, editores=[], registro=ler.Registro(data=data), prazo=0.0)
+            assert [outra.controles_do_lote(n, []) for n in (12, 3, 19, 1)] == [lotes[11], lotes[2], lotes[18], lotes[0]]
+    assert estourariam > 20  # sem o teto, mais de um em cada dez primeiros lotes levaria 7 ou mais perguntas da mesma faixa
+    assert limites.chamadas < min(deu_a_volta) and max(deu_a_volta) <= len(plano.controles) // limites.controles + 1  # a volta vem entre o 13º e o 19º lote
+    # Sem mínimo de acertos não há teto por faixa; e o config que não dá para respeitar (teto de 1 por faixa, 5 faixas, 10 por lote) completa o lote assim mesmo.
+    sem_minimo = ler.Rodada(plano=_com(plano, controles_minimo=0), data=HOJE, editores=[], registro=ler.Registro(data=HOJE), prazo=0.0)
+    assert sem_minimo.controles_do_lote(1, []) == sem_minimo._ordem_dos_controles[:10]
+    apertado = ler.Rodada(plano=_com(plano, controles_minimo=2), data=HOJE, editores=[], registro=ler.Registro(data=HOJE), prazo=0.0)
+    assert len(chaves(apertado.controles_do_lote(1, []))) == 10 and len({c.faixa for c in apertado.controles_do_lote(1, [])[:5]}) == 5
+
+
+def test_quem_responde_a_mesma_coisa_para_tudo_nao_passa_nos_controles(plano, gabarito, tmp_path: Path):
+    """Mais da metade das perguntas de controle cai numa faixa só. Sem o teto por faixa, o
+    leitor que marca tudo com os mesmos códigos dessa faixa acertava 7 de 10 em mais de um lote
+    a cada cinco, e cada lote aceito punha 30 leituras iguais na guarda. Com o teto, ele nunca
+    chega ao mínimo, em faixa nenhuma: todo lote é descartado e nada vai à guarda."""
+
+    class Constante(LeitorFalso):
+        def call(self, *, label, system, user_text, schema, max_tokens, deadline=None):
+            self.calls.append({"label": label, "user_text": user_text})
+            self.usage.record(self.model, 1000, 200)
+            return {"leituras": [{"i": pid, **_codigos(self.padrao)} for pid, _tipo, _ementa in BLOCO.findall(user_text)]}
+
+    itens = _universo(*[_item(n) for n in range(1, 61)])  # dois lotes de 30 por dia
+    for codigos in (PONTUAL, MINIMO, MEDIO, TOPO, SIMBOLICO):
+        for k in range(15):
+            data = (date(2026, 11, 1) + timedelta(days=k)).isoformat()
+            pasta = tmp_path / f"{codigos.split()[2]}-{k}"
+            registro = ler.ler_universo(_com(plano, segundas=0), pasta, itens, data, editores=[Constante(gabarito, padrao=codigos)])
+            assert (registro.lotes, registro.descartados, registro.primeiras, registro.controles_total) == (2, 2, 0, 20), (codigos, data)
+            assert registro.controles_certos <= 2 * (plano.limites.controles_minimo - 1) and len(_guarda(pasta, plano)) == 0
 
 
 def test_o_lote_que_erra_nos_controles_e_descartado_inteiro(plano, gabarito, tmp_path: Path):
@@ -474,7 +540,28 @@ def test_a_segunda_leitura_confirma_na_mesma_faixa(plano, gabarito, tmp_path: Pa
     assert guarda.de("cd", "1") == replace(primeira, r=leitura.DUAS)  # os códigos, a confiança e o porquê da primeira
     assert guarda.de("cd", "2").r == leitura.DUAS and guarda.de("cd", "3").r == leitura.UMA
     assert (registro.primeiras, registro.segundas, registro.confirmadas, registro.terceiras, registro.pendentes_segundas) == (0, 2, 2, 0, 0)
+    assert (registro.mesmo_editor, registro.de_outra_rodada) == (0, 2)  # as primeiras são de outra rodada: não se sabe de que editor
     assert leitura.avaliar(plano.regua, guarda.de("cd", "1")).faixa == "estruturante"  # agora conta como topo
+
+
+def test_na_materia_votada_a_marca_do_caixa_em_que_os_leitores_divergem_fica_nd(plano, gabarito, tmp_path: Path):
+    """Dois leitores na mesma faixa com marcas do caixa opostas: na matéria votada, a leitura
+    é confirmada (r = 2) com o custo "nd" e a anotação que a tira do voto fiscal (a regra da
+    leitura inicial), e não com a marca do primeiro; na proposição que não foi a voto, valem
+    os códigos do primeiro. Com a terceira leitura, a mesma regra entre os dois que ficaram
+    na faixa que vale."""
+    gasta, corta = "fiscal geral ajuste gasto neutro neutro", TOPO  # as duas de peso 60; caixa −1 e +1
+    itens = _universo(_item(1, universos={leitura.VOTO}), _item(2), _item(3, universos={leitura.VOTO, leitura.PERFIL}))
+    _semear(tmp_path, plano, {("cd", 2026, str(n)): _lida(gasta, porque="Cria despesa.") for n in (1, 2, 3)})
+    ia = LeitorFalso(gabarito, respostas={"Ementa cd 1 de 2026.": corta, "Ementa cd 2 de 2026.": corta, "Ementa cd 3 de 2026.": [MEDIO, corta]})
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[ia])
+    guarda = _guarda(tmp_path, plano)
+    em_disputa = _lida("fiscal geral ajuste nd neutro neutro", porque=f"Cria despesa. {leitura.DISPUTA_DE_CONTAS}")
+    assert guarda.de("cd", "1") == replace(em_disputa, r=leitura.DUAS) and leitura.contas_em_disputa(guarda.de("cd", "1"))
+    assert guarda.de("cd", "2") == _lida(gasta, porque="Cria despesa.", r=leitura.DUAS)  # não foi a voto: os códigos do primeiro
+    assert guarda.de("cd", "3") == replace(em_disputa, r=leitura.TRES)  # a terceira ficou com a primeira na faixa, com a marca oposta
+    assert (registro.segundas, registro.confirmadas, registro.terceiras, registro.decididas) == (3, 2, 1, 1)
+    assert leitura.avaliar(plano.regua, guarda.de("cd", "1")).marcas["contas"] is None
 
 
 @pytest.mark.parametrize(
@@ -500,10 +587,11 @@ def test_faixas_diferentes_pedem_a_terceira_e_ela_decide(plano, gabarito, tmp_pa
     assert leitura.avaliar(plano.regua, guarda.de("cd", "1")).lida is (r != leitura.INSTAVEL)
 
 
-def test_sem_terceira_possivel_hoje_fica_como_esta_e_volta_amanha(plano, gabarito, tmp_path: Path):
+def test_sem_terceira_possivel_hoje_a_segunda_fica_guardada_e_a_terceira_sai_na_rodada_seguinte(plano, gabarito, tmp_path: Path):
     """As duas leituras divergem e a terceira não cabe (o teto de chamadas acabou; ou o lote
-    da terceira foi descartado, ou veio sem a resposta): a leitura fica com r = 1, igual, e
-    no dia seguinte a segunda leitura é refeita do começo."""
+    da terceira foi descartado, ou veio sem a resposta): a leitura fica com r = 1, igual, e a
+    segunda fica guardada (``a_decidir.json``). Na rodada seguinte não se pede outra segunda:
+    a leitura nova é a terceira, e vale a regra dos três com as três leituras feitas."""
     itens = _universo(_item(1))
     primeira = _lida(TOPO, porque="A primeira.")
     for pasta, limites, extra in (
@@ -526,39 +614,187 @@ def test_sem_terceira_possivel_hoje_fica_como_esta_e_volta_amanha(plano, gabarit
         assert len(ia.calls) == (1 if limites else 2)
         assert ("teto de 1 chamadas" in registro.motivo) is bool(limites)
         assert registro.descartados == (1 if extra.get("erra_na_terceira") else 0) and registro.invalidas == (1 if extra.get("omite_na_terceira") else 0)
-        # No dia seguinte, outra segunda leitura, que agora concorda: confirmada.
+        # A segunda leitura, que divergiu, fica guardada, com quem a fez; e o registro do dia diz que uma espera a terceira.
+        em_espera = leitura.ler_a_decidir(pasta / "leitura", plano.regua)
+        assert em_espera == {("cd", "1"): leitura.ADecidir(_lida(MEDIO, porque="Lido no teste.", confianca=3), ("falso",))}, pasta.name
+        assert pasta / "leitura" / leitura.A_DECIDIR in registro.gravados and _dias(pasta)[-1]["pendentes"] == {"primeiras": 0, "segundas": 1, "terceiras": 1}
+        # No dia seguinte, uma leitura só, que é a terceira: fica com a primeira, e a leitura é decidida por dois de três (não "confirmada por dois").
         amanha = LeitorFalso(gabarito, respostas={"Ementa cd 1 de 2026.": TOPO_TAMBEM})
         registro = ler.ler_universo(plano, pasta, itens, "2026-11-16", editores=[amanha])
-        assert _guarda(pasta, plano).de("cd", "1") == replace(primeira, r=leitura.DUAS) and registro.confirmadas == 1
-        assert [d["data"] for d in _dias(pasta)] == [HOJE, "2026-11-16"]
+        assert registro.passos == [(1, ler.TERCEIRA, "falso")] and len(amanha.calls) == 1
+        assert _guarda(pasta, plano).de("cd", "1") == replace(primeira, r=leitura.TRES)
+        assert (registro.segundas, registro.confirmadas, registro.terceiras, registro.decididas, registro.instaveis, registro.pendentes_segundas) == (0, 0, 1, 1, 0, 0)
+        assert leitura.ler_a_decidir(pasta / "leitura", plano.regua) == {} and (pasta / "leitura" / leitura.A_DECIDIR).is_file()  # o arquivo fica, vazio: quem publica não leva remoções
+        assert [d["data"] for d in _dias(pasta)] == [HOJE, "2026-11-16"] and _dias(pasta)[-1]["pendentes"] == {"primeiras": 0, "segundas": 0, "terceiras": 0}
+        # O dia em que só houve a terceira leitura é dia em que algo foi lido (a página diz qual foi o último).
+        assert leitura.resumo_do_diario(pasta / "leitura")["periodo"]["leu_em"] == "2026-11-16"
+
+
+def test_leituras_que_divergem_em_dias_seguidos_nao_saem_confirmadas(plano, gabarito, tmp_path: Path):
+    """A primeira leitura (de outro dia) cai no topo. No dia 1 a segunda cai em outra faixa e a
+    terceira não cabe; no dia 2 a leitura nova cai numa terceira faixa: são três leituras em
+    três faixas, e a proposição fica instável (r = 0). Antes, a segunda que divergia era
+    esquecida e pedia-se outra a cada dia, até uma concordar: no dia 3 a proposição saía
+    "confirmada por dois leitores" (r = 2) com quatro leituras em três faixas."""
+    itens = _universo(_item(1), _item(2))
+    _semear(tmp_path, plano, {("cd", 2026, "1"): _lida(TOPO), ("cd", 2026, "2"): _lida(TOPO)})
+    um = _com(plano, chamadas=1)
+    dia1 = ler.ler_universo(um, tmp_path, itens, "2026-11-15", editores=[LeitorFalso(gabarito, "a", respostas={"Ementa cd 1 de 2026.": MEDIO, "Ementa cd 2 de 2026.": MEDIO})])
+    assert (dia1.segundas, dia1.confirmadas, dia1.terceiras) == (2, 0, 0) and sorted(leitura.ler_a_decidir(tmp_path / "leitura", plano.regua)) == [("cd", "1"), ("cd", "2")]
+    # Dia 2: a leitura nova da 1 cai numa terceira faixa (instável); a da 2 volta ao topo (duas de três: decidida, com os códigos da primeira).
+    b = LeitorFalso(gabarito, "b", respostas={"Ementa cd 1 de 2026.": PONTUAL, "Ementa cd 2 de 2026.": TOPO_TAMBEM})
+    dia2 = ler.ler_universo(um, tmp_path, itens, "2026-11-16", editores=[LeitorFalso(gabarito, "a", falha=LLMUnavailable("fora do ar")), b])
+    guarda = _guarda(tmp_path, plano)
+    assert (guarda.de("cd", "1").r, guarda.de("cd", "2")) == (leitura.INSTAVEL, _lida(TOPO, r=leitura.TRES))
+    assert (dia2.segundas, dia2.confirmadas, dia2.terceiras, dia2.decididas, dia2.instaveis) == (0, 0, 2, 1, 1) and dia2.passos == [(1, ler.TERCEIRA, "b")]
+    assert leitura.ler_a_decidir(tmp_path / "leitura", plano.regua) == {}
+    # Dia 3: não há mais o que reler (a instável não volta à fila).
+    c = LeitorFalso(gabarito, "c", respostas={"Ementa cd 1 de 2026.": TOPO})
+    dia3 = ler.ler_universo(um, tmp_path, itens, "2026-11-17", editores=[c])
+    assert c.calls == [] and (dia3.segundas, dia3.confirmadas) == (0, 0) and _guarda(tmp_path, plano).de("cd", "1").r == leitura.INSTAVEL
+
+
+def test_a_terceira_de_outro_dia_evita_quem_fez_a_segunda(plano, gabarito, tmp_path: Path):
+    """A segunda que espera a terceira guarda quem já leu a proposição na rodada dela: a
+    terceira, em outro dia, vai a quem ainda não leu, se houver (a guarda das leituras não
+    diz quem leu; o arquivo das que esperam diz)."""
+    itens = _universo(_item(1))
+    a, b, c = (LeitorFalso(gabarito, nome, respostas={"Ementa cd 1 de 2026.": codigos}) for nome, codigos in (("a", TOPO), ("b", MEDIO), ("c", MEDIO)))
+    dia1 = ler.ler_universo(_com(plano, chamadas=2), tmp_path, itens, "2026-11-15", editores=[a, b, c])  # a primeira (a) e a segunda (b); a terceira não cabe
+    assert dia1.passos == [(1, ler.PRIMEIRA, "a"), (2, ler.SEGUNDA, "b")]
+    assert leitura.ler_a_decidir(tmp_path / "leitura", plano.regua)[("cd", "1")].editores == ("a", "b")
+    dia2 = ler.ler_universo(plano, tmp_path, itens, "2026-11-16", editores=[a, b, c])
+    assert dia2.passos == [(1, ler.TERCEIRA, "c")] and _guarda(tmp_path, plano).de("cd", "1") == _lida(MEDIO, porque="Lido no teste.", confianca=3, r=leitura.TRES)
+    assert (dia2.terceiras, dia2.decididas, dia2.mesmo_editor, dia2.terceira_de_quem_leu) == (1, 1, 0, 0)
+    # Com as duas IAs de ontem só, a terceira volta a uma delas, e o registro conta.
+    _semear(tmp_path / "dois", plano, {("cd", 2026, "1"): _lida(TOPO)})
+    leitura.gravar_a_decidir(tmp_path / "dois" / "leitura", plano.regua, {("cd", "1"): leitura.ADecidir(_lida(MEDIO), ("a", "b"))})
+    dia2 = ler.ler_universo(plano, tmp_path / "dois", itens, "2026-11-16", editores=[a, b])
+    assert [etapa for _n, etapa, _quem in dia2.passos] == [ler.TERCEIRA] and (dia2.terceiras, dia2.mesmo_editor, dia2.terceira_de_quem_leu) == (1, 0, 1)
+
+
+def test_a_segunda_guardada_de_proposicao_fora_do_universo_de_hoje_fica_e_nao_entra_nas_pendentes(plano, gabarito, tmp_path: Path):
+    """A proposição com a segunda guardada pode não estar no universo de hoje (saiu das contas,
+    ou a fonte dela caiu). A segunda fica guardada (a proposição pode voltar), mas o registro
+    não a conta: ``pendentes.terceiras`` é parte de ``pendentes.segundas`` ("dessas, as que
+    esperam a terceira"), e contava todas as do arquivo (0 à espera da segunda, 1 delas à
+    espera da terceira). Quando a proposição volta, a leitura dela é a terceira."""
+    _semear(tmp_path, plano, {("cd", 2026, "1"): _lida(TOPO), ("cd", 2026, "2"): _lida(TOPO), ("cd", 2026, "3"): _lida(MINIMO)})
+    guardadas = {("cd", n): leitura.ADecidir(_lida(MEDIO), ("a",)) for n in ("1", "2")}
+    leitura.gravar_a_decidir(tmp_path / "leitura", plano.regua, guardadas)
+    um = _com(plano, chamadas=0)  # nenhuma chamada cabe: só o que fica na fila
+    sem_a_1 = ler.ler_universo(um, tmp_path, _universo(_item(2), _item(3)), HOJE, agora=AGORA, editores=[LeitorFalso(gabarito)])
+    assert (sem_a_1.pendentes_primeiras, sem_a_1.pendentes_segundas, sem_a_1.pendentes_terceiras) == (0, 1, 1)  # só a 2: a 1 não está no universo de hoje
+    sem_nenhuma = ler.ler_universo(plano, tmp_path, _universo(_item(3)), HOJE, agora=AGORA, editores=[LeitorFalso(gabarito)])
+    assert sem_nenhuma.motivo == "nada a ler: a guarda está em dia" and _dias(tmp_path)[-1]["pendentes"] == {"primeiras": 0, "segundas": 0, "terceiras": 0}
+    assert leitura.ler_a_decidir(tmp_path / "leitura", plano.regua) == guardadas  # nada foi esquecido
+    volta = ler.ler_universo(plano, tmp_path, _universo(_item(1), _item(2), _item(3)), "2026-11-16", editores=[LeitorFalso(gabarito, "b", padrao=TOPO_TAMBEM)])
+    assert [etapa for _n, etapa, _quem in volta.passos] == [ler.TERCEIRA] and (volta.terceiras, volta.decididas, volta.pendentes_segundas, volta.pendentes_terceiras) == (2, 2, 0, 0)
+
+
+@pytest.mark.parametrize("estrago", ["ilegível", "de outra versão", "com linha ruim"])
+def test_sem_ler_inteiro_o_arquivo_das_segundas_guardadas_a_rodada_nao_faz_segundas_nem_o_regrava(plano, gabarito, tmp_path: Path, estrago: str):
+    """``a_decidir.json`` ilegível, de outra versão das instruções ou com uma linha fora do
+    formato: a rodada avisa, faz as primeiras leituras, não faz segundas nem terceiras (a
+    segunda que divergisse não teria onde ficar guardada, e a guardada que não foi lida seria
+    pedida de novo) e deixa o arquivo como está. Consertado o arquivo, as segundas voltam."""
+    _semear(tmp_path, plano, {("cd", 2026, "1"): _lida(TOPO), ("cd", 2026, "2"): _lida(TOPO)})
+    arquivo = tmp_path / "leitura" / leitura.A_DECIDIR
+    leitura.gravar_a_decidir(tmp_path / "leitura", plano.regua, {("cd", "1"): leitura.ADecidir(_lida(MEDIO), ("a",))})
+    bom = json.loads(arquivo.read_text(encoding="utf-8"))
+    texto = {
+        "ilegível": "{isto não é json",
+        "de outra versão": json.dumps({**bom, "regua": plano.regua.leitura.versao + 1}),
+        "com linha ruim": json.dumps({**bom, "itens": {**bom["itens"], "cd|77": {"s": ["saude"], "ed": []}}}),
+    }[estrago]
+    arquivo.write_text(texto, encoding="utf-8")
+    itens = _universo(_item(1), _item(2), _item(3))
+    ia = LeitorFalso(gabarito, padrao=TOPO_TAMBEM)
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[ia])
+    assert registro.passos == [(1, ler.PRIMEIRA, "falso")] and (registro.primeiras, registro.segundas, registro.terceiras, registro.pendentes_segundas) == (1, 0, 0, 3)
+    assert arquivo.read_text(encoding="utf-8") == texto and arquivo not in registro.gravados
+    assert [_guarda(tmp_path, plano).de("cd", n).r for n in ("1", "2", "3")] == [leitura.UMA] * 3
+    assert [aviso for aviso in registro.avisos if leitura.A_DECIDIR in aviso and "não faz segundas leituras" in aviso]
+    arquivo.unlink()
+    depois = ler.ler_universo(plano, tmp_path, itens, "2026-11-16", editores=[ia])
+    assert (depois.segundas, depois.confirmadas, depois.avisos) == (3, 3, [])
+
+
+def test_a_segunda_guardada_sai_do_arquivo_quando_a_leitura_deixa_de_ser_de_um_leitor_so(plano, gabarito, tmp_path: Path):
+    """A leitura da guarda foi confirmada ou ficou instável por outro caminho (importada por
+    fora): a segunda guardada já não espera nada e sai do arquivo, mesmo numa rodada que não
+    lê; a que ainda espera fica."""
+    _semear(tmp_path, plano, {("cd", 2026, "1"): _lida(TOPO, r=leitura.DUAS), ("cd", 2026, "2"): _lida(TOPO, r=leitura.INSTAVEL), ("cd", 2026, "3"): _lida(TOPO)})
+    leitura.gravar_a_decidir(tmp_path / "leitura", plano.regua, {("cd", n): leitura.ADecidir(_lida(MEDIO), ("a",)) for n in ("1", "2", "3")})
+    registro = ler.ler_universo(plano, tmp_path, _universo(_item(1), _item(2), _item(3)), HOJE, agora=AGORA, editores=[])
+    assert registro.motivo.startswith("sem IA") and tmp_path / "leitura" / leitura.A_DECIDIR in registro.gravados
+    assert sorted(leitura.ler_a_decidir(tmp_path / "leitura", plano.regua)) == [("cd", "3")]
+    assert (registro.pendentes_segundas, registro.pendentes_terceiras) == (1, 1)
+
+
+def test_a_primeira_que_mudou_e_cai_na_faixa_da_segunda_guardada_sai_confirmada(plano, gabarito, tmp_path: Path):
+    """A primeira leitura mudou depois de a segunda ser guardada (importada por fora) e as duas
+    agora caem na mesma faixa: a leitura do dia não muda nada, a proposição sai confirmada por
+    dois (r = 2) com os códigos da primeira, e o registro conta uma confirmada (não uma
+    instável nem uma decidida pela terceira)."""
+    _semear(tmp_path, plano, {("cd", 2026, "1"): _lida(MEDIO, porque="Importada.")})
+    leitura.gravar_a_decidir(tmp_path / "leitura", plano.regua, {("cd", "1"): leitura.ADecidir(_lida(MEDIO, porque="A segunda."), ("a",))})
+    registro = ler.ler_universo(plano, tmp_path, _universo(_item(1, universos={leitura.VOTO})), HOJE, agora=AGORA, editores=[LeitorFalso(gabarito, "b", padrao=MINIMO)])
+    assert _guarda(tmp_path, plano).de("cd", "1") == _lida(MEDIO, porque="Importada.", r=leitura.DUAS)
+    assert (registro.segundas, registro.terceiras, registro.confirmadas, registro.decididas, registro.instaveis) == (0, 1, 1, 0, 0)
+    assert leitura.ler_a_decidir(tmp_path / "leitura", plano.regua) == {}
+
+
+def test_o_arquivo_das_segundas_que_esperam_a_terceira(plano, tmp_path: Path):
+    """``a_decidir.json``: uma proposição por linha; ausente, ilegível, de outra versão das
+    instruções ou com linha fora do formato não derruba nada (a linha ruim fica de fora); e
+    só é gravado quando muda."""
+    pasta = tmp_path / "leitura"
+    assert leitura.ler_a_decidir(pasta, plano.regua) == {} and not leitura.gravar_a_decidir(pasta, plano.regua, {}) and not pasta.exists()
+    espera = {("sf", "PL-12-2025"): leitura.ADecidir(_lida(MEDIO, porque="Segunda."), ("b",)), ("cd", "30"): leitura.ADecidir(_lida(TOPO), ()), ("cd", "4"): leitura.ADecidir(_lida(MINIMO), ("a", "b"))}
+    assert leitura.gravar_a_decidir(pasta, plano.regua, espera) and not leitura.gravar_a_decidir(pasta, plano.regua, espera)
+    texto = (pasta / leitura.A_DECIDIR).read_text(encoding="utf-8")
+    assert texto.splitlines()[0] == f'{{"v":1,"regua":{plano.regua.leitura.versao},"itens":{{' and [linha.split(":")[0] for linha in texto.splitlines()[1:-1]] == ['"cd|4"', '"cd|30"', '"sf|PL-12-2025"']
+    assert leitura.ler_a_decidir(pasta, plano.regua) == espera
+    assert _guarda(tmp_path, plano).ignorados == [] and len(_guarda(tmp_path, plano)) == 0  # não é arquivo da guarda
+    dados_ = json.loads(texto)
+    dados_["itens"].update({"cd|9": {"s": ["saude"], "ed": []}, "xx|1": dados_["itens"]["cd|4"], "cd|abc": dados_["itens"]["cd|4"], "cd|7": "isto não é uma leitura"})
+    (pasta / leitura.A_DECIDIR).write_text(json.dumps(dados_), encoding="utf-8")
+    assert leitura.ler_a_decidir(pasta, plano.regua) == espera
+    (pasta / leitura.A_DECIDIR).write_text(json.dumps({**dados_, "regua": plano.regua.leitura.versao + 1}), encoding="utf-8")
+    assert leitura.ler_a_decidir(pasta, plano.regua) == {}
+    (pasta / leitura.A_DECIDIR).write_text("{isto não é json", encoding="utf-8")
+    assert leitura.ler_a_decidir(pasta, plano.regua) == {}
+    assert leitura.gravar_a_decidir(pasta, plano.regua, {}) and json.loads((pasta / leitura.A_DECIDIR).read_text(encoding="utf-8"))["itens"] == {}
 
 
 def test_a_segunda_leitura_prefere_outro_editor_da_cadeia(plano, gabarito, tmp_path: Path):
     """A proposição lida pela primeira vez nesta rodada (pelo primeiro editor) tem a segunda
-    leitura feita pelo editor seguinte; a terceira, por quem ainda não a leu, se houver. A
-    que já estava na guarda segue a ordem da cadeia. Com um editor só, vale o mesmo, e o
-    registro diz quantas foram."""
+    leitura feita pelo editor seguinte; a terceira, por quem ainda não a leu, se houver. Da
+    que já estava na guarda não se sabe quem fez a primeira (a guarda não diz): supõe-se o
+    primeiro editor da cadeia, que a segunda evita do mesmo jeito, e o registro conta essas
+    segundas à parte. Com um editor só, ele faz tudo, e o registro diz quantas foram."""
     itens = _universo(_item(1, universos={leitura.VOTO}), _item(2, universos={leitura.VOTO}), _item(3, universos={leitura.VOTO}))
     _semear(tmp_path / "tres", plano, {("cd", 2026, "3"): _lida(MINIMO)})
     a = LeitorFalso(gabarito, "a", respostas={"Ementa cd 1 de 2026.": TOPO})
     b = LeitorFalso(gabarito, "b", respostas={"Ementa cd 1 de 2026.": MEDIO})
     c = LeitorFalso(gabarito, "c", respostas={"Ementa cd 1 de 2026.": MEDIO})
     registro = ler.ler_universo(plano, tmp_path / "tres", itens, HOJE, agora=AGORA, editores=[a, b, c])
-    assert registro.passos == [(1, ler.PRIMEIRA, "a"), (2, ler.SEGUNDA, "a"), (3, ler.SEGUNDA, "b"), (4, ler.TERCEIRA, "c")]
-    assert [x["label"] for x in a.calls] == ["leitura 1", "leitura 2"]  # as primeiras; e a segunda da que já estava na guarda
-    assert sorted(a.ementas(0)) == ["Ementa cd 1 de 2026.", "Ementa cd 2 de 2026."] and a.ementas(1) == ["Ementa cd 3 de 2026."]
-    assert [x["label"] for x in b.calls] == ["leitura 3"] and sorted(b.ementas(0)) == ["Ementa cd 1 de 2026.", "Ementa cd 2 de 2026."]
-    assert [x["label"] for x in c.calls] == ["leitura 4"] and c.ementas(0) == ["Ementa cd 1 de 2026."]
+    assert registro.passos == [(1, ler.PRIMEIRA, "a"), (2, ler.SEGUNDA, "b"), (3, ler.TERCEIRA, "c")]
+    assert [x["label"] for x in a.calls] == ["leitura 1"] and sorted(a.ementas(0)) == ["Ementa cd 1 de 2026.", "Ementa cd 2 de 2026."]  # só as primeiras
+    # As segundas num lote só, para o "b": as duas que o "a" acabou de ler e a que já estava na guarda.
+    assert [x["label"] for x in b.calls] == ["leitura 2"] and sorted(b.ementas(0)) == ["Ementa cd 1 de 2026.", "Ementa cd 2 de 2026.", "Ementa cd 3 de 2026."]
+    assert [x["label"] for x in c.calls] == ["leitura 3"] and c.ementas(0) == ["Ementa cd 1 de 2026."]
     guarda = _guarda(tmp_path / "tres", plano)
     assert (guarda.de("cd", "1").r, guarda.de("cd", "1").codigos) == (leitura.TRES, tuple(MEDIO.split()))  # a e b divergiram; c ficou com b
     assert guarda.de("cd", "2").r == guarda.de("cd", "3").r == leitura.DUAS
-    assert (registro.primeiras, registro.segundas, registro.terceiras, registro.mesmo_editor, registro.provedor) == (2, 3, 1, 0, "a → b → c")
+    assert (registro.primeiras, registro.segundas, registro.terceiras, registro.mesmo_editor, registro.de_outra_rodada, registro.provedor) == (2, 3, 1, 0, 1, "a → b → c")
 
     so = LeitorFalso(gabarito, "so")
     registro = ler.ler_universo(plano, tmp_path / "um", itens, HOJE, agora=AGORA, editores=[so])
     assert registro.passos == [(1, ler.PRIMEIRA, "so"), (2, ler.SEGUNDA, "so")]
-    assert (registro.primeiras, registro.segundas, registro.confirmadas, registro.mesmo_editor, registro.provedor) == (3, 3, 3, 3, "so")
-    assert _dias(tmp_path / "um")[0]["mesmo_editor"] == 3
+    assert (registro.primeiras, registro.segundas, registro.confirmadas, registro.mesmo_editor, registro.de_outra_rodada, registro.provedor) == (3, 3, 3, 3, 0, "so")
+    assert (_dias(tmp_path / "um")[0]["mesmo_editor"], _dias(tmp_path / "um")[0]["de_outra_rodada"]) == (3, 0)
 
     # O editor que estoura o limite sai da cadeia: quem sobra faz as duas leituras.
     esgotado = LeitorFalso(gabarito, "esgotado", falha=LLMUnavailable("cota do dia", exhausted=True))
@@ -566,6 +802,57 @@ def test_a_segunda_leitura_prefere_outro_editor_da_cadeia(plano, gabarito, tmp_p
     registro = ler.ler_universo(plano, tmp_path / "esgotado", itens, HOJE, agora=AGORA, editores=[esgotado, reserva])
     assert len(esgotado.calls) == 1 and esgotado.exhausted and len(reserva.calls) == 2 and registro.passos == [(1, ler.PRIMEIRA, "reserva"), (2, ler.SEGUNDA, "reserva")]
     assert (registro.primeiras, registro.segundas, registro.mesmo_editor, registro.falhas, registro.provedor) == (3, 3, 3, 0, "reserva")
+
+
+def test_a_segunda_leitura_de_primeira_de_outro_dia_evita_o_primeiro_editor_da_cadeia(plano, gabarito, tmp_path: Path):
+    """No primeiro dia só cabe a primeira leitura (teto de uma chamada), feita pelo primeiro
+    editor. No dia seguinte a rodada não tem como saber quem a fez (a guarda não guarda o
+    editor): a segunda leitura evita o primeiro da cadeia e vai ao seguinte, em vez de voltar
+    a quem leu; o registro não as conta como "mesmo editor" (não sabe) e as conta à parte."""
+    itens = _universo(*[_item(n, universos={leitura.VOTO}) for n in (1, 2, 3)])
+    a, b = LeitorFalso(gabarito, "a", padrao=TOPO), LeitorFalso(gabarito, "b", padrao=TOPO_TAMBEM)
+    registro = ler.ler_universo(_com(plano, chamadas=1), tmp_path, itens, HOJE, agora=AGORA, editores=[a, b])
+    assert registro.passos == [(1, ler.PRIMEIRA, "a")] and (registro.primeiras, registro.segundas, registro.pendentes_segundas) == (3, 0, 3)
+    registro = ler.ler_universo(plano, tmp_path, itens, "2026-11-16", editores=[a, b])
+    assert registro.passos == [(1, ler.SEGUNDA, "b")] and (len(a.calls), len(b.calls)) == (1, 1)  # nenhuma chamada a mais a quem fez a primeira
+    assert (registro.segundas, registro.confirmadas, registro.mesmo_editor, registro.de_outra_rodada, registro.provedor) == (3, 3, 0, 3, "b")
+    assert all(_guarda(tmp_path, plano).de("cd", str(n)).r == leitura.DUAS for n in (1, 2, 3))
+    assert [(d["data"], d["segundas"], d["mesmo_editor"], d["de_outra_rodada"]) for d in _dias(tmp_path)] == [(HOJE, 0, 0, 0), ("2026-11-16", 3, 0, 3)]
+    assert leitura.resumo_do_diario(tmp_path / "leitura")["periodo"]["de_outra_rodada"] == 3  # e vai somado ao resumo que a atualização leva a meta.json
+    # Com um editor só na cadeia não há quem evitar: ele relê, e o registro continua sem saber dizer se foi o mesmo.
+    _semear(tmp_path / "um", plano, {("cd", 2026, "1"): _lida(TOPO)})
+    so = LeitorFalso(gabarito, "so", padrao=TOPO)
+    registro = ler.ler_universo(plano, tmp_path / "um", _universo(_item(1)), HOJE, editores=[so])
+    assert registro.passos == [(1, ler.SEGUNDA, "so")] and (registro.segundas, registro.mesmo_editor, registro.de_outra_rodada) == (1, 0, 1)
+    # Quando a segunda diverge, a terceira evita os dois: o suposto da primeira e o da segunda.
+    _semear(tmp_path / "tres", plano, {("cd", 2026, "1"): _lida(TOPO)})
+    a, b, c = LeitorFalso(gabarito, "a", padrao=TOPO), LeitorFalso(gabarito, "b", padrao=MEDIO), LeitorFalso(gabarito, "c", padrao=MEDIO)
+    registro = ler.ler_universo(plano, tmp_path / "tres", _universo(_item(1)), HOJE, editores=[a, b, c])
+    assert registro.passos == [(1, ler.SEGUNDA, "b"), (2, ler.TERCEIRA, "c")] and len(a.calls) == 0
+    assert (registro.terceiras, registro.decididas, registro.mesmo_editor, registro.terceira_de_quem_leu, registro.de_outra_rodada) == (1, 1, 0, 0, 1)
+
+
+def test_com_dois_editores_a_terceira_leitura_volta_a_um_deles_e_o_registro_conta(plano, gabarito, tmp_path: Path):
+    """Cadeia de dois editores: um lê, o outro diverge, e não há um terceiro para decidir. A
+    terceira leitura volta a quem já leu (se ele repetir a própria resposta, "duas de três" é
+    ele duas vezes): o registro conta essas terceiras à parte, em ``terceira_de_quem_leu``.
+    ``mesmo_editor`` continua contando só as segundas feitas por quem fez a primeira: é o que
+    a página escreve ("N segundas, M delas pelo mesmo editor que fez a primeira"), e aqui as
+    segundas foram do outro editor."""
+    itens = _universo(*[_item(n, universos={leitura.VOTO}) for n in (1, 2, 3)])
+    a, b = LeitorFalso(gabarito, "a", padrao=TOPO), LeitorFalso(gabarito, "b", padrao=MEDIO)
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[a, b])
+    assert registro.passos == [(1, ler.PRIMEIRA, "a"), (2, ler.SEGUNDA, "b"), (3, ler.TERCEIRA, "a")]
+    assert (registro.segundas, registro.confirmadas, registro.terceiras, registro.decididas, registro.mesmo_editor, registro.terceira_de_quem_leu, registro.de_outra_rodada) == (3, 0, 3, 3, 0, 3, 0)
+    guarda = _guarda(tmp_path, plano)
+    assert all((guarda.de("cd", str(n)).r, guarda.de("cd", str(n)).codigos) == (leitura.TRES, tuple(TOPO.split())) for n in (1, 2, 3))
+    assert (_dias(tmp_path)[0]["mesmo_editor"], _dias(tmp_path)[0]["terceira_de_quem_leu"]) == (0, 3)
+    # Com um editor só, ele faz as três: as segundas contam em mesmo_editor (nunca mais que as segundas) e as terceiras, à parte.
+    so = LeitorFalso(gabarito, "so", respostas={f"Ementa cd {n} de 2026.": [TOPO, MEDIO, TOPO] for n in (1, 2, 3)})
+    registro = ler.ler_universo(plano, tmp_path / "um", itens, HOJE, agora=AGORA, editores=[so])
+    assert (registro.segundas, registro.terceiras, registro.mesmo_editor, registro.terceira_de_quem_leu) == (3, 3, 3, 3)
+    periodo = leitura.resumo_do_diario(tmp_path / "um" / "leitura")["periodo"]  # o que a atualização leva a meta.json
+    assert (periodo["segundas"], periodo["mesmo_editor"], periodo["terceiras"], periodo["terceira_de_quem_leu"]) == (3, 3, 3, 3) and periodo["mesmo_editor"] <= periodo["segundas"]
 
 
 # ── os limites: prazo, chamadas, IA fora do ar ───────────────────────────────
@@ -583,7 +870,7 @@ def test_prazo_estourado_para_sem_perder_o_que_ja_leu(plano, gabarito, tmp_path:
     assert registro.motivo == "parou antes do fim: prazo de 480 s"
     assert (registro.primeiras, registro.lotes, registro.pendentes_primeiras) == (6, 3, 4)
     assert sorted(_guarda(tmp_path, plano).da_casa("cd"), key=int) == ["5", "6", "7", "8", "9", "10"]
-    assert _dias(tmp_path)[0]["motivo"] == registro.motivo and _dias(tmp_path)[0]["pendentes"] == {"primeiras": 4, "segundas": 0}
+    assert _dias(tmp_path)[0]["motivo"] == registro.motivo and _dias(tmp_path)[0]["pendentes"] == {"primeiras": 4, "segundas": 0, "terceiras": 0}
 
 
 def test_rodada_interrompida_no_meio_nao_perde_o_lote_ja_lido(plano, gabarito, tmp_path: Path):
@@ -600,7 +887,7 @@ def test_rodada_interrompida_no_meio_nao_perde_o_lote_ja_lido(plano, gabarito, t
         ler.ler_universo(_com(plano, lote=2), tmp_path, itens, HOJE, agora=AGORA, editores=[ia])
     assert sorted(_guarda(tmp_path, plano).da_casa("cd")) == ["3", "4"]
     (dia,) = _dias(tmp_path)
-    assert (dia["primeiras"], dia["lotes"], dia["pendentes"]) == (2, 1, {"primeiras": 2, "segundas": 0})
+    assert (dia["primeiras"], dia["lotes"], dia["pendentes"]) == (2, 1, {"primeiras": 2, "segundas": 0, "terceiras": 0})
 
 
 def test_teto_de_chamadas_e_ia_que_falha(plano, gabarito, tmp_path: Path):
@@ -644,7 +931,7 @@ def test_sem_editor_nao_le_e_registra_o_motivo(plano, gabarito, tmp_path: Path):
     assert registro.motivo == "sem IA: nada lido (GEMINI_API_KEY não definida; ANTHROPIC_API_KEY não definida)"
     assert [i.titulo for i in registro.escolhidas] == ["PL 2/2026", "PL 1/2026"] and (registro.faltavam, registro.primeiras, registro.pendentes_primeiras) == (2, 0, 2)
     assert sorted(a.name for a in (tmp_path / "leitura").iterdir()) == ["diario.json"]
-    assert _dias(tmp_path)[0]["motivo"].startswith("sem IA: nada lido") and _dias(tmp_path)[0]["pendentes"] == {"primeiras": 2, "segundas": 0}
+    assert _dias(tmp_path)[0]["motivo"].startswith("sem IA: nada lido") and _dias(tmp_path)[0]["pendentes"] == {"primeiras": 2, "segundas": 0, "terceiras": 0}
     assert ler.ler_universo(plano, tmp_path, itens, HOJE, editores=[]).motivo == "sem IA: nada lido"
 
     # Com a guarda em dia: com IA, "nada a ler" (e nenhuma chamada); sem IA, o registro diz que não há IA.
@@ -678,8 +965,8 @@ def test_o_registro_do_dia(plano, gabarito, tmp_path: Path):
     assert [d["data"] for d in dias] == [d["data"] for d in antigos[10:]] + [HOJE]
     assert dias[-1] == {
         "data": HOJE, "quando": AGORA, "rodadas": 1, "primeiras": 5, "segundas": 2, "terceiras": 0, "lotes": 3, "descartados": 0, "falhas": 0,
-        "controles": [30, 30], "confirmadas": 2, "decididas": 0, "instaveis": 0, "invalidas": 0, "mesmo_editor": 2, "chamadas": 3,
-        "tokens": {"entrada": 3000, "saida": 600}, "pendentes": {"primeiras": 0, "segundas": 0}, "provedor": "falso", "modelo": "modelo-falso", "motivo": "",
+        "controles": [30, 30], "confirmadas": 2, "decididas": 0, "instaveis": 0, "invalidas": 0, "mesmo_editor": 2, "terceira_de_quem_leu": 0, "de_outra_rodada": 0, "chamadas": 3,
+        "tokens": {"entrada": 3000, "saida": 600}, "pendentes": {"primeiras": 0, "segundas": 0, "terceiras": 0}, "provedor": "falso", "modelo": "modelo-falso", "motivo": "",
     }  # fmt: skip
     assert dias[-1] == ler.linha(registro) and json.loads(linhas[-2]) == dias[-1]
 
@@ -687,7 +974,7 @@ def test_o_registro_do_dia(plano, gabarito, tmp_path: Path):
     assert {k: v for k, v in resumo.items() if k != "periodo"} == dias[-1]
     assert resumo["periodo"] == {
         "dias": 60, "desde": antigos[10]["data"], "leu_em": HOJE, "rodadas": 60, "primeiras": 59 + 5, "segundas": 2, "terceiras": 0, "lotes": 59 + 3, "descartados": 0,
-        "falhas": 0, "confirmadas": 2, "decididas": 0, "instaveis": 0, "invalidas": 0, "mesmo_editor": 2, "chamadas": 3, "controles": [59 * 10 + 30, 59 * 10 + 30],
+        "falhas": 0, "confirmadas": 2, "decididas": 0, "instaveis": 0, "invalidas": 0, "mesmo_editor": 2, "terceira_de_quem_leu": 0, "de_outra_rodada": 0, "chamadas": 3, "controles": [59 * 10 + 30, 59 * 10 + 30],
     }  # fmt: skip
     # No dia seguinte, sem nada a ler: a linha do dia diz isso, e "leu_em" continua sendo o último dia com leitura.
     ler.ler_universo(plano, tmp_path, itens, "2026-11-16", agora="2026-11-16T09:00:00+00:00", editores=[ia])
@@ -709,7 +996,7 @@ def test_juntar_soma_as_rodadas_do_mesmo_dia():
     junta = ler.juntar(primeira, segunda)
     assert (junta["rodadas"], junta["primeiras"], junta["segundas"], junta["lotes"], junta["descartados"], junta["chamadas"], junta["confirmadas"]) == (2, 10, 2, 4, 1, 4, 2)
     assert (junta["controles"], junta["tokens"], junta["provedor"], junta["modelo"]) == ([8, 12], {"entrada": 40, "saida": 7}, "a → b", "m-a + m-b")
-    assert (junta["quando"], junta["motivo"], junta["pendentes"]) == ("t2", "", {"primeiras": 0, "segundas": 0}) and "avisos" not in junta
+    assert (junta["quando"], junta["motivo"], junta["pendentes"]) == ("t2", "", {"primeiras": 0, "segundas": 0, "terceiras": 0}) and "avisos" not in junta
     assert ler.juntar(None, segunda) == segunda and list(junta) == list(segunda)
 
 
@@ -763,6 +1050,55 @@ def test_nenhuma_leitura_existente_e_apagada(plano, gabarito, tmp_path: Path):
     assert sorted(a.name for a in pasta.iterdir()) == sorted([*textos, leitura.DIARIO])
 
 
+def test_o_arquivo_da_guarda_com_linha_que_nao_valida_nao_e_regravado(plano, gabarito, tmp_path: Path):
+    """Um código renomeado ou retirado da régua sem subir a versão das instruções (ou uma
+    linha editada à mão) deixa na guarda linhas que não validam. Regravar o arquivo as
+    apagaria, e com elas leituras confirmadas: a rodada não o regrava, leia ou não leia
+    alguma coisa, deixa as proposições daquele ano e Casa de fora e avisa no registro. Os
+    outros arquivos seguem como sempre, e a atualização continua usando as linhas válidas."""
+    pasta = tmp_path / "leitura"
+    pasta.mkdir()
+    da_camara = leitura.serializar(plano.regua, "cd", 2025, {"1": _lida(TOPO, r=2), "2": _lida(TOPO, r=2), "3": _lida(PONTUAL, r=3), "4": _lida(TOPO)})
+    da_camara = da_camara.replace('"2":["fiscal","geral","ajuste","corta"', '"2":["fiscal","geral","ajuste","codigo_antigo"')  # um código que a régua não tem mais
+    do_senado = leitura.serializar(plano.regua, "sf", 2025, {"PL-7-2025": _lida(TOPO, r=2), "PL-8-2025": _lida(MINIMO, r=2)}).replace('"PL-8-2025":', '"oito":')  # uma chave fora do formato
+    em_ordem = leitura.serializar(plano.regua, "cd", 2024, {"90": _lida(MINIMO, r=2)})
+    textos = {"cd-2025.json": da_camara, "sf-2025.json": do_senado, "cd-2024.json": em_ordem}
+    assert "codigo_antigo" in da_camara and '"oito":' in do_senado
+    for nome, texto in textos.items():
+        (pasta / nome).write_text(texto, encoding="utf-8")
+    idades = {nome: (pasta / nome).stat().st_mtime_ns for nome in textos}
+
+    def intactos() -> bool:
+        return all((pasta / nome).read_text(encoding="utf-8") == texto and (pasta / nome).stat().st_mtime_ns == idades[nome] for nome, texto in textos.items())
+
+    # A 4 espera a segunda leitura (peso 60) e a 5 não tem leitura, as duas no arquivo que não se regrava; a 6 e a 91 são de outros arquivos.
+    itens = _universo(*[_item(n, ano=2025) for n in range(1, 6)], _item(7, casa="sf", ano=2025), _item(9, casa="sf", ano=2025), _item(6), _item(91, ano=2024))
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[])  # uma rodada que não lê nada
+    assert registro.motivo == "sem IA: nada lido" and registro.gravados == [] and intactos()
+    (aviso,) = [a for a in registro.avisos if "não valida" in a]
+    assert aviso.endswith("ficam de fora: cd-2025.json (1 linha), sf-2025.json (1 linha)") and "não os regrava" in aviso
+    assert (registro.faltavam, registro.esperavam_segunda, registro.pendentes_primeiras, registro.pendentes_segundas) == (2, 0, 2, 0)  # só a 6 e a 91
+    assert _dias(tmp_path)[0]["avisos"] == [aviso]  # o aviso vai ao registro do dia
+    # Com IA: lê só o que é dos outros arquivos (nem a primeira leitura da 5, nem a segunda da 4), e os dois arquivos ficam como estavam.
+    ia = LeitorFalso(gabarito)
+    registro = ler.ler_universo(plano, tmp_path, itens, HOJE, agora=AGORA, editores=[ia])
+    assert len(ia.calls) == 1 and sorted(ia.ementas(0)) == ["Ementa cd 6 de 2026.", "Ementa cd 91 de 2024."]
+    assert (registro.primeiras, registro.segundas, registro.pendentes_primeiras, registro.pendentes_segundas) == (2, 0, 0, 0) and aviso in registro.avisos
+    assert sorted(p.name for p in registro.gravados) == ["cd-2024.json", "cd-2026.json"]
+    assert (pasta / "cd-2025.json").read_text(encoding="utf-8") == da_camara and (pasta / "sf-2025.json").read_text(encoding="utf-8") == do_senado
+    assert all((pasta / nome).stat().st_mtime_ns == idades[nome] for nome in ("cd-2025.json", "sf-2025.json"))
+    assert (pasta / "cd-2024.json").read_text(encoding="utf-8").splitlines()[1:3] == [em_ordem.splitlines()[1] + ",", '"91":["outro","grupo","conduta","neutro","neutro","neutro",0,3,"","Lido no teste.",1]']
+    # Quem lê a guarda para as contas continua com as linhas válidas desses arquivos, e sabe quais têm linha inválida.
+    guarda = _guarda(tmp_path, plano)
+    assert (guarda.invalidas, guarda.com_invalidas, guarda.ignorados) == (2, {"cd-2025.json": 1, "sf-2025.json": 1}, [])
+    assert guarda.de("cd", "1").r == leitura.DUAS and guarda.de("cd", "2") is None and guarda.de("sf", "PL-7-2025").r == leitura.DUAS and len(guarda) == 7
+    guarda.deixar_de_fora("cd-2025.json")
+    assert guarda.de("cd", "1") is None and guarda.ano_de("cd", "3") is None and len(guarda) == 4
+    guarda.deixar_de_fora("sf-2025.json")
+    guarda.deixar_de_fora("não é arquivo da guarda")
+    assert len(guarda) == 3 and guarda.gravar(pasta) == []  # sem os dois na memória, gravar não toca neles
+
+
 # ── o comando, com o Congresso de mentira ────────────────────────────────────
 
 
@@ -788,9 +1124,12 @@ def test_sem_chave_de_ia_o_comando_nao_le_e_nao_falha(publicado: Path, tmp_path:
     e sai com 0. Com a leitura desligada (QIJ_NO_LEITURA, ou no config), nem carrega nada."""
     resumo = tmp_path / "resumo.md"
     monkeypatch.setenv("GITHUB_STEP_SUMMARY", str(resumo))
-    with caplog.at_level("INFO"):
-        assert main(_comando(publicado)) == 0
     pasta = publicado / "data" / "congresso" / "leitura"
+    with caplog.at_level("INFO"):
+        assert main(_comando(publicado, "--max", "0")) == 0 and not pasta.exists()  # --max 0 só diz o que leria: não grava nada
+        assert "9 proposição(ões) sem leitura" in caplog.text and "--max 0" in caplog.text
+        caplog.clear()
+        assert main(_comando(publicado)) == 0
     assert sorted(a.name for a in pasta.iterdir()) == ["diario.json"]
     (dia,) = leitura.ler_diario(pasta)
     assert dia["data"] == fabrica.HOJE and dia["quando"] == f"{fabrica.HOJE}T12:00:00+00:00" and dia["primeiras"] == 0
@@ -835,7 +1174,7 @@ def test_o_comando_le_com_a_cadeia_do_jornal_e_a_atualizacao_leva_o_resumo(publi
     assert "Ana Lima" not in ia.calls[0]["user_text"] and "PL 10" not in ia.calls[0]["user_text"] and "1010" not in ia.calls[0]["user_text"]
     (dia,) = leitura.ler_diario(pasta / "leitura")
     assert (dia["primeiras"], dia["segundas"], dia["confirmadas"], dia["lotes"], dia["controles"], dia["provedor"], dia["mesmo_editor"]) == (len(com_ementa), 4, 4, 2, [20, 20], "falso", 4)
-    assert dia["pendentes"] == {"primeiras": 0, "segundas": 0} and dia["motivo"] == ""
+    assert dia["pendentes"] == {"primeiras": 0, "segundas": 0, "terceiras": 0} and dia["motivo"] == ""
 
     # No dia seguinte, a guarda está em dia: nenhuma chamada, e o registro ganha a linha do dia.
     assert main(["congresso", "ler", "--dir", str(publicado), "--cache", str(publicado / "cache"), "--now", "2026-11-14T12:00:00"]) == 0
@@ -917,52 +1256,331 @@ def test_configuracao_quebrada_e_o_unico_erro_do_comando(publicado: Path, gabari
 # ── os fluxos do GitHub ──────────────────────────────────────────────────────
 
 SEGREDOS_DE_IA = ("GEMINI_API_KEY", "AIMLAPI_KEY", "SENSENOVA_API_KEY", "MISTRAL_API_KEY", "MOONSHOT_API_KEY", "ANTHROPIC_API_KEY")
+FLUXOS = ROOT / ".github" / "workflows"
+SE_LER = "steps.decidir.outputs.ler == 'true'"  # a condição dos passos que vêm depois da decisão
+A_GUARDA = "data/congresso/leitura"
+HOJE_NO_FLUXO, ONTEM_NO_FLUXO = "2026-11-17", "2026-11-16"  # o `date` de mentira dos passos responde sempre este dia
+COMMIT_DA_LEITURA = "📚 Leitura dos projetos de lei em 17/11/2026"
+precisa_de_git = pytest.mark.skipif(shutil.which("git") is None or shutil.which("bash") is None, reason="sem git ou sem bash")
 
 
-@pytest.mark.parametrize(("fluxo", "job"), [("daily.yml", "edition"), ("congresso.yml", "congresso")])
-def test_os_fluxos_leem_os_projetos_no_fim_da_edicao_diaria_e_antes_de_atualizar_no_fluxo_manual(fluxo: str, job: str):
-    """Nos dois fluxos, o passo "Ler os projetos novos" é acessório (continue-on-error, com
-    prazo próprio), usa o mesmo cache da atualização e recebe os mesmos segredos de IA e as
-    mesmas variáveis de modelo que o passo da edição. No fluxo manual do Congresso, vem logo
-    antes de "Atualizar o Congresso", e o que lê entra no commit do fluxo. Na edição diária,
-    vem por último, depois de gerar e publicar a edição e de enviar o e-mail (a edição usa as
-    IAs primeiro e não espera a leitura), e é seguido de "Publicar a leitura", também
-    acessório, que leva só data/congresso/leitura num commit próprio."""
-    yml = yaml.safe_load((ROOT / ".github" / "workflows" / fluxo).read_text(encoding="utf-8"))
-    passos = yml["jobs"][job]["steps"]
+def _fluxo(nome: str) -> dict[str, Any]:
+    yml = yaml.safe_load((FLUXOS / nome).read_text(encoding="utf-8"))
+    if True in yml:  # o YAML 1.1 lê a chave "on" como verdadeiro
+        yml["on"] = yml.pop(True)
+    return yml
+
+
+def _passo(job: dict[str, Any], nome: str) -> dict[str, Any]:
+    (passo,) = [p for p in job["steps"] if p.get("name") == nome]
+    return passo
+
+
+def _da_leitura() -> dict[str, Any]:
+    """O único job de leitura.yml."""
+    (job,) = _fluxo("leitura.yml")["jobs"].values()
+    return job
+
+
+@pytest.mark.parametrize("fluxo", ["daily.yml", "congresso.yml"])
+def test_a_edicao_diaria_e_o_fluxo_manual_do_congresso_nao_leem_os_projetos(fluxo: str):
+    """A leitura não mora na "Edição diária" nem no fluxo manual do Congresso: o Instagram
+    dispara quando a "Edição diária" termina e não pode esperar a leitura, e o passo que
+    publica a leitura não pode conviver com os que refazem o commit com a cópia local de
+    ``data/``. Nenhum passo deles roda ``congresso ler`` nem publica a guarda à parte."""
+    texto = (FLUXOS / fluxo).read_text(encoding="utf-8")
+    assert "congresso ler" not in texto and "QIJ_NO_LEITURA" not in texto and "Leitura dos projetos" not in texto
+    nomes = [str(p.get("name") or "") for job in _fluxo(fluxo)["jobs"].values() for p in job["steps"]]
+    assert "Atualizar o Congresso" in nomes and "Publicar (commit e push)" in nomes
+    assert not [n for n in nomes if "projetos" in n.lower() or "leitura" in n.lower()]
+
+
+def test_a_leitura_tem_um_fluxo_proprio_que_roda_depois_da_edicao_diaria():
+    """``leitura.yml``: dispara quando a "Edição diária" termina (como o Instagram) ou à mão,
+    com um teto opcional; só segue se a execução que disparou deu certo; tem fila própria
+    (não a da edição) e prazo curto; baixa a ponta da branch e, antes de qualquer outra coisa,
+    decide se há o que ler: todo passo seguinte depende dessa decisão. Instala como a edição,
+    só restaura o cache do Congresso (com a chave da edição) e lê com os mesmos segredos de
+    IA e as mesmas variáveis de modelo do passo "Gerar a edição"."""
+    yml, diario = _fluxo("leitura.yml"), _fluxo("daily.yml")
+    assert yml["name"] == "Leitura dos projetos" and diario["name"] == "Edição diária"
+    assert yml["on"]["workflow_run"] == {"workflows": ["Edição diária"], "types": ["completed"]} == _fluxo("instagram.yml")["on"]["workflow_run"]
+    assert set(yml["on"]) == {"workflow_run", "workflow_dispatch"}  # sem agendamento próprio nem push
+    assert list(yml["on"]["workflow_dispatch"]["inputs"]) == ["max"] and yml["on"]["workflow_dispatch"]["inputs"]["max"]["default"] == ""
+    assert yml["permissions"] == {"contents": "write"}
+    job = _da_leitura()
+    assert job["if"] == "github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'"
+    # A fila é só deste fluxo, e fica no job: a execução pulada pelo "if" não entra nela.
+    assert "concurrency" not in yml and job["concurrency"]["cancel-in-progress"] is False
+    assert job["concurrency"]["group"].startswith("leitura-") and "daily-edition" not in job["concurrency"]["group"]
+    assert job["concurrency"]["group"] not in {diario["concurrency"]["group"], _fluxo("congresso.yml")["concurrency"]["group"], "instagram"}
+    passos = job["steps"]
     nomes = [p.get("name") for p in passos]
-    assert nomes.count("Ler os projetos novos") == 1
-    onde = nomes.index("Ler os projetos novos")
-    assert nomes.index("Cache do que foi baixado do Congresso") < onde
-    ler_, atualizar = passos[onde], passos[nomes.index("Atualizar o Congresso")]
-    assert ler_["continue-on-error"] is True and 5 <= ler_["timeout-minutes"] <= 20
-    assert 'python -m qijournal congresso ler --dir . --cache "$RUNNER_TEMP/congresso"' in ler_["run"]
-    assert '--cache "$RUNNER_TEMP/congresso"' in atualizar["run"] or "$RUNNER_TEMP/congresso" in atualizar["run"]
+    assert nomes == [
+        "Baixar o repositório", "Verificar se há o que ler", "Configurar Python", "Instalar dependências", "Dia do cache do Congresso",
+        "Restaurar o cache do que foi baixado do Congresso", "Ler os projetos novos", "Publicar a leitura (commit e push)",
+    ]  # fmt: skip
+    da_edicao = diario["jobs"]["edition"]
+    baixar, decidir = passos[:2]
+    assert baixar == {"name": "Baixar o repositório", **{k: _passo(da_edicao, "Baixar o repositório")[k] for k in ("uses", "with")}} and baixar["with"] == {"ref": "${{ github.ref_name }}"}
+    assert decidir["id"] == "decidir" and "if" not in decidir and "continue-on-error" not in decidir
+    assert decidir["env"] == {"EVENT": "${{ github.event_name }}", "QIJ_NO_LEITURA": "${{ vars.QIJ_NO_LEITURA }}", "QIJ_NO_CONGRESSO": "${{ vars.QIJ_NO_CONGRESSO }}", "INPUT_MAX": "${{ inputs.max }}"}
+    assert all(p.get("if") == SE_LER for p in passos[2:])  # nada roda sem a decisão
+    assert all("${{" not in p.get("run", "") for p in passos)  # nenhuma entrada é interpolada direto num script
+    # Python e dependências como na edição.
+    for nome in ("Configurar Python", "Instalar dependências", "Dia do cache do Congresso"):
+        assert {k: v for k, v in _passo(job, nome).items() if k != "if"} == _passo(da_edicao, nome), nome
+    # O cache da edição, só restaurado: a mesma versão da ação, a mesma chave, e nada grava de volta.
+    cache, da_edicao_cache = _passo(job, "Restaurar o cache do que foi baixado do Congresso"), _passo(da_edicao, "Cache do que foi baixado do Congresso")
+    assert cache["uses"] == da_edicao_cache["uses"].replace("actions/cache@", "actions/cache/restore@") != da_edicao_cache["uses"]
+    assert cache["with"] == da_edicao_cache["with"] and cache["with"]["path"] == "${{ runner.temp }}/congresso" and cache["continue-on-error"] is True
+    assert [p["uses"] for p in passos if "actions/cache" in p.get("uses", "")] == [cache["uses"]]
+    # A leitura: acessória, com prazo próprio dentro do prazo do job, e com as IAs da edição.
+    ler_ = _passo(job, "Ler os projetos novos")
+    assert ler_["continue-on-error"] is True and 5 <= ler_["timeout-minutes"] < job["timeout-minutes"] <= 30
+    assert 'args=(--dir . --cache "$RUNNER_TEMP/congresso")' in ler_["run"] and 'python -m qijournal congresso ler "${args[@]}"' in ler_["run"]
+    # Sem o cache restaurado, não lê (ver test_sem_o_cache_do_congresso_o_passo_nao_le): a pasta conferida é a que a edição guarda.
+    assert ler_["run"].index('find "$RUNNER_TEMP/congresso" -type f') < ler_["run"].index("python -m qijournal congresso ler") and cache["with"]["path"].endswith("/congresso")
+    assert ler_["env"]["INPUT_MAX"] == "${{ inputs.max }}" and 'if [ -n "$INPUT_MAX" ]; then args+=(--max "$INPUT_MAX"); fi' in ler_["run"]
+    edicao = _passo(da_edicao, "Gerar a edição")
+    da_ia = {k: v for k, v in edicao["env"].items() if k in SEGREDOS_DE_IA or (k.startswith("QIJ_") and k.endswith("MODEL"))}
+    assert set(SEGREDOS_DE_IA) < set(da_ia) and len(da_ia) > len(SEGREDOS_DE_IA) and {k: ler_["env"].get(k) for k in da_ia} == da_ia
     for segredo in SEGREDOS_DE_IA:
         assert ler_["env"][segredo] == f"${{{{ secrets.{segredo} }}}}"
-    edicao = next(p for p in yaml.safe_load((ROOT / ".github" / "workflows" / "daily.yml").read_text(encoding="utf-8"))["jobs"]["edition"]["steps"] if p.get("name") == "Gerar a edição")
-    da_ia = {k: v for k, v in edicao["env"].items() if k in SEGREDOS_DE_IA or (k.startswith("QIJ_") and k.endswith("MODEL"))}
-    assert {k: ler_["env"].get(k) for k in da_ia} == da_ia
+    assert {k: ler_["env"][k] for k in ("QIJ_BRAND", "TZ", "PYTHONUNBUFFERED")} == {k: edicao["env"][k] for k in ("QIJ_BRAND", "TZ", "PYTHONUNBUFFERED")}
     assert ler_["env"]["QIJ_NO_LEITURA"] == "${{ vars.QIJ_NO_LEITURA }}" and ler_["env"]["QIJ_NO_CONGRESSO"] == "${{ vars.QIJ_NO_CONGRESSO }}"
-    publicar = next(p for p in passos if p.get("name") == "Publicar (commit e push)")
-    caminhos = re.search(r'git add "\$@" -- (.+)', publicar["run"]).group(1).split()
-    if fluxo == "congresso.yml":
-        # Logo antes da atualização, que já usa as leituras; a guarda e o registro
-        # (data/congresso/leitura/) entram no commit que o fluxo já faz.
-        assert onde + 1 == nomes.index("Atualizar o Congresso")
-        assert any(c in ("data", "data/congresso") for c in caminhos)
+
+
+def test_o_passo_que_publica_a_leitura_so_leva_a_guarda_e_nunca_refaz_o_commit_com_a_copia_local():
+    """O texto do passo "Publicar a leitura": o único ``git add`` é o da pasta da guarda, sem
+    remoções; o commit leva só o que ele pôs; não há ``git reset`` (nem outro comando que
+    troque o que o remoto tem pelo que está na cópia local); push recusado: o commit é
+    reaplicado sobre o remoto e, se não der, o passo desiste e avisa."""
+    publicar = _passo(_da_leitura(), "Publicar a leitura (commit e push)")
+    script = publicar["run"]
+    assert "continue-on-error" not in publicar and f"pasta={A_GUARDA}\n" in script
+    assert re.findall(r"git add\b[^\n]*", script) == ['git add --ignore-removal -- "$pasta"']
+    assert re.findall(r"git commit\b[^\n]*", script) == ['git commit --quiet -m "📚 Leitura dos projetos de lei em $(date +%d/%m/%Y)"']
+    for proibido in ("git reset", "git checkout", "git restore", "git rm", "git clean", "git stash", "git merge", "git pull", "--force", "-f origin", "commit -a", "--all", "add -A", "add -u", "add ."):
+        assert proibido not in script, proibido
+    assert re.findall(r"git push\b[^\n;]*", script) == ['git push origin "HEAD:${GITHUB_REF_NAME}"']
+    assert re.findall(r"git (?:fetch|rebase)\b[^\n;]*", script) == ['git fetch --quiet origin "${GITHUB_REF_NAME}"', "git rebase --quiet --autostash FETCH_HEAD", "git rebase --abort || true"]
+    assert script.count("::warning::") == 2 and "exit 1" not in script
+
+
+def _ambiente_do_passo(tmp: Path, **extra: str) -> dict[str, str]:
+    """O ambiente em que os passos rodam nos testes: só o que o passo recebe, um git sem a
+    configuração da máquina e ``date`` e ``sleep`` de mentira (hoje é sempre 17/11/2026, e
+    ninguém espera)."""
+    comandos = tmp / "bin"
+    if not comandos.is_dir():
+        comandos.mkdir(parents=True)
+        (comandos / "date").write_text(f'#!/bin/sh\ncase "$1" in +%F) echo {HOJE_NO_FLUXO} ;; +%d/%m/%Y) echo 17/11/2026 ;; *) exit 9 ;; esac\n', encoding="utf-8")
+        (comandos / "sleep").write_text("#!/bin/sh\n", encoding="utf-8")
+        for comando in comandos.iterdir():
+            comando.chmod(0o755)
+        (tmp / "gitconfig").write_text("[user]\n\tname = Outro\n\temail = outro@example.invalid\n[init]\n\tdefaultBranch = main\n", encoding="utf-8")
+    return {
+        "PATH": f"{comandos}{os.pathsep}{os.environ['PATH']}", "HOME": str(tmp), "GIT_CONFIG_GLOBAL": str(tmp / "gitconfig"), "GIT_CONFIG_SYSTEM": os.devnull,
+        "GITHUB_OUTPUT": str(tmp / "saida"), "GITHUB_REF_NAME": "main", "TZ": "America/Sao_Paulo", **extra,
+    }  # fmt: skip
+
+
+def _rodar(script: str, onde: Path, tmp: Path, **ambiente: str) -> subprocess.CompletedProcess[str]:
+    """Roda o script de um passo como o GitHub o roda (``bash -e``), em ``onde``."""
+    (tmp / "passo.sh").write_text(script, encoding="utf-8")
+    (tmp / "saida").write_text("", encoding="utf-8")
+    return subprocess.run(["bash", "-e", str(tmp / "passo.sh")], cwd=onde, env=_ambiente_do_passo(tmp, **ambiente), capture_output=True, text=True, timeout=120)
+
+
+@precisa_de_git
+@pytest.mark.parametrize(
+    ("evento", "edicao", "dias", "ambiente", "ler_"),
+    [
+        ("workflow_run", HOJE_NO_FLUXO, [ONTEM_NO_FLUXO], {}, "true"),  # a edição de hoje saiu e o registro não tem hoje
+        ("workflow_run", HOJE_NO_FLUXO, None, {}, "true"),  # ainda sem registro (a primeira leitura)
+        ("workflow_run", HOJE_NO_FLUXO, "{isto não é json", {}, "true"),  # registro ilegível: a rodada começa um novo
+        ("workflow_run", HOJE_NO_FLUXO, [ONTEM_NO_FLUXO, HOJE_NO_FLUXO], {}, "false"),  # a leitura de hoje já está no registro
+        ("workflow_run", ONTEM_NO_FLUXO, [], {}, "false"),  # a edição de hoje ainda não saiu
+        ("workflow_run", None, [], {}, "false"),  # sem manifesto da edição
+        ("workflow_dispatch", ONTEM_NO_FLUXO, [HOJE_NO_FLUXO], {}, "true"),  # à mão, sempre lê
+        ("workflow_dispatch", HOJE_NO_FLUXO, [HOJE_NO_FLUXO], {"INPUT_MAX": "0"}, "true"),
+        ("workflow_dispatch", HOJE_NO_FLUXO, [], {"INPUT_MAX": "40"}, "true"),
+        ("workflow_dispatch", HOJE_NO_FLUXO, [], {"INPUT_MAX": "muitas"}, None),  # teto que não é número: erro
+        ("workflow_dispatch", HOJE_NO_FLUXO, [], {"INPUT_MAX": "-3"}, None),
+        ("workflow_dispatch", HOJE_NO_FLUXO, [], {"QIJ_NO_LEITURA": "1"}, "false"),  # desligada: nem à mão
+        ("workflow_run", HOJE_NO_FLUXO, [], {"QIJ_NO_LEITURA": " Sim "}, "false"),
+        ("workflow_run", HOJE_NO_FLUXO, [], {"QIJ_NO_CONGRESSO": "true"}, "false"),
+        ("workflow_run", HOJE_NO_FLUXO, [], {"QIJ_NO_LEITURA": "0", "QIJ_NO_CONGRESSO": ""}, "true"),  # "0" não desliga
+    ],
+)
+def test_o_primeiro_passo_decide_se_ha_o_que_ler(tmp_path: Path, evento: str, edicao: str | None, dias: list[str] | str | None, ambiente: dict[str, str], ler_: str | None):
+    """O passo "Verificar se há o que ler", rodado de verdade: depois da "Edição diária", só
+    manda ler se a edição de hoje (``edicoes/latest.json``, no fuso de Brasília) já saiu e o
+    registro ainda não tem a linha de hoje; à mão, sempre; com a leitura ou o Congresso
+    desligados, nunca. As variáveis que desligam valem como o Python as lê."""
+    repo = tmp_path / "repo"
+    (repo / "edicoes").mkdir(parents=True)
+    if edicao is not None:
+        (repo / "edicoes" / "latest.json").write_text(json.dumps({"date": edicao}), encoding="utf-8")
+    if dias is not None:
+        (repo / A_GUARDA).mkdir(parents=True)
+        (repo / A_GUARDA / leitura.DIARIO).write_text(dias if isinstance(dias, str) else ler.serializar_diario([{"data": d, "primeiras": 1} for d in dias]), encoding="utf-8")
+    if any(_truthy(v) for k, v in ambiente.items() if k.startswith("QIJ_NO_")):  # como o Python lê as variáveis que desligam
+        assert ler_ == "false"
+    feito = _rodar(_passo(_da_leitura(), "Verificar se há o que ler")["run"], repo, tmp_path, EVENT=evento, **ambiente)
+    saida = (tmp_path / "saida").read_text(encoding="utf-8")
+    if ler_ is None:
+        assert feito.returncode == 1 and "::error::" in feito.stdout and saida == ""
     else:
-        # A edição primeiro: a leitura vem depois de gerar e publicar a edição e de enviar o e-mail.
-        for antes in ("Gerar a edição", "Publicar (commit e push)", "Enviar e-mail (SMTP)"):
-            assert nomes.index(antes) < onde, antes
-        # O disparo manual "Gerar sem IA" vale também para a leitura.
-        assert ler_["env"]["INPUT_NO_LLM"] == "${{ inputs.no_llm }}" and 'if [ "$INPUT_NO_LLM" = "true" ]; then export QIJ_NO_LLM=1; fi' in ler_["run"]
-        # O que foi lido vai num commit próprio, logo em seguida: só a guarda e o registro do dia.
-        assert nomes.count("Publicar a leitura (commit e push)") == 1 and nomes[onde + 1] == "Publicar a leitura (commit e push)"
-        da_leitura = passos[onde + 1]
-        assert da_leitura["continue-on-error"] is True
-        adicoes = re.findall(r"git add\b[^\n]*", da_leitura["run"])
-        assert adicoes and set(adicoes) == {"git add -- data/congresso/leitura"}
-        assert not re.search(r"git commit\b[^\n]*(?:\s-a\b|--all\b)", da_leitura["run"])  # o commit leva só o que o "git add" pôs
-        assert "git commit" in da_leitura["run"] and 'git push origin "HEAD:${GITHUB_REF_NAME}"' in da_leitura["run"]
-    assert yml["jobs"][job]["timeout-minutes"] >= {"daily.yml": 95, "congresso.yml": 55}[fluxo]
+        assert (feito.returncode, saida) == (0, f"ler={ler_}\n"), feito.stdout + feito.stderr
+
+
+@precisa_de_git
+@pytest.mark.parametrize(("cache", "le"), [(None, False), ("vazio", False), ("com arquivos", True)])
+def test_sem_o_cache_do_congresso_o_passo_nao_le(tmp_path: Path, cache: str | None, le: bool):
+    """O passo "Ler os projetos novos", rodado de verdade com um ``python`` de mentira: sem o
+    cache do Congresso restaurado (a pasta não existe, ou não tem nenhum arquivo), a leitura
+    baixaria tudo de novo, estouraria o prazo do passo sem deixar a linha do dia no registro
+    e repetiria isso a cada hora. O passo avisa e termina sem ler; com o cache, lê."""
+    comandos = Path(_ambiente_do_passo(tmp_path)["PATH"].split(os.pathsep)[0])
+    (comandos / "python").write_text('#!/bin/sh\necho "python $*"\n', encoding="utf-8")
+    (comandos / "python").chmod(0o755)
+    temporaria = tmp_path / "runner"
+    if cache is not None:
+        (temporaria / "congresso" / "api").mkdir(parents=True)
+    if cache == "com arquivos":
+        (temporaria / "congresso" / "api" / "abc.json").write_text("{}", encoding="utf-8")
+    feito = _rodar(_passo(_da_leitura(), "Ler os projetos novos")["run"], tmp_path, tmp_path, RUNNER_TEMP=str(temporaria), INPUT_MAX="7")
+    assert feito.returncode == 0, feito.stdout + feito.stderr
+    if le:
+        assert feito.stdout == f"python -m qijournal congresso ler --dir . --cache {temporaria}/congresso --max 7\n"
+    else:
+        assert "python" not in feito.stdout and feito.stdout.startswith("::warning::Sem o cache do Congresso") and "não leu" in feito.stdout
+
+
+def _texto_da_guarda(ano: int, estados: dict[str, int]) -> str:
+    """Um arquivo da guarda como a rodada o grava: ``{chave: r}`` → uma proposição por linha."""
+    return leitura.serializar(REGUA, "cd", ano, {chave: _lida(TOPO, r=r, porque=f"Proposição {chave}.") for chave, r in estados.items()})
+
+
+def _registro_com(*dias: str) -> str:
+    return ler.serializar_diario([{"data": d, "primeiras": 1} for d in dias])
+
+
+CONFIRMADAS = {str(n): 2 for n in range(110, 180, 10)}  # sete proposições que ninguém toca, entre a 100 e o fim do arquivo
+NO_REPOSITORIO = {  # a guarda antes da leitura do dia
+    "cd-2026.json": _texto_da_guarda(2026, {"100": 1, **CONFIRMADAS}),
+    "cd-2025.json": _texto_da_guarda(2025, {"50": 2}),
+    leitura.DIARIO: _registro_com(ONTEM_NO_FLUXO),
+    leitura.AUDITORIA: '{"data":"2026-11-16"}\n',
+}
+LIDO_HOJE = {  # o que a leitura do dia grava: a 180, nova, no fim de cd-2026.json, e a linha de hoje no registro
+    "cd-2026.json": _texto_da_guarda(2026, {"100": 1, **CONFIRMADAS, "180": 1}),
+    leitura.DIARIO: _registro_com(ONTEM_NO_FLUXO, HOJE_NO_FLUXO),
+}
+IMPORTADAS = {  # o que outro envia em arquivos da guarda que a leitura do dia não tocou
+    "cd-2027.json": _texto_da_guarda(2027, {"900": 1}),
+    "cd-2025.json": _texto_da_guarda(2025, {"50": 3, "60": 2}),
+    leitura.AUDITORIA: '{"data":"2026-11-17"}\n',
+}
+NO_FIM_DO_ARQUIVO = _texto_da_guarda(2026, {"100": 2, **CONFIRMADAS, "190": 2})  # outro confirmou a 100 e importou a 190 para o fim, onde a leitura pôs a 180
+NO_COMECO_DO_ARQUIVO = _texto_da_guarda(2026, {"100": 2, **CONFIRMADAS})  # outro só confirmou a 100, longe da linha nova
+CASOS_DE_PUBLICAR = {
+    # caso: (o que a leitura gravou na guarda; o que outro enviou enquanto ela lia, {caminho: texto}; a guarda do repositório no fim)
+    "normal": (LIDO_HOJE, {}, {**NO_REPOSITORIO, **LIDO_HOJE}),
+    "o remoto andou fora da guarda": (LIDO_HOJE, {"index.html": "refeita\n", "data/congresso/meta.json": '{"v":2}\n'}, {**NO_REPOSITORIO, **LIDO_HOJE}),
+    "o remoto andou em outros arquivos da guarda": (LIDO_HOJE, {f"{A_GUARDA}/{nome}": texto for nome, texto in IMPORTADAS.items()}, {**NO_REPOSITORIO, **LIDO_HOJE, **IMPORTADAS}),
+    # Não dá para juntar: fica o que o outro enviou, e a leitura do dia não é publicada.
+    "o remoto mexeu nas mesmas linhas da guarda": (
+        LIDO_HOJE,
+        {f"{A_GUARDA}/cd-2026.json": NO_FIM_DO_ARQUIVO, f"{A_GUARDA}/cd-2027.json": IMPORTADAS["cd-2027.json"]},
+        {**NO_REPOSITORIO, "cd-2026.json": NO_FIM_DO_ARQUIVO, "cd-2027.json": IMPORTADAS["cd-2027.json"]},
+    ),
+    # As duas mudanças ficam: a 100 confirmada pelo outro e a 180 lida hoje.
+    "o remoto mexeu no mesmo arquivo, em outras linhas": (
+        LIDO_HOJE,
+        {f"{A_GUARDA}/cd-2026.json": NO_COMECO_DO_ARQUIVO},
+        {**NO_REPOSITORIO, **LIDO_HOJE, "cd-2026.json": _texto_da_guarda(2026, {"100": 2, **CONFIRMADAS, "180": 1})},
+    ),
+    "nada a publicar": ({}, {"index.html": "refeita\n"}, NO_REPOSITORIO),
+    # Um arquivo que sumiu da cópia local e a sobra de uma gravação interrompida não vão ao repositório.
+    "um arquivo sumiu da cópia local": ({**LIDO_HOJE, "cd-2025.json": None, ".cd-2026.json.abc123.tmp": "pela metade"}, {"index.html": "refeita\n"}, {**NO_REPOSITORIO, **LIDO_HOJE}),
+}
+
+
+@precisa_de_git
+@pytest.mark.parametrize("caso", list(CASOS_DE_PUBLICAR))
+def test_publicar_a_leitura_nao_desfaz_nem_apaga_o_que_outro_enviou(plano, tmp_path: Path, caso: str):
+    """O passo "Publicar a leitura", rodado de verdade em repositórios locais: o do GitHub,
+    a cópia rasa da execução e a de outro, que envia enquanto a leitura lê. O commit da
+    leitura só toca a pasta da guarda; o que o outro enviou (dentro ou fora dela) chega ao
+    fim igual, sempre; e quando os dois mexeram nas mesmas linhas, a leitura não é publicada
+    (o passo avisa e termina sem erro)."""
+    gravado, enviado, no_fim = CASOS_DE_PUBLICAR[caso]
+    conflito = caso == "o remoto mexeu nas mesmas linhas da guarda"
+    ambiente = _ambiente_do_passo(tmp_path)
+
+    def git(onde: Path, *args: str) -> str:
+        return subprocess.run(["git", *args], cwd=onde, env=ambiente, check=True, capture_output=True, text=True, timeout=60).stdout
+
+    def gravar(repo: Path, arquivos: dict[str, str | None]) -> None:
+        for caminho, texto in arquivos.items():
+            destino = repo / caminho
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            if texto is None:
+                destino.unlink()
+            else:
+                destino.write_text(texto, encoding="utf-8")
+
+    def enviar(mensagem: str) -> None:
+        git(outro, "add", "--all")
+        git(outro, "commit", "--quiet", "-m", mensagem)
+        git(outro, "push", "--quiet", "origin", "main")
+
+    origem, runner, outro = tmp_path / "origin.git", tmp_path / "runner", tmp_path / "outro"
+    git(tmp_path, "init", "--quiet", "--bare", str(origem))
+    git(tmp_path, "clone", "--quiet", str(origem), str(outro))
+    gravar(outro, {"index.html": "hoje\n", "edicoes/latest.json": '{"date":"2026-11-17"}\n', "data/congresso/meta.json": '{"v":1}\n', **{f"{A_GUARDA}/{nome}": texto for nome, texto in NO_REPOSITORIO.items()}})
+    enviar("inicial")
+    git(tmp_path, "clone", "--quiet", "--depth", "1", origem.as_uri(), str(runner))  # raso, como o checkout do Actions
+    gravar(runner, {f"{A_GUARDA}/{nome}": texto for nome, texto in gravado.items()})
+    if enviado:
+        gravar(outro, enviado)
+        enviar("enviado por outro")
+    do_outro = git(origem, "rev-parse", "main").strip()
+
+    feito = _rodar(_passo(_da_leitura(), "Publicar a leitura (commit e push)")["run"], runner, tmp_path)
+    assert feito.returncode == 0, feito.stdout + feito.stderr
+    assert ("::warning::" in feito.stdout) is conflito
+    assert not (runner / ".git" / "rebase-merge").exists() and not (runner / ".git" / "rebase-apply").exists()
+    # A guarda no repositório, arquivo por arquivo; e o que o outro enviou, igual.
+    guarda_final = {nome: git(origem, "show", f"main:{A_GUARDA}/{nome}") for nome in git(origem, "ls-tree", "--name-only", f"main:{A_GUARDA}/").split()}
+    assert guarda_final == no_fim
+    for caminho, texto in enviado.items():
+        if conflito or not caminho.endswith("cd-2026.json"):  # no mesmo arquivo, em outras linhas, as duas mudanças se juntam
+            assert git(origem, "show", f"main:{caminho}") == texto, caminho
+    # A guarda que ficou é legível, linha por linha.
+    (tmp_path / "conferir" / "leitura").mkdir(parents=True)
+    gravar(tmp_path / "conferir" / "leitura", guarda_final)
+    conferida = _guarda(tmp_path / "conferir", plano)
+    assert (len(conferida), conferida.invalidas, conferida.ignorados) == (sum(len(json.loads(texto)["itens"]) for nome, texto in no_fim.items() if nome.startswith("cd-")), 0, [])
+    assert [d["data"] for d in _dias(tmp_path / "conferir")] == [ONTEM_NO_FLUXO, *([HOJE_NO_FLUXO] if gravado and not conflito else [])]
+    historico = git(origem, "log", "--format=%s", "main").splitlines()
+    if not gravado or conflito:
+        assert git(origem, "rev-parse", "main").strip() == do_outro and COMMIT_DA_LEITURA not in historico  # nada foi publicado
+    else:
+        assert historico == [COMMIT_DA_LEITURA, *(["enviado por outro"] if enviado else []), "inicial"]
+        assert git(origem, "rev-parse", "main~1").strip() == do_outro  # o commit da leitura vem por cima do que o outro enviou
+        mudou = git(origem, "show", "--format=", "--name-status", "main").split()
+        assert mudou == ["M", f"{A_GUARDA}/cd-2026.json", "M", f"{A_GUARDA}/{leitura.DIARIO}"]  # só a guarda; nenhuma remoção, nenhum arquivo temporário
+
+
+@precisa_de_git
+def test_publicar_a_leitura_sem_a_pasta_das_leituras_nao_e_erro(tmp_path: Path):
+    """Leitura desligada e pasta ainda fora do repositório: o passo termina sem erro e sem commit."""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    feito = _rodar("git init --quiet .\n" + _passo(_da_leitura(), "Publicar a leitura (commit e push)")["run"], repo, tmp_path)
+    assert feito.returncode == 0 and "nada a publicar" in feito.stdout, feito.stdout + feito.stderr
+    assert _rodar("git log --oneline\n", repo, tmp_path).returncode != 0  # nenhum commit

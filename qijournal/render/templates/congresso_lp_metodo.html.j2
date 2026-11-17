@@ -2,7 +2,8 @@
     por congresso.html.j2 no fim da seção "Como ler", só quando há c.lp). Tudo vem pronto de
     render/congresso_lp_metodo.py (c.lp.metodo): a premissa, os termos, a régua (os seis campos,
     a conta do peso, as faixas e as três marcas, do config), quem leu e a auditoria publicada
-    em meta.json, a cobertura, o que a régua não mede, os cinco erros de leitura e os limites.
+    em meta.json, a leitura de todo dia (como é feita e, se o registro veio, os números dela),
+    a cobertura, o que a régua não mede, os cinco erros de leitura e os limites.
     Nenhum nome de faixa, alavanca, marca ou código é escrito aqui: os rótulos vêm do config. -#}
 {% set Y = c.lp.metodo %}
     <div class="az-blk cg-lp-met" id="cg-lp-metodo">
@@ -64,17 +65,17 @@
         {% endfor %}
       </ol>
       {% endif %}
-      {% if A.estados %}<p class="cg-lp-met-x">{% if A.lidas %}Das {{ A.lidas }} proposições lidas: {% endif %}{{ A.estados }}.</p>{% endif %}
+      {% if A.estados %}<p class="cg-lp-met-x">{% if A.lidas %}Das {{ A.lidas }} proposições lidas{% if A.data %} até {{ A.data }}{% endif %}: {% endif %}{{ A.estados }}.</p>{% endif %}
       <div class="cg-lp-met-as">
         {% for b in A.blocos %}
         <div>
           <p class="cg-lp-met-k">{{ b.titulo }}</p>
           <p class="cg-lp-met-x">{{ b.texto }}</p>
           {% if b.tabela %}
-          <table class="an-tbl cg-tb cg-lp-met-c">
+          <div class="an-tbl-wrap"><table class="an-tbl cg-tb cg-lp-met-c">
             <thead><tr><th scope="col">Os dois leitores, lado a lado</th><th scope="col">Leituras iguais</th><th scope="col">Kappa</th></tr></thead>
             <tbody>{% for l in b.tabela %}<tr><th scope="row">{% if l.forte %}<b>{{ l.nome }}</b>{% else %}{{ l.nome }}{% endif %}</th><td>{{ l.igual }}</td><td>{{ l.kappa }}</td></tr>{% endfor %}</tbody>
-          </table>
+          </table></div>
           <p class="az-dek">Kappa: a concordância já descontado o que dois leitores acertariam por acaso (1 é concordância total; 0, só acaso).{% if b.depois %} {{ b.depois }}{% endif %}</p>
           {% endif %}
         </div>
@@ -83,6 +84,8 @@
       {% else %}
       <p class="cg-lp-met-x">A auditoria da leitura não veio nesta atualização.</p>
       {% endif %}
+      <p class="cg-lp-met-k" id="cg-lp-diaria">A leitura de todo dia</p>
+      <p class="cg-lp-met-x">{{ Y.diaria.como }}{% if Y.diaria.numeros %} <b>{{ Y.diaria.numeros }}</b>{% endif %}{% if Y.diaria.quem %} {{ Y.diaria.quem }}{% endif %}</p>
       <p class="cg-lp-av"><b class="cg-lp-av-k">O que isto mede</b> Tudo isto {{ Y.constancia }}. Dois leitores de IA que concordam podem errar juntos.</p>
 
       {% if Y.cobertura %}
@@ -95,7 +98,7 @@
           {% endfor %}
         </tbody>
       </table></div>
-      <p class="az-dek">Nas três últimas colunas: com leitura, de quantas. Sem leitura: a ementa não permite dizer um dos três fatores do peso, ou os leitores não se entenderam.</p>
+      <p class="az-dek">Nas três últimas colunas: com leitura, de quantas. Sem leitura: a ementa não permite dizer um dos três fatores do peso, ou os leitores não se entenderam.{% for l in Y.cobertura if l.nota %} {{ l.nota }}{% endfor %}</p>
       {% endif %}
 
       <h5 class="cg-lp-met-h">O que a régua não mede <span>e cinco jeitos de ler errado</span></h5>

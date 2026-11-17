@@ -1,6 +1,7 @@
 {#- Aba Congresso: a visão por parlamentar (incluído por congresso.js.j2, dentro da mesma função,
-    só quando há c.lp). O interruptor "Ver por" (as abas de cada visão; a visão não entra no
-    endereço: sai da aba), o que as vistas novas têm em comum (os rótulos do manifesto, o leitor
+    só quando há c.lp). O interruptor "Ver por" (as abas de cada visão; a visão sai da vista
+    do endereço e, no "Como ler", que é das duas, do próprio endereço: #v=metodo ou
+    #cg-lp-metodo), o que as vistas novas têm em comum (os rótulos do manifesto, o leitor
     de arquivos sob demanda, a Janela, a pessoa em foco e a alavanca, que atravessam as vistas) e
     as duas primeiras: "Os projetos" (#v=projetos) e "Quem propõe" (#v=autores).
     Os pontos vêm de projetos-<casa>.json e autores-<casa>.json quando a vista abre; o HTML já
@@ -14,7 +15,7 @@
   var lpVistas = {};  // vista → Casa → { abrir(), doEndereco(parâmetros), casaMudou() }
 
   /* O interruptor "Ver por": as abas de hoje são a visão "partido"; as novas, a visão "pessoa". */
-  var lenteEl = d.getElementById('cgLente'), fraseDaBarra = d.getElementById('cgCasasN');
+  var lenteEl = d.getElementById('cgLente'), blocoDaLeitura = d.getElementById('cg-lp-metodo');
   var LENTE = {}, lenteAtual = 'partido', carregando = true;
   if (nav) lista(nav.querySelectorAll('ul')).forEach(function (ul) {
     var l = ul.getAttribute('data-lente') || 'partido';
@@ -31,32 +32,65 @@
     if (lenteEl) lista(lenteEl.querySelectorAll('button')).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lente') === l ? 'true' : 'false'); });
     guardar('qij-lente', l);
   }
+  /* "Como ler" é das duas visões, e o endereço diz de qual: #v=metodo (e as âncoras antigas da seção) abre o da visão por
+     partido, como sempre abriu; #cg-lp-metodo (o bloco da leitura dos projetos, ou uma âncora de dentro dele) abre o da visão
+     por parlamentar. Assim cada entrada do histórico diz de que visão é, e o voltar do navegador devolve a barra dela. */
+  function lenteDoEndereco() {
+    var alvo = d.getElementById((w.location.hash || '').slice(1));
+    return alvo && blocoDaLeitura && blocoDaLeitura.contains(alvo) ? 'pessoa' : 'partido';
+  }
+  function enderecoDe(vista, l) { return LENTE[vista] === 'ambas' && l === 'pessoa' && blocoDaLeitura ? '#cg-lp-metodo' : '#v=' + vista; }
+  /* O "Como ler" da visão por parlamentar: a seção de sempre, no bloco da leitura dos projetos (no fim dela). */
+  function lpComoLer() {
+    verVista('metodo');
+    if (blocoDaLeitura) blocoDaLeitura.scrollIntoView();
+  }
   aoTrocarVista = function (nome) {
-    if (LENTE[nome] && LENTE[nome] !== 'ambas' && LENTE[nome] !== lenteAtual) verLente(LENTE[nome]);
+    var l = LENTE[nome] === 'ambas' ? lenteDoEndereco() : LENTE[nome];
+    if (l && l !== lenteAtual) verLente(l);
     if (!(carregando && nome === vistaPadrao)) guardar('qij-vista-' + lenteAtual, nome);
   };
-  w.setTimeout(function () { carregando = false; }, 0);
+  /* Enquanto a página carrega, a vista padrão não é guardada (ela aparece antes de o endereço dizer qual é a vista, e
+     apagaria a da visão por partido quando o endereço é de uma vista da outra). Carregada a página, guarda-se a vista que
+     ficou na tela: sem isto, "Partido" devolvia a vista de uma visita anterior na mesma aba, e não a que a pessoa via. */
+  w.setTimeout(function () {
+    carregando = false;
+    if (vistaAtual) guardar('qij-vista-' + lenteAtual, vistaAtual);
+  }, 0);
+  /* A primeira linha da barra fica mais alta onde o interruptor desce de linha (no celular, sempre). A margem de rolagem das
+     âncoras cresce o mesmo tanto (--cg-lp-barra, em congresso_lp.css.j2): o alvo de um endereço antigo (#cg-rachas-cd) para
+     com a folga de sempre abaixo da barra, e não debaixo dela. */
+  function lpBarra() {
+    var linha = lenteEl.parentNode, antes = casas && !casas.hidden ? casas.offsetHeight : 0;
+    root.style.setProperty('--cg-lp-barra', Math.max(0, linha.offsetHeight - antes) + 'px');
+  }
   if (lenteEl && abas.length) {
     lenteEl.hidden = false;
-    if (fraseDaBarra) fraseDaBarra.hidden = !casas || casas.hidden;
     verLente('partido');
+    lpBarra();
+    w.addEventListener('resize', lpBarra);
+    if (d.fonts && d.fonts.ready && d.fonts.ready.then) d.fonts.ready.then(lpBarra);  // a letra da página chega depois e muda as larguras
     lenteEl.addEventListener('click', function (event) {
       var b = event.target && event.target.closest ? event.target.closest('button[data-lente]') : null, l = b ? b.getAttribute('data-lente') : '';
       if (!l || l === lenteAtual) return;
       var destino = guardado('qij-vista-' + l);
       if (!destino || (LENTE[destino] !== l && LENTE[destino] !== 'ambas')) destino = l === 'pessoa' ? (LPM.abas || [])[0] : vistaPadrao;
       if (!destino) return;
-      if (w.history && w.history.pushState) w.history.pushState(null, '', '#v=' + destino);
+      if (!(w.history && w.history.pushState)) { w.location.hash = enderecoDe(destino, l).slice(1); return; }
+      w.history.pushState(null, '', enderecoDe(destino, l));
       verLente(l);
-      verVista(destino);
+      if (LENTE[destino] === 'ambas' && l === 'pessoa') lpComoLer(); else verVista(destino);
     });
   }
-
-  /* "Como ler", na visão por parlamentar, leva ao bloco da leitura dos projetos (no fim da seção que já existia). */
+  /* A aba "Como ler" da visão por parlamentar grava o endereço dela (#cg-lp-metodo), e não #v=metodo, que é o da visão por
+     partido: o ouvinte vem antes do das abas de sempre (fase de captura), e a troca não passa por ele. */
   if (nav) nav.addEventListener('click', function (event) {
-    var a = event.target && event.target.closest ? event.target.closest('a[href="#cg-lp-metodo"]') : null, alvo = d.getElementById('cg-lp-metodo');
-    if (a && alvo) alvo.scrollIntoView();
-  });
+    var a = event.target && event.target.closest ? event.target.closest('a[href="#cg-lp-metodo"]') : null;
+    if (!a || !blocoDaLeitura) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (w.history && w.history.pushState) { w.history.pushState(null, '', '#cg-lp-metodo'); lpComoLer(); } else w.location.hash = 'cg-lp-metodo';
+  }, true);
 
   /* ── O que as vistas novas têm em comum ── */
   var lpCache = {}, lpFila = {};
@@ -141,14 +175,23 @@
     b.hidden = false;
     b.addEventListener('click', function () { var ls = b.parentNode.querySelector('.cg-lp-ls'); if (ls) ls.classList.add('cg-lp-ab'); b.hidden = true; });
   });
-  /* Os links "→" entre as vistas (com a pessoa em foco) e a linha "A seguir". */
-  root.addEventListener('click', function (event) {
-    var a = event.target && event.target.closest ? event.target.closest('a[data-lp-ir]') : null;
-    if (!a) return;
+  /* O começo da vista aberta, logo abaixo da barra fixa (onde a troca de aba também deixa a página). */
+  function lpAoComeco() {
+    var ativa = root.querySelector('.cg-vista.on');
+    w.scrollTo(0, ativa && barraFixa ? Math.max(0, w.pageYOffset + ativa.getBoundingClientRect().top - barraFixa.offsetHeight) : 0);
+  }
+  /* A linha "A seguir" e os links "→" entre as vistas (a.cg-lp-ir: os dos cartões, o da frase de "Pessoa ou partido?" e o
+     "Perfil pelos projetos" do dossiê, que fica fora de root): a vista de destino abre no começo, com a pessoa em foco.
+     Sem isto a troca pelo endereço não rola, e a página ficava onde estava: no meio ou no fim da vista nova. */
+  d.addEventListener('click', function (event) {
+    var a = event.target && event.target.closest ? event.target.closest('a[data-lp-ir], a.cg-lp-ir') : null, destino;
+    if (!a || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    if (a.hasAttribute('data-lp-ir')) destino = '#v=' + a.getAttribute('data-lp-ir') + '&c=' + (lpCasaDaVez() || 'cd') + (LP.quem ? '&quem=' + LP.quem : '') + (LP.eixo ? '&eixo=' + LP.eixo : '');
+    else destino = a.getAttribute('href') || '';
+    if (!/^#v=[a-z]+/.test(destino)) return;
     event.preventDefault();
     event.stopPropagation();
-    var destino = '#v=' + a.getAttribute('data-lp-ir') + '&c=' + (lpCasaDaVez() || 'cd') + (LP.quem ? '&quem=' + LP.quem : '') + (LP.eixo ? '&eixo=' + LP.eixo : '');
-    if (w.history && w.history.pushState) { w.history.pushState(null, '', destino); doEndereco(); w.scrollTo(0, 0); } else w.location.hash = destino.slice(1);
+    if (w.history && w.history.pushState) { w.history.pushState(null, '', destino); doEndereco(); lpAoComeco(); } else w.location.hash = destino.slice(1);
   }, true);
   function lpVista(nome) {
     lpVistas[nome] = {};
@@ -238,7 +281,7 @@
         var i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
         ant.disabled = !n || i === 0;
         prox.disabled = !n || i === n - 1;
-        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? ' realçados' : ' projetos') : 'nada realçado';
+        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : (n === 1 ? ' projeto' : ' projetos')) : 'nada realçado';
         else if (i < 0) posEl.textContent = emFoco.t + ' · fora do realce (' + num(n) + (n === 1 ? ' realçado)' : ' realçados)');
         else posEl.textContent = emFoco.t + ' · ' + num(i + 1) + ' de ' + num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : '');
       }
@@ -534,6 +577,8 @@
     var MINIMO = LPC.min_proj || 10, MEDIDAS = {}, NS = 'http://www.w3.org/2000/svg';
     /* As medidas do funil e a coluna de onde sai a contagem de cada uma vêm das contas (M.lp.funil): a parte do topo conta só o confirmado. */
     (LPM.funil || [['topo', 'estr'], ['sb', 'sb']]).forEach(function (par) { MEDIDAS[par[0]] = [par[1], 'fz_' + par[0]]; });
+    /* Só o que as contas puseram em MEDIDAS: um nome herdado de Object ("constructor", "toString") no endereço não é medida. */
+    function eMedida(med) { return Object.prototype.hasOwnProperty.call(MEDIDAS, med); }
     function s(tag, attrs, texto) {
       var el = d.createElementNS(NS, tag), k;
       for (k in attrs || {}) if (attrs[k] != null) el.setAttribute(k, attrs[k]);
@@ -585,7 +630,7 @@
         var i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
         ant.disabled = !n || i === 0;
         prox.disabled = !n || i === n - 1;
-        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? ' realçados' : ' ' + UNS + ' no gráfico') : 'ninguém realçado';
+        if (!emFoco) posEl.textContent = n ? num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : ' ' + (n === 1 ? UM : UNS) + ' no gráfico') : 'ninguém realçado';
         else if (i < 0) posEl.textContent = emFoco.nome + ' · fora do ' + (emFoco.n < MINIMO ? 'gráfico' : 'realce') + ' (' + num(n) + ')';
         else posEl.textContent = emFoco.nome + ' · ' + num(i + 1) + ' de ' + num(n) + (temFiltro() ? (n === 1 ? ' realçado' : ' realçados') : '');
       }
@@ -706,7 +751,7 @@
           st.textContent = 'Nesta medida, nenhum ' + UM + ' sai da faixa cinza: a diferença de cada um para a Casa não se distingue do acaso. Por isso nenhum nome vai escrito no gráfico.';
           /* Se na outra medida alguém sai da faixa, a frase leva até lá: o gráfico todo cinza não é o fim da resposta. */
           meds.forEach(function (b) {
-            var med = b.getAttribute('data-med'), saem = MEDIDAS[med] && med !== F.med ? Q.filter(function (q) { return q.n >= MINIMO && fora(q, med); }).length : 0;
+            var med = b.getAttribute('data-med'), saem = eMedida(med) && med !== F.med ? Q.filter(function (q) { return q.n >= MINIMO && fora(q, med); }).length : 0;
             if (!saem) return;
             st.appendChild(d.createTextNode(' Na outra medida, ' + (saem === 1 ? '1 sai' : num(saem) + ' saem') + ': '));
             st.appendChild(h('button', { type: 'button', cls: 'cg-pa-limpa cg-lp-outra', text: 'ver ' + b.textContent.replace(/^./, function (c) { return c.toLowerCase(); }) })).addEventListener('click', function () { trocarMedida(med); aplicar(); });
@@ -802,7 +847,7 @@
         var foraDosNumeros = [];
         if (q.rp) foraDosNumeros.push(num(q.rp) + ' com ementa igual à de proposição anterior');
         if (q.bc) foraDosNumeros.push(num(q.bc) + ' de bancada');
-        if (q.sl) foraDosNumeros.push(lpDec(q.sl) + '% dos ' + num(q.tot) + ' sem leitura');
+        if (q.sl) foraDosNumeros.push(q.tot === 1 ? '1 sem leitura' : lpDec(q.sl) + '% dos ' + num(q.tot) + ' sem leitura');
         if (foraDosNumeros.length) nos.push(h('ul', { cls: 'cg-lp-tx' }, [linhaDeTexto(['Ficam fora dos números: ' + foraDosNumeros.join(' · ') + '.'])]));
         if (q.saldo != null || q.fid != null || q.pres != null) {
           nos.push(h('p', { cls: 'cg-pa-c-h', text: 'No voto (da visão por partido)' }));
@@ -812,12 +857,14 @@
         if (q.topo) { saidas.push(' · '); saidas.push(lpIr('projetos', q.k, 'Os projetos dele nas portas →')); }
         if ((LPM.abas || []).indexOf('decide') >= 0) { saidas.push(' · '); saidas.push(lpIr('decide', q.k, 'Como vota quando pesa →')); }
         nos.push(h('p', { cls: 'cg-pa-c-l' }, saidas));
-        if (q.tot) nos.push(todosOsProjetos(q));
+        if (q.tot + (q.rp || 0) + (q.bc || 0)) nos.push(todosOsProjetos(q));
         return nos;
       }
-      /* "Todos os projetos": autoria/<casa>-<id>.json, lido quando alguém abre. */
+      /* "Todos os projetos": autoria/<casa>-<id>.json, lido quando alguém abre. A lista traz também os que ficam fora
+         dos números (ementa repetida e de bancada): o título conta todas as linhas dela. */
       function todosOsProjetos(q) {
-        var caixa = h('div', { cls: 'an-tbl-wrap' }), det = h('details', { cls: 'cg-lp-todos' }, [h('summary', { text: 'Todos os ' + num(q.tot) + ' projetos, com a leitura de cada um' }), caixa]), feito = false;
+        var todos = q.tot + (q.rp || 0) + (q.bc || 0), caixa = h('div', { cls: 'an-tbl-wrap' }), feito = false;
+        var det = h('details', { cls: 'cg-lp-todos' }, [h('summary', { text: todos === 1 ? 'O único projeto, com a leitura dele' : 'Todos os ' + num(todos) + ' projetos, com a leitura de cada um' }), caixa]);
         det.addEventListener('toggle', function () {
           if (!det.open || feito) return;
           feito = true;
@@ -922,7 +969,7 @@
 
       /* ── A medida, os filtros, os números e a busca ── */
       function trocarMedida(med) {
-        if (!MEDIDAS[med] || med === F.med) return;
+        if (!eMedida(med) || med === F.med) return;
         F.med = med;
         desenhar();
       }
@@ -993,7 +1040,7 @@
         var p = pendente;
         pendente = null;
         if (p) {
-          trocarMedida(MEDIDAS[p.med] ? p.med : 'topo');
+          trocarMedida(eMedida(p.med) ? p.med : 'topo');
           F = { med: F.med, pt: Q.some(function (q) { return q.pt === p.pt; }) ? p.pt : '', uf: /^[A-Z]{2}$/.test(p.uf || '') ? p.uf : '', tem: p.tem === '1', acima: p.acima === '1' };
           LP.eixo = lpRotulo(LPM.eixos, p.eixo) ? p.eixo : '';
           LP.quem = /^(cd|sf)-\d+$/.test(p.quem || '') && p.quem.slice(0, 2) === casa ? p.quem : '';

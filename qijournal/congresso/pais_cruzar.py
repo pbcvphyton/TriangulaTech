@@ -1,9 +1,10 @@
 """Pessoa ou partido? Quanto o partido explica de cada medida, e o que anda junto.
 
 Para cada medida de cada parlamentar em exercício (as que a página já tem: de que lado vota,
-governismo, fidelidade, presença, cota, número de propostas; e as da leitura dos projetos:
-parte do topo (só o confirmado por duas leituras), parte da faixa mínima, mediana do peso,
-saldo de contas, taxa de exceção e voto fiscal), três números:
+governismo, fidelidade, presença e cota; quantos projetos apresentou **na legislatura**, do
+perfil de quem propõe; e as da leitura dos projetos: parte do topo (só o confirmado por duas
+leituras), parte da faixa mínima, mediana do peso, saldo de contas, taxa de exceção e voto
+fiscal), três números:
 
 - **quanto o partido explica** (``e2``, em %): da variação entre pessoas, a parte que fica
   entre os partidos, já descontado o que qualquer divisão em tantos grupos explicaria
@@ -17,7 +18,9 @@ Os sorteios saem de um gerador semeado com ``cruzar.semente``, a Casa e a medida
 dados, o resultado é o mesmo de um dia para o outro, e uma medida não muda porque outra entrou.
 
 ``zona``: ``quase_tudo`` (do corte alto de ``cruzar.zonas`` para cima), ``parte`` ou ``pouco``.
-``distingue`` é falso quando o intervalo encosta no acaso. **Potência**: com menos de
+``distingue`` é falso quando o intervalo encosta no acaso. As duas saem dos números
+**publicados** (com uma casa): a palavra e a cor nunca contradizem o número que a página
+mostra (:func:`publicado`). **Potência**: com menos de
 ``limiares.pessoas_minimo`` pessoas no mínimo da medida, não há número: a zona é
 ``sem_como_dizer`` ("não dá para responder por pessoa").
 
@@ -41,6 +44,7 @@ from . import pais_estat as estat
 from .regras import ProjetoDePais
 
 ALFA_PARES = 0.01  # "passa do acaso": 99%, contando todos os pares (Holm)
+PERCENTIL_DO_ACASO = 95.0  # "o que daria por acaso": o valor que tantos de cada 100 embaralhamentos dos partidos não passam (a tela diz o número)
 OUTROS = "Outros"
 SEM_COMO_DIZER = "sem_como_dizer"
 VOTO, PROJETOS, GABINETE = "voto", "projetos", "gabinete"
@@ -70,7 +74,9 @@ MEDIDAS: tuple[tuple[str, str, Callable[[Linha, ProjetoDePais], float | None]], 
     ("gov", VOTO, _coluna("gov")),  # governismo
     ("vf", VOTO, _voto_fiscal),  # voto fiscal (limiares.voto_minimo votos ou mais)
     ("fid", VOTO, _coluna("fid")),  # fidelidade ao partido
-    ("prop", PROJETOS, _coluna("prop", 0)),  # quantos projetos apresenta (o número que a página já tem)
+    # quantos projetos apresentou na legislatura: os PL, PLP e PEC de autoria principal do perfil, lidos ou não ("tot"),
+    # a mesma janela das outras medidas. Não é o "prop" do dossiê, que soma as legislaturas anteriores (desde 2011 ou antes).
+    ("prop", PROJETOS, _coluna("tot", 0)),
     ("topo", PROJETOS, _parte("estr", lambda regua: regua.limiares.perfil_minimo)),  # parte do topo: só o confirmado ("estr"), como no funil
     ("sb", PROJETOS, _parte("sb", lambda regua: regua.limiares.perfil_minimo)),  # parte da faixa mínima
     ("tip", PROJETOS, _coluna("tip")),  # mediana do peso
@@ -108,15 +114,22 @@ def medida(ident: str, grupo: str, x: list[float | None], partidos: list[str], r
         return {**saida, "motivo": "sem_variacao"}
     cfg = regua.cruzar
     ic = estat.eta2_intervalo(vals, grupos, reamostras=cfg.reamostras, gerador=random.Random(f"{cfg.semente}:{casa}:{ident}:reamostra"), confianca=regua.limiares.confianca)
-    acaso = estat.eta2_acaso(vals, grupos, permutacoes=cfg.permutacoes, gerador=random.Random(f"{cfg.semente}:{casa}:{ident}:permuta"))
-    saida.update(
-        e2=round(100.0 * e2, 1),
-        ic=[round(100.0 * ic[0], 1), round(100.0 * ic[1], 1)] if ic else None,
-        acaso=round(100.0 * acaso, 1) if acaso is not None else None,
-        zona=zona(100.0 * e2, cfg.zonas),
-        distingue=bool(ic and acaso is not None and ic[0] > acaso),
-    )
+    acaso = estat.eta2_acaso(vals, grupos, permutacoes=cfg.permutacoes, gerador=random.Random(f"{cfg.semente}:{casa}:{ident}:permuta"), percentil_do_acaso=PERCENTIL_DO_ACASO)
+    saida.update(publicado(e2, ic, acaso, cfg.zonas))
     return saida
+
+
+def publicado(e2: float, ic: tuple[float, float] | None, acaso: float | None, zonas: tuple[float, float]) -> dict[str, Any]:
+    """Os números de uma medida como vão ao arquivo (em %, com uma casa), e o que se decide
+    com eles: a ``zona`` e ``distingue`` saem do número **publicado**, não do exato. 69,96 é
+    publicado como 70,0 e fica na zona de 70 para cima; um intervalo que começa em 2,44, com
+    o acaso em 2,36, é publicado como 2,4 contra 2,4 e encosta. Assim quem lê o arquivo, ou a
+    página, nunca vê um número de um lado do corte com a palavra do outro (e :func:`frase`,
+    que decide pelos mesmos números publicados, diz o mesmo que a barra)."""
+    e2_pub = round(100.0 * e2, 1)
+    ic_pub = [round(100.0 * ic[0], 1), round(100.0 * ic[1], 1)] if ic else None
+    acaso_pub = round(100.0 * acaso, 1) if acaso is not None else None
+    return {"e2": e2_pub, "ic": ic_pub, "acaso": acaso_pub, "zona": zona(e2_pub, zonas), "distingue": bool(ic_pub and acaso_pub is not None and ic_pub[0] > acaso_pub)}
 
 
 def frase(medidas: list[dict[str, Any]], zonas: tuple[float, float]) -> dict[str, Any]:

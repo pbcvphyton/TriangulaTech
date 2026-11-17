@@ -3,10 +3,10 @@
 As proposições que existiam foram lidas de uma vez, por fora, e estão na guarda
 (:mod:`qijournal.congresso.leitura`). Todo dia chegam proposições novas e matérias novas vão
 a voto: este módulo as lê com a cadeia de IAs do jornal (a mesma da edição e do Termômetro:
-``llm.providers``, cada editor com a sua chave) e grava na mesma guarda. Na edição diária,
-roda por último, com a edição já publicada: a edição usa as IAs primeiro e não espera a
-leitura, e o que for lido entra nas contas na atualização seguinte do Congresso. No fluxo
-manual do Congresso, roda logo antes da atualização. Uma rodada:
+``llm.providers``, cada editor com a sua chave) e grava na mesma guarda. No GitHub, roda num
+fluxo à parte (``.github/workflows/leitura.yml``), que dispara quando a edição diária
+termina: a edição, o e-mail e o Instagram não esperam a leitura, a edição usa as IAs
+primeiro, e o que for lido entra nas contas na atualização seguinte do Congresso. Uma rodada:
 
 1. **o que ler** (:func:`escolher`): do universo de que as contas precisam
    (:func:`leitura.coletar`), primeiro as proposições sem leitura (as matérias votadas; depois
@@ -19,16 +19,31 @@ manual do Congresso, roda logo antes da atualização. Uma rodada:
    (:func:`leitura.bloco`: id opaco, tipo, ementa, ementa detalhada, palavras-chave e tema;
    nunca número, autor, partido nem origem), com algumas **perguntas de controle** misturadas
    sem aviso (``config/leitura_referencia.jsonl``: proposições reais que dois leitores
-   classificaram igual; quais entram sai da data e do número do lote). A saída vem num esquema
+   classificaram igual; quais entram sai da data e do número do lote, sem repetir no dia e
+   com no máximo ``controles_minimo`` − 1 da mesma faixa por lote, para que responder a
+   mesma coisa a tudo nunca baste: :meth:`Rodada.controles_do_lote`). A saída vem num esquema
    JSON e cada item passa por :func:`leitura.validar`;
 3. **a nota do lote**: nos controles, em quantos a faixa (pela fórmula) é a da referência.
    Abaixo do mínimo, o lote inteiro é descartado: nada dele vai à guarda. No lote aceito,
    guarda-se o que veio válido; o que faltou ou veio fora do formato fica para a próxima rodada;
-4. **segunda leitura**: uma chamada nova, que não vê a primeira (de outro editor da cadeia,
-   se houver, quando a primeira foi desta rodada). Mesma faixa: a leitura está confirmada
-   (``r`` = 2). Faixas diferentes: uma terceira chamada decide pela regra dos três
-   (:func:`leitura.conciliar`: ``r`` = 3, ou 0 se os três divergem); sem terceira possível
-   hoje, a leitura fica como estava (``r`` = 1) e volta amanhã;
+4. **segunda leitura**: uma chamada nova, que não vê a primeira. Quando a primeira foi desta
+   rodada, vai a outro editor da cadeia, se houver. Quando é de outra rodada, a guarda não
+   diz que editor a fez: a segunda evita o primeiro da cadeia (o que costuma fazer as
+   primeiras leituras), sem garantia de que seja outro, e o registro conta essas à parte
+   (``de_outra_rodada``). Mesma faixa: a leitura está confirmada (``r`` = 2). Faixas
+   diferentes: uma terceira chamada decide pela regra dos três (:func:`leitura.conciliar`:
+   ``r`` = 3, ou 0 se os três divergem), de um editor que ainda não leu a proposição, se
+   houver; a segunda feita por quem fez a primeira na rodada entra em ``mesmo_editor``, e a
+   terceira feita por quem se sabe que já tinha lido a proposição, em
+   ``terceira_de_quem_leu`` (da primeira leitura de outra rodada não se sabe o editor). Sem
+   terceira possível hoje, a leitura fica como estava (``r`` = 1) e a segunda, que
+   divergiu, fica guardada com quem a fez (``a_decidir.json``, na pasta da guarda:
+   :func:`leitura.abrir_a_decidir`). Na rodada seguinte não se pede outra segunda: a
+   leitura nova é a terceira, e vale a regra dos três. Assim só sai confirmado o que os
+   leitores disseram igual, com todas as leituras feitas na conta (sem isso, a segunda que
+   divergia era esquecida e pedida de novo a cada dia, até uma concordar). Na matéria
+   votada, a marca do caixa só vale se os leitores da faixa disseram a mesma
+   (:func:`leitura.conciliar`);
 5. **limites** (``projeto_de_pais.leitura.diaria``, em ``config/congresso.yaml``): teto de
    primeiras e de segundas leituras, tamanho do lote, prazo e teto de chamadas. A guarda é
    gravada a cada lote: prazo estourado ou rodada interrompida não perdem o que já foi lido;
@@ -41,7 +56,10 @@ Nada aqui derruba a atualização nem a edição: sem chave de IA, a rodada regi
 nada lido"; chamada que falha, lote descartado e resposta fora do formato viram contagem e
 aviso. Só configuração quebrada é erro (:class:`ErroDeConfiguracao`). Nenhuma leitura
 gravada é apagada: a rodada só acrescenta primeiras leituras e muda o estado (``r``) das
-que relê.
+que relê, e não regrava o arquivo da guarda que não leu inteiro (de outra versão das
+instruções, ilegível, ou com linha que não valida): as proposições dele esperam o conserto.
+O mesmo vale para ``a_decidir.json``: se não for lido inteiro, a rodada não o regrava e não
+faz segundas leituras.
 """
 
 from __future__ import annotations
@@ -286,8 +304,8 @@ def classe_da_primeira(item: Item) -> int:
 def faltam_ler(itens: Mapping[str, Mapping[str, Item]], guarda: leitura.Guarda, *, bloqueados: Collection[str] = ()) -> tuple[list[Item], int]:
     """As proposições do universo sem leitura na guarda, na ordem em que serão lidas, e
     quantas ficam de fora por não ter ementa (não há o que ler). ``bloqueados``: os arquivos
-    da guarda que não foram lidos (de outra versão das instruções, ou ilegíveis): a rodada
-    não grava por cima deles, e as proposições deles ficam de fora."""
+    da guarda que a rodada não regrava (de outra versão das instruções, ilegíveis, ou com
+    linha que não valida): as proposições deles ficam de fora."""
     todas = [i for casa in sorted(itens) for i in leitura.faltam(itens[casa], guarda) if leitura.arquivo(Path(), i.casa, i.ano).name not in bloqueados]
     return em_ordem((i for i in todas if i.ementa), classe_da_primeira), sum(1 for i in todas if not i.ementa)
 
@@ -363,12 +381,15 @@ class Registro:
     decididas: int = 0  # divergentes que a terceira leitura decidiu: r = 3
     instaveis: int = 0  # três leituras, três faixas: r = 0
     invalidas: int = 0  # em lotes aceitos, proposições sem resposta ou com resposta fora do formato
-    mesmo_editor: int = 0  # segundas leituras feitas pelo mesmo editor da primeira desta rodada (não havia outro)
+    mesmo_editor: int = 0  # segundas leituras feitas pelo editor que fez a primeira nesta rodada (não havia outro); nunca passa de ``segundas``
+    terceira_de_quem_leu: int = 0  # terceiras leituras feitas por um editor que se sabe que já tinha lido a proposição (a segunda, ou a primeira feita na rodada da segunda; da primeira de outra rodada a guarda não diz o editor, e ela não entra aqui): "duas de três" pode ser ele duas vezes
+    de_outra_rodada: int = 0  # segundas leituras de primeira que não é desta rodada: a guarda não diz que editor a fez (pode ter sido o mesmo)
     chamadas: int = 0  # chamadas à cadeia de IAs
     tokens_entrada: int = 0
     tokens_saida: int = 0
     pendentes_primeiras: int = 0  # o que ficou sem a primeira leitura
     pendentes_segundas: int = 0  # o que ficou à espera da segunda
+    pendentes_terceiras: int = 0  # dessas, as que já tiveram a segunda, em outra faixa, e esperam a terceira (a_decidir.json)
     provedor: str = ""  # os editores que responderam, na ordem: "gemini → gemini_lite"
     modelo: str = ""  # os modelos deles: "a + b"
     motivo: str = ""  # por que a rodada não leu, ou parou antes do fim
@@ -400,9 +421,11 @@ def linha(registro: Registro) -> dict[str, Any]:
         "instaveis": registro.instaveis,
         "invalidas": registro.invalidas,
         "mesmo_editor": registro.mesmo_editor,
+        "terceira_de_quem_leu": registro.terceira_de_quem_leu,
+        "de_outra_rodada": registro.de_outra_rodada,
         "chamadas": registro.chamadas,
         "tokens": {"entrada": registro.tokens_entrada, "saida": registro.tokens_saida},
-        "pendentes": {"primeiras": registro.pendentes_primeiras, "segundas": registro.pendentes_segundas},
+        "pendentes": {"primeiras": registro.pendentes_primeiras, "segundas": registro.pendentes_segundas, "terceiras": registro.pendentes_terceiras},
         "provedor": registro.provedor,
         "modelo": registro.modelo,
         "motivo": registro.motivo,
@@ -527,20 +550,41 @@ class Rodada:
         return max(1, min(self.plano.limites.lote, cabem))
 
     def controles_do_lote(self, numero: int, itens: Sequence[Item]) -> list[Controle]:
-        """As perguntas de controle do lote ``numero`` do dia: as seguintes da lista embaralhada
-        pela data (a mesma data e o mesmo número dão as mesmas perguntas), pulando a que for
-        uma das proposições do lote."""
-        quantos = min(self.plano.limites.controles, len(self._ordem_dos_controles))
+        """As perguntas de controle do lote ``numero`` do dia (a mesma data e o mesmo número dão
+        as mesmas perguntas). Saem de uma fila, a lista embaralhada pela data: cada lote leva
+        as seguintes da fila, sem passar de ``controles_minimo`` − 1 perguntas da mesma faixa
+        (mais da metade das perguntas cai numa faixa só; com esse teto, quem responde a mesma
+        coisa para tudo nunca chega ao mínimo de acertos). A que estouraria o teto da faixa
+        fica na fila para os lotes seguintes, e nenhuma se repete no dia enquanto a fila
+        completa os lotes; quando não completa, a lista dá outra volta. A pergunta que for uma
+        das proposições do lote é pulada."""
+        limites, ordem = self.plano.limites, self._ordem_dos_controles
+        quantos = min(limites.controles, len(ordem))
+        teto = max(1, limites.controles_minimo - 1) if limites.controles_minimo else quantos
         do_lote = {(i.casa, i.chave) for i in itens}
-        escolhidos: list[Controle] = []
-        comeco = (numero - 1) * quantos
-        for k in range(len(self._ordem_dos_controles)):
-            if len(escolhidos) == quantos:
-                break
-            controle = self._ordem_dos_controles[(comeco + k) % len(self._ordem_dos_controles)]
-            if (controle.item.casa, controle.item.chave) not in do_lote:
-                escolhidos.append(controle)
-        return escolhidos
+        fila = list(range(len(ordem)))  # posições na lista do dia
+        escolhidos: list[int] = []
+        for n in range(1, numero + 1):  # os lotes anteriores gastam a fila do mesmo jeito, seja qual for a ordem das chamadas
+            escolhidos = []
+            por_faixa: dict[str, int] = {}
+            # 1: o que está na fila; 2: a lista dá outra volta; 3: sem o teto (a lista não tem como respeitá-lo).
+            for passada in (1, 2, 3):
+                if passada == 2:
+                    fila += [k for k in range(len(ordem)) if k not in fila]
+                for k in fila:
+                    if len(escolhidos) == quantos:
+                        break
+                    controle = ordem[k]
+                    if k in escolhidos or (n == numero and (controle.item.casa, controle.item.chave) in do_lote):
+                        continue
+                    if passada < 3 and por_faixa.get(controle.faixa, 0) >= teto:
+                        continue
+                    escolhidos.append(k)
+                    por_faixa[controle.faixa] = por_faixa.get(controle.faixa, 0) + 1
+                if len(escolhidos) == quantos:
+                    break
+            fila = [k for k in fila if k not in escolhidos]
+        return [ordem[k] for k in escolhidos]
 
     def montar(self, numero: int, itens: Sequence[Item]) -> tuple[list[tuple[str, Item, Controle | None]], str]:
         """O lote ``numero``: as proposições e os controles misturados numa ordem que sai da
@@ -668,7 +712,7 @@ def ler_universo(
 
     ``pasta``: ``data/congresso``. ``editores``: os editores por IA, na ordem da cadeia, ou
     uma função que os monta e diz o motivo quando não há nenhum. ``maximo``: teto de leituras desta rodada, primeiras e segundas somadas (``None``:
-    os tetos do config; 0: só diz o que leria). ``relogio``: o relógio do prazo, na escala de
+    os tetos do config; 0: só diz o que leria, sem chamar a IA e sem gravar nada). ``relogio``: o relógio do prazo, na escala de
     ``time.monotonic`` (é a que os editores usam para o mesmo prazo, que vai em cada chamada)."""
     regua, limites = plano.regua, plano.limites
     pasta_da_guarda = leitura.pasta_da_guarda(pasta)
@@ -679,16 +723,43 @@ def ler_universo(
     if bloqueados:
         registro.avisos.append(f"arquivo(s) da guarda que não foram lidos (de outra versão das instruções, ou ilegíveis); a rodada não grava por cima deles: {', '.join(sorted(bloqueados))}")
         log.warning("Leitura diária: %s", registro.avisos[-1])
+    # O arquivo com linha que não valida (um código que a régua não tem mais, sem subir a versão
+    # das instruções; ou uma linha editada à mão) também fica de fora: regravá-lo apagaria essas
+    # linhas, e com elas leituras confirmadas. A rodada não o toca nem lê as proposições dele.
+    com_invalidas = dict(sorted(guarda.com_invalidas.items()))
+    if com_invalidas:
+        for nome in com_invalidas:
+            guarda.deixar_de_fora(nome)
+        bloqueados |= set(com_invalidas)
+        registro.avisos.append(
+            "arquivo(s) da guarda com linha que não valida (fora do formato, ou com código que a régua não tem mais); a rodada não os regrava, para não apagar essas linhas, e as proposições deles ficam de fora: "
+            + ", ".join(f"{nome} ({quantas} linha{'s' if quantas > 1 else ''})" for nome, quantas in com_invalidas.items())
+        )
+        log.warning("Leitura diária: %s", registro.avisos[-1])
+    # As segundas leituras que divergiram da primeira em outra rodada e esperam a terceira. A que
+    # já não espera (a leitura da guarda deixou de ser de um leitor só) sai da lista. O arquivo
+    # que não foi lido inteiro não é regravado, e a rodada não faz segundas leituras: sem ele,
+    # a segunda que diverge seria esquecida, e pedida de novo até uma concordar.
+    espera, problema_da_espera = leitura.abrir_a_decidir(pasta_da_guarda, regua)
+    espera = {k: v for k, v in espera.items() if (ja := guarda.de(*k)) is None or ja.r == leitura.UMA}
+    if problema_da_espera:
+        registro.avisos.append(f"{leitura.A_DECIDIR} (as segundas leituras que esperam a terceira) não foi lido inteiro ({problema_da_espera}); a rodada não o regrava e não faz segundas leituras até o conserto")
+        log.warning("Leitura diária: %s", registro.avisos[-1])
     gravados: set[Path] = set()
 
     def pendentes() -> None:
         registro.pendentes_primeiras = len(faltam_ler(itens, guarda, bloqueados=bloqueados)[0])
-        registro.pendentes_segundas = len(pedem_segunda(regua, itens, guarda))
+        esperam_a_segunda = pedem_segunda(regua, itens, guarda)
+        registro.pendentes_segundas = len(esperam_a_segunda)
+        # Só as que estão na fila de hoje: a segunda guardada de proposição que não está no universo de hoje fica no arquivo, sem entrar na conta.
+        registro.pendentes_terceiras = sum(1 for i in esperam_a_segunda if (i.casa, i.chave) in espera)
 
     def salvar() -> None:
         """A guarda e o registro do dia, como estão agora: um lote lido não se perde se a
         rodada for interrompida depois."""
         gravados.update(guarda.gravar(pasta_da_guarda))
+        if not problema_da_espera and leitura.gravar_a_decidir(pasta_da_guarda, regua, espera):
+            gravados.add(pasta_da_guarda / leitura.A_DECIDIR)
         registro.gravados = sorted(gravados)
         registro.provedor = " → ".join(rodada.responderam) if rodada is not None else ""
         if rodada is not None:
@@ -725,10 +796,10 @@ def ler_universo(
         log.info("Leitura diária: a ler hoje: %s", _titulos(primeiras))
     if esperam:
         log.info("Leitura diária: esperam a segunda leitura: %s", _titulos(esperam))
-    if maximo is not None and maximo <= 0:
+    if maximo is not None and maximo <= 0:  # só diz o que leria: nem a guarda nem o registro do dia são gravados
         registro.motivo = "teto de 0 leituras nesta rodada (--max 0): nada lido"
         log.info("Leitura diária: %s", registro.motivo)
-        salvar()
+        pendentes()
         return registro
 
     # 2. A cadeia de IAs. Sem nenhuma, o registro diz isso, haja ou não o que ler.
@@ -753,6 +824,9 @@ def ler_universo(
     rodada = Rodada(plano=plano, data=hoje, editores=prontos, registro=registro, prazo=relogio() + max(0, limites.prazo_segundos), nomes_dos_temas=nomes_dos_temas, relogio=relogio)
     tamanho = rodada.tamanho
     quem_leu: dict[tuple[str, str], str] = {}  # o editor da primeira leitura feita nesta rodada
+    # A guarda não diz que editor fez cada leitura. Da primeira leitura de outra rodada, supõe-se o
+    # primeiro da cadeia (é quem faz as primeiras leituras, salvo quando falha): a segunda o evita.
+    primeiro_da_cadeia = str(getattr(prontos[0], "provider", "") or "")
 
     try:
         # 3. As primeiras leituras.
@@ -772,11 +846,18 @@ def ler_universo(
 
         # 4. As segundas leituras que mudam a conta (também as das que acabaram de ser lidas).
         teto_das_segundas = limites.segundas if maximo is None else min(limites.segundas, max(0, maximo - len(primeiras)))
-        segundas = pedem_segunda(regua, itens, guarda)[:teto_das_segundas]
-        por_editor: dict[str, list[Item]] = {}  # o editor da primeira leitura ("": não foi nesta rodada)
+        segundas = pedem_segunda(regua, itens, guarda)[: 0 if problema_da_espera else teto_das_segundas]
+        por_editor: dict[str, list[Item]] = {}  # o editor que a segunda leitura evita: o da primeira (o suposto, se ela não foi nesta rodada)
+        # Por conjunto de editores que a terceira evita: (a proposição, as duas leituras, quem se sabe que já a leu).
+        divergentes: dict[frozenset[str], list[tuple[Item, Leitura, Leitura, frozenset[str]]]] = {}
         for item in segundas:
-            por_editor.setdefault(quem_leu.get((item.casa, item.chave), ""), []).append(item)
-        divergentes: dict[frozenset[str], list[tuple[Item, Leitura, Leitura]]] = {}
+            guardada, da_guarda = espera.get((item.casa, item.chave)), guarda.de(item.casa, item.chave)
+            if guardada is not None and da_guarda is not None:
+                # A segunda já foi feita, em outra rodada, e caiu em outra faixa: não se pede outra. A leitura de hoje é a terceira.
+                ja_leram = frozenset(guardada.editores)
+                divergentes.setdefault(ja_leram | ({primeiro_da_cadeia} - {""}), []).append((item, da_guarda, guardada.leitura, ja_leram))
+                continue
+            por_editor.setdefault(quem_leu.get((item.casa, item.chave)) or primeiro_da_cadeia, []).append(item)
         for da_primeira, grupo in por_editor.items():
             for bloco in _lotes(grupo, tamanho):
                 resultado = rodada.lote(bloco, SEGUNDA, evitar={da_primeira} - {""})
@@ -788,31 +869,39 @@ def ler_universo(
                     primeira = guarda.de(item.casa, item.chave)
                     if segunda is None or primeira is None or primeira.r != leitura.UMA:
                         continue
+                    desta_rodada = quem_leu.get((item.casa, item.chave), "")  # vazio: a primeira é de outra rodada, de editor que a guarda não diz
                     registro.segundas += 1
-                    registro.mesmo_editor += bool(da_primeira) and quem == da_primeira
+                    registro.mesmo_editor += quem == desta_rodada
+                    registro.de_outra_rodada += not desta_rodada
                     if faixa_da_formula(regua, primeira) == faixa_da_formula(regua, segunda):
-                        guarda.registrar(item.casa, guarda.ano_de(item.casa, item.chave) or item.ano, item.chave, leitura.conciliar(regua, primeira, segunda))
+                        guarda.registrar(item.casa, guarda.ano_de(item.casa, item.chave) or item.ano, item.chave, leitura.conciliar(regua, primeira, segunda, votada=leitura.VOTO in item.universos))
                         registro.confirmadas += 1
-                    else:  # sem a terceira, fica como está (r = 1) e volta amanhã
-                        divergentes.setdefault(frozenset({da_primeira, quem} - {""}), []).append((item, primeira, segunda))
+                    else:  # a leitura fica como está (r = 1), e a segunda, guardada até a terceira decidir: nesta rodada, se couber; senão, na próxima
+                        espera[(item.casa, item.chave)] = leitura.ADecidir(segunda, tuple(dict.fromkeys(e for e in (desta_rodada, quem) if e)))
+                        divergentes.setdefault(frozenset({da_primeira, quem} - {""}), []).append((item, primeira, segunda, frozenset({desta_rodada, quem} - {""})))
                 salvar()
 
-        # 5. As terceiras: onde as duas divergiram, a regra dos três.
-        for ja_leram, casos in divergentes.items():
+        # 5. As terceiras: onde as duas divergiram, a regra dos três. Vai a quem ainda não leu a
+        # proposição, se houver; com dois editores na cadeia, volta a um dos dois, e o registro conta.
+        for evitar, casos in divergentes.items():
             for bloco in _lotes(casos, tamanho):
-                resultado = rodada.lote([item for item, _p, _s in bloco], TERCEIRA, evitar=ja_leram)
+                resultado = rodada.lote([item for item, _p, _s, _j in bloco], TERCEIRA, evitar=evitar)
                 if resultado is None:
                     continue
-                validas, _quem = resultado
-                for item, primeira, segunda in bloco:
+                validas, quem = resultado
+                for item, primeira, segunda, ja_leram in bloco:
                     terceira = validas.get((item.casa, item.chave))
                     if terceira is None or guarda.de(item.casa, item.chave) != primeira:
                         continue
-                    final = leitura.conciliar(regua, primeira, segunda, terceira)
+                    final = leitura.conciliar(regua, primeira, segunda, terceira, votada=leitura.VOTO in item.universos)
                     guarda.registrar(item.casa, guarda.ano_de(item.casa, item.chave) or item.ano, item.chave, final)
+                    espera.pop((item.casa, item.chave), None)
                     registro.terceiras += 1
+                    registro.terceira_de_quem_leu += quem in ja_leram
                     if final.r == leitura.TRES:
                         registro.decididas += 1
+                    elif final.r == leitura.DUAS:  # a primeira mudou desde a segunda guardada (importada por fora) e agora as duas caem na mesma faixa
+                        registro.confirmadas += 1
                     else:
                         registro.instaveis += 1
                 salvar()

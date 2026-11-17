@@ -245,6 +245,40 @@ def test_conciliar_duas_e_tres_leituras(regua):
     assert leitura.conciliar(regua, nd, _lida("nd nd nd nd nd nd")).r == leitura.DUAS
 
 
+def test_conciliar_na_materia_votada_a_marca_do_caixa_em_disputa_fica_nd(regua):
+    """Na matéria votada, a leitura só confirma a marca do caixa que os leitores da faixa que
+    vale disseram igual (a regra da leitura inicial): se divergem, o custo fica "nd", com a
+    anotação, e a matéria sai do voto fiscal. Fora das votadas, valem os códigos do primeiro
+    leitor da faixa, como sempre. As outras marcas e a alavanca são as dele nos dois casos."""
+    gasta = _lida("fiscal geral ajuste gasto profissao afrouxa", porque="Cria despesa.")  # 60; caixa −1
+    corta = _lida("fiscal geral ajuste corta neutro aperta", porque="Contém despesa.")  # 60; caixa +1
+    renuncia = _lida("infra setor sistema renuncia neutro neutro", porque="Cria renúncia.")  # 60; outro código, a mesma marca −1
+    sem_marca = _lida("fiscal geral ajuste nd neutro afrouxa", porque="Não dá para dizer.")  # 60; caixa "nd"
+    media = _lida("produtividade grupo ajuste corta neutro neutro", porque="Média.")  # 24; caixa +1
+    em_disputa = leitura.Leitura(("fiscal", "geral", "ajuste", "nd", "profissao", "afrouxa"), porque=f"Cria despesa. {leitura.DISPUTA_DE_CONTAS}", r=leitura.DUAS)
+    assert leitura.conciliar(regua, gasta, corta) == leitura.Leitura(gasta.codigos, porque="Cria despesa.", r=leitura.DUAS)  # fora das votadas
+    assert leitura.conciliar(regua, gasta, corta, votada=True) == em_disputa
+    assert leitura.contas_em_disputa(em_disputa) and leitura.marcas(regua, em_disputa) == {"contas": None, "isonomia": -1, "controle": -1}
+    # Códigos diferentes com a mesma marca: não há disputa.
+    assert leitura.conciliar(regua, gasta, renuncia, votada=True) == leitura.Leitura(gasta.codigos, porque="Cria despesa.", r=leitura.DUAS)
+    # Um leitor viu a marca e o outro não: disputa, também quando o "nd" é o do primeiro (a de controle não leva a matéria ao voto fiscal).
+    assert leitura.conciliar(regua, sem_marca, corta, votada=True) == leitura.Leitura(sem_marca.codigos, porque=f"Não dá para dizer. {leitura.DISPUTA_DE_CONTAS}", r=leitura.DUAS)
+    assert not leitura.contas_em_disputa(leitura.conciliar(regua, sem_marca, _lida("infra setor sistema nd neutro neutro"), votada=True))
+    # Com a terceira: só contam os leitores que caíram na faixa que vale.
+    assert leitura.conciliar(regua, gasta, media, corta, votada=True) == leitura.Leitura(em_disputa.codigos, porque=em_disputa.porque, r=leitura.TRES)
+    assert leitura.conciliar(regua, media, gasta, renuncia, votada=True) == leitura.Leitura(gasta.codigos, porque="Cria despesa.", r=leitura.TRES)  # a marca da média (+1) não entra
+    assert leitura.conciliar(regua, media, gasta, corta, votada=True) == leitura.Leitura(em_disputa.codigos, porque=em_disputa.porque, r=leitura.TRES)
+    # Leitura instável não ganha anotação: já está fora de toda conta.
+    assert leitura.conciliar(regua, gasta, media, _lida("outro local simbolico neutro neutro neutro"), votada=True) == leitura.Leitura(gasta.codigos, porque="Cria despesa.", r=leitura.INSTAVEL)
+    # A justificativa comprida é cortada para a anotação caber inteira: a guarda corta o que passa do limite, e a anotação cortada deixaria de tirar a matéria do voto fiscal.
+    comprida = _lida("fiscal geral ajuste gasto profissao afrouxa", porque=("Cria despesa obrigatória sem dizer a fonte. " * 5)[: leitura.PORQUE_MAX].rstrip())
+    anotada = leitura.conciliar(regua, comprida, corta, votada=True)
+    assert len(comprida.porque) > leitura.PORQUE_MAX - len(leitura.DISPUTA_DE_CONTAS) and len(anotada.porque) <= leitura.PORQUE_MAX
+    assert anotada.porque.endswith(f" {leitura.DISPUTA_DE_CONTAS}") and anotada.porque.startswith("Cria despesa obrigatória sem dizer a fonte. Cria")
+    assert leitura.de_linha(regua, anotada.linha()) == anotada and leitura.contas_em_disputa(leitura.de_linha(regua, anotada.linha()))
+    assert leitura.com_contas_em_disputa(regua, anotada) == anotada  # anotar de novo não repete a anotação
+
+
 # ── a régua no arquivo ───────────────────────────────────────────────────────
 
 

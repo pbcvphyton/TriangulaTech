@@ -493,11 +493,12 @@ projeto_de_pais:
       - {r: 2, rotulo: "lido na ementa, por dois leitores"}
       - {r: 3, rotulo: "lido na ementa, por três leitores (os dois primeiros divergiram)"}
       - {r: 0, rotulo: "leitura instável (os leitores não se entenderam): fica sem leitura"}
-    # A leitura diária (python -m qijournal congresso ler): todo dia, no fim da edição diária (com a
-    # edição já publicada; no fluxo manual do Congresso, logo antes da atualização), a cadeia de IAs
-    # do jornal (llm.providers, em config/site.yaml) lê as proposições novas e as matérias que foram
-    # a voto, e relê o que muda a conta, com as instruções de config/leitura_projetos.txt. O que for
-    # lido na edição diária entra nas contas na atualização seguinte.
+    # A leitura diária (python -m qijournal congresso ler): todo dia, depois da edição diária, num
+    # fluxo à parte (.github/workflows/leitura.yml: a edição, o e-mail e o Instagram não esperam a
+    # leitura), a cadeia de IAs do jornal (llm.providers, em config/site.yaml) lê as proposições
+    # novas e as matérias que foram a voto, e relê o que muda a conta, com as instruções de
+    # config/leitura_projetos.txt. O que for lido entra nas contas na atualização seguinte do
+    # Congresso.
     # Em cada lote vão, misturadas e sem aviso, perguntas de controle (config/leitura_referencia.jsonl:
     # proposições reais que dois leitores classificaram igual); o lote que erra nelas é descartado.
     # O registro de cada dia fica em data/congresso/leitura/diario.json. Desligar sem mexer aqui:
@@ -508,7 +509,7 @@ projeto_de_pais:
       segundas: 60           # teto de segundas leituras por rodada: só as que mudam a conta (peso do topo e matérias votadas)
       lote: 30               # proposições por chamada à IA (os controles vão a mais)
       controles: 10          # perguntas de controle em cada lote (a mesma régua de aceite da leitura inicial: 7 de 10)
-      controles_minimo: 7    # acertos (a faixa, pela fórmula) abaixo disto: o lote inteiro é descartado
+      controles_minimo: 7    # acertos (a faixa, pela fórmula) abaixo disto: o lote inteiro é descartado; e nenhum lote leva mais que isto menos um (6) perguntas da mesma faixa: quem responde a mesma coisa para tudo não passa
       prazo_segundos: 480    # prazo da leitura, do primeiro lote ao último (8 min; cabe no timeout do passo)
       chamadas: 12           # teto de chamadas à IA por rodada (150 primeiras = 5; 60 segundas = 2; o resto, terceiras leituras)
       editores: []           # vazio: toda a cadeia de llm.providers; ou só estes, nesta ordem (ex.: [gemini, gemini_lite])

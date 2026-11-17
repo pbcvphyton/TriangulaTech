@@ -9,6 +9,10 @@ Como nos outros módulos da tela, aqui só se **apresenta**:
 - **a cobertura e a auditoria** saem de ``meta.json`` (``leitura_projetos``). A auditoria é
   escrita por fora (``data/congresso/leitura/auditoria.json``) e só repassada: o que vier a
   menos simplesmente não aparece, e nenhum número é inventado aqui;
+- **a leitura de todo dia** (:func:`_diaria`): como as proposições novas são lidas (os limites
+  vêm de ``projeto_de_pais.leitura.diaria``, no config) e, quando ``meta.json`` traz
+  ``leitura_projetos.diaria`` (o resumo do registro dela), os números do período e quem
+  respondeu. Também só repassado: o que não vier não aparece;
 - **o que a régua não mede**, os cinco erros de leitura e os limites são o texto da régua
   (seção 6), escritos com os rótulos do config.
 """
@@ -18,6 +22,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from ..congresso import pais_cruzar
 from . import congresso as pagina
 
 CONSTANCIA = "mede a constância entre leitores de IA; não foi conferida contra codificação humana"
@@ -242,13 +247,122 @@ def _auditoria(a: Any, regua: Any, R: Any) -> dict[str, Any] | None:
     }
 
 
+# ── a leitura de todo dia, do config e de meta.json ──────────────────────────
+
+
+def _q(n: int, um: str, uns: str) -> str:
+    """"1 lote", "7 lotes"."""
+    return f"{_num(n)} {um if n == 1 else uns}"
+
+
+def _diaria(d: Any, limites: Any, ate: str) -> dict[str, str]:
+    """O parágrafo "A leitura de todo dia". ``como`` sai sempre: quem lê as proposições que
+    chegam depois da leitura inicial, com que aceite e o que acontece até lá. ``limites``: os
+    de ``projeto_de_pais.leitura.diaria`` (:class:`qijournal.congresso.ler.Limites`; ``None``
+    se o config não pôde ser lido: a frase sai sem os números). ``ate``: a data da auditoria,
+    por extenso, ou vazio.
+
+    ``numeros`` e ``quem`` só saem quando ``d`` (``meta.json`` → ``leitura_projetos.diaria``)
+    veio: do período guardado no registro, as primeiras, as segundas e as terceiras leituras;
+    quantas das segundas e terceiras foram feitas por uma IA que já tinha lido a mesma
+    proposição na rodada (``mesmo_editor``) e em quantas segundas a primeira leitura era de
+    outra rodada, em que o registro não diz quem leu (``de_outra_rodada``); os controles certos
+    de quantos e os lotes descartados; do último dia, quando foi, quem respondeu e o que ficou
+    na fila. Cada pedaço só entra se o número veio."""
+    depois = f"depois de {ate}" if ate else "depois da leitura inicial"
+    if limites is not None and not limites.ligada:
+        como = f"A leitura de todo dia está desligada no config: a proposição que chega {depois} fica como “sem leitura”, fora das contas, até ser lida por fora."
+    else:
+        if limites is None:
+            lotes = "Vão em lotes, com perguntas de controle escondidas (proposições que dois leitores já classificaram igual): o lote que erra demais nelas é descartado inteiro."
+        elif limites.controles:
+            lotes = (
+                f"Vão em lotes de até {_num(limites.lote)}, e em cada lote vão escondidas {_q(limites.controles, 'pergunta de controle', 'perguntas de controle')} "
+                f"(proposições que dois leitores já classificaram igual): o lote que acerta a faixa em menos de {_num(limites.controles_minimo)} delas é descartado inteiro."
+            )
+        else:
+            lotes = f"Vão em lotes de até {_num(limites.lote)}, sem perguntas de controle (estão desligadas no config)."
+        como = (
+            f"As proposições e as matérias votadas que chegam {depois} são lidas todo dia pela cadeia de IAs do jornal (a mesma que escreve a edição), "
+            f"com as mesmas instruções e sem ver número, autor nem partido. {lotes} "
+            "O que muda a conta (o peso do topo da régua e as matérias votadas) ganha uma segunda leitura, de outra IA da cadeia quando há. "
+            "Se as duas caem em faixas diferentes, uma terceira decide, de uma IA que ainda não leu a proposição, quando há. "
+            "Quando só uma IA responde, a segunda ou a terceira é de quem já tinha lido a mesma proposição, e o registro conta quantas foram assim. "
+            "Quando a primeira leitura é de uma rodada anterior, o registro não guarda de que IA ela foi: a segunda evita a IA que costuma fazer as primeiras, sem garantia de que seja outra, e o registro conta essas à parte. "
+            "Até ser lida, a proposição nova aparece como “sem leitura”, fora das contas; lida num dia, entra na atualização seguinte. "
+            "Os números de concordância acima são da leitura inicial: a de todo dia tem só as perguntas de controle."
+        )
+    if not isinstance(d, Mapping) or not d:
+        return {"como": como, "numeros": "", "quem": ""}
+    p = d.get("periodo") if isinstance(d.get("periodo"), Mapping) else {}
+    primeiras, segundas, terceiras = _n(p, "primeiras"), _n(p, "segundas"), _n(p, "terceiras")
+    mesmo, de_outra = _n(p, "mesmo_editor"), _n(p, "de_outra_rodada")
+    partes = []
+    leituras = [
+        x
+        for x in (
+            _q(primeiras, "primeira leitura", "primeiras leituras") if primeiras is not None else "",
+            _q(segundas, "segunda", "segundas") if segundas is not None else "",
+            _q(terceiras, "terceira", "terceiras") if terceiras else "",
+        )
+        if x
+    ]
+    if leituras:
+        partes.append(_lista(leituras))
+        # "mesmo_editor": segundas e terceiras feitas por uma IA que já tinha lido a mesma proposição na rodada
+        quais = "das segundas e terceiras" if segundas and terceiras else "das terceiras" if terceiras else "das segundas"
+        if (segundas or terceiras) and mesmo is not None:
+            ja_tinha = "por uma IA que já tinha lido a mesma proposição na rodada"
+            if (segundas or 0) + (terceiras or 0) == 1:  # uma só: "a segunda foi feita…", não "das segundas, 1 foi feita…"
+                partes.append(f"a {'segunda' if segundas else 'terceira'} {'foi' if mesmo else 'não foi'} feita {ja_tinha}")
+            else:
+                partes.append(f"nenhuma {quais} foi feita {ja_tinha}" if not mesmo else f"{quais}, {_num(mesmo)} {'foi feita' if mesmo == 1 else 'foram feitas'} {ja_tinha}")
+        # "de_outra_rodada": segundas cuja primeira leitura é de outra rodada, em que o registro não diz quem leu
+        if segundas and de_outra:
+            onde = "na segunda" if segundas == 1 else f"em {_num(de_outra)} das segundas"
+            partes.append(f"{onde}, a primeira leitura era de outra rodada e o registro não diz de que IA era (pode ter sido a mesma)")
+    controles = p.get("controles")
+    if isinstance(controles, list) and len(controles) == 2 and all(isinstance(v, int) and not isinstance(v, bool) for v in controles) and controles[1] > 0:
+        partes.append(f"nos controles, {_num(controles[0])} de {_num(controles[1])} na faixa certa ({_pct(100.0 * controles[0] / controles[1])})")
+    lotes_n, descartados = _n(p, "lotes"), _n(p, "descartados")
+    if descartados is not None:
+        partes.append((f"{_q(descartados, 'lote descartado', 'lotes descartados')}" if descartados else "nenhum lote descartado") + (f", de {_num(lotes_n)}" if lotes_n else ""))
+    desde, dias = pagina._data(p.get("desde"), ano=True), _n(p, "dias")
+    cabeca = (f"Desde {desde}" if desde else "No registro") + (f" ({_q(dias, 'dia com rodada', 'dias com rodada')})" if dias else "")
+    numeros = f"{cabeca}: {'; '.join(partes)}." if partes else ""
+    ultima, leu_em = pagina._data(d.get("data"), ano=True), pagina._data(p.get("leu_em"), ano=True)
+    quem = []
+    if ultima:
+        quem.append(f"A última rodada foi em {ultima}" + (f" (a última em que algo foi lido, em {leu_em})" if leu_em and leu_em != ultima else "") + ".")
+    provedor, modelo, motivo = (str(d.get(k) or "").strip() for k in ("provedor", "modelo", "motivo"))
+    if provedor:
+        quem.append(f"Nela, quem respondeu: {provedor}" + (f" ({modelo})" if modelo else "") + ".")
+    elif motivo and ultima:
+        quem.append(f"Nela, nenhuma IA respondeu ({motivo}).")
+    pendentes = d.get("pendentes")
+    if isinstance(pendentes, Mapping):
+        fila = [x for x in (
+            f"{_num(pendentes['primeiras'])} sem leitura" if _n(pendentes, "primeiras") else "",
+            f"{_num(pendentes['segundas'])} à espera da segunda leitura" if _n(pendentes, "segundas") else "",
+        ) if x]  # fmt: skip
+        if fila:
+            quem.append(f"Ficaram na fila: {' e '.join(fila)}.")
+    return {"como": como, "numeros": numeros, "quem": " ".join(quem)}
+
+
 # ── tudo junto ───────────────────────────────────────────────────────────────
 
 
-def _cobertura(casas: list[tuple[str, str]], cobertura: Any) -> list[dict[str, str]]:
+def _cobertura(casas: list[tuple[str, str]], cobertura: Any, votadas: Mapping[str, Any] | None = None) -> list[dict[str, str]]:
     """Uma linha por Casa: quantas proposições as contas pedem, quantas têm leitura, quantas
     ficaram sem, quantas têm a faixa confirmada, e a mesma conta por uso (o perfil de quem
-    propõe, o que espera e as matérias votadas)."""
+    propõe, o que espera e as matérias votadas).
+
+    ``votadas``: Casa → quantas matérias "Na hora do voto" conta (``decide.materias``). A
+    cobertura conta **proposições do registro** e o voto, **matérias** (uma por título): a
+    matéria que volta da outra Casa e é votada de novo ganha outro número de registro, com
+    outra ementa, e aparece duas vezes aqui. Quando os dois números diferem, ``nota`` diz o
+    que cada um conta, com os números."""
     linhas = []
     for ident, nome in casas:
         c = cobertura.get(ident) if isinstance(cobertura, Mapping) else None
@@ -259,9 +373,20 @@ def _cobertura(casas: list[tuple[str, str]], cobertura: Any) -> list[dict[str, s
             u = c.get(chave)
             return f"{_num(u.get('lidos'))} de {_num(u.get('total'))}" if isinstance(u, Mapping) and u.get("total") else "—"
 
+        do_voto, materias = c.get("voto"), _n(votadas or {}, ident)
+        registros = _n(do_voto, "total")
+        nota = ""
+        if registros is not None and materias is not None and registros > materias:
+            a_mais = registros - materias
+            nota = (
+                f"{'Na' if ident == 'cd' else 'No'} {nome}, as matérias votadas são {_num(registros)} proposições do registro para as {_num(materias)} matérias que “Na hora do voto” conta: "
+                f"há {_num(a_mais)} {'registro' if a_mais == 1 else 'registros'} a mais, de matéria que foi a voto sob mais de um número de registro "
+                "(acontece com a que volta da outra Casa e é votada de novo, com outra ementa). Aqui ela é lida uma vez por registro; no voto, conta uma vez só, pela última votação."
+            )
         linhas.append(
             {
                 "casa": nome,
+                "nota": nota,
                 "total": _num(c.get("total")),
                 "lidos": _num(c.get("lidos")),
                 "pct": _pct(100.0 * (c.get("lidos") or 0) / c["total"]),
@@ -275,11 +400,14 @@ def _cobertura(casas: list[tuple[str, str]], cobertura: Any) -> list[dict[str, s
     return linhas
 
 
-def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, str]], desde: int | None, cruzar: Mapping[str, Any] | None) -> dict[str, Any]:
+def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, str]], desde: int | None, cruzar: Mapping[str, Any] | None, medidas: Mapping[str, Any] | None = None, votadas: Mapping[str, Any] | None = None, limites_da_diaria: Any = None) -> dict[str, Any]:
     """O bloco "A leitura dos projetos" do Como ler. ``R``: os rótulos da tela; ``regua``: o
     ``projeto_de_pais`` do config; ``meta``: ``meta.json`` → ``leitura_projetos``; ``casas``:
     ``(id, nome)`` das Casas que têm a visão; ``cruzar``: os parâmetros do cruzamento (de uma
-    Casa qualquer: são os mesmos)."""
+    Casa qualquer: são os mesmos); ``medidas``: as medidas da tela (:func:`.congresso_lp_voto.medidas`),
+    de onde sai o nome com que a tela chama cada uma; ``votadas``: Casa → quantas matérias
+    "Na hora do voto" conta (para a nota da cobertura: :func:`_cobertura`); ``limites_da_diaria``:
+    os limites da leitura de todo dia, do config (:func:`_diaria`)."""
     m, cortes = R.m, R.m["cortes"]
     nivel = {ident: rot for ident, rot in m["niveis"]}
     por_nivel: dict[str, list[str]] = {}
@@ -297,6 +425,7 @@ def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, s
     fechado = round(100 * float(cortes.get("partido_fechado") or 0.8))
     par = cruzar or {}
     auditoria = _auditoria(meta.get("auditoria"), regua, R)
+    nome_de_quantos = ((medidas or {}).get("prop") or {}).get("nome") or ""  # como a tela chama a medida de quantos projetos cada um apresentou
 
     premissa = (
         f"Esta parte da página mede cada projeto em relação a um objetivo declarado: {m.get('objetivo') or '—'}. "
@@ -339,8 +468,12 @@ def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, s
         ),
         (
             "A faixa do acaso",
-            (f"Com poucos projetos, qualquer parte sai alta ou baixa por acaso. A faixa cinza do gráfico de “Quem propõe” é o que a diferença para a taxa da Casa pode ser só por acaso: binomial exata, {round(100 * (1 - float(cortes.get('funil_alfa') or 0.01)))}% de confiança, "
-            "já contando todas as pessoas comparadas."),
+            ("Acaso é sorte. Com poucos projetos, um ou dois a mais ou a menos aparecem por sorte, mesmo em quem é igual à média da Casa. A faixa cinza do gráfico de “Quem propõe” é o que a sorte sozinha "
+            f"daria a um parlamentar médio com aquele número de projetos. Só sai dela quem tem um resultado que a sorte daria menos de 1 vez em {_num(round(1 / float(cortes.get('funil_alfa') or 0.01)))}, já contando que são "
+            "muitos comparados de uma vez (entre centenas de nomes, algum acaba saindo do comum só por sorte). Dentro da faixa não quer dizer “igual à média”: quer dizer que não dá para afirmar. "
+            f"A conta: binomial exata contra a taxa da Casa, {round(100 * (1 - float(cortes.get('funil_alfa') or 0.01)))}% de confiança, já contando todas as pessoas comparadas. "
+            "Ela trata cada projeto como um sorteio separado; como os projetos de uma mesma pessoa se parecem, a faixa de verdade é um pouco mais larga que a desenhada: "
+            "quem está bem na borda não deve ser lido como fora dela."),
         ),
         (
             "Quando pesa",
@@ -359,8 +492,21 @@ def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, s
         (
             "Quanto o partido explica",
             "Da variação entre pessoas em cada medida, a parte entre partidos, descontado o que qualquer divisão em tantos grupos explicaria. "
-            + (f"O traço do acaso sai embaralhando os partidos entre as pessoas {_num(par.get('permutacoes'))} vezes; o intervalo, reamostrando as pessoas {_num(par.get('reamostras'))} vezes. " if par.get("permutacoes") and par.get("reamostras") else "")
-            + "Barra cujo intervalo encosta no acaso sai em cinza: não é “é a pessoa”, é “não dá para separar”.",
+            "Aqui o acaso também é sorte: mesmo que o partido não dissesse nada, dividir as pessoas em tantos grupos já daria algum número, e o traço “por acaso daria até” mostra até onde a sorte costuma chegar. "
+            + (
+                f"É o valor que {round(pais_cruzar.PERCENTIL_DO_ACASO)} de cada 100 embaralhamentos dos partidos entre as pessoas não passam (são {_num(par.get('permutacoes'))} embaralhamentos); "
+                f"o intervalo sai reamostrando as pessoas {_num(par.get('reamostras'))} vezes. "
+                if par.get("permutacoes") and par.get("reamostras")
+                else ""
+            )
+            + "Barra cujo intervalo encosta no acaso sai em cinza: não é “é a pessoa”, é “não dá para separar”."
+            # a janela da medida de quantos projetos é a da legislatura, como no perfil
+            + (
+                f" “{nome_de_quantos}” conta os PL, PLP e PEC de autoria principal apresentados na legislatura, com ou sem leitura, fora os de ementa repetida e os de bancada: "
+                "é o conjunto do perfil de “Quem propõe”, não o total do dossiê, que soma as legislaturas anteriores."
+                if nome_de_quantos
+                else ""
+            ),
         ),
         (
             "O que anda junto",
@@ -388,8 +534,9 @@ def metodo(R: Any, regua: Any, meta: Mapping[str, Any], casas: list[tuple[str, s
         "premissa": premissa,
         "itens": itens,
         "regua": _regua(regua),
-        "cobertura": _cobertura(casas, meta.get("cobertura")),
+        "cobertura": _cobertura(casas, meta.get("cobertura"), votadas),
         "auditoria": auditoria,
+        "diaria": _diaria(meta.get("diaria"), limites_da_diaria, (auditoria or {}).get("data") or ""),
         "constancia": CONSTANCIA,
         "nao_mede": (
             "O texto integral da grande maioria (o jabuti sob “e dá outras providências”, a fonte prevista no articulado, o que o substitutivo mudou), o custo em reais, a constitucionalidade, o efeito real, "

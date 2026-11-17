@@ -152,17 +152,17 @@
         {{ janela(X.janela) }}
         <div class="cg-lp-xfoco">
           <figure class="cg-lp-fig cg-lp-xfig">
-            <figcaption class="az-h cg-lp-h">Quanto o partido explica <span>de toda a diferença entre {{ casa.lp.uns }} em cada medida, a parte que some quando se sabe o partido; de 0 a 100%</span></figcaption>
+            <figcaption class="az-h cg-lp-h">Quanto o partido explica <span>de toda a diferença entre {{ casa.lp.uns }} em cada medida, a parte que some quando se sabe o partido; de 0 a 100%{{ info(X.dica_acaso) }}</span></figcaption>
             {% for g in X.grupos %}
             <p class="cg-lp-xg">{{ g.nome }}</p>
             <ul class="cg-lp-xs">
               {% for b in g.medidas %}
-              <li><button type="button" class="cg-lp-xb{% if b.cinza %} cg-lp-xb-cz{% endif %}" data-x="{{ b.id }}" aria-pressed="false"><span class="cg-lp-xn">{{ b.nome }}{% if b.regua %} <em class="cg-lp-tag cg-lp-tag-ac" title="Os polos são definidos por partidos: parte deste número vem da própria construção da medida.">régua</em>{% endif %}</span><span class="cg-lp-xt" aria-hidden="true"><i style="width:{{ b.w }}%"></i>{% if b.ic %}<u style="left:{{ b.ic[0] }}%;width:{{ (b.ic[1] - b.ic[0])|round(1) }}%"></u>{% endif %}{% if b.acaso is not none %}<s style="left:{{ b.acaso }}%"></s>{% endif %}</span><span class="cg-lp-xv">{% if b.e2 %}<b>{{ b.e2 }}</b> {% endif %}{{ b.palavra }}</span>{% if not b.sem %}<small class="cg-lp-xd">{{ b.n }} {{ casa.lp.uns }} em {{ b.k }} partidos · {{ b.ic_txt }} · {{ b.acaso_txt }}</small>{% endif %}</button></li>
+              <li><button type="button" class="cg-lp-xb{% if b.cinza %} cg-lp-xb-cz{% endif %}" data-x="{{ b.id }}"{% if b.medidos is not none %} data-n="{{ b.medidos }}"{% endif %} aria-pressed="false"><span class="cg-lp-xn">{{ b.nome }}{% if b.regua %} <em class="cg-lp-tag cg-lp-tag-ac" title="Os polos são definidos por partidos: parte deste número vem da própria construção da medida.">régua</em>{% endif %}</span><span class="cg-lp-xt" aria-hidden="true"><i style="width:{{ b.w }}%"></i>{% if b.ic %}<u style="left:{{ b.ic[0] }}%;width:{{ (b.ic[1] - b.ic[0])|round(1) }}%"></u>{% endif %}{% if b.acaso is not none %}<s style="left:{{ b.acaso }}%"></s>{% endif %}</span><span class="cg-lp-xv">{% if b.e2 %}<b>{{ b.e2 }}</b> {% endif %}{{ b.palavra }}</span>{% if not b.sem %}<small class="cg-lp-xd">{{ b.n }} {{ casa.lp.uns }} em {{ b.k }} partidos · {{ b.ic_txt }} · {{ b.acaso_txt }}</small>{% endif %}</button></li>
               {% endfor %}
             </ul>
             {% endfor %}
             <p class="cg-leg cg-lp-leg cg-lp-xleg"><span><i class="cg-lp-xl-b"></i>quanto o partido explica</span><span><i class="cg-lp-xl-a"></i>o que daria por acaso</span><span><i class="cg-lp-xl-i"></i>intervalo de {{ X.confianca }}%</span><span><i class="cg-lp-xl-b cg-lp-xl-cz"></i>não se distingue do acaso</span></p>
-            <p class="az-dek cg-lp-nota">{{ X.zonas[1] }}% ou mais: o partido diz quase tudo; de {{ X.zonas[0] }}% a {{ X.zonas[1] }}%: diz parte; abaixo de {{ X.zonas[0] }}%: diz pouco. Barra cujo intervalo encosta no traço do acaso sai em cinza. Com menos de {{ X.pessoas_minimo }} pessoas medidas, não há número. <span class="cg-lp-so-js">Clique numa barra para ver os partidos ao lado.</span></p>
+            <p class="az-dek cg-lp-nota">{{ X.zonas[1] }}% ou mais: o partido diz quase tudo; de {{ X.zonas[0] }}% a {{ X.zonas[1] }}%: diz parte; abaixo de {{ X.zonas[0] }}%: diz pouco. Barra cujo intervalo encosta no traço do acaso sai em cinza: acaso é sorte, e “por acaso daria até” é o que a sorte sozinha daria em {{ X.percentil }} de cada 100 vezes, com os partidos embaralhados entre as pessoas. Com menos de {{ X.pessoas_minimo }} pessoas medidas, não há número. <span class="cg-lp-so-js">Clique numa barra para ver os partidos ao lado.</span></p>
           </figure>
           <figure class="cg-pa-fig cg-lp-fig cg-lp-xfig2" hidden>
             <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht"></span> <span>um ponto por {{ casa.lp.um }}; faixas apertadas e separadas: o partido explica; largas e sobrepostas: é a pessoa</span></figcaption>

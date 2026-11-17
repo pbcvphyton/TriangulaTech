@@ -34,7 +34,10 @@ o que falta mandar à IA.
   arredondado meio para cima; a faixa sai do peso (a do topo só para alavanca do núcleo, e
   só conta depois de confirmada por duas leituras de IA: a leitura de regras, ou uma só de
   IA, fica na faixa de baixo, com o alerta); as três marcas (contas, isonomia, controle)
-  levam o valor do seu código e nunca se somam nem multiplicam o peso.
+  levam o valor do seu código e nunca se somam nem multiplicam o peso. Na matéria votada em
+  que os leitores da mesma faixa divergiram na marca do caixa, o custo fica "nd" e a
+  justificativa termina com :data:`DISPUTA_DE_CONTAS`: ela fica fora do voto fiscal
+  (:func:`conciliar`, :func:`contas_em_disputa`).
 
 - **A leitura de uma proposição** (:func:`leitura_de`; :class:`Leitor` para quem faz as
   contas): a de IA, da guarda, se houver; senão, a do leitor de regras (hoje, nenhuma).
@@ -47,7 +50,8 @@ o que falta mandar à IA.
 
 O que fica de fora: a leitura em si (a de IA: a carga, feita por fora e trazida por
 :func:`importar`, e a de todo dia, das proposições novas, em :mod:`qijournal.congresso.ler`,
-que grava na mesma guarda e deixa o registro de cada dia em ``diario.json``: :func:`ler_diario`;
+que grava na mesma guarda, deixa o registro de cada dia em ``diario.json`` (:func:`ler_diario`)
+e guarda em ``a_decidir.json`` a segunda leitura que divergiu e espera a terceira (:func:`abrir_a_decidir`);
 a de regras, em ``leitor_regras.py``), as contas por parlamentar e por Casa, e tudo o que a
 ementa não mostra (o texto integral, o custo em reais, o mérito). Sem leitura (algum "nd" em
 campo de peso, leitura instável ou proposição que ninguém leu), a proposição fica fora de
@@ -84,6 +88,7 @@ AUDITORIA = "auditoria.json"  # a concordância medida entre leituras: escrita p
 INSTRUCOES = "leitura_projetos.txt"  # config/: o que o leitor recebe
 REFERENCIA = "leitura_referencia.jsonl"  # config/: as perguntas de controle da leitura diária (:mod:`qijournal.congresso.ler`)
 DIARIO = "diario.json"  # o registro da leitura diária, na pasta da guarda: uma linha por dia
+A_DECIDIR = "a_decidir.json"  # na pasta da guarda: as segundas leituras que divergiram da primeira e esperam a terceira
 # De onde vem uma leitura (os rótulos ficam no YAML, em ``fontes``). Na coluna "fo" dos
 # arquivos da tela: "regra", "ia" e, para a leitura de IA confirmada (r ≥ 2), "ia2".
 REGRA, IA, IA2 = "regra", "ia", "ia2"
@@ -93,6 +98,10 @@ INSTAVEL, UMA, DUAS, TRES = 0, 1, 2, 3
 ESTADOS = (INSTAVEL, UMA, DUAS, TRES)
 CONFIANCAS = (1, 2, 3)
 PORQUE_MAX = 160  # a justificativa gravada (as instruções pedem até 120)
+# Como a justificativa termina quando os leitores que caíram na mesma faixa divergiram na marca
+# do caixa: o custo fica "nd" e a matéria fica fora do voto fiscal. Quem escreve é
+# :func:`com_contas_em_disputa`; quem lê, :func:`contas_em_disputa`.
+DISPUTA_DE_CONTAS = "[leitores divergem na marca de contas]"
 # Os alertas de uma leitura (os rótulos ficam no YAML, em ``alertas``).
 INICIATIVA, A_CONFIRMAR, DUVIDA = "iniciativa", "a_confirmar", "duvida"
 # Por que uma proposição precisa de leitura.
@@ -262,6 +271,31 @@ def marcas(regua: ProjetoDePais, leitura: Leitura) -> dict[str, int | None]:
     return saida
 
 
+def contas_em_disputa(leitura: Leitura | None) -> bool:
+    """Os leitores que caíram na mesma faixa divergiram na marca do caixa desta proposição (a
+    justificativa leva a anotação :data:`DISPUTA_DE_CONTAS`). A matéria assim fica fora do
+    voto fiscal, também pela marca de controle: a página diz que ele só conta onde dois
+    leitores chegaram à mesma marca."""
+    return leitura is not None and DISPUTA_DE_CONTAS in leitura.porque
+
+
+def com_contas_em_disputa(regua: ProjetoDePais, leitura: Leitura) -> Leitura:
+    """A leitura com a marca do caixa em disputa: o código do campo do caixa
+    (``papeis.caixa``) vira "nd" e a justificativa, cortada para caber, termina com a
+    anotação :data:`DISPUTA_DE_CONTAS`. É o que a leitura inicial gravou nas matérias votadas
+    em que os leitores da mesma faixa divergiram na marca. Sem o papel do caixa na régua, a
+    leitura volta como veio."""
+    campo = next((c for c in regua.campos_de_marca if c.marca == regua.papeis.caixa), None) if regua.papeis.caixa else None
+    if campo is None:
+        return leitura
+    codigos = list(leitura.codigos)
+    codigos[regua.chaves.index(campo.chave)] = ND
+    porque = leitura.porque
+    if not contas_em_disputa(leitura):
+        porque = f"{porque[: PORQUE_MAX - len(DISPUTA_DE_CONTAS) - 1].rstrip()} {DISPUTA_DE_CONTAS}".lstrip()
+    return replace(leitura, codigos=tuple(codigos), porque=porque)
+
+
 def alertas(regua: ProjetoDePais, leitura: Leitura, *, tipo: str = "", origem: str = "") -> tuple[str, ...]:
     """Os alertas de uma leitura com peso:
 
@@ -353,7 +387,7 @@ def _faixa_ou_nada(regua: ProjetoDePais, leitura: Leitura) -> str:
     return avaliar(regua, replace(leitura, r=DUAS)).faixa_da_ementa
 
 
-def conciliar(regua: ProjetoDePais, primeira: Leitura, segunda: Leitura, terceira: Leitura | None = None) -> Leitura:
+def conciliar(regua: ProjetoDePais, primeira: Leitura, segunda: Leitura, terceira: Leitura | None = None, *, votada: bool = False) -> Leitura:
     """O que vale depois de uma segunda leitura independente (e de uma terceira, se houve).
 
     - as duas na mesma faixa (ou as duas sem leitura): valem os códigos da primeira, ``r`` = 2;
@@ -361,18 +395,36 @@ def conciliar(regua: ProjetoDePais, primeira: Leitura, segunda: Leitura, terceir
       ficam guardados, mas a proposição fica sem leitura);
     - com terceira: vale a faixa em que dois dos três caíram, com os códigos do primeiro
       leitor que caiu nela, ``r`` = 3; três faixas diferentes: leitura instável, ``r`` = 0.
+
+    O que se confirma é a faixa. Os outros códigos (a alavanca, as marcas de isonomia e de
+    controle) são os do primeiro leitor da faixa que vale, e ninguém os conferiu. A exceção é
+    a marca do caixa da matéria ``votada``, que decide o voto fiscal: se os leitores que
+    caíram na faixa que vale não chegaram à mesma marca (+1, 0, −1 ou "nd"), ela não é a de
+    nenhum deles: o custo fica "nd" e a justificativa leva a anotação
+    (:func:`com_contas_em_disputa`). É a regra com que a leitura inicial foi conciliada, um
+    passo mais estrita: lá, quando o custo do primeiro leitor da faixa já era "nd", a
+    anotação não era posta (a matéria ainda podia entrar no voto fiscal pela marca de
+    controle); aqui é, e a matéria fica fora.
     """
     f1, f2 = _faixa_ou_nada(regua, primeira), _faixa_ou_nada(regua, segunda)
     if f1 == f2:
-        return replace(primeira, r=DUAS)
-    if terceira is None:
+        final = replace(primeira, r=DUAS)
+    elif terceira is None:
         return replace(primeira, r=INSTAVEL)
-    f3 = _faixa_ou_nada(regua, terceira)
-    if f3 == f1:
-        return replace(primeira, r=TRES)
-    if f3 == f2:
-        return replace(segunda, r=TRES)
-    return replace(primeira, r=INSTAVEL)
+    else:
+        f3 = _faixa_ou_nada(regua, terceira)
+        if f3 == f1:
+            final = replace(primeira, r=TRES)
+        elif f3 == f2:
+            final = replace(segunda, r=TRES)
+        else:
+            return replace(primeira, r=INSTAVEL)
+    if votada and regua.papeis.caixa:
+        faixa = _faixa_ou_nada(regua, final)
+        de_acordo = [lida for lida in (primeira, segunda, terceira) if lida is not None and _faixa_ou_nada(regua, lida) == faixa]
+        if len({marcas(regua, lida).get(regua.papeis.caixa) for lida in de_acordo}) > 1:
+            final = com_contas_em_disputa(regua, final)
+    return final
 
 
 # ── a linha do leitor e a linha da guarda ────────────────────────────────────
@@ -546,6 +598,7 @@ class Guarda:
         self._onde: dict[tuple[str, str], int] = {}  # (casa, chave) → ano
         self.ignorados: list[str] = []  # arquivos de outra versão das instruções (ou do formato), ou ilegíveis
         self.invalidas = 0  # linhas fora do formato ou com código que o YAML não tem mais
+        self.com_invalidas: dict[str, int] = {}  # os arquivos que têm essas linhas → quantas (regravar um deles as apagaria)
 
     @classmethod
     def ler(cls, pasta: Path, regua: ProjetoDePais) -> Guarda:
@@ -572,6 +625,7 @@ class Guarda:
                 leitura = de_linha(regua, linha)
                 if leitura is None or not chave_valida(casa, str(chave_)):
                     guarda.invalidas += 1
+                    guarda.com_invalidas[caminho.name] = guarda.com_invalidas.get(caminho.name, 0) + 1
                     continue
                 guarda.registrar(casa, ano, str(chave_), leitura)
         return guarda
@@ -594,6 +648,17 @@ class Guarda:
     def da_casa(self, casa: str) -> dict[str, Leitura]:
         """Todas as leituras de uma Casa: chave → leitura."""
         return {k: leitura for (c, _ano), itens in self._anos.items() if c == casa for k, leitura in itens.items()}
+
+    def deixar_de_fora(self, nome: str) -> None:
+        """Tira da guarda em memória as leituras do arquivo ``nome`` (``<casa>-<ano>.json``):
+        quem lê assim não regrava esse arquivo (:meth:`gravar` só grava os anos que a guarda
+        tem). É como a leitura diária trata o arquivo com linha que não valida."""
+        achado = _ARQUIVO.match(nome)
+        if not achado:
+            return
+        casa = achado.group(1)
+        for chave_ in self._anos.pop((casa, int(achado.group(2))), {}):
+            self._onde.pop((casa, chave_), None)
 
     def registrar(self, casa: str, ano: int, chave_: str, leitura: Leitura) -> str:
         """Guarda a leitura (a nova substitui a antiga da mesma proposição). Devolve
@@ -1226,7 +1291,7 @@ def codigos_das_instrucoes(texto: str, chaves: Iterable[str]) -> dict[str, list[
 DIARIO_VERSAO = 1
 # O que se soma de um dia para o outro (e entre as rodadas do mesmo dia).
 SOMAS_DO_DIARIO = (
-    "rodadas", "primeiras", "segundas", "terceiras", "lotes", "descartados", "falhas", "confirmadas", "decididas", "instaveis", "invalidas", "mesmo_editor", "chamadas",
+    "rodadas", "primeiras", "segundas", "terceiras", "lotes", "descartados", "falhas", "confirmadas", "decididas", "instaveis", "invalidas", "mesmo_editor", "terceira_de_quem_leu", "de_outra_rodada", "chamadas",
 )  # fmt: skip
 
 
@@ -1266,9 +1331,84 @@ def resumo_do_diario(pasta: Path) -> dict[str, Any] | None:
         periodo[chave_] = sum(v for d in dias if isinstance(v := d.get(chave_), int) and not isinstance(v, bool))
     periodo["controles"] = [sum(_par(d.get("controles"))[k] for d in dias) for k in (0, 1)]
     for dia in dias:
-        if any(isinstance(dia.get(k), int) and dia[k] > 0 for k in ("primeiras", "segundas")):
+        # A terceira também é leitura: a segunda que divergiu espera a terceira de um dia para o outro, e há dia só com terceiras.
+        if any(isinstance(dia.get(k), int) and dia[k] > 0 for k in ("primeiras", "segundas", "terceiras")):
             periodo["leu_em"] = dia["data"]
     return {**ultimo, "controles": _par(ultimo.get("controles")), "periodo": periodo}
+
+
+# ── as segundas leituras que esperam a terceira ──────────────────────────────
+#
+# ``data/congresso/leitura/a_decidir.json``: a segunda leitura que caiu em faixa diferente da
+# primeira, quando a terceira não coube na mesma rodada da leitura diária. Fica guardada, com
+# quem já leu a proposição naquela rodada, até a terceira decidir (:func:`conciliar`): sem
+# ela, a rodada seguinte pediria outra segunda, e mais outra, até uma concordar, e a proposição
+# sairia "confirmada por dois leitores" com as leituras que divergiram esquecidas. Uma
+# proposição por linha, ``"<casa>|<chave>":{"s":[a linha da segunda leitura],"ed":[editores]}``.
+
+A_DECIDIR_VERSAO = 1
+
+
+@dataclass(frozen=True)
+class ADecidir:
+    """Uma segunda leitura que divergiu da primeira e espera a terceira."""
+
+    leitura: Leitura  # a segunda leitura (uma leitura só: ``r`` = 1)
+    editores: tuple[str, ...] = ()  # quem já leu a proposição na rodada da segunda (o da primeira, se foi nela, e o da segunda)
+
+
+def abrir_a_decidir(pasta: Path, regua: ProjetoDePais) -> tuple[dict[tuple[str, str], ADecidir], str]:
+    """``<pasta>/a_decidir.json`` (a pasta da guarda): ``(casa, chave)`` → a segunda leitura
+    que espera a terceira, e por que o arquivo não foi lido inteiro (vazio: foi, ou não
+    existe). Ilegível, de outro formato ou de outra versão das instruções ao leitor: nada
+    dele vale. A linha fora do formato fica de fora."""
+    caminho = Path(pasta) / A_DECIDIR
+    if not caminho.is_file():
+        return {}, ""
+    try:
+        dados = json.loads(caminho.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}, "ilegível"
+    if not isinstance(dados, dict) or dados.get("v") != A_DECIDIR_VERSAO or not isinstance(dados.get("itens"), dict):
+        return {}, "de outro formato"
+    if dados.get("regua") != regua.leitura.versao:
+        return {}, "de outra versão das instruções"
+    saida: dict[tuple[str, str], ADecidir] = {}
+    ruins = 0
+    for nome, valor in dados["itens"].items():
+        casa, _barra, chave_ = str(nome).partition("|")
+        lida = de_linha(regua, valor.get("s")) if isinstance(valor, dict) else None
+        if lida is None or casa not in base.CASAS or not chave_valida(casa, chave_):
+            ruins += 1
+            continue
+        editores = valor.get("ed") if isinstance(valor.get("ed"), list) else []
+        saida[(casa, chave_)] = ADecidir(replace(lida, r=UMA), tuple(str(e) for e in editores if isinstance(e, str) and e))
+    return saida, f"{ruins} linha{'s' if ruins > 1 else ''} fora do formato" if ruins else ""
+
+
+def ler_a_decidir(pasta: Path, regua: ProjetoDePais) -> dict[tuple[str, str], ADecidir]:
+    """As segundas leituras que esperam a terceira: o que :func:`abrir_a_decidir` conseguiu ler."""
+    return abrir_a_decidir(pasta, regua)[0]
+
+
+def serializar_a_decidir(regua: ProjetoDePais, espera: Mapping[tuple[str, str], ADecidir]) -> str:
+    """O arquivo das segundas leituras que esperam a terceira: uma proposição por linha, em
+    ordem de Casa e de chave (o git guarda só as linhas que mudaram)."""
+    linhas = ",\n".join(
+        f"{json.dumps(f'{casa}|{chave_}')}:{json.dumps({'s': item.leitura.linha(), 'ed': list(item.editores)}, ensure_ascii=False, separators=(',', ':'))}"
+        for (casa, chave_), item in sorted(espera.items(), key=lambda par: (par[0][0], _ordem(par[0][1])))
+    )
+    return f'{{"v":{A_DECIDIR_VERSAO},"regua":{json.dumps(regua.leitura.versao)},"itens":{{\n{linhas}\n}}}}\n'
+
+
+def gravar_a_decidir(pasta: Path, regua: ProjetoDePais, espera: Mapping[tuple[str, str], ADecidir]) -> bool:
+    """Grava ``<pasta>/a_decidir.json`` se mudou (devolve se gravou). Sem nada à espera, o
+    arquivo que não existe não é criado; o que existe fica, vazio (quem publica a guarda não
+    leva remoções: o arquivo apagado voltaria, com o que já foi decidido)."""
+    caminho = Path(pasta) / A_DECIDIR
+    if not espera and not caminho.is_file():
+        return False
+    return _gravar(caminho, serializar_a_decidir(regua, espera))
 
 
 # ── carregar o universo fora da atualização ──────────────────────────────────

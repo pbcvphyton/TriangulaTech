@@ -16,10 +16,11 @@ import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
 
 import pytest
 
-from qijournal.congresso import dados, pais, regras
+from qijournal.congresso import dados, pais, pais_cruzar, regras
 from qijournal.render import congresso_lp, congresso_lp_metodo, congresso_lp_voto
 from tests.test_congresso_lp_tela import MODELOS, ROOT, _atualizar, _bloco, _gerar, _nomes_da_regua, _texto
 
@@ -43,7 +44,7 @@ DECIDE = {
         {"id": "9-1", "d": "2026-08-12", "k": "cd-PLP-230-2025", "t": "PLP 230/2025", "w": 24, "ex": "fiscal", "dir": "nd", "pes": 1, "mf": -1, "res": "aprovado", "sim": 333, "nao": 91, "contra_partido": 26, "e": "Altera a lei de responsabilidade fiscal.", "f": 0},
         {"id": "9-2", "d": "2025-11-05", "k": "cd-PL-4357-2023", "t": "PL 4357/2023", "w": 16, "ex": "produtividade", "dir": "neutro", "pes": 0, "mf": 0, "res": "rejeitado", "sim": 113, "nao": 287, "contra_partido": 11, "e": "Altera a lei de locações.", "f": 0},
     ],
-    "divergentes": [{"k": "cd-1", "nome": "Fulano de Tal", "pt": "PP", "uf": "SP", "div": 27, "div_cont": 4, "vn": 58}, {"k": "cd-2", "nome": "Beltrana", "pt": "PP", "uf": "RJ", "div": 1, "div_cont": 0, "vn": 30}],
+    "divergentes": [{"k": "cd-1", "nome": "Fulano de Tal", "pt": "PP", "uf": "SP", "div": 27, "div_cont": 4, "vn": 58}, {"k": "cd-2", "nome": "Beltrana", "pt": "PP", "uf": "RJ", "div": 1, "div_cont": 1, "vn": 30}],
 }  # fmt: skip
 
 PARAMETROS = {"zonas": [30, 70], "permutacoes": 1000, "reamostras": 2000, "semente": 57, "confianca": 0.95, "pessoas_minimo": 50, "alfa_pares": 0.01}
@@ -126,12 +127,61 @@ def grande(pasta: Path, tmp_path_factory: pytest.TempPathFactory) -> str:
     meta = dados.pasta_de(copia) / "meta.json"
     m = json.loads(meta.read_text(encoding="utf-8"))
     m["leitura_projetos"]["auditoria"] = AUDITORIA
+    m["leitura_projetos"]["cobertura"]["cd"]["voto"] = {"total": 380, "lidos": 342}  # um registro a mais do que as 379 matérias de DECIDE
     meta.write_text(json.dumps(m, ensure_ascii=False), encoding="utf-8")
     return _gerar(copia)
 
 
 def _metodo(html: str) -> str:
     return html.split('id="cg-lp-metodo"', 1)[1].split("</section>", 1)[0]
+
+
+# O bastante de página para rodar as faixas por partido (lpFaixas) no Node: elementos de mentira, com
+# a largura que o teste der, e os formatadores da página. ``texto(el)`` devolve o que se lê num elemento.
+PAGINA_DE_MENTIRA = r"""
+function El(tag) {
+  var el = this;
+  this.tag = tag; this.filhos = []; this.attrs = {}; this.style = {}; this.cls = {}; this.parentNode = null; this.textContent = ''; this.hidden = false;
+  this.classList = { add: function (c) { el.cls[c] = 1; }, remove: function (c) { delete el.cls[c]; }, contains: function (c) { return !!el.cls[c]; } };
+}
+El.prototype.appendChild = function (f) { f.parentNode = this; this.filhos.push(f); return f; };
+El.prototype.removeChild = function (f) { this.filhos.splice(this.filhos.indexOf(f), 1); return f; };
+El.prototype.setAttribute = function (k, v) { this.attrs[k] = String(v); };
+El.prototype.getAttribute = function (k) { return this.attrs[k] == null ? null : this.attrs[k]; };
+El.prototype.addEventListener = function () {};
+El.prototype.getBoundingClientRect = function () { return { left: 0, top: 0, width: this.tag === 'span' ? this.textContent.length * 6.3 : LARGURA, height: 20 }; };  // letra de largura fixa
+function texto(el) { return el.textContent + el.filhos.map(texto).join(''); }
+function h(tag, attrs, filhos) {
+  var el = new El(tag), k;
+  for (k in attrs || {}) {
+    if (attrs[k] == null) continue;
+    if (k === 'cls') String(attrs[k]).split(' ').forEach(function (c) { el.cls[c] = 1; }); else if (k === 'text') el.textContent = String(attrs[k]); else el.attrs[k] = String(attrs[k]);
+  }
+  (filhos || []).forEach(function (f) { if (f == null) return; if (typeof f === 'string') { var t = new El('#text'); t.textContent = f; f = t; } el.appendChild(f); });
+  return el;
+}
+function esvaziar(el) { el.filhos = []; }
+function num(v) { return String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+function pct(v) { return Math.round(v) + '%'; }
+function saldo(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(Math.round(v)); }
+function lpDec(v) { return v == null ? '—' : String(Math.round(v * 10) / 10).replace('.', ','); }
+function faixas() { var caixa = new El('div'); return { caixa: caixa, fx: lpFaixas(caixa, { fig: new El('figure'), dica: new El('div'), longe: false, escolher: function () {}, texto: function () { return ''; } }) }; }
+"""
+
+
+def _faixas_no_node(tmp_path: Path, medidas: dict, cenario: str, *, largura: int = 515) -> dict:
+    """Roda no Node o componente das faixas por partido (o trecho de ``congresso_lp_voto.js.j2`` que vai
+    de ``LPMED`` até antes de "Na hora do voto"), com ``medidas`` no lugar das do manifesto. ``cenario``
+    é o JavaScript do teste: preenche o objeto ``r``, que volta como dicionário."""
+    componente = VOTO_JS.split("  var LPMED = ", 1)[1].split("  /* ════ Na hora do voto", 1)[0]
+    script = tmp_path / "faixas.js"
+    script.write_text(
+        f"var LARGURA = {largura}, LPM = {json.dumps({'medidas_tela': medidas, 'outros': 'Outros partidos'})}, LPC = {json.dumps({'min_partido': 5, 'min_pessoas': 50, 'longe': 20})};\n"
+        + PAGINA_DE_MENTIRA + "  var LPMED = " + componente + "\nvar r = {};\n" + cenario + "\nconsole.log(JSON.stringify(r));\n",
+        encoding="utf-8",
+    )
+    saida = subprocess.run(["node", str(script)], capture_output=True, text=True, check=True, timeout=60)
+    return json.loads(saida.stdout)
 
 
 # ── Na hora do voto ──────────────────────────────────────────────────────────
@@ -175,6 +225,7 @@ def test_na_hora_do_voto_traz_o_essencial_sem_script(grande: str):
     # quem mais divergiu: em contagem, sem ranking de independência
     assert "Quem mais votou contra o próprio partido fechado" in lido and "não é ranking de independência" in lido
     assert "27 vezes em 58 votos" in lido and "em 4 delas, do lado do caixa (voto fiscal)" in lido and "1 vez em 30 votos" in lido
+    assert "em 1 delas, do lado do caixa (voto fiscal)" in lido and "1 dela," not in lido  # uma das vezes: "delas"
     assert "O que não dá para concluir" in lido and "não se votou certo nem se é independente" in lido and "A seguir: pessoa ou partido? →" in lido
 
 
@@ -249,16 +300,30 @@ def test_pessoa_ou_partido_a_resposta_e_as_barras_saem_dos_numeros(grande: str):
     # três grupos, e dentro de cada um da maior barra para a menor
     assert [g for g in re.findall(r'<p class="cg-lp-xg">([^<]+)</p>', bloco)] == ["Voto", "Projetos", "Gabinete"]
     assert re.findall(r'class="cg-lp-xb[^"]*" data-x="([a-z]+)"', bloco) == ["saldo", "gov", "fid", "vf", "topo", "sc", "pres"]
-    barra = {ident: trecho for ident, trecho in re.findall(r'data-x="([a-z]+)" aria-pressed="false">(.*?)</button>', bloco)}
+    barra = {ident: trecho for ident, trecho in re.findall(r'data-x="([a-z]+)" data-n="\d+" aria-pressed="false">(.*?)</button>', bloco)}
     # a barra, o intervalo e o traço do acaso, em largura e posição; a palavra da zona
     assert '<i style="width:75.1%"></i><u style="left:70.2%;width:9.4%"></u><s style="left:2.2%"></s>' in barra["saldo"]
     assert "<b>75%</b> diz quase tudo" in barra["saldo"] and "régua</em>" in barra["saldo"] and "510 deputados em 20 partidos · intervalo de 95%: de 70% a 80% · por acaso daria até 2%" in barra["saldo"]
-    assert "<b>70%</b> diz parte" in barra["gov"] and "<b>12%</b> diz pouco: olhe a pessoa" in barra["fid"] and "régua</em>" not in barra["gov"]
+    # perto de um corte, o número vai com uma casa: 69,9 é "diz parte" e não pode sair "70%" ao lado de "70% ou mais: quase tudo"
+    assert "<b>69,9%</b> diz parte" in barra["gov"] and "intervalo de 95%: de 64% a 76% · por acaso daria até 2%" in barra["gov"] and "70%" not in _texto(barra["gov"])
+    assert "<b>12%</b> diz pouco: olhe a pessoa" in barra["fid"] and "régua</em>" not in barra["gov"]
     # o que encosta no acaso sai em cinza, com as palavras; o que não tem gente bastante não tem número
     assert 'class="cg-lp-xb cg-lp-xb-cz" data-x="topo"' in bloco and "<b>0%</b> não se distingue do acaso" in barra["topo"]
     assert 'class="cg-lp-xb cg-lp-xb-cz" data-x="sc"' in bloco and "não dá para responder por pessoa: só 39 podem ser medidos (a régua pede ao menos 50)" in barra["sc"] and "<b>" not in barra["sc"].split("cg-lp-xv", 1)[1]
+    # cada barra leva quantas pessoas as contas mediram: o painel ao lado decide (e escreve) pelo mesmo número
+    assert 'data-x="sc" data-n="39" aria-pressed' in bloco and 'data-x="saldo" data-n="510" aria-pressed' in bloco
     assert "não dá para responder por pessoa: ninguém pode ser medido (a régua pede ao menos 50)" in barra["vf"]
     assert 'class="cg-lp-xb" data-x="pres"' in bloco and "<b>7%</b> diz pouco: olhe a pessoa" in barra["pres"]
+    # barra colorida cujo intervalo (2,4) e acaso (2,2) dariam "de 2%" e "até 2%": os dois vão com uma casa, para não parecer que encosta
+    assert "512 deputados em 20 partidos · intervalo de 95%: de 2,4% a 13,6% · por acaso daria até 2,2%" in barra["pres"]
+    # "por acaso daria até N%" vem explicado em palavras simples: na dica "i" do gráfico das barras e na nota embaixo delas
+    dica = bloco.split("Quanto o partido explica <span>", 1)[1].split("</figcaption>", 1)[0].split('data-dica="', 1)[1].split('"', 1)[0]
+    assert dica.startswith("Acaso é sorte. Mesmo que o partido não dissesse nada, dividir os deputados em tantos grupos já daria algum número, só por sorte.")
+    # o traço é o 95º percentil dos embaralhamentos, não o máximo: a frase não diz "até onde a sorte chega" sem dizer em quantas vezes
+    assert pais_cruzar.PERCENTIL_DO_ACASO == 95.0 and "até onde a sorte chega" not in bloco
+    assert "O traço “por acaso daria até” mostra até onde a sorte costuma chegar: com os partidos embaralhados entre as pessoas 1.000 vezes, o número fica abaixo dele em 95 de cada 100." in dica
+    assert "A barra só conta quando o intervalo dela fica todo acima do traço. Barra em cinza não quer dizer “é a pessoa”: quer dizer que não dá para afirmar." in dica
+    assert "sai em cinza: acaso é sorte, e “por acaso daria até” é o que a sorte sozinha daria em 95 de cada 100 vezes, com os partidos embaralhados entre as pessoas." in texto
     assert "70% ou mais: o partido diz quase tudo; de 30% a 70%: diz parte; abaixo de 30%: diz pouco." in texto
     # o que anda junto: a pergunta, a barra a partir do zero e a resposta em frase; só afirma o que passa do acaso
     pares = bloco.split('<ul class="cg-lp-pares">', 1)[1].split("</ul>", 1)[0].split("<li")[1:]
@@ -266,6 +331,7 @@ def test_pessoa_ou_partido_a_resposta_e_as_barras_saem_dos_numeros(grande: str):
     assert 'class="cg-lp-pb-p" style="width:12.5%"' in pares[0] and "<b>0,25</b> Quem propõe mais do lado do caixa dá mais voto fiscal: correlação fraca (0,25; n = 226)." in pares[0] and "dentro do mesmo partido: 0,11 (fraca)" in pares[0]
     assert 'class="cg-lp-pb-n" style="width:11.5%"' in pares[1] and "<b>−0,23</b> Quem vota mais à esquerda tem parte maior na faixa" in pares[1]
     assert pares[2].startswith(' class="cg-lp-par-cz">') and "Não se distingue do acaso (0,06; n = 513)." in pares[2]
+    assert "Quem vota mais apresentou mais projetos na legislatura?" in pares[2]  # a pergunta diz a janela da medida, a da legislatura
     assert pares[3].startswith(' class="cg-lp-par-cz">') and "Não dá para responder por pessoa: ninguém tem as duas medidas" in pares[3] and "cg-lp-pb-" not in pares[3]
     assert "Só vira afirmação o par que passa do acaso a 99%, já contando os 4 pares" in texto and "andar junto não é causa" in texto
     # a tabela das medianas aceita partido sem mediana
@@ -304,9 +370,38 @@ def test_a_frase_resposta_muda_com_os_numeros(R: congresso_lp.Rotulos, frase: di
     assert "se lê pelo partido" not in linha + ninguem  # a frase antiga afirmava que a proposta "se lê pela pessoa"
 
 
-def test_as_medidas_da_tela_sao_as_das_contas(R: congresso_lp.Rotulos):
+def test_o_numero_escrito_concorda_com_a_palavra_e_com_a_cor_perto_de_um_corte(R: congresso_lp.Rotulos):
+    """A palavra ("diz parte"), a cor da barra e o número ao lado saem do mesmo lugar. Nas contas, a zona e "distingue"
+    são decididos pelo número publicado (uma casa). Na tela, o percentual é inteiro, a não ser que o inteiro caia do
+    outro lado de um corte: aí vai com a casa das contas. O mesmo na linha da frase-resposta, cujos números decidem o
+    título."""
+    zonas = (30.0, 70.0)
+    assert pais_cruzar.publicado(0.6996, (0.6, 0.8), 0.02, zonas) == {"e2": 70.0, "ic": [60.0, 80.0], "acaso": 2.0, "zona": "quase_tudo", "distingue": True}
+    assert pais_cruzar.publicado(0.6994, (0.6, 0.8), 0.02, zonas)["zona"] == "parte" and pais_cruzar.publicado(0.2996, None, None, zonas)["zona"] == "parte"
+    assert pais_cruzar.publicado(0.073, (0.0244, 0.136), 0.0236, zonas)["distingue"] is False  # 2,4 contra 2,4: encosta
+    assert pais_cruzar.publicado(0.073, (0.0246, 0.136), 0.0236, zonas)["distingue"] is True  # 2,5 contra 2,4
+    assert pais_cruzar.publicado(0.073, None, 0.02, zonas)["distingue"] is False and pais_cruzar.publicado(0.073, (0.03, 0.1), None, zonas)["distingue"] is False
+    escritos = {v: congresso_lp_voto._pct_do_corte(v, zonas) for v in (69.9, 69.5, 70.0, 70.4, 29.6, 30.4, 75.1, 0.3, 0.0)}
+    assert escritos == {69.9: "69,9%", 69.5: "69,5%", 70.0: "70%", 70.4: "70%", 29.6: "29,6%", 30.4: "30%", 75.1: "75%", 0.3: "0,3%", 0.0: "0%"}
+    medidas = {"saldo": {"e2": 69.9, "ic": [63.6, 75.9], "distingue": True}, "topo": {"e2": 5.0, "ic": [0.0, 29.6], "distingue": False}}
+    r = congresso_lp_voto.resposta({"caso": "nem_o_voto", "projetos_distingue": False}, medidas, [30.0, 70.0], "deputado", "deputados", R)
+    linha = "".join(t for t, _forte in r["linha"])
+    assert r["titulo"][0] == "Nem no voto o partido diz tudo." and "O partido explica 69,9% da diferença entre deputados no lado em que votam e 5% na parte de" in linha
+    assert "(o intervalo vai de 0% a 29,6% e encosta no que o acaso daria)" in linha
+
+
+def test_o_par_de_quantos_projetos_diz_a_janela_da_medida(R: congresso_lp.Rotulos):
+    """A medida conta os projetos apresentados na legislatura (a coluna ``tot``). Quando o par passa do acaso, a frase
+    diz isso, e não "apresenta mais projetos", que se lia como o total do dossiê."""
+    lp = {"cruzar": {**CRUZAR, "pares": [{"a": "pres", "b": "prop", "n": 513, "rho": 0.2, "dentro": 0.22, "p": 4e-06, "passa": True}, {"a": "ct", "b": "prop", "n": 512, "rho": -0.21, "dentro": -0.2, "p": 1e-05, "passa": True}]}}
+    pares = congresso_lp_voto.cruzar("cd", "deputado", "deputados", lp, R, congresso_lp_voto.medidas(R))["pares"]
+    assert (pares[0]["pergunta"], pares[0]["resposta"]) == ("Quem vota mais apresentou mais projetos na legislatura?", "Quem vota mais (presença) apresentou mais projetos na legislatura: correlação fraca (0,20; n = 513).")
+    assert pares[1]["pergunta"] == "Quem gasta mais cota apresentou mais projetos na legislatura?" and "apresentou menos projetos na legislatura: correlação fraca (−0,21; n = 512)." in pares[1]["resposta"]
+
+
+def test_as_medidas_da_tela_sao_as_das_contas(R: congresso_lp.Rotulos, regua: regras.ProjetoDePais):
     """O script tira o valor de cada pessoa das colunas que :func:`medidas` aponta: toda medida
-    das contas tem de estar lá, com nome, unidade e coluna."""
+    das contas tem de estar lá, com nome, unidade e coluna, e a coluna é a que as contas usam."""
     from qijournal.congresso import pais_cruzar
 
     M = congresso_lp_voto.medidas(R)
@@ -316,6 +411,13 @@ def test_as_medidas_da_tela_sao_as_das_contas(R: congresso_lp.Rotulos):
     linha = {"va": 6, "vn": 16, "estr": 1, "n": 9, "saldo": -25, "prop": None}
     assert congresso_lp_voto.valor(linha, M["vf"]) == pytest.approx(37.5) and congresso_lp_voto.valor(linha, M["topo"]) is None  # menos de 10 projetos lidos
     assert congresso_lp_voto.valor(linha, M["saldo"]) == -25 and congresso_lp_voto.valor(linha, M["prop"]) == 0 and congresso_lp_voto.valor(linha, M["gov"]) is None
+    # uma pessoa com todas as colunas dá, em cada medida, o mesmo valor na tela e nas contas
+    completa = {"saldo": -25, "gov": 61.5, "va": 6, "vn": 16, "fid": 88.0, "tot": 12, "prop": 66, "n": 11, "estr": 1, "sb": 3, "tip": 4.5, "sc": -20, "tx": 9.1, "pres": 77.0, "ct": 31000}
+    das_contas = pais_cruzar.valores([completa], regua)
+    for ident, _grupo, _valor in pais_cruzar.MEDIDAS:
+        assert congresso_lp_voto.valor(completa, M[ident]) == pytest.approx(das_contas[ident][0]), ident
+    # "quantos projetos apresentou" é da legislatura (12), não o total do dossiê (66), e o nome diz a janela
+    assert congresso_lp_voto.valor(completa, M["prop"]) == 12 and M["prop"]["col"] == ["tot"] and M["prop"]["nome"] == "Quantos projetos apresentou na legislatura"
 
 
 # ── Como ler: a leitura dos projetos ─────────────────────────────────────────
@@ -349,7 +451,18 @@ def test_o_como_ler_ganha_a_leitura_dos_projetos_com_a_regua_do_config(grande: s
     # os termos das quatro vistas
     for termo in ("O que é lido", "O peso (0 a 100)", "As três marcas", "Parado, e em que porta", "O perfil de cada um", "A faixa do acaso", "Quando pesa", "Voto fiscal", "Contra o próprio partido", "Quanto o partido explica", "O que anda junto"):
         assert f"<dt>{termo}</dt>" in bloco, termo
-    assert "embaralhando os partidos entre as pessoas 1.000 vezes; o intervalo, reamostrando as pessoas 2.000 vezes" in lido
+    assert "o traço “por acaso daria até” mostra até onde a sorte costuma chegar. É o valor que 95 de cada 100 embaralhamentos dos partidos entre as pessoas não passam (são 1.000 embaralhamentos); o intervalo sai reamostrando as pessoas 2.000 vezes." in lido
+    assert "até onde a sorte chega" not in lido
+    # "o acaso", em palavras simples, nos dois termos em que ele entra; a conta continua dita
+    faixa = _texto(bloco.split("<dt>A faixa do acaso</dt>", 1)[1].split("</dd>", 1)[0])
+    assert faixa.startswith("Acaso é sorte. Com poucos projetos, um ou dois a mais ou a menos aparecem por sorte, mesmo em quem é igual à média da Casa.")
+    assert "é o que a sorte sozinha daria a um parlamentar médio com aquele número de projetos" in faixa and "a sorte daria menos de 1 vez em 100, já contando que são muitos comparados de uma vez" in faixa
+    assert "Dentro da faixa não quer dizer “igual à média”: quer dizer que não dá para afirmar." in faixa and "binomial exata contra a taxa da Casa, 99% de confiança" in faixa
+    # o que a conta supõe, e por que a borda não é para ser lida ao pé da letra (está no comentário das contas, e tem de estar na página)
+    assert faixa.endswith("Ela trata cada projeto como um sorteio separado; como os projetos de uma mesma pessoa se parecem, a faixa de verdade é um pouco mais larga que a desenhada: quem está bem na borda não deve ser lido como fora dela.")
+    assert "Aqui o acaso também é sorte: mesmo que o partido não dissesse nada, dividir as pessoas em tantos grupos já daria algum número" in lido
+    # a janela da medida de quantos projetos: a da legislatura (a do perfil), não o total do dossiê
+    assert "“Quantos projetos apresentou na legislatura” conta os PL, PLP e PEC de autoria principal apresentados na legislatura, com ou sem leitura" in lido and "não o total do dossiê" in lido
     # o que a régua não mede, os cinco erros de leitura e os limites
     erros = bloco.split('<ol class="cg-lp-met-e">', 1)[1].split("</ol>", 1)[0]
     assert erros.count("<li>") == 5 and "<b>Peso como qualidade.</b>" in erros and "<b>“Voto fiscal” como voto certo ou como independência.</b>" in erros
@@ -361,9 +474,18 @@ def test_o_como_ler_publica_a_cobertura_e_a_auditoria_que_vieram(grande: str, pe
     # a cobertura, de meta.json (o Congresso de mentira tem seis proposições lidas na Câmara)
     cobertura = _metodo(grande).split('class="an-tbl cg-tb cg-lp-met-cb"', 1)[1].split("</table>", 1)[0]
     assert '<tr><th scope="row">Câmara</th><td>6</td><td><b>6</b> <small>100%</small></td><td>0</td><td>1</td><td>5 de 5</td>' in cobertura and cobertura.count("<tr>") == 2
+    # as matérias votadas da cobertura são proposições do registro; "Na hora do voto" conta matérias: quando os números diferem, a nota diz
+    assert "<td>342 de 380</td>" in cobertura and "379 matérias" in _texto(_bloco(grande, "cg-lp-dec-cd"))
+    assert (
+        "Na Câmara, as matérias votadas são 380 proposições do registro para as 379 matérias que “Na hora do voto” conta: há 1 registro a mais, "
+        "de matéria que foi a voto sob mais de um número de registro (acontece com a que volta da outra Casa e é votada de novo, com outra ementa). "
+        "Aqui ela é lida uma vez por registro; no voto, conta uma vez só, pela última votação."
+    ) in lido
+    assert "proposições do registro para as" not in _texto(_metodo(pequena))  # sem diferença, nada a explicar
     # quem leu e o estado das leituras
     assert "Primeira leitura. O modelo de IA mais barato leu tudo, às cegas." in lido and "Segunda leitura. Um modelo intermediário releu" in lido and "Terceira leitura. O modelo mais forte desempatou." in lido
-    assert "Das 40.106 proposições lidas: 37.960 têm uma leitura só, 811 têm duas leituras na mesma faixa, 1.112 foram decididas pelo terceiro leitor e 223 ficaram instáveis" in lido
+    # a frase da auditoria leva a data dela: o que chegou depois é da leitura de todo dia
+    assert "Das 40.106 proposições lidas até 16/11/2026: 37.960 têm uma leitura só, 811 têm duas leituras na mesma faixa, 1.112 foram decididas pelo terceiro leitor e 223 ficaram instáveis" in lido
     # as perguntas de controle, o piloto e a segunda leitura, com os números que vieram
     assert "As perguntas de controle" in lido and "Resultado: 2.361 de 2.630 na mesma faixa (89,8%), em 263 lotes." in lido and "5 lotes foram relidos." in lido
     assert "Amostra: 334 ementas (150 ao acaso; 90 PLP e PEC)." in lido and "A faixa do peso 82% 0,74" in lido and "A marca “Contas” 86% 0,77" in lido
@@ -377,6 +499,123 @@ def test_o_como_ler_publica_a_cobertura_e_a_auditoria_que_vieram(grande: str, pe
     sem_auditoria = _texto(_metodo(pequena))
     assert "A auditoria da leitura não veio nesta atualização." in sem_auditoria and "kappa" not in sem_auditoria.lower() and "Primeira leitura" not in sem_auditoria
     assert f"Tudo isto {congresso_lp_metodo.CONSTANCIA}." in sem_auditoria and all(limite in sem_auditoria for limite in congresso_lp_metodo.LIMITES)
+
+
+def test_toda_tabela_do_bloco_da_leitura_rola_dentro_da_caixa_dela(grande: str):
+    """Tabela fora da caixa (``an-tbl-wrap``) não rola sozinha: no celular estreito (360 px ou menos), "Os dois
+    leitores, lado a lado" fazia a página inteira rolar de lado, e o Como ler abria deslocado."""
+    tabelas = re.findall(r'(<div class="an-tbl-wrap">)?<table class="([^"]+)"', _metodo(grande))
+    assert len(tabelas) >= 4 and "an-tbl cg-tb cg-lp-met-c" in [classe for _caixa, classe in tabelas]
+    assert [classe for caixa, classe in tabelas if not caixa] == []
+
+
+DIARIA = {
+    "data": "2026-11-18", "quando": "2026-11-18T09:10:00+00:00", "rodadas": 1, "primeiras": 20, "segundas": 5, "terceiras": 0, "lotes": 2, "descartados": 0, "falhas": 0, "controles": [17, 20],
+    "confirmadas": 5, "decididas": 0, "instaveis": 0, "invalidas": 1, "mesmo_editor": 5, "chamadas": 2, "tokens": {"entrada": 1, "saida": 1}, "pendentes": {"primeiras": 12, "segundas": 3},
+    "provedor": "editor_a → editor_b", "modelo": "modelo-a + modelo-b", "motivo": "",
+    "periodo": {"dias": 3, "desde": "2026-11-16", "leu_em": "2026-11-17", "rodadas": 3, "primeiras": 143, "segundas": 31, "terceiras": 2, "lotes": 7, "descartados": 1, "falhas": 0, "mesmo_editor": 5, "de_outra_rodada": 12, "controles": [52, 70]},
+}  # fmt: skip
+
+
+def test_o_como_ler_diz_como_e_a_leitura_de_todo_dia_com_e_sem_o_registro(grande: str, pequena: str, pasta: Path, tmp_path: Path):
+    """O parágrafo "A leitura de todo dia" sai sempre (quem lê o que chega depois da leitura inicial, os lotes
+    com as perguntas de controle e o mínimo de acertos do config, a segunda leitura, o "sem leitura" até lá).
+    Com ``leitura_projetos.diaria`` em ``meta.json``, ganha os números do período e quem respondeu."""
+    from qijournal.congresso import ler
+
+    limites = ler.Limites()
+    assert (limites.lote, limites.controles, limites.controles_minimo) == (30, 10, 7)  # os do config de hoje, que a frase repete
+    for html, depois in ((grande, "depois de 16/11/2026"), (pequena, "depois da leitura inicial")):
+        bloco = _metodo(html)
+        paragrafo = _texto(bloco.split('<p class="cg-lp-met-k" id="cg-lp-diaria">A leitura de todo dia</p>', 1)[1].split("</p>", 1)[0])
+        assert paragrafo.startswith(f"As proposições e as matérias votadas que chegam {depois} são lidas todo dia pela cadeia de IAs do jornal")
+        assert "Vão em lotes de até 30, e em cada lote vão escondidas 10 perguntas de controle" in paragrafo and "o lote que acerta a faixa em menos de 7 delas é descartado inteiro" in paragrafo
+        assert "ganha uma segunda leitura, de outra IA da cadeia quando há. Se as duas caem em faixas diferentes, uma terceira decide, de uma IA que ainda não leu a proposição, quando há." in paragrafo
+        assert "Quando só uma IA responde, a segunda ou a terceira é de quem já tinha lido a mesma proposição, e o registro conta quantas foram assim." in paragrafo
+        assert "Quando a primeira leitura é de uma rodada anterior, o registro não guarda de que IA ela foi: a segunda evita a IA que costuma fazer as primeiras, sem garantia de que seja outra, e o registro conta essas à parte." in paragrafo
+        assert "editor" not in paragrafo  # quem lê é "IA", como no resto do parágrafo
+        assert "Até ser lida, a proposição nova aparece como “sem leitura”, fora das contas" in paragrafo and "a de todo dia tem só as perguntas de controle" in paragrafo
+        # sem o registro: nenhum número de rodada, nenhum editor
+        assert "primeiras leituras" not in paragrafo and "quem respondeu" not in paragrafo and "A última rodada" not in paragrafo
+        assert bloco.index('id="cg-lp-diaria"') < bloco.index("O que isto mede")
+    # com o registro: os números do período, a última rodada, quem respondeu e a fila
+    copia = tmp_path / "data"
+    shutil.copytree(pasta, copia)
+    meta = dados.pasta_de(copia) / "meta.json"
+    m = json.loads(meta.read_text(encoding="utf-8"))
+    m["leitura_projetos"]["auditoria"] = AUDITORIA
+    meta.write_text(json.dumps(m, ensure_ascii=False), encoding="utf-8")
+    sem_registro = _gerar(copia)
+    m["leitura_projetos"]["diaria"] = DIARIA
+    meta.write_text(json.dumps(m, ensure_ascii=False), encoding="utf-8")
+    com_registro = _gerar(copia)
+    paragrafo = _texto(_metodo(com_registro).split('id="cg-lp-diaria">A leitura de todo dia</p>', 1)[1].split("</p>", 1)[0])
+    assert (
+        "Desde 16/11/2026 (3 dias com rodada): 143 primeiras leituras, 31 segundas e 2 terceiras; "
+        "das segundas e terceiras, 5 foram feitas por uma IA que já tinha lido a mesma proposição na rodada; "
+        "em 12 das segundas, a primeira leitura era de outra rodada e o registro não diz de que IA era (pode ter sido a mesma); "
+        "nos controles, 52 de 70 na faixa certa (74,3%); 1 lote descartado, de 7."
+    ) in paragrafo
+    assert "A última rodada foi em 18/11/2026 (a última em que algo foi lido, em 17/11/2026). Nela, quem respondeu: editor_a → editor_b (modelo-a + modelo-b)." in paragrafo
+    assert "Ficaram na fila: 12 sem leitura e 3 à espera da segunda leitura." in paragrafo
+    # o registro só acrescenta ao parágrafo: o resto da página é igual, byte a byte
+    de, ate = '<p class="cg-lp-met-k" id="cg-lp-diaria">', '<p class="cg-lp-av"><b class="cg-lp-av-k">O que isto mede</b>'
+    assert com_registro.split(de, 1)[0] == sem_registro.split(de, 1)[0] and com_registro.split(ate, 1)[1] == sem_registro.split(ate, 1)[1]
+    antes = sem_registro.split(de, 1)[1].split(ate, 1)[0]
+    assert com_registro.split(de, 1)[1].split(ate, 1)[0].startswith(antes.rstrip().removesuffix("</p>")) and "<b>Desde 16/11/2026" not in antes
+
+
+def test_a_leitura_de_todo_dia_so_escreve_o_que_veio(R: congresso_lp.Rotulos, regua: regras.ProjetoDePais):
+    """O resumo do registro é só repassado: chave que falta, ou de outro tipo, não vira número inventado."""
+    from qijournal.congresso import ler
+
+    limites = ler.Limites()
+    vazio = congresso_lp_metodo._diaria(None, limites, "")
+    assert vazio["numeros"] == "" and vazio["quem"] == "" and "depois da leitura inicial" in vazio["como"]
+    # o registro pela metade (o período sem lotes; controles zerados; nenhum editor respondeu)
+    y = congresso_lp_metodo._diaria({"data": "2026-11-18", "provedor": "", "motivo": "sem IA: nada lido", "periodo": {"dias": 1, "desde": "2026-11-18", "primeiras": 0, "segundas": 0, "controles": [0, 0]}, "pendentes": "x"}, limites, "16/11/2026")
+    assert y["numeros"] == "Desde 18/11/2026 (1 dia com rodada): 0 primeiras leituras e 0 segundas." and y["quem"] == "A última rodada foi em 18/11/2026. Nela, nenhuma IA respondeu (sem IA: nada lido)."
+    assert congresso_lp_metodo._diaria({"periodo": "?", "controles": "?", "data": 5}, limites, "") == {**vazio}
+    # uma segunda só, de quem já tinha lido; sem o campo das de outra rodada (registro de antes dele), nada se diz delas; nenhum lote descartado
+    y = congresso_lp_metodo._diaria({"periodo": {"primeiras": 1, "segundas": 1, "mesmo_editor": 1, "lotes": 1, "descartados": 0}}, limites, "")
+    assert y["numeros"] == "No registro: 1 primeira leitura e 1 segunda; a segunda foi feita por uma IA que já tinha lido a mesma proposição na rodada; nenhum lote descartado, de 1."
+
+    def numeros(**periodo: int) -> str:
+        return congresso_lp_metodo._diaria({"periodo": periodo}, limites, "")["numeros"]
+
+    # "mesmo_editor" conta as segundas e as terceiras de quem já tinha lido: a frase diz de quais, e não "delas pelo mesmo que fez a primeira"
+    assert numeros(primeiras=9, segundas=4, terceiras=1, mesmo_editor=0, de_outra_rodada=0) == "No registro: 9 primeiras leituras, 4 segundas e 1 terceira; nenhuma das segundas e terceiras foi feita por uma IA que já tinha lido a mesma proposição na rodada."
+    assert numeros(primeiras=9, segundas=4, terceiras=0, mesmo_editor=2, de_outra_rodada=1) == (
+        "No registro: 9 primeiras leituras e 4 segundas; das segundas, 2 foram feitas por uma IA que já tinha lido a mesma proposição na rodada; "
+        "em 1 das segundas, a primeira leitura era de outra rodada e o registro não diz de que IA era (pode ter sido a mesma)."
+    )
+    assert numeros(primeiras=0, segundas=3, de_outra_rodada=3) == "No registro: 0 primeiras leituras e 3 segundas; em 3 das segundas, a primeira leitura era de outra rodada e o registro não diz de que IA era (pode ter sido a mesma)."
+    # sem os dois campos, só as contagens; sem segundas nem terceiras, nada a dizer de quem as fez
+    assert numeros(primeiras=9, segundas=4, terceiras=1) == "No registro: 9 primeiras leituras, 4 segundas e 1 terceira."
+    assert numeros(primeiras=9, segundas=0, terceiras=0, mesmo_editor=0, de_outra_rodada=0) == "No registro: 9 primeiras leituras e 0 segundas."
+    assert "editor" not in numeros(primeiras=9, segundas=4, terceiras=1, mesmo_editor=5, de_outra_rodada=2)
+    # com uma segunda só, a frase concorda: "a segunda", não "das segundas, 1" nem "em 1 das segundas"
+    assert numeros(primeiras=2, segundas=1, mesmo_editor=0, de_outra_rodada=1) == (
+        "No registro: 2 primeiras leituras e 1 segunda; a segunda não foi feita por uma IA que já tinha lido a mesma proposição na rodada; "
+        "na segunda, a primeira leitura era de outra rodada e o registro não diz de que IA era (pode ter sido a mesma)."
+    )
+    # sem os limites (config ilegível), a frase sai sem os números; desligada, diz que está desligada; sem controles, diz que não há
+    assert "com perguntas de controle escondidas" in congresso_lp_metodo._diaria(None, None, "")["como"] and "30" not in congresso_lp_metodo._diaria(None, None, "")["como"]
+    assert congresso_lp_metodo._diaria(None, ler.Limites(ligada=False), "16/11/2026")["como"].startswith("A leitura de todo dia está desligada no config: a proposição que chega depois de 16/11/2026 fica como “sem leitura”")
+    assert "sem perguntas de controle (estão desligadas no config)" in congresso_lp_metodo._diaria(None, ler.Limites(controles=0, controles_minimo=0), "")["como"]
+    # o método inteiro, sem nada em meta.json: o parágrafo está lá, sem números
+    assert congresso_lp_metodo.metodo(R, regua, {}, [], None, None)["diaria"] == congresso_lp_metodo._diaria(None, None, "")
+
+
+def test_a_nota_da_cobertura_so_sai_quando_ha_registros_a_mais_do_que_materias():
+    cobertura = {"cd": {"total": 32838, "lidos": 31604, "voto": {"total": 381, "lidos": 342}}, "sf": {"total": 6715, "lidos": 6048, "voto": {"total": 288, "lidos": 237}}}
+    casas = [("cd", "Câmara"), ("sf", "Senado")]
+    camara, senado = congresso_lp_metodo._cobertura(casas, cobertura, {"cd": 379, "sf": 288})
+    assert camara["voto"] == "342 de 381" and "são 381 proposições do registro para as 379 matérias" in camara["nota"] and "há 2 registros a mais" in camara["nota"]
+    assert senado["voto"] == "237 de 288" and senado["nota"] == ""  # iguais
+    # sem o número do voto, com número que não é número, ou com menos registros do que matérias: nenhuma nota inventada
+    assert [linha["nota"] for linha in congresso_lp_metodo._cobertura(casas, cobertura)] == ["", ""]
+    assert [linha["nota"] for linha in congresso_lp_metodo._cobertura(casas, cobertura, {"cd": "379", "sf": 300})] == ["", ""]
 
 
 def test_a_auditoria_pela_metade_nao_derruba_a_pagina(R: congresso_lp.Rotulos, regua: regras.ProjetoDePais):
@@ -402,6 +641,116 @@ def test_nenhum_nome_de_categoria_da_regua_esta_escrito_nos_modelos_novos(regua:
         for ident in sorted(ids):
             assert not re.search(r"""['":=]""" + re.escape(ident) + r"""['"]""", texto), f"{nome}: o id “{ident}” está escrito"
             assert not re.search(r"cg-lp-" + re.escape(ident) + r"(?![\w-])", texto), f"{nome}: a classe cg-lp-{ident} leva o nome de uma categoria"
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+def test_a_medida_que_nao_e_desenhada_nao_herda_a_mediana_da_anterior(tmp_path: Path):
+    """Em "Pessoa ou partido?", a medida que não alcança o mínimo de pessoas não ganha pontos. A frase de quem
+    está em foco não pode trazer a mediana do partido da medida desenhada antes (era "saldo de contas: −100 ·
+    mediana do PP: +59", com a mediana de "De que lado vota"); e o aviso diz a contagem das contas, a da barra."""
+    medidas = {"a": {"nome": "A", "un": "n", "min": 0, "col": ["a"]}, "b": {"nome": "B", "un": "saldo", "min": -100, "max": 100, "zero": True, "col": ["b"]}}
+    r = _faixas_no_node(
+        tmp_path,
+        medidas,
+        """
+        var Q = [], i, f = faixas();
+        for (i = 0; i < 60; i++) Q.push({ k: 'sf-' + i, nome: 'Nome ' + i, pt: i < 30 ? 'PP' : 'PT', uf: 'SC', a: 10 + i, b: i < 43 ? i - 100 : null });
+        r.a = f.fx.desenhar(Q, 'a', 'senador', 'senadores');
+        r.frase_a = lpNaMedida(Q[0], LPMED.a);
+        r.pontos_a = f.fx.ordem().length;
+        r.b = f.fx.desenhar(Q, 'b', 'senador', 'senadores', 39);
+        r.frase_b = lpNaMedida(Q[0], LPMED.b);
+        r.pontos_b = f.fx.ordem().length;
+        r.aviso_b = texto(f.caixa);
+        r.b_sem_as_contas = f.fx.desenhar(Q, 'b', 'senador', 'senadores');
+        r.aviso_sem_as_contas = texto(f.caixa);
+        """,
+    )
+    assert r["a"] is True and r["pontos_a"] == 60 and r["frase_a"] == "10 · mediana do PP: 24,5"
+    assert r["b"] is False and r["pontos_b"] == 0 and r["frase_b"] == "−100"  # só o número dele: nenhuma mediana de outra medida
+    assert r["aviso_b"].startswith("Não dá para responder por pessoa nesta medida: só 39 senadores podem ser medidos (a régua pede ao menos 50).")
+    assert r["b_sem_as_contas"] is False and "só 43 senadores podem ser medidos" in r["aviso_sem_as_contas"]  # sem o número das contas, o que a página contou
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+@pytest.mark.parametrize(
+    ("largura", "projetos", "cota"),
+    [
+        (515, ["1", "10", "100", "2.000"], ["R$ 0", "R$ 25.000", "R$ 50.000", "R$ 75.000", "R$ 100.000"]),  # tela larga: só "1.000" encostaria em "2.000"
+        (342, ["1", "10", "100", "2.000"], ["R$ 0", "R$ 50.000", "R$ 100.000"]),  # celular: os cinco rótulos em reais não cabem
+    ],
+)
+def test_os_rotulos_da_regua_das_faixas_nao_encostam_um_no_outro(tmp_path: Path, largura: int, projetos: list[str], cota: list[str]):
+    """A régua das faixas por partido escrevia "1.0002.000" (a potência de 10 colada no teto do eixo logarítmico)
+    e, no celular, "R$ 75.000" por cima de "R$ 100.000". O rótulo que encostaria no vizinho não é escrito; a
+    linha da marca fica no gráfico, e as escalas que cabem saem inteiras."""
+    medidas = {
+        "prop": {"nome": "Projetos", "un": "n", "min": 1, "log": True, "col": ["tot"], "padrao": 0},
+        "ct": {"nome": "Cota", "un": "reais", "min": 0, "col": ["ct"]},
+        "pres": {"nome": "Presença", "un": "%", "min": 0, "max": 100, "col": ["pres"]},
+    }
+    r = _faixas_no_node(
+        tmp_path,
+        medidas,
+        """
+        var Q = [], i;
+        for (i = 0; i < 60; i++) Q.push({ k: 'cd-' + i, nome: 'Nome ' + i, pt: i < 30 ? 'PP' : 'PT', uf: 'SP', tot: i ? i : 1208, ct: 1000 + i * 1500, pres: 40 + i });
+        function regua(medida) {
+          var f = faixas(), rotulos, pista;
+          f.fx.desenhar(Q, medida, 'deputado', 'deputados');
+          rotulos = f.caixa.filhos[0].filhos[0].filhos;
+          pista = f.caixa.filhos[1].filhos[1];
+          return { marcas: rotulos.map(texto), escritos: rotulos.filter(function (s) { return !s.hidden; }).map(texto), linhas: pista.filhos.filter(function (x) { return x.cls['cg-lp-fx-g']; }).length };
+        }
+        r.prop = regua('prop'); r.ct = regua('ct'); r.pres = regua('pres');
+        """,
+        largura=largura,
+    )
+    assert r["prop"]["marcas"] == ["1", "10", "100", "1.000", "2.000"] and r["prop"]["escritos"] == projetos and r["prop"]["linhas"] == 5
+    assert r["ct"]["marcas"] == ["R$ 0", "R$ 25.000", "R$ 50.000", "R$ 75.000", "R$ 100.000"] and r["ct"]["escritos"] == cota and r["ct"]["linhas"] == 5
+    assert r["pres"]["escritos"] == ["0%", "25%", "50%", "75%", "100%"]
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+def test_o_rotulo_de_cada_marca_da_regua_diz_onde_ela_esta(tmp_path: Path):
+    """Na "Mediana do peso", de 0 a 25, as marcas ficam em 6,25, 12,5 e 18,75 e saíam escritas "6", "13" e "19". E, no
+    eixo logarítmico de quantos projetos, quem tem 0 é desenhado na primeira marca (não há zero em escala logarítmica):
+    quando há alguém assim, a marca diz "até 1", e não "1"."""
+    medidas = {
+        "tip": {"nome": "Mediana do peso", "un": "peso", "min": 0, "col": ["tip"]},
+        "prop": {"nome": "Projetos", "un": "n", "min": 1, "log": True, "col": ["tot"], "padrao": 0},
+        "ct": {"nome": "Cota", "un": "reais", "min": 0, "col": ["ct"]},
+    }
+    r = _faixas_no_node(
+        tmp_path,
+        medidas,
+        """
+        var Q = [], i;
+        for (i = 0; i < 60; i++) Q.push({ k: 'cd-' + i, nome: 'Nome ' + i, pt: i < 30 ? 'PP' : 'PT', uf: 'SP', tot: i, tip: i % 24, ct: 1000 + i * 1500 });
+        function marcas(medida) { var f = faixas(); f.fx.desenhar(Q, medida, 'deputado', 'deputados'); return f.caixa.filhos[0].filhos[0].filhos.map(texto); }
+        r.tip = marcas('tip'); r.com_zero = marcas('prop'); r.ct = marcas('ct');
+        Q[0].tot = 1; r.sem_zero = marcas('prop');
+        """,
+    )
+    assert r["tip"] == ["0", "6,25", "12,5", "18,75", "25"]
+    assert r["com_zero"] == ["até 1", "10", "100"] and r["sem_zero"] == ["1", "10", "100"]
+    assert r["ct"] == ["R$ 0", "R$ 25.000", "R$ 50.000", "R$ 75.000", "R$ 100.000"]  # as marcas inteiras saem como sempre
+
+
+def test_sem_pontos_na_medida_o_contador_e_a_janela_do_voto_dizem_isso():
+    """Em "Na hora do voto", quando a medida não é desenhada, o contador não diz que a pessoa em foco está
+    "sem número" (o cartão ao lado mostra o número dela) nem a Janela diz "0 medidos"."""
+    assert "else if (!temPontos) posEl.textContent = emFoco.nome + ' · sem pontos nesta medida';" in VOTO_JS
+    assert VOTO_JS.index("else if (!temPontos) posEl.textContent") < VOTO_JS.index("' · fora do gráfico (sem número nesta medida)'")
+    assert "temPontos ? num(faixas.ordem().length) + ' ' + UNS + ' medidos' : 'sem pontos nesta medida'" in VOTO_JS
+
+
+def test_as_frases_do_cartao_do_voto_concordam_no_singular():
+    """"0 vezes em 1 voto dado" e "em 1 delas" (uma das vezes), no cartão montado pelo script; o contador
+    diz "1 deputado no gráfico"."""
+    assert "(q.wn === 1 ? ' voto dado' : ' votos dados') + ' nas votações que entram'" in VOTO_JS
+    assert "'; em ' + num(q.div_cont) + ' delas, do lado do caixa.'" in VOTO_JS and "' dela'" not in VOTO_JS
+    assert "num(n) + ' ' + (n === 1 ? UM : UNS) + ' no gráfico'" in VOTO_JS
 
 
 def test_o_script_das_duas_vistas_e_do_estilo_da_casa(grande: str):

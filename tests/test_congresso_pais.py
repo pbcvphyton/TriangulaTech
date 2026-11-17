@@ -438,6 +438,33 @@ def test_a_marca_fiscal_so_com_leitura_confirmada_e_marca_legivel(r: regras.Regr
     assert pais_voto.marca_fiscal(ctx, leitura.avaliar(regua, None), None) == 0
 
 
+def test_a_materia_com_a_marca_do_caixa_em_disputa_fica_fora_do_voto_fiscal(r: regras.Regras, regua):
+    """Os leitores caíram na mesma faixa e divergiram na marca do caixa: o custo fica "nd", com
+    a anotação na justificativa (:func:`leitura.com_contas_em_disputa`), e a matéria não entra
+    no voto fiscal nem pela marca de controle na alavanca do caixa (era por ela que entravam o
+    PLP 230/2025, o PLP 18/2021 e a PEC 24/2019, na Câmara, e a PEC 10/2020, no Senado)."""
+    afrouxa = _lida("fiscal grupo ajuste nd neutro afrouxa", r=2, porque="Flexibiliza limite de despesa.")  # como o PLP 230/2025 está na guarda
+    disputada = leitura.com_contas_em_disputa(regua, _lida("fiscal grupo ajuste corta neutro afrouxa", r=2, porque="Flexibiliza limite de despesa."))
+    assert disputada.codigos == afrouxa.codigos and disputada.porque == f"Flexibiliza limite de despesa. {leitura.DISPUTA_DE_CONTAS}"
+    assert leitura.contas_em_disputa(disputada) and not leitura.contas_em_disputa(afrouxa) and not leitura.contas_em_disputa(None)
+    da_guarda = _lida("fiscal grupo ajuste nd neutro afrouxa", r=2, porque="Flexibiliza limite de despesa. [leitores divergem na marca de contas]")  # a anotação, como a leitura inicial a gravou
+    assert leitura.contas_em_disputa(da_guarda) and da_guarda == disputada
+    ctx = _ctx(r, {})
+
+    def marca(lida: leitura.Leitura) -> int:
+        return pais_voto.marca_fiscal(ctx, leitura.avaliar(regua, lida, tipo="PLP"), lida)
+
+    assert (marca(afrouxa), marca(disputada)) == (-1, 0)  # sem disputa, a marca de controle vale; com ela, a matéria fica fora
+    # A anotação cabe sempre na justificativa gravada, e a leitura que já a tem não a ganha de novo.
+    longa = leitura.com_contas_em_disputa(regua, _lida("fiscal grupo ajuste corta neutro afrouxa", r=3, porque="x" * leitura.PORQUE_MAX))
+    assert len(longa.porque) <= leitura.PORQUE_MAX and longa.porque.endswith(leitura.DISPUTA_DE_CONTAS) and leitura.de_linha(regua, longa.linha()) == longa
+    assert leitura.com_contas_em_disputa(regua, disputada) == disputada
+    # Na conta inteira: o PL 6 (controle +1 na alavanca do caixa) sai do voto fiscal quando a marca do caixa está em disputa.
+    lidas = {**VOTADAS, "6": leitura.com_contas_em_disputa(regua, VOTADAS["6"])}
+    votadas, _conta = pais_voto.universo(_ctx(r, lidas, _cadastros({i: "PT" if i <= 5 else "PL" for i in range(1, 11)})), [_base_de_votos()])
+    assert {x.titulo: x.marca for x in votadas if x.marca} == {"PL 1/2025": 1, "PL 2/2025": -1}
+
+
 def test_o_universo_do_voto_e_o_voto_fiscal(r: regras.Regras, regua):
     """As 13 votações de cima: 10 matérias com votação do texto principal (o PL 1 tem três
     votações: vale a do texto, não o destaque nem a redação final; o PDL não entra); 1 quase
@@ -591,6 +618,20 @@ def test_o_partido_explica_tudo_no_voto_e_nada_nos_projetos(regua):
     par = next(x for x in bloco["pares"] if (x["a"], x["b"]) == ("saldo", "topo"))
     # Dentro do partido todos votam igual: não há o que correlacionar ("dentro" fica nulo).
     assert par["n"] == 60 and abs(par["rho"]) < 0.01 and par["dentro"] is None and not par["passa"] and par["p"] > 0.9
+
+
+def test_quantos_projetos_apresenta_conta_os_da_legislatura_e_nao_o_total_do_dossie(regua):
+    """A medida "prop" de "Pessoa ou partido?" sai de ``tot`` (os PL, PLP e PEC de autoria principal
+    apresentados na legislatura, lidos ou não: a janela das outras medidas de projetos). A coluna
+    ``prop`` da linha, o total do dossiê, que soma as legislaturas anteriores, não entra."""
+    linhas = [{"k": f"cd-{partido}{i}", "pt": partido, "n": 0, "tot": base + i, "prop": 500 - i} for partido, base in (("A", 0), ("B", 10), ("C", 20), ("D", 30)) for i in range(15)]
+    assert pais_cruzar.valores(linhas, regua)["prop"] == [linha["tot"] for linha in linhas]
+    # sem projeto na legislatura a medida é zero, com qualquer total no dossiê
+    assert pais_cruzar.valores([{"k": "cd-1", "pt": "A", "n": 0, "prop": 66}], regua)["prop"] == [0]
+    bloco = pais_cruzar.calcular(linhas, regua, "cd")
+    assert [b["med"]["prop"] for b in bloco["por_partido"]] == [7, 17, 27, 37]
+    medida = next(m for m in bloco["medidas"] if m["id"] == "prop")
+    assert medida["n"] == 60 and medida["e2"] > 70  # os partidos diferem no que cada um apresentou na legislatura
 
 
 def test_os_casos_da_frase():

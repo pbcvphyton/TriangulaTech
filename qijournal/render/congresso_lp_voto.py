@@ -93,7 +93,7 @@ def medidas(R: Any) -> dict[str, dict[str, Any]]:
         "gov": {"nome": "Governismo", "curto": "Governismo", **cem, "col": ["gov"], "mais": "vota mais com o governo", "menos": "vota menos com o governo"},
         "vf": {"nome": "Voto fiscal", "curto": "Voto fiscal", **cem, "col": ["va", "vn", cortes["min_votos"]], "selo": True, "mais": "dá mais voto fiscal", "menos": "dá menos voto fiscal"},
         "fid": {"nome": "Fidelidade ao partido", "curto": "Fidelidade", **cem, "col": ["fid"], "mais": "é mais fiel ao partido", "menos": "é menos fiel ao partido"},
-        "prop": {"nome": "Quantos projetos apresenta", "curto": "Projetos", "un": "n", "min": 1, "log": True, "col": ["prop"], "padrao": 0, "mais": "apresenta mais projetos", "menos": "apresenta menos projetos"},
+        "prop": {"nome": "Quantos projetos apresentou na legislatura", "curto": "Projetos na legislatura", "un": "n", "min": 1, "log": True, "col": ["tot"], "padrao": 0, "mais": "apresentou mais projetos na legislatura", "menos": "apresentou menos projetos na legislatura"},
         "topo": {"nome": f"Parte de {R.topo_pl} confirmados", "curto": f"{R.topo_pl.capitalize()} confirmados", **cem, "col": ["estr", "n", cortes["min_proj"]], "selo": True, "mais": f"tem parte maior de {R.topo_pl} confirmados", "menos": f"tem parte menor de {R.topo_pl} confirmados"},
         "sb": {"nome": f"Parte na faixa “{R.piso}”", "curto": f"Faixa “{R.piso}”", **cem, "col": ["sb", "n", cortes["min_proj"]], "selo": True, "mais": f"tem parte maior na faixa “{R.piso}”", "menos": f"tem parte menor na faixa “{R.piso}”"},
         "tip": {"nome": "Mediana do peso", "curto": "Mediana do peso", "un": "peso", "min": 0, "col": ["tip"], "selo": True, "mais": "tem mediana de peso maior", "menos": "tem mediana de peso menor"},
@@ -281,8 +281,9 @@ def decide(casa: str, nome_casa: str, um: str, uns: str, lp: Mapping[str, Any], 
     divergentes = [
         {
             "k": i.get("k") or "", "nome": i.get("nome") or "", "legenda": "-".join(x for x in (i.get("pt"), i.get("uf")) if x),
-            "valor": f"{_num(i.get('div'))} {s(int(i.get('div') or 0), 'vez', 'vezes')} em {_num(i.get('vn'))} votos",
-            "extra": (f"em {_num(i['div_cont'])} {s(int(i['div_cont']), 'dela', 'delas')}, do lado do caixa (voto fiscal)" if i.get("div_cont") else ""),
+            "valor": f"{_num(i.get('div'))} {s(int(i.get('div') or 0), 'vez', 'vezes')} em {_num(i.get('vn'))} {s(int(i.get('vn') or 0), 'voto', 'votos')}",
+            # "em 1 delas": uma das vezes, não "dela"
+            "extra": (f"em {_num(i['div_cont'])} delas, do lado do caixa (voto fiscal)" if i.get("div_cont") else ""),
         }
         for i in d.get("divergentes") or []
         if i.get("nome")
@@ -359,6 +360,20 @@ RESPOSTAS = {
     "nem_o_voto": ("Nem no voto o partido diz tudo.", ""),
 }
 SEM_PROJETOS = "No que cada um propõe, não dá para separar o partido do acaso."
+
+
+def _mostrado(valor: float) -> float:
+    """O número que ``pagina._pct`` escreve para um percentual (inteiro, fora perto de 0 e de 100)."""
+    return round(valor, 1) if 99.5 <= valor < 100 or 0 < valor < 0.5 else float(round(valor))
+
+
+def _pct_do_corte(valor: Any, cortes: Any) -> str:
+    """O percentual como a página o escreve (inteiro), a não ser que o inteiro caia do outro
+    lado de um dos ``cortes``: 69,9 sairia "70%" ao lado da legenda "70% ou mais: o partido diz
+    quase tudo", com a palavra "diz parte". Nesse caso vai com uma casa ("69,9%"), que é como
+    as contas o publicam e por onde decidem a palavra (:func:`pais_cruzar.publicado`)."""
+    v = float(valor)
+    return pagina._pct1(v) if any((_mostrado(v) >= float(c)) != (v >= float(c)) for c in cortes) else pagina._pct(v)
 ZONAS = {"quase_tudo": "diz quase tudo", "parte": "diz parte", "pouco": "diz pouco: olhe a pessoa"}
 # As perguntas de "O que anda junto", pelo par de medidas das contas; {topo} e {piso} vêm do config.
 PERGUNTAS = {
@@ -367,9 +382,9 @@ PERGUNTAS = {
     ("saldo", "topo"): "Um lado do voto propõe mais {topo} confirmado?",
     ("saldo", "sb"): "Um lado do voto propõe mais projeto da faixa “{piso}”?",
     ("fid", "topo"): "Quem é mais fiel ao partido propõe menos {topo} confirmado?",
-    ("pres", "prop"): "Quem vota mais apresenta mais projeto?",
+    ("pres", "prop"): "Quem vota mais apresentou mais projetos na legislatura?",
     ("pres", "topo"): "Quem vota mais propõe mais {topo} confirmado?",
-    ("ct", "prop"): "Quem gasta mais cota apresenta mais projeto?",
+    ("ct", "prop"): "Quem gasta mais cota apresentou mais projetos na legislatura?",
     ("ct", "topo"): "Quem gasta mais cota propõe mais {topo} confirmado?",
 }
 
@@ -397,11 +412,12 @@ def resposta(frase: Mapping[str, Any], medidas_do_bloco: Mapping[str, Mapping[st
     olhe = caso == "voto_sim_projetos_nao" and len(ic_p) == 2 and ic_p[1] < zonas[0]
     partes: list[tuple[str, bool]] = []
     if v.get("e2") is not None:
-        partes += [("O partido explica ", False), (pagina._pct(v["e2"]), True), (f" da diferença entre {uns} no lado em que votam", False)]
+        # os números da linha são os que decidem o título: perto de um corte, vão com uma casa
+        partes += [("O partido explica ", False), (_pct_do_corte(v["e2"], zonas), True), (f" da diferença entre {uns} no lado em que votam", False)]
         if p.get("e2") is not None:
-            partes += [(" e ", False), (pagina._pct(p["e2"]), True), (f" na parte de {R.topo_pl} confirmados do que propõem", False)]
+            partes += [(" e ", False), (_pct_do_corte(p["e2"], zonas), True), (f" na parte de {R.topo_pl} confirmados do que propõem", False)]
             if not p.get("distingue") and len(ic_p) == 2:
-                partes.append((f" (o intervalo vai de {pagina._pct(ic_p[0])} a {pagina._pct(ic_p[1])} e encosta no que o acaso daria)", False))
+                partes.append((f" (o intervalo vai de {_pct_do_corte(ic_p[0], zonas)} a {_pct_do_corte(ic_p[1], zonas)} e encosta no que o acaso daria)", False))
         partes.append((". ", False))
     partes.append(("Quanto maior a barra, mais o partido basta; quanto menor, mais é preciso olhar a pessoa.", False))
     if olhe:
@@ -441,13 +457,20 @@ def cruzar(casa: str, um: str, uns: str, lp: Mapping[str, Any], R: Any, M: Mappi
             palavra = "não se distingue do acaso"
         else:
             palavra = ZONAS.get(x.get("zona") or "", "")
+        # O número escrito concorda com a palavra e com a cor. Perto de um corte de zona, o percentual vai com uma casa
+        # ("69,9% diz parte", não "70%"). E a barra colorida (o intervalo fica todo acima do acaso) cujos inteiros
+        # encostariam ("de 2% a 14% · por acaso daria até 2%", de 2,4 contra 2,2) escreve o intervalo e o acaso com uma casa.
+        justo = bool(x.get("distingue")) and len(ic) == 2 and acaso is not None and not _mostrado(float(ic[0])) > _mostrado(float(acaso))
+        escreve = pagina._pct1 if justo else pagina._pct
         return {
             "id": ident, "nome": def_.get("nome") or ident, "regua": bool(def_.get("regua")), "selo": bool(def_.get("selo")), "sem": sem, "cinza": sem or not x.get("distingue"),
-            "e2": pagina._pct(e2) if not sem else "", "w": 0 if sem else round(float(e2), 1), "palavra": palavra,
+            "e2": _pct_do_corte(e2, zonas) if not sem else "", "w": 0 if sem else round(float(e2), 1), "palavra": palavra,
             "ic": [round(float(ic[0]), 1), round(float(ic[1]), 1)] if len(ic) == 2 else None,
-            "ic_txt": f"intervalo de {round(100 * float(par.get('confianca') or 0.95))}%: de {pagina._pct(ic[0])} a {pagina._pct(ic[1])}" if len(ic) == 2 else "",
-            "acaso": round(float(acaso), 1) if acaso is not None else None, "acaso_txt": f"por acaso daria até {pagina._pct(acaso)}" if acaso is not None else "",
+            "ic_txt": f"intervalo de {round(100 * float(par.get('confianca') or 0.95))}%: de {escreve(ic[0])} a {escreve(ic[1])}" if len(ic) == 2 else "",
+            "acaso": round(float(acaso), 1) if acaso is not None else None, "acaso_txt": f"por acaso daria até {escreve(acaso)}" if acaso is not None else "",
             "n": _num(x.get("n")), "k": _num(x.get("k")),
+            # quantas pessoas as contas mediram (em partidos de duas ou mais): o painel ao lado decide por este número, o mesmo da barra
+            "medidos": int(x["n"]) if isinstance(x.get("n"), int) else None,
         }  # fmt: skip
 
     grupos = []
@@ -490,10 +513,17 @@ def cruzar(casa: str, um: str, uns: str, lp: Mapping[str, Any], R: Any, M: Mappi
     ]
     r = resposta(c.get("frase") or {}, por_id, zonas, um, uns, R, lp.get("autores"))
     alfa = float(par.get("alfa_pares") or pais_cruzar.ALFA_PARES)
+    vezes = f" {_num(par['permutacoes'])} vezes" if par.get("permutacoes") else ""
     return {
         "titulo": r["titulo"],
         "linha": r["linha"],
         "caso": r["caso"],
+        # "por acaso daria até N%", em palavras simples (a dica "i" do gráfico das barras)
+        "dica_acaso": (
+            f"Acaso é sorte. Mesmo que o partido não dissesse nada, dividir os {uns} em tantos grupos já daria algum número, só por sorte. O traço “por acaso daria até” mostra até onde a sorte costuma chegar: "
+            f"com os partidos embaralhados entre as pessoas{vezes}, o número fica abaixo dele em {round(pais_cruzar.PERCENTIL_DO_ACASO)} de cada 100. A barra só conta quando o intervalo dela fica todo acima do traço. "
+            "Barra em cinza não quer dizer “é a pessoa”: quer dizer que não dá para afirmar."
+        ),
         "janela": [
             (f"{_num(c.get('pessoas'))} {uns} em exercício, em {_num(c.get('partidos'))} partidos de dois ou mais", True),
             ("% da diferença entre pessoas que o partido explica, medida a medida", False),
@@ -508,6 +538,7 @@ def cruzar(casa: str, um: str, uns: str, lp: Mapping[str, Any], R: Any, M: Mappi
         "tabela": tabela,
         "zonas": [_dec(zonas[0]), _dec(zonas[1])],
         "confianca": round(100 * float(par.get("confianca") or 0.95)),
+        "percentil": round(pais_cruzar.PERCENTIL_DO_ACASO),  # o traço do acaso: o valor que tantos de cada 100 embaralhamentos não passam
         "permutacoes": _num(par.get("permutacoes")),
         "reamostras": _num(par.get("reamostras")),
         "pessoas_minimo": pessoas_minimo,

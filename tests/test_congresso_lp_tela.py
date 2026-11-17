@@ -15,6 +15,8 @@ import itertools
 import json
 from pathlib import Path
 import re
+import shutil
+import subprocess
 
 import pytest
 
@@ -124,6 +126,81 @@ def _manifesto(html: str) -> dict:
     return json.loads(html.split('<script type="application/json" id="cgManifesto">', 1)[1].split("</script>", 1)[0])
 
 
+# Uma página de mentira para rodar no Node o trecho do interruptor "Ver por" (de ``var lenteEl`` até antes de "O que as
+# vistas novas têm em comum", em ``congresso_lp.js.j2``): as duas listas de abas ("Como ler" está nas duas), a seção do
+# Como ler com o bloco da leitura dos projetos, o armazenamento da aba do navegador e o histórico. ``verVista``, o ouvinte
+# das abas e ``doEndereco`` fazem o que os de ``congresso.js.j2`` fazem no que importa aqui.
+LENTE_DE_MENTIRA = r"""
+function aba(vista, href) {
+  return { getAttribute: function (k) { return k === 'data-vista' ? vista : k === 'href' ? href : null; },
+    closest: function (sel) { return sel === 'a[data-vista]' || (sel === 'a[href="#cg-lp-metodo"]' && href === '#cg-lp-metodo') ? this : null; } };
+}
+function ul(lente, abas) { return { getAttribute: function () { return lente; }, querySelectorAll: function () { return abas; } }; }
+function botao(l) {
+  var at = { 'data-lente': l };
+  return { getAttribute: function (k) { return k in at ? at[k] : null; }, setAttribute: function (k, v) { at[k] = v; }, closest: function () { return this; } };
+}
+var ABAS = {
+  partido: [aba('resumo', '#cg-leitura'), aba('escolha', '#cg-escolha'), aba('metodo', '#cg-metodo')],
+  pessoa: [aba('projetos', '#cg-projetos'), aba('autores', '#cg-autores'), aba('metodo', '#cg-lp-metodo')]
+};
+var BOTOES = [botao('partido'), botao('pessoa')], daLente = [], daNav = [], prazos = [], historico = [], rootAttrs = {};
+var DENTRO = {}, blocoDaLeituraDeMentira = { rolou: 0, scrollIntoView: function () { this.rolou += 1; }, contains: function (el) { return el === this || el === DENTRO; } };
+var IDS = { cgLente: { hidden: true, parentNode: { offsetHeight: LINHA }, querySelectorAll: function () { return BOTOES; }, addEventListener: function (tipo, fn) { daLente.push(fn); } },
+  'cg-lp-metodo': blocoDaLeituraDeMentira, 'cg-lp-diaria': DENTRO, 'cg-metodo': {}, 'cg-leitura': {} };
+var VISTA_DO_ID = { 'cg-lp-metodo': 'metodo', 'cg-lp-diaria': 'metodo', 'cg-metodo': 'metodo', 'cg-leitura': 'resumo' };
+var d = { getElementById: function (id) { return IDS[id] || null; } };
+var w = {
+  location: { hash: HASH },
+  sessionStorage: { getItem: function (k) { return k in ARMAZEM ? ARMAZEM[k] : null; }, setItem: function (k, v) { ARMAZEM[k] = String(v); } },
+  history: { pushState: function (estado, titulo, endereco) { w.location.hash = endereco; historico.push(endereco); } },
+  setTimeout: function (fn) { prazos.push(fn); }, addEventListener: function () {}
+};
+var root = { setAttribute: function (k, v) { rootAttrs[k] = v; }, style: { setProperty: function (k, v) { rootAttrs[k] = v; } } };
+var nav = { querySelectorAll: function () { return [ul('partido', ABAS.partido), ul('pessoa', ABAS.pessoa)]; }, addEventListener: function (tipo, fn, captura) { daNav.push([fn, !!captura]); } };
+var casas = { hidden: false, offsetHeight: 40 }, abas = ABAS.partido.concat(ABAS.pessoa), vistaPadrao = 'resumo', vistaAtual = '', aoTrocarVista = null, LPM = { abas: ['projetos', 'autores'] };
+function lista(x) { return Array.prototype.slice.call(x); }
+function verVista(nome) { vistaAtual = nome; if (aoTrocarVista) aoTrocarVista(nome); return true; }
+/* O ouvinte das abas de sempre: grava #v=<vista> e troca a vista. */
+nav.addEventListener('click', function (event) {
+  var a = event.target.closest('a[data-vista]');
+  if (!a) return;
+  w.history.pushState(null, '', '#v=' + a.getAttribute('data-vista'));
+  verVista(a.getAttribute('data-vista'));
+});
+function doEndereco() {
+  var h = w.location.hash, v = /^#v=([a-z]+)/.exec(h);
+  if (v) verVista(v[1]); else if (VISTA_DO_ID[h.slice(1)]) verVista(VISTA_DO_ID[h.slice(1)]); else verVista(vistaPadrao);
+}
+/* O fim de congresso.js.j2: a vista padrão, depois o endereço; e, passado o carregamento, os prazos. */
+function carregar() { verVista(vistaPadrao); doEndereco(); prazos.forEach(function (fn) { fn(); }); }
+function irAoEndereco(h) { w.location.hash = h; doEndereco(); }  // voltar, avançar ou um link de dentro da página
+function clicarNaLente(l) { daLente.forEach(function (fn) { fn({ target: BOTOES[l === 'partido' ? 0 : 1] }); }); }
+function clicarNaAba(a) {
+  var ev = { target: a, parou: false, preventDefault: function () {}, stopPropagation: function () { this.parou = true; } };
+  daNav.forEach(function (o) { if (o[1]) o[0](ev); });
+  if (!ev.parou) daNav.forEach(function (o) { if (!o[1]) o[0](ev); });
+}
+function estado() {
+  return { vista: vistaAtual, lente: rootAttrs['data-lente'], hash: w.location.hash, guardadas: [ARMAZEM['qij-vista-partido'] || '', ARMAZEM['qij-vista-pessoa'] || ''],
+    pressionado: BOTOES.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; }).map(function (b) { return b.getAttribute('data-lente'); }).join() };
+}
+"""
+
+
+def _lente_no_node(tmp_path: Path, cenario: str, *, guardado: dict[str, str] | None = None, endereco: str = "", linha: int = 40) -> dict:
+    """Roda no Node o interruptor "Ver por" sobre a página de mentira. ``guardado``: o que a aba do navegador traz de
+    uma visita anterior (``sessionStorage``); ``endereco``: o da carga; ``linha``: a altura da primeira linha da barra
+    (a do grupo da Casa tem 40). ``cenario`` é o JavaScript do teste: preenche ``r``, que volta como dicionário."""
+    trecho = "  var lenteEl = " + SCRIPT.split("  var lenteEl = ", 1)[1].split("  /* ── O que as vistas novas têm em comum ── */", 1)[0]
+    script = tmp_path / "lente.js"
+    script.write_text(
+        f"var ARMAZEM = {json.dumps(guardado or {})}, HASH = {json.dumps(endereco)}, LINHA = {linha};\n" + LENTE_DE_MENTIRA + trecho + "\nvar r = {};\n" + cenario + "\nconsole.log(JSON.stringify(r));\n",
+        encoding="utf-8",
+    )
+    return json.loads(subprocess.run(["node", str(script)], capture_output=True, text=True, check=True, timeout=60).stdout)
+
+
 # ── sem o bloco "lp", a página é a de sempre ─────────────────────────────────
 
 
@@ -169,12 +246,13 @@ def test_a_barra_ganha_o_interruptor_e_a_lista_da_visao_por_parlamentar(com: str
     barra = _barra(com)
     # o interruptor fica fora do grupo da Casa (a troca de Casa regrava os botões de lá) e nasce escondido, como ela
     casas = barra.split('id="cgCasas"', 1)[1].split("</div>", 1)[0]
-    assert "data-lente" not in casas and "cg-casas-n" not in casas and casas.count("<button") == 2
+    assert "data-lente" not in casas and casas.count("<button") == 2
     assert '<div class="cg-lente" id="cgLente" role="group" aria-label="Ver por" hidden>' in barra
     assert '<button type="button" class="cg-lente-b" data-lente="partido" aria-pressed="true">Partido <span>como votam</span></button>' in barra
     assert '<button type="button" class="cg-lente-b" data-lente="pessoa" aria-pressed="false">Parlamentar <span>o que propõem</span></button>' in barra
-    # a frase de ajuda é a mesma, agora no fim da primeira linha
-    assert barra.index('id="cgLente"') < barra.index('<span class="cg-casas-n" id="cgCasasN" hidden>Escolha a Casa e, abaixo, o que quer ver dela.</span>') < barra.index("<nav")
+    # a frase de ajuda não muda de lugar: dentro do grupo da Casa, logo depois dos botões; o interruptor vem depois do grupo
+    assert casas.rstrip().endswith('<span class="cg-casas-n">Escolha a Casa e, abaixo, o que quer ver dela.</span>') and barra.count("cg-casas-n") == 1 and "cgCasasN" not in com
+    assert barra.index('<span class="cg-casas-n">') < barra.index('id="cgLente"') < barra.index("<nav")
     # sem script: as duas listas, cada uma com o rótulo
     assert barra.index('<p class="cg-vistas-r">Visão por partido</p>') < barra.index('<ul data-lente="partido">') < barra.index('<p class="cg-vistas-r">Visão por parlamentar</p>') < barra.index('<ul data-lente="pessoa">')
     pessoa = barra.split('<ul data-lente="pessoa">', 1)[1].split("</ul>", 1)[0]
@@ -190,6 +268,101 @@ def test_a_barra_ganha_o_interruptor_e_a_lista_da_visao_por_parlamentar(com: str
     # as vistas novas vêm depois de "Escolha o seu candidato" e antes de "Como ler"
     ordem = re.findall(r'class="[^"]*cg-vista[^"]*" data-vista="([a-z]+)"', com)
     assert ordem[-6:] == ["escolha", "projetos", "autores", "decide", "cruzar", "metodo"]
+
+
+def test_o_grupo_da_casa_e_o_de_sempre_e_quem_se_ajusta_a_largura_e_o_interruptor(sem: str, com: str):
+    """O que já existia fica onde estava: o grupo da Casa (os botões e a frase de ajuda) tem o mesmo HTML com e sem a
+    visão por parlamentar, e nenhuma regra da visão nova esconde nem move a frase (ela sumia de 721 a 1.099 px e, acima
+    disso, ia para depois do interruptor). Quem se ajusta é o interruptor: perde o texto de apoio abaixo de 1.000 px,
+    o rótulo entre 721 e 819 px (a faixa em que a frase aparece e a linha é curta) e ocupa uma linha só dele no celular."""
+    grupo_com, grupo_sem = (_barra(html).split('<div class="cg-casas" id="cgCasas"', 1)[1].split("</div>", 1)[0] for html in (com, sem))
+    assert grupo_com == grupo_sem and "Escolha a Casa e, abaixo, o que quer ver dela." in grupo_sem
+    assert "cg-casas-n" not in ESTILO and "cgCasasN" not in SCRIPT and "fraseDaBarra" not in SCRIPT
+    antigo = (MODELOS / "congresso.css.j2").read_text(encoding="utf-8")
+    assert antigo.count(".cg-casas-n{display:none}") == 1 and "@media (max-width:720px){" in antigo  # a main só a esconde até 720 px
+    assert "@media (max-width:999px){.cg-lente .cg-lente-b span{display:none}}" in ESTILO
+    assert "@media (min-width:721px) and (max-width:819px){.cg-lente-r{display:none}}" in ESTILO
+    assert ".cg-barra-1{display:flex;flex-wrap:wrap;" in ESTILO and "  .cg-lente{flex:1 1 100%;" in ESTILO.split("@media (max-width:560px){", 1)[1]
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+def test_a_margem_das_ancoras_cresce_o_que_a_barra_cresce_com_o_interruptor(tmp_path: Path):
+    """No celular o interruptor ocupa uma linha a mais, e a barra fixa fica 39 px mais alta: com a margem de rolagem de
+    sempre (104 px), o alvo de um endereço antigo (``#cg-rachas-cd``) parava com o título debaixo da barra. O script
+    mede quanto a primeira linha cresceu sobre o grupo da Casa e o estilo soma isso à margem; a ficha continua sem
+    margem, e a regra dela vem depois (as duas têm o mesmo peso)."""
+    antigo = (MODELOS / "congresso.css.j2").read_text(encoding="utf-8")
+    assert ".cg [id]{scroll-margin-top:104px}\n.cg-mo [id]{scroll-margin-top:0}" in antigo  # os 104 px de sempre: se mudarem lá, mudam aqui
+    assert ".cg [id]{scroll-margin-top:calc(104px + var(--cg-lp-barra,0px))}\n.cg-mo [id]{scroll-margin-top:0}\n" in ESTILO
+    medir = "r.extra = rootAttrs['--cg-lp-barra'];"
+    assert _lente_no_node(tmp_path, medir, linha=79)["extra"] == "39px"  # o interruptor numa linha só dele: 40 do grupo da Casa + 39
+    assert _lente_no_node(tmp_path, medir, linha=40)["extra"] == "0px"  # na linha da Casa: a margem de sempre
+    assert _lente_no_node(tmp_path, "casas.hidden = true; lpBarra(); " + medir, linha=39)["extra"] == "39px"  # sem o grupo da Casa (uma Casa só), a linha inteira é a mais
+    assert "w.addEventListener('resize', lpBarra);" in SCRIPT and "d.fonts.ready.then(lpBarra)" in SCRIPT
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+def test_ver_por_devolve_a_vista_em_que_a_pessoa_estava_e_nao_a_de_uma_visita_anterior(tmp_path: Path):
+    """A aba do navegador guarda a última vista de cada visão. A página carregada de novo na mesma aba mostra o Resumo
+    (a vista padrão, que não é guardada enquanto a página carrega): ir a "Parlamentar" e voltar a "Partido" tem de
+    devolver o Resumo, e não "Escolha o seu candidato", guardada na visita anterior. Vale também para quem troca de
+    visão por um link da página. E a lembrança de uma carga para a outra continua: quem recarrega numa vista da visão
+    por parlamentar volta, em "Partido", à vista da visão por partido em que estava antes."""
+    de_antes = {"qij-vista-partido": "escolha", "qij-lente": "partido"}
+    r = _lente_no_node(tmp_path, "carregar(); r.chegada = estado(); clicarNaLente('pessoa'); r.pessoa = estado(); clicarNaLente('partido'); r.partido = estado();", guardado=de_antes)
+    assert (r["chegada"]["vista"], r["chegada"]["lente"], r["chegada"]["guardadas"]) == ("resumo", "partido", ["resumo", ""])
+    assert (r["pessoa"]["vista"], r["pessoa"]["lente"], r["pessoa"]["hash"]) == ("projetos", "pessoa", "#v=projetos")
+    assert (r["partido"]["vista"], r["partido"]["lente"], r["partido"]["hash"], r["partido"]["pressionado"]) == ("resumo", "partido", "#v=resumo", "partido")
+    # por um link da página (o item do Resumo que leva a "Os projetos"), sem passar pelo interruptor
+    r = _lente_no_node(tmp_path, "carregar(); irAoEndereco('#v=projetos'); r.pessoa = estado(); clicarNaLente('partido'); r.partido = estado();", guardado=de_antes)
+    assert r["pessoa"]["lente"] == "pessoa" and (r["partido"]["vista"], r["partido"]["lente"]) == ("resumo", "partido")
+    # recarregada em "Os projetos": a vista padrão, que só passou pela tela, não apaga a da visão por partido
+    r = _lente_no_node(tmp_path, "carregar(); r.chegada = estado(); clicarNaLente('partido'); r.partido = estado();", guardado=de_antes, endereco="#v=projetos")
+    assert (r["chegada"]["vista"], r["chegada"]["lente"], r["chegada"]["guardadas"]) == ("projetos", "pessoa", ["escolha", "projetos"])
+    assert (r["partido"]["vista"], r["partido"]["lente"]) == ("escolha", "partido")
+
+
+@pytest.mark.skipif(shutil.which("node") is None, reason="sem Node.js para rodar o JavaScript da página")
+def test_cada_endereco_do_como_ler_diz_de_que_visao_e(tmp_path: Path):
+    """"Como ler" é das duas visões. ``#v=metodo`` (e as âncoras antigas da seção) é o da visão por partido, como sempre
+    foi; ``#cg-lp-metodo`` (o bloco da leitura dos projetos, ou uma âncora de dentro dele) é o da visão por
+    parlamentar, e é o endereço que a aba "Como ler" dela grava. Assim o voltar do navegador para o Como ler da visão
+    por partido devolve a barra da visão por partido (ficava na visão por parlamentar, sem as abas de sempre)."""
+    r = _lente_no_node(
+        tmp_path,
+        """
+        carregar(); r.chegada = estado();
+        clicarNaLente('pessoa'); r.pessoa = estado();
+        irAoEndereco('#v=metodo'); r.voltar = estado();                      // o voltar do navegador
+        irAoEndereco('#v=projetos'); r.avancar = estado();                   // e o avançar
+        clicarNaAba(ABAS.pessoa[2]); r.aba = estado(); r.rolou = blocoDaLeituraDeMentira.rolou;  // "Como ler" da visão por parlamentar
+        clicarNaLente('partido'); r.partido = estado();
+        clicarNaLente('pessoa'); r.de_volta = estado(); r.rolou_de_novo = blocoDaLeituraDeMentira.rolou;
+        clicarNaLente('partido'); clicarNaAba(ABAS.partido[2]); r.aba_antiga = estado();        // "Como ler" de sempre
+        irAoEndereco('#cg-lp-diaria'); r.dentro = estado();                  // uma âncora de dentro do bloco da leitura
+        irAoEndereco('#cg-metodo'); r.antiga = estado();                     // a âncora antiga da seção
+        """,
+        endereco="#v=metodo",
+    )
+    assert (r["chegada"]["vista"], r["chegada"]["lente"]) == ("metodo", "partido")
+    assert (r["pessoa"]["vista"], r["pessoa"]["lente"], r["pessoa"]["hash"]) == ("projetos", "pessoa", "#v=projetos")
+    assert (r["voltar"]["vista"], r["voltar"]["lente"], r["voltar"]["pressionado"]) == ("metodo", "partido", "partido")
+    assert (r["avancar"]["vista"], r["avancar"]["lente"]) == ("projetos", "pessoa")
+    assert (r["aba"]["vista"], r["aba"]["lente"], r["aba"]["hash"], r["rolou"]) == ("metodo", "pessoa", "#cg-lp-metodo", 1)
+    assert (r["partido"]["vista"], r["partido"]["lente"], r["partido"]["hash"]) == ("metodo", "partido", "#v=metodo")
+    assert (r["de_volta"]["vista"], r["de_volta"]["lente"], r["de_volta"]["hash"], r["rolou_de_novo"]) == ("metodo", "pessoa", "#cg-lp-metodo", 2)
+    assert (r["aba_antiga"]["vista"], r["aba_antiga"]["lente"], r["aba_antiga"]["hash"]) == ("metodo", "partido", "#v=metodo")
+    assert (r["dentro"]["vista"], r["dentro"]["lente"]) == ("metodo", "pessoa") and (r["antiga"]["vista"], r["antiga"]["lente"]) == ("metodo", "partido")
+    # colado numa aba nova: cada um abre na sua visão
+    assert _lente_no_node(tmp_path, "carregar(); r.e = estado();", endereco="#cg-lp-metodo")["e"]["lente"] == "pessoa"
+    assert _lente_no_node(tmp_path, "carregar(); r.e = estado();", endereco="#v=metodo", guardado={"qij-lente": "pessoa", "qij-vista-pessoa": "metodo"})["e"]["lente"] == "partido"
+
+
+def test_o_como_ler_de_cada_vista_nova_leva_ao_bloco_da_leitura(com: str):
+    """O "como ler" ao lado do selo, no cabeçalho de cada uma das quatro vistas, abre o Como ler no
+    bloco "A leitura dos projetos", e não no começo do método da visão por partido."""
+    assert re.findall(r'<a class="cg-lp-como" href="(#[^"]+)">como ler</a>', com) == ["#cg-lp-metodo"] * 4
+    assert com.count('id="cg-lp-metodo"') == 1
 
 
 def test_o_manifesto_leva_os_rotulos_do_config_e_os_enderecos_dos_arquivos(com: str, regua: regras.ProjetoDePais):
@@ -322,8 +495,10 @@ def test_nenhum_nome_de_categoria_da_regua_esta_escrito_no_modelo_nem_no_script(
 def test_o_script_nao_monta_html_e_e_do_estilo_da_casa():
     assert "innerHTML" not in SCRIPT and "outerHTML" not in SCRIPT and "insertAdjacentHTML" not in SCRIPT and "document.write" not in SCRIPT
     assert "=>" not in SCRIPT and "`" not in SCRIPT and not re.search(r"\b(let|const)\s", SCRIPT)  # o mesmo ES5 dos outros arquivos
-    # cada filtro ou foco regrava o endereço sem criar entrada no histórico; só a troca de visão e a linha "A seguir" criam
-    assert SCRIPT.count("replaceState(") == 2 and SCRIPT.count("pushState(") == 2
+    # cada filtro ou foco regrava o endereço sem criar entrada no histórico; só criam a troca de visão, a aba "Como ler" da
+    # visão por parlamentar (que grava o endereço dela, #cg-lp-metodo) e os links de vista para vista, com a linha "A seguir"
+    assert SCRIPT.count("replaceState(") == 2 and SCRIPT.count("pushState(") == 3
+    assert "w.history.pushState(null, '', '#cg-lp-metodo'); lpComoLer();" in SCRIPT and "w.history.pushState(null, '', enderecoDe(destino, l));" in SCRIPT
     # os pontos não levam data-k nem data-m (a página abre o dossiê ou a ficha a qualquer clique nesses atributos)
     for linha in SCRIPT.splitlines():
         if "'cg-lp-p " in linha or "'cg-lp-q'" in linha:
@@ -331,6 +506,63 @@ def test_o_script_nao_monta_html_e_e_do_estilo_da_casa():
     assert "'data-q': q.k" in SCRIPT and "cg-lp-p " not in MODELO  # os pontos nem saem no modelo
     # os arquivos da visão só são pedidos quando uma vista nova abre
     assert SCRIPT.count("buscar(") == 1 and "lpArquivo('projetos', casa" in SCRIPT and "lpArquivo('autores', casa" in SCRIPT and "lpArquivo('autoria', q.k" in SCRIPT
+
+
+def test_quem_propoe_diz_em_palavras_simples_o_que_e_o_acaso(com: str, pasta_com: Path):
+    """O termo fica ("o que o acaso explica"), e vem explicado onde aparece primeiro: uma frase curta na
+    abertura da vista e, na dica "i" do gráfico, a explicação inteira (acaso é sorte; a faixa cinza é o que
+    a sorte sozinha daria; quem sai dela; e que dentro dela não dá para afirmar)."""
+    vista = _vista(com, "autores")
+    abertura = _texto(vista.split('<p class="az-ld">', 1)[1].split("</p>", 1)[0])
+    assert "Acaso é sorte: a faixa cinza é o que a sorte sozinha daria a um parlamentar médio; dentro dela, não dá para afirmar diferença." in abertura
+    assert vista.index("Acaso é sorte") < vista.index("do que o acaso explica")  # antes dos números, que usam o termo
+    legenda = vista.split('<figcaption class="az-h cg-lp-h">', 1)[1].split("</figcaption>", 1)[0]
+    dica = legenda.split('data-dica="', 1)[1].split('"', 1)[0]
+    assert "a faixa cinza é o que o acaso explica" in _texto(legenda)
+    comparados = json.loads((dados.pasta_de(pasta_com) / "casa-cd.json").read_text(encoding="utf-8"))["lp"]["autores"]["plotados"]
+    quantos = f"que são {comparados} comparados" if comparados > 1 else "todos os comparados"
+    assert dica == (
+        "Acaso é sorte. Com poucos projetos, um ou dois a mais ou a menos aparecem por sorte, mesmo em quem é igual à média da Casa. "
+        "A faixa cinza é o que a sorte sozinha daria a um deputado médio com aquele número de projetos. "
+        f"Só sai dela quem tem um resultado que a sorte daria menos de 1 vez em 100, já contando {quantos} de uma vez. "
+        "Dentro da faixa não quer dizer “igual à média”: quer dizer que não dá para afirmar."
+    )
+    assert "378 comparados" in congresso_lp._autores("cd", "deputado", "deputados", {"autores": {"em_exercicio": 513, "plotados": 378}}, congresso_lp.Rotulos.de(pais.manifesto(regras.carregar(ROOT)), regras.carregar(ROOT).projeto_de_pais))["dica_acaso"]
+
+
+def test_os_links_entre_as_vistas_abrem_a_vista_de_destino_no_comeco(com: str):
+    """Os links "→" (``a.cg-lp-ir``: os dos cartões, o da frase de "Pessoa ou partido?", o do cartão de projeto no
+    HTML e o "Perfil pelos projetos" do dossiê) e a linha "A seguir" passam pelo mesmo ouvinte: endereço novo no
+    histórico, a vista trocada e a página no começo dela. O ouvinte fica no documento, porque o dossiê está fora
+    da seção da página."""
+    ouvinte = SCRIPT.split("function lpAoComeco()", 1)[1].split("function lpVista(", 1)[0]
+    assert "d.addEventListener('click'" in ouvinte and "closest('a[data-lp-ir], a.cg-lp-ir')" in ouvinte and "}, true);" in ouvinte
+    assert "w.history.pushState(null, '', destino); doEndereco(); lpAoComeco();" in ouvinte and "w.scrollTo(0, 0)" not in SCRIPT
+    assert "if (!a || event.metaKey || event.ctrlKey || event.shiftKey) return;" in ouvinte  # abrir em outra aba continua valendo
+    # todo link de vista para vista leva a classe que o ouvinte pega: os que o script monta, o do HTML e o do dossiê
+    assert "function lpIr(vista, quem, texto) { return h('a', { cls: 'cg-lp-ir', href: '#v=' + vista" in SCRIPT
+    assert re.search(r'<a class="cg-lp-ir" href="#v=autores&amp;c=cd&amp;quem=cd-\d+">ver o perfil de projetos →</a>', com)
+    assert "h('a', { cls: 'cg-lp-ir', href: '#v=autores&c=' + f.k.slice(0, 2) + '&quem=' + f.k, text: 'Perfil pelos projetos ('" in com
+
+
+def test_a_medida_do_endereco_so_vale_se_for_das_contas():
+    """``#v=autores&med=constructor`` (ou outro nome herdado de Object) não é medida: a vista cai na
+    primeira, como com qualquer valor desconhecido. O teste é pela chave própria de MEDIDAS."""
+    assert "function eMedida(med) { return Object.prototype.hasOwnProperty.call(MEDIDAS, med); }" in SCRIPT
+    assert "trocarMedida(eMedida(p.med) ? p.med : 'topo')" in SCRIPT and "if (!eMedida(med) || med === F.med) return;" in SCRIPT
+    assert not re.search(r"MEDIDAS\[(?:p\.)?med\]\s*(?:\?|&&|\|\|)", SCRIPT) and "!MEDIDAS[" not in SCRIPT
+
+
+def test_as_frases_do_script_concordam_no_singular_e_o_titulo_da_lista_conta_as_linhas_dela():
+    """Com um só, o contador diz "1 realçado", "1 projeto", "1 deputado no gráfico"; quem tem um projeto só não
+    lê "100% dos 1 sem leitura"; e "Todos os N projetos" conta as linhas da lista que abre (os que entram nos
+    números e os que ficam fora: ementa repetida e de bancada)."""
+    assert "temFiltro() ? ' realçados'" not in SCRIPT and SCRIPT.count("(n === 1 ? ' realçado' : ' realçados')") == 4
+    assert "(n === 1 ? ' projeto' : ' projetos')" in SCRIPT and "' ' + (n === 1 ? UM : UNS) + ' no gráfico'" in SCRIPT
+    assert "q.tot === 1 ? '1 sem leitura' : lpDec(q.sl) + '% dos ' + num(q.tot) + ' sem leitura'" in SCRIPT
+    assert "'Todos os ' + num(q.tot)" not in SCRIPT and "var todos = q.tot + (q.rp || 0) + (q.bc || 0)" in SCRIPT
+    assert "todos === 1 ? 'O único projeto, com a leitura dele' : 'Todos os ' + num(todos) + ' projetos, com a leitura de cada um'" in SCRIPT
+    assert "if (q.tot + (q.rp || 0) + (q.bc || 0)) nos.push(todosOsProjetos(q));" in SCRIPT
 
 
 def test_o_plural_do_rotulo_nao_inventa_concordancia():

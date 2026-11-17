@@ -2,9 +2,8 @@
 :root{--cg-lp1:#9FB0EE;--cg-lp2:#6A84E4;--cg-lp3:#3B5BDB;--cg-lp-cz:#939CAB;--cg-lp-fx:#EEF0F4}
 :root[data-theme="dark"]{--cg-lp1:#3A4C9C;--cg-lp2:#5068CC;--cg-lp3:#6A82E6;--cg-lp-cz:#66758D;--cg-lp-fx:#1B2433}
 
-/* O interruptor "Ver por": de segundo nível (a Casa continua sendo o único par de pílulas pretas) */
+/* O interruptor "Ver por": de segundo nível (a Casa continua sendo o único par de pílulas pretas). O grupo da Casa (os botões e a frase de ajuda) fica onde sempre esteve; o interruptor vem depois dele, na mesma linha. Quem se ajusta à largura é o interruptor: perde o texto de apoio, depois o rótulo e, se ainda assim não couber, desce de linha (no celular, sempre). */
 .cg-barra-1{display:flex;flex-wrap:wrap;align-items:center;gap:0 18px}
-.cg-barra-1>.cg-casas-n{padding:9px 0 3px}
 .cg-lente{display:flex;align-items:center;gap:8px;padding:9px 0 3px}
 .cg-lente-r{font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint)}
 .cg-lente-g,.cg-lp-med{display:inline-flex;border:1.5px solid var(--rule);border-radius:20px;overflow:hidden}
@@ -13,19 +12,23 @@
 .cg-lente-b span{margin-left:5px;font-size:11.5px;font-weight:500}
 .cg-lente-b[aria-pressed="true"]{background:var(--cg-trk);color:var(--ink);box-shadow:inset 0 -2px 0 var(--ink)}
 .cg-lente-b:focus-visible{outline:2px solid var(--link);outline-offset:-2px}
-.cg-lente[hidden],.cg-casas-n[hidden]{display:none}
+.cg-lente[hidden]{display:none}
 .cg-vistas-r{margin:8px 0 0;font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint)}
 .cg-abas .cg-vistas-r{display:none}
 .cg[data-lente="partido"] .cg-vistas ul[data-lente="pessoa"],
 .cg[data-lente="pessoa"] .cg-vistas ul[data-lente="partido"]{display:none}
-@media (max-width:1099px){.cg-barra-1>.cg-casas-n{display:none}}
-@media (max-width:899px){.cg-lente .cg-lente-b span{display:none}}
+@media (max-width:999px){.cg-lente .cg-lente-b span{display:none}}
+@media (min-width:721px) and (max-width:819px){.cg-lente-r{display:none}}
 @media (max-width:560px){
   .cg-lente{flex:1 1 100%;padding:2px 0 3px}
   .cg-lente-r{display:none}
   .cg-lente-g{display:grid;grid-template-columns:1fr 1fr;width:100%}
   .cg-lente .cg-lente-b{min-height:32px}
 }
+
+/* As âncoras: a margem de rolagem de sempre (os 104px de congresso.css.j2) mais o que a primeira linha da barra cresce onde o interruptor desce de linha (--cg-lp-barra, que o script mede: lpBarra, em congresso_lp.js.j2). O alvo de um endereço antigo (#cg-rachas-cd) para com a folga de sempre abaixo da barra. Sem script não há interruptor, e a margem é a de sempre. A ficha (.cg-mo) continua sem margem. */
+.cg [id]{scroll-margin-top:calc(104px + var(--cg-lp-barra,0px))}
+.cg-mo [id]{scroll-margin-top:0}
 
 /* O selo, a Janela e as formas */
 .cg-lp-selo{display:inline-block;margin:0 2px;background:none;font-size:9px;vertical-align:1px;cursor:help}

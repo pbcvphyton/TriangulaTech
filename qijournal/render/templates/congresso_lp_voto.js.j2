@@ -54,7 +54,27 @@
       for (i = 0; i <= 4; i++) saida.push(X0 + (X1 - X0) * i / 4);
       return saida;
     }
-    function desenhar(Q, medida, um, uns) {
+    /* Os rótulos da régua não encostam um no outro. O da ponta esquerda começa na marca dele, o da direita termina nela e os do
+       meio ficam centrados (é o que o estilo faz). Se não cabem todos, a escala linear escreve um sim, um não; a logarítmica
+       deixa de escrever a potência de 10 que encostaria no teto (ou na anterior). A linha de cada marca continua no gráfico. */
+    function semEncostar(rotulos, ms, largura) {
+      var FOLGA = 5, ultimo = rotulos.length - 1, todos = [], ficam = [];
+      var cx = rotulos.map(function (el, i) {
+        var larg = el.getBoundingClientRect().width || el.textContent.length * 6.4, x = xp(ms[i]) * largura / 100;
+        todos.push(i);
+        return i === 0 ? [x, x + larg] : i === ultimo ? [x - larg, x] : [x - larg / 2, x + larg / 2];
+      });
+      function cabem(quais) { for (var j = 1; j < quais.length; j++) if (cx[quais[j]][0] - cx[quais[j - 1]][1] < FOLGA) return false; return true; }
+      if (cabem(todos)) return;
+      if (!LOG) ficam = todos.filter(function (i) { return i % 2 === 0; });
+      if (LOG || !cabem(ficam)) {
+        ficam = [];
+        todos.forEach(function (i) { if (i === 0 || i === ultimo || (cx[i][0] - cx[ficam[ficam.length - 1]][1] >= FOLGA && cx[ultimo][0] - cx[i][1] >= FOLGA)) ficam.push(i); });
+      }
+      rotulos.forEach(function (el, i) { el.hidden = ficam.indexOf(i) < 0; });
+    }
+    /* nasContas: quantas pessoas as contas mediram nesta medida, quando a vista sabe (é o número que a barra diz). */
+    function desenhar(Q, medida, um, uns, nasContas) {
       def = LPMED[medida] || null;
       ordem = [];
       emFoco = null;
@@ -63,7 +83,9 @@
       esvaziar(caixa);
       if (!def) return false;
       var medidos = 0, maior = 0;
-      Q.forEach(function (q) { q._v = lpValor(q, def); q._el = null; if (q._v != null) { medidos += 1; maior = Math.max(maior, q._v); } });
+      /* Cada desenho recomeça do zero: a medida que não chega a ser desenhada não herda o grupo (nem a mediana) da anterior. */
+      Q.forEach(function (q) { q._v = lpValor(q, def); q._el = null; q._g = null; q._longe = false; if (q._v != null) { medidos += 1; maior = Math.max(maior, q._v); } });
+      if (nasContas != null) medidos = nasContas;
       if (medidos < MIN_PES) {
         caixa.appendChild(h('p', { cls: 'cg-lp-fx-so', text: 'Não dá para responder por pessoa nesta medida: ' + (medidos ? 'só ' + num(medidos) + ' ' + (medidos === 1 ? um + ' pode ser medido' : uns + ' podem ser medidos') : 'nenhum ' + um + ' pode ser medido') + ' (a régua pede ao menos ' + MIN_PES + '). A tabela mostra o que há por partido, sem concluir que “é o partido”.' }));
         return false;
@@ -94,11 +116,17 @@
         return (A.outros - B.outros) || ((A.med == null) - (B.med == null)) || (B.med - A.med) || (a < b ? -1 : 1);
       });
       var maiores = nomes.slice().sort(function (a, b) { return grupos[b].n - grupos[a].n; }).slice(0, 8), ms = marcas();
-      var regua = h('div', null, ms.map(function (m) {
-        return h('span', { style: 'left:' + xp(m).toFixed(2) + '%', text: def.un === '%' ? Math.round(m) + '%' : def.un === 'saldo' ? saldo(m) : def.un === 'reais' ? 'R$ ' + num(m) : num(m) });
-      }));
+      /* O rótulo de cada marca diz onde ela está: a marca em 6,25 não sai "6". E, no eixo logarítmico, quem está abaixo do piso
+         (0 projetos, com o piso em 1) é desenhado na primeira marca: quando há alguém assim, ela diz "até 1". */
+      var abaixoDoPiso = LOG && Q.some(function (q) { return q._v != null && q._v < X0; });
+      var rotulos = ms.map(function (m, i) {
+        var escrito = m === Math.round(m) ? num(m) : String(Math.round(m * 100) / 100).replace('.', ',');
+        if (abaixoDoPiso && i === 0) escrito = 'até ' + escrito;
+        return h('span', { style: 'left:' + xp(m).toFixed(2) + '%', text: def.un === '%' ? Math.round(m) + '%' : def.un === 'saldo' ? saldo(m) : def.un === 'reais' ? 'R$ ' + num(m) : escrito });
+      }), regua = h('div', null, rotulos);
       caixa.appendChild(h('div', { cls: 'cg-lp-fx-r', 'aria-hidden': 'true' }, [regua]));
       var largura = Math.max(160, regua.getBoundingClientRect().width || 560);  // a largura da pista, medida: é ela que diz quantos pontos cabem lado a lado
+      semEncostar(rotulos, ms, largura);
       nomes.forEach(function (g) {
         var G = grupos[g], pista = h('div', { cls: 'cg-lp-fx-p' }), cheias = {}, cabeca;
         ms.forEach(function (m) { pista.appendChild(h('i', { cls: 'cg-lp-fx-g' + (def.zero && m === 0 ? ' cg-lp-fx-z' : ''), style: 'left:' + xp(m).toFixed(2) + '%' })); });
@@ -234,7 +262,8 @@
         var ordem = faixas.ordem(), i = emFoco ? ordem.indexOf(emFoco) : -1, n = ordem.length;
         ant.disabled = !n || i === 0;
         prox.disabled = !n || i === n - 1;
-        if (!emFoco) posEl.textContent = n ? num(n) + ' ' + UNS + ' no gráfico' : 'sem pontos nesta medida';
+        if (!emFoco) posEl.textContent = n ? num(n) + ' ' + (n === 1 ? UM : UNS) + ' no gráfico' : 'sem pontos nesta medida';
+        else if (!temPontos) posEl.textContent = emFoco.nome + ' · sem pontos nesta medida';  // a medida não foi desenhada: o número dele, se há, está no cartão
         else if (i < 0) posEl.textContent = emFoco.nome + ' · fora do gráfico (sem número nesta medida)';
         else posEl.textContent = emFoco.nome + ' · ' + num(i + 1) + ' de ' + num(n);
       }
@@ -255,7 +284,7 @@
         if (LP.eixo) fichas.push(['Na tabela das votações: ' + lpEixo(LP.eixo), function () { LP.eixo = ''; aplicar(); }]);
         if (emFoco) fichas.push(['Em foco: ' + emFoco.nome, function () { irA(null); }]);
         limpar.hidden = !fichas.length;
-        janela(fichas.length ? [num(faixas.ordem().length) + ' ' + UNS + ' medidos'] : null, fichas, limparTudo, 'No gráfico: ');
+        janela(fichas.length ? [temPontos ? num(faixas.ordem().length) + ' ' + UNS + ' medidos' : 'sem pontos nesta medida'] : null, fichas, limparTudo, 'No gráfico: ');
         atualizarPasso();
         if (!semEndereco) gravarEndereco();
       }
@@ -315,7 +344,7 @@
           : ['Com o partido: poucos votos de peso com posição do partido (' + num(q.fp_n || 0) + '; são precisos ' + MINIMO + ').']));
         nos.push(h('ul', { cls: 'cg-lp-tx' }, lista2));
         nos.push(h('p', { cls: 'cg-pa-c-h', text: 'Contra o próprio partido fechado' }));
-        nos.push(h('ul', { cls: 'cg-lp-tx' }, [item([h('b', { text: num(q.div) + (q.div === 1 ? ' vez' : ' vezes') }), ' em ' + num(q.wn) + ' votos dados nas votações que entram' + (q.div_cont ? '; em ' + num(q.div_cont) + (q.div_cont === 1 ? ' dela' : ' delas') + ', do lado do caixa.' : '.')])]));
+        nos.push(h('ul', { cls: 'cg-lp-tx' }, [item([h('b', { text: num(q.div) + (q.div === 1 ? ' vez' : ' vezes') }), ' em ' + num(q.wn) + (q.wn === 1 ? ' voto dado' : ' votos dados') + ' nas votações que entram' + (q.div_cont ? '; em ' + num(q.div_cont) + ' delas, do lado do caixa.' : '.')])]));
         nos.push(h('p', { cls: 'cg-pa-c-h', text: 'Os votos, um a um' }));
         votos.appendChild(h('p', { cls: 'cg-pa-c-o', text: 'Carregando os votos…' }));
         nos.push(votos);
@@ -453,7 +482,8 @@
         if ((w.location.hash || '') !== endereco()) w.history.replaceState(null, '', endereco());
       }
       function desenhar() {
-        var tem = faixas.desenhar(Q, X, UM, UNS), def = LPMED[X];
+        var daVez = barras.filter(function (b) { return b.getAttribute('data-x') === X; })[0], n = daVez ? parseInt(daVez.getAttribute('data-n'), 10) : NaN;
+        var tem = faixas.desenhar(Q, X, UM, UNS, isNaN(n) ? null : n), def = LPMED[X];
         if (titulo) { esvaziar(titulo); titulo.appendChild(d.createTextNode(def.nome + ', partido a partido ')); if (def.selo) titulo.appendChild(lpSelo()); }
         if (leg) leg.hidden = !tem;
         faixas.focar(emFoco);

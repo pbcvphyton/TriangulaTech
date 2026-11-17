@@ -60,7 +60,7 @@
     <header class="az-lh" id="cg-projetos">
       <p class="az-ln">Os projetos</p>
       <h3 class="az-lt" id="cg-projetos-h">O que mais pesa para o país, e em que porta parou</h3>
-      <p class="az-ld">Cada projeto de lei foi lido e pesado pelo quanto mexe na estrutura do país, em relação a um objetivo declarado: {{ L.objetivo }}. Aqui estão os de maior peso que ainda tramitam, a porta em que cada um parou e com quem está. A porta e o tempo vêm do registro oficial; o peso é leitura. {{ selo() }} <a class="cg-lp-como" href="#cg-metodo">como ler</a></p>
+      <p class="az-ld">Cada projeto de lei foi lido e pesado pelo quanto mexe na estrutura do país, em relação a um objetivo declarado: {{ L.objetivo }}. Aqui estão os de maior peso que ainda tramitam, a porta em que cada um parou e com quem está. A porta e o tempo vêm do registro oficial; o peso é leitura. {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -213,7 +213,7 @@
     <header class="az-lh" id="cg-autores">
       <p class="az-ln">O perfil pelos projetos</p>
       <h3 class="az-lt" id="cg-autores-h">O projeto que cada um propõe é o perfil dele</h3>
-      <p class="az-ld">Um ponto por parlamentar. Quanto mais à direita, mais projetos apresentou; quanto mais alto, maior a parte deles que são {{ L.rot.topo_pl }} confirmados (peso do topo da régua, com duas leituras). Dentro da faixa cinza, a diferença para a Casa pode ser acaso. Só conta a autoria principal: relatoria, emenda e negociação ficam de fora. {{ selo() }} <a class="cg-lp-como" href="#cg-metodo">como ler</a></p>
+      <p class="az-ld">Um ponto por parlamentar. Quanto mais à direita, mais projetos apresentou; quanto mais alto, maior a parte deles que são {{ L.rot.topo_pl }} confirmados (peso do topo da régua, com duas leituras). Acaso é sorte: a faixa cinza é o que a sorte sozinha daria a um parlamentar médio; dentro dela, não dá para afirmar diferença. Só conta a autoria principal: relatoria, emenda e negociação ficam de fora. {{ selo() }} <a class="cg-lp-como" href="#cg-lp-metodo">como ler</a></p>
     </header>
     {% for casa in c.casas %}
     <div class="cg-c" data-casa="{{ casa.id }}">
@@ -240,7 +240,7 @@
 
         <div class="cg-pa-foco cg-lp-foco">
           <figure class="cg-pa-fig cg-lp-fig">
-            <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht">A parte dos projetos de cada um que são {{ L.rot.topo_pl }} confirmados</span> <span>pelo número de projetos lidos; a faixa cinza é o que o acaso explica{{ info(L.dicas.acaso) }}</span></figcaption>
+            <figcaption class="az-h cg-lp-h"><span class="cg-lp-ht">A parte dos projetos de cada um que são {{ L.rot.topo_pl }} confirmados</span> <span>pelo número de projetos lidos; a faixa cinza é o que o acaso explica{{ info(A.dica_acaso) }}</span></figcaption>
             <p class="cg-pa-ey cg-lp-ey" aria-hidden="true" hidden></p>
             <div class="cg-pa-plot cg-lp-plot" hidden><svg class="cg-pa-svg cg-lp-svg" role="img" aria-label="Um ponto por {{ casa.lp.um }}: a parte dos projetos que são {{ L.rot.topo_pl }} confirmados, pelo número de projetos lidos"></svg></div>
             <p class="cg-pa-ex cg-lp-ex" aria-hidden="true" hidden>projetos lidos, de autoria principal (escala logarítmica) →</p>

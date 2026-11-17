@@ -25,8 +25,10 @@ substitutivo votado no dia. Matéria sem leitura na guarda fica fora dos dois it
   leituras de IA, ``r`` ≥ 2) e marca legível: a marca do caixa +1 ou −1, ou a de controle +1
   ou −1 na alavanca do caixa; de peso ``voto_peso`` ou mais, ou na alavanca do caixa com
   qualquer peso (menos nos escopos de ``papeis.voto_fiscal_sem_escopo``). Marcas +1 e −1 na
-  mesma matéria: fora. É voto fiscal o **Sim em matéria de marca +1** e o **Não em matéria de
-  marca −1**. Mede de que lado do caixa a pessoa vota, não se votou certo.
+  mesma matéria: fora. Marca do caixa **em disputa** entre os leitores que confirmaram a
+  faixa (:func:`leitura.contas_em_disputa`): fora, também pela marca de controle. É voto
+  fiscal o **Sim em matéria de marca +1** e o **Não em matéria de marca −1**. Mede de que
+  lado do caixa a pessoa vota, não se votou certo.
 - **Contra o próprio partido fechado**: voto diferente do da maioria do partido do dia quando
   ela reuniu ``limiares.coesao_partido`` do Sim + Não (os limiares que a página já usa para a
   dissidência). Por pessoa só há contagem: não há teste de dissidência seletiva (com tão
@@ -97,12 +99,14 @@ class Votada:
 def marca_fiscal(ctx: Contexto, a: Avaliacao, lida: Leitura | None) -> int:
     """A marca fiscal de uma matéria votada (item B da régua): +1, −1 ou 0 (fora).
 
-    Fora: sem leitura; leitura **não confirmada** (um leitor só); nenhuma marca legível (a do
-    caixa em 0 ou "nd", e a de controle em 0, "nd" ou fora da alavanca do caixa); as duas
-    marcas em sentidos opostos; ou matéria leve (peso abaixo de ``limiares.voto_peso``) fora da
-    alavanca do caixa, ou nela com escopo de ``papeis.voto_fiscal_sem_escopo``."""
+    Fora: sem leitura; leitura **não confirmada** (um leitor só); a marca do caixa **em
+    disputa** entre os leitores que confirmaram a faixa (:func:`leitura.contas_em_disputa`:
+    nem a marca de controle a põe na conta); nenhuma marca legível (a do caixa em 0 ou "nd",
+    e a de controle em 0, "nd" ou fora da alavanca do caixa); as duas marcas em sentidos
+    opostos; ou matéria leve (peso abaixo de ``limiares.voto_peso``) fora da alavanca do
+    caixa, ou nela com escopo de ``papeis.voto_fiscal_sem_escopo``."""
     papeis = ctx.regua.papeis
-    if lida is None or not a.lida or not lida.confirmada or not papeis.caixa:
+    if lida is None or not a.lida or not lida.confirmada or not papeis.caixa or leitura.contas_em_disputa(lida):
         return 0
     na_alavanca = bool(papeis.alavanca_do_caixa) and a.alavanca == papeis.alavanca_do_caixa
     sinais = {a.marcas.get(papeis.caixa)}

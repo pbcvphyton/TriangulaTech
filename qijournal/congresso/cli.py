@@ -8,9 +8,9 @@
 - ``ler``: a leitura diária dos projetos de lei novos, com a cadeia de IAs do jornal: lê as
   proposições que ainda não têm leitura e relê as que mudam a conta, em lotes cegos com
   perguntas de controle, e grava em ``data/congresso/leitura/`` (a guarda e o registro do
-  dia, ``diario.json``). Roda todo dia no fim da edição diária (``daily.yml``), com a edição
-  já publicada; no fluxo manual do Congresso, logo antes de ``atualizar``. Sem chave de IA,
-  não lê nada.
+  dia, ``diario.json``). Roda todo dia num fluxo à parte (``leitura.yml``), depois da edição
+  diária, que não espera a leitura; o que lê entra nas contas no ``atualizar`` seguinte. Sem
+  chave de IA, não lê nada.
 - ``leitura importar``: traz para ``data/congresso/leitura/`` as leituras de IA dos projetos
   de lei (uma por linha, em JSON), conferidas contra os códigos de ``config/congresso.yaml``.
 - ``leitura exportar``: grava, em lotes cegos, as proposições que precisam da leitura de IA e
@@ -130,10 +130,13 @@ def _resumo_da_leitura(registro: ler.Registro | None, motivo: str = "") -> None:
             f"| Sem leitura antes da rodada | {registro.faltavam} (fora {registro.sem_ementa} sem ementa) |",
             f"| Primeiras leituras | {registro.primeiras} |",
             f"| Segundas leituras | {registro.segundas} ({registro.confirmadas} confirmadas, {registro.decididas} decididas pela terceira, {registro.instaveis} instáveis) |",
+            f"| Segundas pela mesma IA que fez a primeira na rodada | {registro.mesmo_editor} |",
+            f"| Terceiras por uma IA que se sabe que já tinha lido a proposição (da primeira leitura de outra rodada a guarda não diz a IA) | {registro.terceira_de_quem_leu} |",
+            f"| Segundas de primeira leitura de outra rodada (a guarda não diz de que IA) | {registro.de_outra_rodada} |",
             f"| Lotes | {registro.lotes} ({registro.descartados} descartados pelos controles, {registro.falhas} sem resposta) |",
             f"| Controles certos | {registro.controles_certos} de {registro.controles_total} |",
             f"| Respostas fora do formato | {registro.invalidas} |",
-            f"| Ficam para a próxima rodada | {registro.pendentes_primeiras} sem leitura, {registro.pendentes_segundas} à espera da segunda |",
+            f"| Ficam para a próxima rodada | {registro.pendentes_primeiras} sem leitura, {registro.pendentes_segundas} à espera da segunda ({registro.pendentes_terceiras} delas já com a segunda, em outra faixa, à espera da terceira) |",
             f"| Chamadas à IA | {registro.chamadas} ({registro.tokens_entrada} tokens de entrada, {registro.tokens_saida} de saída) |",
             f"| Editores | {registro.provedor or 'nenhum'}{f' ({registro.modelo})' if registro.modelo else ''} |",
         ]

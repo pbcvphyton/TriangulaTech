@@ -883,7 +883,9 @@ COLUNAS_DO_AUTOR = [
     "va", "vn", "div", "div_cont", "saldo", "gov", "fid", "pres", "ct",
     "topo", "tot", "sl", "sc", "sc_n", "tx", "tq", "mk", "ad", "bc", "rp", "wn", "pp", "pp_n", "pd", "pd_n", "fp", "fp_n", "fd", "fd_n", "prop",
 ]  # fmt: skip
-DO_RESUMO = ("saldo", "gov", "fid", "pres", "ct", "prop")  # o que vem de resumo.json, repetido para a vista não baixar o arquivo inteiro
+# O que vem de resumo.json, repetido para a vista não baixar o arquivo inteiro. "prop" é o total do dossiê (soma as
+# legislaturas anteriores): fica no arquivo, mas nenhuma medida o usa; "quantos projetos apresentou" sai de "tot".
+DO_RESUMO = ("saldo", "gov", "fid", "pres", "ct", "prop")
 
 
 def _json(dados: Any) -> str:
@@ -939,7 +941,7 @@ def da_casa(
     tramita). ``autoria``: por parlamentar, as proposições que ele assina. ``relatorias``: só
     no Senado (a lista do que tramita não traz o relator). ``resumo``: chave da pessoa → a
     linha dela em ``resumo.json`` (de onde vêm o saldo, o governismo, a fidelidade, a presença,
-    a cota e o número de propostas)."""
+    a cota e o número de propostas do dossiê)."""
     from . import pais_cruzar, pais_voto  # import tardio: os dois usam este módulo
 
     das_pessoas = [p for lista in autoria.values() for p in lista]

@@ -32,6 +32,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
+import yaml
+
 from .. import text
 from ..config import Config
 from ..congresso import dados, pais, projetos, relevancia
@@ -511,7 +513,14 @@ def _autores(casa: str, um: str, uns: str, lp: Mapping[str, Any], R: Rotulos) ->
     ]
     poucos, sem = int(a.get("poucos") or 0), int(a.get("sem") or 0)
     fora = a.get("fora") or {}
+    em_quantas = round(1 / float(cortes.get("funil_alfa") or 0.01))  # a sorte daria o resultado menos de 1 vez em tantas
     return {
+        # "o que o acaso explica", em palavras simples (a dica "i" do gráfico)
+        "dica_acaso": (
+            f"Acaso é sorte. Com poucos projetos, um ou dois a mais ou a menos aparecem por sorte, mesmo em quem é igual à média da Casa. "
+            f"A faixa cinza é o que a sorte sozinha daria a um {um} médio com aquele número de projetos. Só sai dela quem tem um resultado que a sorte daria menos de 1 vez em {_num(em_quantas)}, "
+            f"já contando {'que são ' + _num(plotados) + ' comparados' if plotados > 1 else 'todos os comparados'} de uma vez. Dentro da faixa não quer dizer “igual à média”: quer dizer que não dá para afirmar."
+        ),
         "janela": [
             (f"{Uns} com {minimo} projetos lidos ou mais", False),
             (f"a parte dos projetos de cada um que são {R.topo_pl} confirmados", False),
@@ -538,6 +547,23 @@ def _regras(config: Config) -> Any:
         return regras_mod.carregar(config.root)
     except Exception as erro:  # noqa: BLE001 (o config da régua é acessório para a página: sem ele, a visão não sai)
         log.warning("Visão por parlamentar: não foi possível ler config/congresso.yaml (%s)", erro)
+        return None
+
+
+def _limites_da_diaria(config: Config) -> Any:
+    """Os limites da leitura de todo dia (``projeto_de_pais.leitura.diaria`` em
+    ``config/congresso.yaml``: o tamanho do lote, as perguntas de controle e o mínimo de
+    acertos), para o Como ler dizer como ela é feita. ``None`` se o bloco não puder ser lido:
+    a frase sai sem os números."""
+    # import tardio: o módulo da leitura diária só entra aqui, para os limites
+    from ..congresso import ler
+
+    try:
+        bruto = yaml.safe_load((Path(config.root) / "config" / regras_mod.ARQUIVO).read_text(encoding="utf-8")) or {}
+        da_leitura = (bruto.get("projeto_de_pais") or {}).get("leitura") or {}
+        return ler.limites_de(da_leitura.get("diaria"))
+    except Exception as erro:  # noqa: BLE001 (acessório para a página: sem os limites, o texto sai sem os números)
+        log.warning("Visão por parlamentar: não foi possível ler os limites da leitura diária (%s)", erro)
         return None
 
 
@@ -625,12 +651,12 @@ def encaixar(view: Any, d: Any, config: Config, data_dir: Path) -> None:
             ),
             "caixa": "Esta marca diz o que a ementa enuncia para o caixa público. Não diz que falta fonte, não mede o tamanho do gasto nem o mérito. Anda ao lado do peso: nunca é somada nem multiplicada.",
             "sem_andar": "Tempo desde o último andamento oficial. A data muda também quando a matéria é pautada e não votada.",
-            "acaso": "Com poucos projetos, qualquer parte sai alta ou baixa por acaso. Dentro da faixa cinza, a diferença para a Casa não se distingue do acaso (99% de confiança, já contando todas as pessoas comparadas).",
         },
     }
     # o bloco "A leitura dos projetos" do Como ler: a régua (do config), a cobertura e a auditoria (de meta.json)
     parametros = next((com[casa.id].get("cruzar", {}).get("parametros") for casa in view.casas if casa.id in com and (com[casa.id].get("cruzar") or {}).get("parametros")), None)
-    view.lp["metodo"] = metodo_mod.metodo(R, regras.projeto_de_pais, meta, [(casa.id, casa.curto) for casa in view.casas if casa.id in com], min(anos) if anos else None, parametros)
+    votadas = {ident: (lp.get("decide") or {}).get("materias") for ident, lp in com.items()}  # quantas matérias "Na hora do voto" conta em cada Casa
+    view.lp["metodo"] = metodo_mod.metodo(R, regras.projeto_de_pais, meta, [(casa.id, casa.curto) for casa in view.casas if casa.id in com], min(anos) if anos else None, parametros, medidas, votadas, _limites_da_diaria(config))
     manifesto_da_pagina = json.loads(view.manifesto)
     manifesto_da_pagina["lp"] = manifesto(m, R, repo, medidas)
     view.manifesto = json.dumps(manifesto_da_pagina, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")

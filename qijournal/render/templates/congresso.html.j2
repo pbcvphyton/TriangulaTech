@@ -64,8 +64,8 @@
     <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
   </div>
   {#- A barra fixa: a Casa e, logo abaixo, as vistas dela (uma de cada vez, com script; sem script, todas em sequência).
-      Com a visão por parlamentar (c.lp), a primeira linha ganha o interruptor "Ver por" e a frase de ajuda vai para o
-      fim dela; sem c.lp, a barra é a de sempre. -#}
+      Com a visão por parlamentar (c.lp), a primeira linha ganha o interruptor "Ver por", depois do grupo da Casa (os
+      botões e a frase de ajuda, que ficam onde sempre estiveram); sem c.lp, a barra é a de sempre. -#}
   <div class="cg-barra" id="cgBarra">
     {% if c.lp %}
     <div class="cg-barra-1">
@@ -74,9 +74,7 @@
       {% for casa in c.casas %}
       <button class="cg-casa-b" type="button" data-casa="{{ casa.id }}"{% if loop.first %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ casa.curto }} <span>{{ casa.em_exercicio }}</span></button>
       {% endfor %}
-      {% if not c.lp %}
       <span class="cg-casas-n">Escolha a Casa e, abaixo, o que quer ver dela.</span>
-      {% endif %}
     </div>
     {% if c.lp %}
     {% include "congresso_lp_barra.html.j2" %}
