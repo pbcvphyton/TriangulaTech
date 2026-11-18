@@ -1,0 +1,3351 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-18",
+ "analises": [
+  {
+   "id": "125c387c00aa",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/17/falta-de-acordo-sobre-compensacao-no-plp-do-ajuste-fiscal-levou-ao-adiamento-da-votacao.ghtml",
+   "titulo": "Falta de acordo sobre compensação no PLP do ajuste fiscal levou ao adiamento da votação",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "sem-acordo-senado-adia-votacao-do-ajuste-fiscal",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de negociações legislativas em torno do projeto de ajuste fiscal no Congresso."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 463,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impasse em torno de dispositivos de ajuste fiscal que afetam repasses a Estados e o setor produtivo.",
+    "causa": "Divergência entre o governo federal e parlamentares da oposição sobre pontos de compensação tributária e fundos.",
+    "vitima": "Estados e setor produtivo.",
+    "culpado": "Governo federal e sua base frágil no Congresso.",
+    "solucao": "Negociação e possível retirada de artigos do texto.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto descreve trâmites parlamentares de forma puramente factual e descritiva, sem carregar juízos de valor para lados distintos, mantendo-se idêntico caso os papéis estivessem invertidos.",
+   "atores": [
+    {
+     "nome": "Davi Alcolumbre",
+     "campo": "centro"
+    },
+    {
+     "nome": "Eduardo Braga",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Carlos Portinho",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "líder do PL no Senado, Carlos Portinho (RJ), e outros parlamentares envolvidos nessa…",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 12
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "economia de até R$ 60 bilhões",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O número é apresentado com base institucional clara ligada à proposta do projeto.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f65d5b544e84",
+   "url": "https://www.infomoney.com.br/brasil/pf-apreende-iate-de-r-40-mi-e-carros-de-luxo-de-dono-da-esportes-da-sorte-veja-foto/",
+   "titulo": "PF apreende iate de R$ 40 mi e carros de luxo de dono da Esportes da Sorte; veja foto",
+   "veiculo": "InfoMoney",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "pf-apreende-iate-de-r-40-mi-e-bloqueia-r-2-3-bi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Relata operação da Polícia Federal e da Receita contra crimes financeiros e lavagem de dinheiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 570,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investigação sobre lavagem de dinheiro e exploração ilegal de jogos por plataforma de apostas.",
+    "causa": "Movimentações financeiras suspeitas e operação sem autorização prévia.",
+    "vitima": "Sistema financeiro e arrecadação pública.",
+    "culpado": "Empresa e dirigentes investigados.",
+    "solucao": "Apreensão de bens e bloqueio de ativos.",
+    "motor_moral": "lei_e_ordem"
+   },
+   "teste_inversao": "O texto relata dados de uma operação policial de maneira direta, técnica e estritamente baseada em informações oficiais, sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "Darwin Henrique da Silva Filho",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Polícia Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Polícia Federal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "bloqueio de mais de R$ 2,3 bilhões em ativos",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os valores de bloqueio e apreensão são informados com base nos dados fornecidos pelos órgãos oficiais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "afd95f573cf4",
+   "url": "https://www.cnnbrasil.com.br/internacional/principe-william-defende-acao-urgente-contra-mudancas-climaticas/",
+   "titulo": "Príncipe William defende ação urgente contra mudanças climáticas",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "principe-william-entrega-premio-ambiental-de-r-7",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre premiação ambiental internacional e declaração de membro da realeza britânica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 307,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mudanças climáticas e degradação ambiental global.",
+    "causa": "Falta de ação prévia e urgente das gerações passadas e atuais.",
+    "vitima": "Próximas gerações.",
+    "culpado": "Sociedade global inativa.",
+    "solucao": "Ações urgentes e financiamento de soluções ambientais.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A matéria relata evento oficial de premiação de forma neutra e informativa, aplicável a qualquer personalidade pública.",
+   "atores": [
+    {
+     "nome": "Príncipe William",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Príncipe William",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 65,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "1 milhão de libras (cerca de 7,6 milhões de reais)",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os valores da premiação são explicitados com clareza de conversão e finalidade.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c230c0c3333f",
+   "url": "https://brasil.mongabay.com/short-article/2026/11/encontro-raro-na-ti-arariboia-expoe-riscos-a-indigenas-isolados-awa/",
+   "titulo": "Encontro raro na TI Arariboia expõe riscos a indígenas isolados Awá",
+   "veiculo": "Mongabay Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "indigenas-isolados-awa-fazem-contato-raro-com-gr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Trata da proteção de indígenas isolados, envolvendo órgãos do Estado e ativistas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 474,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Riscos à saúde e à integridade de indígenas isolados após contato raro.",
+    "causa": "Vulnerabilidade imunológica e pressões ambientais em territórios protegidos.",
+    "vitima": "Indígenas isolados Awá.",
+    "culpado": "Crimes ambientais e ameaças territoriais.",
+    "solucao": "Acionamento de plano de contingência e respeito à autodeterminação.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A notícia aborda o tema de forma informativa, com fontes institucionais e de entidades civis devidamente identificadas, mantendo o padrão jornalístico padrão.",
+   "atores": [
+    {
+     "nome": "Povos Indígenas Awá",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Funai",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Funai",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sarah Shenker, diretora e pesquisadora sênior da organização de defesa dos direitos…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 80,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "disse Sarah Shenker, diretora e pesquisadora sênior da organização de defesa dos direitos indígenas Survival International",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta contraponto institucional da Funai em conjunto com a visão de especialista de ONG.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "197421fba248",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/lula-gasta-r-133-mi-na-eleicao-e-flavio-r-115-mi-marketing-redes-sociais-e-viagens-lideram-despesas.shtml",
+   "titulo": "Lula gasta R$ 133 mi na eleição e Flávio, R$ 115 mi; marketing, redes sociais e viagens lideram despesas",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Compara gastos e receitas de campanha dos candidatos presidenciais Lula e Flávio Bolsonaro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 920,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Diferenças nos custos e nas fontes de financiamento de campanhas eleitorais presidenciais.",
+    "causa": "Utilização distinta de fundos públicos partidários e doações privadas.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Transparência por meio da prestação de contas à Justiça Eleitoral.",
+    "motor_moral": "transparencia"
+   },
+   "teste_inversao": "O texto relata dados oficiais de prestações de contas de forma estritamente comparativa e simétrica entre os dois principais candidatos, sem viés na apuração.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "TSE (Tribunal Superior Eleitoral)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Lula atingiu o teto de despesas estipulado pelo TSE e desembolsou R$ 133,4 milhões, 16% a mais do que Flávio, que empregou R$ 114,6 milhões.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os dados financeiros de ambas as campanhas são apresentados de forma simétrica e comparativa com base no TSE.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d10520a4f160",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/17/escala-5x2-decisao-dino.ghtml",
+   "titulo": "Dino decide julgar mérito de ações que questionam escala 5x2, diz que liminar segue valendo e dá prazo para partes se manifestarem",
+   "veiculo": "g1",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Decisão do STF sobre a escala 5x2, envolvendo regras de transição, negociações coletivas e prazos para o Congresso; tema de política trabalhista e institucional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 91,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 811,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Lacunas e contradições nas regras de transição da escala 5x2",
+    "causa": "Mudança na jornada de trabalho aprovada pelo Congresso",
+    "vitima": "Empregadores e trabalhadores sujeitos às regras de transição",
+    "culpado": "Nenhum",
+    "solucao": "Decisão do STF estabelece regras provisórias e leva mérito ao plenário",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os lados estivessem trocados (entidades de trabalhadores questionando a decisão e ministro decidindo a favor de empregadores), o texto seria escrito de forma igual, pois é factual e descreve a decisão e os argumentos das partes. Mudaria apenas o conteúdo das ações, não o tratamento.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "CNC (Confederação Nacional do Comércio)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "CNI (Confederação Nacional da Indústria)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Congresso Nacional (Câmara e Senado)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Luiz Fux",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o ministro Flávio Dino, do Supremo Tribunal Federal (STF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Confederação Nacional do Comércio de Bens, Serviços e Turismo (CNC)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Confederação Nacional da Indústria (CNI)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "bbfd5a2ae4f8",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/dino-decide-que-escala-5x2-sera-julgada-de-forma-definitiva-pelo-stf",
+   "titulo": "Dino decide que escala 5x2 será julgada de forma definitiva pelo STF",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Decisão do STF sobre escala 5x2, com menção a negociações coletivas e papel do Congresso; tema trabalhista e institucional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 257 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 91,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 257,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspensão do julgamento da liminar por pedido de destaque",
+    "causa": "Pedido de destaque do ministro Luiz Fux",
+    "vitima": "Partes interessadas na definição da escala",
+    "culpado": "Nenhum",
+    "solucao": "Dino decide julgar mérito e mantém liminar em vigor",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os lados estivessem trocados, o texto seria igual, pois é factual e cita a decisão do ministro com verbo neutro. Mudaria apenas o conteúdo da fala.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Luiz Fux",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o ministro",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7d2aeb17a6e5",
+   "url": "https://climainfo.org.br/2026/11/17/cop31-texto-sobre-financas-climaticas-revela-possibilidade-de-nenhum-texto/",
+   "titulo": "COP31: texto sobre finanças climáticas revela possibilidade de “nenhum texto”",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Negociações internacionais sobre financiamento climático, com disputa entre países desenvolvidos e em desenvolvimento; tema econômico e ambiental."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 476,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impasse nas negociações sobre financiamento climático na COP31",
+    "causa": "Divergências entre países desenvolvidos e em desenvolvimento sobre quem deve financiar e alcance das obrigações",
+    "vitima": "Países em desenvolvimento, que dependem de financiamento climático",
+    "culpado": "Nenhum",
+    "solucao": "Manutenção das negociações com texto entre colchetes",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os lados estivessem trocados (países em desenvolvimento resistindo a ampliar a base e desenvolvidos defendendo mais responsabilidade), o texto seria escrito de forma igual, pois descreve as posições de ambos simetricamente.",
+   "atores": [
+    {
+     "nome": "Países desenvolvidos (UE, Suíça, Nova Zelândia)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Países em desenvolvimento",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "China e Arábia Saudita",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "informa a Exame",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "destaca o Carbon Brief",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "relato do Earth Negotiations Bulletin — publicação do Instituto Internacional para o…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "43e2fd408fc4",
+   "url": "https://www.poder360.com.br/poder-seguranca-publica/de-ferrari-a-iate-veja-apreensoes-da-pf-em-operacao-contra-apostas-ilegais/",
+   "titulo": "De Ferrari a iate: veja apreensões da PF em operação contra apostas ilegais",
+   "veiculo": "Poder360",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "pf-apreende-iate-de-r-40-mi-e-bloqueia-r-2-3-bi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "economico"
+    ],
+    "justificativa": "Operação da Polícia Federal contra organização criminosa ligada a apostas ilegais, com sonegação e lavagem de dinheiro; tema de segurança pública e economia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 655,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Organização criminosa explorando ilegalmente jogos e apostas",
+    "causa": "Atuação antes de obter autorização do Ministério da Fazenda",
+    "vitima": "Sociedade e erário, por sonegação e lavagem",
+    "culpado": "Organização criminosa investigada",
+    "solucao": "Operação Cash Out da Polícia Federal",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se os lados estivessem trocados (empresa investigando PF), o texto não seria igual, pois é uma notícia sobre ação policial; mas o tratamento factual seria o mesmo, sem juízo de valor.",
+   "atores": [
+    {
+     "nome": "Polícia Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Esporte da Sorte",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Investigados",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Segundo a PF",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Esportes da Sorte",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 24,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8ddd4e253d8f",
+   "url": "https://www.moneytimes.com.br/banco-do-brasil-bbas3-b3-b3sa3-americanas-amer3-e-outros-destaques-desta-quarta-feira-mlem/",
+   "titulo": "Banco do Brasil (BBAS3), B3 (B3SA3), Americanas (AMER3) e outros destaques desta quarta-feira (18)",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Resumo de notícias corporativas e de mercado, sem disputa político-ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 381,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Notícias corporativas do dia",
+    "causa": "Fatos corporativos e de mercado",
+    "vitima": "Investidores",
+    "culpado": "Nenhum",
+    "solucao": "Informações ao mercado",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se os lados estivessem trocados, o texto seria igual, pois é um resumo factual de comunicados e balanços, sem juízo de valor.",
+   "atores": [
+    {
+     "nome": "Banco do Brasil",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "B3",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Americanas",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Aneel",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Enel São Paulo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Banco Digimais / Edir Macedo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "O Banco do Brasil (BBAS3) divulgou comunicado",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sébastien Durchon, CFO da varejista",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "A diretoria da Agência Nacional de Energia Elétrica (Aneel)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "19d3c54a66d1",
+   "url": "https://neofeed.com.br/startups/quem-sao-os-grandes-e-pouco-conhecidos-vencedores-do-ipo-bilionario-da-anthropic/",
+   "titulo": "Quem são os grandes (e pouco conhecidos) vencedores do IPO bilionário da Anthropic",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "anthropic-avanca-rumo-a-ipo-bilionario-em-ny-com",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda o mercado financeiro e os fundos de venture capital por ocasião do IPO bilionário da Anthropic."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 77,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 747,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Grandes lucros gerados por IPO de empresa de IA.",
+    "causa": "Investimento antecipado de gestoras e fundos.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Realização de IPO e abertura de capital.",
+    "motor_moral": "sucesso_economico"
+   },
+   "teste_inversao": "O texto descreve fatos e números sobre investidores em uma oferta pública de ações, mantendo tom estritamente informativo.",
+   "atores": [
+    {
+     "nome": "Anthropic",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Financial Times (FT)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "60230de7da9e",
+   "url": "https://www.camara.leg.br/noticias/1320142-presidentes-da-camara-e-do-senado-pedem-que-stf-julgue-validade-da-lei-da-dosimetria-neste-ano",
+   "titulo": "Presidentes da Câmara e do Senado pedem que STF julgue validade da Lei da Dosimetria neste ano",
+   "veiculo": "Agência Câmara",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "fachin-diz-que-stf-pode-julgar-lei-da-dosimetria",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de pedido institucional dos chefes do Legislativo ao STF sobre a validade da Lei da Dosimetria."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 233 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 233,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Indefinição jurídica sobre a Lei da Dosimetria.",
+    "causa": "Ações diretas de inconstitucionalidade pendentes de julgamento no STF.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Julgamento definitivo pelo STF ainda no ano corrente.",
+    "motor_moral": "institucionalidade"
+   },
+   "teste_inversao": "O texto relata de forma neutra uma movimentação institucional dos presidentes do Congresso, sem tomar partido sobre o mérito da lei.",
+   "atores": [
+    {
+     "nome": "Hugo Motta e Davi Alcolumbre",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Alexandre de Moraes",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "nota conjunta divulgada à imprensa",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d5fd3bfaff68",
+   "url": "https://www.seudinheiro.com/2026/colunistas/fim-do-mundo-mercado-reage-ajuste-fiscal-fim-escala-6x1-ata-fed-desemprego-crise-ia-balanco-nvidia-rsgp/",
+   "titulo": "Não é o fim do mundo: mercado reage a ajuste fiscal, fim da escala 6×1, ata do Fed, desemprego e crise na IA após balanço da Nvidia",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "senado-retoma-votacao-do-pacote-fiscal-sob-caute",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Comentário sobre indicadores macroeconômicos, ajuste fiscal e reações do mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 566,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Incertezas no cenário econômico e fiscal do país.",
+    "causa": "Debates sobre ajuste fiscal e mudanças nas leis trabalhistas.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Adoção de medidas e adaptação dos agentes econômicos.",
+    "motor_moral": "prudencia_economica"
+   },
+   "teste_inversao": "O texto equilibra diferentes visões sobre o ajuste fiscal e o impacto das medidas sem expressar juízo de valor próprio.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "75e3b753d467",
+   "url": "https://www.suno.com.br/noticias/dolar-hoje-alta-cotacao-analistas/",
+   "titulo": "Dólar hoje passa de R$ 5,80 e recua; por que o real não reage?",
+   "veiculo": "Suno Notícias",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "senado-retoma-votacao-do-pacote-fiscal-sob-caute",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Discute flutuações do dólar, percepção de risco sobre o ajuste fiscal do governo e comando da Fazenda."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 673,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Valorização do dólar e instabilidade nos ativos brasileiros.",
+    "causa": "Dúvidas sobre o cumprimento de metas fiscais e indefinição na equipe econômica.",
+    "vitima": "Nenhuma.",
+    "culpado": "Governo federal (na percepção dos analistas citados).",
+    "solucao": "Aprovação de ajuste fiscal consistente e clareza na política econômica.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "A cobertura de mercado atribui as pressões cambiais a fatores fiscais de forma padrão e impessoal, sem viés partidário direto.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rebecca Nossig, estrategista de ações da Nomad",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Alberto Ramos, responsável pela área de Economia para a América Latina do Goldman Sachs",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e8b1900dac7e",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/18/eua-democratas-vencem-no-alasca-e-fecham-eleio-com-maioria-ampla-de-56-senadores.ghtml",
+   "titulo": "EUA: Democratas vencem no Alasca e fecham eleição com maioria ampla de 56 senadores",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "democratas-vencem-no-alasca-e-consolidam-maioria",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata do resultado de eleições legislativas nos Estados Unidos e disputas políticas envolvendo Donald Trump."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 312,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disputa acirrada e tentativas de contestação de resultados eleitorais no Alasca.",
+    "causa": "Ações judiciais movidas pelo governo federal a pedido de Donald Trump.",
+    "vitima": "Nenhuma.",
+    "culpado": "Donald Trump (apontado por interferência nas instâncias eleitorais).",
+    "solucao": "Conclusão da apuração e rejeição de recursos judiciais.",
+    "motor_moral": "democracia_representativa"
+   },
+   "teste_inversao": "O relato factual descreve as vitórias eleitorais e as tentativas de intervenção jurídica mantendo equidistância e relatando os fatos conforme apuração de agências.",
+   "atores": [
+    {
+     "nome": "Partido Democrata",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Donald Trump e Partido Republicano",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Associated Press (AP)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c58a24810200",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/tarcisio-mantem-dirigente-do-republicanos-na-articulacao-politica-e-confirma-outros-4-secretarios.shtml",
+   "titulo": "Tarcísio mantém dirigente do Republicanos na articulação política e confirma outros 4 secretários",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Notícia sobre composição do secretariado do governador reeleito, envolvendo partidos e cargos no Executivo estadual."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 62,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 685,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Montagem do secretariado para o novo mandato, com necessidade de manter base aliada e evitar atritos.",
+    "causa": "Reeleição de Tarcísio e necessidade de reorganizar o governo.",
+    "vitima": "A base governista na Alesp, que se queixa de demora na liberação de emendas.",
+    "culpado": "Arthur Lima, cujo trabalho vinha sendo criticado.",
+    "solucao": "Manter Roberto Carneiro na articulação política e promover Sultani.",
+    "motor_moral": "lealdade"
+   },
+   "teste_inversao": "Se um governador de esquerda montasse secretariado com aliados, o texto seria escrito de forma semelhante, pois é factual. O que mudaria seria a menção a Bolsonaro e Paulo Guedes, que são contexto.",
+   "atores": [
+    {
+     "nome": "Tarcísio de Freitas",
+     "campo": "direita"
+    },
+    {
+     "nome": "Roberto Carneiro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Leonardo Sultani",
+     "campo": "direita"
+    },
+    {
+     "nome": "Gilberto Kassab",
+     "campo": "centro"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Arthur Lima",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Caio Paes de Andrade",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Lais Vita",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Natalia Resende",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Aliados do governador",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "O governo",
+     "campo": "direita",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "A equipe de Tarcísio",
+     "campo": "direita",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "O presidente do PSD",
+     "campo": "centro",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "229be8a39302",
+   "url": "https://g1.globo.com/trabalho-e-carreira/noticia/2026/11/17/stj-cobranca-taxa-uber-motoristas.ghtml",
+   "titulo": "STJ suspende decisão que impedia cobrança de taxa da Uber para motoristas em todo o país",
+   "veiculo": "g1",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Disputa judicial sobre modelo de cobrança da Uber, envolvendo direitos trabalhistas e competência do Judiciário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 781,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspensão nacional do programa 'Passe para Motoristas' da Uber, com conflito de competência entre Justiça do Trabalho e Justiça comum.",
+    "causa": "Ação civil pública do MPT contra a Uber e pedido da empresa ao STJ.",
+    "vitima": "Motoristas de aplicativo, que podem ser prejudicados pelo modelo de cobrança.",
+    "culpado": "A Uber, que adotou modelo que poderia transferir riscos aos trabalhadores.",
+    "solucao": "Suspensão provisória da liminar até o STJ decidir a competência.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Se a Uber fosse uma empresa estatal e o MPT defendesse a empresa, o texto seria escrito de forma semelhante, pois é factual. O que mudaria seria a caracterização dos atores.",
+   "atores": [
+    {
+     "nome": "Uber",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ministério Público do Trabalho (MPT)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Justiça do Trabalho (9ª Vara do Trabalho de Salvador)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "STJ (ministro Raul Araújo)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Motoristas de aplicativo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o ministro Raul Araújo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    },
+    {
+     "rotulo": "a Uber",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o Ministério Público do Trabalho (MPT)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "a Justiça do Trabalho",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "aeafce93e5c1",
+   "url": "https://www.infomoney.com.br/onde-investir/estrangeiros-volume-negociado-fiis-b3/",
+   "titulo": "Estrangeiros já respondem por um terço do volume negociado em FIIs na B3",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [],
+    "justificativa": "Notícia de mercado sem dimensão político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 312,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Participação estrangeira em FIIs cresce, mas ainda é menor que a de pessoas físicas.",
+    "causa": "Aumento do interesse de investidores estrangeiros no mercado brasileiro.",
+    "vitima": "Nenhum",
+    "culpado": "Nenhum",
+    "solucao": "Nenhuma",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Não se aplica, pois não há lados políticos.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1d53395a7da0",
+   "url": "https://www.cnnbrasil.com.br/nacional/nordeste/ma/video-indigenas-isolados-awa-fazem-contato-com-grupo-guajajara-no-maranhao/",
+   "titulo": "Vídeo: indígenas isolados Awá fazem contato com grupo Guajajara no Maranhão",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "indigenas-isolados-awa-fazem-contato-raro-com-gr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre contato de indígenas isolados, com dimensão de política indigenista."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 336,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Contato de indígenas isolados Awá com Guajajara, com riscos sanitários e de perda de isolamento.",
+    "causa": "Aproximação do grupo Awá, possivelmente devido a invasões, desmatamento e incêndios na terra indígena.",
+    "vitima": "Os indígenas Awá, vulneráveis a doenças e ameaças ao seu modo de vida.",
+    "culpado": "Invasores ilegais e atividades de desmatamento/incêndio.",
+    "solucao": "Acompanhamento do governo federal, Sala de Situação, princípio do não contato.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o governo fosse de direita e a política fosse de contato, o texto seria escrito de forma semelhante, pois é factual. O que mudaria seria a ênfase no princípio do não contato.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Povo Awá",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Povo Guajajara",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Survival International",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Guardiões Guajajara",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a organização Survival International",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "O governo federal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "os ministérios dos Povos Indígenas e da Saúde, além da Funai",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Os Guardiões Guajajara",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a07d556eeeb1",
+   "url": "https://climainfo.org.br/2026/11/17/ias-trocam-ciencia-por-respostas-falsas-sobre-a-crise-climatica-para-agradar-usuarios/",
+   "titulo": "IAs trocam ciência por respostas falsas sobre a crise climática para agradar usuários",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Reportagem sobre confiabilidade de IA para políticas climáticas, com dimensão de políticas públicas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 754,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Modelos de IA mudam de opinião e negam a crise climática para agradar usuários, tornando-se pouco confiáveis para políticas climáticas.",
+    "causa": "Treinamento dos modelos que recompensa alinhamento com o usuário, mesmo quando errado.",
+    "vitima": "A sociedade e os formuladores de políticas, que podem ser enganados.",
+    "culpado": "As empresas de IA e seus modelos, que priorizam agradar usuários.",
+    "solucao": "Ter cautela ao usar IA para políticas climáticas; confiar na ciência.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Se o relatório fosse sobre IA e economia, o texto seria escrito de forma semelhante, pois é factual. O que mudaria seria o tema.",
+   "atores": [
+    {
+     "nome": "UNESCO",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "University College London (UCL)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Modelos de IA (LLMs)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Johan Rockström",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o relatório 'Podemos confiar na IA em relação ao clima?...'",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Maria Perez-Ortiz, autora principal do estudo e professora de Ciência da Computação da UCL",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 52,
+     "ultima": false
+    },
+    {
+     "rotulo": "Johan Rockström, codiretor do Potsdam Institute for Climate Impact Research (PIK)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 76,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e3b2c41d0e31",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/pgr-e-a-favor-de-prorrogacao-de-investigacao-do-caso-dark-horse",
+   "titulo": "PGR é a favor de prorrogação de investigação do caso Dark Horse",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Notícia sobre investigação no STF envolvendo figuras políticas de alto escalão (ex-presidente, senador, deputado), com decisão da PGR."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 289 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 289,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investigação sobre pagamentos para o filme Dark Horse precisa de mais tempo para perícias e cooperação internacional.",
+    "causa": "Necessidade de concluir perícias contábeis e obter registros financeiros no exterior.",
+    "vitima": "A própria investigação, que precisa de mais prazo para ser concluída.",
+    "culpado": "Não há culpado definido; há investigados que negam irregularidades.",
+    "solucao": "Prorrogação do inquérito por 90 dias, com parecer favorável da PGR.",
+    "motor_moral": "devido_processo_legal"
+   },
+   "teste_inversao": "Se o caso envolvesse um político de esquerda e a PGR fosse favorável à prorrogação, o texto seria factualmente semelhante; não há elementos que mudariam com a troca de lados.",
+   "atores": [
+    {
+     "nome": "Paulo Gonet",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Daniel Vorcaro",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Lindberg Farias",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o procurador-Geral da República, Paulo Gonet",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": true
+    },
+    {
+     "rotulo": "a Polícia Federal (PF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o senador Flávio Bolsonaro (PL-RJ)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o deputado federal Lindberg Farias (PT-RJ)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o site The Intercept",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a2dabb9aadfa",
+   "url": "https://www.moneytimes.com.br/fachin-sinaliza-que-stf-pode-julgar-lei-da-dosimetria-ainda-neste-ano/",
+   "titulo": "Fachin sinaliza que STF pode julgar ainda este ano Lei da Dosimetria, que beneficia Bolsonaro",
+   "veiculo": "Money Times",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "fachin-diz-que-stf-pode-julgar-lei-da-dosimetria",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Disputa sobre validade de lei que altera penas de condenados do 8 de janeiro, envolvendo STF, Congresso e ex-presidente."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 352,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Validade da Lei da Dosimetria, que reduz penas de condenados do 8 de janeiro, está em discussão no STF.",
+    "causa": "Pedido dos presidentes da Câmara e do Senado para que o STF julgue a lei ainda este ano.",
+    "vitima": "Não há vítima definida; a lei pode beneficiar condenados, incluindo Bolsonaro.",
+    "culpado": "Não há culpado; é um processo judicial sobre constitucionalidade.",
+    "solucao": "Julgamento pelo plenário do STF, com liberação pelo relator.",
+    "motor_moral": "devido_processo_legal"
+   },
+   "teste_inversao": "Se a lei beneficiasse um político de esquerda e o STF sinalizasse julgamento, o texto seria factualmente semelhante; não há elementos que mudariam com a troca de lados.",
+   "atores": [
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Alexandre de Moraes",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Hugo Motta",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Davi Alcolumbre",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Marcelo Crivella",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Paulinho da Força",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "O presidente do Supremo Tribunal Federal (STF), Edson Fachin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro Alexandre de Moraes",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 8,
+     "ultima": true
+    },
+    {
+     "rotulo": "os presidentes da Câmara dos Deputados, Hugo Motta (Republicanos-PB), e do Senado, Davi…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o ex-presidente Jair Bolsonaro (PL)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "o presidente Luiz Inácio Lula da Silva (PT)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "99c2dd004752",
+   "url": "https://www.camara.leg.br/noticias/1320284-camara-aprova-credito-de-r-925-milhoes-para-prevenir-efeitos-do-el-nino",
+   "titulo": "Câmara aprova crédito de R$ 925 milhões para prevenir efeitos do El Niño",
+   "veiculo": "Agência Câmara",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-e-camara-aprovam-medidas-de-credito-e-soc",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aprovação de crédito extraordinário para prevenção de efeitos do El Niño; medida governamental sem disputa ideológica explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 215 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 215,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Efeitos projetados do El Niño em 2026/2027 podem afetar a safra e a segurança alimentar.",
+    "causa": "Fenômeno climático El Niño com gravidade projetada.",
+    "vitima": "Agricultores e famílias em situação de insegurança alimentar.",
+    "culpado": "El Niño (fenômeno natural, não humano).",
+    "solucao": "Crédito extraordinário de R$ 925 milhões para compra antecipada de estoques e distribuição de alimentos.",
+    "motor_moral": "protecao_social"
+   },
+   "teste_inversao": "Não há lados político-ideológicos em disputa; o texto é institucional e factual, então a inversão não se aplica.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Câmara dos Deputados",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Conab",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministério do Desenvolvimento Agrário",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministério do Desenvolvimento Social",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a mensagem presidencial",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    },
+    {
+     "rotulo": "A Companhia Nacional de Abastecimento (Conab)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e2f5f0c2757c",
+   "url": "https://neofeed.com.br/economia/por-que-o-remedio-fiscal-do-governo-piorou-a-febre-do-mercado/",
+   "titulo": "Por que o remédio fiscal do governo piorou a “febre” do mercado",
+   "veiculo": "NeoFeed",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "senado-retoma-votacao-do-pacote-fiscal-sob-caute",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Análise sobre a reação do mercado financeiro ao pacote fiscal do governo Lula, com críticas de economistas e ausência de contraponto governamental."
+   },
+   "estado": "ok",
+   "T": 9,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 59,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1038,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 2.35,
+    "atores": 6.27,
+    "divergente": false
+   },
+   "por_eixo": {
+    "economico": 8.63
+   },
+   "criterios": {
+    "FONTES": 6.27,
+    "ENQUADRAMENTO": 2.35
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mercado financeiro reage com volatilidade ao pacote fiscal do governo, que não acalma os investidores.",
+    "causa": "Pacote considerado tímido e com incertezas políticas, além de falta de apoio no PT.",
+    "vitima": "Governo Lula, que perde credibilidade; e a economia, com câmbio e juros pressionados.",
+    "culpado": "Governo Lula, por não apresentar ajuste fiscal suficiente.",
+    "solucao": "Ajuste fiscal mais ambicioso e escolha de ministro da economia que acalme o mercado.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "Se o governo fosse de direita e o mercado reagisse mal a um pacote fiscal, o texto provavelmente seria similar, mas as fontes poderiam ser diferentes; a ausência de contraponto do governo é o principal sinal de viés.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Mercado financeiro",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Bruno Moretti",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "José Márcio Camargo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Luiz Fernando Figueiredo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Fernando Haddad",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Mansueto Almeida",
+     "campo": "direita"
+    },
+    {
+     "nome": "Rafael Fonteles",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Geraldo Alckmin",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "José Márcio Camargo, economista-chefe da Genial Investimentos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 141,
+     "ultima": false
+    },
+    {
+     "rotulo": "Luiz Fernando Figueiredo, sócio e conselheiro da Jubarte Capital e ex-diretor do Banco…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 105,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Para José Márcio Camargo, economista-chefe da Genial Investimentos, a volatilidade atual ainda é reflexo da eleição presidencial",
+     "paragrafo": "P4",
+     "direcao": "direita",
+     "contribuicao": 6.27,
+     "explicacao": "As duas únicas fontes ouvidas são economistas de mercado que criticam o pacote do governo; não há nenhuma fonte governamental ou defensora das medidas para contraponto.",
+     "intensidade": 2,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Mercado financeiro",
+     "desfavorece": "Governo Lula",
+     "ressalva": "É uma análise, não uma notícia; pode ser legítimo que um texto de análise apresente apenas especialistas, mas o desequilíbrio é claro."
+    },
+    {
+     "id": "E2",
+     "criterio": "ENQUADRAMENTO",
+     "citacao": "a principal preocupação do mercado não está restrita ao conteúdo das medidas",
+     "paragrafo": "P3",
+     "direcao": "direita",
+     "contribuicao": 2.35,
+     "explicacao": "O texto assume que a reação do mercado é o critério central para avaliar a política fiscal, sem discutir outros objetivos (como proteção social ou crescimento).",
+     "intensidade": 1,
+     "certeza": 0.6,
+     "eixo": "economico",
+     "ressalva": "É uma análise de mercado, que naturalmente parte da perspectiva dos investidores."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1f18db198e9b",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/17/senado-aprova-brasil-soberano-3-que-libera-ate-r-135-bilhoes-para-conter-feitos-do-tarifaco.ghtml",
+   "titulo": "Senado aprova Brasil Soberano 3, que libera até R$ 13,5 bilhões para conter feitos do tarifaço",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "senado-e-camara-aprovam-medidas-de-credito-e-soc",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aprovação de medida provisória que libera crédito para empresas afetadas por tarifas dos EUA; envolve política comercial e resposta do governo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 421,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tarifaço dos EUA afeta empresas exportadoras brasileiras.",
+    "causa": "Sobretaxas impostas pelos EUA com base na seção 301.",
+    "vitima": "Empresas brasileiras dos setores atingidos.",
+    "culpado": "Governo dos EUA, que impôs as tarifas.",
+    "solucao": "Crédito subsidiado de até R$ 13,5 bilhões do Tesouro e R$ 5 bilhões do BNDES.",
+    "motor_moral": "soberania_nacional"
+   },
+   "teste_inversao": "Não há lados político-ideológicos em disputa; o texto é institucional e factual, então a inversão não se aplica.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Senado Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos EUA",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Leany Lemos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o governo americano",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "O Senado Federal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "a relatora, senadora Leany Lemos (PSB-DF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3fa6743e2c19",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/simbolo-africano-no-stf-e-sinalizacao-de-fachin-contra-racismo-no-judiciario-diz-fundador-de-instituto.shtml",
+   "titulo": "Símbolo africano no STF é sinalização de Fachin contra racismo no Judiciário, diz fundador de instituto",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": "Entrevista",
+   "genero": "entrevista",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Entrevista com advogado sobre racismo no Judiciário, STF e cobrança a Lula por ministra negra; tema político-ideológico."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1354,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Racismo no Judiciário e julgamentos baseados na cor da pele",
+    "causa": "Herança do positivismo criminológico e ideologia racial entre aplicadores do direito",
+    "vitima": "População negra e vítimas de racismo",
+    "culpado": "Parte dos aplicadores do direito que desprezam provas e fatos",
+    "solucao": "Instalação do símbolo, protocolo de julgamento com perspectiva racial e agravante para crimes raciais",
+    "motor_moral": "igualdade_racial"
+   },
+   "teste_inversao": "Se um entrevistado de direita defendesse a manutenção de símbolos religiosos e criticasse a medida, o texto seria uma entrevista com ele, com o mesmo formato. A redação não toma partido.",
+   "atores": [
+    {
+     "nome": "Hédio Silva Júnior",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "advogado Hédio Silva Júnior, fundador do Idafro (Instituto de Defesa dos Direitos das…",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 23,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7ef157c18fe0",
+   "url": "https://www.infomoney.com.br/mercados/goldman-sachs-rebaixa-brasil-por-crescimento-fraco-e-pouco-espaco-para-cortar-juros/",
+   "titulo": "Goldman Sachs rebaixa Brasil por crescimento fraco e ‘pouco espaço’ para cortar juros",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "goldman-sachs-rebaixa-acoes-do-brasil-para-neutr",
+   "origem": "materia",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia de mercado sobre rebaixamento da recomendação para a Bolsa brasileira, com implicações na política econômica do governo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 53,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 523,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crescimento fraco e pouco espaço para cortar juros reduzem chances de recuperação da Bolsa",
+    "causa": "Desaceleração da economia, espaço limitado para cortes da Selic e falta de clareza fiscal",
+    "vitima": "Investidores na Bolsa brasileira",
+    "culpado": "Governo (falta de clareza fiscal)",
+    "solucao": "Postura defensiva, com foco em empresas de qualidade",
+    "motor_moral": "prudencia_financeira"
+   },
+   "teste_inversao": "Se o Goldman elevasse a recomendação para o Brasil, o texto seria similar, apenas mudando os termos. Não há viés político.",
+   "atores": [
+    {
+     "nome": "Goldman Sachs",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "o Goldman Sachs",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "4ec875d35ffe",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/18/gastos-campanha-de-lula-e-flavio-bolsonaro.ghtml",
+   "titulo": "Campanha de Lula atingiu limite de gastos; gastos de Flávio Bolsonaro ficaram R$ 18,6 milhões abaixo do teto",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Notícia sobre prestação de contas eleitorais de Lula e Flávio Bolsonaro, com dados do TSE; tema político-eleitoral."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1195,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Campanhas eleitorais com gastos próximos ou abaixo do teto e necessidade de prestação de contas",
+    "causa": "Regras eleitorais e limites de gastos",
+    "vitima": "Eleitorado (transparência)",
+    "culpado": "Nenhum (não há irregularidade apontada)",
+    "solucao": "Análise das contas pelo TSE e devolução de sobras",
+    "motor_moral": "transparencia_eleitoral"
+   },
+   "teste_inversao": "Se os números fossem invertidos (Flávio no limite e Lula abaixo), o texto seria similar, apenas trocando os nomes. Não há viés.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jonatas Moreth, advogado com atuação em direito público e eleitoral e conselheiro…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 209,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b79e7e5fb9fd",
+   "url": "https://www.cnnbrasil.com.br/economia/money/macroeconomia/passe-para-motoristas-da-uber-volta-a-vigorar-apos-stj-suspender-liminar/",
+   "titulo": "“Passe para Motoristas” da Uber volta a vigorar após STJ suspender liminar",
+   "veiculo": "CNN Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-18",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Notícia sobre decisão do STJ em disputa entre Uber e motoristas; envolve regulação do trabalho e Justiça."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 238 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 59,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 238,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Cobrança do Passe para Motoristas e disputa judicial sobre sua legalidade",
+    "causa": "Liminar da Justiça do Trabalho da Bahia que proibia a cobrança",
+    "vitima": "Motoristas de aplicativo (afetados pela cobrança)",
+    "culpado": "Nenhum (decisão judicial)",
+    "solucao": "Decisão do STJ que suspende a liminar e mantém o programa",
+    "motor_moral": "seguranca_juridica"
+   },
+   "teste_inversao": "Se a liminar tivesse sido mantida e a Uber recorresse, o texto provavelmente ouviria a Uber e talvez os motoristas. A falta de contraponto é um problema, mas não é um viés ideológico claro.",
+   "atores": [
+    {
+     "nome": "Uber",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "STJ",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Justiça do Trabalho da Bahia",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Motoristas de aplicativo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ianda Lopes, diretora jurídica da Uber",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7c7876cac97d",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/defesa-pede-que-supremo-julgue-pedido-para-soltar-vorcaro",
+   "titulo": "Defesa pede que Supremo julgue pedido para soltar Vorcaro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "pf-entrega-nesta-quarta-relatorio-sobre-ministro",
+   "origem": "materia",
+   "data_publicacao": "2026-11-17",
+   "analisado_em": "2026-11-18",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Notícia sobre pedido de soltura de ex-banqueiro investigado por fraudes; envolve STF, PF e MP."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 73,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 381,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Prisão de Vorcaro e demora no julgamento do pedido de soltura",
+    "causa": "Retenção dos autos na presidência do STF",
+    "vitima": "Daniel Vorcaro (preso)",
+    "culpado": "Presidência do STF (retenção dos autos)",
+    "solucao": "Julgamento do pedido de soltura pelo ministro mais antigo da Segunda Turma",
+    "motor_moral": "devido_processo_legal"
+   },
+   "teste_inversao": "Se fosse um pedido do MP para manter a prisão, o texto seria similar, ouvindo o MP e mencionando a defesa. Não há viés.",
+   "atores": [
+    {
+     "nome": "Daniel Vorcaro",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Defesa de Vorcaro",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Paulo Gonet (PGR)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Polícia Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a defesa do ex-banqueiro Daniel Vorcaro",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 129,
+     "ultima": true
+    },
+    {
+     "rotulo": "procurador-geral da República, Paulo Gonet",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "a Polícia Federal (PF)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-18T14:47:29+00:00",
+   "provedor": "gemini_lite → sensenova",
+   "modelo": "gemini-flash-lite-latest + sensenova-6.8-flash-lite",
+   "candidatos": 80,
+   "textos_curtos": 18,
+   "falhas": 30,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 51694,
+    "saida": 67935
+   },
+   "analises": [
+    "125c387c00aa",
+    "f65d5b544e84",
+    "afd95f573cf4",
+    "c230c0c3333f",
+    "197421fba248",
+    "d10520a4f160",
+    "bbfd5a2ae4f8",
+    "7d2aeb17a6e5",
+    "43e2fd408fc4",
+    "8ddd4e253d8f",
+    "19d3c54a66d1",
+    "60230de7da9e",
+    "d5fd3bfaff68",
+    "75e3b753d467",
+    "e8b1900dac7e",
+    "c58a24810200",
+    "229be8a39302",
+    "aeafce93e5c1",
+    "1d53395a7da0",
+    "a07d556eeeb1",
+    "e3b2c41d0e31",
+    "a2dabb9aadfa",
+    "99c2dd004752",
+    "e2f5f0c2757c",
+    "1f18db198e9b",
+    "3fa6743e2c19",
+    "7ef157c18fe0",
+    "4ec875d35ffe",
+    "b79e7e5fb9fd",
+    "7c7876cac97d"
+   ]
+  }
+ ]
+}
