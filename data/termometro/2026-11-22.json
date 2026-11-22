@@ -1,0 +1,6232 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-22",
+ "analises": [
+  {
+   "id": "2f2d6a570e27",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/22/agenda-de-politica-camara-deve-votar-ajuste-fiscal-e-lula-discute-nome-para-stf.ghtml",
+   "titulo": "Agenda de política: Câmara deve votar ajuste fiscal e Lula discute nome para STF",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-pauta-votacao-de-pacote-fiscal-apos-lula",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de articulações do governo para votação de pacote fiscal no Congresso, indicações para o STF e agendas oficiais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 628,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de aprovação de ajuste fiscal e preenchimento de vagas institucionais.",
+    "causa": "Omissão de bloqueios orçamentários futuros e vacâncias no Judiciário.",
+    "vitima": "Investidores e contas públicas.",
+    "culpado": "Incertezas fiscais.",
+    "solucao": "Votação rápida de pacote de ajuste pelo Congresso e articulações políticas.",
+    "motor_moral": "responsabilidade"
+   },
+   "teste_inversao": "O texto tem caráter puramente factual e descritivo sobre a agenda da semana em Brasília, mantendo o mesmo tom independentemente dos atores envolvidos.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Davi Alcolumbre",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Hugo Motta",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro do Planejamento e Orçamento, Bruno Moretti",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 2,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A proposta já foi aprovada pelo Senado e tem previsão de impacto de cerca de R$ 50 bilhões em 2027.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados numéricos acompanhados de base e contexto institucional.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1ea334d802cf",
+   "url": "https://www1.folha.uol.com.br/colunas/painel/2026/11/oab-sp-alerta-stf-que-pejotizacao-pode-gerar-perdas-de-r-200-bi-por-ano.shtml",
+   "titulo": "OAB-SP alerta STF que pejotização pode gerar perdas de R$ 200 bi por ano",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "oab-sp-alerta-stf-que-pejotizacao-pode-gerar-per",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Discute o impacto fiscal e trabalhista da 'pejotização' e nota técnica entregue ao STF."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 419,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possíveis perdas de arrecadação bilionárias decorrentes da permissão de pejotização.",
+    "causa": "Mudança no regime de contratação de trabalhadores hipersuficientes.",
+    "vitima": "Arrecadação pública e trabalhadores de menor renda.",
+    "culpado": "Possível decisão permissiva do Supremo.",
+    "solucao": "Manutenção das regras de contratação pelo regime celetista.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O artigo discute uma nota técnica específica da OAB-SP; a estrutura argumentativa foca nos dados apresentados pela entidade.",
+   "atores": [
+    {
+     "nome": "OAB-SP",
+     "campo": "centro"
+    },
+    {
+     "nome": "STF",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "economistas da FGV, Nelson Marconi e Marco Brancher",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "uma nota técnica que aponta que a pejotização pode gerar perdas de arrecadação na ordem de R$ 200 bilhões por ano.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O valor é atribuído diretamente ao estudo da entidade.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "455ae08e8267",
+   "url": "https://www.seudinheiro.com/2026/economia/haddad-quer-taxar-bilionarios-e-dispara-alerta-sobre-uma-nova-oligarquia-global-e-preciso-coragem-politica-miql/",
+   "titulo": "Haddad quer taxar bilionários e dispara alerta sobre uma nova oligarquia global: “É preciso coragem política”",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "haddad-defende-taxar-bilionarios-e-alerta-para-o",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Aborda o discurso do ex-ministro Fernando Haddad sobre taxação de bilionários e desigualdade em cúpula internacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 929,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concentração extrema de riqueza e formação de oligarquia global.",
+    "causa": "Influência política desmedida de super-ricos e sistemas tributários regressivos.",
+    "vitima": "Democracia e populações vulneráveis.",
+    "culpado": "Bilionários e concentração de capital.",
+    "solucao": "Coordenação internacional para tributação mínima sobre super-ricos.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata as declarações de Fernando Haddad em evento internacional com amplo espaço para suas falas, padrão comum em coberturas de pronunciamentos de autoridades.",
+   "atores": [
+    {
+     "nome": "Fernando Haddad",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ex-ministro",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 139,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 139,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A proposta de taxação dos bilionários, porém, ainda depende de articulação internacional para avançar.",
+     "paragrafo": "P17",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto pondera a fala de Haddad trazendo um obstáculo prático para a implementação da medida.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "1679b0a7bd07",
+   "url": "https://www.infomoney.com.br/brasil/governo-lula-reconhece-calamidade-em-tupancireta-no-rs-chuva-deixou-5-mortos/",
+   "titulo": "Governo Lula reconhece calamidade em Tupanciretã, no RS; chuva deixou 5 mortos",
+   "veiculo": "InfoMoney",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-federal-decreta-calamidade-publica-em-tu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura sobre decretação de calamidade pública em município gaúcho após tempestade e ações de resposta dos governos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 965,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Destruição severa causada por tempestade em município gaúcho.",
+    "causa": "Fenômeno meteorológico extremo de supercélula.",
+    "vitima": "População afetada de Tupanciretã.",
+    "culpado": "Fenômenos naturais adversos.",
+    "solucao": "Ajuda humanitária, liberação de recursos e reconstrução da infraestrutura.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A matéria relata tragédia climática ouvindo autoridades federais, estaduais e municipais com rigor técnico e isenção, sem viés político aparente.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Governo do RS",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Prefeitura de Tupanciretã",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro da Integração e do Desenvolvimento Regional, Waldez Góes",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": false
+    },
+    {
+     "rotulo": "prefeito de Tupanciretã, Gustavo Terra",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 91,
+     "ultima": true
+    },
+    {
+     "rotulo": "meteorologista Andrea Ramos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 78,
+     "ultima": false
+    },
+    {
+     "rotulo": "meteorologista do MetSul Estael Sias",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": false
+    },
+    {
+     "rotulo": "vice-governador Gabriel Souza",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 53,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 55,
+    "direita": 144
+   },
+   "falas": 8,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A Defesa Civil gaúcha confirmou cinco mortes e 265 feridos na cidade.",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utiliza dados quantitativos oficiais fornecidos pela Defesa Civil.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c90998dc6d5e",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/21/britanico-atravessa-estreito-de-ormuz-a-nado-para-alertar-sobre-o-impacto-ambiental-da-guerra.ghtml",
+   "titulo": "Britânico atravessa Estreito de Ormuz a nado para alertar sobre o impacto ambiental da guerra",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Relata ato de ativismo ambiental (travessia a nado no Estreito de Ormuz) para alertar sobre impactos da guerra."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 56,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 334,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impactos ambientais de conflitos armados nos oceanos.",
+    "causa": "Guerras e combates na região do Estreito de Ormuz.",
+    "vitima": "A natureza e os ecossistemas marinhos.",
+    "culpado": "Partes envolvidas nos conflitos armados.",
+    "solucao": "Cessar-fogo e preservação ambiental.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto foca na iniciativa individual de um ativista ambiental, mantendo o padrão de reportagens de perfil e protestos ecológicos.",
+   "atores": [
+    {
+     "nome": "Lewis Pugh",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "nadador",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 108,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "f75046ce5c97",
+   "url": "https://www.cnnbrasil.com.br/internacional/inspirado-em-bukele-governo-do-haiti-anuncia-construcao-de-tres-prisoes/",
+   "titulo": "Inspirado em Bukele, governo do Haiti anuncia construção de três prisões",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a adoção de um modelo controverso de segurança pública internacional, envolvendo o governo de El Salvador e do Haiti."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 456,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "O controle de gangues e a violência extrema no Haiti.",
+    "causa": "Fragilidade institucional e ausência de um sistema prisional e de segurança robusto.",
+    "vitima": "A população haitiana aterrorizada pela violência.",
+    "culpado": "Gangues armadas.",
+    "solucao": "Adotar o modelo de segurança e prisões de El Salvador.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se a notícia tratasse de um modelo de segurança de esquerda, o tom descritivo sobre as controvérsias de direitos humanos provavelmente seria enfatizado ou atenuado de forma simétrica.",
+   "atores": [
+    {
+     "nome": "Nayib Bukele",
+     "campo": "direita"
+    },
+    {
+     "nome": "Patrick Pelissier",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro haitiano",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 52,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Bukele enviou mais de 2 mil soldados ao país caribenho",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta um número específico sobre o envio de tropas com fonte clara.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca",
+     "favorece": "Nayib Bukele"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "27e853568c57",
+   "url": "https://www.poder360.com.br/poder-justica/oab-sp-estima-perda-de-r-200-bilhoes-por-ano-com-pejotizacao/",
+   "titulo": "OAB-SP estima perda de R$ 200 bilhões por ano com pejotização",
+   "veiculo": "Poder360",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "oab-sp-alerta-stf-que-pejotizacao-pode-gerar-per",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Analisa o impacto econômico e fiscal da regulamentação das relações de trabalho (pejotização) no Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 346,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Perdas expressivas na arrecadação tributária e previdenciária devido à pejotização.",
+    "causa": "Migração de trabalhadores para o modelo PJ.",
+    "vitima": "Previdência Social e cofres públicos.",
+    "culpado": "Flexibilização das regras de contratação.",
+    "solucao": "Apresentação de dados técnicos ao STF.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto manteria a mesma estrutura caso a estimativa partisse de um setor empresarial favorável à pejotização, desde que baseada em estudo formal.",
+   "atores": [
+    {
+     "nome": "OAB-SP",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "OAB-SP",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "7fb424baebf2",
+   "url": "https://www.moneytimes.com.br/haddad-defende-taxar-bilionarios-e-alerta-contra-oligarquia-global-em-paris-gaep/",
+   "titulo": "Haddad defende taxar bilionários e alerta contra oligarquia global",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "haddad-defende-taxar-bilionarios-e-alerta-para-o",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Relata declarações de Fernando Haddad sobre tributação de bilionários e combate à desigualdade global."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 420,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.92,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.92
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A concentração excessiva de poder econômico e a desigualdade global.",
+    "causa": "Falta de cooperação internacional e baixa tributação sobre os mais ricos.",
+    "vitima": "Trabalhadores e a democracia global.",
+    "culpado": "Oligarquia global e grupos econômicos poderosos.",
+    "solucao": "Imposto mínimo global sobre bilionários e fortalecimento de programas sociais.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se um ministro liberal criticasse a proposta apontando fuga de capitais, o veículo daria espaço proporcional para a contestação econômica.",
+   "atores": [
+    {
+     "nome": "Fernando Haddad",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Fernando Haddad",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 154,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 154,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "destacou a vitória política de Luiz Inácio Lula da Silva (PT) nas eleições 2026 como um marco global",
+     "paragrafo": "P1",
+     "direcao": "esquerda",
+     "contribuicao": -3.92,
+     "explicacao": "O texto destaca a narrativa do governo sem incorporar contrapontos de críticos à proposta de tributação.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "favorece": "Luiz Inácio Lula da Silva"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6bba826ac8f9",
+   "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-11/lula-presta-solidariedade-cidade-gaucha-devastada-por-tempestade",
+   "titulo": "Lula presta solidariedade à cidade gaúcha devastada por tempestade",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-federal-decreta-calamidade-publica-em-tu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda a atuação do governo federal perante desastre natural e declarações políticas do presidente."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 45,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 566,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Devastação causada por tempestade no Rio Grande do Sul e desafios climáticos globais.",
+    "causa": "Fenômenos meteorológicos extremos.",
+    "vitima": "População atingida pelo temporal em Tupanciretã.",
+    "culpado": "Nenhum apontado diretamente, exceto menção genérica a combustíveis fósseis.",
+    "solucao": "Apoio federal aos municípios afetados.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura de apoio a desastres naturais segue um formato institucional padrão, independentemente da orientação ideológica do presidente.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 165,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 165,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "de 8,6 mil casas, 8 mil tiveram destelhamento",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados numéricos específicos sobre o impacto do temporal na cidade gaúcha.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "914862052c2a",
+   "url": "https://oc.eco.br/colapso-da-cop31-e-sinal-de-saude-do-acordo-de-paris/",
+   "titulo": "Colapso da COP31 é sinal de saúde do Acordo de Paris",
+   "veiculo": "Observatório do Clima",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "economico"
+    ],
+    "justificativa": "Avalia o encerramento da COP31, criticando propostas de combustíveis fósseis e defendendo diretrizes socioambientais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 47,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1301,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tentativas de enfraquecimento das metas climáticas globais nas negociações internacionais.",
+    "causa": "Lobby dos combustíveis fósseis e interesses de países produtores de petróleo.",
+    "vitima": "Populações vulneráveis e países em desenvolvimento.",
+    "culpado": "Presidências da COP e nações petroleiras.",
+    "solucao": "Manutenção rigorosa das metas de transição energética e financiamento climático.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Um texto produzido por entidades ligadas a indústrias de energia fóssil enfatizaria a necessidade de segurança energética em vez de criticar as tecnologias de captura de carbono.",
+   "atores": [
+    {
+     "nome": "Observatório do Clima",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Stela Herschmann",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 72,
+     "ultima": false
+    },
+    {
+     "rotulo": "Anna Cárcamo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 95,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mariana Belmont",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 192,
+     "ultima": false
+    },
+    {
+     "rotulo": "Thaynah Gutierrez",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 109,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 468,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "7a7fa8d7b6c3",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/22/jair-bolsonaro-esta-com-uma-cara-boa-diz-michelle-ao-visita-lo-na-uti.ghtml",
+   "titulo": "Jair Bolsonaro está com 'uma cara boa', diz Michelle ao visitá-lo na UTI",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "bolsonaro-segue-internado-na-uti-em-brasilia-e-m",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata da internação hospitalar de um ex-presidente e figura central da política brasileira."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 153 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 79,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 153,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Internação hospitalar do ex-presidente Jair Bolsonaro com dores abdominais.",
+    "causa": "Problemas de saúde decorrentes de episódios anteriores.",
+    "vitima": "Jair Bolsonaro",
+    "culpado": "Nenhum",
+    "solucao": "Tratamento médico e recuperação na UTI.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata um fato médico de interesse público sem juízos de valor da redação, focando nas declarações da família. Seria escrito de forma idêntica para qualquer figura pública.",
+   "atores": [
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Michelle Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Michelle Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 41
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "84e28645d8e2",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/custos-de-financiamento-da-argentina-disparam-e-queda-na-popularidade-de-milei-abala-investidores.shtml",
+   "titulo": "Custos de financiamento da Argentina disparam e queda na popularidade de Milei abala investidores",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "premio-de-risco-da-argentina-dispara-a-10-7-pont",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda a situação econômica da Argentina, o governo de Javier Milei e a repercussão política e de mercado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1204,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disparidade nos custos de financiamento da dívida argentina e queda na popularidade do governo.",
+    "causa": "Dúvidas sobre a reeleição de Milei e o cumprimento de metas fiscais.",
+    "vitima": "Investidores e economia argentina",
+    "culpado": "Incerteza política e oposição peronista",
+    "solucao": "Negociação de empréstimos, operações compromissadas e ajuda internacional.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A cobertura econômica utiliza dados de mercado e traz diversas fontes técnicas e oficiais para explicar o cenário, mantendo neutralidade descritiva.",
+   "atores": [
+    {
+     "nome": "Javier Milei",
+     "campo": "direita"
+    },
+    {
+     "nome": "Luis Caputo",
+     "campo": "direita"
+    },
+    {
+     "nome": "Cristina Fernández de Kirchner",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ramiro Blazquez Giomi",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Fernando Marull",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": false
+    },
+    {
+     "rotulo": "consultoria MAP Latam",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "Luis Caputo",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": false
+    },
+    {
+     "rotulo": "Scott Bessent",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 6,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 16
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "6b24ef24c584",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/21/o-cancer-muda-voce-princesa-catherine-fala-sobre-doenca-em-documentario-da-bbc.ghtml",
+   "titulo": "'O câncer muda você': princesa Kate Middleton fala sobre doença em documentário da BBC",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de um documentário sobre a recuperação de saúde da Princesa Kate Middleton."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 693,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Superação de um câncer pela Princesa de Gales.",
+    "causa": "Doença oncológica.",
+    "vitima": "Princesa Kate Middleton",
+    "culpado": "Nenhum",
+    "solucao": "Tratamento médico e apoio familiar.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Reportagem de caráter humano e informativo sobre saúde, sem viés político-partidário.",
+   "atores": [
+    {
+     "nome": "Princesa Kate Middleton",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Catherine",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 70,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kate Phillips",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "James Middleton",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f25f003566a4",
+   "url": "https://www.cnnbrasil.com.br/internacional/colonos-atacam-cisjordania-rival-de-netanyahu-denuncia-terrorismo/",
+   "titulo": "Colonos atacam Cisjordânia; rival de Netanyahu denuncia “terrorismo”",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda conflitos e ataques na Cisjordânia, envolvendo figuras políticas de destaque em Israel e na Palestina."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 648,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques de colonos israelenses contra propriedades palestinas na Cisjordânia.",
+    "causa": "Políticas de expansão de assentamentos e retórica governamental.",
+    "vitima": "População palestina",
+    "culpado": "Colonos e políticos de direita israelenses",
+    "solucao": "Operações direcionadas, detenção administrativa e responsabilização dos culpados.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata os incidentes ouvindo diferentes lideranças políticas e as autoridades de segurança, mantendo o equilíbrio na atribuição de declarações.",
+   "atores": [
+    {
+     "nome": "Gadi Eisenkot",
+     "campo": "centro"
+    },
+    {
+     "nome": "Benjamin Netanyahu",
+     "campo": "direita"
+    },
+    {
+     "nome": "Itamar Ben-Gvir e Bezalel Smotrich",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gadi Eisenkot",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mustafa Barghouti",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "Forças de Defesa de Israel (FDI)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": false
+    },
+    {
+     "rotulo": "Yousef Jabareen",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ahmad Tibi",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 64,
+    "direita": 0
+   },
+   "falas": 13,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "cfb40858519f",
+   "url": "https://www.infomoney.com.br/consumo/mega-sena-acumula-e-premio-do-proximo-sorteio-vai-a-r-65-milhoes/",
+   "titulo": "Mega-Sena acumula e prêmio do próximo sorteio vai a R$ 65 milhões",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [],
+    "justificativa": "Resultado de concurso de loteria (Mega-Sena), sem dimensão político-ideológica."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 219,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Acumulação do prêmio da Mega-Sena.",
+    "causa": "Ausência de apostas vencedoras nas seis dezenas.",
+    "vitima": "Nenhum",
+    "culpado": "Nenhum",
+    "solucao": "Novo sorteio marcado.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de divulgação de serviço/resultado de loteria, aplicável a qualquer concurso.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "39ff7600e683",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/sobe-para-4-o-numero-de-mortos-em-tupancireta-no-sul",
+   "titulo": "Sobe para 4 o número de mortos em Tupanciretã, no Sul",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "temporal-no-rio-grande-do-sul-deixa-ate-cinco-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto relata as consequências e os auxílios governamentais decorrentes de um desastre natural."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 56,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 301,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Devastação causada por tempestade e microexplosão em Tupanciretã e municípios vizinhos",
+    "causa": "Fenômeno meteorológico extremo",
+    "vitima": "População afetada e ferida/morta pela tempestade",
+    "culpado": "Nenhum (desastre natural)",
+    "solucao": "Ações de socorro e liberação de recursos emergenciais pelos governos estadual e federal",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata um fato trágico natural e a resposta institucional, mantendo tom estritamente informativo independentemente da cor partidária dos governantes envolvidos.",
+   "atores": [
+    {
+     "nome": "Eduardo Leite",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "autoridades",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "cerca de 8 mil casas",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados quantitativos detalhados com base em informações oficiais da Defesa Civil.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4d3f87c8cd54",
+   "url": "https://www.seudinheiro.com/2026/financas-pessoais/claude-fez-o-impossivel-ia-da-anthropic-ajuda-a-resolver-misterio-da-matematica-de-167-anos-lefp/",
+   "titulo": "Claude fez o impossível? IA da Anthropic ajuda a resolver mistério da matemática de 167 anos",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "matematico-da-anthropic-afirma-ter-resolvido-a-h",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Reportagem sobre avanço científico e tecnológico envolvendo inteligência artificial e matemática."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1045,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Complexidade histórica e insolubilidade milenar de um enigma matemático",
+    "causa": "Desafio intrínseco da teoria dos números primos",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Uso de inteligência artificial combinada com ferramentas computacionais de verificação",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto descreve um avanço científico e tecnológico sem qualquer juízo de valor ideológico, sendo imune a variações de inversão política.",
+   "atores": [
+    {
+     "nome": "Anthropic",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "James Maynard, professor da Universidade de Oxford e vencedor da Medalha Fields de 2022",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "afirmou James Maynard",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição perfeitamente neutro para registrar a opinião de especialista.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9ecf377503f4",
+   "url": "https://www.poder360.com.br/poder-governo/governo-prepara-politica-de-protecao-a-mulheres-na-vida-publica/",
+   "titulo": "Governo prepara política de proteção a mulheres na vida pública",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "costumes",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de política governamental voltada para a proteção de mulheres na vida pública e debate de violência de gênero."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 730,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Violência política de gênero e raça contra mulheres em espaços de representação",
+    "causa": "Discriminação e ataques digitais estruturais",
+    "vitima": "Mulheres na política, em especial candidatas e parlamentares negras",
+    "culpado": "Agressores anônimos e autores de crimes de ódio na internet",
+    "solucao": "Criação de políticas nacionais de proteção, orçamentos próprios e protocolos de segurança",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O tratamento dado ao anúncio de políticas públicas e denúncias de violência política seguiria o mesmo rigor metodológico de relatórios e fontes, independentemente da orientação partidária da figura pública afetada.",
+   "atores": [
+    {
+     "nome": "Ministério das Mulheres",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Ana Elisa",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Giovanni Oliveira, coordenador de Democracia e Justiça do Instituto Marielle Franco",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "87% dos casos",
+     "paragrafo": "P20",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados quantitativos oriundos de pesquisas de organizações especializadas devidamente citadas.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "costumes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "865628271a42",
+   "url": "https://www.moneytimes.com.br/bahrein-intercepta-novos-ataques-do-ira-apos-bombardeio-atingir-unidade-industrial-gaep/",
+   "titulo": "Bahrein intercepta ataques do Irã após bombardeio atingir unidade industrial",
+   "veiculo": "Money Times",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda conflito militar internacional envolvendo o Irã, Estados Unidos e instalações no Bahrein."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 402,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Escalada de ataques militares e instabilidade geopolítica no Golfo Pérsico",
+    "causa": "Conflito regional envolvendo Irã, Estados Unidos e aliados",
+    "vitima": "Infraestrutura civil e industrial do Bahrein",
+    "culpado": "Forças iranianas executoras dos bombardeios",
+    "solucao": "Interceptação por defesas aéreas e alertas governamentais de segurança",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O relato de hostilidades internacionais e comunicados oficiais de ambos os lados da contenda mantém tom estritamente descritivo, sem viés ideológico inerente.",
+   "atores": [
+    {
+     "nome": "Governo do Bahrein",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Irã",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "assessor de mídia do rei",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Guarda Revolucionária",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "afirmou ter atingido",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição equilibrado e neutro ('afirmou') para relatar a versão do governo iraniano.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0425fe915d99",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/21/mxico-captura-narcotraficante-el-chapo-isidro-um-dos-dez-fugitivos-mais-procurados-pelo-fbi.ghtml",
+   "titulo": "México captura narcotraficante 'El Chapo Isidro', um dos dez fugitivos mais procurados pelo FBI",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "mexico-captura-narcotraficante-el-chapo-isidro-e",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de operação militar de captura de narcotraficante e pressões geopolíticas entre Estados Unidos e México."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 247 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 247,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atuação do crime organizado internacional e narcotráfico",
+    "causa": "Poder econômico e territorial de cartéis de drogas",
+    "vitima": "População civil de Sinaloa afetada por confrontos e violência armada",
+    "culpado": "Líderes de cartéis e narcotraficantes procurados",
+    "solucao": "Operações militares de captura sob pressão internacional",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A cobertura jornalística dos desdobramentos de segurança pública e pressões diplomáticas internacionais manteria o mesmo padrão descritivo independentemente da administração em vigor em Washington ou na Cidade do México.",
+   "atores": [
+    {
+     "nome": "Governo do México",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "secretário de Segurança do México",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "informou neste sábado",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição neutro para relatar as informações prestadas pelo governo mexicano.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "dacbe5193bcf",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/amazon-negocia-compra-da-startup-decart-em-acordo-bilionario-para-ganhar-eficiencia-em-ia.shtml",
+   "titulo": "Amazon está perto de fechar compra da Decart em acordo bilionário para ganhar eficiência em IA",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "amazon-negocia-compra-da-startup-de-inteligencia",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto aborda uma negociação comercial de aquisição empresarial no setor de tecnologia, sem grande embate político-ideológico direto."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 611,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Concorrência por eficiência e capacidade computacional em inteligência artificial.",
+    "causa": "Necessidade de otimização de modelos de IA com menos uso de chips.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Aquisição de startup pela Amazon.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente descritivo sobre o mercado de tecnologia e negócios, sem viés ideológico observável.",
+   "atores": [
+    {
+     "nome": "Amazon",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Decart",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "5fe1068e0f9b",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/21/protestos-levam-milhares-de-pessoas-as-ruas-em-diferentes-paises-da-europa-neste-sabado-video.ghtml",
+   "titulo": "Protestos levam milhares de pessoas às ruas em diferentes países da Europa neste sábado; VÍDEO",
+   "veiculo": "g1",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "costumes",
+     "geral"
+    ],
+    "justificativa": "Trata de protestos populares contra o custo de vida, políticas governamentais, moradia e educação na Europa."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 924,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Custo de vida elevado, crise de habitação e baixos salários.",
+    "causa": "Políticas econômicas governamentais e inflação.",
+    "vitima": "Trabalhadores e jovens europeus.",
+    "culpado": "Governos e especulação imobiliária.",
+    "solucao": "Aumentos salariais, controle de preços e intervenção estatal.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata manifestações públicas de forma factual, ouvindo os participantes sem adotar o discurso como verdade absoluta da redação.",
+   "atores": [
+    {
+     "nome": "Manifestantes e sindicatos europeus",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo de centro-direita de Portugal",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo da Espanha (PSOE)",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Manuel Gomes, de 44 anos, operário de uma fábrica",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 40,
+     "ultima": false
+    },
+    {
+     "rotulo": "Gemma Brammulles, manifestante e integrante de um sindicato de inquilinos",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Greta Thunberg",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 8,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 48,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Segundo dados do Eurostat, os rendimentos médios anuais em Portugal em 2025 ficaram 37% abaixo da média da União Europeia.",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados estatísticos oficiais para contextualizar a situação econômica.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "52ab4a2cb1f8",
+   "url": "https://www.infomoney.com.br/brasil/defesa-civil-de-sp-reforca-alerta-para-fortes-chuvas-em-todo-o-estado-ate-terca-feira/",
+   "titulo": "Defesa Civil de SP reforça alerta para fortes chuvas em todo o Estado até terça-feira",
+   "veiculo": "InfoMoney",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Alerta meteorológico da Defesa Civil sobre chuvas no estado de São Paulo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 348,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Riscos de temporais e fortes chuvas no estado de São Paulo.",
+    "causa": "Instabilidade climática.",
+    "vitima": "População das áreas afetadas.",
+    "culpado": "Nenhum.",
+    "solucao": "Monitoramento e alerta preventivo.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto é um informe utilitário de previsão do tempo e alertas de Defesa Civil, sem viés político.",
+   "atores": [
+    {
+     "nome": "Defesa Civil de São Paulo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civíl",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "cfbc500f8f23",
+   "url": "https://agenciabrasil.ebc.com.br/internacional/noticia/2026-11/paises-vao-negociar-regulamentacao-de-robos-assassinos-ate-2028",
+   "titulo": "Países vão negociar regulamentação de “robôs assassinos” até 2028",
+   "veiculo": "Agência Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de negociações multilaterais na ONU sobre regulamentação de armas autônomas (robôs assassinos) e oposições de grandes potências."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 397,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.53,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.53
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ausência de regulamentação internacional para armas autônomas letais.",
+    "causa": "Oposição de países produtores de armas como Rússia, EUA e Israel a acordos vinculantes.",
+    "vitima": "Civis em zonas de conflito.",
+    "culpado": "Grandes nações produtoras de armas.",
+    "solucao": "Negociações diplomáticas contínuas na ONU.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto equilibra a frustração dos defensores de direitos humanos com a avaliação positiva do presidente da mesa de negociações.",
+   "atores": [
+    {
+     "nome": "Grupos de direitos humanos e defensores da regulação",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Rússia, EUA e Israel",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Julien Thoeni",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "um diplomata envolvido nas negociações",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 7,
+     "ultima": false
+    },
+    {
+     "rotulo": "Nicole van Rooijen",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 15,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Muitos grupos de direitos humanos criticaram o resultado, que, segundo eles, significa que a tecnologia agora tem a chance de superar a diplomacia.",
+     "paragrafo": "P11",
+     "direcao": "esquerda",
+     "contribuicao": -3.53,
+     "explicacao": "Dá voz proeminente aos críticos do acordo, enquadrando o resultado como falha frente à tecnologia.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Grupos de direitos humanos e defensores da regulação",
+     "desfavorece": "Rússia, EUA e Israel",
+     "ressalva": "O texto também apresenta a perspectiva do presidente da reunião que defende o acordo como conquista."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2c3032ff5b5e",
+   "url": "https://www.seudinheiro.com/2026/economia/loterias-deste-domingo-22-dois-apostadores-levam-quase-r-1-milhao-cada-mas-a-mega-sena-ainda-reserva-bolada-de-r-65-milhoes-miql/",
+   "titulo": "Loterias deste domingo (22): dois apostadores levam quase R$ 1 milhão na Lotofácil; Mega-Sena ainda reserva bolada de R$ 65 milhões",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto trata principalmente de resultados de loterias, mas inclui inserções sobre o debate político-econômico do governo e mercado financeiro (Lula, Haddad, ajuste fiscal)."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 832,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.75,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HIERARQUIA": -3.75
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Incerteza fiscal e econômica combinada com resultados de loterias.",
+    "causa": "Divergências entre o governo e agentes econômicos sobre contas públicas.",
+    "vitima": "Investidores e contribuintes.",
+    "culpado": "Nenhum atribuído conclusivamente.",
+    "solucao": "Ajuste fiscal e debate sobre taxação.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta trechos de chamadas editoriais de economia em meio ao noticiário utilitário de loterias, refletindo a estrutura de portal de notícias.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Haddad",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Mercado financeiro / Faria Lima",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HIERARQUIA",
+     "citacao": "Haddad quer taxar bilionários e dispara alerta sobre uma nova oligarquia global: \"É preciso coragem política\"",
+     "paragrafo": "P8",
+     "direcao": "esquerda",
+     "contribuicao": -3.75,
+     "explicacao": "Inserção de manchetes e chamadas políticas no meio de uma matéria sobre loterias, misturando temas díspares.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Governo Lula / Haddad",
+     "desfavorece": "Mercado financeiro / Faria Lima",
+     "ressalva": "Pode se tratar de blocos automáticos de notícias recomendadas ou chamadas de rodapé inseridas na página."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "171fbe06b45c",
+   "url": "https://www.cnnbrasil.com.br/economia/money/tecnologia/impacto-de-custo-de-data-centers-ainda-e-duvida-diz-analista/",
+   "titulo": "Impacto de custo de data centers ainda é dúvida, diz analista",
+   "veiculo": "CNN Brasil",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda o mercado financeiro, custos de capital e investimentos em tecnologia e data centers, com leve menção a debates regulatórios."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 633,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incerteza sobre o retorno de investimentos multibilionários em inteligência artificial e o custo de capital.",
+    "causa": "Taxas de juros elevadas e expansão acelerada de infraestrutura sem clareza de retorno imediato.",
+    "vitima": "Investidores e empresas de tecnologia expostas à volatilidade.",
+    "culpado": "Nenhum.",
+    "solucao": "Monitoramento de múltiplos e diversificação geográfica.",
+    "motor_moral": "prudencia_economica"
+   },
+   "teste_inversao": "O texto é estritamente descritivo e baseado em análises de mercado, mantendo o mesmo tom independentemente do viés político.",
+   "atores": [
+    {
+     "nome": "Felipe Cima",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Felipe Cima, analista de renda variável da Manchester",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 123,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1d3c845f54ab",
+   "url": "https://www.moneytimes.com.br/funcionario-da-anthropic-diz-que-ia-ajudou-a-resolver-problema-matematico-de-167-anos/",
+   "titulo": "Funcionário da Anthropic diz que IA ajudou a resolver problema matemático de 167 anos",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "matematico-da-anthropic-afirma-ter-resolvido-a-h",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de avanço científico e matemático com auxílio de inteligência artificial, sem contenda político-partidária."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 300,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Complexidade na validação de provas matemáticas complexas geradas por IA.",
+    "causa": "Natureza intrincada de problemas históricos da matemática como a hipótese de Riemann.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Análise por especialistas independentes e validação formal em linguagem de programação.",
+    "motor_moral": "progresso_cientifico"
+   },
+   "teste_inversao": "Notícia estritamente factual sobre ciência, sem viés político aplicável.",
+   "atores": [
+    {
+     "nome": "James Maynard",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8f78c1f10b9d",
+   "url": "https://www.poder360.com.br/poder-gente/morre-paolo-bulgari-responsavel-pela-expansao-global-da-joalheria/",
+   "titulo": "Morre Paolo Bulgari, responsável pela expansão global da joalheria",
+   "veiculo": "Poder360",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Obituário de empresário do setor de joalheria."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 411,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Falecimento de figura histórica do setor empresarial.",
+    "causa": "Causas naturais associadas à idade avançada.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Nenhuma.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Texto de caráter biográfico e necrológico.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "6dbd3d1b97c0",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/22/navio-de-carga-russo-pega-fogo-na-costa-da-finlndia-aps-ataque.ghtml",
+   "titulo": "Navio de carga russo pega fogo na costa da Finlândia após ataque",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "cargueiro-russo-atacado-por-drones-pega-fogo-no",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Relata ataque militar a navio de carga russo no contexto da guerra na Ucrânia e implicações geopolíticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 344,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques a embarcações em rotas marítimas no Mar Báltico devido ao conflito regional.",
+    "causa": "Ofensivas com drones militares atribuídas à Ucrânia contra alvos russos.",
+    "vitima": "Tripulação e embarcação russa atingida.",
+    "culpado": "Ucrânia (conforme avaliação das forças locais).",
+    "solucao": "Nenhuma indicada.",
+    "motor_moral": "seguranca_coletiva"
+   },
+   "teste_inversao": "O texto relata os fatos com base em autoridades de defesa finlandesas e estonianas de forma neutra.",
+   "atores": [
+    {
+     "nome": "Ucrânia",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Rússia",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "guarda costeira da Finlândia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "comandante da Marinha da Estônia, Ivo Vark",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0e770e72e1f0",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/ministerio-das-mulheres-vai-criar-politica-de-protecao-contra-violencia-politica-de-genero-e-raca.shtml",
+   "titulo": "Ministério das Mulheres vai criar política de proteção contra violência política de gênero e raça",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Aborda políticas públicas de proteção contra violência política de gênero e raça, envolvendo ameaças a parlamentares e debates governamentais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 993,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crescimento de casos de violência política de gênero e raça no ambiente digital e presencial.",
+    "causa": "Intolerância e ataques direcionados a candidatas e parlamentares mulheres, especialmente negras.",
+    "vitima": "Mulheres que atuam na política, em especial parlamentares e candidatas negras.",
+    "culpado": "Autores anônimos de ameaças e agressores virtuais.",
+    "solucao": "Criação de política nacional específica com orçamento próprio, escolta e canais de acolhimento.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura utiliza dados estatísticos de pesquisas institucionais e relata ameaças concretas com base em boletins e notas oficiais, mantendo padrão jornalístico padrão para denúncias de violência.",
+   "atores": [
+    {
+     "nome": "Ministério das Mulheres",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Ana Elisa (PT-MG)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Instituto Marielle Franco",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Giovanni Oliveira, coordenador de Democracia e Justiça do Instituto Marielle Franco",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ana Elisa",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 66,
+     "ultima": false
+    },
+    {
+     "rotulo": "Clarice Tavares, diretora de pesquisa do InternetLab",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 95,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "78872afd86b1",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/22/el-nino-galapagos-chuvas.ghtml",
+   "titulo": "El Niño: fortes chuvas causam inundações e afetam mais de 7 mil em Galápagos",
+   "veiculo": "g1",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata-se de cobertura jornalística sobre desastres naturais decorrentes do fenômeno El Niño em Galápagos, sem disputa político-partidária central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 485,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Inundações severas causadas pelo fenômeno El Niño em Galápagos.",
+    "causa": "O fenômeno meteorológico El Niño, que eleva temperaturas de águas no Pacífico.",
+    "vitima": "Moradores das ilhas Galápagos afetados pelas enchentes.",
+    "culpado": "Fenômenos naturais (El Niño).",
+    "solucao": "Evacuações urgentes, apoio governamental e atendimento a desabrigados.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve uma tragédia climática de forma estritamente factual e descritiva, sem viés político evidente.",
+   "atores": [
+    {
+     "nome": "Governo do Equador",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Paula Calderón",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": false
+    },
+    {
+     "rotulo": "María Cobos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1d8aaf6657d3",
+   "url": "https://agenciabrasil.ebc.com.br/internacional/noticia/2026-11/manifestantes-marcham-em-lisboa-contra-aumento-no-custo-de-vida",
+   "titulo": "Manifestantes marcham em Lisboa contra aumento no custo de vida",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda protestos sindicais contra políticas econômicas governamentais, custo de vida e crise imobiliária em Portugal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 369,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Custo de vida elevado, baixos salários e crise imobiliária em Portugal.",
+    "causa": "Políticas do governo de centro-direita e pressões inflacionárias.",
+    "vitima": "Trabalhadores e jovens afetados pela crise.",
+    "culpado": "Governo e especulação imobiliária.",
+    "solucao": "Aumento de salários e aposentadorias, além de contenção dos custos de moradia.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata a manifestação sindical e traz dados do Eurostat de forma neutra, sem julgamentos opinativos da redação.",
+   "atores": [
+    {
+     "nome": "CGTP",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo de Portugal",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Manuel Gomes",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 43,
+     "ultima": false
+    },
+    {
+     "rotulo": "Luís Russo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 58,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "765a913a6ad8",
+   "url": "https://www.cnnbrasil.com.br/politica/caso-master-pode-definir-relacao-de-lula-com-congresso-diz-professor/",
+   "titulo": "Caso Master pode definir relação de Lula com Congresso, diz professor",
+   "veiculo": "CNN Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Analisa os impactos políticos e institucionais de investigações jurídicas sobre a relação entre o Executivo e o Legislativo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 795,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Riscos de instabilidade e paralisia decisória no governo devido a investigações e força da oposição.",
+    "causa": "Desdobramentos do caso Banco Master e configuração do Congresso Nacional.",
+    "vitima": "A governabilidade do presidente Lula.",
+    "culpado": "Crises institucionais e atritos políticos.",
+    "solucao": "Articulação com o Centrão e postura técnica no STF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto veicula uma análise especializada estruturada sob a forma de entrevista ou comentário de especialista, mantendo distanciamento da redação.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "PL",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Paulo Niccoli Ramirez",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 255,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d0375d7651a5",
+   "url": "https://www.infomoney.com.br/mundo/a-cop-mais-longa-da-historia-termina-sem-acordo-entenda-o-que-deu-errado/",
+   "titulo": "A COP mais longa da história termina sem acordo; entenda o que deu errado",
+   "veiculo": "InfoMoney",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata do fracasso de negociações internacionais sobre o clima (COP31), envolvendo disputas sobre combustíveis fósseis e financiamento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 551,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso da COP31 em alcançar um acordo robusto sobre clima e combustíveis fósseis.",
+    "causa": "Divergências sobre o papel dos combustíveis fósseis, financiamento a países pobres e captura de carbono.",
+    "vitima": "Comunidades vulneráveis a desastres climáticos.",
+    "culpado": "Países produtores e negociadores resistentes a metas mais ambiciosas.",
+    "solucao": "Consenso internacional mais rígido contra a emissão de poluentes.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura apresenta as posições dos diferentes blocos e ONGs sem viés partidário nacional.",
+   "atores": [
+    {
+     "nome": "União Europeia e aliados",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Darragh O'Brien",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": false
+    },
+    {
+     "rotulo": "Miatta Fahnbulleh",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "Harjeet Singh",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 48,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 48,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "77b634cf3dde",
+   "url": "https://www.seudinheiro.com/2026/economia/apos-criticas-de-todos-os-lados-lula-defende-pacote-fiscal-e-diz-que-nao-deixara-a-faria-lima-ensinar-como-dirigir-o-brasil-giov/",
+   "titulo": "Após críticas de todos os lados, Lula defende pacote fiscal e diz que não deixará a Faria Lima ensinar como dirigir o Brasil",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-pauta-votacao-de-pacote-fiscal-apos-lula",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda o embate político e econômico em torno do pacote fiscal do governo Lula, envolvendo críticas de aliados e do mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1154,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desequilíbrio nas contas públicas e incertezas sobre a eficácia do ajuste fiscal.",
+    "causa": "Crescimento de despesas obrigatórias e insuficiência de medidas estruturais de corte de gastos.",
+    "vitima": "A estabilidade econômica e a credibilidade fiscal do país.",
+    "culpado": "Resistência política a cortes ou ineficiência nos gastos públicos.",
+    "solucao": "Implementação de medidas robustas de contenção de gastos ou novas receitas.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata tanto as declarações do presidente quanto as ponderações de analistas econômicos, mantendo equilíbrio na exposição dos pontos de vista.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Mercado financeiro / Faria Lima",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gustavo Assis",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 21
+   },
+   "falas": 13,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b8a9756b47b0",
+   "url": "https://www.moneytimes.com.br/ajuste-fiscal-lula-defende-moretti-e-critica-gritaria-de-parte-da-esquerda-e-de-yuppies-da-faria-lima/",
+   "titulo": "Ajuste fiscal: Lula defende Moretti e critica ‘gritaria’ de parte da esquerda e de ‘yuppies da Faria Lima’",
+   "veiculo": "Money Times",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-pauta-votacao-de-pacote-fiscal-apos-lula",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a defesa do presidente Lula sobre a proposta de ajuste fiscal do governo, as críticas recebidas de setores da esquerda e do mercado financeiro ('yuppies da Faria Lima'), e sua relação com entidades empresariais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 755,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Controle do Orçamento público e necessidade de ajuste fiscal sem afetar os mais pobres.",
+    "causa": "Desequilíbrios orçamentários e renúncias fiscais de empresas.",
+    "vitima": "Povo pobre e beneficiários de políticas públicas que não devem ser cortados.",
+    "culpado": "Setores do mercado financeiro e críticos apressados que buscam lucros ou duvidam do governo.",
+    "solucao": "Ajuste fiscal direcionado aos mais ricos e manutenção de governança sobre o Orçamento.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto reproduz integralmente as falas e posições do presidente Lula em sua live semanal. Se os lados estivessem trocados e o veículo cobrisse críticas contundentes da oposição a um governo de direita, o tratamento dependeria da linha editorial, mas a estrutura de centralizar a narrativa na voz principal do governante é comum na cobertura de pronunciamentos oficiais.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Bruno Moretti",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Esquerda brasileira (críticos)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Mercado financeiro / yuppies da Faria Lima",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Luiz Inácio Lula da Silva",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 350,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 350,
+    "direita": 0
+   },
+   "falas": 18,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7fdda9dbb03c",
+   "url": "https://www.poder360.com.br/poder-internacional/cop31-nao-chega-a-consenso-e-deve-terminar-sem-acordo-climatico/",
+   "titulo": "COP31 não chega a consenso e deve terminar sem acordo climático",
+   "veiculo": "Poder360",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto relata o encerramento da COP31 sem acordo climático devido a divergências entre delegações internacionais e a União Europeia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 576,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incapacidade de alcançar um consenso global na COP31 sobre metas climáticas e combustíveis fósseis.",
+    "causa": "Divergências sobre o texto da proposta, ausência de menção explícita a combustíveis fósseis e falta de proporcionalidade nas medidas.",
+    "vitima": "Comunidades vulneráveis afetadas pelas mudanças climáticas.",
+    "culpado": "Nenhum apontado diretamente; impasse atribuído a divergências de negociação.",
+    "solucao": "Busca contínua por resultados equilibrados e credíveis em negociações futuras.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta de forma equilibrada as posições dos países que rejeitaram o acordo e a defesa da presidência da conferência. A inversão de lados não alteraria a estrutura neutra de relato de evento internacional.",
+   "atores": [
+    {
+     "nome": "União Europeia e delegações opositoras",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Presidência da COP31 (Turquia e Austrália)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Kate Hughes, negociadora-chefe do Reino Unido para as questões climáticas",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 45,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sirgun Gjerlow Aasland, ministro do clima da Noruega",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": false
+    },
+    {
+     "rotulo": "Murat Kurum, presidente da conferência",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 42,
+     "ultima": false
+    },
+    {
+     "rotulo": "Grupo dos Países Menos Desenvolvidos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "719a1a3951ab",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/documentos-da-pf-acirram-disputa-no-stf-sobre-relatoria-do-caso-master.shtml",
+   "titulo": "Documentos da PF acirram disputa no STF sobre relatoria do caso Master",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a disputa interna no STF e na PGR em torno da relatoria do caso Banco Master e do envio de relatórios da Polícia Federal envolvendo ministros."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1244,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise institucional e disputa de relatoria no STF envolvendo relatórios da Polícia Federal sobre o caso Banco Master.",
+    "causa": "Conflitos entre ministros da corte, diretores da PF e a PGR sobre o manuseio e divulgação de informações de investigações.",
+    "vitima": "A credibilidade e a estabilidade das instituições judiciais.",
+    "culpado": "Atuação cruzada entre diferentes alas do STF, PF e PGR.",
+    "solucao": "Avaliação dos relatórios pela PGR e decisão final pelo STF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata os argumentos de ambas as alas em disputa no STF (aliados de Mendonça e interlocutores de Moraes) com simetria de tratamento. A inversão de papéis evidenciaria o mesmo cuidado descritivo.",
+   "atores": [
+    {
+     "nome": "Aliados de André Mendonça",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Interlocutores de Alexandre de Moraes",
+     "campo": "centro"
+    },
+    {
+     "nome": "Edson Fachin",
+     "campo": "centro"
+    },
+    {
+     "nome": "Paulo Gonet / PGR",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gilmar Mendes",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "67992d15fbc8",
+   "url": "https://g1.globo.com/tecnologia/ciberseguranca/noticia/2026/11/21/ataques-ciberneticos-ia-ou-atualizacoes-pendentes-o-que-ha-por-tras-da-onda-de-apagoes-dos-ultimos-dias.ghtml",
+   "titulo": "Ataques cibernéticos, IA ou atualizações pendentes: o que há por trás da onda de apagões dos últimos dias",
+   "veiculo": "g1",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto aborda uma onda de falhas tecnológicas globais, ciberataques, o papel da inteligência artificial e a dependência de grandes empresas de tecnologia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 63,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1272,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ondas recentes de apagões e falhas tecnológicas globais que geram preocupação.",
+    "causa": "Atualizações defeituosas, dívida técnica, vulnerabilidades exploradas por hackers e uso de inteligência artificial.",
+    "vitima": "Usuários e empresas dependentes da infraestrutura tecnológica global.",
+    "culpado": "Vulnerabilidades estruturais e hackers.",
+    "solucao": "Identificação rápida de falhas, melhoria na cibersegurança e uso preventivo de inteligência artificial.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto trata de um tema tecnológico e empresarial de interesse público geral, ouvindo especialistas de diferentes consultorias e autoridades governamentais sem viés político partidário.",
+   "atores": [
+    {
+     "nome": "Empresas de tecnologia (Microsoft, Amazon, Oracle, etc.)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos EUA (Marco Rubio)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Scott Helme",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 52,
+     "ultima": true
+    },
+    {
+     "rotulo": "secretário de Estado americano, Marco Rubio",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sheila Pancholi, responsável por garantia de riscos da consultoria britânica RSM UK",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": false
+    },
+    {
+     "rotulo": "engenheiro de segurança Xander Van Raemdonck",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "Martin Reynolds, diretor de tecnologia de campo da empresa de fornecimento de software…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 16
+   },
+   "falas": 14,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2c0cedfe6e15",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/temporais-provocam-alagamentos-e-danos-em-imoveis-no-estado-de-sp",
+   "titulo": "Temporais provocam alagamentos e danos em imóveis no estado de SP",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto relata ocorrências de temporais, alagamentos e ações da Defesa Civil no estado de São Paulo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 62,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 642,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Temporais e fortes chuvas provocam alagamentos, danos materiais e desalojam famílias no estado de SP.",
+    "causa": "Condições climáticas adversas e chuvas intensas.",
+    "vitima": "Moradores de municípios afetados pelos temporais.",
+    "culpado": "Fenômenos meteorológicos.",
+    "solucao": "Atuação da Defesa Civil, emissão de alertas e prestação de assistência municipal.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é uma notícia estritamente utilitária e descritiva sobre boletins da Defesa Civil. A inversão de contexto não geraria alteração metodológica.",
+   "atores": [
+    {
+     "nome": "Defesa Civil do Estado de São Paulo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3ecd2c074fec",
+   "url": "https://www.moneytimes.com.br/ele-esta-com-uma-cara-boa-diz-michelle-ao-visitar-bolsonaro-na-uti-gaep/",
+   "titulo": "‘Está com uma cara boa’, diz Michelle ao visitar Bolsonaro na UTI",
+   "veiculo": "Money Times",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "bolsonaro-segue-internado-na-uti-em-brasilia-e-m",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda a internação hospitalar de Jair Bolsonaro, figura central da política nacional, detalhando também decisões judiciais sobre monitoramento eletrônico e sua situação penal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 566,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Internação hospitalar de Jair Bolsonaro por abdômen agudo obstrutivo e medidas judiciais relacionadas.",
+    "causa": "Quadro clínico de obstrução intestinal e histórico de saúde.",
+    "vitima": "Jair Bolsonaro",
+    "culpado": "Nenhum",
+    "solucao": "Atendimento médico, procedimentos clínicos e autorização de suspensão temporária de tornozeleira eletrônica.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Sim, o texto seguiria a mesma estrutura e tom se tratasse de qualquer outra figura pública de relevância equivalente hospitalizada.",
+   "atores": [
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Michelle Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Alexandre de Moraes",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Michelle",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": false
+    },
+    {
+     "rotulo": "hospital",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": false
+    },
+    {
+     "rotulo": "Carlos Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 15
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a6f15284e7cc",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/22/negociaes-climticas-devem-fracassar-e-cop31-deve-ficar-sem-acordo-final.ghtml",
+   "titulo": "Negociações climáticas da COP31 fracassam após UE e outros países rejeitarem acordo",
+   "veiculo": "Valor Econômico",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral",
+     "economico"
+    ],
+    "justificativa": "Cobre o fracasso das negociações climáticas internacionais na COP31, com repercussões globais e de políticas públicas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 58,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 340,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso nas negociações da COP31 sem um acordo abrangente sobre o clima.",
+    "causa": "Desentendimentos entre países e rejeição de minutas consideradas fracas.",
+    "vitima": "Esforço global de combate ao aquecimento global",
+    "culpado": "Governos e nações sem consenso",
+    "solucao": "Ações mais ambiciosas e compromisso político dos países.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Sim, a cobertura relata os fatos oficiais e as declarações da ONU de forma direta e sem viés partidário nacional.",
+   "atores": [
+    {
+     "nome": "União Europeia e outros países",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Turquia e Austrália",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "António Guterres",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "António Guterres",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 109,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f60451257be8",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/banco-de-dados-de-informacoes-criminais-do-fbi-foi-hackeado-diz-cnn.shtml",
+   "titulo": "Banco de dados de informações criminais do FBI foi hackeado, diz CNN",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de suposta violação de dados do FBI e falhas tecnológicas sistêmicas nos Estados Unidos, envolvendo declarações do presidente Donald Trump."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 661,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possível invasão de banco de dados do FBI e série de falhas tecnológicas recentes nos EUA.",
+    "causa": "Falhas de segurança cibernética e problemas de infraestrutura de transporte.",
+    "vitima": "Usuários e sistemas de segurança dos EUA",
+    "culpado": "Hackers / Grupos de extorsão digital",
+    "solucao": "Investigação pelas autoridades e reparação de infraestrutura.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, a matéria relata as informações apuradas pela CNN e Reuters sem tomar partido político partidário.",
+   "atores": [
+    {
+     "nome": "FBI",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Sean Duffy",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 18
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "efce93b93956",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/22/exigencias-policia-municipal-prefeituras.ghtml",
+   "titulo": "Maioria das cidades terá dificuldade para criar polícia municipal, diz deputado",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Discute a viabilidade financeira e as regras legais da criação de polícias municipais decorrente da PEC da Segurança Pública aprovada pelo Congresso."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 842,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade das cidades em cumprir os requisitos financeiros para criar polícias municipais.",
+    "causa": "Falta de arrecadação própria e dependência de repasses federais e estaduais.",
+    "vitima": "Municípios sem capacidade financeira",
+    "culpado": "Nenhum",
+    "solucao": "Trava legal e critérios rigorosos definidos na PEC da Segurança Pública.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Sim, o texto apresenta dados estatísticos e o contraponto entre parlamentares e representantes das guardas de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "Aluisio Mendes",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Reinaldo Monteiro",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Aluisio Mendes",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 113,
+     "ultima": false
+    },
+    {
+     "rotulo": "Reinaldo Monteiro",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 64,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 113
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7916b1e2e8d0",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/apos-temporal-governo-reconhece-calamidade-publica-em-tupancireta",
+   "titulo": "Após temporal, governo reconhece calamidade pública em Tupanciretã",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-federal-decreta-calamidade-publica-em-tu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral",
+     "economico"
+    ],
+    "justificativa": "Aborda o reconhecimento de calamidade pública pelo governo federal e estadual no Rio Grande do Sul após temporal, envolvendo ações de ministros e governadores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 651,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Devastação causada por temporal em Tupanciretã (RS) e mortes registradas.",
+    "causa": "Fenômeno climático severo (tempestade).",
+    "vitima": "População atingida de Tupanciretã e demais municípios gaúchos",
+    "culpado": "Nenhum",
+    "solucao": "Reconhecimento de calamidade pública, repasses de verbas emergenciais e planos de reconstrução.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Sim, o relato institucional das medidas de socorro e atuação governamental é padrão para coberturas de desastres naturais.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Waldez Góes",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Eduardo Leite",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Waldez Góes",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 114,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 114,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b1c6df2fb048",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/bolsas-chinesas-flexibilizam-regras-para-impulsionar-mercado-de-acoes/",
+   "titulo": "Bolsas chinesas flexibilizam regras para impulsionar mercado de ações",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de medidas econômicas e regulatórias adotadas por bolsas de valores e pelo governo chinês para estabilizar o mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 434,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda e dificuldades no mercado acionário chinês com crescimento lento e tensões geopolíticas.",
+    "causa": "Crescimento lento no país, queda global de ações de inteligência artificial e tensões geopolíticas.",
+    "vitima": "Investidores e empresas com ações em dificuldades.",
+    "culpado": "Fatores macroeconômicos e volatilidade global.",
+    "solucao": "Flexibilização de regras de margem, cortes de taxas e introdução de formadores de mercado.",
+    "motor_moral": "Estabilidade econômica e desenvolvimento saudável do mercado."
+   },
+   "teste_inversao": "O texto apresenta fatos sobre medidas regulatórias financeiras sem adotar juízos de valor ideológicos. Seria escrito da mesma forma se as medidas fossem tomadas por qualquer outro país.",
+   "atores": [
+    {
+     "nome": "Governo da China / Pequim",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Bolsas de Xangai, Shenzhen e Pequim",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "as três bolsas em comunicados idênticos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": false
+    },
+    {
+     "rotulo": "bolsa de valores de Shenzhen",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a4ef00ed0c0d",
+   "url": "https://www.moneytimes.com.br/negociacoes-climaticas-da-cop31-fracassam-com-ue-e-outros-paises-rejeitando-acordo-gaep/",
+   "titulo": "Negociações climáticas da COP31 fracassam, com União Europeia e outros países rejeitando acordo",
+   "veiculo": "Money Times",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Cobre o fracasso de negociações climáticas internacionais na COP31, envolvendo disputas diplomáticas e econômicas sobre combustíveis fósseis e financiamento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 865,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso nas negociações climáticas da COP31 em alcançar consenso sobre um acordo final.",
+    "causa": "Divergências profundas entre países sobre metas de combustíveis fósseis, financiamento climático e remoção de carbono.",
+    "vitima": "Esforços globais de combate ao aquecimento global.",
+    "culpado": "Governos mundiais divididos por crises concorrentes e interesses econômicos divergentes.",
+    "solucao": "Manutenção das estruturas técnicas e jurídicas anteriores e negociações futuras.",
+    "motor_moral": "Responsabilidade ambiental e multilateralismo."
+   },
+   "teste_inversao": "O texto relata os argumentos de múltiplos lados (União Europeia, países produtores de petróleo, nações em desenvolvimento) com neutralidade e sem viés editorial evidente.",
+   "atores": [
+    {
+     "nome": "União Europeia e países defensores de metas rígidas",
+     "campo": "centro"
+    },
+    {
+     "nome": "Arábia Saudita e países produtores de petróleo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Presidência da COP31 (Turquia e Austrália)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente turco da COP31, Murat Kurum",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente das negociações da COP31 pela Austrália, Chris Bowen",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro do Meio Ambiente da Irlanda, Darragh O'Brien",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro do Clima da Bélgica, Jean-Luc Crucke",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 14,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b802c143e1b4",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/21/sobe-para-4-o-nmero-de-mortos-em-temporal-no-rs-estado-tem-20-mil-desalojados.ghtml",
+   "titulo": "Sobe para 5 o número de mortos em temporal no RS; Estado tem 20 mil desalojados",
+   "veiculo": "Valor Econômico",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "temporal-no-rio-grande-do-sul-deixa-ate-cinco-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata os impactos de temporais e tornados no Rio Grande do Sul e Paraná, incluindo ações governamentais de assistência."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 791,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mortes, feridos e destruição causados por temporais e tornados no Sul do país.",
+    "causa": "Fenômenos meteorológicos extremos (supercélulas, microexplosões e tornados).",
+    "vitima": "População dos municípios atingidos pelos temporais.",
+    "culpado": "Fatores naturais e climáticos.",
+    "solucao": "Assistência da Defesa Civil, restabelecimento de serviços e auxílio financeiro governamental.",
+    "motor_moral": "Solidariedade e dever de assistência humanitária."
+   },
+   "teste_inversao": "O relato de tragédias climáticas e ações da Defesa Civil é puramente factual e institucional, mantendo o mesmo padrão independentemente do alinhamento político do governante citado.",
+   "atores": [
+    {
+     "nome": "Governo do Rio Grande do Sul (Eduardo Leite)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "governador Eduardo Leite (PSD)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 50
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b1f6f6507104",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/china-critica-medida-dos-eua-que-restringe-gigantes-nacionais-das-telecomunicacoes.shtml",
+   "titulo": "China critica medida dos EUA que restringe gigantes nacionais das telecomunicações",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda conflitos comerciais e regulatórios entre China e Estados Unidos envolvendo o setor de telecomunicações e segurança nacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 382,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Restrições impostas pelos Estados Unidos a empresas de telecomunicações chinesas.",
+    "causa": "Acusações de chamadas automatizadas ilegais e preocupações de segurança nacional americana.",
+    "vitima": "Grandes operadoras de telecomunicações da China.",
+    "culpado": "Decisões regulatórias dos EUA vistas como repressivas pela China.",
+    "solucao": "Apelos diplomáticos e possíveis medidas retaliatórias por parte de Pequim.",
+    "motor_moral": "Concorrência leal e soberania tecnológica."
+   },
+   "teste_inversao": "O texto expõe simetricamente os argumentos do governo chinês e da agência reguladora americana, sem tomar partido na disputa geopolítica.",
+   "atores": [
+    {
+     "nome": "Governo da China / Ministério do Comércio",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos Estados Unidos / FCC",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério do Comércio em comunicado",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 51,
+     "ultima": false
+    },
+    {
+     "rotulo": "regulador americano",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d19a79c531d1",
+   "url": "https://g1.globo.com/economia/midia-e-marketing/noticia/2026/11/21/joe-wallach-morre-aos-103-anos.ghtml",
+   "titulo": "Joe Wallach, um dos executivos que participaram da inauguração da Globo, morre aos 103 anos",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Obituário e cobertura jornalística sobre a morte de Joe Wallach, executivo histórico da televisão brasileira e da TV Globo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1029,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falecimento do executivo Joe Wallach aos 103 anos.",
+    "causa": "Morte natural decorrente da idade avançada.",
+    "vitima": "Família, amigos e o setor televisivo.",
+    "culpado": "Nenhum.",
+    "solucao": "Homenagens póstumas e recordação de seu legado profissional.",
+    "motor_moral": "Reconhecimento, gratidão e memória institucional."
+   },
+   "teste_inversao": "Trata-se de um obituário institucional padrão focado em homenagear a trajetória de uma figura de relevância histórica para a empresa de mídia.",
+   "atores": [
+    {
+     "nome": "Família Marinho / Grupo Globo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Roberto Irineu Marinho, João Roberto Marinho e José Roberto Marinho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 83,
+     "ultima": false
+    },
+    {
+     "rotulo": "Roberto Irineu Marinho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": false
+    },
+    {
+     "rotulo": "Boninho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 89,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c2cf7aac7654",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/tempestade-no-rio-grande-do-sul-afeta-196-mil-pessoas-em-33-cidades",
+   "titulo": "Tempestade no Rio Grande do Sul afeta 19,6 mil pessoas em 33 cidades",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "temporal-no-rio-grande-do-sul-deixa-ate-cinco-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre desastre natural e ações governamentais de assistência, sem forte disputa político-ideológica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 338,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Temporal severo causa mortes e destruição no Rio Grande do Sul",
+    "causa": "Fenômenos meteorológicos extremos",
+    "vitima": "População afetada dos municípios gaúchos",
+    "culpado": "Nenhum",
+    "solucao": "Ações de emergência e auxílio federal",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é puramente informativo e descritivo sobre um desastre natural, mantendo o mesmo tom independentemente da localidade ou partido dos envolvidos.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro"
+    },
+    {
+     "nome": "Ronaldo Machado Salles (PSDB)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "governo",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "afetaram pelo menos 19.663 pessoas em 33 municípios",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados detalhados com base em órgão oficial.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "81e08226d4b4",
+   "url": "https://www.cnnbrasil.com.br/nacional/sudeste/sp/fotografo-registra-fieis-cumprindo-promessa-durante-temporal-em-aparecida/",
+   "titulo": "Fotógrafo registra fiéis “cumprindo promessa” durante temporal em Aparecida",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Reportagem sobre forte temporal, danos materiais e relatos de populares em Aparecida (SP)."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 526,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Temporal causa estragos e alagamentos em Aparecida (SP)",
+    "causa": "Chuva intensa e atípica",
+    "vitima": "Moradores e turistas afetados",
+    "culpado": "Nenhum",
+    "solucao": "Trabalhos de zeladoria e resgate",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve eventos climáticos e impactos locais sem viés político.",
+   "atores": [
+    {
+     "nome": "Prefeitura de Aparecida",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a1a23ee2165c",
+   "url": "https://www.moneytimes.com.br/minuta-final-da-cop31-na-turquia-omite-mencoes-a-combustiveis-fosseis-gaep/",
+   "titulo": "Minuta final da COP31 omite menções a combustíveis fósseis",
+   "veiculo": "Money Times",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-fracassa-e-termina-sem-acordo-final-apos-i",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "costumes"
+    ],
+    "justificativa": "Trata de negociações e diretrizes globais sobre transição energética e combustíveis fósseis na COP31."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 295 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 76,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 295,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Minuta da COP31 omite menções diretas ao fim dos combustíveis fósseis",
+    "causa": "Divergências e negociações na cúpula do clima",
+    "vitima": "Esforço global de limitação do aquecimento",
+    "culpado": "Negociadores e redação do documento",
+    "solucao": "Inclusão de metas estritas e financiamento",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A abordagem relata fatos da negociação climática sem tomar partido explícito, ouvindo os dois lados das críticas.",
+   "atores": [
+    {
+     "nome": "Governo da Turquia / Ministérios",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ativistas ambientais",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro do Meio Ambiente da Turquia, Murat Kurum",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Especialistas",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Especialistas alertam que o documento, ao evitar tais termos, pode enfraquecer o esforço global",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de especialistas anônimos para corroborar uma avaliação crítica da minuta.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "ressalva": "Comum em jornalismo internacional quando há consenso técnico."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "8b83e01899d0",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/21/morre-joe-wallach-executivo-que-ajudou-a-estruturar-a-tv-globo-e-criou-a-telemundo-aos-103-anos.ghtml",
+   "titulo": "Morre Joe Wallach, executivo que ajudou a estruturar a TV Globo e criou a Telemundo, aos 103 anos",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Perfil obituário e histórico sobre o executivo Joe Wallach e sua trajetória na TV Globo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1166,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HUMANIZACAO": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falecimento de Joe Wallach aos 103 anos",
+    "causa": "Causas naturais associadas à idade avançada",
+    "vitima": "Nenhum",
+    "culpado": "Nenhum",
+    "solucao": "Homenagens e resgate histórico",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de um obituário elogioso padrão para qualquer figura de destaque no meio empresarial ou cultural.",
+   "atores": [
+    {
+     "nome": "Joe Wallach",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Família Marinho",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Boninho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 78,
+     "ultima": false
+    },
+    {
+     "rotulo": "Roberto Irineu Marinho, João Roberto Marinho e José Roberto Marinho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 83,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HUMANIZACAO",
+     "citacao": "Era uma pessoa doce e muito amada pelos amigos. Vai em paz Joe!",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Tom laudatório natural de textos obituários.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral",
+     "favorece": "Joe Wallach",
+     "ressalva": "Adequado ao gênero jornalístico de obituário."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "fa712056b2d1",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/ao-menos-14-pessoas-estao-desaparecidas-apos-drone-russo-atingir-predio-na-regiao-de-kiev-diz-zelenski.shtml",
+   "titulo": "Ao menos duas pessoas morrem e 10 estão desaparecidas após ataque russo em Kiev",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Cobertura de conflito geopolítico (guerra Rússia-Ucrânia), ataques com drones e impactos colaterais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 648,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques militares russos e ucranianos causam mortes, danos e riscos regionais",
+    "causa": "Guerra em curso entre Ucrânia e Rússia",
+    "vitima": "Civis em Kiev e tripulações de embarcações",
+    "culpado": "Atores do conflito armado",
+    "solucao": "Esforços de resgate e contenção de danos",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "A reportagem relata os episódios de forma simétrica sobre as perdas e ataques de ambos os lados do conflito.",
+   "atores": [
+    {
+     "nome": "Governo Russo",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo Ucraniano",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Volodimir Zelenski",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 33,
+     "ultima": true
+    },
+    {
+     "rotulo": "guarda costeira finlandesa",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 33
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "corroborando um relato de autoridades russas",
+     "paragrafo": "P12",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro ('corroborando') para alinhar relatos de lados opostos.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "947ece800941",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/22/ataque-russo-kiev-ucrania.ghtml",
+   "titulo": "Ataque russo perto de Kiev, na Ucrânia, atinge prédio de apartamentos e deixa mortos e feridos",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda o conflito na Ucrânia e alegações cruzadas envolvendo Rússia, Ucrânia, Lituânia e Finlândia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 630,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques militares russos e incidentes com drones na Europa.",
+    "causa": "Invasão russa da Ucrânia e escalada geopolítica.",
+    "vitima": "Civis ucranianos e infraestrutura atingida.",
+    "culpado": "Rússia.",
+    "solucao": "Respostas de emergência e contestações diplomáticas.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata fatos de agências internacionais sem tomar partido nas disputas secundárias, ouvindo as partes envolvidas.",
+   "atores": [
+    {
+     "nome": "Rússia",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ucrânia",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Lituânia",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Serviço Estatal de Emergência da Ucrânia",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "governador de Kaliningrado, Alexei Bezprozvannykh",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 8,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro das Relações Exteriores da Lituânia, Kęstutis Budrys",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 36
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "bbc1c45c8e75",
+   "url": "https://agenciabrasil.ebc.com.br/internacional/noticia/2026-11/terremoto-de-magnitude-68-graus-atinge-o-peru",
+   "titulo": "Terremoto de magnitude 6,8 graus atinge o Peru",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre um terremoto no Peru sem grande controvérsia político-partidária."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 227 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 77,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 227,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Terremoto de magnitude 6,8 no Peru.",
+    "causa": "Atividade tectônica ao longo do Anel de Fogo do Pacífico.",
+    "vitima": "População afetada pelo susto do tremor.",
+    "culpado": "Nenhum.",
+    "solucao": "Monitoramento pelas autoridades.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo e utilitário.",
+   "atores": [
+    {
+     "nome": "Vicente Quispe",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Centro Alemão de Pesquisa em Geociências",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Vicente Quispe, vereador da província de Junín",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "44333c2764de",
+   "url": "https://www.cnnbrasil.com.br/nacional/rs-ciclone-pode-provocar-granizo-e-ventos-acima-de-80-km-h-neste-domingo/",
+   "titulo": "RS: Ciclone pode provocar granizo e ventos acima de 80 km/h neste domingo",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "temporal-no-rio-grande-do-sul-deixa-ate-cinco-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Previsão do tempo e impactos de tempestades no Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 446,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Condições meteorológicas extremas e tempestades.",
+    "causa": "Fenômenos climáticos como ciclone extratropical e frente fria.",
+    "vitima": "População atingida pelas tempestades.",
+    "culpado": "Nenhum.",
+    "solucao": "Alertas meteorológicos e atuação da Defesa Civil.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Texto puramente utilitário de previsão do tempo.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "42a41943e75d",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/eisenkot-convida-partido-de-netanyahu-para-negociar-coalizao-em-israel.shtml",
+   "titulo": "Eisenkot convida partido de Netanyahu para negociar coalizão em Israel",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-21",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Negociações para formação de governo em Israel envolvendo partidos políticos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 768,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impasse político na formação de governo em Israel após eleições inconclusivas.",
+    "causa": "Falta de maioria absoluta para os blocos principais no Parlamento.",
+    "vitima": "Nenhum.",
+    "culpado": "Nenhum.",
+    "solucao": "Negociações para um governo de união nacional.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata as exigências de ambos os lados de maneira simétrica, citando os partidos de Eisenkot e Netanyahu.",
+   "atores": [
+    {
+     "nome": "Gadi Eisenkot",
+     "campo": "centro"
+    },
+    {
+     "nome": "Binyamin Netanyahu",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "partido Yashar, de Eisenkot",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    },
+    {
+     "rotulo": "Likud",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 34
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d1224f8c0da0",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/22/defesas-aereas-do-bahrein-interceptam-ataques-do-ira-instalacao-industrial-e-atingida.ghtml",
+   "titulo": "Defesas aéreas do Bahrein interceptam ataques do Irã; instalação industrial é atingida",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-22",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Conflito militar envolvendo o Bahrein, o Irã e os Estados Unidos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "10 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 10 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 346,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 10,
+   "enquadramento": {
+    "problema": "Ataques iranianos com mísseis e drones contra o território do Bahrein.",
+    "causa": "Escalada das hostilidades regionais após ataques anteriores de EUA e Israel ao Irã.",
+    "vitima": "Civis feridos no Bahrein.",
+    "culpado": "Irã.",
+    "solucao": "Interceptações pelas defesas aéreas e alertas à população.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta as versões do governo do Bahrein e da Guarda Revolucionária iraniana, mantendo o equilíbrio na atribuição de declarações.",
+   "atores": [
+    {
+     "nome": "Bahrein",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Irã",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério do Interior do Bahrein",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Força de Defesa do Bahrein",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": false
+    },
+    {
+     "rotulo": "Guarda Revolucionária",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 13,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 13,
+    "direita": 3
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-22T15:53:11+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 80,
+   "textos_curtos": 18,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 96594,
+    "saida": 43771
+   },
+   "analises": [
+    "2f2d6a570e27",
+    "1ea334d802cf",
+    "455ae08e8267",
+    "1679b0a7bd07",
+    "c90998dc6d5e",
+    "f75046ce5c97",
+    "27e853568c57",
+    "7fb424baebf2",
+    "6bba826ac8f9",
+    "914862052c2a",
+    "7a7fa8d7b6c3",
+    "84e28645d8e2",
+    "6b24ef24c584",
+    "f25f003566a4",
+    "cfb40858519f",
+    "39ff7600e683",
+    "4d3f87c8cd54",
+    "9ecf377503f4",
+    "865628271a42",
+    "0425fe915d99",
+    "dacbe5193bcf",
+    "5fe1068e0f9b",
+    "52ab4a2cb1f8",
+    "cfbc500f8f23",
+    "2c3032ff5b5e",
+    "171fbe06b45c",
+    "1d3c845f54ab",
+    "8f78c1f10b9d",
+    "6dbd3d1b97c0",
+    "0e770e72e1f0",
+    "78872afd86b1",
+    "1d8aaf6657d3",
+    "765a913a6ad8",
+    "d0375d7651a5",
+    "77b634cf3dde",
+    "b8a9756b47b0",
+    "7fdda9dbb03c",
+    "719a1a3951ab",
+    "67992d15fbc8",
+    "2c0cedfe6e15",
+    "3ecd2c074fec",
+    "a6f15284e7cc",
+    "f60451257be8",
+    "efce93b93956",
+    "7916b1e2e8d0",
+    "b1c6df2fb048",
+    "a4ef00ed0c0d",
+    "b802c143e1b4",
+    "b1f6f6507104",
+    "d19a79c531d1",
+    "c2cf7aac7654",
+    "81e08226d4b4",
+    "a1a23ee2165c",
+    "8b83e01899d0",
+    "fa712056b2d1",
+    "947ece800941",
+    "bbc1c45c8e75",
+    "44333c2764de",
+    "42a41943e75d",
+    "d1224f8c0da0"
+   ]
+  }
+ ]
+}
