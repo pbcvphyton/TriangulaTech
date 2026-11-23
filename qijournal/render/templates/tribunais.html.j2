@@ -47,7 +47,13 @@
     a área e as partes por tipo (nunca nome de pessoa física). de: de onde a folha sai (o painel do
     tribunal ou o dossiê do ministro). -#}
 {% macro processo(x, trib, de, rot) -%}
-<li><p class="tb-fi-d">{{ x.dias }}<small>dias</small></p><p class="tb-fi-p">{% if x.link %}<a href="{{ x.link }}" data-pr="{{ x.id }}" data-de="{{ de }}" target="_blank" rel="noopener noreferrer">{{ x.rotulo }}</a>{% else %}<b>{{ x.rotulo }}</b>{% endif %}{{ area(x.area, x.area_nome) }}</p><p class="tb-fi-x">{% if x.relator %}<b>{{ x.relator }}</b> · {% endif %}{{ x.texto }}</p></li>
+<li><p class="tb-fi-d">{{ x.dias }}<small>dias</small></p><p class="tb-fi-p">{% if x.link %}<a href="{{ x.link }}" data-pr="{{ x.id }}" data-de="{{ de }}" target="_blank" rel="noopener noreferrer">{{ x.rotulo }}</a>{% else %}<b>{{ x.rotulo }}</b>{% endif %}{{ area(x.area, x.area_nome) }}</p><p class="tb-fi-x">{% if x.relator %}<b>{{ x.relator }}</b> · {% endif %}{{ x.texto }}{% if x.cnj %} <span class="tb-cnj"><span class="az-selo">CNJ</span> {{ x.cnj }}</span>{% endif %}</p></li>
+{%- endmacro %}
+
+{#- A camada do CNJ (DataJud) de um ministro ou do tribunal: as faixas de concluso, com a cobertura;
+    só existe quando o cnj.json foi publicado. -#}
+{% macro faixas_cnj(b, selo) -%}
+<div class="tb-cnj-b"><p class="tb-cnj-k"><span class="az-selo">{{ selo }}</span> há quanto tempo concluso ao relator</p><div class="tb-cnj-l">{% for f in b.faixas %}<p class="tb-cnj-f{% if not f.ok %} tb-cnj-ins{% endif %}"><span>Conclusos há + de {{ f.rot }}</span><b>{{ f.v }}</b><small>{{ f.x }}</small></p>{% endfor %}</div><p class="tb-cnj-n">{{ b.nota }}</p></div>
 {%- endmacro %}
 
 {#- As fontes de hoje: o estado escrito e a forma (● completa, ◐ com aviso, ■ falhou, ○ desligada). -#}
@@ -70,6 +76,7 @@
   </header>
   {% if c.frases %}<ul class="cg-d-fr">{% for f in c.frases %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
   <div class="cg-tiles">{% for k in c.tiles %}{{ tile(k) }}{% endfor %}</div>
+  {% if c.cnj %}{{ faixas_cnj(c.cnj, "CNJ · DataJud") }}{% endif %}
   <section class="tb-cd-sec">
     <h6 class="tb-cd-h6">Do que é o acervo <span>a parte de cada área; o traço é {{ c.pares }}</span></h6>
     <div class="tb-cd-fp"><span class="tb-fp" role="img" aria-label="As maiores áreas: {{ c.digital_aria }}">{% for x in c.digital %}<i class="tb-a-{{ x.area }}" style="flex:{{ x.flex }}"></i>{% endfor %}</span></div>
@@ -363,6 +370,16 @@
         <h5 class="az-h">Os mais antigos na mesa <span>{{ fi.rot }}, do mais antigo; nunca processo em segredo de justiça</span></h5>
         {% if fi.antigos %}<ol class="tb-fi tb-fi-2c">{% for x in fi.antigos %}{{ processo(x, tr.id, tr.id, fi.rot) }}{% endfor %}</ol>{% else %}<p class="az-dek">A lista está vazia nesta atualização.</p>{% endif %}
       </div>
+      {% if fi.cnj %}{% set fc = fi.cnj %}
+      <div class="az-blk" id="tb-cnj-{{ tr.id }}">
+        <h5 class="az-h">Há quanto tempo concluso <span>a data da conclusão vem do DataJud (CNJ), acervo de {{ fc.acervo }}, índice do CNJ até {{ fc.indice }}</span></h5>
+        {{ faixas_cnj(fc.tribunal, fc.selo) }}
+        <div class="an-tbl-wrap"><table class="an-tbl tb-tbl tb-cnj-t"><caption class="sr-only">Por ministro das Turmas: sem decisão registrada (STJ) e concluso (CNJ) há mais de {{ fi.mesa_dias[0] }} dias e de {{ fi.mesa_dias[-1] }} dias</caption>
+          <thead><tr><th scope="col">Ministro</th><th scope="col">Sem decisão há + de {{ fi.mesa_dias[0] }} dias <small>STJ</small></th><th scope="col">Concluso há + de {{ fi.mesa_dias[0] }} dias <small>CNJ</small></th><th scope="col">Sem decisão há + de 1 ano <small>STJ</small></th><th scope="col">Concluso há + de 1 ano <small>CNJ</small></th><th scope="col">Com data no CNJ</th></tr></thead>
+          {% for g in fc.grupos %}<tbody><tr class="tb-cnj-g"><th scope="rowgroup" colspan="6">{{ g.nome }}</th></tr>{% for l in g.linhas %}<tr><th scope="row"><a href="#tb-mesa-{{ l.id }}" data-min="{{ l.id }}">{{ l.nome }}</a></th><td>{{ l.sem[0] }}</td><td{% if not l.cnj[0].ok %} class="tb-cnj-ins"{% endif %}>{{ l.cnj[0].v }}</td><td>{{ l.sem[1] }}</td><td{% if not l.cnj[-1].ok %} class="tb-cnj-ins"{% endif %}>{{ l.cnj[-1].v }}</td><td>{{ l.cob }}</td></tr>{% endfor %}</tbody>{% endfor %}
+        </table></div>
+      </div>
+      {% endif %}
       <div class="az-2c">
         <div class="az-blk">
           <h5 class="az-h">Por grupo <span>na mesa e há quanto tempo</span></h5>

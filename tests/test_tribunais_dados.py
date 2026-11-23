@@ -11,6 +11,7 @@ do portal, total fora da faixa, data que volta, teto de tamanho); o fallback das
 
 from __future__ import annotations
 
+import dataclasses
 import gzip
 import json
 import shutil
@@ -42,7 +43,10 @@ PAGINAS = {
 
 @pytest.fixture(scope="module")
 def regras() -> modelo.Regras:
-    return modelo.carregar_regras()
+    # O DataJud (ligado para uso pessoal no config) tem os testes de ponta a ponta dele, nos dois
+    # modos, em test_tribunais_datajud.py; o portal falso daqui não o serve.
+    r = modelo.carregar_regras()
+    return dataclasses.replace(r, datajud={**r.datajud, "ativo": False})
 
 
 class Portal:

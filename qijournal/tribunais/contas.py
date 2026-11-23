@@ -1234,5 +1234,162 @@ def montar(
     return contas.resultado(fluxo=fluxo, pautas=pautas, decisoes=decisoes, temas=temas)
 
 
-__all__ = ["Conta", "Contas", "Fluxo", "Resultado", "faixas", "fluxo_stf", "fluxo_stj", "fracao", "idade", "link_oficial",
-           "mini_folha", "montar", "razao"]
+# ── a camada do CNJ (DataJud): "concluso há N dias" no STJ ───────────────────────────────────
+
+# O estado de cada processo na mesa diante do que o DataJud trouxe (a letra vai ao cnj.json):
+ESTADOS_CNJ = {
+    "c": "concluso ao relator (a conclusão veio depois do último ato do magistrado)",
+    "n": "sem conclusão em aberto (houve ato do magistrado depois da última conclusão, ou nenhuma conclusão desde a última distribuição ou decisão)",
+    "d": "o DataJud está atrás do acervo do STJ para este processo (o último movimento dele é anterior à última distribuição ou decisão)",
+    "x": "há movimento fora da Tabela Processual Unificada depois da última conclusão",
+    "a": "não está no índice público do DataJud",
+    "p": "ainda não consultado (a carga anda em fatias)",
+}
+COM_DATA = ("c", "n")  # o estado do processo está determinado (entra na cobertura)
+
+
+def estado_cnj(linha: Mapping[str, Any], registro: Mapping[str, Any] | None, ref: date) -> tuple[str, int | None]:
+    """O estado de um processo na mesa (``ESTADOS_CNJ``) e, quando concluso, há quantos dias.
+
+    ``linha``: o processo no retrato do acervo do STJ (``distribuicao``, ``ultima_decisao``);
+    ``registro``: o que o DataJud trouxe (``datajud.resumir_documento``); ``ref``: a data do acervo.
+    Concluso só quando (1) a última Conclusão (TPU 51) veio depois do último ato do magistrado, (2) não
+    há movimento fora da TPU depois dela e (3) ela não é anterior à última distribuição nem à última
+    decisão que o acervo do STJ registra (o STJ sabe de algo que o DataJud ainda não tem: não vale).
+    Os dias contam da data da conclusão até a data do acervo, como o "sem decisão" do STJ, e nunca
+    passam dele (a conclusão vem depois da distribuição ou da decisão)."""
+    if registro is None:
+        return "p", None
+    if registro.get("aus"):
+        return "a", None
+    marco = max((d for d in (linha.get("distribuicao"), linha.get("ultima_decisao")) if d), default=None)
+    ultimo = registro.get("u")
+    if not ultimo or (marco and str(ultimo) < str(marco)):
+        return "d", None
+    if registro.get("x"):
+        return "x", None
+    conclusao = registro.get("c")
+    if registro.get("ab") and conclusao and (not marco or str(conclusao) >= str(marco)):
+        d = _data(str(conclusao))
+        return "c", (max(0, (ref - d).days) if d else None)
+    return "n", None
+
+
+@dataclass
+class _ContaCNJ:
+    base: int = 0  # na mesa, público, não suspenso, com a data da última distribuição ou decisão
+    segredo: int = 0  # na mesa em segredo de justiça: o índice público não tem
+    estados: Counter[str] = field(default_factory=Counter)
+    conclusos: list[int] = field(default_factory=list)  # dias dos conclusos
+    candidatos: Counter[int] = field(default_factory=Counter)  # limite → sem decisão há mais que ele
+    com_data: Counter[int] = field(default_factory=Counter)  # limite → candidatos com o estado determinado
+    acima: Counter[int] = field(default_factory=Counter)  # limite → conclusos há mais que ele
+
+    def somar(self, outra: _ContaCNJ) -> None:
+        self.base += outra.base
+        self.segredo += outra.segredo
+        self.estados.update(outra.estados)
+        self.conclusos += outra.conclusos
+        self.candidatos.update(outra.candidatos)
+        self.com_data.update(outra.com_data)
+        self.acima.update(outra.acima)
+
+    def para_json(self, limites: Sequence[int], minimo: float) -> dict[str, Any]:
+        com_data = sum(self.estados.get(e, 0) for e in COM_DATA)
+        cobertura = round(com_data / self.base, 4) if self.base else None
+        suficiente = cobertura is not None and cobertura >= minimo
+        faixas_saida = []
+        for lim in limites:
+            cand, det = self.candidatos.get(lim, 0), self.com_data.get(lim, 0)
+            cob = round(det / cand, 4) if cand else None
+            ok = cand == 0 or (cob is not None and cob >= minimo)
+            faixas_saida.append({"dias": lim, "candidatos": cand, "com_data": det, "cobertura": cob, "suficiente": ok,
+                                 "conclusos": self.acima.get(lim, 0) if ok else None})
+        ordenados = sorted(self.conclusos)
+        return {
+            "base": self.base, "com_data": com_data, "cobertura": cobertura, "suficiente": suficiente, "segredo": self.segredo,
+            "estados": {e: self.estados.get(e, 0) for e in ESTADOS_CNJ},
+            "conclusos": self.estados.get("c", 0),
+            "mediana": round(percentil(ordenados, 50)) if suficiente and ordenados else None,
+            "p90": round(percentil(ordenados, 90)) if suficiente and ordenados else None,
+            "faixas": faixas_saida,
+        }
+
+
+def camada_cnj(
+    linhas: Iterable[Mapping[str, Any]],
+    registros: Mapping[str, Mapping[str, Any]],
+    regras: Regras,
+    *,
+    data_dados: str | None,
+    listados: Iterable[str] = (),
+) -> dict[str, Any]:
+    """A camada do CNJ sobre a mesa do STJ (o ``cnj.json``, só publicado com ``datajud.publicar``).
+
+    ``linhas``: a mesa de hoje (``datajud.ler_retrato``); ``registros``: o diário do DataJud
+    (número CNJ → registro); ``listados``: os ids dos processos que a página lista (a fila e os mais
+    antigos de cada ministro), que ganham o estado um a um.
+
+    Por ministro e no tribunal (só a grade, como o "sem decisão"): ``base`` (na mesa, público, não
+    suspenso), quantos têm o estado determinado (``com_data``: concluso ou sem conclusão em aberto),
+    a ``cobertura``, os estados, a mediana dos dias de concluso (só com cobertura suficiente) e as
+    **faixas** de ``mesa_dias``: para cada limite, os candidatos (sem decisão registrada há mais que
+    ele: só esses podem estar conclusos há mais que ele), quantos deles têm o estado determinado e,
+    quando a cobertura passa de ``datajud.movimentos.cobertura_minima``, quantos estão conclusos há
+    mais que o limite (senão ``conclusos: null`` e ``suficiente: false``: "cobertura insuficiente")."""
+    composicao: Composicao = regras.composicao["stj"]
+    limites = tuple(int(x) for x in (regras.limiares.get("mesa_dias") or (180, 365)))
+    minimo = float((regras.datajud.get("movimentos") or {}).get("cobertura_minima", 0.80))
+    ref = _data(data_dados) or datetime.now(ZoneInfo("America/Sao_Paulo")).date()
+    grade = {m.id for m in composicao.da_grade()}
+    ministros = {m.id for m in composicao.ministros}  # a grade e os de cargo (Presidência, Vice, Corregedoria)
+    contas: dict[str, _ContaCNJ] = defaultdict(_ContaCNJ)
+    fora = _ContaCNJ()
+    listados = set(listados)
+    processos: dict[str, list[Any]] = {}
+    for x in linhas:
+        rid = str(x.get("relator") or "")
+        conta = contas[rid] if rid in ministros else fora
+        if x.get("segredo"):
+            conta.segredo += 1
+            continue
+        if x.get("sobrestado") or x.get("sem_decisao_dias") is None:
+            continue
+        registro = registros.get(str(x.get("cnj") or ""))
+        estado, dias = estado_cnj(x, registro, ref)
+        conta.base += 1
+        conta.estados[estado] += 1
+        sem = int(x["sem_decisao_dias"])
+        if estado == "c" and dias is not None:
+            conta.conclusos.append(dias)
+        for lim in limites:
+            if sem > lim:
+                conta.candidatos[lim] += 1
+                if estado in COM_DATA:
+                    conta.com_data[lim] += 1
+                    if estado == "c" and dias is not None and dias > lim:
+                        conta.acima[lim] += 1
+        if x.get("id") in listados:
+            data = (registro or {}).get("c") if estado == "c" else (registro or {}).get("a") if estado == "n" else None
+            processos[str(x["id"])] = [estado, dias, data]
+    tribunal = _ContaCNJ()
+    for mid in sorted(contas):
+        if mid in grade:
+            tribunal.somar(contas[mid])
+    todos = _ContaCNJ()
+    for c in contas.values():
+        todos.somar(c)
+    todos.somar(fora)
+    return {
+        "data_dados": data_dados,
+        "limites": list(limites), "cobertura_minima": minimo,
+        "universo": tribunal.para_json(limites, minimo),
+        "mesa_inteira": todos.para_json(limites, minimo),  # com a Presidência, a Vice e os resíduos (a cobertura da carga)
+        "ministros": {mid: contas[mid].para_json(limites, minimo) for mid in sorted(contas)},
+        "processos": {k: processos[k] for k in sorted(processos)},
+    }
+
+
+
+__all__ = ["ESTADOS_CNJ", "Conta", "Contas", "Fluxo", "Resultado", "camada_cnj", "estado_cnj", "faixas", "fluxo_stf", "fluxo_stj",
+           "fracao", "idade", "link_oficial", "mini_folha", "montar", "razao"]

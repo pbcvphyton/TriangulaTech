@@ -277,6 +277,11 @@ class ColetorTribunais(Coletor):
                     v = c["recusa_espera_s"]
                     self._recusa_host[h.lower()] = float(v) if v is not None else None
         self.robots_validade_h = float(robots_validade_h if robots_validade_h is not None else fontes.get("robots_validade_h", 24))
+        # Hosts de API sem arquivo de regras (``robots: api`` no config): o /robots.txt responde 4xx
+        # porque a API pede credencial em todo caminho (o DataJud é um Elasticsearch: 401 sem a chave,
+        # 403 com ela, "robots.txt" lido como nome de índice). RFC 9309, §2.3.1.3: 4xx = sem regras.
+        # Os outros hosts seguem como sempre: 401/403/429 no robots.txt param o host.
+        self._robots_api = {h.lower() for h, c in hosts_cfg.items() if (c or {}).get("robots") == "api"}
         self.proibidos = tuple(proibidos if proibidos is not None else (fontes.get("proibidos") or ()))
         self.agente = agente or net.USER_AGENT
         self._baixar = baixar
@@ -324,10 +329,15 @@ class ColetorTribunais(Coletor):
                 resp = self._com_recusa(endereco, lambda: self.fetch(endereco, timeout=30.0, retries=1, headers={"Accept": "text/plain, */*"}), robots=True)
                 texto = resp.text()
             except RecusaDoHost as exc:
-                self._hosts_fora[host] = exc
-                raise
+                if host in self._robots_api:
+                    texto = self._sem_regras(host, exc)
+                else:
+                    self._hosts_fora[host] = exc
+                    raise
             except FetchError as exc:
-                if exc.status is not None and 400 <= exc.status < 500 and exc.status not in (401, 403, 429):
+                if host in self._robots_api and exc.status is not None and 400 <= exc.status < 500 and exc.status != 429:
+                    texto = self._sem_regras(host, exc)
+                elif exc.status is not None and 400 <= exc.status < 500 and exc.status not in (401, 403, 429):
                     texto = ""  # robots.txt ausente (404): tudo permitido
                 else:
                     erro = FetchError(url, f"robots.txt de {host} inacessível ({exc}); nada foi pedido ao host", exc.status)
@@ -337,6 +347,11 @@ class ColetorTribunais(Coletor):
         robots = ler_robots(texto)
         self._robots[host] = robots
         return robots
+
+    def _sem_regras(self, host: str, exc: FetchError) -> str:
+        log.info("Tribunais: %s é uma API sem robots.txt (HTTP %s no /robots.txt): sem regras (RFC 9309, §2.3.1.3); valem as do termo de uso",
+                 host, exc.status)
+        return ""
 
     def permitido(self, url: str) -> bool:
         """``url`` pode ser pedida (lista de proibidos e robots.txt)? Lê o robots.txt se preciso."""

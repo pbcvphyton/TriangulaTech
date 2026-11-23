@@ -584,7 +584,39 @@ def atualizar(coletor: Any, regras: Any, pasta: Path | str | None = None) -> dic
     url = modelo_url.format(versao=numero)
     caminho = coletor.arquivo_grande(url, validade_h=24.0 * 7)
     versao = atualizar_de_dump(caminho, pasta, data_versao=publicada or data_pagina, fonte=url)
+    gravar_movimentos(caminho, pasta)  # a árvore de movimentos (o DataJud lê), da mesma versão
     return {"mudou": bool(versao.get("gravados")), "versao": versao}
+
+
+# ── a árvore de movimentos (para o DataJud) ──────────────────────────────────────────────────
+
+MOVIMENTOS = "movimentos.json"
+
+
+def compactar_movimentos(tabelas: dict[str, list[dict[str, Any]]]) -> list[list[Any]]:
+    """Os movimentos da TPU (itens ``M``) como ``[codigo, pai, "nome"]`` (``0`` no fim se inativo).
+    Duas raízes: 1 Magistrado (decisão, despacho, julgamento) e 14 Serventuário (51 Conclusão
+    fica em 14 › 48)."""
+    itens = []
+    for r in tabelas.get("ITENS") or []:
+        if r.get("tipo_item") != "M":
+            continue
+        pai = r.get("cod_item_pai")
+        item: list[Any] = [int(r["cod_item"]), int(pai) if pai not in (None, "") else None, _nome(r.get("nome"))]
+        if (r.get("situacao") or "A").strip().upper() != "A":
+            item.append(0)
+        itens.append(item)
+    itens.sort(key=lambda x: x[0])
+    return itens
+
+
+def gravar_movimentos(dump: Path | str, pasta: Path | str | None = None) -> bool:
+    """Refaz ``movimentos.json`` em ``pasta`` a partir do dump do SGT (só grava se mudou)."""
+    pasta = Path(pasta) if pasta is not None else PASTA
+    itens = compactar_movimentos(ler_dump(dump, ("ITENS",)))
+    if not itens:
+        raise ValueError(f"dump do SGT sem movimentos: {dump}")
+    return _gravar_texto(pasta / MOVIMENTOS, _por_linha(itens))
 
 
 def iterar_linhas_stf(texto: str | None) -> Iterator[str]:

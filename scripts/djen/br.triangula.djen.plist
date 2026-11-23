@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DJEN na máquina do dono (macOS): a tarefa agendada do launchd. O instalar.sh troca @REPO@ e
+  @CACHE@ pelos caminhos e grava em ~/Library/LaunchAgents/. Roda às 8h17 e às 20h47 (hora do Mac);
+  com o Mac dormindo na hora, roda quando ele acorda. Nada é enviado além de data/tribunais/djen.json.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>br.triangula.djen</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>@REPO@/scripts/djen/rodar_djen.sh</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>QIJ_DJEN_REPO</key>
+    <string>@REPO@</string>
+    <key>QIJ_DJEN_CACHE</key>
+    <string>@CACHE@</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict>
+      <key>Hour</key>
+      <integer>8</integer>
+      <key>Minute</key>
+      <integer>17</integer>
+    </dict>
+    <dict>
+      <key>Hour</key>
+      <integer>20</integer>
+      <key>Minute</key>
+      <integer>47</integer>
+    </dict>
+  </array>
+  <key>RunAtLoad</key>
+  <false/>
+  <key>LowPriorityIO</key>
+  <true/>
+  <key>Nice</key>
+  <integer>10</integer>
+  <key>StandardOutPath</key>
+  <string>@CACHE@/logs/launchd.log</string>
+  <key>StandardErrorPath</key>
+  <string>@CACHE@/logs/launchd.log</string>
+</dict>
+</plist>

@@ -280,6 +280,17 @@
       h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, faixas.map(function (f, i) { return h('span', { text: (nomes[i] || f[0]).replace(' meses', ' m').replace(' anos', ' a') }); }))
     ];
   }
+  /* A camada do CNJ (DataJud), só quando publicada (M.cnj): ["c", dias, "AAAA-MM-DD"] → "concluso há N dias" (o texto de render/tribunais.py, _texto_cnj) */
+  function textoCnj(id) {
+    var c = (M.cnj || {})[id];
+    if (!c || !c.length) return '';
+    if (c[0] === 'c' && c[1] != null) return 'concluso há ' + dias(c[1]) + (c[2] ? ', desde ' + dataBr(c[2]) : '');
+    if (c[0] === 'n') return 'sem conclusão em aberto' + (c[2] ? '; último despacho ou decisão em ' + mesAno(c[2]) : '');
+    if (c[0] === 'd') return 'o CNJ ainda não tem a última distribuição ou decisão';
+    if (c[0] === 'a') return 'fora do índice público';
+    if (c[0] === 'x') return 'movimento fora da tabela do CNJ';
+    return '';
+  }
   function itemFila(f, t, de) {
     var dd = diasDe(f, t), datas = f.datas || {}, extras = [];
     var a = partesFolha(f, 'ativo'), b = partesFolha(f, 'passivo');
@@ -294,7 +305,7 @@
     return h('li', {}, [
       h('p', { cls: 'tb-fi-d' }, [dd == null ? '—' : num(dd), h('small', { text: dd == null ? '' : 'dias' })]),  /* vista: a fonte não dá o dia; a pauta troca os dois pela sessão */
       h('p', { cls: 'tb-fi-p' }, [num1, area(f.area)]),
-      h('p', { cls: 'tb-fi-x', text: extras.join(' · ') })
+      h('p', { cls: 'tb-fi-x' }, [extras.join(' · '), t === 'stj' && textoCnj(f.id) ? h('span', { cls: 'tb-cnj' }, [' ', h('span', { cls: 'az-selo', text: 'CNJ' }), ' ' + textoCnj(f.id)]) : null])
     ]);
   }
   function montarDossie(dz, x) {
@@ -428,6 +439,8 @@
     } else if (datas.andamento) {
       marcos.push(marco('Concluso ao relator', datas.andamento, 'ok'));
     }
+    var cj = t === 'stj' ? (M.cnj || {})[f.id] : null;
+    if (cj && cj[0] === 'c' && cj[2]) marcos.push(marco('Concluso (CNJ · DataJud)', cj[2], 'ok', datas.ultima_decisao || datas.distribuicao || datas.autuacao));
     var ultimo = marcos.length ? marcos[marcos.length - 1].iso : null;
     marcos.push({ nome: 'No arquivo do dia', iso: hoje, cls: 'agora', dias: ultimo ? entre(ultimo, hoje) : null });
     var flags = Object.keys(f.flags || {}).filter(function (k) { return f.flags[k] === true; });

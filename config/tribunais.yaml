@@ -519,7 +519,10 @@ fontes:
     portal.stf.jus.br: {pausa_s: 1}
     jurisprudencia.stf.jus.br: {pausa_s: 1}
     www.cnj.jus.br: {pausa_s: 1}
-    api-publica.datajud.cnj.jus.br: {pausa_s: 0.5, recusa_espera_s: null}   # 3.13 do termo: até 120/min; 403 ali é chave, não taxa
+    # O DataJud é um Elasticsearch puro: não tem robots.txt (o /robots.txt responde 401 sem a chave e 403
+    # com ela, "robots.txt" lido como nome de índice; conferido em 23/11/2026). robots: api = 4xx no
+    # robots.txt vale "sem regras" (RFC 9309, §2.3.1.3); as regras do host são as do termo de uso.
+    api-publica.datajud.cnj.jus.br: {pausa_s: 0.5, recusa_espera_s: null, robots: api}   # 3.13 do termo: até 120/min; 403 ali é chave, não taxa
   # Nunca, nem que o robots.txt permita (prefixos de URL): a trava do coletor recusa antes de pedir.
   # O link para o leitor humano abrir o processo no tribunal é permitido (links_oficiais).
   proibidos:
@@ -563,28 +566,97 @@ fontes:
   djen: {ativo: false}
 
 # ── DataJud (CNJ, API Pública) ───────────────────────────────────────────────────────────────
-# DESLIGADO por padrão. O que a página publica vem do STJ (CC-BY) e do STF. O Termo de Uso da API
-# (v1.2, lido em scratchpad/amostras/termos/datajud_termos_v1.2.txt) diz:
+# LIGADO PARA USO PESSOAL (decisão do dono, 23/11/2026: "não vou distribuir informação; é para uso
+# pessoal"). O Termo de Uso da API (v1.2, lido em scratchpad/amostras/termos/datajud_termos_v1.2.txt):
 #   3.3  "fornecida exclusivamente para fins legais, não comerciais e autorizados";
 #   3.8  "não modificar, distribuir, vender ou explorar comercialmente a API ou qualquer informação
-#        derivada dela" — ao pé da letra, conflita com publicar número derivado;
-#   3.9  "dar ciência ao CNJ de qualquer informação, notícia, estudo, relatório ou documento [...]
-#        disponibilizado ao público em geral" — ligar exige avisar o CNJ;
+#        derivada dela" — o repositório e o site são públicos: o que entra em data/tribunais/ ou na
+#        página é distribuído. Por isso publicar: false;
+#   3.9  "dar ciência ao CNJ de qualquer informação [...] disponibilizado ao público em geral" —
+#        publicar exige avisar o CNJ antes;
 #   3.13 "não realizar mais de 120 requisições por minuto" — o teto do cliente (por_minuto).
-# Além disso, o serviço vive sobrecarregado (22 e 23/11/2026: 16 de 102 e 1 de 22 tentativas
-# completas; 429, 504 e resultados parciais com _shards.failed > 0). Quando ligado, serve só para
-# frescor e conferência (ativos por gabinete × acervo do STJ), exibidos no "Como ler", nunca no
-# caminho crítico. Ligar: ativo: true aqui (decisão do dono, depois de avisar o CNJ, item 3.9).
+# O serviço vive sobrecarregado (22 e 23/11/2026: 16 de 102 e 1 de 22 tentativas completas; em
+# 23/11 de manhã, 0 de 25: 429 e 504). Nada dele está no caminho crítico: falha vira aviso.
+# O que se pede: o frescor do índice, a conferência (ativos por gabinete × acervo do STJ) e os
+# movimentos dos processos na mesa (o "concluso há N dias" do STJ; ver movimentos abaixo).
 datajud:
-  ativo: false
+  ativo: true
+  # publicar: false (padrão) = o DataJud é consultado, o resultado fica só no cache (fora do git) e
+  # nada derivado dele entra em data/tribunais/ nem na página; no meta.json a fonte sai "ligada para
+  # uso pessoal; não publicada", sem número. true = a camada do CNJ vai aos painéis e à página, com
+  # o selo "CNJ · DataJud" (só depois de dar ciência ao CNJ, item 3.9). A variável de ambiente
+  # QIJ_DATAJUD_PUBLICAR=1 liga numa execução (a prévia privada), =0 desliga.
+  publicar: false
   url: "https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search"   # o STF não está no DataJud (404 index_not_found)
   chave: "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="    # pública (wiki do CNJ); a variável DATAJUD_API_KEY a substitui
   chave_wiki: "https://datajud-wiki.cnj.jus.br/api-publica/acesso/"
-  por_minuto: 120                # 3.13
+  por_minuto: 120                # 3.13 (um pedido por vez: o tempo de cada um, de 1 a 60 s, já segura o ritmo)
   timeout_s: 90                  # acima dos 60 s do balanceador do CNJ: o 504 chega, não é cortado aqui
-  tentativas: 6
-  espera_s: [5, 10, 20, 40, 80]  # × aleatório entre 1 − variacao e 1 + variacao; Retry-After vence se vier
+  tentativas: 3                  # frescor e conferência (agregações sobre o índice inteiro); os lotes têm as deles (movimentos)
+  espera_s: [5, 15]              # × aleatório entre 1 − variacao e 1 + variacao; em 23/11 seis tentativas do frescor gastaram 5 min do prazo sem resposta
   variacao: 0.2
   disjuntor: 3                   # consultas seguidas sem resposta completa: DataJud parado nesta execução
-  prazo_s: 720                   # teto do DataJud por execução
+  prazo_s: 900                   # teto do DataJud por execução; dados.py corta ao que sobra do passo (30 min) menos 5 min
   velho_dias: 15                 # o CNJ carrega o índice em lotes irregulares
+  # Os movimentos dos processos na mesa do STJ: a data da última Conclusão (TPU 51, conferida na
+  # tabela de movimentos do SGT: 14 Serventuário › 48 › 51, sem filhos; o tipo vai no complemento
+  # tipo_de_conclusao), do último ato do magistrado (raiz 1 da TPU: decisão 3, julgamento 193,
+  # despacho 11009), da última decisão ou julgamento e do último movimento. Régua da página:
+  # "concluso há N dias (CNJ)" = a última conclusão veio depois do último ato do magistrado E não é
+  # anterior à última distribuição ou decisão que o acervo do STJ registra (contas.camada_cnj).
+  movimentos:
+    ativo: true
+    lote: 500                    # números CNJ por consulta (terms em numeroProcesso.keyword, _source filtrado)
+    pagina: 1000                 # documentos por página do incremental (search_after)
+    tentativas: 4                # por lote
+    espera_s: [5, 15, 30]
+    folga_s: 100                 # não começa lote novo com menos que isto de prazo
+    incremental_fracao: 0.5      # parte do prazo do incremental enquanto a carga inicial não termina
+    campo_incremental: dataHoraUltimaAtualizacao
+    margem_h: 24                 # o incremental olha este tanto antes da marca (carga do índice fora de ordem)
+    reconsultar_ausentes_dias: 7 # número que não estava no índice é pedido de novo depois disto
+    cobertura_minima: 0.80       # faixa "conclusos há mais de 180/365 dias" do ministro só com 80% ou mais dos candidatos com data no CNJ
+
+# ── DJEN: Diário de Justiça Eletrônico Nacional (CNJ) ────────────────────────────────────────
+# Lido só por qijournal/tribunais/djen.py ("python -m qijournal tribunais djen"); o fontes.djen
+# acima é o marcador antigo e não vale mais. Desde 29/11/2024 os atos judiciais do STJ saem no DJEN
+# (Res. STJ/GP 19/2024; a página "Publicações Oficiais do STJ" aponta para
+# comunica.pje.jus.br/consulta?siglaTribunal=STJ&meio=D). O STF tem DJe próprio (Res. STF 700/2020 e
+# 725/2021) e, até onde se sabe, não publica no DJEN: a sonda confere e, sem publicação em
+# sem_publicacao_dias dias úteis seguidos, o djen.json diz "publica: false".
+# A API recusa (403 geográfico, CloudFront) quem está fora do Brasil: roda numa máquina do dono, no
+# Brasil, pela tarefa agendada de scripts/djen/ (nunca no GitHub Actions, nunca por proxy ou VPN).
+# A edição e a aba nunca dependem disto: sem djen.json novo, a aba sai sem a camada.
+djen:
+  ativo: true
+  api: "https://comunicaapi.pje.jus.br/api/v1/comunicacao"
+  consulta: "https://comunica.pje.jus.br/consulta"   # para o leitor (não é coletada)
+  tribunais: [stj, stf]
+  itens_por_pagina: 100          # o máximo que a API aceita
+  pausa_s: 2                     # entre um pedido e o seguinte; o Crawl-delay do robots.txt vence se for maior
+  max_paginas_dia: 150           # 15 mil publicações por tribunal e dia (o STJ publica ~3 mil decisões e acórdãos por dia útil)
+  janela_dias: 30                # dias corridos até ontem
+  dias_por_execucao: 5           # dias novos por execução (a janela enche em uma semana; --completo tira o teto)
+  incluir_hoje: false            # o dia de hoje ainda recebe publicações: só entra fechado, no dia seguinte
+  prazo_s: 2400                  # teto de uma execução (com o acervo refeito)
+  guardar_dias: 40               # o cache da máquina guarda os dias por isto
+  sem_publicacao_dias: 3         # dias úteis fechados sem nada: "o tribunal não publica no DJEN"
+  origem: "coletado no Brasil, fora do GitHub Actions"   # vai no djen.json (público): sem cidade, sem nome
+  atribuicao: "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)"
+  # O casamento com o acervo (a "mesa"): o retrato que o fluxo dos Tribunais deixa no cache; sem ele,
+  # o retrato é refeito uma vez por dia na máquina (o arquivo aberto do STJ, 82 MB, e a planilha do
+  # STF, pelo mesmo coletor: robots.txt e 10 s entre pedidos ao portal do STJ).
+  acervo: {baixar: true, retrato_validade_h: 30}
+  listas: {mesa_por_ministro: 5, partes: 10, partes_ministro: 3, orgaos: 40, tipos_brutos: 30}
+  sonda: {itens: 100, tentativas_dias: 3, amostra: 12}
+  # O tipo de cada publicação: o primeiro grupo cujo padrão (texto sem acento, maiúsculo) aparece no
+  # tipoDocumento; tipoDocumento genérico ("Intimação"): as três primeiras linhas do texto. Edital
+  # também pelo tipoComunicacao. O resto é "outros" (e a contagem crua fica em cobertura.tipos_brutos,
+  # para afinar esta lista depois da primeira coleta no Brasil).
+  tipos:
+    - {id: pauta, nome: "Pautas de julgamento", padroes: ["PAUTA", "SESSAO DE JULGAMENTO", "SESSAO VIRTUAL"]}
+    - {id: distribuicao, nome: "Distribuição", padroes: ["DISTRIBUICAO"]}
+    - {id: acordao, nome: "Acórdãos", padroes: ["ACORDAO", "EMENTA"]}
+    - {id: decisao, nome: "Decisões", padroes: ["DECISAO", "SENTENCA", "MONOCRATICA"]}
+    - {id: despacho, nome: "Despachos", padroes: ["DESPACHO", "ATO ORDINATORIO"]}
+    - {id: edital, nome: "Editais", padroes: ["EDITAL"]}

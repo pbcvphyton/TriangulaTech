@@ -1,0 +1,71 @@
+{
+ "status": "success",
+ "message": "Sucesso",
+ "count": 3812345,
+ "itens": [
+  {
+   "id": 9001,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "TJSP",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "Foro Central Cível - 1ª Vara Cível",
+   "idOrgao": 70001,
+   "texto": "<p>AREsp 0000001/SP</p><p>DECISÃO</p><p>Cuida-se de agravo interposto por CARLOS EXEMPLO SOUZA contra decisão que inadmitiu o recurso especial.</p><p>Ante o exposto, conheço do agravo e nego provimento ao recurso especial.</p><p>Brasília, 19 de novembro de 2026.</p><p>MINISTRA NANCY ANDRIGHI</p><p>Relatora</p>",
+   "numero_processo": "00000010020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Decisão",
+   "nomeClasse": "AGRAVO EM RECURSO ESPECIAL",
+   "codigoClasse": "11881",
+   "numeroComunicacao": 1,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000001-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9001,
+     "nome": "BANCO DO BRASIL S/A",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9001,
+     "nome": "CARLOS EXEMPLO SOUZA",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9001,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    },
+    {
+     "id": 102,
+     "comunicacao_id": 9001,
+     "advogado_id": 502,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 502,
+      "nome": "ADVOGADO 2 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  }
+ ]
+}

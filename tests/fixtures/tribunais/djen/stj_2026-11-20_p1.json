@@ -1,0 +1,301 @@
+{
+ "status": "success",
+ "message": "Sucesso",
+ "count": 7,
+ "items": [
+  {
+   "id": 9001,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "GABINETE DA MINISTRA NANCY ANDRIGHI",
+   "idOrgao": 70001,
+   "texto": "<p>AREsp 0000001/SP</p><p>DECISÃO</p><p>Cuida-se de agravo interposto por CARLOS EXEMPLO SOUZA contra decisão que inadmitiu o recurso especial.</p><p>Ante o exposto, conheço do agravo e nego provimento ao recurso especial.</p><p>Brasília, 19 de novembro de 2026.</p><p>MINISTRA NANCY ANDRIGHI</p><p>Relatora</p>",
+   "numero_processo": "00000010020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Decisão",
+   "nomeClasse": "AGRAVO EM RECURSO ESPECIAL",
+   "codigoClasse": "11881",
+   "numeroComunicacao": 1,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000001-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9001,
+     "nome": "BANCO DO BRASIL S/A",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9001,
+     "nome": "CARLOS EXEMPLO SOUZA",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9001,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    },
+    {
+     "id": 102,
+     "comunicacao_id": 9001,
+     "advogado_id": 502,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 502,
+      "nome": "ADVOGADO 2 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9002,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "TERCEIRA TURMA",
+   "idOrgao": 70002,
+   "texto": "<p>RECURSO ESPECIAL Nº 0000002 - SP (2026/0000002-0)</p><p>RELATORA : MINISTRA NANCY ANDRIGHI</p><p>RECORRENTE : MARIA MODELO 12345678909</p><p>RECORRIDO : INSTITUTO NACIONAL DO SEGURO SOCIAL - INSS</p><p>EMENTA</p><p>DIREITO PREVIDENCIÁRIO. Texto da ementa (sintético).</p><p>Precedente: AgInt no REsp 1/SP, Relator Ministro RAUL ARAÚJO, Quarta Turma.</p>",
+   "numero_processo": "00000020020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Acórdão",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "codigoClasse": "1032",
+   "numeroComunicacao": 2,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000002-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9002,
+     "nome": "MARIA MODELO 12345678909",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9002,
+     "nome": "INSTITUTO NACIONAL DO SEGURO SOCIAL - INSS",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9002,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9003,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "COORDENADORIA DA QUINTA TURMA",
+   "idOrgao": 70003,
+   "texto": "<p>PAUTA DE JULGAMENTOS</p><p>Sessão virtual de 01/12/2026 a 07/12/2026. Processo incluído em pauta (texto sintético).</p>",
+   "numero_processo": "00000030020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Intimação",
+   "nomeClasse": "HABEAS CORPUS",
+   "codigoClasse": "1720",
+   "numeroComunicacao": 3,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000003-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9003,
+     "nome": "CARLOS EXEMPLO SOUZA",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9003,
+     "nome": "MINISTÉRIO PÚBLICO FEDERAL",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9003,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9004,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "PRESIDÊNCIA",
+   "idOrgao": 70004,
+   "texto": "<p>DECISÃO</p><p>Agravo que não impugnou especificamente os fundamentos da decisão de admissibilidade (texto sintético).</p><p>MINISTRO PRESIDENTE DO STJ</p>",
+   "numero_processo": "00000040020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Decisão",
+   "nomeClasse": "AGRAVO EM RECURSO ESPECIAL",
+   "codigoClasse": "11881",
+   "numeroComunicacao": 4,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000004-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9004,
+     "nome": "CAIXA ECONÔMICA FEDERAL",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9004,
+     "nome": "PARTE EXEMPLO LTDA",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9004,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    },
+    {
+     "id": 102,
+     "comunicacao_id": 9004,
+     "advogado_id": 502,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 502,
+      "nome": "ADVOGADO 2 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9005,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "GABINETE DO MINISTRO RAUL ARAÚJO FILHO",
+   "idOrgao": 70005,
+   "texto": "<p>DESPACHO</p><p>PROCESSO EM SEGREDO DE JUSTIÇA</p><p>Intimem-se as partes (texto sintético).</p>",
+   "numero_processo": "00000050020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Despacho",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "codigoClasse": "1032",
+   "numeroComunicacao": 5,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000005-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9005,
+     "nome": "A. B. C.",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9005,
+     "nome": "D. E. F.",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9005,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    },
+    {
+     "id": 102,
+     "comunicacao_id": 9005,
+     "advogado_id": 502,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 502,
+      "nome": "ADVOGADO 2 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  }
+ ]
+}

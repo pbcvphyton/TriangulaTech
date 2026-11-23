@@ -2,7 +2,10 @@
 
 :func:`atualizar` roda na ordem do brief: a TPU (só com ``completo``), o **STJ** (acervo, pautas,
 precedentes, atas e íntegras), o **STF** (planilha do acervo, atas, jurisprudência, repercussão
-geral e pauta) e, por último, o **DataJud** (desligado por padrão; nunca no caminho crítico).
+geral e pauta) e, por último, o **DataJud** (ligado para uso pessoal; nunca no caminho crítico): os
+movimentos dos processos na mesa do STJ vão ao cache e viram a camada do CNJ (``cnj.json``, o
+"concluso há N dias") **só** com ``datajud.publicar`` ou ``QIJ_DATAJUD_PUBLICAR=1``; sem isso, nada
+derivado do DataJud entra em ``data/tribunais/`` (o repositório é público; termo de uso, item 3.8).
 
 Regras da casa (as mesmas do Congresso, mais estritas onde o dado é mais frágil):
 
@@ -65,6 +68,8 @@ log = logging.getLogger(__name__)
 
 META = "meta.json"
 ACHADOS = "achados.json"
+CNJ = "cnj.json"  # a camada do DataJud: só existe com datajud.publicar (ou QIJ_DATAJUD_PUBLICAR=1)
+RESERVA_DATAJUD_S = 5 * 60  # o que o DataJud deixa do prazo para a camada, a gravação e a página
 MINISTROS = "ministros"
 PASTA_TPU = "tpu"
 TETO_JSON = 300_000  # contrato §9: cada JSON de data/tribunais/
@@ -941,6 +946,84 @@ def _numeros(t: Tribunal) -> dict[str, Any]:
             "ministros": len(p.get("ministros") or ()), "dossies": len(t.dossies)}
 
 
+# ── DataJud (o gancho) ───────────────────────────────────────────────────────
+
+
+def _retrato_stj(r: Rodada, tribunais: Mapping[str, Tribunal], painel: Mapping[str, Any] | None) -> Path | None:
+    """O retrato do acervo do STJ que corresponde ao painel em uso (o de hoje ou o da véspera)."""
+    data = (painel or {}).get("data_dados")
+    if data:
+        caminho = r.cache / "retratos" / f"stj-{data}.tsv.gz"
+        if caminho.is_file():
+            return caminho
+    t = tribunais.get("stj")
+    return t.retrato if t is not None and t.retrato is not None and t.retrato.is_file() else None
+
+
+def _listados_stj(r: Rodada, tribunais: Mapping[str, Tribunal], painel: Mapping[str, Any] | None) -> set[str]:
+    """Os ids dos processos que a página lista no STJ: a fila e os mais antigos de cada ministro
+    (do painel e dos dossiês)."""
+    ids = {str(f.get("id")) for f in ((painel or {}).get("fila") or {}).get("mais_antigos") or []}
+    for m in (painel or {}).get("ministros") or []:
+        ids |= {str(f.get("id")) for f in m.get("mais_antigos") or []}
+    t = tribunais.get("stj")
+    dossies: Iterable[Mapping[str, Any]]
+    if t is not None and t.painel is not None:
+        dossies = t.dossies.values()
+    else:
+        dossies = [d for d in (ler_json(c) for c in sorted((r.pasta / MINISTROS).glob("stj-*.json"))) if isinstance(d, dict)]
+    for d in dossies:
+        ids |= {str(f.get("id")) for f in d.get("mais_antigos") or []}
+    ids.discard("None")
+    return ids
+
+
+def _cobertura_cnj(camada: Mapping[str, Any]) -> dict[str, Any]:
+    """O resumo da camada do CNJ para ``meta.json → cobertura.stj.datajud.movimentos``."""
+    u = camada.get("mesa_inteira") or {}
+    f = camada.get("fonte") or {}
+    return {"base": u.get("base"), "com_data": u.get("com_data"), "cobertura": u.get("cobertura"), "estados": u.get("estados"),
+            "segredo": u.get("segredo"), "indice_ate": f.get("indice_ate"), "execucoes_restantes": f.get("execucoes_restantes")}
+
+
+def _datajud(r: Rodada, tribunais: Mapping[str, Tribunal], painel_stj: Mapping[str, Any] | None) -> tuple[datajud.Resultado, dict[str, Any] | None]:
+    """A rodada do DataJud e, quando ele trouxe a mesa, a camada do CNJ (``contas.camada_cnj``).
+
+    A camada sempre vai para o cache (``<cache>/datajud/camada.json``: o uso pessoal); para a pasta
+    pública (``cnj.json``) só com ``datajud.publicar`` ou ``QIJ_DATAJUD_PUBLICAR=1``."""
+    regras = r.regras
+    publicar = datajud.deve_publicar(regras, r.opcoes.ambiente)
+    anterior_cob = ((r.anterior.get("cobertura") or {}).get("stj") or {})
+    prazo = float(regras.datajud.get("prazo_s") or 720)
+    prazo = max(0.0, min(prazo, r.restante() - RESERVA_DATAJUD_S))
+    pasta_tpu = r.pasta / PASTA_TPU if (r.pasta / PASTA_TPU / tpu_mod.MOVIMENTOS).is_file() else None
+    dj = datajud.atualizar(regras, r.coletor, agora=r.agora, hoje=r.hoje, anterior_fonte=r.fonte_anterior("datajud") or None,
+                           anterior_conferencia=anterior_cob.get("datajud"), painel_stj=painel_stj, ambiente=r.opcoes.ambiente,
+                           cache=r.cache, retrato=_retrato_stj(r, tribunais, painel_stj), pasta_tpu=pasta_tpu, publicar=publicar,
+                           prazo_s=prazo)
+    if dj.linhas is None or dj.registros is None or painel_stj is None:
+        return dj, None
+    camada = contas.camada_cnj(dj.linhas, dj.registros, regras, data_dados=painel_stj.get("data_dados"),
+                               listados=_listados_stj(r, tribunais, painel_stj))
+    frescor = dj.frescor or {}
+    camada = {
+        "v": VERSAO, "trib": "stj",
+        "fonte": {"nome": datajud.NOME, "selo": datajud.SELO, "atribuicao": datajud.ATRIBUICAO, "url": datajud.URL_LEITOR,
+                  "indice_ate": (frescor.get("max_timestamp") or "")[:10] or None, "max_atualizacao": frescor.get("max_atualizacao"),
+                  "coletado_em": dj.coletado_em, "execucoes_restantes": dj.execucoes},
+        **camada,
+    }
+    try:  # a cópia de uso pessoal, no cache (fora do git)
+        destino = r.cache / "datajud" / "camada.json"
+        destino.parent.mkdir(parents=True, exist_ok=True)
+        _gravar(destino, _json(camada))
+    except OSError as exc:
+        log.warning("Tribunais: a camada do DataJud não foi gravada no cache (%s)", exc)
+    if not publicar:
+        return dj, None
+    return dj, camada
+
+
 def atualizar(
     root: Path | None,
     data_dir: Path,
@@ -972,16 +1055,15 @@ def atualizar(
             continue
         tribunais[trib] = rodar(r)
 
-    # DataJud (o último; desligado por padrão): a conferência usa o painel do STJ em uso.
+    # DataJud (o último): a conferência usa o painel do STJ em uso; os movimentos, a mesa dele.
     painel_stj = (tribunais.get("stj") and tribunais["stj"].painel) or ler_json(pasta / "stj.json")
-    anterior_cob = ((r.anterior.get("cobertura") or {}).get("stj") or {})
-    dj = datajud.atualizar(regras, coletor, agora=r.agora, hoje=r.hoje, anterior_fonte=r.fonte_anterior("datajud") or None,
-                           anterior_conferencia=anterior_cob.get("datajud"), painel_stj=painel_stj if isinstance(painel_stj, dict) else None,
-                           ambiente=opcoes.ambiente)
+    painel_stj = painel_stj if isinstance(painel_stj, dict) else None
+    dj, camada = _datajud(r, tribunais, painel_stj)
     resultado.datajud = dj.log
+    fixos = {CNJ: _json(camada)} if camada is not None else {}
 
     # Os arquivos de hoje (em memória), com os tetos conferidos.
-    por_trib = _conferir_tamanhos(r, tribunais, {})
+    por_trib = _conferir_tamanhos(r, tribunais, fixos)
     refeitos = {trib: tribunais[trib] for trib in por_trib}
     # As fontes de cada tribunal: as de hoje quando o painel foi refeito; senão, só o aviso do
     # acervo, e as acessórias ficam como estavam (são as do painel que continua publicado).
@@ -1008,10 +1090,11 @@ def atualizar(
             cobertura[trib] = dict(refeitos[trib].cobertura)  # type: ignore[arg-type]
         elif isinstance(anterior_cobertura.get(trib), dict):
             cobertura[trib] = dict(anterior_cobertura[trib])
-    if dj.conferencia is not None:
-        cobertura.setdefault("stj", {})["datajud"] = dj.conferencia
+    if dj.conferencia is not None or camada is not None:
+        cobertura.setdefault("stj", {})["datajud"] = {**(dj.conferencia or {}),
+                                                     **({"movimentos": _cobertura_cnj(camada)} if camada is not None else {})}
     elif "stj" in cobertura:
-        cobertura["stj"].pop("datajud", None)
+        cobertura["stj"].pop("datajud", None)  # sem publicar: nada do DataJud no meta.json
     avisos = [f"{f['nome']}: {f['aviso']}" for f in fontes.values() if f.get("aviso") and f.get("ok") is not None]
     coletados = [f["coletado_em"] for f in fontes.values() if f.get("ok") and f.get("coletado_em")]
     meta = {
@@ -1033,6 +1116,10 @@ def atualizar(
             arquivos[rel] = arqs[rel]
         novos = {Path(rel).name for rel in arqs if rel.startswith(MINISTROS)}
         apagar += [c for c in sorted((pasta / MINISTROS).glob(f"{trib}-*.json")) if c.name not in novos]
+    if camada is not None and CNJ in fixos:
+        arquivos[CNJ] = fixos[CNJ]
+    else:
+        apagar.append(pasta / CNJ)  # sem publicar, a camada do CNJ sai da pasta pública
     arquivos[ACHADOS] = _json(achados)
     arquivos[META] = _json(meta)
     for rel in (ACHADOS, META):

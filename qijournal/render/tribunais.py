@@ -50,7 +50,7 @@ AREAS_NO_CARTAO = 8  # barras ordenadas no cartão do ministro; as demais somam 
 PARTES_DA_DIGITAL = 5  # a impressão digital da mesa: as 5 maiores áreas + "outras" (no máximo 6 partes: designer.md §2.2)
 MINISTROS_POR_AREA = 12  # na aba Assuntos, quantos ministros cada área mostra (os demais, somados)
 FILA_NA_PAGINA = 30  # a fila do tribunal inteiro (o painel traz até limiares.listas.fila_mais_antigos)
-ARQUIVOS = {"meta": "meta.json", "achados": "achados.json"}  # e "<trib>.json", "ministros/<id>.json"
+ARQUIVOS = {"meta": "meta.json", "achados": "achados.json", "cnj": "cnj.json"}  # e "<trib>.json", "ministros/<id>.json"
 NOMES = {"stj": "Superior Tribunal de Justiça", "stf": "Supremo Tribunal Federal"}
 ONDE = {
     "gabinete": "no gabinete (na mesa)",
@@ -99,6 +99,7 @@ class Dados:
     meta: dict[str, Any]
     paineis: dict[str, dict[str, Any]]  # "stf"/"stj" → o painel (só os que existem, na versão certa)
     achados: list[dict[str, Any]]
+    cnj: dict[str, Any] | None = None  # a camada do DataJud (cnj.json): só quando publicada
 
 
 def _ler(caminho: Path) -> Any | None:
@@ -124,7 +125,23 @@ def carregar(data_dir: Path) -> Dados | None:
         return None
     bruto = _ler(pasta / ARQUIVOS["achados"])
     achados = bruto.get("achados") if isinstance(bruto, dict) and bruto.get("v") == VERSAO else None
-    return Dados(meta=meta, paineis=paineis, achados=[a for a in achados or [] if isinstance(a, dict)])
+    return Dados(meta=meta, paineis=paineis, achados=[a for a in achados or [] if isinstance(a, dict)], cnj=_camada_cnj(pasta, meta, paineis))
+
+
+def _camada_cnj(pasta: Path, meta: dict[str, Any], paineis: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
+    """O ``cnj.json`` (a camada do DataJud) só quando o ``meta.json`` diz que ela foi publicada e
+    ela é do acervo do STJ em uso: sem as duas coisas, a página não mostra nada do DataJud."""
+    fonte = (meta.get("fontes") or {}).get("datajud") or {}
+    if fonte.get("publicado") is not True or "stj" not in paineis:
+        return None
+    cnj = _ler(pasta / ARQUIVOS["cnj"])
+    if not isinstance(cnj, dict) or cnj.get("v") != VERSAO or cnj.get("trib") != "stj":
+        return None
+    if cnj.get("data_dados") != paineis["stj"].get("data_dados"):
+        log.warning("Tribunais: o cnj.json é do acervo de %s e o painel do STJ de %s; a camada do CNJ fica de fora",
+                    cnj.get("data_dados"), paineis["stj"].get("data_dados"))
+        return None
+    return cnj
 
 
 def publicada(out_dir: Path) -> bool:
@@ -400,8 +417,31 @@ def _partes_folha(folha: dict[str, Any], nomes: dict[str, str]) -> str:
     return " · ".join(trechos)
 
 
-def _item_fila(folha: dict[str, Any], trib: str, r: Reguas, nomes: dict[str, str], relatores: dict[str, str], com_relator: bool) -> dict[str, Any]:
-    """Um processo numa lista "o que espera há mais tempo" (a mini-folha arrumada)."""
+def _texto_cnj(item: Any) -> str:
+    """O estado de um processo listado na camada do CNJ (``cnj.json → processos``) em palavras:
+    ``["c", 412, "2025-10-03"]`` → ``"concluso há 412 dias"``. Sem estado (ainda não consultado): vazio."""
+    if not isinstance(item, list) or not item:
+        return ""
+    estado = item[0]
+    dias = item[1] if len(item) > 1 else None
+    data = item[2] if len(item) > 2 else None
+    if estado == "c" and dias is not None:
+        return f"concluso há {_dias(dias)}" + (f", desde {_data(data)}" if data else "")
+    if estado == "n":
+        return "sem conclusão em aberto" + (f"; último despacho ou decisão em {_mes_ano(data)}" if data else "")
+    if estado == "d":
+        return "o CNJ ainda não tem a última distribuição ou decisão"
+    if estado == "a":
+        return "fora do índice público"
+    if estado == "x":
+        return "movimento fora da tabela do CNJ"
+    return ""
+
+
+def _item_fila(folha: dict[str, Any], trib: str, r: Reguas, nomes: dict[str, str], relatores: dict[str, str], com_relator: bool,
+               cnj: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Um processo numa lista "o que espera há mais tempo" (a mini-folha arrumada). ``cnj``: os
+    processos da camada do DataJud (só quando publicada), que dão o "concluso há N dias (CNJ)"."""
     dias = folha.get("sem_decisao_dias") if trib == "stj" else folha.get("concluso_dias")
     datas = folha.get("datas") or {}
     if trib == "stj":
@@ -418,7 +458,7 @@ def _item_fila(folha: dict[str, Any], trib: str, r: Reguas, nomes: dict[str, str
     return {
         "id": str(folha.get("id") or ""), "rotulo": _numero_processo(folha), "link": filters.safe_url(str(folha.get("link") or "")) or "",
         "dias": _num(dias) if dias is not None else "—", "area": area["id"], "area_nome": area["curto"], "relator": rel,
-        "texto": " · ".join(extras),
+        "texto": " · ".join(extras), "cnj": _texto_cnj((cnj or {}).get(str(folha.get("id") or ""))) if trib == "stj" else "",
     }
 
 
@@ -481,6 +521,8 @@ def _fontes(trib: str, meta: dict[str, Any]) -> tuple[list[dict[str, Any]], list
     for fid, f in (meta.get("fontes") or {}).items():
         if not isinstance(f, dict) or f.get("trib") not in (trib, "cnj"):
             continue
+        if fid == "datajud" and trib != "stj":  # o STF não está no DataJud
+            continue
         nome = str(f.get("nome") or fid)
         data = _data(f.get("data_dados"), ano=False)
         velho = False
@@ -488,7 +530,9 @@ def _fontes(trib: str, meta: dict[str, Any]) -> tuple[list[dict[str, Any]], list
             velho = (date.fromisoformat(str(hoje)) - date.fromisoformat(str(f.get("data_dados")))).days > int(f.get("velho_dias") or 9999)
         except (TypeError, ValueError):
             velho = False
-        if f.get("ok") is None:
+        if f.get("ok") is None and f.get("publicado") is False:
+            estado, forma, rotulo = "off", "○", "uso pessoal, não publicado"
+        elif f.get("ok") is None:
             estado, forma, rotulo = "off", "○", "desligada"
         elif f.get("ok") is False:
             estado, forma, rotulo = "erro", "■", (f"falhou hoje; dados de {data}" if data else "falhou; sem dados")
@@ -624,7 +668,36 @@ def _digital(m: dict[str, Any], r: Reguas) -> tuple[list[dict[str, Any]], str]:
 # ── o cartão (a mesa compacta de um ministro) ────────────────────────────────
 
 
-def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str]) -> dict[str, Any]:
+def _faixa_cnj(f: dict[str, Any]) -> dict[str, Any]:
+    """Uma faixa da camada do CNJ (``{"dias", "candidatos", "com_data", "cobertura", "suficiente",
+    "conclusos"}``) em texto: o número só com a cobertura suficiente."""
+    lim = int(f.get("dias") or 0)
+    rot = "1 ano" if lim == 365 else f"{_num(lim)} dias"
+    cand = int(f.get("candidatos") or 0)
+    if not cand:
+        return {"rot": rot, "v": "0", "x": "nenhum processo sem decisão registrada há tanto tempo", "ok": True}
+    if not f.get("suficiente"):
+        return {"rot": rot, "v": "cobertura insuficiente", "ok": False,
+                "x": f"{_pct(f.get('cobertura') or 0)} dos {_num(cand)} sem decisão registrada há mais de {rot} têm a data no CNJ"}
+    return {"rot": rot, "v": _num(f.get("conclusos")), "ok": True,
+            "x": f"de {_num(cand)} sem decisão registrada há mais de {rot}; {_pct(f.get('cobertura'))} com a data no CNJ"}
+
+
+def _bloco_cnj(conta: dict[str, Any] | None, minimo: Any) -> dict[str, Any] | None:
+    """O que a página mostra da camada do CNJ para um ministro ou para o tribunal."""
+    if not isinstance(conta, dict) or not conta.get("base"):
+        return None
+    faixas = [_faixa_cnj(f) for f in conta.get("faixas") or []]
+    cob = conta.get("cobertura")
+    nota = (f"{_num(conta.get('com_data'))} de {_num(conta.get('base'))} processos públicos na mesa ({_pct(cob or 0)}) têm o estado no CNJ"
+            + (f"; mediana do concluso: {_dias(conta['mediana'])}" if conta.get("mediana") is not None else "")
+            + (f"; {_num(conta.get('segredo'))} em segredo de justiça ficam de fora (o índice público não os tem)" if conta.get("segredo") else "")
+            + f". As faixas só saem com {_pct(float(minimo or 0.8))} ou mais dos candidatos com a data.")
+    return {"faixas": faixas, "nota": nota}
+
+
+def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str],
+            cnj: dict[str, Any] | None = None) -> dict[str, Any]:
     ela = m.get("genero") == "f"
     pares_longo, pares_curto = _texto_pares(trib, r.limiares)
     pares_longo = pares_longo.replace("sem ele", "sem ela") if ela else pares_longo
@@ -706,7 +779,9 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
                        "aria": f"{_pct(cel.get('p'), fino=True)} do acervo" + (f"; {pares_curto} {_pct(cel.get('pares'), fino=True)}" if cel.get("pares") is not None else "")})
     outras = max(0, total - sum(int(areas[a].get("n") or 0) for a in maiores[:AREAS_NO_CARTAO]))
     digital, digital_aria = _digital(m, r)
-    antigos = [_item_fila(f, trib, r, nomes, relatores, False) for f in m.get("mais_antigos") or []]
+    cnj_proc = (cnj or {}).get("processos") if trib == "stj" else None
+    antigos = [_item_fila(f, trib, r, nomes, relatores, False, cnj_proc) for f in m.get("mais_antigos") or []]
+    bloco_cnj = _bloco_cnj(((cnj or {}).get("ministros") or {}).get(m["id"]), (cnj or {}).get("cobertura_minima")) if trib == "stj" else None
     sobrestados = int(m.get("sobrestados") or 0)
     fluxo = []
     e = m.get("entradas")
@@ -736,7 +811,7 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
         "sobrestados": (f"Fora desta lista: {_plural(sobrestados, 'processo suspenso', 'processos suspensos')} à espera de um tema repetitivo ou de repercussão geral (não estão parados por escolha do gabinete)."
                         if sobrestados else ""),
         "partes": [{"nome": nomes.get(g) or _humano(g), "n": _num(n)} for g, n in (m.get("partes") or [])],
-        "fluxo": fluxo, "ela": ela, "processos": _num(total),
+        "fluxo": fluxo, "ela": ela, "processos": _num(total), "cnj": bloco_cnj,
     }
 
 
@@ -807,8 +882,37 @@ def _partes(trib: str, p: dict[str, Any], r: Reguas) -> dict[str, Any]:
     }
 
 
-def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str]) -> dict[str, Any]:
+def _fila_cnj(p: dict[str, Any], cnj: dict[str, Any]) -> dict[str, Any] | None:
+    """A tabela da fila com a camada do CNJ: por ministro das Turmas, o "sem decisão registrada" do
+    STJ ao lado do "concluso" do CNJ, nas duas faixas, e o tribunal no topo."""
+    ministros = cnj.get("ministros") or {}
+    grupos = []
+    por_id = {m["id"]: m for m in p.get("ministros") or []}
+    for g in p.get("grupos") or []:
+        if g.get("id") == "pr":
+            continue
+        linhas = []
+        for mid in g.get("ministros") or []:
+            m, c = por_id.get(mid), ministros.get(mid)
+            if not m or not isinstance(c, dict) or not c.get("base"):
+                continue
+            sd = m.get("sem_decisao") or {}
+            faixas = [_faixa_cnj(f) for f in c.get("faixas") or []]
+            linhas.append({"id": mid, "nome": m.get("nome") or mid, "sem": [_num(sd.get("mais_180")), _num(sd.get("mais_365"))],
+                           "cnj": faixas, "cob": _pct(c.get("cobertura") or 0)})
+        if linhas:
+            grupos.append({"nome": g.get("nome"), "linhas": linhas})
+    u = _bloco_cnj(cnj.get("universo"), cnj.get("cobertura_minima"))
+    if not grupos or u is None:
+        return None
+    fonte = cnj.get("fonte") or {}
+    return {"grupos": grupos, "tribunal": u, "selo": str(fonte.get("selo") or "CNJ · DataJud"),
+            "indice": _data(fonte.get("indice_ate")), "acervo": _data(cnj.get("data_dados"))}
+
+
+def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str], cnj: dict[str, Any] | None = None) -> dict[str, Any]:
     fila = p.get("fila") or {}
+    cnj_proc = (cnj or {}).get("processos") if trib == "stj" else None
     grupos = {g["id"]: g for g in p.get("grupos") or []}
     # Idade de cada mesa: do 1º ao 3º quartil, o traço na mediana e o ponto no p90
     linhas = []
@@ -845,7 +949,8 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
     mesa_dias = r.limiares.get("mesa_dias") or [180, 365]
     return {
         "linhas": linhas, "eixo": eixo,
-        "antigos": [_item_fila(f, trib, r, nomes, relatores, True) for f in (fila.get("mais_antigos") or [])[:FILA_NA_PAGINA]],
+        "antigos": [_item_fila(f, trib, r, nomes, relatores, True, cnj_proc) for f in (fila.get("mais_antigos") or [])[:FILA_NA_PAGINA]],
+        "cnj": _fila_cnj(p, cnj) if trib == "stj" and cnj else None,
         "por_grupo": por_grupo, "mesa_dias": [_num(d) for d in mesa_dias],
         "sobrestados": f"{_num(sob.get('total'))} processos suspensos" + (f": {', '.join(motivos)}" if motivos else "") + "." if sob.get("total") else "",
         "vistas": vistas, "rot": "sem decisão registrada" if trib == "stj" else "conclusos ao relator",
@@ -904,6 +1009,39 @@ def _selo_fonte(f: Any) -> str:
     return f"{f.get('nome')}, dados de {data}" if data else str(f.get("nome") or "")
 
 
+def _texto_metodo_cnj(cnj: dict[str, Any], mesa: list[Any]) -> str:
+    """O "Como ler" da camada do CNJ: a régua, de onde vem, a idade do índice e a cobertura de hoje."""
+    fonte = cnj.get("fonte") or {}
+    u = cnj.get("mesa_inteira") or {}
+    acervo, indice = cnj.get("data_dados"), fonte.get("indice_ate")
+    try:
+        atraso = (date.fromisoformat(str(acervo)) - date.fromisoformat(str(indice))).days
+    except (TypeError, ValueError):
+        atraso = None
+    minimo = _pct(float(cnj.get("cobertura_minima") or 0.8))
+    texto = ("O acervo aberto do STJ não diz desde quando o processo está concluso. Essa data vem do DataJud, a base nacional do CNJ "
+             "(API Pública): para cada processo na mesa, a última Conclusão (código 51 da Tabela Processual Unificada de movimentos) e o "
+             "último ato do magistrado (decisão, despacho ou julgamento: a raiz 1 da tabela). \"Concluso há N dias (CNJ)\" só vale quando a "
+             "conclusão veio depois do último ato do magistrado e não é anterior à última distribuição nem à última decisão que o acervo do "
+             f"STJ registra; os dias contam até a data do acervo ({_data(acervo)}), como o \"sem decisão\", e nunca passam dele. ")
+    if indice:
+        texto += (f"O índice do CNJ vai até {_data(indice)}" + (f", {_dias(atraso)} antes do acervo" if atraso and atraso > 0 else "")
+                  + ": processo com distribuição ou decisão mais nova fica sem a data (o CNJ ainda não a tem). ")
+    texto += (f"Processos em segredo de justiça não estão no índice público ({_num(u.get('segredo'))} na mesa hoje) e os suspensos ficam fora, "
+              f"como no \"sem decisão\". Cobertura de hoje: {_num(u.get('com_data'))} de {_num(u.get('base'))} processos públicos na mesa "
+              f"({_pct(u.get('cobertura') or 0)}) têm o estado no CNJ")
+    pend = (u.get("estados") or {}).get("p")
+    if pend:
+        texto += f"; {_num(pend)} ainda não foram consultados (a carga anda em fatias, a cada coleta"
+        if fonte.get("execucoes_restantes"):
+            texto += f"; faltam cerca de {_num(fonte['execucoes_restantes'])}"
+        texto += ")"
+    texto += (f". As faixas de mais de {_num(mesa[0])} e de {_num(mesa[-1])} dias de cada ministro só aparecem quando {minimo} ou mais dos "
+              "candidatos (os sem decisão registrada há mais que o limite) têm a data; abaixo disso a página diz \"cobertura insuficiente\". "
+              f"{fonte.get('atribuicao') or 'Fonte: CNJ, DataJud (API Pública)'}; o CNJ não garante a precisão nem a atualidade dos dados (termo de uso, item 3.6).")
+    return texto
+
+
 # ── o "Como ler" ─────────────────────────────────────────────────────────────
 
 
@@ -959,10 +1097,15 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         ("Recursos internos", "Agravo interno, agravo regimental e embargos de declaração não são processos novos: o processo continua um só. Nas pautas e nas "
          "decisões eles contam como itens."),
     ]
-    if datajud:
+    if datajud and d.cnj is not None:
+        textos.append(("O DataJud (CNJ · DataJud)", _texto_metodo_cnj(d.cnj, mesa)))
+    elif datajud:
         textos.append(("O DataJud", str(datajud.get("aviso") or "O DataJud, a base do CNJ, fica desligado: a página não usa número dele.")))
     textos.append(("O que fica de fora", "O Diário de Justiça Eletrônico Nacional (DJEN) recusa o acesso de fora do Brasil e não é lido nesta fase. "
                    "O valor da causa, a data exata da conclusão no STJ e o andamento processo a processo não estão nas fontes abertas lidas aqui."))
+    if d.cnj is not None:  # com a camada do CNJ, a data da conclusão no STJ não falta mais (falta onde a cobertura não chega)
+        textos = [(t, x.replace("a data exata da conclusão no STJ, ", "").replace("a data exata da conclusão no STJ e ", ""))
+                  if t == "O que fica de fora" else (t, x) for t, x in textos]
     textos.append(("O que isto não diz", "Número de processos não é produtividade nem orientação de quem julga. Acervo grande pode ser herança, prevenção ou "
                    "uma Turma com mais entrada. A área do processo é a que o tribunal registrou, não uma leitura do caso. A página não diz quem tem razão, "
                    "nem como um ministro vai votar. As escolhas editoriais estão escritas aqui para poderem ser contestadas."))
@@ -991,7 +1134,8 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
     for fid, f in fontes.items():
         if not isinstance(f, dict):
             continue
-        estado = "desligada" if f.get("ok") is None else "deu certo" if f.get("ok") else "falhou na última coleta"
+        estado = ("ligada para uso pessoal; não publicada" if f.get("ok") is None and f.get("publicado") is False
+                  else "desligada" if f.get("ok") is None else "deu certo" if f.get("ok") else "falhou na última coleta")
         linhas_fontes.append({"nome": str(f.get("nome") or fid), "url": filters.safe_url(str(f.get("url") or "")) or "", "data": _data(f.get("data_dados")) or "—",
                               "estado": estado, "registros": _num(f.get("registros")) if f.get("registros") is not None else "—",
                               "atribuicao": str(f.get("atribuicao") or "")})
@@ -1117,8 +1261,8 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
                   "liminar": f"{_pct(liminar.get('p'), fino=True)} ({_num(liminar.get('n'))} processos)", "recortes": recortes_valor},
         "pares": pares_longo, "colunas": colunas, "nota_colunas": _nota_colunas(fora_colunas),
         "matriz": _matriz(trib, p, r, colunas), "chips": chips, "lista_mesa": lista_mesa,
-        "cartoes": [_cartao(trib, p, m, r, nomes, relatores) for m in p.get("ministros") or []],
-        "assuntos": _assuntos(trib, p, r, nomes, tpu), "partes": _partes(trib, p, r), "fila": _fila(trib, p, r, nomes, relatores),
+        "cartoes": [_cartao(trib, p, m, r, nomes, relatores, d.cnj) for m in p.get("ministros") or []],
+        "assuntos": _assuntos(trib, p, r, nomes, tpu), "partes": _partes(trib, p, r), "fila": _fila(trib, p, r, nomes, relatores, d.cnj),
         "fluxo": _fluxo(trib, p, d.meta),
         "colunas_grupo": {g.get("id"): sorted(a for a, (n, frac) in (g.get("areas") or {}).items() if frac < 0.01) for g in p.get("grupos") or [] if g.get("id") != "pr"},
     }
@@ -1173,6 +1317,8 @@ def tribunais_view(d: Dados, config: Config) -> dict[str, Any]:
                         "data": (d.paineis.get(t["id"]) or {}).get("data_dados") or hoje}
               for t in tribunais if t["tem"]},
     }
+    if d.cnj is not None:  # a camada do CNJ (só publicada): o estado de cada processo listado no STJ, para os dossiês
+        manifesto["cnj"] = d.cnj.get("processos") or {}
     return {
         "atualizado": _data(hoje), "tribunais": tribunais, "padrao": padrao, "areas_css": areas_css,
         "areas": [{"id": a["id"], "curto": a["curto"], "nome": a["nome"]} for a in r.areas],

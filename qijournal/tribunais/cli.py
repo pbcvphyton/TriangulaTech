@@ -132,6 +132,33 @@ def cmd_pagina(args: argparse.Namespace, config: Config) -> int:
     return EXIT_OK
 
 
+def cmd_djen(args: argparse.Namespace, config: Config) -> int:
+    """``tribunais djen``: o DJEN do STJ e do STF (só roda no Brasil: a API recusa quem está fora).
+    ``--sondar`` faz poucos pedidos e diz o que a API dá; sem ele, coleta os dias que faltam e grava
+    ``data/tribunais/djen.json``. Recusa e falha de fonte viram aviso e o comando sai 0."""
+    if not config.tribunais_ativo:
+        log.info("Tribunais desligado para a marca %s (ou QIJ_NO_TRIBUNAIS); nada a fazer", config.brand.key)
+        return EXIT_OK
+    from . import djen  # import tardio: só este comando usa
+
+    agora = _agora(args)
+    if args.sondar:
+        relatorio = djen.sondar(config.root, Path(args.cache), agora=agora, dia=args.dia)
+        print(djen.relatorio_da_sonda(relatorio))
+        return EXIT_OK
+    resultado = djen.executar(config.root, Path(args.dir), Path(args.cache), agora=agora, completo=args.completo, so=args.so,
+                              acervo=[Path(a) for a in args.acervo], sem_acervo=args.sem_acervo)
+    if not resultado.ativo:
+        log.info("DJEN desligado em config/tribunais.yaml (djen.ativo); nada a fazer")
+        return EXIT_OK
+    for aviso in resultado.avisos:
+        log.warning("%s", aviso)
+    coletados = "; ".join(f"{t.upper()}: {len(d)} dia(s)" for t, d in resultado.coletados.items()) or "nenhum dia novo"
+    log.info("DJEN: %s; %d requisições em %.1f min; djen.json %s", coletados, resultado.requisicoes, resultado.segundos / 60,
+             f"gravado em {resultado.caminho}" if resultado.gravado else "sem mudança")
+    return EXIT_OK
+
+
 def add_parser(commands: argparse._SubParsersAction, common: argparse.ArgumentParser, iso_datetime) -> None:
     tribunais = commands.add_parser("tribunais", help="analítico dos Tribunais: acervo do STF e do STJ e a aba Tribunais")
     sub = tribunais.add_subparsers(dest="tribunais_command", required=True, metavar="ação")
@@ -147,3 +174,15 @@ def add_parser(commands: argparse._SubParsersAction, common: argparse.ArgumentPa
     pagina = sub.add_parser("pagina", parents=[common], help="só refaz a aba a partir de data/tribunais/ (sem rede)")
     pagina.add_argument("--dir", default=".", metavar="DIR", help="pasta publicada (padrão: .)")
     pagina.set_defaults(handler=cmd_pagina)
+
+    djen = sub.add_parser("djen", parents=[common], help="DJEN (CNJ): as publicações do STJ e do STF por ministro (roda no Brasil)")
+    djen.add_argument("--dir", default=".", metavar="DIR", help="pasta publicada; grava DIR/data/tribunais/djen.json (padrão: .)")
+    djen.add_argument("--cache", default=CACHE_PADRAO, metavar="DIR", help=f"pasta do que foi coletado, fora do git (padrão: {CACHE_PADRAO})")
+    djen.add_argument("--sondar", action="store_true", help="poucos pedidos: a API responde? STJ e STF publicam? grava a amostra mascarada")
+    djen.add_argument("--dia", default=None, metavar="AAAA-MM-DD", help="com --sondar: o dia a sondar (padrão: o último dia útil)")
+    djen.add_argument("--completo", action="store_true", help="coleta todos os dias que faltam na janela (sem o teto por execução)")
+    djen.add_argument("--so", choices=("stj", "stf"), default=None, help="só um tribunal")
+    djen.add_argument("--acervo", action="append", default=[], metavar="DIR", help="pasta com retratos do acervo (retratos/<trib>-AAAA-MM-DD.tsv.gz)")
+    djen.add_argument("--sem-acervo", action="store_true", help="não casa com o acervo (sai sem a mesa) e não baixa o acervo")
+    djen.add_argument("--now", type=iso_datetime, metavar="ISO", help="data/hora de referência (sem fuso = UTC)")
+    djen.set_defaults(handler=cmd_djen)

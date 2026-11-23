@@ -1,0 +1,15 @@
+# DJEN na máquina do dono (Linux, systemd do usuário): o serviço que o triangula-djen.timer chama.
+# O instalar.sh troca @REPO@ e @CACHE@ e grava em ~/.config/systemd/user/.
+[Unit]
+Description=Triangula: coleta do DJEN (STJ e STF) e envio do djen.json
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=QIJ_DJEN_REPO=@REPO@
+Environment=QIJ_DJEN_CACHE=@CACHE@
+ExecStart=/bin/bash @REPO@/scripts/djen/rodar_djen.sh
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=3h

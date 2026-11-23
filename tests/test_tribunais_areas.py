@@ -126,8 +126,8 @@ def test_config_com_erro_derruba_com_o_caminho(bruto: dict) -> None:
         de_dict(mal)
 
 
-def test_datajud_desligado_por_padrao(regras: Regras) -> None:
-    assert regras.datajud["ativo"] is False and regras.datajud["por_minuto"] == 120
+def test_datajud_ligado_para_uso_pessoal_sem_publicar(regras: Regras) -> None:
+    assert regras.datajud["ativo"] is True and regras.datajud["publicar"] is False and regras.datajud["por_minuto"] == 120
     assert regras.pausa_do_host("dadosabertos.web.stj.jus.br") == 10.0
     assert regras.pausa_do_host("portal.stf.jus.br") == 1.0
     assert "https://dadosabertos.web.stj.jus.br/api/" in regras.fontes["proibidos"]
