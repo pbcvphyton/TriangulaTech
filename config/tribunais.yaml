@@ -606,7 +606,7 @@ datajud:
   # anterior à última distribuição ou decisão que o acervo do STJ registra (contas.camada_cnj).
   movimentos:
     ativo: true
-    lote: 500                    # números CNJ por consulta (terms em numeroProcesso.keyword, _source filtrado)
+    lote: 1000                   # números CNJ por consulta (terms em numeroProcesso.keyword, _source filtrado); 23/11: 500 → 1 MB em 53 s; 1.000 parcial → 0,6–1,1 MB em 55–61 s
     pagina: 1000                 # documentos por página do incremental (search_after)
     tentativas: 4                # por lote
     espera_s: [5, 15, 30]

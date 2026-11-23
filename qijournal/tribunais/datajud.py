@@ -1125,6 +1125,7 @@ class Resultado:
     frescor: dict[str, Any] | None = None  # max_timestamp e max_atualizacao do índice (a idade dele)
     execucoes: int | None = None  # execuções até a carga inicial cobrir a mesa (estimativa)
     coletado_em: str | None = None  # a última execução que trouxe movimento novo (não muda sem dado novo)
+    atualizacao_mais_nova: str | None = None  # a dataHoraUltimaAtualizacao mais nova no diário (a idade do índice, sem o frescor)
 
 
 def deve_publicar(regras: Regras, ambiente: Mapping[str, str] | None = None) -> bool:
@@ -1292,6 +1293,7 @@ def atualizar(
                 estado.movimentos["coletado_em"] = instante
                 estado.gravar()
         r.coletado_em = estado.movimentos.get("coletado_em")
+        r.atualizacao_mais_nova = max((str(g["upd"])[:19] for g in guarda.registros.values() if g.get("upd")), default=None)
         r.linhas, r.registros, r.carga = linhas, guarda.registros, carga
         pendentes = sum(1 for n in numeros if n not in guarda)
         r.execucoes = execucoes_restantes(pendentes, estado.movimentos.get("historico") or [])
@@ -1343,6 +1345,7 @@ def atualizar(
     def com_mov(r: Resultado) -> Resultado:
         r.linhas, r.registros, r.carga, r.frescor, r.execucoes, r.coletado_em = (mov.linhas, mov.registros, mov.carga, mov.frescor,
                                                                                  mov.execucoes, mov.coletado_em)
+        r.atualizacao_mais_nova = mov.atualizacao_mais_nova
         r.log += sufixo
         return _publico(r, regras)
 
@@ -1374,3 +1377,72 @@ def atualizar(
     fonte = com_aviso_de_atraso(base)
     guardar(fonte, conferencia)
     return com_mov(Resultado(fonte, conferencia, cliente.placar, True, linha, publicar=publicar))
+
+
+# ── só a carga, na máquina do dono ───────────────────────────────────────────────────────────
+
+
+def principal(argv: Sequence[str] | None = None) -> int:
+    """``python -m qijournal.tribunais.datajud --cache DIR [--dir .] [--fatias N] [--prazo S]``.
+
+    Só a carga dos movimentos (uso pessoal): fatias seguidas sobre a mesa do último retrato do acervo
+    do STJ no cache (o que ``tribunais atualizar`` deixou), sem tocar em ``data/tribunais/``. O
+    resultado fica no cache (o diário e ``<cache>/datajud/camada.json``); a próxima ``tribunais
+    atualizar`` o usa (e só o publica com ``datajud.publicar``). Para a máquina do dono, numa tarefa
+    agendada: a carga inicial anda muito mais depressa que só nas execuções do GitHub."""
+    import argparse
+
+    from . import contas, modelo
+    from .fontes import ColetorTribunais
+
+    p = argparse.ArgumentParser(prog="python -m qijournal.tribunais.datajud", description=principal.__doc__)
+    p.add_argument("--cache", required=True, help="a pasta do cache dos Tribunais (a mesma de `tribunais atualizar`)")
+    p.add_argument("--dir", default=".", help="a pasta publicada (lê data/tribunais/stj.json, só para a lista; padrão: .)")
+    p.add_argument("--fatias", type=int, default=1, help="quantas fatias seguidas (padrão: 1)")
+    p.add_argument("--prazo", type=float, default=None, help="segundos por fatia (padrão: datajud.prazo_s do config)")
+    p.add_argument("--pausa", type=float, default=30.0, help="segundos entre uma fatia e a seguinte (padrão: 30)")
+    args = p.parse_args(argv)
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+    raiz = Path(__file__).resolve().parents[2]
+    regras = modelo.carregar_regras(raiz)
+    if not regras.datajud.get("ativo"):
+        log.warning("DataJud desligado no config (datajud.ativo); nada a fazer")
+        return 0
+    cache = Path(args.cache)
+    retratos = sorted((cache / "retratos").glob("stj-*.tsv.gz"))
+    if not retratos:
+        log.error("Sem retrato do acervo do STJ em %s/retratos: rode `python -m qijournal tribunais atualizar` antes", cache)
+        return 1
+    retrato = retratos[-1]
+    data_acervo = retrato.name.removeprefix("stj-").removesuffix(".tsv.gz")
+    try:
+        painel = json.loads((Path(args.dir) / "data" / "tribunais" / "stj.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        painel = None
+    listados = set()
+    if isinstance(painel, dict) and painel.get("data_dados") == data_acervo:
+        listados = {str(f.get("id")) for f in (painel.get("fila") or {}).get("mais_antigos") or []}
+        for m in painel.get("ministros") or []:
+            listados |= {str(f.get("id")) for f in m.get("mais_antigos") or []}
+    for i in range(max(1, args.fatias)):
+        r = atualizar(regras, ColetorTribunais(cache, regras=regras), cache=cache, retrato=retrato,
+                      painel_stj=painel if isinstance(painel, dict) else None, publicar=False,
+                      prazo_s=args.prazo if args.prazo is not None else float(regras.datajud.get("prazo_s") or 900))
+        log.info("Fatia %d: %s", i + 1, r.log)
+        if r.linhas is not None and r.registros is not None:
+            camada = contas.camada_cnj(r.linhas, r.registros, regras, data_dados=data_acervo, listados=listados)
+            destino = cache / "datajud" / "camada.json"
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            destino.write_text(json.dumps({"v": 1, "trib": "stj", **camada}, ensure_ascii=False, sort_keys=False) + "\n", encoding="utf-8")
+            u = camada["mesa_inteira"]
+            log.info("Mesa do STJ em %s: %d de %d processos públicos com o estado no CNJ (%.0f%%); faltam %s execuções (estimativa)",
+                     data_acervo, u["com_data"], u["base"], 100 * (u["cobertura"] or 0), r.execucoes if r.execucoes is not None else "?")
+        if r.carga is not None and r.carga.pendentes == 0:
+            break
+        if i + 1 < args.fatias:
+            time.sleep(max(0.0, args.pausa))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(principal())

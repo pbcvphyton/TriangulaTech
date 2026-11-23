@@ -146,7 +146,7 @@ def test_o_config_liga_para_uso_pessoal_sem_publicar(regras: Regras) -> None:
     assert datajud.deve_publicar(regras, {"QIJ_DATAJUD_PUBLICAR": " sim "}) is True
     assert datajud.deve_publicar(dataclasses.replace(regras, datajud={**regras.datajud, "publicar": True}), {"QIJ_DATAJUD_PUBLICAR": "0"}) is False
     mov = regras.datajud["movimentos"]
-    assert (mov["lote"], mov["cobertura_minima"], mov["campo_incremental"]) == (500, 0.8, "dataHoraUltimaAtualizacao")
+    assert (mov["lote"], mov["cobertura_minima"], mov["campo_incremental"]) == (1000, 0.8, "dataHoraUltimaAtualizacao")
 
 
 def test_desligado_no_config_nao_pede_nada(tmp_path: Path, desligado: Regras) -> None:
@@ -935,3 +935,10 @@ def test_parcial_nunca_vale_para_contagem_nem_pagina(tmp_path: Path, ligado: Reg
     cliente, fetch, _ = montar(tmp_path, ligado, [parcial, _lote(NUMEROS[:2])])
     docs = cliente.consultar(datajud.consulta_incremental("2026-11-01T00:00:00Z", 2), ler=datajud.ler_documentos)
     assert len(docs) == 2 and len(fetch.posts) == 2 and cliente.placar.parciais == 1 and cliente.placar.aproveitadas == 0
+
+
+def test_a_carga_avulsa_sem_retrato_nao_pede_nada(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    """``python -m qijournal.tribunais.datajud`` (a carga na máquina do dono) precisa do retrato do
+    acervo que ``tribunais atualizar`` deixa no cache; sem ele, sai com 1 antes de qualquer pedido."""
+    assert datajud.principal(["--cache", str(tmp_path)]) == 1
+    assert "Sem retrato do acervo do STJ" in caplog.text

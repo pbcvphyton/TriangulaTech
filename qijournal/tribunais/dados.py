@@ -1010,6 +1010,7 @@ def _datajud(r: Rodada, tribunais: Mapping[str, Tribunal], painel_stj: Mapping[s
         "v": VERSAO, "trib": "stj",
         "fonte": {"nome": datajud.NOME, "selo": datajud.SELO, "atribuicao": datajud.ATRIBUICAO, "url": datajud.URL_LEITOR,
                   "indice_ate": (frescor.get("max_timestamp") or "")[:10] or None, "max_atualizacao": frescor.get("max_atualizacao"),
+                  "atualizacao_mais_nova": (dj.atualizacao_mais_nova or "")[:10] or None,
                   "coletado_em": dj.coletado_em, "execucoes_restantes": dj.execucoes},
         **camada,
     }
@@ -1021,6 +1022,18 @@ def _datajud(r: Rodada, tribunais: Mapping[str, Tribunal], painel_stj: Mapping[s
         log.warning("Tribunais: a camada do DataJud não foi gravada no cache (%s)", exc)
     if not publicar:
         return dj, None
+    # Publicado: a fonte diz de quando são os movimentos mesmo quando o frescor (uma agregação sobre o
+    # índice inteiro) não respondeu hoje; o aviso não diz "sem número" quando a camada tem número.
+    fonte, f = dict(dj.fonte), camada["fonte"]
+    if not fonte.get("data_dados") and f.get("atualizacao_mais_nova"):
+        fonte["data_dados"] = f["atualizacao_mais_nova"]
+    if not fonte.get("coletado_em") and f.get("coletado_em"):
+        fonte["coletado_em"] = f["coletado_em"]
+    if fonte.get("ok") is False and (camada.get("mesa_inteira") or {}).get("com_data"):
+        quando = _br(str(f.get("coletado_em") or "")[:10] or None, ano=False)
+        fonte["aviso"] = (f"O DataJud não deu resposta completa em {_br(r.opcoes.hoje, ano=False)}; a camada do CNJ usa os movimentos já "
+                          f"guardados (o último lote veio em {quando}).")
+    dj.fonte = fonte  # type: ignore[assignment]
     return dj, camada
 
 

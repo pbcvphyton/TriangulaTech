@@ -906,8 +906,10 @@ def _fila_cnj(p: dict[str, Any], cnj: dict[str, Any]) -> dict[str, Any] | None:
     if not grupos or u is None:
         return None
     fonte = cnj.get("fonte") or {}
+    indice = (f"índice do CNJ até {_data(fonte['indice_ate'])}" if fonte.get("indice_ate")
+              else f"documentos do CNJ atualizados até {_data(fonte['atualizacao_mais_nova'])}" if fonte.get("atualizacao_mais_nova") else "")
     return {"grupos": grupos, "tribunal": u, "selo": str(fonte.get("selo") or "CNJ · DataJud"),
-            "indice": _data(fonte.get("indice_ate")), "acervo": _data(cnj.get("data_dados"))}
+            "indice": indice, "acervo": _data(cnj.get("data_dados"))}
 
 
 def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str], cnj: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -1027,6 +1029,9 @@ def _texto_metodo_cnj(cnj: dict[str, Any], mesa: list[Any]) -> str:
     if indice:
         texto += (f"O índice do CNJ vai até {_data(indice)}" + (f", {_dias(atraso)} antes do acervo" if atraso and atraso > 0 else "")
                   + ": processo com distribuição ou decisão mais nova fica sem a data (o CNJ ainda não a tem). ")
+    elif fonte.get("atualizacao_mais_nova"):
+        texto += (f"O documento mais novo que veio do índice do CNJ foi atualizado lá em {_data(fonte['atualizacao_mais_nova'])} (a consulta da "
+                  "data do índice não respondeu): processo com distribuição ou decisão mais nova fica sem a data. ")
     texto += (f"Processos em segredo de justiça não estão no índice público ({_num(u.get('segredo'))} na mesa hoje) e os suspensos ficam fora, "
               f"como no \"sem decisão\". Cobertura de hoje: {_num(u.get('com_data'))} de {_num(u.get('base'))} processos públicos na mesa "
               f"({_pct(u.get('cobertura') or 0)}) têm o estado no CNJ")
