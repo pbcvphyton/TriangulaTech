@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<!--[if IE 9]> <html lang="pt_BR" class="ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="pt_BR"  > <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+      <meta name="generator" content="ckan 2.10.11" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NJW3NDC');</script>
+    <!-- End Google Tag Manager -->
+    
+    <title>Acervo em tramitação - Conjunto de dados - Portal de Dados Abertos do STJ</title>
+
+    
+    <link rel="shortcut icon" href="/base/images/ckan.ico" />
+    
+  
+      
+      
+      
+    
+  
+
+    
+    
+      
+      
+    
+  
+  <meta property="og:title" content="Acervo em tramitação - Portal de Dados Abertos do STJ">
+  <meta property="og:description" content="Este conjunto de dados contém as informações acerca dos processos em tramitação no tribunal ao final do dia e que já estejam autuados. O conjunto é composto por um arquivo CSV com o dicionário dos...">
+
+
+    
+    <script type="text/javascript" src="/ruxitagentjs_ICA7NVfqrux_10349261020121938.js" data-dtconfig="rid=RID_1206680726|rpid=1006938944|domain=stj.jus.br|reportUrl=/rb_bf38074tch|app=ea7c4b59f27d43eb|srtbv=4|owasp=1|featureHash=ICA7NVfqrux|rdnt=1|uxrgce=1|cuc=14pbrr80|mel=100000|expw=1|dpvc=1|lastModification=1795108040274|postfix=14pbrr80|tp=500,50,0|srbbv=3|agentUri=/ruxitagentjs_ICA7NVfqrux_10349261020121938.js"></script><link href="/webassets/base/b7ac027b_main.css" rel="stylesheet"/>
+<link href="/webassets/ckanext-activity/6ac15be0_activity.css" rel="stylesheet"/><style>
+        /* =====================================================
+The "account masthead" bar across the top of the site
+===================================================== */
+
+@font-face {
+    font-family: "ubuntu";
+    src: url("../../../base/fonts/Ubuntu-Regular.ttf");
+   }
+   
+   .account-masthead {
+   /*min-height: 40px;*/
+   }
+   /* The "bubble" containing the number of new notifications. */
+   .account-masthead .account .notifications a span {
+   /*background-color: black;*/
+   }
+   /* The text and icons in the user account info. */
+   .account-masthead .account ul li a { 
+   font-size:13px; 
+   text-transform:uppercase;  
+   font-weight:900!important;
+   font-family:ubuntu, Helvetica, sans-serif;
+   color: #004164!important;
+   }
+   /* The user account info text and icons, when the user's pointer is hovering over them. */
+   .account ul li a:hover {
+   color:#1A8DA4!important;
+   background-color: transparent !important;
+   font-weight: none;
+   }
+   
+   /* ========================================================================
+   The main masthead bar that contains the site logo, nav links, and search
+   ======================================================================== */
+   
+   /*.masthead {
+   background-color: #000;
+   }*/
+   
+   .masthead .navigation .nav-pills li.active a { 
+    background-color: #000;
+    color: white;
+   }
+   
+   .masthead .navigation .nav-pills li a {  
+   color: #165484;
+   }
+   
+   .p-2, .masthead {
+   padding:0!important;
+   }
+   
+   /* The "navigation pills" in the masthead (the links to Datasets,
+   Organizations, etc) when the user's pointer hovers over them. */
+   .masthead .navigation .nav-pills li a:hover {
+   background-color: rgb(48, 48, 48);
+   color: white;
+   }
+   /* The "active" navigation pill (for example, when you're on the /dataset page
+   the "Datasets" link is active). */
+   .masthead .navigation .nav-pills li.active a {
+   background-color: rgb(74, 74, 74);
+   }
+   /* The "box shadow" effect that appears around the search box when it
+   has the keyboard cursor's focus. */
+   .masthead input[type="text"]:focus {
+   -webkit-box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.7);
+   box-shadow: inset 0px 0px 2px 0px rgba(0, 0, 0, 0.7);
+   }
+   
+   
+   /* ===========================================
+   The content in the middle of the front page
+   =========================================== */
+   
+   /* Remove the "box shadow" effect around various boxes on the page. */
+   .box {
+   box-shadow: none;
+   }
+   
+   .homepage .hero {
+   padding:0;
+   } 
+   
+   /* Remove the borders around the "Welcome to CKAN" and "Search Your Data"
+   boxes. */
+   .hero .box {
+   border: none;
+   }
+   /* Change the colors of the "Search Your Data" box. */
+   .homepage .module-search .module-content {
+   color: rgb(68, 68, 68);
+   background-color: white;
+   }
+   /* Change the background color of the "Popular Tags" box. */
+   .homepage .module-search .tags {
+   background-color: rgb(61, 61, 61);
+   }
+   /* Remove some padding. This makes the bottom edges of the "Welcome to CKAN"
+   and "Search Your Data" boxes line up. */
+   .module-content:last-child {
+   padding-bottom: 0px;
+   }
+   .homepage .module-search {
+   padding: 0px;
+   }
+   /* Add a border line between the top and bottom halves of the front page. */
+   .homepage [role="main"] {
+   border-top: 1px solid rgb(204, 204, 204);
+   }
+   
+   
+   /* ====================================
+   The footer at the bottom of the site
+   ==================================== */
+   
+   .site-footer,
+   body {
+   /*background-color: rgb(40, 40, 40);*/
+   font-family: ubuntu,sans-serif;
+   }
+   
+   .site-footer {
+     background-image: linear-gradient(#004164, #002132);
+     color:#FFF;
+     font-size:0.85em !important;
+   }
+   
+   /* The link texts in the footer. */
+   .site-footer a {
+   color: #FFF ;
+   }
+   
+   .site-footer a:hover {
+   color:#3AA3FE;
+   }
+   
+   .stjweb p {
+   font-size: 0.85em;
+   }
+      </style>
+    
+   <style type="text/css">/* Copyright 2014-present Evernote Corporation. All rights reserved. */
+   @keyframes caretBlink {
+    from { opacity: 1.0; }
+    to { opacity: 0.0; }
+   }
+   
+   @keyframes rotateSpinner {
+    from {
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+   }
+   
+   #text-tool-caret {
+    animation-name: caretBlink;  
+    animation-iteration-count: infinite;  
+    animation-timing-function: cubic-bezier(1.0,0,0,1.0);
+    animation-duration: 1s; 
+   }
+   
+   #en-markup-loading-spinner {
+    position: absolute;
+    top: calc(50% - 16px);
+    left: calc(50% - 16px);
+    width: 32px;
+    height: 32px;
+   }
+   
+   #en-markup-loading-spinner img {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    animation-name: rotateSpinner;
+    animation-duration: 0.6s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+   }
+   </style><style type="text/css">/* Copyright 2014-present Evernote Corporation. All rights reserved. */
+   .skitchToastBoxContainer {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 30px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    pointer-events: none;
+   }
+   
+   .skitchToastBox {
+    width: 200px;
+    height: 16px;
+    padding: 12px;
+    background-color: rgba(47, 55, 61, 0.95);
+    border-radius: 4px;
+    color: white;
+    cursor: default;
+    font-size: 10pt;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.32);
+    font-family: 'Soleil', Helvetica, Arial, sans-serif;
+    border: 2px rgba(255, 255, 255, 0.38) solid;
+   }
+   
+   .lang-zh-cn .skitchToastBox {
+    font-family: '微软雅黑', 'Microsoft YaHei', SimSun,
+        '&#x30E1;&#x30A4;&#x30EA;&#x30AA;', Meiryo, 'MS PGothic', 'Soleil',
+        Helvetica, Arial, sans-serif;
+   }
+   
+   .lang-ja-jp .skitchToastBox {
+    font-family: '&#x30E1;&#x30A4;&#x30EA;&#x30AA;', Meiryo, 'MS PGothic',
+        '微软雅黑', 'Microsoft YaHei', SimSun, 'Soleil', Helvetica, Arial,
+        sans-serif;
+   }
+   
+   .skitchToast {
+    padding-left: 20px;
+    padding-right: 20px;
+    display: inline-block;
+    height: 10px;
+    color: #f1f5f8;
+    text-align: center;
+   }
+   
+   .skitchVisible {
+    /* Don't remove this class it's a hack used by the Evernote Clipper */
+   }
+   </style><style type="text/css">/* Copyright 2014-present Evernote Corporation. All rights reserved. */
+   
+   @font-face {
+    font-family: 'Soleil';
+    font-weight: normal;
+    font-style: normal;
+   }
+   </style><style type="text/css">/* Copyright 2019-present Evernote Corporation. All rights reserved. */
+   
+   #en-markup-disabled {
+    position: fixed;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    cursor: default;
+    -webkit-user-select: none;
+   }
+   
+   #en-markup-alert-container {
+    position: absolute;
+    z-index: 9999;
+    width: 450px;
+    left: calc(50% - 225px);
+    top: calc(50% - 85px);
+    background-color: white;
+    box-shadow: 0 2px 7px 1px rgba(0,0,0,0.35);
+    -webkit-user-select: none;
+   }
+   
+   #en-markup-alert-container .cell-1 {
+    position: relative;
+    height: 110px;
+    width: 105px;
+    float: left;
+    text-align: center;    
+    background-position: 65% 50%;
+    background-repeat: no-repeat;
+   }
+   
+   #en-markup-alert-container .cell-2 {
+    position: relative;
+    float: left;
+    width: 345px;
+    margin-top: 29px;
+    margin-bottom: 20px;
+   }
+   
+   #en-markup-alert-container .cell-2 .cell-2-title {
+    margin-bottom: 5px;
+    padding-right: 30px;
+    font-size: 12pt;
+    font-family: Tahoma, Arial;
+   }
+   
+   #en-markup-alert-container .cell-2 .cell-2-message {
+    padding-right: 30px;
+    font-size: 9.5pt;
+    font-family: Tahoma, Arial;
+   }
+   
+   #en-markup-alert-container .cell-3 {
+    position: relative;
+    width: 450px;
+    height: 60px;
+    float: left;
+    background-color: rgb(240,240,240);
+   }
+   
+   #en-markup-alert-container .cell-3 button {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    width: 110px;
+    height: 36px;
+   }
+   
+   #en-markup-alert-container .cell-3 button.alt-button {
+    position: absolute;
+    top: 12px;
+    right: 140px;
+    width: 110px;
+    height: 36px;
+   }
+   
+   /* ====================================
+   New classes created by the Portal STJ
+   ==================================== */
+   
+   .cab-logo-stj img{
+   height: 35px;
+   }
+   
+   .cab-menu {
+   vertical-align: middle;
+   margin: auto;
+   }
+   
+   .cab-logo-dados {
+   margin:100px 0 25px 0;
+   }
+   
+   .search-form {
+   border-bottom:0;
+   }
+   
+   .temas {
+   background-color: #EDF1F3;
+   color: #165484;
+   }
+   
+   .temas  h3 {
+   font-family: ubuntu, Helvetica, sans-serif;
+   font-size: ;
+   padding:25px
+   }
+   
+   .temas-ico {
+   margin:0 20px;
+   }
+   
+   .temas-ico ul {
+   list-style: none; 
+   text-align: center;
+   padding:0;
+   }
+   
+   .temas-ico .icone {
+   width: 70px;
+   height: 70px;
+   margin:auto auto 10px auto;
+   }
+   
+   .temas-ico .icone:hover {
+   background-position: -84px;
+   }
+   
+   #ico-juris {
+   background: url("../../../base/images/ico-juris.svg") no-repeat;  background-size: cover; 
+   }
+   
+   #ico-juris:hover {
+   background-position: -84px;
+   }
+   
+   #ico-consulta {
+   background: url("../../../base/images/ico-consulta-process.svg") no-repeat;  background-size: cover; 
+   }
+   
+   #ico-consulta:hover {
+   background-position: -86px;
+   }
+   
+   #ico-precedentes {
+   background: url("../../../base/images/ico-precedentes.svg") no-repeat;  
+   background-size: cover; 
+   }
+   
+   #ico-precedentes:hover {
+   background-position: -83px;
+   }
+   
+   #ico-sessoes {
+   background: url("../../../base/images/ico-sessoes-julg.svg") no-repeat;  
+   background-size: cover; 
+   }
+   
+   #ico-sessoes:hover {
+   background-position: -81px;
+   }
+   
+   #ico-diario:hover {
+   background-position: -81px;
+   }
+   
+   #ico-dje {
+   background: url("../../../base/images/ico-dje.svg") no-repeat;  
+   background-size: cover; 
+   }
+   
+   #ico-dje:hover {
+   background-position: -81px;
+   }
+   
+   .box, .wrapper {
+   border:0;
+   margin-right:15px;
+   }
+   
+   .temas-ico span, .temas-ico a {
+   display:block;
+   font-size:15px;
+   line-height:18px;
+   color:#004164;
+   text-decoration:none;
+   }
+   
+   .texto-apresentacao {
+        font-family: ubuntu,sans-serif;
+        font-weight: 100;
+        margin-left: -20px;    
+    }
+   
+   .texto-apresentacao h2 {
+   color:#004164;
+   letter-spacing:-2px; 
+   font-size:45px;
+   font-weight:100;
+   }
+   
+   .texto-apresentacao p {
+   font-size: 18px;
+   color: #656564;
+   font-weight:100;
+   }
+
+   .modulo-atualizacoes {
+   color:#FFF;
+   background-color: #165484;
+   padding-bottom: 15px;
+   margin-bottom: 0;
+   border-radius: 10px;
+   }
+   
+   .modulo-atualizacoes h2, .acervoDados h2 {
+   font-weight:300;
+   margin: 15px 15px 0 15px;
+   }
+   
+   .modulo-atualizacoes a {
+        color: #7AC3F2 !important;
+        font-weight: 500;    
+    }
+   
+   .modulo-atualizacoes .titulo {
+   font-size: 14px;
+   font-family: Ubuntu,sans-serif;
+   background-color:transparent;
+   color:#FFF;
+   border-bottom:0;
+   margin-bottom:0;
+   padding-bottom:0;
+   }
+   
+   .modulo-atualizacoes ul {
+   background-color:transparent;
+   margin: 0 
+   }
+   
+   .modulo-atualizacoes .module-content:last-child {
+   border-bottom: 0;
+   }
+   
+   .noticias .dataset-heading a {
+    color:#5ba3ca;
+   }
+
+   .noticias h2 {
+   margin-left: 0;;
+   }
+   
+   .noticias li {
+   padding:0;
+   }
+   
+   
+   .noticias .dataset-item {
+   padding:0 0 15px 0;
+   margin:0 30px;
+   }
+   
+   .noticias .dataset-item {
+   border-bottom: 1px solid rgba(255,255,255,0.3);
+   }
+
+   .dataset-item:last-of-type {
+        border-bottom: none!important;
+        margin-bottom: 0 !important;
+        padding-bottom: 10px!important;    
+    }
+   
+   .acervoDados {
+   background-color: #2577AC;
+   border-radius: 10px;
+   padding: 15px;
+   color: #FFF;
+   text-align:center;
+   }
+   
+   .acervoDados h2 {
+   text-align:left;
+   }
+   
+   .acervoDados ul {
+   list-style-type: none;
+   margin-top:30px;
+   width:100%;
+   }
+   
+   .acervoDados ul li {
+   min-width:33%;
+   }
+   
+   .acervoDados ul a {
+   color:#FFF;
+   }
+  
+   .acervoDados .icone span {
+      font-size: 1.7em;    
+      display: block;
+    }
+   
+   .acervoDados .icone {
+   padding-top:66px;
+   text-align:center;
+   display:block;
+   width:100%;
+   }
+   
+   .acervoDados .icone:hover { 
+   text-decoration: none;
+   }
+   
+   .ico-dados {
+   display:block;
+   background:url("../../../base/images/ico-dados.svg") no-repeat top center;  
+   }
+   
+   .ico-organizacao {
+   background:url("../../../base/images/ico-organizacao.svg") no-repeat top center;
+   }
+   
+   .ico-grupo {
+   background:url("../../../base/images/ico-grupo.svg") no-repeat top center;
+   }
+   
+   .temas-ico span {
+   width: 80%;
+    margin: auto;
+   }
+   
+   .temas-ico a:hover  {
+   text-decoration:none!important;
+   color:#1A8DA4;
+   }
+   
+   .search-form .search-input.search-giant button i {
+   color: #004164;
+   }
+   
+   .copy-redes {
+   border-top: 1px solid rgba(255, 255, 255, 0.25);
+   margin-right: 10px;
+   margin-top: 10px;
+   padding-top:10px
+   }
+   
+   .copy-redes .avalie { 
+   background:url("../../../base/images/icon_avalie.svg") no-repeat;
+   padding: 7px 0 7px 35px;
+   height: 27px;
+   }
+   
+   .logo-stj-branca {
+    margin-right:10px;
+   }
+   
+   /*mídias sociais*/
+   
+   .midias-sociais a {
+   display:inline-flex;
+   align-items: baseline;
+   width:24px;
+   height:24px;
+   }
+   
+   .ico-facebook {
+   background:url("../../../base/images/ico-facebook.svg") no-repeat;
+   }
+   
+   .ico-twitter {
+   background: url("../../../base/images/icon-twitter.svg");
+   }
+   
+   .ico-instagram {
+   background: url("../../../base/images/icon-instagram.svg");
+   }
+   
+   .ico-flickr {
+   background: url("../../../base/images/icon-flickr.svg");
+   }
+   
+   .ico-youtube {
+   background: url("../../../base/images/ico-youTube.svg");
+   }
+   
+   .ico-linkedin {
+   background: url("../../../base/images/ico-linkedin.svg");
+   }
+   
+   .ico-soundcloud {
+   background: url("../../../base/images/ico-soundcloud.svg");
+   }
+   
+   .ico-spotify {
+   background: url("../../../base/images/ico-spotify.svg");
+   }
+   
+   .ico-rss {
+   background: url("../../../base/images/ico-rss.svg");
+   }
+   
+   /* Páginas internas */
+   
+   .filters .module:first-child .module-heading {
+    background-color: #165484;
+    color: #FFF;
+    font-weight: 300;
+   }
+   
+   .toolbar .breadcrumb a {
+    color:#FFF;
+   }
+   
+   h1 {
+    color:#004164;
+   }
+   
+   .toolbar .breadcrumb a {
+    color:#FFF;
+   }
+   
+    /* Páginas internas */
+   
+    .filters .module:first-child .module-heading {
+       background-color: #165484;
+       color: #FFF;
+       font-weight: 300;
+     }
+   
+     .toolbar .breadcrumb a {
+       color:#FFF;
+     }
+   
+     h1 {
+       color:#004164;
+     }
+   
+     .toolbar .breadcrumb a {
+       color:#FFF;
+     }
+   
+     .box, .wrapper {
+       border: 0;
+       margin-right: 5px;
+       margin-left: 5px;
+       border-radius: 10px;
+   }
+   
+     .dataset-list .dataset-heading a{
+       color:#5ba3ca; /* 004164 */
+  }
+
+  .context-info .image img, .context-info .image a {
+    display: block;
+    width: 70%;
+    height: 100%;
+    border-radius: 4px;
+    margin: auto;
+  } 
+
+  .filters .module-narrow .module-heading {
+    color:#FFF !important;  
+    padding-top: 10px !important;  
+  }
+
+  .dataset-list .dataset-heading a {
+    color: #2577AC;
+  }
+       
+   @media (max-width: 575.98px) {
+   .cab-logo-dados {
+    margin:25px 0;
+   }
+   
+   .cab-logo-dados img {
+    width:80%;
+   }
+   
+   .cab-logo-stj img {
+    margin-left: 10px;
+    width: 55px;
+   }
+   
+   .temas-ico {
+    margin:0;
+   }
+   
+   .temas-ico .icone {
+    width: 40px;
+    height: 40px;
+    margin: 0 5px 0 0;
+   }
+   
+   .temas-ico a {
+    display: flex;
+    vertical-align: middle;
+    height: 100%;
+    align-content: center;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+   }
+   
+   .temas-ico span {
+    text-align:left;
+   }
+   
+   .temas-ico li {
+    margin-bottom:10px;
+   }
+   
+   .homepage .module-search .search-form input {
+    padding: 7px;
+    margin-bottom: 30px;
+   }
+   
+   .stjweb {
+    margin-left:10px;
+   }
+   
+   .stjweb div {
+    margin-bottom: 15px;
+   }
+   
+   .search-form .search-input button {
+    top: 29% !important;
+   }
+   
+   .search-form .search-input.search-giant button i {
+    font-size: 22px !important;
+   }
+   
+   .texto-apresentacao h2 {
+    font-size: 34px;
+   }
+   
+   .texto-apresentacao {
+    margin:10px;
+   }
+   
+   .box {
+    margin-right:0;
+   }
+   
+   .modulo-atualizacoes, .acervoDados {
+    margin: 0 20px 20px 20px;
+   }
+   
+   .acervoDados {
+    margin-top:15px;
+   }
+   
+   .acervoDados .icone {
+    padding-top:0;
+    background-size: 14%;
+    background-position:left;
+    text-align:left;
+    padding-left: 46px;
+   }
+   
+   .acervoDados .icone span {
+    display:inline-block;
+    text-align: left;
+    margin-bottom: 20px;
+   }
+   
+   .copy-redes div {
+    text-align:center;
+    }
+
+    .module-heading {
+        background-color: #165484!important;        
+        border-top: transparent;        
+        color: #FFF;        
+        font-weight: 300;        
+    }
+
+    .module-narrow .nav-item > a .badge, .module-narrow .nav-aside li a .badge {        
+        background-color: #ECEEF0;        
+        color: #595959;        
+        border-radius: 10px;        
+    }     
+}
+      </style>
+    
+  </head>
+
+  
+  <body data-site-root="https://dadosabertos.web.stj.jus.br/" data-locale-root="https://dadosabertos.web.stj.jus.br/" >
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NJW3NDC"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    
+    <div class="visually-hidden-focusable"><a href="#content">Skip to main content</a></div>
+  
+
+  
+    
+
+ 
+<div class="account-masthead" style="background-color: white; color: black;">
+  <div class="container">      
+    <div class="row" style="flex-wrap: nowrap;">
+        <div class="col-6 mt-2 mb-2 cab-logo-stj">
+            <a href="https://www.stj.jus.br">
+            <img src="/base/images/logo-stj.svg" alt="Logo STJ"
+                title="logo STJ" height="22px" width="60px" />
+            </a>
+        </div>
+        <div class="col-6 cab-menu">    
+             
+            <nav class="account not-authed" aria-label="Account">
+            <!--
+            <ul class="list-unstyled">
+                
+                <li><a href="/user/login">Entrar</a></li>
+                
+                <li><a class="sub" href="/user/register">Registrar</a></li>
+                 
+            </ul>
+            -->  
+            </nav>
+             
+        </div>
+    </div>
+  </div>
+</div>
+
+<header class="masthead" style="background-color: transparent;">
+  <div class="container-fluid">
+
+    <div class="d-flex align-items-center cab-logo-dados text-center justify-content-center mt-5 mb-5">
+        <a href="/">
+            <img src="/base/images/logo-dadosAbertos.svg" alt="Logo dados abertos"
+            title="Dados Abertos" />
+        </a>
+    </div>
+
+
+      
+
+    
+  </div>
+</header>
+
+  
+    <div class="main">
+      <div id="content" class="container">
+        
+          
+            <div class="flash-messages">
+              
+                
+              
+            </div>
+          
+
+          
+            <div class="toolbar" role="navigation" aria-label="Breadcrumb">
+              
+                
+                  <ol class="breadcrumb">
+                    
+<li class="home"><a href="/" aria-label="Início"><i class="fa fa-home"></i><span> Início</span></a></li>
+                    
+  
+    
+    
+      
+      
+      <li><a href="/organization/">Organizações</a></li>
+      <li><a href="/organization/superior-tribunal-de-justica" title="Superior Tribunal de Justiça">Superior Tribunal de Justiça</a></li>
+    
+    <li class="active"><a href="/dataset/acervo-em-tramitacao" title="Acervo em tramitação">Acervo em tramitação</a></li>
+  
+
+                  </ol>
+                
+              
+            </div>
+          
+
+          <div class="row wrapper">
+            
+            
+            
+
+            
+              <aside class="secondary col-md-3">
+                
+                
+
+  
+
+  
+    
+
+  
+    <section class="module module-narrow">
+      <div class="module context-info">
+        <div class="module-content">
+          
+            
+              <h1 class="heading">Acervo em tramitação</h1>
+            
+            
+              
+              <div class="nums">
+                <dl>
+                  <dt>Seguidores</dt>
+                  <dd data-module="followers-counter" data-module-id="d68560f4-eb0c-4fb2-8395-f8a36f441c10" data-module-num_followers="0"><span>0</span></dd>
+                </dl>
+              </div>
+            
+            
+              
+                <div class="follow_button">
+                  
+                </div>
+              
+            
+          
+        </div>
+      </div>
+    </section>
+  
+
+  
+
+  
+    
+      
+      
+
+
+
+
+
+  <div class="module module-narrow module-shallow context-info">
+    
+      <h2 class="module-heading"><i class="fa fa-building"></i> Organização</h2>
+    
+    <section class="module-content">
+      
+      
+        <div class="image">
+          <a href="/organization/superior-tribunal-de-justica">
+            <img src="https://dadosabertos.web.stj.jus.br/uploads/group/2022-05-03-205127.167022logo-stj.png" width="200" alt="superior-tribunal-de-justica" />
+          </a>
+        </div>
+      
+      
+      <h1 class="heading">Superior Tribunal de Justiça
+        
+      </h1>
+      
+      
+      
+        <p class="description">
+          Órgão do Poder Judiciário Brasileiro, o Superior Tribunal de Justiça (STJ) é a corte responsável por uniformizar a interpretação da lei federal em todo o Brasil. É de sua...
+        </p>
+        <p class="read-more">
+          <a href="/organization/about/superior-tribunal-de-justica">Leia mais</a>
+        </p>
+      
+      
+      
+      
+    </section>
+  </div>
+  
+    
+  
+
+  
+    
+
+  <section class="module module-narrow social">
+    
+      <h2 class="module-heading"><i class="fa fa-share-square"></i> Social</h2>
+    
+    
+      <ul class="nav nav-simple">
+        <li class="nav-item"><a href="https://twitter.com/share?url=https://dadosabertos.web.stj.jus.br/dataset/acervo-em-tramitacao" target="_blank"><i class="fa-brands fa-twitter-square"></i> Twitter</a></li>
+        <li class="nav-item"><a href="https://www.facebook.com/sharer.php?u=https://dadosabertos.web.stj.jus.br/dataset/acervo-em-tramitacao" target="_blank"><i class="fa-brands fa-facebook-square"></i> Facebook</a></li>
+      </ul>
+    
+  </section>
+
+  
+
+  
+    
+
+
+  
+      
+        <section class="module module-narrow module-shallow license">
+          
+            <h2 class="module-heading"><i class="fa fa-lock"></i> Licença</h2>
+          
+          
+            <p class="module-content">
+              
+                
+  
+    <a href="http://www.opendefinition.org/licenses/cc-by" rel="dc:rights">Creative Commons Atribuição</a>
+  
+
+                
+                  <a href="http://opendefinition.org/okd/" title="Este conjunto de dados satisfaz a Definição de Aberto - Open Definition.">
+                      <img class="open-data" src="/base/images/od_80x15_blue.png" alt="[Open Data]" />
+                  </a>
+                
+              
+            </p>
+          
+        </section>
+      
+  
+
+  
+
+
+              </aside>
+            
+
+            
+              <div class="primary col-md-9 col-xs-12" role="main">
+                
+                
+                  <article class="module">
+                    
+                      <header class="module-content page-header">
+                        
+                        <ul class="nav nav-tabs">
+                          
+  
+  <li class="active"><a href="/dataset/acervo-em-tramitacao"><i class="fa fa-sitemap"></i> Conjunto de dados</a></li>
+  <li><a href="/dataset/groups/acervo-em-tramitacao"><i class="fa fa-users"></i> Grupos</a></li>
+
+  <li><a href="/dataset/activity/acervo-em-tramitacao"><i class="fa fa-clock"></i> Fluxo de Atividades</a></li>
+
+                        </ul>
+                      </header>
+                    
+                    <div class="module-content">
+                      
+                      
+  
+                      
+  
+    
+    <h1>
+      
+        Acervo em tramitação
+        
+        
+      
+    </h1>
+    
+      
+        <div class="notes embedded-content">
+          <p>Este conjunto de dados contém as informações acerca dos processos em tramitação no tribunal ao final do dia e que já estejam autuados. </p>
+<p>O conjunto é composto por um arquivo CSV com o dicionário dos dados e arquivos JSON compactados contendo os metadados do processo em tramitação. </p>
+<p>As atualizações são realizadas diariamente pela adição de arquivo referente ao dia anterior, identificado no nome no formato AAAAMMDD.</p>
+        </div>
+      
+    
+    
+    <span class="insert-comment-thread"></span>
+  
+
+  
+    
+
+<section id="dataset-resources" class="resources">
+  <h2>Dados e recursos</h2>
+  
+    
+      <ul class="resource-list">
+        
+  
+    
+    
+
+
+
+<li class="resource-item" data-id="ad9b3116-a9d9-4c16-b30d-65b58556c999">
+  
+  <a class="heading" href="/dataset/acervo-em-tramitacao/resource/ad9b3116-a9d9-4c16-b30d-65b58556c999" title="dicionario-tramitando.csv">
+    dicionario-tramitando.csv<span class="format-label" property="dc:format" data-format="csv">CSV</span>
+    
+
+  </a>
+  
+  
+    <p class="description">
+      
+    </p>
+  
+  
+  
+  <div class="dropdown btn-group">
+    <a href="#" class="btn btn-primary dropdown-toggle" type="button" id="dropdownExplorer" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-share"></i>
+      Explorar
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownExplorer">
+      
+        
+  
+    
+          <li>
+            <a class="dropdown-item" href="/dataset/acervo-em-tramitacao/resource/ad9b3116-a9d9-4c16-b30d-65b58556c999">
+              
+                <i class="fa fa-info-circle"></i>
+                Mais informações
+              
+            </a>
+          </li>
+        
+  
+
+
+
+
+        
+      <li>
+        <a class="dropdown-item resource-url-analytics" href="https://dadosabertos.web.stj.jus.br/dataset/d68560f4-eb0c-4fb2-8395-f8a36f441c10/resource/ad9b3116-a9d9-4c16-b30d-65b58556c999/download/dicionario-tramitando.csv" target="_blank" rel="noreferrer">
+          
+            <i class="fa fa-arrow-circle-down"></i>
+            Baixar
+          
+        </a>
+      </li>
+      
+      
+      
+    </ul>
+  </div>
+  
+  
+</li>
+  
+    
+    
+
+
+
+<li class="resource-item" data-id="265df1ec-72dd-412a-bdfb-ac5033d620d0">
+  
+  <a class="heading" href="/dataset/acervo-em-tramitacao/resource/265df1ec-72dd-412a-bdfb-ac5033d620d0" title="processos_tramitando_20261120.json.gz">
+    processos_tramitando_20261120.json.gz<span class="format-label" property="dc:format" data-format="gz">GZ</span>
+    
+
+  </a>
+  
+  
+    <p class="description">
+      
+    </p>
+  
+  
+  
+  <div class="dropdown btn-group">
+    <a href="#" class="btn btn-primary dropdown-toggle" type="button" id="dropdownExplorer" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa fa-share"></i>
+      Explorar
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="dropdownExplorer">
+      
+        
+  
+    
+          <li>
+            <a class="dropdown-item" href="/dataset/acervo-em-tramitacao/resource/265df1ec-72dd-412a-bdfb-ac5033d620d0">
+              
+                <i class="fa fa-info-circle"></i>
+                Mais informações
+              
+            </a>
+          </li>
+        
+  
+
+
+
+
+        
+      <li>
+        <a class="dropdown-item resource-url-analytics" href="https://dadosabertos.web.stj.jus.br/dataset/d68560f4-eb0c-4fb2-8395-f8a36f441c10/resource/265df1ec-72dd-412a-bdfb-ac5033d620d0/download/processos_tramitando_20261120.json.gz" target="_blank" rel="noreferrer">
+          
+            <i class="fa fa-arrow-circle-down"></i>
+            Baixar
+          
+        </a>
+      </li>
+      
+      
+      
+    </ul>
+  </div>
+  
+  
+</li>
+  
+
+      </ul>
+    
+  
+</section>
+  
+
+  
+    
+
+  
+
+  
+    <section class="additional-info">
+  <h3>Informações Adicionais</h3>
+  <table class="table table-striped table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th scope="col">Campo</th>
+        <th scope="col">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        
+
+        
+
+        
+
+        
+
+        
+        
+          <tr>
+            <th scope="row" class="dataset-label">Última Atualização</th>
+            <td class="dataset-details">
+                
+<span class="automatic-local-datetime" data-datetime="2026-11-21T17:37:48+0000">
+    novembro 21, 2026, 17:37 (UTC)
+</span>
+            </td>
+          </tr>
+        
+        
+          <tr>
+            <th scope="row" class="dataset-label">Criado</th>
+
+            <td class="dataset-details">
+                
+<span class="automatic-local-datetime" data-datetime="2026-02-19T20:05:35+0000">
+    fevereiro 19, 2026, 20:05 (UTC)
+</span>
+            </td>
+          </tr>
+        
+
+      
+        
+      
+
+      
+    </tbody>
+  </table>
+</section>
+  
+
+
+                    </div>
+                  </article>
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  
+    <footer class="site-footer mt-5" style="background-color: transparent;">    
+  <div class="container">
+
+      <div class="row stjweb">            
+          <div class="col-md-4">
+              <h5>STJ NA WEB</h5> 
+              <p><a href="https://www.stj.jus.br">stj.jus.br</a></p>
+              <p><a href="https://international.stj.jus.br/pt">internacional.stj.jus.br</a></p>
+              <p><a href="https://transparencia.stj.jus.br/pt">transparencia.stj.jus.br</a></p>
+              <p><a href="https://balcaovirtual.stj.jus.br/pt">balcaovirtual.stj.jus.br</a></p>
+              <p><a href="https://agenda2030.stj.jus.br/pt">agenda2030.stj.jus.br</a></p>
+          </div>
+          <div class="col-md-4">
+              <h5>TELEFONES ÚTEIS</h5>                
+              <p> Informações Gerais<br/>
+                +55 61 3319.8000</p><br>
+              <p> Informações Gerais<br/>
+                +55 61 3319.8888 (Ouvidoria)</p>
+              
+          </div>
+          <div class="col-md-4">
+              <h5>ENDEREÇO</h5>
+              <p>Superior Tribunal de Justiça</p>
+              <p>SAFS - Quadra 06 - Lote 01 - Trecho III</p>
+              <p>CEP: 70095-900</p>
+              <p>Brasília/DF</p>                
+          </div>
+      </div>
+
+      <div class="row copy-redes">
+        <div class="col-md-4 mb-md-0 mb-3">
+          <p style="margin-bottom: 0; display: grid;">Impulsionado por:
+            <a href="https://ckan.org" target="_blank">
+              <img src="/base/images/ckan-logo-white.svg" height="20px" alt="logo CKAN">
+            </a>
+          </p>
+        </div>
+
+        <div class="col-md-4 col-12 mb-md-0 mb-3 midias-sociais">
+          <a href="https://www.facebook.com/stjnoticias" class="ico-facebook" alt="Facebook do STJ" target="_blank"></a>
+          <a href="https://twitter.com/stjnoticias" class="ico-twitter" alt="Twitter do STJ" target="_blank"></a>
+          <a href="https://www.instagram.com/stjnoticias/" class="ico-instagram" alt="Instagran do STJ"
+            target="_blank"></a>
+          <a href="http://flickr.com/stjnoticias" class="ico-flickr" alt="Flickr do STJ" target="_blank"></a>
+          <a href="https://www.youtube.com/stjnoticias" class="ico-youtube" alt="YouTube do STJ" target="_blank"></a>
+          <a href="https://www.linkedin.com/company/superior-tribunal-de-justi-a/" alt="Linkedin do STJ"
+            class="ico-linkedin" target="_blank"></a>
+          <a href="https://soundcloud.com/stjnoticias" alt="Soundcloud do STJ" class="ico-soundcloud"
+            target="_blank"></a>
+          <a href="https://open.spotify.com/show/2mku7I8KhrwXCEsQ6hOP8c" alt="Spotify do STJ" class="ico-spotify"
+            target="_blank"></a>
+          <a href="http://www.stj.jus.br/sites/portalp/Paginas/RSS.aspx"
+            alt="Informações sobre RSS" class="ico-rss" target="_blank"></a>
+        </div>
+
+        <div class="col-md-4 col-12">
+          <a href="https://forms.office.com/r/HKL534WGfu" target="_blank" class="avalie">Avalie o Portal de Dados do STJ</a>
+          <p hidden>Versão: 1.0.3</p>
+        </div>
+      </div>      
+    </div>      
+  </div>          
+</footer>
+  
+  
+  
+  
+  
+  
+    
+
+  
+
+      
+
+    
+    
+    <link href="/webassets/vendor/f3b8236b_select2.css" rel="stylesheet"/>
+<link href="/webassets/vendor/d05bf0e7_fontawesome.css" rel="stylesheet"/>
+    <script src="/webassets/vendor/8c3c143a_jquery.js" type="text/javascript"></script>
+<script src="/webassets/vendor/39b77503_vendor.js" type="text/javascript"></script>
+<script src="/webassets/vendor/6d1ad7e6_bootstrap.js" type="text/javascript"></script>
+<script src="/webassets/base/d40537a0_main.js" type="text/javascript"></script>
+<script src="/webassets/base/2d284989_ckan.js" type="text/javascript"></script>
+<script src="/webassets/activity/0fdb5ee0_activity.js" type="text/javascript"></script>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5ec3252ae19299c',t:'MTc5NTM5NTIwMg=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5ec3252ae19299c',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

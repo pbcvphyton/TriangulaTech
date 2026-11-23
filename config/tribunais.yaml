@@ -436,6 +436,14 @@ composicao:
       - {nome: "Rosa Weber", motivo: "aposentada"}
       - {nome: "Ricardo Lewandowski", motivo: "aposentado"}
       - {nome: "Marco Aurélio", motivo: "aposentado"}
+      # Ainda relatores na planilha do acervo de 22/11/2026 (de 1 a 3 processos cada) ou em temas antigos de RG:
+      - {nome: "Teori Zavascki", motivo: "falecido em 2017"}
+      - {nome: "Celso de Mello", motivo: "aposentado"}
+      - {nome: "Joaquim Barbosa", motivo: "aposentado"}
+      - {nome: "Ayres Britto", motivo: "aposentado"}
+      - {nome: "Ellen Gracie", motivo: "aposentada"}
+      - {nome: "Cezar Peluso", motivo: "aposentado"}
+      - {nome: "Menezes Direito", motivo: "falecido em 2009"}
 
 # ── Limiares (as réguas das contas) ──────────────────────────────────────────────────────────
 limiares:

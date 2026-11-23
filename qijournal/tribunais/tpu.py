@@ -302,7 +302,7 @@ def _siglas_padrao(classes: dict[int, tuple[int | None, str, str | None, int]]) 
 # ── o dump do SGT ────────────────────────────────────────────────────────────────────────────
 
 # Literal SQL do dump: aspas dobradas ('') e, por um vício herdado do MySQL, escapes com barra (\' \").
-_LITERAL = re.compile(r"'((?:[^'\\]|\\.|'')*)'", re.S)
+_LITERAL = re.compile(r"'((?:[^'\\]|\\.|'')*)'", re.DOTALL)
 _INSERT = re.compile(r"INSERT INTO ([A-Za-z_]+) \(([^)]*)\) VALUES ")
 _PALAVRA = re.compile(r"[A-Za-z_][A-Za-z_0-9]*")
 _NUMERO = re.compile(r"-?\d+(?:\.\d+)?")
@@ -311,7 +311,7 @@ TABELAS = ("ITENS", "ASSUNTOS", "CLASSES")  # só estas interessam à aba
 
 
 def _desfazer(literal: str) -> str:
-    return re.sub(r"\\(.)", r"\1", literal.replace("''", "'"), flags=re.S)
+    return re.sub(r"\\(.)", r"\1", literal.replace("''", "'"), flags=re.DOTALL)
 
 
 def _valores(s: str, i: int, variaveis: dict[str, str]) -> tuple[list[Any], int]:
@@ -540,7 +540,7 @@ def dump_da_pagina(pagina: str) -> tuple[int, str | None] | None:
     """Da página de versões do SGT (``versoes.php``): (número da versão, data) do dump
     Oracle/Postgres (``value="85_dump_dados_oracle_postgres.sql"``)."""
     m = re.search(
-        r"(\d{2})/(\d{2})/(\d{4})\s*</td>\s*<td>\s*<input[^>]*value=\"(\d+)_dump_dados_oracle_postgres\.sql\"", pagina or "", re.S
+        r"(\d{2})/(\d{2})/(\d{4})\s*</td>\s*<td>\s*<input[^>]*value=\"(\d+)_dump_dados_oracle_postgres\.sql\"", pagina or "", re.DOTALL
     )
     if m:
         dia, mes, ano, numero = m.groups()

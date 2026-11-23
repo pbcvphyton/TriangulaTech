@@ -1,0 +1,101 @@
+{
+ "size": 0,
+ "track_total_hits": true,
+ "query": {
+  "bool": {
+   "filter": [
+    {
+     "terms": {
+      "base": [
+       "decisoes",
+       "acordaos"
+      ]
+     }
+    },
+    {
+     "range": {
+      "julgamento_data": {
+       "gte": "2025-11-23",
+       "lte": "2026-11-22",
+       "format": "yyyy-MM-dd"
+      }
+     }
+    }
+   ]
+  }
+ },
+ "aggs": {
+  "ultima": {
+   "max": {
+    "field": "julgamento_data",
+    "format": "yyyy-MM-dd"
+   }
+  },
+  "base": {
+   "terms": {
+    "field": "base",
+    "size": 5
+   },
+   "aggs": {
+    "mes": {
+     "date_histogram": {
+      "field": "julgamento_data",
+      "calendar_interval": "month",
+      "format": "yyyy-MM"
+     }
+    }
+   }
+  },
+  "classe": {
+   "terms": {
+    "field": "processo_classe_processual_unificada_classe_sigla.keyword",
+    "size": 100
+   },
+   "aggs": {
+    "processos": {
+     "cardinality": {
+      "field": "processo_numero",
+      "precision_threshold": 40000
+     }
+    }
+   }
+  },
+  "relator": {
+   "terms": {
+    "field": "relator_processo_nome.keyword",
+    "size": 200
+   },
+   "aggs": {
+    "base": {
+     "terms": {
+      "field": "base",
+      "size": 5
+     },
+     "aggs": {
+      "mes": {
+       "date_histogram": {
+        "field": "julgamento_data",
+        "calendar_interval": "month",
+        "format": "yyyy-MM"
+       }
+      }
+     }
+    },
+    "classe": {
+     "terms": {
+      "field": "processo_classe_processual_unificada_classe_sigla.keyword",
+      "size": 100
+     },
+     "aggs": {
+      "processos": {
+       "cardinality": {
+        "field": "processo_numero",
+        "precision_threshold": 40000
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

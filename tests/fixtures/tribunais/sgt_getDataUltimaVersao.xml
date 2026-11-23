@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="https://www.cnj.jus.br/sgt/sgt_ws.php"><SOAP-ENV:Header>
+    <dep:Deprecation xmlns:dep="http://www.cnj.jus.br/sgt/deprecation" mustUnderstand="0">
+      <dep:Message>Endpoint depreciado. Migre para https://sgt.cloud.cnj.jus.br/api/v1/soap</dep:Message>
+      <dep:Successor>https://sgt.cloud.cnj.jus.br/api/v1/soap</dep:Successor>
+    </dep:Deprecation>
+  </SOAP-ENV:Header>
+  <SOAP-ENV:Body><ns1:getDataUltimaVersaoResponse><return>05/11/2026</return></ns1:getDataUltimaVersaoResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>
