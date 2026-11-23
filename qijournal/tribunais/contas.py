@@ -19,10 +19,14 @@ O que se mede (analista jurídico §1–§8):
   mais). Quem herdou acervo, chegou à Turma há menos de 6 meses ou tem menos de 1.000 processos
   aparece sem marca, com o selo;
 - **quem se repete**: os litigantes (PJ e ente, pelo grupo de ``partes.py``) em processos
-  distintos, por polo, no tribunal e por ministro; processo em segredo conta nos números e nunca
-  alimenta lista; nos precatórios (Prc, RPV) o requerente é o credor e fica fora;
-- **o que se mede no lugar do valor**: ente público num polo (União, Fazenda Nacional, INSS,
-  Estado ou DF, Município), pedido de liminar ou tutela pendente, recortes econômicos;
+  distintos, por polo (recorre, responde ou interessado), no tribunal e por ministro, sobre a base
+  de ``cobertura.partes.base``: sem os processos em segredo (que contam no acervo, nas áreas e no
+  dinheiro público, mas não entram nesta conta nem em lista nenhuma) e sem os precatórios (Prc,
+  RPV), em que o requerente é o credor; a parte de cada um (``p``) é sobre essa base;
+- **o que se mede no lugar do valor**: dinheiro público num polo (União, Fazenda Nacional, INSS,
+  Estado ou DF, Município; o Ministério Público, a Defensoria e as autarquias não entram), a
+  liminar (STJ: o processo chegou com pedido de liminar; STF: liminar ou tutela pendente),
+  recortes econômicos;
 - **o fluxo**: o que entrou (atas: sorteio × herança × registro), o que vai a julgamento (pautas),
   o que foi decidido (STJ: íntegras, com o atraso; STF: a pesquisa de jurisprudência) e os temas.
 
@@ -40,14 +44,14 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
-from statistics import median
+from statistics import median, median_low
 from typing import Any
 from zoneinfo import ZoneInfo
 
 from ..congresso.pais_estat import binomial_bicaudal, holm, percentil
 from . import VERSAO
 from .achados import temas_recentes
-from .modelo import Composicao, Ministro, Regras
+from .modelo import Composicao, Ministro, Regras, normalizar
 from .partes import (
     Catalogo,
     CoberturaSTF,
@@ -232,6 +236,8 @@ class Conta:
     polos: Counter[tuple[str, str]] = field(default_factory=Counter)  # (grupo, polo) → processos
     sem_decisao: list[int] = field(default_factory=list)  # na mesa, não sobrestado (STJ: sem decisão; STF: concluso)
     no_tribunal: list[int] = field(default_factory=list)
+    anos: Counter[int] = field(default_factory=Counter)  # STF: o ano de autuação (a planilha não dá o dia)
+    recursos: int = 0
     antigos: _Antigos | None = None
     vistas: list[Any] = field(default_factory=list)
 
@@ -491,13 +497,47 @@ def _decisoes(trib: str, dados: Any, hoje: date, regras: Regras) -> tuple[dict[s
 TIPOS_TEMA_PENDENTE = ("repetitivo", "iac")  # o que o analista conta como "tema sob relatoria" no STJ
 
 
+def _nome_relator(texto: str) -> str:
+    """O nome de um relator fora da composição como a página mostra: ``"Fulano de Tal
+    (DESEMBARGADOR Convocado do Tjdft)"`` → ``"Fulano de Tal (desembargador convocado do TJDFT)"``."""
+    m = re.match(r"^(.*?)\s*\((.*)\)\s*$", texto)
+    nome, extra = (m.group(1), m.group(2)) if m else (texto, "")
+    nome = nome_proprio(nome) or nome
+    if not extra:
+        return nome
+    extra = " ".join(extra.split()).lower()
+    extra = re.sub(r"\bconvocad([oa]) (tj|trf|trt)", r"convocad\1 do \2", extra, flags=re.IGNORECASE)
+    extra = re.sub(r"\b(tj[a-z]{1,4}|trf|trt)\b", lambda x: x.group(1).upper(), extra)
+    return f"{nome} ({extra})"
+
+
 def _temas(trib: str, dados: Any, regras: Regras) -> tuple[dict[str, Any] | None, dict[str, list[dict[str, Any]]]]:
     """O bloco ``temas`` do painel e a lista de temas pendentes de cada ministro."""
     if dados is None:
         return None, {}
     por: dict[str, list[dict[str, Any]]] = defaultdict(list)
     saiu: Counter[str] = Counter()
+    motivos: dict[str, str] = {}
+    sem_relator = 0
     por_tipo: Counter[str] = Counter()
+    composicao = regras.composicao[trib]
+
+    def quem_saiu(bruto: Any) -> None:
+        """O relator que não está mais na composição, pelo nome canônico de ``saiu`` (com o motivo);
+        fora da lista, o nome como veio, com o parêntese do convocado arrumado."""
+        nonlocal sem_relator
+        texto = re.sub(r"^MIN\.?\s*", "", str(bruto or "").strip())
+        if not texto or normalizar(texto) in ("NAO INFORMADO", "RELATOR NAO INFORMADO", "-"):
+            sem_relator += 1
+            return
+        achado = composicao.saida(texto)
+        if achado is not None:
+            nome, motivo = achado
+            motivos[nome] = motivo
+        else:
+            nome = _nome_relator(texto)
+        saiu[nome] += 1
+
     if trib == "stj":
         temas = list(dados)
         for t in temas:
@@ -510,12 +550,12 @@ def _temas(trib: str, dados: Any, regras: Regras) -> tuple[dict[str, Any] | None
                 por[t["relator_id"]].append({"numero": t.get("numero"), "tipo": t.get("tipo"), "titulo": t.get("titulo"),
                                              "situacao": t.get("situacao"), "desde": t.get("desde"), "link": t.get("link")})
             elif (t.get("fora") or "residuos") == "residuos":
-                saiu[nome_proprio(t.get("relator")) or "Relator não informado"] += 1
+                quem_saiu(t.get("relator"))
         pendentes = sum(por_tipo[t] for t in TIPOS_TEMA_PENDENTE)
         painel = {"fonte": "stj_precedentes", "pendentes": pendentes,
                   "por_tipo": {"repetitivo": por_tipo["repetitivo"], "iac": por_tipo["iac"], "rg": 0,
                                **{k: v for k, v in sorted(por_tipo.items()) if k not in ("repetitivo", "iac")}},
-                  "relator_saiu": _ordenado(saiu)}
+                  "relator_saiu": [[n, k, motivos.get(n, "")] for n, k in _ordenado(saiu)], "sem_relator": sem_relator}
     else:
         temas = list((dados or {}).get("temas") or ())
         for t in temas:
@@ -526,9 +566,9 @@ def _temas(trib: str, dados: Any, regras: Regras) -> tuple[dict[str, Any] | None
                 por[t["relator_id"]].append({"numero": t.get("numero"), "tipo": "rg", "titulo": t.get("titulo"),
                                              "situacao": t.get("situacao"), "desde": t.get("desde"), "link": t.get("link")})
             elif (t.get("fora") or "residuos") == "residuos":
-                saiu[nome_proprio(re.sub(r"^MIN\.?\s*", "", str(t.get("relator") or "").strip())) or "Relator não informado"] += 1
+                quem_saiu(t.get("relator"))
         painel = {"fonte": "stf_rg", "pendentes": por_tipo["rg"], "por_tipo": {"repetitivo": 0, "iac": 0, "rg": por_tipo["rg"]},
-                  "relator_saiu": _ordenado(saiu)}
+                  "relator_saiu": [[n, k, motivos.get(n, "")] for n, k in _ordenado(saiu)], "sem_relator": sem_relator}
     for lista in por.values():
         lista.sort(key=lambda x: (x["tipo"] or "", x["numero"] if x["numero"] is not None else 10**9))
     return painel, por
@@ -603,6 +643,8 @@ class Contas:
         self.pauta_segredo: set[str] = set()  # na pauta, mas em segredo no acervo: nunca vai a lista
         self.cobertura_stf = CoberturaSTF() if trib == "stf" else None
         self.area_por: Counter[str] = Counter()
+        self.recursos = 0  # processos de classe recursal (limiares.classes_recurso): "recorre" e "responde"
+        self.classes_recurso = frozenset(str(c) for c in ((lim.get("classes_recurso") or {}).get(trib) or ()))
 
     # ── somar ────────────────────────────────────────────────────────────────────────────────
 
@@ -624,9 +666,7 @@ class Contas:
         if datas.get("autuacao"):
             d = _data(datas["autuacao"])
             return max(0, (ref - d).days) if d else None
-        if datas.get("ano_autuacao"):
-            return max(0, (ref.year - int(datas["ano_autuacao"])) * 365)
-        return None
+        return None  # só o ano (STF): a idade em dias seria inventada; vale o ano (autuacao)
 
     def _dias_mesa(self, p: Mapping[str, Any]) -> int | None:
         return p.get("sem_decisao_dias") if self.trib == "stj" else p.get("concluso_dias")
@@ -713,6 +753,13 @@ class Contas:
         dias_trib = self._dias_no_tribunal(p)
         if dias_trib is not None:
             conta.no_tribunal.append(dias_trib)
+        else:
+            ano = (p.get("datas") or {}).get("ano_autuacao")
+            if ano:
+                conta.anos[int(ano)] += 1
+        if str(p.get("classe") or "") in self.classes_recurso:
+            conta.recursos += 1
+            self.recursos += 1
         if p.get("na_mesa"):
             conta.na_mesa += 1
             dias = self._dias_mesa(p)
@@ -780,7 +827,9 @@ class Contas:
         # selos e comparabilidade
         selos: dict[str, list[str]] = {}
         comparavel: dict[str, bool] = {}
+        relogio: dict[str, str] = {}  # quem teve o relógio da mesa reiniciado há menos de um ano (chegada à Turma, herança)
         ref = _data(self.data_dados) or self.hoje
+        reduzida = self._distribuicao_reduzida(entradas_painel, entradas_por)
         for mid, m in self.ministros.items():
             c = self.contas[mid]
             s = []
@@ -797,44 +846,88 @@ class Contas:
             if (mid in self.grade and entradas_painel is not None and entradas_painel["dias_com_ata"] >= 20
                     and not (entradas_por.get(mid) or {}).get("resumo", {}).get("sorteio_30d")):
                 s.append("sem_distribuicao")
+            elif mid in reduzida:
+                s.append("distribuicao_reduzida")
             if mid in self.grade and c.processos < minimo_acervo:
                 s.append("poucos_processos")
             selos[mid] = s
             comparavel[mid] = mid in self.grade and not ({"heranca", "recem_chegado", "poucos_processos"} & set(s))
+            # O relógio do "sem decisão" recomeça na redistribuição e na atribuição: quem chegou à Turma
+            # (ou herdou acervo) há menos de mesa_dias[1] dias não pode ter nada acima disso por construção.
+            marcos = []
+            if mid in self.grade and m.turma_desde and (ref - date.fromisoformat(m.turma_desde)).days < self.mesa_dias[1]:
+                marcos.append(m.turma_desde)
+            if "heranca" in s and mid in entradas_por:
+                dias_h = [d for d, n in entradas_por[mid]["dossie"]["heranca_dias"] if (ref - date.fromisoformat(d)).days < self.mesa_dias[1]]
+                grandes = [d for d, n in entradas_por[mid]["dossie"]["heranca_dias"] if d in dias_h and n >= 100]
+                if grandes or dias_h:
+                    marcos.append(min(grandes or dias_h))
+            if marcos:
+                relogio[mid] = max(marcos)
 
         # a matriz e o teste
-        celulas: dict[str, dict[str, dict[str, Any]]] = {}
-        testes: dict[tuple[str, str], float] = {}
-        detalhes: dict[tuple[str, str], dict[str, Any]] = {}
-        for mid in self.ministros:
-            c = self.contas[mid]
-            pares = self._pares(mid)
-            pares_areas = self._soma(pares, "areas")
-            pares_n = sum(self.contas[o].processos for o in pares)
-            linha = {}
-            for a in ids_areas:
-                k = c.areas.get(a, 0)
-                p = fracao(k, c.processos)
-                q = fracao(pares_areas.get(a, 0), pares_n) if pares_n else None
-                linha[a] = {"n": k, "p": p if p is not None else 0.0, "pares": q, "razao": razao(p, q), "marca": 0}
-                if comparavel[mid] and pares_n and (k >= minimo_area or pares_areas.get(a, 0) >= minimo_area):
-                    p0 = pares_areas.get(a, 0) / pares_n
-                    if 0.0 < p0 < 1.0:
-                        testes[(mid, a)] = binomial_bicaudal(k, c.processos, p0)
-                        detalhes[(mid, a)] = {"k": k, "n": c.processos, "p": k / c.processos, "pares": p0,
-                                              "pares_n": pares_n, "pares_k": pares_areas.get(a, 0)}
-            celulas[mid] = linha
-        passam = holm(testes, alfa) if testes else set()
-        marcas = []
-        for chave, pv in sorted(testes.items(), key=lambda kv: (kv[1], kv[0])):
-            d = detalhes[chave]
-            r = d["p"] / d["pares"]
-            efeito = (r >= razao_max or r <= razao_min) and abs(d["p"] - d["pares"]) >= pontos
-            marca = (1 if r > 1 else -1) if (chave in passam and efeito) else 0
-            celulas[chave[0]][chave[1]]["marca"] = marca
-            marcas.append({"ministro": chave[0], "area": chave[1], "k": d["k"], "n": d["n"], "p": round(d["p"], 4),
-                           "pares": round(d["pares"], 4), "pares_k": d["pares_k"], "pares_n": d["pares_n"],
-                           "razao": round(r, 2), "p_valor": pv, "acaso": chave in passam, "efeito": efeito, "marca": marca})
+        modo_pares = ((comp.get("pares") or {}).get(trib) or "turma")
+        sem_destoante = trib in (comp.get("sem_destoante") or ())
+
+        def testar(destoantes: Mapping[str, set[str]]) -> tuple[dict[str, dict[str, dict[str, Any]]], dict[tuple[str, str], float],
+                                                                 dict[tuple[str, str], dict[str, Any]]]:
+            """As células da matriz e os testes; ``destoantes``: por área, quem sai dos pares dos outros."""
+            celulas: dict[str, dict[str, dict[str, Any]]] = {}
+            testes: dict[tuple[str, str], float] = {}
+            detalhes: dict[tuple[str, str], dict[str, Any]] = {}
+            for mid in self.ministros:
+                c = self.contas[mid]
+                pares = self._pares(mid)
+                pares_areas = self._soma(pares, "areas")
+                pares_n = sum(self.contas[o].processos for o in pares)
+                linha = {}
+                for a in ids_areas:
+                    fora = sorted(o for o in destoantes.get(a, ()) if o in pares)
+                    pa_k, pa_n = pares_areas.get(a, 0), pares_n
+                    if fora:
+                        pa_k -= sum(self.contas[o].areas.get(a, 0) for o in fora)
+                        pa_n -= sum(self.contas[o].processos for o in fora)
+                    k = c.areas.get(a, 0)
+                    p = fracao(k, c.processos)
+                    q = fracao(pa_k, pa_n) if pa_n else None
+                    linha[a] = {"n": k, "p": p if p is not None else 0.0, "pares": q, "razao": razao(p, q), "marca": 0}
+                    if comparavel[mid] and pa_n and (k >= minimo_area or pa_k >= minimo_area):
+                        p0 = pa_k / pa_n
+                        if 0.0 < p0 < 1.0:
+                            testes[(mid, a)] = binomial_bicaudal(k, c.processos, p0)
+                            detalhes[(mid, a)] = {"k": k, "n": c.processos, "p": k / c.processos, "pares": p0,
+                                                  "pares_n": pa_n, "pares_k": pa_k, "fora": fora}
+                celulas[mid] = linha
+            return celulas, testes, detalhes
+
+        def marcar(celulas: dict[str, dict[str, dict[str, Any]]], testes: Mapping[tuple[str, str], float],
+                   detalhes: Mapping[tuple[str, str], dict[str, Any]]) -> list[dict[str, Any]]:
+            passam = holm(dict(testes), alfa) if testes else set()
+            saida = []
+            for chave, pv in sorted(testes.items(), key=lambda kv: (kv[1], kv[0])):
+                d = detalhes[chave]
+                r = d["p"] / d["pares"]
+                efeito = (r >= razao_max or r <= razao_min) and abs(d["p"] - d["pares"]) >= pontos
+                marca = (1 if r > 1 else -1) if (chave in passam and efeito) else 0
+                celulas[chave[0]][chave[1]]["marca"] = marca
+                saida.append({"ministro": chave[0], "area": chave[1], "k": d["k"], "n": d["n"], "p": round(d["p"], 4),
+                              "pares": round(d["pares"], 4), "pares_k": d["pares_k"], "pares_n": d["pares_n"],
+                              "razao": round(r, 2), "p_valor": pv, "acaso": chave in passam, "efeito": efeito, "marca": marca,
+                              **({"fora": d["fora"]} if d.get("fora") else {})})
+            return saida
+
+        celulas, testes, detalhes = testar({})
+        marcas = marcar(celulas, testes, detalhes)
+        if sem_destoante and modo_pares != "turma":
+            # Pares = o tribunal inteiro: o gabinete bem acima numa área (▲) sai da conta dos outros
+            # naquela área (um acervo concentrado por prevenção não marca os demais "abaixo").
+            destoantes: dict[str, set[str]] = defaultdict(set)
+            for x in marcas:
+                if x["marca"] > 0:
+                    destoantes[x["area"]].add(x["ministro"])
+            if destoantes:
+                celulas, testes, detalhes = testar(destoantes)
+                marcas = marcar(celulas, testes, detalhes)
 
         # os nomes publicáveis
         def nome_de(gid: str) -> dict[str, Any]:
@@ -881,12 +974,14 @@ class Contas:
                 convocado = {"tribunal": convocado.get("tribunal"), "vaga_de": convocado.get("vaga_de"), "desde": m.turma_desde}
             sem_decisao = idade(c.sem_decisao, limites=self.mesa_dias)
             no_tribunal = idade(c.no_tribunal, limites=self.mesa_dias, completa=trib == "stj")
+            autuacao = _autuacao(c.anos, ref)
             resumo = {
                 "id": mid, "nome": m.nome, "genero": m.genero, "grupo": self.grupo_de[mid], "turma": m.turma, "secao": m.secao,
                 "cargos": list(m.cargos), "convocado": convocado, "selos": selos[mid], "comparavel": comparavel[mid],
                 "processos": c.processos, "na_mesa": c.na_mesa, "onde": {o: c.onde.get(o, 0) for o in ONDES},
                 "segredo": c.segredo, "sobrestados": c.sobrestados, "liminar": c.liminar, "ente_publico": c.ente_publico,
-                "sem_decisao": sem_decisao, "no_tribunal": no_tribunal, "areas": celulas[mid],
+                "sem_decisao": sem_decisao, "no_tribunal": no_tribunal, **({"autuacao": autuacao} if autuacao else {}),
+                **({"relogio": relogio[mid]} if mid in relogio else {}), "areas": celulas[mid],
                 "subareas": [[s, n, fracao(n, c.processos)] for s, n in _ordenado(c.subareas, int(self.listas.get("subareas_painel", 5)))],
                 "partes": partes_min,
                 "mais_antigos": folhas[:n_painel],
@@ -941,8 +1036,9 @@ class Contas:
                 "classes": _ordenado(c.classes),
                 "onde": {o: c.onde.get(o, 0) for o in ONDES},
                 "idade": {
-                    "no_tribunal": {"faixas": faixas(c.no_tribunal, meses) if trib == "stj" else None,
+                    "no_tribunal": {"faixas": faixas(c.no_tribunal, meses) if c.no_tribunal else None,
                                     "mediana": no_tribunal["mediana"], "p90": no_tribunal["p90"]},
+                    **({"autuacao": autuacao} if autuacao else {}),
                     "sem_decisao": {"faixas": faixas(c.sem_decisao, meses), "mediana": sem_decisao["mediana"], "p90": sem_decisao["p90"],
                                     "mais_180": sem_decisao["mais_180"], "mais_365": sem_decisao["mais_365"]},
                 },
@@ -1005,7 +1101,7 @@ class Contas:
         for gid in top_ids[: int(self.listas.get("partes_tribunal", 30))]:
             nomes_usados.add(gid)
             area_dele = _ordenado(self.lit_area.get(gid, Counter()), 1)
-            top.append({"id": gid, **nome_de(gid), "n": self.lit_n[gid], "p": fracao(self.lit_n[gid], self.processos),
+            top.append({"id": gid, **nome_de(gid), "n": self.lit_n[gid], "p": fracao(self.lit_n[gid], self.base_partes),
                         "recorre": self.lit_polo.get((gid, "ativo"), 0), "responde": self.lit_polo.get((gid, "passivo"), 0),
                         "outro": self.lit_polo.get((gid, "outro"), 0), "mesas": len(self.lit_mesas.get(gid, ())),
                         "area": area_dele[0][0] if area_dele else None})
@@ -1038,20 +1134,25 @@ class Contas:
 
         grade_sem = [v for i in self.grade for v in self.contas[i].sem_decisao]
         grade_trib = [v for i in self.grade for v in self.contas[i].no_tribunal]
+        grade_anos: Counter[int] = Counter()
+        for i in self.grade:
+            grade_anos.update(self.contas[i].anos)
+        autuacao_grade = _autuacao(grade_anos, ref)
         universo = {
             "processos": self.processos, "na_grade": grade_n,
             "na_mesa": sum(self.contas[i].na_mesa for i in self.grade), "segredo": self.segredo,
             "sobrestados": self.sobrestados, "liminar": self.liminar, "ente_publico": self.ente_publico,
             "sem_decisao_180": sum(1 for v in grade_sem if v > self.mesa_dias[0]),
             "sem_decisao_365": sum(1 for v in grade_sem if v > self.mesa_dias[1]),
-            "pessoas_fisicas": self.pessoas_fisicas,
+            "pessoas_fisicas": self.pessoas_fisicas, "recursos": self.recursos,
         }
         nome, sigla = NOMES[trib]
         painel = {
             "v": VERSAO, "trib": trib, "nome": nome, "sigla": sigla, "data_dados": self.data_dados,
             "universo": universo,
             "idade": {"sem_decisao": idade(grade_sem, limites=self.mesa_dias),
-                      "no_tribunal": idade(grade_trib, limites=self.mesa_dias, completa=trib == "stj")},
+                      "no_tribunal": idade(grade_trib, limites=self.mesa_dias, completa=trib == "stj"),
+                      **({"autuacao": autuacao_grade} if autuacao_grade else {})},
             "grupos": grupos, "media": media, "ministros": resumos, "fora_da_grade": fora, "areas": areas, "recortes": recortes,
             "partes": {"top": top, "pessoas_fisicas": self.pessoas_fisicas,
                        "ente_publico": {"n": self.ente_publico, "p": fracao(self.ente_publico, self.processos), "por_grupo": ente_por_grupo},
@@ -1078,7 +1179,7 @@ class Contas:
         sinais = {
             "trib": trib, "data_dados": self.data_dados, "hoje": self.hoje.isoformat(),
             "testes": len(testes), "marcas": marcas,
-            "mesa": self._sinais_mesa(comparavel, alfa, razao_min, razao_max, pontos),
+            "mesa": self._sinais_mesa(comparavel, alfa, razao_min, razao_max, pontos, selos=selos, relogio=relogio),
             "heranca": {mid: d["dossie"]["heranca_dias"] for mid, d in entradas_por.items() if d["dossie"]["heranca_dias"]},
             "entradas_dia": ({d: {dest: dict(c) for dest, c in fluxo.por_dia[d].items()} for d in fluxo.dias[-7:]}
                              if fluxo is not None else {}),
@@ -1091,12 +1192,42 @@ class Contas:
         }
         return Resultado(painel=painel, dossies=dossies, cobertura=cobertura, sinais=sinais)
 
+    def _distribuicao_reduzida(self, entradas_painel: Mapping[str, Any] | None, entradas_por: Mapping[str, Any]) -> set[str]:
+        """Os gabinetes da grade que recebem por distribuição bem menos que os pares (quem acumula o
+        TSE, por exemplo): com 20 dias de ata ou mais, sorteio de 30 dias abaixo de
+        ``limiares.distribuicao_reduzida`` × a mediana da Turma (STJ) ou do grupo (STF). O zero é
+        "sem distribuição" (outro selo)."""
+        if entradas_painel is None or entradas_painel.get("dias_com_ata", 0) < 20:
+            return set()
+        fator = float(self.regras.limiares.get("distribuicao_reduzida", 0.5))
+        chave = (lambda m: m.turma) if self.trib == "stj" else (lambda m: self.grupo_de[m.id])
+        por_turma: dict[str, list[str]] = defaultdict(list)
+        for mid in sorted(self.grade):
+            por_turma[str(chave(self.ministros[mid]))].append(mid)
+        saida = set()
+        for ids in por_turma.values():
+            recebido = {mid: int(((entradas_por.get(mid) or {}).get("resumo") or {}).get("sorteio_30d") or 0) for mid in ids}
+            if len(ids) < 2:
+                continue
+            base = median(recebido.values())
+            saida |= {mid for mid, n in recebido.items() if 0 < n < fator * base}
+        return saida
+
     def _sinais_mesa(self, comparavel: Mapping[str, bool], alfa: float, razao_min: float, razao_max: float,
-                     pontos: float) -> list[dict[str, Any]]:
+                     pontos: float, *, selos: Mapping[str, Sequence[str]] | None = None,
+                     relogio: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
         """A "mesa antiga": em cada Turma (STJ) ou grupo (STF), o ministro comparável com a maior
         parte da mesa parada há mais de um ano, testado contra o resto da Turma (binomial exata,
-        Holm a 99% entre as Turmas, piso de efeito)."""
+        Holm a 99% entre as Turmas, piso de efeito).
+
+        Ficam fora dos candidatos **e dos pares**: quem não é comparável, quem recebe menos por
+        distribuição (selos ``distribuicao_reduzida`` e ``sem_distribuicao``: o acervo envelhece de
+        outro jeito) e quem teve o relógio reiniciado há menos de ``mesa_dias[1]`` dias (chegada à
+        Turma, herança: não pode ter nada acima do limite por construção, e baixaria a taxa dos
+        pares). Sem pelo menos 2 pares, a Turma fica sem candidato."""
         limite = self.mesa_dias[1]
+        selos = selos or {}
+        relogio = relogio or {}
         chave_grupo = (lambda m: m.turma) if self.trib == "stj" else (lambda m: self.grupo_de[m.id])
         por_turma: dict[str, list[str]] = defaultdict(list)
         for mid in sorted(self.grade):
@@ -1107,17 +1238,23 @@ class Contas:
             for mid in ids:
                 valores = self.contas[mid].sem_decisao
                 dados[mid] = (sum(1 for v in valores if v > limite), len(valores))
-            elegiveis = [mid for mid in ids if comparavel.get(mid) and dados[mid][1] >= 100]
+            validos = [mid for mid in ids if comparavel.get(mid) and mid not in relogio
+                       and not ({"distribuicao_reduzida", "sem_distribuicao"} & set(selos.get(mid) or ()))]
+            elegiveis = [mid for mid in validos if dados[mid][1] >= 100]
             if not elegiveis:
                 continue
             mid = max(elegiveis, key=lambda i: (dados[i][0] / dados[i][1], i))
             k, n = dados[mid]
-            pk = sum(dados[o][0] for o in ids if o != mid)
-            pn = sum(dados[o][1] for o in ids if o != mid)
+            pares = [o for o in validos if o != mid]
+            if len(pares) < 2:
+                continue
+            pk = sum(dados[o][0] for o in pares)
+            pn = sum(dados[o][1] for o in pares)
             if not pn or not (0 < pk / pn < 1):
                 continue
             candidatos[(turma, mid)] = {"turma": turma, "ministro": mid, "k": k, "n": n, "p": round(k / n, 4),
                                         "pares": round(pk / pn, 4), "pares_k": pk, "pares_n": pn,
+                                        "n_pares": len(pares), "fora": sorted(o for o in ids if o != mid and o not in pares),
                                         "p_valor": binomial_bicaudal(k, n, pk / pn)}
         passam = holm({c: v["p_valor"] for c, v in candidatos.items()}, alfa) if candidatos else set()
         saida = []
@@ -1127,6 +1264,18 @@ class Contas:
             v["passa"] = chave in passam and r >= razao_max and (v["p"] - v["pares"]) >= pontos
             saida.append(v)
         return saida
+
+
+def _autuacao(anos: Mapping[int, int], ref: date) -> dict[str, Any] | None:
+    """STF: a planilha só dá o ano de autuação. ``{ano_mediano, no_ano_dos_dados, por_ano}``: o
+    ano em que metade do acervo já tinha chegado (a mediana dos anos), a parte autuada no ano dos
+    dados e a contagem por ano. ``None`` sem nenhum ano (STJ, que tem a data)."""
+    total = sum(anos.values())
+    if not total:
+        return None
+    ordenados = sorted(anos.elements())
+    return {"ano_mediano": int(median_low(ordenados)), "no_ano_dos_dados": fracao(anos.get(ref.year, 0), total),
+            "por_ano": [[a, anos[a]] for a in sorted(anos)]}
 
 
 def _temas_quentes(fluxo: Fluxo | None, regras: Regras) -> list[dict[str, Any]]:

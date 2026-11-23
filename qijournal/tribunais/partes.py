@@ -57,27 +57,36 @@ class ErroDoCatalogo(ValueError):
 
 # ── texto ────────────────────────────────────────────────────────────────────────────────────
 
-# Marcas de instituição num nome sem CNPJ: sem nenhuma, é pessoa física (e o nome some).
+# Marcas de instituição num nome sem CNPJ: sem nenhuma, é pessoa física (e o nome some). Nada que
+# seja também sobrenome comum: "Câmara" só como Câmara Municipal, dos Deputados..., e nem "Sá" (SA no
+# fim), "Brasileiro" ou "ME" (a firma individual é a própria pessoa, como o MEI). "S A" no fim fica:
+# na fonte é sempre empresa.
 _INSTITUICAO = re.compile(
-    r"\b(?:LTDA|EIRELI|S ?/ ?A|S\.A|S/C|EPP|LIMITED|LTD|LLC|INC|CORP|CORPORATION|GMBH|BANCO|BANK|CIA|COMPANHIA|"
-    r"SINDICATO|ASSOCIACAO|FEDERACAO|CONFEDERACAO|COOPERATIVA|FUNDACAO|INSTITUTO|CONDOMINIO|EMPRESA|ADVOGADOS|"
-    r"SOCIEDADE|PARTIDO|IGREJA|HOSPITAL|FACULDADE|UNIVERSIDADE|COLEGIO|ESCOLA|CLUBE|MASSA FALIDA|CONSORCIO|SEGURADORA|"
+    r"\b(?:LTDA|LIMITADA|EIRELI|S ?/ ?A|S\.A|S/C|EPP|LIMITED|LTD|LLC|INC|CORP|CORPORATION|GMBH|BANCO|BANK|CIA|COMPANHIA|"
+    r"SINDICATO|ASSOCIACAO|ASSOC|FEDERACAO|CONFEDERACAO|CONFED|COOPERATIVA|FUNDACAO|INSTITUTO|INSTITUICAO|CONDOMINIO|EMPRESA|"
+    r"ADVOGADOS|SOCIEDADE|PARTIDO|IGREJA|HOSPITAL|FACULDADE|UNIVERSIDADE|COLEGIO|ESCOLA|CLUBE|MASSA FALIDA|CONSORCIO|SEGURADORA|"
     r"SEGUROS|ASSOCIADOS|COMERCIO|INDUSTRIA|SERVICOS|PARTICIPACOES|ENGENHARIA|CONSTRUTORA|TRANSPORTES|AGROPECUARIA|"
     r"ADMINISTRADORA|INVESTIMENTOS|FUNDO|ORGANIZACAO|ENTIDADE|UNIMED|OAB|ORDEM DOS ADVOGADOS|DISTRIBUIDORA|ENERGIA|"
     r"SANEAMENTO|TELECOMUNICACOES|PREVIDENCIA|PREVIDENCIARIA|AGENCIA|AUTARQUIA|DEPARTAMENTO|SUPERINTENDENCIA|"
-    r"SECRETARIA|MINISTERIO|PROCURADORIA|DEFENSORIA|ADVOCACIA|CONSELHO|CONGRESSO|SENADO|CAMARA|ASSEMBLEIA|MESA D[AO]|"
+    r"SECRETARIA|MINISTERIO|PROCURADORIA|DEFENSORIA|ADVOCACIA|CONSELHO|CONGRESSO|SENADO|"
+    r"CAMARA (?:MUNICIPAL|DOS DEPUTADOS|LEGISLATIVA|DE VEREADORES|DE COMERCIO)|ASSEMBLEIA|MESA D[AO]|"
     r"TRIBUNAL|PREFEITURA|MUNICIPIO|ESTADO D[OAE]|DISTRITO FEDERAL|UNIAO|FAZENDA|INSS|GOVERNO|POLICIA|COMANDO|"
     r"EXERCITO|MARINHA|AERONAUTICA|CENTRO|NUCLEO|REDE|MOVIMENTO|COLETIVO|COMISSAO|COMITE|ALIANCA|COORDENACAO|"
-    r"COMUNIDADE|POVOS?|NACAO|NACIONAL|BRASILEIR[AO]|S A$|SA$|ME$)\b"
+    r"COMUNIDADE|POVOS?|NACAO|NACIONAL|USINA|METALURGICA|CONCESSIONARIA|LOJAS|SUPERMERCADOS?|CIMENTO|SISTEMAS|PRODUTOS|"
+    r"ACUCAREIRA|LATICINIOS|MINERACAO|S A$)\b"
 )
 # Entes públicos que a expressão do STJ (stj._ENTE) não pega (no STF aparecem mais).
 _ENTE_EXTRA = re.compile(
-    r"\b(?:CONGRESSO NACIONAL|MESA D[AO]|SENADO FEDERAL|CAMARA DOS DEPUTADOS|ASSEMBLEIA LEGISLATIVA|CAMARA MUNICIPAL|"
+    r"\b(?:CONGRESSO NACIONAL|MESA D[AO]|SENADO FEDERAL|CAMARA DOS DEPUTADOS|ASSEMBLEIA LEGISLATIVA|CAMARA MUNICIPAL|CAMARA DE VEREADORES|"
     r"SECRETARIA D|POLICIA (?:FEDERAL|CIVIL|MILITAR)|GOVERNO D|AGENCIA (?:NACIONAL|ESTADUAL|REGULADORA|GOIANA)|"
     r"DEPARTAMENTO (?:NACIONAL|ESTADUAL|DE)|SUPERINTENDENCIA D|CONSELHO (?:NACIONAL|FEDERAL|REGIONAL|SUPERIOR)|"
     r"INSTITUTO DE PREVIDENCIA|FUNDO UNICO DE PREVIDENCIA|MINISTERIO D[AOE]|COMANDO D[AOE]|EXERCITO|MARINHA DO BRASIL|"
     r"UNIVERSIDADE (?:FEDERAL|ESTADUAL)|FUNDACAO NACIONAL|FUNDACAO UNIVERSIDADE)"
 )
+def _marca_instituicao(resto: str) -> bool:
+    return bool(_stj._PJ.search(resto) or _INSTITUICAO.search(resto) or _stj._ENTE.search(resto) or _ENTE_EXTRA.search(resto))
+
+
 _PARTICULAS = frozenset({"DE", "DA", "DO", "DAS", "DOS", "E", "EM", "NA", "NO", "NAS", "NOS", "A", "O", "AS", "OS", "PARA",
                          "POR", "COM", "SOB", "DI", "DEL", "LA", "LE"})
 _SIGLAS_PJ = frozenset({"SA", "S/A", "S.A", "S.A.", "LTDA", "ME", "EPP", "EIRELI", "S/C", "CIA"})
@@ -411,7 +420,7 @@ class Catalogo:
         if gid is None:
             return None
         lit = self.grupos.get(gid)
-        if lit is not None and lit.categoria in ("estado", "mp", "defensoria", "municipio"):
+        if lit is not None and lit.categoria in ("estado", "mp", "defensoria", "municipio", "partido"):
             return gid
         if any(g == gid for _, g in self._contem):
             return gid
@@ -425,6 +434,10 @@ class Catalogo:
             return "desconhecido"
         if _stj._ORGAO_JULGADOR.match(chave):
             return "autoridade"
+        if _stj.firma_individual(chave, marca=_marca_instituicao):
+            return "pf"  # MEI e empresário individual com nome de gente: é a própria pessoa
+        if _stj._PRIVADA_NO_COMECO.match(chave):
+            return "pj"  # sindicato, associação, partido, OAB: entidade privada, mesmo com ente no nome
         if _stj._ENTE.search(chave) or _ENTE_EXTRA.search(chave):
             return "ente"
         if _stj._PJ.search(chave) or _INSTITUICAO.search(chave):

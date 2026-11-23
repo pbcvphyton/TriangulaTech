@@ -234,17 +234,22 @@ _SEM_NOME = frozenset({"", "-", "_", "NAO CONSTA", "NAO INDICADO", "NAO INFORMAD
                        "A MESMA", "AS MESMAS", "SEM NOME", "DESCONHECIDO", "IGNORADO"})
 # Nome que termina com um CPF (11 dígitos, com ou sem pontuação): MEI, tratado como pessoa física.
 _CPF_NO_FIM = re.compile(r"(?:(?<![\d./-])\d{11}|(?<!\d)\d{3}\.\d{3}\.\d{3}-\d{2})\s*$")
+# Ente público: o nome COMEÇA pelo ente (ou o ente vem depois de " - ": "ESTADO X - PROCURADORIA").
+# "Ministério Público" no meio do nome não basta: o Sindicato dos Servidores do Poder Judiciário e do
+# Ministério Público da União é um sindicato, pessoa jurídica de direito privado.
 _ENTE = re.compile(
-    r"^(?:UNIAO\b|FAZENDA (?:NACIONAL|PUBLICA|DO ESTADO|ESTADUAL|MUNICIPAL|DO MUNICIPIO)|ESTADO D[OAE]S? |"
-    r"DISTRITO FEDERAL\b|MUNICIPIO D|PREFEITURA|CAMARA (?:MUNICIPAL|DOS DEPUTADOS)|SENADO FEDERAL|"
+    r"^(?:UNIAO\b(?! BRASIL)|FAZENDA (?:NACIONAL|PUBLICA|DO ESTADO|ESTADUAL|MUNICIPAL|DO MUNICIPIO)|ESTADO D[OAE]S? |"
+    r"DISTRITO FEDERAL\b|MUNICIPIO D|PREFEITURA|CAMARA (?:MUNICIPAL|DOS DEPUTADOS|DE VEREADORES)|SENADO FEDERAL|"
     r"ASSEMBLEIA LEGISLATIVA|INSTITUTO NACIONAL DO SEGURO SOCIAL|INSS\b|AGENCIA NACIONAL|BANCO CENTRAL DO BRASIL|"
     r"CONSELHO (?:FEDERAL|REGIONAL|NACIONAL)|DEPARTAMENTO (?:NACIONAL|ESTADUAL|DE ESTRADAS)|"
     r"UNIVERSIDADE (?:FEDERAL|ESTADUAL)|INSTITUTO FEDERAL|AUTARQUIA|SECRETARIA\b)"
-    r"|MINISTERIO PUBLICO|JUSTICA PUBLICA|DEFENSORIAS? PUBLICAS?|PROCURADORIA|ADVOCACIA[- ]GERAL"
+    r"|(?:^| - )(?:MINISTERIO PUBLICO|JUSTICA PUBLICA|DEFENSORIAS? PUBLICAS?|PROCURADORIA|ADVOCACIA[- ]GERAL)"
 )
+# Nomes que começam assim são entidades privadas, mesmo com um ente público no meio do nome.
+_PRIVADA_NO_COMECO = re.compile(r"^(?:SINDICATO|ASSOCIACAO|FEDERACAO|CONFEDERACAO|PARTIDO|ORDEM DOS ADVOGADOS|OAB\b)")
 _ORGAO_JULGADOR = re.compile(
-    r"^(?:TRIBUNALE?\b|SUPERIOR TRIBUNAL|SUPREMO TRIBUNAL|JUIZO\b|JUIZ\b|JUIZA\b|JUZGADO|JUSTICA\b(?! PUBLICA)|VARA\b|"
-    r"TURMA RECURSAL|(?:PRIMEIRA|SEGUNDA|TERCEIRA|QUARTA|QUINTA|SEXTA) (?:TURMA|SECAO|CAMARA)|SECAO\b|"
+    r"^(?:TRIBUNALE?\b|SUPERIOR TRIBUNAL|SUPREMO TRIBUNAL|JUIZO\b|JUIZ\b|JUIZA\b|JUIZADOS?\b|JUZGADO|JUSTICA\b(?! PUBLICA)|VARA\b|"
+    r"TURMAS? RECURSA|(?:PRIMEIRA|SEGUNDA|TERCEIRA|QUARTA|QUINTA|SEXTA) (?:TURMA|SECAO|CAMARA)|SECAO\b|"
     r"CORREGEDORIA\b|MINISTR[OA] D[OAE]S? |SECRETARIO\b|GOVERNADORA?\b|PREFEIT[OA]\b|"
     r"PRESIDENTE D|DELEGAD[OA] D|DIRETORA?\b|COMANDANTE\b|CHEFE D|REITORA?\b|SUPERINTENDENTE\b|"
     r"ADVOGAD[OA][- ]GERAL|PROCURADORA?[- ]GERAL)"
@@ -256,6 +261,33 @@ _PJ = re.compile(
     r"COMERCIO|INDUSTRIA|SERVICOS|PARTICIPACOES|ENGENHARIA|CONSTRUTORA|TRANSPORTES|AGROPECUARIA|ADMINISTRADORA|"
     r"INVESTIMENTOS|FUNDO|ORGANIZACAO|ENTIDADE|UNIMED|GRUPO DE ATUACAO|OAB|ORDEM DOS ADVOGADOS)\b"
 )
+
+
+# Firma individual com nome de gente: o MEI no formato atual da Receita ("12.345.678 FULANO DE TAL",
+# a raiz do próprio CNPJ antes do nome) e o empresário individual ("FULANO DE TAL - ME", "... EIRELI",
+# "... EPP"). É a própria pessoa: conta como pessoa física e o nome some ("na dúvida, o nome some").
+_RAIZ_NO_COMECO = re.compile(r"^(\d{2}\.?\d{3}\.?\d{3})\s+(?=\D)")
+_SUFIXO_FIRMA = re.compile(r"\s*-?\s*\b(?:MEI|ME|EPP|EIRELI)\.?\s*$")
+
+
+def firma_individual(chave: str, cnpj: str | None = None, marca: Callable[[str], bool] | None = None) -> bool:
+    """``chave`` (o nome já em :func:`chave_rapida`) é de firma individual com nome de gente? A raiz
+    do CNPJ no começo (igual à do próprio CNPJ, quando há) ou o sufixo ME/MEI/EPP/EIRELI no fim, e o
+    resto sem nenhuma marca de pessoa jurídica (``marca``; padrão: ``_PJ`` e ``_ENTE``): "11.222.333
+    LTDA" e "X COMERCIO LTDA - ME" são empresas."""
+    tem_marca = marca or (lambda r: bool(_PJ.search(r) or _ENTE.search(r)))
+    m = _RAIZ_NO_COMECO.match(chave)
+    if m:
+        digitos = re.sub(r"\D", "", m.group(1))
+        cnpj_digitos = re.sub(r"\D", "", cnpj or "")
+        if not cnpj_digitos or cnpj_digitos[:8] == digitos:
+            resto = chave[m.end():].strip()
+            return bool(resto) and not tem_marca(resto)
+    m = _SUFIXO_FIRMA.search(chave)
+    if m and m.start() > 0:
+        resto = chave[:m.start()].strip(" -")
+        return bool(resto) and not tem_marca(resto)
+    return False
 
 
 def cnpj_valido(cnpj: Any) -> bool:
@@ -326,11 +358,11 @@ def parte_preliminar(bruta: Mapping[str, Any]) -> Parte:
     raiz: str | None = cnpj[:8] if valido else None
     if chave == SEGREDO_PARTE or chave in _SEM_NOME:
         tipo, nome, raiz = "desconhecido", None, None
-    elif natureza == "paciente" or _CPF_NO_FIM.search(nome_bruto):
+    elif natureza == "paciente" or _CPF_NO_FIM.search(nome_bruto) or firma_individual(chave, cnpj):
         tipo, nome, raiz = "pf", None, None
     else:
         orgao = _ORGAO_JULGADOR.match(chave) is not None
-        ente = _ENTE.search(chave) is not None
+        ente = _ENTE.search(chave) is not None and not _PRIVADA_NO_COMECO.match(chave)
         pj = valido or _PJ.search(chave) is not None
         if natureza == "autoridade":
             tipo = "autoridade"
@@ -554,7 +586,8 @@ class LeitorSTJ:
                 continue
             cnpj = str(bruta.get("numeroCNPJ") or "")
             nome = str(bruta.get("nomeParte") or "")
-            if cnpj and not _CPF_NO_FIM.search(nome):  # PJ e ente se repetem muito: cache pelo trio (MEI fora: nome de gente)
+            # PJ e ente se repetem muito: cache pelo trio (MEI e firma individual fora: nome de gente nunca vira chave)
+            if cnpj and not _CPF_NO_FIM.search(nome) and not firma_individual(chave_rapida(nome), cnpj):
                 chave = (str(bruta.get("descTipoParte") or ""), nome, cnpj)
                 parte = self._pj.get(chave)
                 if parte is None:

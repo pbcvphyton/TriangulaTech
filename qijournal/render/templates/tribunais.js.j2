@@ -29,7 +29,7 @@
   function dataBr(iso) { return iso && iso.length >= 10 ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
   var MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
   function mesBr(am) { var i = parseInt(String(am).slice(5, 7), 10); return MESES[i - 1] || String(am); }  /* "2026-10" → "out" */
-  function diasDe(j) { var a = Date.parse((j || [])[0]), b = Date.parse((j || [])[1]); return isNaN(a) || isNaN(b) ? 0 : Math.round((b - a) / 864e5) + 1; }
+  function diasDaJanela(j) { var a = Date.parse((j || [])[0]), b = Date.parse((j || [])[1]); return isNaN(a) || isNaN(b) ? 0 : Math.round((b - a) / 864e5) + 1; }
   function mesAno(iso) { return iso && iso.length >= 7 ? iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
   function dias(n) {
     if (n == null) return '—';
@@ -58,8 +58,7 @@
   }
   function nomeSub(id) {
     if ((M.subareas || {})[id]) return M.subareas[id];
-    var a = (M.areas || {})[String(id).split('.')[0]];
-    return 'Outros de ' + (a ? a[0] : id);
+    return 'outros';  /* "Outros de X" ao lado do quadradinho de X repetiria o nome da área */
   }
   function nomeParte(g) {
     if ((M.partes || {})[g]) return M.partes[g];
@@ -68,7 +67,20 @@
   }
   function parteCurta(p) {
     var rot = (M.tiposParte || {})[p.tipo] || 'parte';
+    if (p.tipo === 'pj' && p.grupo && (M.empresas || []).indexOf(p.grupo) >= 0) rot = 'empresa';
     return p.grupo && (p.tipo === 'pj' || p.tipo === 'ente') ? rot + ' (' + nomeParte(p.grupo) + ')' : rot;
+  }
+  /* no recurso, quem recorre e quem responde; na ação originária (ADI, HC, MS, AR, Rcl...), os polos */
+  function polosDe(f, t) {
+    var rec = (((M.t || {})[t] || {}).recurso || []).indexOf(f.classe) >= 0;
+    return rec ? ['Recorre', 'Responde'] : ['Polo ativo', 'Polo passivo'];
+  }
+  /* STJ: o marco da conta (a mais recente entre a distribuição e a última decisão terminativa), dito como é */
+  function marcoStj(datas) {
+    var dist = datas.distribuicao, dec = datas.ultima_decisao;
+    if (dec && (!dist || dec >= dist)) return 'última decisão terminativa em ' + mesAno(dec);
+    if (dist && dec) return 'redistribuído em ' + mesAno(dist) + '; última decisão terminativa em ' + mesAno(dec);
+    return dist ? 'distribuído em ' + mesAno(dist) : '';
   }
   function partesFolha(f, polo) {
     var vistos = {}, saida = [];
@@ -171,7 +183,15 @@
     try { w.sessionStorage.setItem('qij-trib', E.t); } catch (erro) { /* sem armazenamento */ }
     lista(seletor ? seletor.querySelectorAll('button[data-trib]') : []).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-trib') === E.t ? 'true' : 'false'); });
     vistas.forEach(function (v) { v.classList.toggle('on', v.getAttribute('data-vista') === E.v); });
-    abas.forEach(function (a) { if (a.getAttribute('data-vista') === E.v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    abas.forEach(function (a) {
+      if (a.getAttribute('data-vista') !== E.v) { a.removeAttribute('aria-current'); return; }
+      a.setAttribute('aria-current', 'page');
+      var ul = a.parentNode && a.parentNode.parentNode;  /* a tira rola de lado no celular: a aba ativa fica à vista */
+      if (ul && ul.scrollWidth > ul.clientWidth) {
+        var ra = a.getBoundingClientRect(), ru = ul.getBoundingClientRect();
+        ul.scrollLeft = Math.max(0, ul.scrollLeft + (ra.left + ra.width / 2) - (ru.left + ul.clientWidth / 2));
+      }
+    });
     aplicarGrupo();
     aplicarMesa();
     aplicarArea();
@@ -238,10 +258,16 @@
     var mesas = mesasDe(E.t), atual = mesas.filter(function (m) { return !m.hidden; })[0];
     var i = mesas.indexOf(atual) + n;
     if (i < 0 || i >= mesas.length) return;
+    var veio = d.activeElement;  /* o foco não pode cair no corpo quando o cartão onde ele estava some */
     E.min = mesas[i].getAttribute('data-min');
     gravar(false);
     aplicar(false);
     var botao = root.querySelector('.tb-me-b[data-min="' + E.min + '"]');
+    if (veio && veio.closest && veio.closest('.tb-me-l') && botao) { botao.focus({ preventScroll: true }); }
+    else if (veio && veio.closest && veio.closest('.tb-cd')) {
+      var novo = mesas[i].querySelector('button[data-passo="' + n + '"]') || mesas[i].querySelector('.tb-cd-t');
+      if (novo) { if (!novo.hasAttribute('tabindex') && novo.tagName !== 'BUTTON') novo.setAttribute('tabindex', '-1'); novo.focus({ preventScroll: true }); }
+    }
     if (botao && botao.scrollIntoView) botao.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
@@ -258,8 +284,9 @@
       cartao.classList.remove('tb-carregando');
       if (erro || !x) {
         if (w.console && w.console.error) w.console.error(erro);
-        st.textContent = 'Não foi possível abrir o dossiê agora. O resumo acima vale para hoje; tente de novo em instantes.';
-        dz.removeAttribute('data-pedido');  // a próxima vez que a mesa abrir, pede de novo
+        st.textContent = 'Não foi possível abrir o dossiê agora. O resumo acima vale para hoje. ';
+        st.appendChild(h('button', { type: 'button', cls: 'cg-lg-b', 'data-tentar': id, text: 'Tentar de novo' }));
+        dz.removeAttribute('data-pedido');  // o botão (ou a próxima vez que a mesa abrir) pede de novo
         return;
       }
       st.textContent = '';
@@ -292,14 +319,15 @@
     return '';
   }
   function itemFila(f, t, de) {
-    var dd = diasDe(f, t), datas = f.datas || {}, extras = [];
+    var dd = diasDe(f, t), datas = f.datas || {}, extras = [], rot = polosDe(f, t);
     var a = partesFolha(f, 'ativo'), b = partesFolha(f, 'passivo');
-    if (a) extras.push('Recorre: ' + a);
-    if (b) extras.push('Responde: ' + b);
-    if (t === 'stj' && (datas.ultima_decisao || datas.distribuicao)) extras.push('sem decisão desde ' + mesAno(datas.ultima_decisao || datas.distribuicao));
+    if (a) extras.push(rot[0] + ': ' + a);
+    if (b) extras.push(rot[1] + ': ' + b);
+    if (t === 'stj' && marcoStj(datas)) extras.push(marcoStj(datas));
     /* STF: "concluso" só quando o andamento atual é a conclusão ao relator (concluso_dias); senão, a data do último andamento */
     if (t === 'stf' && datas.andamento) extras.push((f.concluso_dias != null ? 'concluso desde ' : 'último andamento em ') + mesAno(datas.andamento));
-    if ((f.flags || {}).liminar) extras.push('liminar pendente');
+    /* STJ: a marca diz só que o processo chegou com pedido de liminar; na lista da idade não diz nada de hoje */
+    if (t === 'stf' && (f.flags || {}).liminar) extras.push('liminar pendente');
     var link = seguro(f.link);
     var num1 = link ? h('a', { href: link, 'data-pr': f.id, 'data-de': de, target: '_blank', rel: 'noopener noreferrer', text: rotuloProc(f) }) : h('b', { text: rotuloProc(f) });
     return h('li', {}, [
@@ -325,15 +353,15 @@
         l.style.width = (80 * (p.recorre || 0) / maior).toFixed(1) + '%';
         r.style.width = (80 * (p.responde || 0) / maior).toFixed(1) + '%';
         return h('li', {}, [
-          h('span', { cls: 'tb-bf-n' }, [p.nome || nomeParte(p.id), h('small', { text: num(p.n) + (p.razao != null ? ' · ' + razao(p.razao) + '× ' + (tm.pares || 'os pares') : '') })]),
+          h('span', { cls: 'tb-bf-n' }, [p.nome || nomeParte(p.id), h('small', { text: num(p.n) + (p.outro ? ' · interessado em ' + num(p.outro) : '') + (p.razao != null ? ' · ' + razao(p.razao) + '× ' + (tm.pares || 'os pares') : '') })]),
           h('span', { cls: 'tb-bf-l' }, [h('b', { text: num(p.recorre) }), l]),
           h('span', { cls: 'tb-bf-r' }, [r, h('b', { text: num(p.responde) })]),
-          h('span', { cls: 'sr-only', text: (p.nome || '') + ': recorre em ' + num(p.recorre) + ', responde em ' + num(p.responde) + '.' })
+          h('span', { cls: 'sr-only', text: (p.nome || '') + ': no polo ativo em ' + num(p.recorre) + ', no passivo em ' + num(p.responde) + (p.outro ? ', interessado em ' + num(p.outro) : '') + '.' })
         ]);
       })));
       secPartes.parentNode.replaceChild(bf, secPartes);
       var pf = (x.partes || {}).pessoas_fisicas, ente = (x.partes || {}).ente_publico || {};
-      bf.parentNode.insertBefore(h('p', { cls: 'tb-pf', text: 'Pessoas físicas: ' + num(pf) + ' processos, somadas, sem nome. Ente público num polo: ' + pct(ente.p, true) + (ente.pares != null ? ' (os pares: ' + pct(ente.pares, true) + ')' : '') + '.' }), bf.nextSibling);
+      bf.parentNode.insertBefore(h('p', { cls: 'tb-pf', text: 'À esquerda, no polo ativo (quem recorre ou pede); à direita, no passivo. Pessoas físicas: ' + num(pf) + ' processos, somadas, sem nome. Dinheiro público num polo (União, Fazenda Nacional, INSS, Estado ou DF, Município): ' + pct(ente.p, true) + (ente.pares != null ? ' (os pares: ' + pct(ente.pares, true) + ')' : '') + '.' }), bf.nextSibling);
     }
     /* no detalhe: subáreas e recortes, com a parte nos pares */
     var subs = (x.subareas || []).slice(0, 12);
@@ -342,7 +370,8 @@
       nos.push(secao('No detalhe', 'as subáreas do acervo e os recortes que atravessam as áreas; entre parênteses, ' + (tm.pares || 'os pares'), [
         h('ol', { cls: 'tb-br' }, subs.map(function (s) {
           var i = h('i'); i.style.width = (100 * (s.n || 0) / maiorSub).toFixed(1) + '%';
-          return h('li', {}, [h('span', { cls: 'tb-br-n' }, [area(s.area), ' ', nomeSub(s.id)]), h('span', { cls: 'tb-br-b', 'aria-hidden': 'true' }, [i]),
+          var aq = (M.areas || {})[s.area];
+          return h('li', {}, [h('span', { cls: 'tb-br-n', title: (aq ? aq[0] + ' · ' : '') + nomeSub(s.id) }, [h('span', { cls: 'tb-ar tb-a-' + s.area }, [h('i', { role: 'img', 'aria-label': aq ? aq[0] : String(s.area || '') })]), ' ', nomeSub(s.id)]), h('span', { cls: 'tb-br-b', 'aria-hidden': 'true' }, [i]),
             h('span', { cls: 'tb-br-v' }, [num(s.n), h('small', { text: pct(s.p, true) + (s.pares != null ? ' (' + pct(s.pares, true) + ')' : '') })])]);
         })),
         (x.recortes || []).length ? h('p', { cls: 'tb-cl' }, [h('span', { cls: 'cg-lg-k', text: 'Recortes' })].concat(x.recortes.map(function (r) {
@@ -362,6 +391,11 @@
     var idade = x.idade || {};
     var quanto = [];
     if ((idade.no_tribunal || {}).faixas) quanto = quanto.concat([h('p', { cls: 'az-h5', text: 'Desde a chegada ao tribunal · mediana ' + dias(idade.no_tribunal.mediana) })]).concat(colunas(idade.no_tribunal.faixas, 'Idade do acervo desde a chegada'));
+    else if (idade.autuacao) {  /* STF: a planilha só traz o ano da autuação */
+      var au = idade.autuacao, anos = (au.por_ano || []).slice(-6);
+      quanto = quanto.concat([h('p', { cls: 'az-h5', text: 'Ano de chegada ao tribunal · metade até ' + au.ano_mediano + '; ' + pct(au.no_ano_dos_dados) + ' no ano dos dados' })])
+        .concat(colunas(anos.map(function (x) { return [String(x[0]), x[1]]; }), 'Processos por ano de autuação'));
+    }
     if ((idade.sem_decisao || {}).faixas) quanto = quanto.concat([h('p', { cls: 'az-h5', text: (tm.rotDias || 'sem decisão há') + ' (na mesa) · mediana ' + dias(idade.sem_decisao.mediana) })]).concat(colunas(idade.sem_decisao.faixas, 'Na mesa, ' + (tm.rotDias || '')));
     nos.push(h('div', { cls: 'tb-cd-2c' }, [
       secao('Onde está o acervo', 'o local de cada processo no arquivo do dia', [h('ol', { cls: 'tb-pl' }, linhasOnde.map(function (k) { return h('li', {}, [h('span', { text: M.onde[k] }), h('b', { text: num(onde[k]) })]); }))]),
@@ -375,7 +409,7 @@
       li.lastChild.textContent = [(tm.orgaos || {})[p.orgao] || p.orgao, p.tipo === 'principal' ? 'recurso principal' : p.tipo].filter(Boolean).join(' · ') + (li.lastChild.textContent ? ' · ' + li.lastChild.textContent : '');
       return li;
     }))]));
-    if ((x.em_vista || []).length) nos.push(secao('Em vista', 'processos dele com pedido de vista de um colega', [h('ol', { cls: 'tb-fi' }, x.em_vista.map(function (v) {
+    if ((x.em_vista || []).length) nos.push(secao('Em vista', 'processos dele com pedido de vista' + (x.em_vista.some(function (v) { return v.ministro_vista; }) ? ' de um colega' : ' (a planilha não diz de quem)'), [h('ol', { cls: 'tb-fi' }, x.em_vista.map(function (v) {
       var li = itemFila(v.processo || {}, t, x.id);
       if (v.ministro_vista) li.lastChild.textContent = 'Em vista com ' + ((M.ministros || {})[v.ministro_vista] || v.ministro_vista) + ' · ' + li.lastChild.textContent;
       return li;
@@ -383,16 +417,29 @@
     /* o que entrou, mês a mês */
     var en = x.entradas;
     if (en && (en.por_mes || []).length) {
-      var mx = Math.max.apply(null, en.por_mes.map(function (m) { return (m[1] || 0) + (m[2] || 0); }).concat([1]));
-      var barras = h('div', { cls: 'cg-sm', role: 'img', 'aria-label': 'Entradas por mês, por sorteio: ' + en.por_mes.map(function (m) { return mesBr(m[0]) + '/' + String(m[0]).slice(0, 4) + ' ' + num(m[1]) + (m[2] ? ' e ' + num(m[2]) + ' por herança' : ''); }).join('; ') }, en.por_mes.map(function (m) {
-        var s = h('span', { title: mesBr(m[0]) + '/' + String(m[0]).slice(0, 4) + ': ' + num(m[1]) + ' por sorteio' + (m[2] ? ', ' + num(m[2]) + ' por herança' : '') });
-        s.style.height = Math.round(100 * (m[1] || 0) / mx) + '%';
+      /* Cada barra é a média por dia do pedaço do mês que a janela cobre: o mês cortado pela janela
+         (8 dias de outubro, 22 de novembro) não pode parecer um mês inteiro ao lado de outro. */
+      var jan = en.janela || [], stjE = t === 'stj';
+      var entra = stjE ? 'distribuídos' : 'distribuídos', fora = stjE ? 'por atribuição' : 'redistribuídos';
+      var pedacos = en.por_mes.map(function (m) {
+        var ini = m[0] + '-01', ultimo = new Date(Date.UTC(+m[0].slice(0, 4), +m[0].slice(5, 7), 0)).toISOString().slice(0, 10);
+        if (jan[0] && ini < jan[0]) ini = jan[0];
+        if (jan[1] && ultimo > jan[1]) ultimo = jan[1];
+        var nd = Math.max(1, (entre(ini, ultimo) || 0) + 1), inteiro = ini.slice(8) === '01' && ultimo === new Date(Date.UTC(+m[0].slice(0, 4), +m[0].slice(5, 7), 0)).toISOString().slice(0, 10);
+        var rot = inteiro ? mesBr(m[0]) : (+ini.slice(8)) + '–' + (+ultimo.slice(8)) + ' ' + mesBr(m[0]);
+        return { m: m, dias: nd, rot: rot, inteiro: inteiro, dia: (m[1] || 0) / nd };
+      });
+      var mx = Math.max.apply(null, pedacos.map(function (q) { return q.dia; }).concat([0.001]));
+      var desc = function (q) { return q.rot + '/' + String(q.m[0]).slice(0, 4) + ' (' + q.dias + (q.dias === 1 ? ' dia' : ' dias') + (q.inteiro ? '' : ', mês parcial') + '): ' + num(q.m[1]) + ' ' + entra + ', ' + (Math.round(q.dia * 10) / 10).toFixed(1).replace('.', ',') + ' por dia' + (q.m[2] ? '; ' + num(q.m[2]) + ' ' + fora : ''); };
+      var barras = h('div', { cls: 'cg-sm', role: 'img', 'aria-label': 'Entradas por dia, em média, em cada pedaço de mês: ' + pedacos.map(desc).join('; ') }, pedacos.map(function (q) {
+        var s = h('span', { title: desc(q) });
+        s.style.height = Math.round(100 * q.dia / mx) + '%';
         return s;
       }));
       /* a série das atas cresce no cache: com 30 dias ou menos, "nos últimos 30 dias" repetiria o total */
-      var txt = num(en.sorteio) + ' por sorteio entre ' + dataBr((en.janela || [])[0]) + ' e ' + dataBr((en.janela || [])[1]) + (diasDe(en.janela) > 30 ? '; ' + num((en.ultimos_30d || {}).sorteio) + ' nos últimos 30 dias.' : '.');
-      if (en.heranca) txt += ' Por atribuição (herança de acervo), à parte: ' + num(en.heranca) + (en.heranca_dias || []).map(function (x2) { return ', ' + num(x2[1]) + ' em ' + dataBr(x2[0]); }).join('') + '.';
-      nos.push(secao('O que entrou', 'por mês, distribuídos por sorteio', [barras, h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, en.por_mes.map(function (m) { return h('span', { text: mesBr(m[0]) }); })), h('p', { cls: 'cg-d-n', text: txt })]));
+      var txt = num(en.sorteio) + ' ' + entra + (stjE ? ' (sorteio ou prevenção)' : '') + ' entre ' + dataBr(jan[0]) + ' e ' + dataBr(jan[1]) + (diasDaJanela(jan) > 30 ? '; ' + num((en.ultimos_30d || {}).sorteio) + ' nos últimos 30 dias.' : '.');
+      if (en.heranca) txt += (stjE ? ' Por atribuição (herança de acervo), à parte: ' : ' Redistribuídos, à parte: ') + num(en.heranca) + ((en.heranca_dias || []).length ? ' (' + en.heranca_dias.map(function (x2) { return num(x2[1]) + ' em ' + dataBr(x2[0]); }).join('; ') + ')' : '') + '.';
+      nos.push(secao('O que entrou', 'média por dia em cada pedaço de mês; ' + (stjE ? 'distribuídos (sorteio ou prevenção)' : 'distribuídos'), [barras, h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, pedacos.map(function (q) { return h('span', { text: q.rot }); })), h('p', { cls: 'cg-d-n', text: txt })]));
     }
     var de = x.decisoes;
     if (de && de.processos != null) nos.push(secao('O que decidiu', 'decisões publicadas', [h('p', { cls: 'cg-d-n', text: num(de.processos) + ' processos com decisão publicada entre ' + dataBr((de.janela || [])[0]) + ' e ' + dataBr((de.janela || [])[1]) + ': ' + num(de.monocraticas) + ' decisões monocráticas e ' + num(de.acordaos) + ' acórdãos' + (de.acordaos_recurso_interno != null ? ' (' + num(de.acordaos_recurso_interno) + ' em recurso interno)' : '') + '.' + (de.ultimo_arquivo ? ' Último arquivo publicado: ' + dataBr(de.ultimo_arquivo) + '.' : '') })]));
@@ -412,13 +459,13 @@
   function acharFolha(id, de, pronto) {
     if (de && (M.ministros || {})[de]) {
       dossieDe(de, function (erro, x) {
-        if (erro || !x) { pronto(null); return; }
+        if (erro || !x) { pronto(null, erro || new Error('vazio')); return; }
         pronto(procurar((x.mais_antigos || []).concat((x.em_pauta || []).map(function (p) { return p.processo; }), (x.em_vista || []).map(function (v) { return v.processo; })), id));
       });
       return;
     }
     painelDe(trDe(id), function (erro, p) {
-      if (erro || !p) { pronto(null); return; }
+      if (erro || !p) { pronto(null, erro || new Error('vazio')); return; }
       var todas = ((p.fila || {}).mais_antigos || []).concat(((p.fila || {}).vistas || []).map(function (v) { return v.processo; }));
       (p.ministros || []).forEach(function (m) { todas = todas.concat(m.mais_antigos || []); });
       pronto(procurar(todas, id));
@@ -433,18 +480,22 @@
     var marcos = [], hoje = tm.data || M.hoje;
     function marco(nome, iso, cls, antes) { return { nome: nome, iso: iso, cls: cls, dias: antes ? entre(antes, iso) : null }; }
     if (t === 'stj') {
-      if (datas.autuacao) marcos.push(marco('Chegou', datas.autuacao, 'ok'));
-      if (datas.distribuicao) marcos.push(marco('Distribuído', datas.distribuicao, 'ok', datas.autuacao));
-      if (datas.ultima_decisao) marcos.push(marco('Última decisão', datas.ultima_decisao, 'ok', datas.distribuicao || datas.autuacao));
+      /* em ordem de data: a redistribuição pode vir depois da última decisão terminativa */
+      var mstj = [];
+      if (datas.autuacao) mstj.push(['Chegou', datas.autuacao]);
+      if (datas.distribuicao) mstj.push([datas.ultima_decisao && datas.distribuicao > datas.ultima_decisao ? 'Redistribuído' : 'Distribuído', datas.distribuicao]);
+      if (datas.ultima_decisao) mstj.push(['Última decisão terminativa', datas.ultima_decisao]);
+      mstj.sort(function (a, b) { return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0; });
+      mstj.forEach(function (k, i) { marcos.push(marco(k[0], k[1], 'ok', i ? mstj[i - 1][1] : null)); });
     } else if (datas.andamento) {
       marcos.push(marco('Concluso ao relator', datas.andamento, 'ok'));
     }
     var cj = t === 'stj' ? (M.cnj || {})[f.id] : null;
-    if (cj && cj[0] === 'c' && cj[2]) marcos.push(marco('Concluso (CNJ · DataJud)', cj[2], 'ok', datas.ultima_decisao || datas.distribuicao || datas.autuacao));
+    if (cj && cj[0] === 'c' && cj[2]) marcos.push(marco('Concluso (CNJ · DataJud)', cj[2], 'ok', marcos.length ? marcos[marcos.length - 1].iso : datas.autuacao));
     var ultimo = marcos.length ? marcos[marcos.length - 1].iso : null;
     marcos.push({ nome: 'No arquivo do dia', iso: hoje, cls: 'agora', dias: ultimo ? entre(ultimo, hoje) : null });
     var flags = Object.keys(f.flags || {}).filter(function (k) { return f.flags[k] === true; });
-    var nomeFlag = { liminar: 'liminar pendente', tutela: 'tutela pendente', sobrestado: 'suspenso', vista: 'com pedido de vista', pauta: 'em mesa ou pauta', sem_decisao: 'sem nenhuma decisão', sem_decisao_final: 'sem decisão final', recurso_interno: 'recurso interno pendente', acordao_pendente: 'acórdão pendente de publicação', preferencia_criminal: 'preferência criminal' };
+    var nomeFlag = { liminar: t === 'stj' ? 'chegou ao STJ com pedido de liminar' : 'liminar pendente', tutela: 'tutela pendente', sobrestado: 'suspenso', vista: 'com pedido de vista', pauta: 'em mesa ou pauta', sem_decisao: 'sem nenhuma decisão', sem_decisao_final: 'sem decisão final', recurso_interno: 'recurso interno pendente', acordao_pendente: 'acórdão pendente de publicação', preferencia_criminal: 'preferência criminal' };
     var link = seguro(f.link);
     var folha = h('article', { cls: 'cg-fo tb-a-' + f.area }, [
       h('p', { cls: 'cg-fo-tm' }, faixa),
@@ -455,7 +506,7 @@
         h('p', { cls: 'cg-fo-ap', text: [f.cnj ? cnj(f.cnj) : '', f.registro ? 'registro ' + f.registro : ''].filter(Boolean).join(' · ') })
       ]),
       h('div', { cls: 'cg-fo-e' }, [h('p', { cls: 'cg-fo-ek' }, [h('span', { text: 'Assunto' })]), h('p', { cls: 'tb-fo-as', text: (f.assunto || {}).caminho || (f.assunto || {}).nome || 'a fonte não informa' })]),
-      h('dl', { cls: 'tb-fo-pt' }, [dado('Recorre', partesFolha(f, 'ativo') || '—'), dado('Responde', partesFolha(f, 'passivo') || '—')]),
+      h('dl', { cls: 'tb-fo-pt' }, [dado(polosDe(f, t)[0], partesFolha(f, 'ativo') || '—'), dado(polosDe(f, t)[1], partesFolha(f, 'passivo') || '—')]),
       h('dl', { cls: 'cg-fo-d' }, [
         dado(ela ? 'Relatora' : 'Relator', rel),
         dado('Onde está', f.na_mesa ? 'na mesa (gabinete do relator)' : (f.local || '—'), f.na_mesa && f.local ? f.local : ''),
@@ -466,7 +517,7 @@
       ]),
       h('div', { cls: 'cg-fo-p' }, [
         h('p', { cls: 'cg-fo-f' }, [link ? h('a', { href: link, target: '_blank', rel: 'noopener noreferrer', text: 'Página oficial ↗' }) : null]),
-        h('p', { cls: 'cg-cb' }, [h('b', { text: t === 'stj' ? 'Sem decisão' : 'Concluso' }), h('span', { text: dd == null ? '' : 'há ' + dias(dd) }), h('small', { text: 'dados de ' + dataBr(hoje) })])
+        h('p', { cls: 'cg-cb' }, [h('b', { text: t === 'stj' ? 'Sem decisão terminativa' : 'Concluso' }), h('span', { text: dd == null ? '' : 'há ' + dias(dd) }), h('small', { text: 'dados de ' + dataBr(hoje) })])
       ])
     ]);
     var ol = h('ol', { cls: 'tb-mc' }, marcos.map(function (k) {
@@ -477,27 +528,41 @@
         h('div', { cls: 'cg-me-f' }, [h('div', { cls: 'cg-fo-w' }, [folha])]),
         h('div', { cls: 'cg-me-d' }, [
           h('p', { cls: 'cg-vo-h' }, ['Os marcos ', h('span', { text: 'as datas que a fonte traz, com os dias entre uma e outra' })]), ol,
-          h('p', { cls: 'cg-d-n', text: (t === 'stj' ? '“Sem decisão” conta da última distribuição ou da última decisão, a mais recente; não é a data da conclusão.' : '“Concluso” conta do andamento “Conclusos ao Relator”.') + ' A folha mostra o que o arquivo aberto do tribunal traz; o andamento completo está na página oficial.' })
+          h('p', { cls: 'cg-d-n', text: (t === 'stj' ? '“Sem decisão terminativa” conta da última distribuição ou da última decisão terminativa, a mais recente (liminares e despachos não entram no arquivo do STJ); não é a data da conclusão. Os dias entre dois marcos ficam sobre o trecho que vai de um ao outro.' : '“Concluso” conta do andamento “Conclusos ao Relator”.') + ' A folha mostra o que o arquivo aberto do tribunal traz; o andamento completo está na página oficial.' })
         ])
       ])
     ];
   }
   function mostrar(nos) {
     while (dentro.firstChild) dentro.removeChild(dentro.firstChild);
-    nos.forEach(function (n) { dentro.appendChild(n); });
+    nos.forEach(function (n) { if (n) dentro.appendChild(n); });
   }
-  function abrirFolha(id, de, semHistorico) {
+  /* o fundo fica inerte com a folha aberta (o foco não sai dela; o leitor de tela não lê atrás) */
+  var inertes = [];
+  function fundoInerte(sim) {
+    if (sim) {
+      inertes = lista(d.body.children).filter(function (n) { return n !== mo && n.tagName !== 'SCRIPT' && !n.inert && !n.classList.contains('cg-dica'); });
+      inertes.forEach(function (n) { n.inert = true; });
+    } else {
+      inertes.forEach(function (n) { n.inert = false; });
+      inertes = [];
+    }
+  }
+  function abrirFolha(id, de, semHistorico, oficial) {
     if (!mo || !/^(stf|stj)-[A-Za-z]+-\d+$/.test(id)) return;
-    if (!aberta) { foco = d.activeElement; fundo = /^#v=/.test(w.location.hash || '') ? w.location.hash : endereco(); }
+    if (!aberta) { foco = d.activeElement; fundo = /^#v=/.test(w.location.hash || '') ? w.location.hash : endereco(); fundoInerte(true); }
     aberta = id;
     mo.hidden = false;
     d.body.classList.add('cg-aberto');
     mo.scrollTop = 0;
     if (!semHistorico && w.location.hash !== '#pr=' + id && w.history && w.history.pushState) w.history.pushState(null, '', '#pr=' + id);
     mostrar([h('h2', { cls: 'sr-only', id: 'tbFolhaT', text: 'Folha do processo' }), h('p', { cls: 'cg-d-st', text: 'Carregando a folha…' })]);
-    acharFolha(id, de, function (f) {
+    acharFolha(id, de, function (f, erro) {
       if (aberta !== id) return;
-      if (!f) mostrar([h('h2', { cls: 'sr-only', id: 'tbFolhaT', text: 'Folha do processo' }), h('p', { cls: 'cg-d-st', text: 'Este processo não está nas listas desta página hoje. A folha só existe para os processos listados (os mais antigos na mesa, em pauta, em vista), nunca para processo em segredo de justiça.' })]);
+      var link = seguro(oficial);
+      var ir = link ? h('p', { cls: 'cg-fo-f' }, [h('a', { href: link, target: '_blank', rel: 'noopener noreferrer', text: 'Página oficial do processo ↗' })]) : null;
+      if (erro) mostrar([h('h2', { cls: 'sr-only', id: 'tbFolhaT', text: 'Folha do processo' }), h('p', { cls: 'cg-d-st', text: 'Não foi possível carregar a folha agora (sem conexão ou arquivo fora do ar).' }), ir]);
+      else if (!f) mostrar([h('h2', { cls: 'sr-only', id: 'tbFolhaT', text: 'Folha do processo' }), h('p', { cls: 'cg-d-st', text: 'Este processo não está nas listas da atualização de hoje: a folha só existe para os processos listados (os mais antigos na mesa, em pauta, em vista).' }), ir]);
       else mostrar(montarFolha(f));
       mo.querySelector('.cg-ml').focus();
     });
@@ -506,6 +571,7 @@
     if (!aberta) return;
     aberta = null;
     mo.hidden = true;
+    fundoInerte(false);
     d.body.classList.remove('cg-aberto');
     if (comHistorico && /^#pr=/.test(w.location.hash) && w.history && w.history.pushState) w.history.pushState(null, '', fundo || endereco());
     if (foco && foco.focus) foco.focus();
@@ -528,7 +594,8 @@
     var alvo = ev.target && ev.target.closest ? ev.target : null;
     if (!alvo || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
     var el;
-    if ((el = alvo.closest('[data-pr]'))) { ev.preventDefault(); abrirFolha(el.getAttribute('data-pr'), el.getAttribute('data-de')); return; }
+    if ((el = alvo.closest('[data-pr]'))) { ev.preventDefault(); abrirFolha(el.getAttribute('data-pr'), el.getAttribute('data-de'), false, el.getAttribute('href')); return; }
+    if ((el = alvo.closest('button[data-tentar]'))) { carregarDossie(el.getAttribute('data-tentar')); return; }
     if (aberta && (alvo === mo || alvo.closest('.cg-mc'))) { fecharFolha(true); return; }
     if (!root.contains(alvo)) return;
     if ((el = alvo.closest('button[data-trib]'))) { E = { v: E.v, t: el.getAttribute('data-trib'), o: '', min: '', area: '' }; gravar(false); aplicar(); return; }
@@ -556,6 +623,14 @@
   });
   d.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && aberta) { fecharFolha(true); return; }
+    if (ev.key === 'Tab' && aberta) {  /* o foco circula dentro da folha (como o modal do site) */
+      var focaveis = lista(mo.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(function (n) { return n.offsetParent !== null || n === d.activeElement; });
+      if (!focaveis.length) { ev.preventDefault(); mo.querySelector('.cg-ml').focus(); return; }
+      var primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+      if (ev.shiftKey && (d.activeElement === primeiro || !mo.contains(d.activeElement) || d.activeElement === mo.querySelector('.cg-ml'))) { ev.preventDefault(); ultimo.focus(); }
+      else if (!ev.shiftKey && (d.activeElement === ultimo || !mo.contains(d.activeElement))) { ev.preventDefault(); primeiro.focus(); }
+      return;
+    }
     if ((ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') && E.v === 'ministros' && !aberta) {
       var dentroDaMesa = ev.target && ev.target.closest && ev.target.closest('.tb-me');
       if (dentroDaMesa && !/^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) { ev.preventDefault(); passo(ev.key === 'ArrowLeft' ? -1 : 1); }
@@ -570,10 +645,12 @@
     var texto = el.getAttribute('data-dica');
     texto = (M.gloss || {})[texto] || texto;
     if (!texto) return;
-    if (!popDica) { popDica = h('div', { cls: 'cg-dica', role: 'tooltip' }); d.body.appendChild(popDica); }
+    if (!popDica) { popDica = h('div', { cls: 'cg-dica', role: 'tooltip', id: 'tbDica' }); d.body.appendChild(popDica); }
     popDica.textContent = texto;
     popDica.hidden = false;
+    if (donoDaDica && donoDaDica !== el) donoDaDica.removeAttribute('aria-describedby');
     donoDaDica = el;
+    el.setAttribute('aria-describedby', 'tbDica');
     var r = el.getBoundingClientRect(), largura = Math.min(320, w.innerWidth - 24);
     popDica.style.maxWidth = largura + 'px';
     var x = Math.max(12, Math.min(r.left + r.width / 2 - popDica.offsetWidth / 2, w.innerWidth - popDica.offsetWidth - 12));
@@ -582,7 +659,7 @@
     popDica.style.left = x + 'px';
     popDica.style.top = y + 'px';
   }
-  function esconderDica() { if (popDica) popDica.hidden = true; donoDaDica = null; }
+  function esconderDica() { if (popDica) popDica.hidden = true; if (donoDaDica) donoDaDica.removeAttribute('aria-describedby'); donoDaDica = null; }
   d.addEventListener('mouseover', function (ev) { var el = ev.target.closest ? ev.target.closest('[data-dica]') : null; if (el) mostrarDica(el); else if (donoDaDica) esconderDica(); });
   d.addEventListener('focusin', function (ev) { var el = ev.target.closest ? ev.target.closest('[data-dica]') : null; if (el) mostrarDica(el); });
   d.addEventListener('focusout', esconderDica);
@@ -590,7 +667,8 @@
     var el = ev.target.closest ? ev.target.closest('[data-dica]') : null;
     if (el) { if (donoDaDica === el && ev.detail === 0) esconderDica(); else mostrarDica(el); } else esconderDica();
   });
-  w.addEventListener('scroll', esconderDica, true);
+  /* a rolagem esconde a dica do ponteiro; a do foco (o Tab rola a página até o botão) acompanha o botão */
+  w.addEventListener('scroll', function () { if (donoDaDica && donoDaDica === d.activeElement) mostrarDica(donoDaDica); else esconderDica(); }, true);
 
   doEndereco();
 })();

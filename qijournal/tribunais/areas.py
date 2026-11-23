@@ -2,7 +2,10 @@
 
 Uma área por processo (as áreas somam 100% do acervo), decidida nesta ordem (analista §3.1):
 
-1. a **classe** (HC, RHC, APn, Inq, RvCr → Penal; ADI, ADC, ADO, ADPF → Constitucional);
+1. a **classe** (HC, RHC, APn, Inq, RvCr → Penal; ADI, ADC, ADO, ADPF → Constitucional), salvo
+   quando a classe cede ao mérito (``cede_ao_merito`` no config): o HC e o RHC cujo assunto de
+   mérito é de Família ou de Saúde (prisão civil por alimentos, guarda, acolhimento, internação
+   compulsória) vão para a área do assunto;
 2. o **nó listado mais específico** na árvore TPU do assunto principal (Família 5626 vence a raiz
    Civil 899; Recuperação judicial está sob Empresas 9616, que vence Civil);
 3. a **raiz** da árvore;
@@ -47,9 +50,12 @@ class Classificador:
         self.tpu = tpu
         self._por_classe: dict[str, str] = {}
         self._por_codigo: dict[int, str] = {}
+        self._cede: dict[str, frozenset[str]] = {}  # classe → áreas de mérito a que ela cede (HC de alimentos → Família)
         for area in regras.areas:
             for sigla in area.classes:
                 self._por_classe[sigla.strip()] = area.id
+            for sigla in area.cede_classes:
+                self._cede[sigla.strip()] = frozenset(area.cede_areas)
             for codigo in (*area.raizes, *area.nos):
                 self._por_codigo[codigo] = area.id
         self._residuais = {a.id for a in regras.areas if a.residual}
@@ -109,6 +115,9 @@ class Classificador:
         sigla = (classe or "").strip()
         area_principal = self.area_do_codigo(principal)
         decisivo: int | None
+        cede = self._cede.get(sigla)
+        if cede and self._merito(area_principal, assuntos) in cede:
+            sigla = ""  # o mérito decide (o HC da prisão civil por alimentos é Família)
         if sigla in self._por_classe:
             area, por, decisivo = self._por_classe[sigla], "classe", None
         elif area_principal is not None and area_principal != PROCESSUAL:
@@ -136,6 +145,17 @@ class Classificador:
             recortes=self.recortes(codigos if self._recortes_por_todos else [c for c in (base,) if c is not None]),
             tambem_toca=tambem,
         )
+
+    def _merito(self, area_principal: str | None, assuntos: Sequence[int]) -> str | None:
+        """A área de mérito do processo sem olhar a classe: a do principal, ou a do primeiro
+        assunto de mérito da lista quando o principal é só processual."""
+        if area_principal is not None and area_principal != PROCESSUAL:
+            return area_principal
+        for c in assuntos:
+            a = self.area_do_codigo(c)
+            if a is not None and a != PROCESSUAL:
+                return a
+        return None
 
     def assunto(self, codigo: int | None, *, profundidade: int | None = None, texto: str | None = None) -> Assunto:
         """O ``Assunto`` de um código (nome e caminho da TPU)."""

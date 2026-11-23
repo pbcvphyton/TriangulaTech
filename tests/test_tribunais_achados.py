@@ -71,7 +71,7 @@ def test_heranca_da_semana_com_convocada() -> None:
     [a] = achados.montar(REGRAS, {"stj": painel}, {"stj": sinais}, hoje=HOJE)["achados"]
     assert a["titulo"] == ("Fátima Maranhão, convocada do TJPB na Sexta Turma desde 17/11, recebeu 1.014 processos por atribuição "
                            "em 19/11/2026")
-    assert "herança de acervo, não sorteio" in a["texto"] and "O acervo dela em 20/11/2026: 4.637 processos." in a["texto"]
+    assert "herança de acervo, não distribuição" in a["texto"] and "O acervo dela em 20/11/2026: 4.637 processos." in a["texto"]
     assert (a["peso"], a["selo"], a["prova"]["fonte"], a["prova"]["data"]) == (15.03, "MESA", "stj_atas", "2026-11-19")
     # herança antiga (mais de uma semana) não é achado do dia; abaixo do limiar (300), também não
     velha = _sinais(heranca={"stj-fatima-maranhao": [["2026-11-01", 1014]]})

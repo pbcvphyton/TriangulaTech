@@ -44,6 +44,7 @@ categorias:
   previdencia_privada: {nome: "Previdência complementar", tipo: pj}
   concessionaria:   {nome: "Energia, água e telefonia", tipo: pj}
   empresa:          {nome: "Outras empresas", tipo: pj}
+  partido:          {nome: "Partidos políticos", tipo: pj}   # pessoa jurídica de direito privado; no STF, autores de ADI e ADPF
   outro_ente:       {nome: "Outros entes públicos", tipo: ente}
   outra_pj:         {nome: "Outras pessoas jurídicas", tipo: pj}
 
@@ -171,7 +172,7 @@ familias:
 # próprio, uma por cidade). Contagens (processos distintos no STJ em 20/11/2026) no comentário.
 grupos:
   # Entes federais
-  - {id: uniao, nome: "União", categoria: uniao, raizes: ["26994558", "00394494"], padroes: ["UNIAO(?: FEDERAL)?"]}   # 18.945; 00394494 = Ministério da Justiça (fora quando AUTORIDADE CENTRAL: o papel decide antes)
+  - {id: uniao, nome: "União", categoria: uniao, raizes: ["26994558", "00394494"], padroes: ["UNIAO(?: FEDERAL)?(?! BRASIL)"]}   # 18.945; 00394494 = Ministério da Justiça (fora quando AUTORIDADE CENTRAL: o papel decide antes)
   - {id: fazenda-nacional, nome: "Fazenda Nacional", categoria: fazenda_nacional, raizes: ["00394460"], padroes: ["FAZENDA NACIONAL"]}  # 14.163
   - {id: inss, nome: "INSS", categoria: inss, raizes: ["29979036"], padroes: ["INSTITUTO NACIONAL DO SEGURO SOCIAL", "INSS"]}  # 10.790
   - {id: mpf, nome: "Ministério Público Federal", categoria: mp, raizes: ["03636198"], padroes: ["MINISTERIO PUBLICO FEDERAL"]}  # 7.037
@@ -199,6 +200,43 @@ grupos:
   - {id: congresso-nacional, nome: "Congresso Nacional", categoria: legislativo, padroes: ["(?:MESA DO )?CONGRESSO NACIONAL"]}
   - {id: senado-federal, nome: "Senado Federal", categoria: legislativo, padroes: ["(?:MESA DO )?SENADO FEDERAL"]}
   - {id: camara-dos-deputados, nome: "Câmara dos Deputados", categoria: legislativo, padroes: ["(?:MESA DA )?CAMARA DOS DEPUTADOS"]}
+  # Partidos políticos (registrados no TSE). Os de nome de uma palavra só valem sozinhos ou antes de
+  # " - " ("SOLIDARIEDADE - NACIONAL", "PODEMOS - SAO PAULO - SP - MUNICIPAL"): sem a marca, viravam
+  # pessoa física na planilha do STF (ADI 5.632, do Solidariedade, saía "Recorre: pessoa física").
+  - {id: partido-pt, nome: "Partido dos Trabalhadores (PT)", categoria: partido, padroes: ["PARTIDO DOS TRABALHADORES"]}
+  - {id: partido-pl, nome: "Partido Liberal (PL)", categoria: partido, padroes: ["PARTIDO LIBERAL"]}
+  - {id: partido-psdb, nome: "PSDB", categoria: partido, padroes: ["PARTIDO DA SOCIAL DEMOCRACIA BRASILEIRA"]}
+  - {id: partido-psd, nome: "PSD", categoria: partido, padroes: ["PARTIDO SOCIAL DEMOCRATICO"]}
+  - {id: partido-psb, nome: "PSB", categoria: partido, padroes: ["PARTIDO SOCIALISTA BRASILEIRO"]}
+  - {id: partido-pdt, nome: "PDT", categoria: partido, padroes: ["PARTIDO DEMOCRATICO TRABALHISTA"]}
+  - {id: partido-mdb, nome: "MDB", categoria: partido, padroes: ["(?:PARTIDO DO )?MOVIMENTO DEMOCRATICO BRASILEIRO"]}
+  - {id: partido-psol, nome: "PSOL", categoria: partido, padroes: ["PARTIDO SOCIALISMO E LIBERDADE"]}
+  - {id: partido-pcdob, nome: "PCdoB", categoria: partido, padroes: ["PARTIDO COMUNISTA DO BRASIL"]}
+  - {id: partido-pv, nome: "Partido Verde (PV)", categoria: partido, padroes: ["PARTIDO VERDE"]}
+  - {id: partido-rede, nome: "Rede Sustentabilidade", categoria: partido, padroes: ["REDE SUSTENTABILIDADE"]}
+  - {id: partido-novo, nome: "Partido Novo", categoria: partido, padroes: ["PARTIDO NOVO", "NOVO(?=$| - )"]}
+  - {id: partido-solidariedade, nome: "Solidariedade", categoria: partido, padroes: ["(?:PARTIDO )?SOLIDARIEDADE(?=$| - | \\()"]}
+  - {id: partido-podemos, nome: "Podemos", categoria: partido, padroes: ["PODEMOS(?=$| - | \\()"]}
+  - {id: partido-republicanos, nome: "Republicanos", categoria: partido, padroes: ["REPUBLICANOS(?=$| - | \\()"]}
+  - {id: partido-cidadania, nome: "Cidadania", categoria: partido, padroes: ["CIDADANIA(?=$| - | \\()"]}
+  - {id: partido-avante, nome: "Avante", categoria: partido, padroes: ["AVANTE(?=$| - | \\()"]}
+  - {id: partido-progressistas, nome: "Progressistas (PP)", categoria: partido, padroes: ["PROGRESSISTAS(?=$| - | \\()", "PARTIDO PROGRESSISTA"]}
+  - {id: partido-uniao-brasil, nome: "União Brasil", categoria: partido, padroes: ["UNIAO BRASIL(?=$| - | \\()"]}
+  - {id: partido-democratas, nome: "Democratas", categoria: partido, padroes: ["DEMOCRATAS(?=$| - | \\()"]}
+  - {id: partido-patriota, nome: "Patriota", categoria: partido, padroes: ["PATRIOTA(?=$| - | \\()"]}
+  - {id: partido-mobiliza, nome: "Mobiliza", categoria: partido, padroes: ["MOBILIZA(?=$| - | \\()"]}
+  - {id: partido-agir, nome: "Agir", categoria: partido, padroes: ["AGIR(?=$| - | \\()"]}
+  - {id: partido-missao, nome: "Missão", categoria: partido, padroes: ["(?:PARTIDO )?MISSAO(?=$| - | \\()"]}
+  - {id: partido-dc, nome: "Democracia Cristã", categoria: partido, padroes: ["DEMOCRACIA CRISTA(?=$| - | \\()"]}
+  - {id: partido-ptb, nome: "PTB", categoria: partido, padroes: ["PARTIDO TRABALHISTA BRASILEIRO"]}
+  - {id: partido-prtb, nome: "PRTB", categoria: partido, padroes: ["PARTIDO RENOVADOR TRABALHISTA BRASILEIRO"]}
+  - {id: partido-prd, nome: "PRD", categoria: partido, padroes: ["PARTIDO RENOVACAO DEMOCRATICA"]}
+  - {id: partido-psc, nome: "PSC", categoria: partido, padroes: ["PARTIDO SOCIAL CRISTAO"]}
+  - {id: partido-pmb, nome: "Partido da Mulher Brasileira", categoria: partido, padroes: ["PARTIDO DA MULHER BRASILEIRA"]}
+  - {id: partido-pcb, nome: "PCB", categoria: partido, padroes: ["PARTIDO COMUNISTA BRASILEIRO"]}
+  - {id: partido-pstu, nome: "PSTU", categoria: partido, padroes: ["PARTIDO SOCIALISTA DOS TRABALHADORES UNIFICADO"]}
+  - {id: partido-pco, nome: "PCO", categoria: partido, padroes: ["PARTIDO DA CAUSA OPERARIA"]}
+  - {id: partido-up, nome: "Unidade Popular", categoria: partido, padroes: ["UNIDADE POPULAR(?=$| - | \\()"]}
   # Bancos e financeiras
   - {id: banco-do-brasil, nome: "Banco do Brasil", categoria: banco, raizes: ["00000000"], padroes: ["BANCO DO BRASIL(?: S ?[/.]? ?A\\.?)?"]}  # 8.345 (raiz 00000000, CNPJ 00.000.000/0001-91, válido)
   - {id: caixa, nome: "Caixa Econômica Federal", categoria: banco, raizes: ["00360305"], padroes: ["CAIXA ECONOMICA FEDERAL"]}  # 4.025

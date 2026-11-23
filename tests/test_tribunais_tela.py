@@ -241,7 +241,7 @@ def test_partes_sem_pessoa_fisica_com_nome(html: str):
 def test_o_nome_do_litigante_vem_do_mapa_de_nomes(html: str):
     """Grupo citado numa lista e fora do topo do tribunal: o nome sai de ``partes.nomes`` do painel
     (``{grupo: {nome, tipo}}``), nunca o id por extenso; o dossiê traz o seu mapa e o script o soma."""
-    assert "empresa (Cooperativa K)" in html
+    assert "pessoa jurídica (Cooperativa K)" in html  # fora do catálogo, a categoria não é conhecida: não se diz "empresa"
     assert "Nome Cooperativa" not in html and "nome-cooperativa-k" in _manifesto(html)["partes"]
     assert "guardarNomes(x)" in html
 

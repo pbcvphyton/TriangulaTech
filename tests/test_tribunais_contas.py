@@ -114,7 +114,7 @@ def test_painel_tem_a_forma_do_contrato(resultado: contas.Resultado) -> None:
         assert chave in p, chave
     assert p["v"] == 1 and p["sigla"] == "STJ" and p["data_dados"] == DATA
     assert set(p["universo"]) == {"processos", "na_grade", "na_mesa", "segredo", "sobrestados", "liminar", "ente_publico",
-                                  "sem_decisao_180", "sem_decisao_365", "pessoas_fisicas"}
+                                  "sem_decisao_180", "sem_decisao_365", "pessoas_fisicas", "recursos"}
     assert [a["id"] for a in p["areas"]] == list(AREAS)
     assert [m["id"] for m in p["ministros"]] == [m.id for m in REGRAS.composicao["stj"].ministros]
     assert [g["id"] for g in p["grupos"]] == ["s1", "s2", "s3", "pr"]
@@ -291,7 +291,8 @@ def test_pautas_decisoes_temas_do_stj(k: Classificador) -> None:
     te = r.painel["temas"]
     assert te["fonte"] == "stj_precedentes" and te["pendentes"] == te["por_tipo"]["repetitivo"] + te["por_tipo"]["iac"]
     soma = sum(m["temas"] for m in r.painel["ministros"])
-    assert soma + sum(n for _, n in te["relator_saiu"]) == te["pendentes"]
+    assert soma + sum(x[1] for x in te["relator_saiu"]) + te["sem_relator"] == te["pendentes"]
+    assert all(len(x) == 3 and x[0] != "Relator não informado" for x in te["relator_saiu"])  # [nome, n, motivo]
 
 
 def test_stf_planilha_atas_jurisprudencia_rg_pauta() -> None:
@@ -316,7 +317,12 @@ def test_stf_planilha_atas_jurisprudencia_rg_pauta() -> None:
     assert fachin["grupo"] == "pr" and not fachin["comparavel"] and fachin["areas"]["penal"]["pares"] is None
     assert p["entradas"]["total"]["sorteio"] == ata["total"]["sorteio"]
     assert p["pautas"]["vistas"] is not None and p["temas"]["por_tipo"]["rg"] == p["temas"]["pendentes"]
-    assert p["idade"]["no_tribunal"]["p90"] is None  # no STF só o ano de autuação: mediana e quartis
+    # no STF a planilha só dá o ano de autuação: nenhuma idade em dias (seria inventada); vale o ano
+    assert p["idade"]["no_tribunal"]["mediana"] is None and p["idade"]["no_tribunal"]["p90"] is None
+    au = p["idade"]["autuacao"]
+    assert set(au) == {"ano_mediano", "no_ano_dos_dados", "por_ano"} and sum(n for _, n in au["por_ano"]) > 0
+    assert all(m["no_tribunal"]["mediana"] is None for m in p["ministros"])
+    assert any("autuacao" in m for m in p["ministros"])
     assert "stf" in r.cobertura["partes"]
     texto = _json(p) + _json(r.dossies)
     assert not any(f'"{x["id"]}"' in texto for x in acervo.processos if x["segredo"])

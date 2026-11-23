@@ -23,7 +23,8 @@ from __future__ import annotations
 import json
 import logging
 import math
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from datetime import date
 from itertools import pairwise
 from pathlib import Path
@@ -61,12 +62,15 @@ ONDE = {
     "stf": "remetidos ao STF",
     "outro": "em outro lugar",
 }
-MOTIVOS = {"T": "tema repetitivo", "RG": "repercussão geral", "C": "controvérsia", "I": "incidente de assunção de competência", "ST": "sem motivo informado"}
+MOTIVOS = {"T": "tema repetitivo", "RG": "repercussão geral", "C": "controvérsia", "I": "incidente de assunção de competência",
+           "ST": "sem motivo identificado pela fonte", "nao_informado": "a planilha não informa o motivo"}
+MOTIVOS_CONHECIDOS = ("T", "RG", "C", "I")  # os que dizem à espera de quê o processo está
 SELOS_MINISTRO = {
     "convocado": "convocado",
     "heranca": "acervo herdado há pouco",
     "recem_chegado": "na Turma há pouco",
     "sem_distribuicao": "não recebe distribuição comum",
+    "distribuicao_reduzida": "recebe menos processos (distribuição reduzida)",
     "poucos_processos": "poucos processos para comparar",
 }
 CARGOS = {
@@ -76,18 +80,30 @@ CARGOS = {
     "presidente_turma": "preside a Turma",
     "presidente_secao": "preside a Seção",
     "decano": "decano",
+    "tse_corregedor": "Corregedor-Geral Eleitoral (TSE)",
+    "tse_efetivo": "ministro do TSE",
 }
 # As dicas (i) dos números: o texto vai uma vez, no manifesto; o botão leva a chave.
 GLOSSARIO = {
     "mesa": "Processos do ministro que estão no gabinete dele na data do arquivo. O resto do acervo está no cartório, com o Ministério Público ou em outro lugar.",
-    "mesa_tribunal": "Processos dos ministros das Turmas que estão no gabinete do relator na data do arquivo.",
-    "sem_decisao_stj": "Dias desde a última distribuição ou a última decisão, a mais recente das duas. Não é a data da conclusão: quando chega uma petição nova, a conta não vê.",
+    "mesa_tribunal": "Processos dos relatores das Turmas que estão no gabinete do relator na data do arquivo.",
+    "sem_decisao_stj": ("Dias desde a última distribuição ou a última decisão terminativa, a mais recente das duas. Decisão terminativa é a "
+                        "que encerra o processo ou o recurso no STJ; liminares, despachos e decisões no meio do caminho não entram no "
+                        "arquivo do STJ. Redistribuição e atribuição também zeram a conta. Não é a data da conclusão."),
     "sem_decisao_stf": "Dias desde o andamento \"Conclusos ao Relator\"; só conta os processos cujo andamento atual é esse.",
-    "idade": "Desde a chegada ao tribunal (a autuação), não desde o início da ação.",
-    "valor": "Nenhuma fonte aberta do STF nem do STJ publica o valor da causa. A página não estima: mostra onde há dinheiro público no recurso e os recortes de conteúdo econômico.",
+    "idade": ("Desde a chegada ao tribunal (a autuação), não desde o início da ação. No STF a planilha só traz o ano de autuação: "
+              "a página mostra o ano de chegada, não os dias."),
+    "valor": ("Nenhuma fonte aberta do STF nem do STJ publica o valor da causa. A página não estima: mostra onde há dinheiro público "
+              "no recurso (a União, a Fazenda Nacional, o INSS, um Estado ou o DF, ou um Município num dos polos) e os recortes de "
+              "conteúdo econômico."),
 }
-TIPOS_TEMA = {"repetitivo": "Repetitivo", "iac": "IAC", "controversia": "Controvérsia", "rg": "Repercussão geral"}
-TIPOS_PARTE = {"pj": "empresa", "ente": "ente público", "pf": "pessoa física", "desconhecido": "parte sem tipo na fonte"}
+TIPOS_TEMA = {"repetitivo": "Repetitivo", "iac": "IAC", "controversia": "Controvérsia", "rg": "Repercussão geral", "relevancia": "Relevância"}
+TIPOS_PARTE = {"pj": "pessoa jurídica", "ente": "ente público", "pf": "pessoa física", "desconhecido": "parte sem tipo na fonte"}
+# "empresa" só quando o grupo publicável é de categoria empresarial do catálogo; sem grupo não se sabe.
+CATEGORIAS_EMPRESA = frozenset({"banco", "plano_saude", "seguradora", "previdencia_privada", "concessionaria", "empresa"})
+DINHEIRO_PUBLICO = "dinheiro público num dos polos"  # União, Fazenda Nacional, INSS, Estado/DF ou Município (partes.dinheiro_publico)
+DINHEIRO_PUBLICO_LISTA = ("a União, a Fazenda Nacional, o INSS, um Estado ou o DF, ou um Município como quem recorre ou quem "
+                          "responde; o Ministério Público, a Defensoria e as autarquias não entram")
 ORDINAL = {"1": "Primeira", "2": "Segunda", "3": "Terceira", "4": "Quarta", "5": "Quinta", "6": "Sexta"}
 
 
@@ -168,22 +184,27 @@ def _num(valor: Any) -> str:
         return "—"
 
 
-def _pct(fracao: Any, fino: bool = False) -> str:
-    """``0.0871`` → ``"9%"`` (``fino``: ``"8,7%"``); abaixo de 1% sempre com uma casa (``"0,6%"``)."""
+def _pct(fracao: Any, fino: bool = False, n: Any = None) -> str:
+    """``0.0871`` → ``"9%"`` (``fino``: ``"8,7%"``); abaixo de 1% sempre com uma casa (``"0,6%"``).
+    ``n``: a contagem por trás da fração; com processo (``n > 0``) nunca sai ``"0%"`` (a fração
+    guardada com 4 casas zera abaixo de 0,005%): sai ``"<0,1%"``."""
     if fracao is None:
         return "—"
     valor = float(fracao) * 100
     if valor == 0:
-        return "0%"
+        try:
+            return "<0,1%" if n is not None and int(n) > 0 else "0%"
+        except (TypeError, ValueError):
+            return "0%"
     if valor < 1 or (fino and valor < 10):
         casas = text.format_number_pt(valor, 1)
         return ("<0,1" if casas == "0,0" else casas) + "%"
     return f"{round(valor)}%"
 
 
-def _celula(fracao: float) -> str:
+def _celula(fracao: float, n: Any = None) -> str:
     """O número da célula da matriz (em %, sem o sinal): inteiro de 1 para cima, uma casa abaixo."""
-    return _pct(fracao).rstrip("%")
+    return _pct(fracao, n=n).rstrip("%")
 
 
 def _razao(valor: Any) -> str:
@@ -236,7 +257,7 @@ def _anos(dias: Any) -> tuple[str, str]:
     if dias < 365:
         return _num(dias), "dia" if dias == 1 else "dias"
     anos = dias / 365
-    return text.format_number_pt(anos, 1), "ano" if anos < 2 else "anos"
+    return text.format_number_pt(anos, 1), "ano" if round(anos, 1) < 2 else "anos"  # a unidade pelo valor que se lê
 
 
 def _janela(janela: Any) -> tuple[str, bool]:
@@ -310,6 +331,11 @@ class Reguas:
     orgaos: dict[str, dict[str, str]]  # trib → {T1: "Primeira Turma"}
     grupos: dict[str, dict[str, str]]  # trib → {s1: "Primeira Seção"}
     links: dict[str, str]
+    categorias: dict[str, str] = field(default_factory=dict)  # grupo do catálogo → categoria ("banco", "partido"...)
+
+    def recurso(self, trib: str, classe: Any) -> bool:
+        """A classe é de recurso (``limiares.classes_recurso``)? Aí "recorre"/"responde"; senão "polo ativo"/"polo passivo"."""
+        return str(classe or "") in ((self.limiares.get("classes_recurso") or {}).get(trib) or ())
 
     def area(self, area_id: str) -> dict[str, Any]:
         for a in self.areas:
@@ -351,7 +377,18 @@ def _reguas(meta: dict[str, Any], config: Config) -> Reguas:
     links = dict((regras.fontes.get("links_oficiais") or {}) if regras else {})
     economicos = list(bruto.get("recortes_economicos") or (regras.recortes_economicos if regras else ()))
     return Reguas(areas=areas, subareas=subareas, recortes=recortes, recortes_economicos=economicos, limiares=limiares,
-                  orgaos=orgaos, grupos=grupos, links=links)
+                  orgaos=orgaos, grupos=grupos, links=links, categorias=_categorias(config))
+
+
+def _categorias(config: Config) -> dict[str, str]:
+    """Grupo do catálogo (``config/tribunais_partes.yaml``) → categoria: diz quando uma pessoa jurídica é "empresa"."""
+    try:
+        import yaml
+
+        bruto = yaml.safe_load((Path(config.root) / "config" / "tribunais_partes.yaml").read_text(encoding="utf-8")) or {}
+    except (OSError, ValueError, AttributeError):
+        return {}
+    return {str(g["id"]): str(g.get("categoria") or "") for g in bruto.get("grupos") or [] if isinstance(g, dict) and g.get("id")}
 
 
 def _faixas_rampa(rampa: list[float]) -> list[dict[str, str]]:
@@ -396,25 +433,48 @@ def _regua_marca(limiares: dict[str, Any]) -> str:
 # ── as partes de uma mini-folha ──────────────────────────────────────────────
 
 
-def _parte_curta(parte: dict[str, Any], nomes: dict[str, str]) -> str:
+def _parte_curta(parte: dict[str, Any], nomes: dict[str, str], categorias: dict[str, str] | None = None) -> str:
     tipo = parte.get("tipo") or "desconhecido"
     rotulo = TIPOS_PARTE.get(tipo, "parte")
     grupo = parte.get("grupo")
+    if tipo == "pj" and grupo and (categorias or {}).get(grupo) in CATEGORIAS_EMPRESA:
+        rotulo = "empresa"
     if grupo and tipo in ("pj", "ente"):
         return f"{rotulo} ({nomes.get(grupo) or _humano(grupo)})"
     return rotulo
 
 
-def _partes_folha(folha: dict[str, Any], nomes: dict[str, str]) -> str:
+def polos(recurso: bool) -> tuple[str, str]:
+    """Os rótulos dos dois polos: no recurso, quem recorre e quem responde; na ação originária (ADI, HC,
+    MS, AR, Rcl...), o polo ativo e o passivo."""
+    return ("Recorre", "Responde") if recurso else ("Polo ativo", "Polo passivo")
+
+
+def _partes_folha(folha: dict[str, Any], nomes: dict[str, str], r: Reguas | None = None, trib: str = "") -> str:
     """"Recorre: ente público (INSS) · Responde: pessoa física" (nunca nome de pessoa física)."""
-    ativos = [_parte_curta(p, nomes) for p in folha.get("partes") or [] if p.get("polo") == "ativo"]
-    passivos = [_parte_curta(p, nomes) for p in folha.get("partes") or [] if p.get("polo") == "passivo"]
+    categorias = r.categorias if r is not None else {}
+    ativo, passivo = polos(r.recurso(trib, folha.get("classe")) if r is not None else True)
+    ativos = [_parte_curta(p, nomes, categorias) for p in folha.get("partes") or [] if p.get("polo") == "ativo"]
+    passivos = [_parte_curta(p, nomes, categorias) for p in folha.get("partes") or [] if p.get("polo") == "passivo"]
     trechos = []
     if ativos:
-        trechos.append("Recorre: " + ", ".join(dict.fromkeys(ativos)))
+        trechos.append(f"{ativo}: " + ", ".join(dict.fromkeys(ativos)))
     if passivos:
-        trechos.append("Responde: " + ", ".join(dict.fromkeys(passivos)))
+        trechos.append(f"{passivo}: " + ", ".join(dict.fromkeys(passivos)))
     return " · ".join(trechos)
+
+
+def _marco_stj(datas: dict[str, Any]) -> str:
+    """Qual marco conta o "sem decisão" de um processo do STJ, com a data que a conta usa (a mais recente
+    entre a distribuição e a última decisão terminativa)."""
+    dist, dec = datas.get("distribuicao"), datas.get("ultima_decisao")
+    if dec and (not dist or str(dec) >= str(dist)):
+        return f"última decisão terminativa em {_mes_ano(dec)}"
+    if dist and dec:
+        return f"redistribuído em {_mes_ano(dist)}; última decisão terminativa em {_mes_ano(dec)}"
+    if dist:
+        return f"distribuído em {_mes_ano(dist)}"
+    return ""
 
 
 def _texto_cnj(item: Any) -> str:
@@ -445,14 +505,15 @@ def _item_fila(folha: dict[str, Any], trib: str, r: Reguas, nomes: dict[str, str
     dias = folha.get("sem_decisao_dias") if trib == "stj" else folha.get("concluso_dias")
     datas = folha.get("datas") or {}
     if trib == "stj":
-        desde = datas.get("ultima_decisao") or datas.get("distribuicao")
-        quando = f"sem decisão desde {_mes_ano(desde)}" if desde else ""
+        quando = _marco_stj(datas)  # a mesma data da conta: a mais recente entre distribuição e decisão terminativa
     else:
         rotulo = "concluso desde" if folha.get("concluso_dias") is not None else "último andamento em"  # concluso só com a conclusão ao relator
         quando = f"{rotulo} {_mes_ano(datas.get('andamento'))}" if datas.get("andamento") else ""
     area = r.area(folha.get("area") or "outros")
-    extras = [x for x in (_partes_folha(folha, nomes), quando) if x]
-    if (folha.get("flags") or {}).get("liminar"):
+    extras = [x for x in (_partes_folha(folha, nomes, r, trib), quando) if x]
+    # STJ: "pedidoDeLiminar" diz só que o processo chegou ao STJ com pedido de liminar (pode ter sido
+    # decidida há anos); nas listas de idade não diz nada de hoje. STF: a coluna é "liminar pendente".
+    if trib == "stf" and (folha.get("flags") or {}).get("liminar"):
         extras.append("liminar pendente")
     rel = relatores.get(folha.get("relator_id") or "", "") if com_relator else ""
     return {
@@ -477,32 +538,48 @@ def _href_de(alvo: str, trib: str) -> str:
     return f"#tb-{campos.get('v') or 'resumo'}-{t}"
 
 
+def _relatores_turmas(p: dict[str, Any]) -> tuple[str, str]:
+    """"os 30 relatores das Turmas (27 ministros e 3 desembargadores convocados)" quando há convocado na
+    grade; senão "os 10 ministros das Turmas". E o rótulo curto ("relatores nas Turmas")."""
+    grade = [m for m in p.get("ministros") or [] if m.get("grupo") != "pr"]
+    conv = sum(1 for m in grade if m.get("convocado") or "convocado" in (m.get("selos") or ()))
+    if not conv:
+        return f"os {len(grade)} ministros das Turmas", "ministros nas Turmas"
+    return (f"os {len(grade)} relatores das Turmas ({len(grade) - conv} ministros e {conv} "
+            f"{'desembargador convocado' if conv == 1 else 'desembargadores convocados'})", "relatores nas Turmas")
+
+
 def _leitura(trib: str, p: dict[str, Any], achados: list[dict[str, Any]], r: Reguas) -> dict[str, Any]:
     """A manchete do tribunal (o achado de maior peso dele) e os demais, numerados. Sem achado, a
     manchete sai dos números do dia, escrita por regra."""
     do_trib = [a for a in achados if a.get("trib") == trib and a.get("titulo")]
     u = p.get("universo") or {}
-    n_min = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr")
-    sem = "sem decisão registrada" if trib == "stj" else "conclusos ao relator"
+    sem = "sem decisão terminativa registrada" if trib == "stj" else "conclusos ao relator"
     fina = (f"Do registro público de {_num(u.get('processos'))} processos em tramitação no {p.get('sigla', trib.upper())} em "
-            f"{_data(p.get('data_dados'))}: {_num(u.get('na_grade'))} com os {n_min} ministros das Turmas, {_num(u.get('na_mesa'))} "
+            f"{_data(p.get('data_dados'))}: {_num(u.get('na_grade'))} com {_relatores_turmas(p)[0]}, {_num(u.get('na_mesa'))} "
             f"na mesa deles; de que é a mesa de cada um, há quanto tempo e quem aparece.")
     if do_trib:
         topo, resto = do_trib[0], do_trib[1:]
         principal = {"selo": topo.get("selo") or "", "texto": topo.get("texto") or "", "href": _href_de(topo.get("alvo", ""), trib),
-                     "alvo": topo.get("alvo") or "", "fonte": _prova(topo)}
+                     "alvo": topo.get("alvo") or "", "fonte": _prova(topo), "ref": _ref_achado(topo)}
         manchete = topo["titulo"]
     else:
         resto = []
         manchete = (f"No {p.get('sigla', trib.upper())}, {_num(u.get('na_mesa'))} processos estão na mesa dos ministros; "
                     f"{_num(u.get('sem_decisao_365'))} {sem} há mais de um ano")
         principal = {"selo": "FILA", "texto": f"{_num(u.get('sem_decisao_365'))} de {_num(u.get('na_mesa'))} na mesa, em {_data(p.get('data_dados'))}.",
-                     "href": f"#tb-fila-{trib}", "alvo": f"#v=fila&t={trib}", "fonte": ""}
+                     "href": f"#tb-fila-{trib}", "alvo": f"#v=fila&t={trib}", "fonte": "", "ref": f"fila {trib}"}
     return {
         "manchete": manchete, "principal": principal, "fina": fina,
         "achados": [{"selo": a.get("selo") or "", "titulo": a["titulo"], "texto": a.get("texto") or "", "href": _href_de(a.get("alvo", ""), trib),
-                     "alvo": a.get("alvo") or "", "fonte": _prova(a)} for a in resto],
+                     "alvo": a.get("alvo") or "", "fonte": _prova(a), "ref": _ref_achado(a)} for a in resto],
     }
+
+
+def _ref_achado(a: dict[str, Any]) -> str:
+    """O que vai no título da issue "Contestar este número": o tipo do achado e o id do ministro (uma
+    autoridade) ou o tribunal; nunca nome de parte nem número de processo (o repositório é público)."""
+    return " ".join(x for x in (str(a.get("tipo") or "achado"), str(a.get("ministro") or a.get("trib") or "")) if x)
 
 
 def _prova(achado: dict[str, Any]) -> str:
@@ -601,14 +678,14 @@ def _matriz(trib: str, p: dict[str, Any], r: Reguas, colunas: list[dict[str, Any
                     cels.append({"a": c["id"], "classe": "tb-0", "v": "·", "titulo": f"{m['nome']}: nenhum processo de {c['curto']}", "sr": ""})
                     continue
                 marca = int(cel.get("marca") or 0)
-                titulo = f"{m['nome']}: {_pct(frac, fino=True)} do acervo em {c['curto']} ({_num(n)} processos)"
+                titulo = f"{m['nome']}: {_pct(frac, fino=True, n=n)} do acervo em {c['curto']} ({_plural(n, 'processo', 'processos')})"
                 if cel.get("pares") is not None:
                     titulo += f"; {pares_curto}: {_pct(cel['pares'], fino=True)}"
                     if cel.get("razao") is not None:
                         titulo += f" ({_razao(cel['razao'])} vez)"
                 classe = _classe_rampa(frac, rampa) + (" tb-up" if marca > 0 else " tb-dn" if marca < 0 else "")
                 sr = f" (bem acima {_de(pares_curto)})" if marca > 0 else f" (bem abaixo {_de(pares_curto)})" if marca < 0 else ""
-                cels.append({"a": c["id"], "classe": classe, "v": _celula(frac), "titulo": titulo, "sr": sr})
+                cels.append({"a": c["id"], "classe": classe, "v": _celula(frac, n), "titulo": titulo, "sr": sr})
             extra = [SELOS_MINISTRO[s] for s in m.get("selos") or [] if s in SELOS_MINISTRO]
             linhas.append({"id": mid, "nome": m.get("nome") or mid, "curta": _turma_curta(m.get("turma")) or ("Pres." if g["id"] == "pr" else ""),
                            "processos": _num(m.get("processos")), "na_mesa": _num(m.get("na_mesa")), "celulas": cels,
@@ -616,10 +693,16 @@ def _matriz(trib: str, p: dict[str, Any], r: Reguas, colunas: list[dict[str, Any
         media = None
         if g.get("id") != "pr" and g.get("processos"):
             cels = []
+            total_g = int(g.get("processos") or 0)
             for c in colunas:
-                n, frac = (g.get("areas") or {}).get(c["id"], [0, 0])
-                cels.append({"a": c["id"], "v": _celula(frac) if n else "·", "titulo": f"{g.get('nome')}: {_pct(frac, fino=True)} em {c['curto']} ({_num(n)} processos)"})
-            media = {"rotulo": "média da Seção" if trib == "stj" else f"média da {g.get('nome', '')}", "processos": _num(g.get("processos")), "celulas": cels}
+                n, _frac = (g.get("areas") or {}).get(c["id"], [0, 0])
+                frac = n / total_g if total_g else 0.0  # da contagem: a fração guardada com 4 casas zera os poucos
+                cels.append({"a": c["id"], "v": _celula(frac, n) if n else "·",
+                             "titulo": f"{g.get('nome')}: {_pct(frac, fino=True, n=n)} em {c['curto']} ({_plural(int(n), 'processo', 'processos')})"})
+            # A coluna "Acervo" da linha de média é a média por gabinete (o grupo soma o acervo de todos).
+            media = {"rotulo": "média da Seção" if trib == "stj" else f"média da {g.get('nome', '')}",
+                     "processos": _num(round(total_g / len(linhas))) if linhas else "—",
+                     "titulo": f"média por gabinete; o grupo soma {_num(total_g)} processos", "celulas": cels}
         turmas = ", ".join(r.orgaos.get(trib, {}).get(t, t) for t in g.get("turmas") or [])
         desc = " · ".join(x for x in (g.get("descricao") or "", turmas, f"{_num(g.get('processos'))} processos" if g.get("processos") else "") if x)
         grupos.append({"id": g.get("id"), "nome": g.get("nome") or g.get("id"), "desc": desc, "linhas": linhas, "media": media,
@@ -634,15 +717,22 @@ def _matriz(trib: str, p: dict[str, Any], r: Reguas, colunas: list[dict[str, Any
         for c in colunas:
             k = int((f.get("areas") or {}).get(c["id"]) or 0)
             frac = k / n
-            cels.append({"a": c["id"], "classe": _classe_rampa(frac, rampa) if k else "tb-0", "v": _celula(frac) if k else "·",
-                         "titulo": f"{f.get('rotulo')}: {_pct(frac, fino=True)} em {c['curto']} ({_num(k)} processos)"})
+            cels.append({"a": c["id"], "classe": _classe_rampa(frac, rampa) if k else "tb-0", "v": _celula(frac, k) if k else "·",
+                         "titulo": f"{f.get('rotulo')}: {_pct(frac, fino=True, n=k)} em {c['curto']} ({_plural(k, 'processo', 'processos')})"})
         fora.append({"id": f.get("id"), "rotulo": f.get("rotulo") or f.get("id"), "nota": f.get("nota") or "", "processos": _num(n), "celulas": cels})
     media = p.get("media") or {}
     linha_tribunal = None
     if trib == "stf" and media.get("processos"):
-        linha_tribunal = {"rotulo": "média do tribunal, sem a Presidência", "processos": _num(media.get("processos")),
-                          "celulas": [{"a": c["id"], "v": _celula((media.get("areas") or {}).get(c["id"], [0, 0])[1]) if (media.get("areas") or {}).get(c["id"], [0])[0] else "·",
-                                       "titulo": f"Média do tribunal sem a Presidência: {_pct((media.get('areas') or {}).get(c['id'], [0, 0])[1], fino=True)} em {c['curto']}"} for c in colunas]}
+        n_grade = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr") or 1
+        total_m = int(media.get("processos") or 0)
+        cels_t = []
+        for c in colunas:
+            k = int(((media.get("areas") or {}).get(c["id"]) or [0, 0])[0] or 0)
+            frac = k / total_m if total_m else 0.0
+            cels_t.append({"a": c["id"], "v": _celula(frac, k) if k else "·",
+                           "titulo": f"Média do tribunal sem a Presidência: {_pct(frac, fino=True, n=k)} em {c['curto']} ({_plural(k, 'processo', 'processos')})"})
+        linha_tribunal = {"rotulo": "média do tribunal, sem a Presidência", "processos": _num(round(total_m / n_grade)),
+                          "titulo": f"média por gabinete; os {n_grade} gabinetes somam {_num(total_m)} processos", "celulas": cels_t}
     caption = (f"A parte do acervo de cada ministro em cada área, em %. ▲ bem acima {_de(pares_longo)}; ▽ bem abaixo "
                f"(só onde {_regua_marca(r.limiares)}).")
     return {"caption": caption, "grupos": grupos, "fora": fora, "linha_tribunal": linha_tribunal,
@@ -681,6 +771,46 @@ def _faixa_cnj(f: dict[str, Any]) -> dict[str, Any]:
                 "x": f"{_pct(f.get('cobertura') or 0)} dos {_num(cand)} sem decisão registrada há mais de {rot} têm a data no CNJ"}
     return {"rot": rot, "v": _num(f.get("conclusos")), "ok": True,
             "x": f"de {_num(cand)} sem decisão registrada há mais de {rot}; {_pct(f.get('cobertura'))} com a data no CNJ"}
+
+
+def _relogio(m: dict[str, Any], ela: bool = False) -> str:
+    """Para quem chegou à Turma ou herdou acervo há menos de um ano (``relogio`` no painel): a frase que
+    troca o "há mais de um ano" (zerado por construção na redistribuição)."""
+    data = m.get("relogio")
+    if not data:
+        return ""
+    chegada = (m.get("convocado") or {}).get("desde") or m.get("turma_desde")
+    if chegada and str(chegada)[:10] == str(data)[:10] or "recem_chegado" in (m.get("selos") or ()) and "heranca" not in (m.get("selos") or ()):
+        return f"o relógio recomeçou na chegada à Turma, em {_data(data)}"
+    return f"o relógio recomeçou na atribuição do acervo, em {_data(data)}"
+
+
+def _liminar_txt(trib: str) -> str:
+    """O que a marca de liminar quer dizer em cada fonte (STJ: o pedido na chegada; STF: a pendente)."""
+    return "chegaram com pedido de liminar" if trib == "stj" else "com liminar ou tutela pendente"
+
+
+def _tile_idade(trib: str, p: dict[str, Any], no_tribunal: dict[str, Any], autuacao: dict[str, Any] | None) -> dict[str, Any]:
+    """A idade do acervo: no STJ, a mediana em dias desde a autuação; no STF, que só dá o ano, o ano
+    mediano de chegada e a parte autuada no ano dos dados (nunca "0 dias")."""
+    sigla = p.get("sigla", trib.upper())
+    if no_tribunal.get("mediana") is None and autuacao:
+        ano_dados = str(p.get("data_dados") or "")[:4]
+        return {"k": "Chegada (ano mediano)", "dica": "idade", "v": str(autuacao.get("ano_mediano")), "u": "",
+                "x": f"{_pct(autuacao.get('no_ano_dos_dados'))} autuados em {ano_dados}; a planilha do {sigla} só traz o ano da autuação"}
+    v, u = _anos(no_tribunal.get("mediana"))
+    return {"k": "Idade mediana", "dica": "idade", "v": v, "u": u, "x": f"desde a chegada ao {sigla}"}
+
+
+def _sobrestados_cartao(trib: str, n: int) -> str:
+    """Os suspensos do gabinete, fora da lista: o motivo de cada um está na aba A fila (no STF, a planilha
+    não o informa). Nada de "parado por escolha": a fonte não diz por que um processo espera."""
+    if not n:
+        return ""
+    base = f"Fora desta lista: {_plural(n, 'processo suspenso', 'processos suspensos')}"
+    if trib == "stf":
+        return base + " (a planilha do STF não informa o motivo)."
+    return base + " (o motivo de cada um, quando a fonte o dá, está na aba A fila)."
 
 
 def _bloco_cnj(conta: dict[str, Any] | None, minimo: Any) -> dict[str, Any] | None:
@@ -737,8 +867,12 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
         textos = [f"{r.area(a)['curto']} {_pct(areas[a].get('p'), fino=True)}, {_razao(areas[a].get('razao'))} vez {pares_curto}" for a in marcados[:2]]
         frases.append("Fora do padrão dos colegas, com teste: " + "; ".join(textos) + ".")
     sd = m.get("sem_decisao") or {}
-    if sd.get("mais_365") is not None:
-        rot = "sem decisão registrada" if trib == "stj" else "conclusos ao relator"
+    relogio = _relogio(m, ela)
+    if relogio:
+        frases.append(f"Na mesa, {relogio}: a conta do \"sem decisão\" recomeça na redistribuição e na atribuição, e por isso "
+                      "não mostra aqui quanto o processo esperou antes.")
+    elif sd.get("mais_365") is not None:
+        rot = "sem decisão terminativa registrada" if trib == "stj" else "conclusos ao relator"
         antigo = (m.get("mais_antigos") or [{}])[0]
         dias_antigo = antigo.get("sem_decisao_dias") if trib == "stj" else antigo.get("concluso_dias")
         frase = f"{_num(sd.get('mais_365'))} na mesa {rot} há mais de um ano"
@@ -753,16 +887,15 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     tiles = [
         {"k": "Na mesa", "dica": "mesa",
          "v": _num(na_mesa), "u": "", "x": f"de {_num(total)} no acervo ({_pct(na_mesa / total if total else 0)})"},
-        {"k": "Sem decisão há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
+        {"k": "Sem decisão terminativa há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
          "dica": f"sem_decisao_{trib}",
-         "v": _num(sd.get("mais_365")), "u": "", "x": f"mediana: {_dias(sd.get('mediana'))}" if sd.get("mediana") is not None else "a fonte não informa"},
+         "v": "—" if relogio else _num(sd.get("mais_365")), "u": "",
+         "x": relogio if relogio else (f"mediana: {_dias(sd.get('mediana'))}" if sd.get("mediana") is not None else "a fonte não informa")},
     ]
-    nt = m.get("no_tribunal") or {}
-    v, u = _anos(nt.get("mediana"))
-    tiles.append({"k": "Idade mediana", "dica": "idade",
-                  "v": v, "u": u, "x": f"desde a chegada ao {p.get('sigla', trib.upper())}" + (" (pelo ano de autuação)" if trib == "stf" else "")})
+    tiles.append(_tile_idade(trib, p, m.get("no_tribunal") or {}, m.get("autuacao")))
     tiles.append({"k": "Valor da causa", "dica": "valor",
-                  "v": "", "u": "", "x": f"as fontes abertas não publicam. Ente público num polo: {_num(m.get('ente_publico'))} ({_pct((m.get('ente_publico') or 0) / total if total else 0)}); liminar pedida: {_num(m.get('liminar'))}",
+                  "v": "", "u": "", "x": f"as fontes abertas não publicam. Dinheiro público num polo: {_num(m.get('ente_publico'))} "
+                                          f"({_pct((m.get('ente_publico') or 0) / total if total else 0)}); {_liminar_txt(trib)}: {_num(m.get('liminar'))}",
                   "sem_numero": True})
     for k in tiles:
         k.setdefault("sem_numero", False)
@@ -787,9 +920,16 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     e = m.get("entradas")
     if isinstance(e, dict):
         janela, curta = _janela((p.get("entradas") or {}).get("janela"))
-        frase = f"Entraram {_num(e.get('sorteio_12m'))} por sorteio {janela}" + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)")
-        if e.get("heranca_12m"):
-            frase += f"; {_num(e.get('heranca_12m'))} por atribuição (herança de acervo), à parte"
+        if trib == "stj":
+            frase = (f"Entraram {_num(e.get('sorteio_12m'))} distribuídos (sorteio ou prevenção) {janela}"
+                     + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)"))
+            if e.get("heranca_12m"):
+                frase += f"; {_num(e.get('heranca_12m'))} por atribuição (herança de acervo), à parte"
+        else:  # a ata do STF só tem "distribuído" e "redistribuído" (impedimento, prevenção, cadeira vaga)
+            frase = (f"Entraram {_num(e.get('sorteio_12m'))} distribuídos {janela}"
+                     + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)"))
+            if e.get("heranca_12m"):
+                frase += f"; {_num(e.get('heranca_12m'))} redistribuídos, à parte"
         fluxo.append(frase + ".")
     pa = m.get("pauta")
     if isinstance(pa, dict) and pa.get("itens"):
@@ -807,9 +947,8 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
         "outras": _num(outras) if outras else "", "digital": digital, "digital_aria": digital_aria,
         "pares": pares_curto, "pares_longo": pares_longo,
         "subareas": [{"nome": r.nome_subarea(s[0]), "n": _num(s[1]), "pct": _pct(s[2], fino=True)} for s in m.get("subareas") or []],
-        "antigos": antigos, "rot_dias": "sem decisão há" if trib == "stj" else "concluso há",
-        "sobrestados": (f"Fora desta lista: {_plural(sobrestados, 'processo suspenso', 'processos suspensos')} à espera de um tema repetitivo ou de repercussão geral (não estão parados por escolha do gabinete)."
-                        if sobrestados else ""),
+        "antigos": antigos, "rot_dias": "sem decisão terminativa há" if trib == "stj" else "concluso há",
+        "sobrestados": _sobrestados_cartao(trib, sobrestados),
         "partes": [{"nome": nomes.get(g) or _humano(g), "n": _num(n)} for g, n in (m.get("partes") or [])],
         "fluxo": fluxo, "ela": ela, "processos": _num(total), "cnj": bloco_cnj,
     }
@@ -858,27 +997,41 @@ def _assuntos(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], tp
     return {"barras": barras, "recortes": recortes, "focos": focos}
 
 
-def _partes(trib: str, p: dict[str, Any], r: Reguas) -> dict[str, Any]:
+def _tipo_litigante(x: dict[str, Any], r: Reguas) -> str:
+    """O tipo de um litigante da lista: "empresa" só quando a categoria do catálogo é empresarial."""
+    if x.get("tipo") == "pj" and r.categorias.get(str(x.get("id") or "")) in CATEGORIAS_EMPRESA:
+        return "empresa"
+    return TIPOS_PARTE.get(x.get("tipo") or "", "")
+
+
+def _partes(trib: str, p: dict[str, Any], r: Reguas, base: Any = None) -> dict[str, Any]:
+    """Quem se repete. ``base``: os processos que entram na conta (``meta.cobertura.<trib>.partes.base``:
+    sem segredo e sem precatório), o denominador da porcentagem de cada um."""
     partes = p.get("partes") or {}
     top = partes.get("top") or []
     maior = max((max(x.get("recorre") or 0, x.get("responde") or 0) for x in top), default=1) or 1
     n_grade = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr")
-    linhas = [{"nome": x.get("nome") or _humano(x.get("id") or ""), "tipo": TIPOS_PARTE.get(x.get("tipo") or "", ""), "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True),
-               "recorre": _num(x.get("recorre")), "responde": _num(x.get("responde")),
+    linhas = [{"nome": x.get("nome") or _humano(x.get("id") or ""), "tipo": _tipo_litigante(x, r), "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True),
+               "recorre": _num(x.get("recorre")), "responde": _num(x.get("responde")), "outro": _num(x.get("outro")) if x.get("outro") else "",
                "wl": f"{80 * (x.get('recorre') or 0) / maior:.1f}", "wr": f"{80 * (x.get('responde') or 0) / maior:.1f}",
                "mesas": f"em {x.get('mesas')} de {n_grade} mesas" if x.get("mesas") is not None else "",
                "area": x.get("area") or "", "area_nome": r.area(x.get("area"))["curto"] if x.get("area") else ""} for x in top]
     ente = partes.get("ente_publico") or {}
     grupos_nome = r.grupos.get(trib, {})
     por_grupo = []
-    for g, (n, base) in (ente.get("por_grupo") or {}).items():
-        por_grupo.append(f"{grupos_nome.get(g, g)}: {_pct(n / base if base else 0, fino=True)} ({_num(n)} de {_num(base)})")
+    for g, (n, base_g) in (ente.get("por_grupo") or {}).items():
+        por_grupo.append(f"{grupos_nome.get(g, g)}: {_pct(n / base_g if base_g else 0, fino=True, n=n)} ({_num(n)} de {_num(base_g)})")
+    base_txt = f"dos {_num(base)} processos desta conta" if base else "dos processos desta conta"
+    u = p.get("universo") or {}
     return {
         "linhas": linhas, "pf": _num(partes.get("pessoas_fisicas")),
-        "ente": f"{_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))} processos) tem um ente público num dos polos" if ente else "",
+        "ente": f"{_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))} processos) tem {DINHEIRO_PUBLICO}" if ente else "",
         "ente_grupos": por_grupo,
-        "concentracao": f"Os 20 litigantes que mais aparecem estão em {_pct(partes.get('concentracao_top20'))} do acervo." if partes.get("concentracao_top20") is not None else "",
+        "concentracao": (f"Os 20 litigantes que mais aparecem estão em {_pct(partes.get('concentracao_top20'))} {base_txt}."
+                         if partes.get("concentracao_top20") is not None else ""),
         "minimo": int(r.limiares.get("nome_parte_tribunal") or 20),
+        "base": _num(base) if base else "",
+        "recursos": _pct((u.get("recursos") or 0) / u["processos"]) if u.get("processos") and u.get("recursos") is not None else "",
     }
 
 
@@ -918,7 +1071,8 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
     grupos = {g["id"]: g for g in p.get("grupos") or []}
     # Idade de cada mesa: do 1º ao 3º quartil, o traço na mediana e o ponto no p90
     linhas = []
-    escala = max([int((m.get("sem_decisao") or {}).get("p90") or 0) for m in p.get("ministros") or []] + [365])
+    # A escala sem a Presidência (que não tem linha no gráfico): a mesa mais lenta dos relatores das Turmas.
+    escala = max([int((m.get("sem_decisao") or {}).get("p90") or 0) for m in p.get("ministros") or [] if m.get("grupo") != "pr"] + [365])
     for g in p.get("grupos") or []:
         if g.get("id") == "pr":
             continue
@@ -928,10 +1082,13 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
             sd = (m or {}).get("sem_decisao") or {}
             if not m or sd.get("mediana") is None:
                 continue
+            relogio = _relogio(m)
+            txt = f"mediana {_dias(sd['mediana'])} · 90% até {_dias(sd.get('p90'))}"
             itens.append({"id": mid, "nome": m.get("nome"), "med": int(sd["mediana"]),
                           "l": f"{100 * (sd.get('p25') or 0) / escala:.1f}", "w": f"{100 * max(0, (sd.get('p75') or 0) - (sd.get('p25') or 0)) / escala:.1f}",
                           "m": f"{100 * sd['mediana'] / escala:.1f}", "p90": f"{min(100.0, 100 * (sd.get('p90') or 0) / escala):.1f}",
-                          "txt": f"mediana {_dias(sd['mediana'])} · 90% até {_dias(sd.get('p90'))}", "mais_365": _num(sd.get("mais_365"))})
+                          "txt": txt + (f" ({relogio})" if relogio else ""), "curto": txt if not relogio else f"{txt}; recomeçou em {_data(m.get('relogio'))}",
+                          "mais_365": "—" if relogio else _num(sd.get("mais_365"))})
         itens.sort(key=lambda x: (-x["med"], x["id"]))
         if itens:
             linhas.append({"grupo": g.get("nome"), "itens": itens})
@@ -940,12 +1097,18 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
     por_grupo = [{"nome": (grupos.get(g) or {}).get("nome") or r.grupos.get(trib, {}).get(g, g), "na_mesa": _num(v.get("na_mesa")),
                   "mais_180": _num(v.get("mais_180")), "mais_365": _num(v.get("mais_365"))} for g, v in (fila.get("por_grupo") or {}).items()]
     sob = fila.get("sobrestados") or {}
-    motivos = [f"{_num(n)} por {MOTIVOS.get(k, k)}" for k, n in sorted((sob.get("por_motivo") or {}).items(), key=lambda kv: (-kv[1], kv[0]))]
     vistas = []
+    gabinetes = {m["id"]: m for m in p.get("ministros") or []}
     for v in fila.get("vistas") or []:
         proc = v.get("processo") or {}
         item = _item_fila(proc, trib, r, nomes, relatores, True)
-        item["vista"] = relatores.get(v.get("ministro_vista") or "", "") or "—"
+        # A planilha marca só "com pedido de vista": sem o ministro, não se diz "em vista com". O que se
+        # sabe é a localização: no gabinete de outro ministro da composição, quando é o caso.
+        quem = relatores.get(v.get("ministro_vista") or "", "")
+        local = str(proc.get("local") or "")
+        dono = next((x["nome"] for x in gabinetes.values() if x.get("nome") and x["id"] != proc.get("relator_id")
+                     and _chave(x["nome"]) in _chave(local)), "") if local and not quem else ""
+        item["vista"] = (f"Em vista com {quem}" if quem else f"No gabinete de {dono} (localização da planilha)" if dono else "")
         item["sessao"] = _data(v.get("sessao"))
         vistas.append(item)
     mesa_dias = r.limiares.get("mesa_dias") or [180, 365]
@@ -954,9 +1117,30 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
         "antigos": [_item_fila(f, trib, r, nomes, relatores, True, cnj_proc) for f in (fila.get("mais_antigos") or [])[:FILA_NA_PAGINA]],
         "cnj": _fila_cnj(p, cnj) if trib == "stj" and cnj else None,
         "por_grupo": por_grupo, "mesa_dias": [_num(d) for d in mesa_dias],
-        "sobrestados": f"{_num(sob.get('total'))} processos suspensos" + (f": {', '.join(motivos)}" if motivos else "") + "." if sob.get("total") else "",
-        "vistas": vistas, "rot": "sem decisão registrada" if trib == "stj" else "conclusos ao relator",
+        "sobrestados": _sobrestados_fila(sob),
+        "vistas": vistas, "vistas_com_quem": any(v["vista"].startswith("Em vista com") for v in vistas),
+        "rot": "sem decisão terminativa registrada" if trib == "stj" else "conclusos ao relator",
     }
+
+
+def _chave(texto: str) -> str:
+    """Para comparar nomes sem acento e sem caixa."""
+    import unicodedata
+
+    return "".join(c for c in unicodedata.normalize("NFD", str(texto or "").upper()) if unicodedata.category(c) != "Mn")
+
+
+def _sobrestados_fila(sob: dict[str, Any]) -> str:
+    """"3.358 suspensos: 1.400 por repercussão geral, 137 por tema repetitivo, 1.819 sem motivo identificado
+    pela fonte." No STF a planilha não informa o motivo de nenhum."""
+    total = int(sob.get("total") or 0)
+    if not total:
+        return ""
+    motivos = sorted((sob.get("por_motivo") or {}).items(), key=lambda kv: (-kv[1], kv[0]))
+    if motivos and all(k == "nao_informado" for k, _ in motivos):
+        return f"{_plural(total, 'processo suspenso', 'processos suspensos')} (a planilha não informa o motivo)."
+    partes = [f"{_num(n)} por {MOTIVOS.get(k, k)}" if k in MOTIVOS_CONHECIDOS else f"{_num(n)} {MOTIVOS.get(k, k)}" for k, n in motivos]
+    return f"{_plural(total, 'processo suspenso', 'processos suspensos')}" + (f": {', '.join(partes)}" if partes else "") + "."
 
 
 def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str, str]]:
@@ -968,10 +1152,16 @@ def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str,
     if isinstance(e, dict):
         jan = e.get("janela") or [None, None]
         tot, u30 = e.get("total") or {}, e.get("ultimos_30d") or {}
-        texto = (f"{_num(tot.get('sorteio'))} processos distribuídos por sorteio entre {_data(jan[0])} e {_data(jan[1])} ({_num(e.get('dias_com_ata'))} dias com ata); "
-                 f"{_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte.")
-        if not _janela(jan)[1]:  # com 30 dias ou menos de série, "nos últimos 30 dias" repetiria o total
-            texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} por sorteio e {_num(u30.get('heranca'))} por herança."
+        if trib == "stj":  # a forma "Distribuição" das atas inclui a prevenção (RISTJ, art. 71): o campo não distingue
+            texto = (f"{_num(tot.get('sorteio'))} processos distribuídos (sorteio ou prevenção) entre {_data(jan[0])} e {_data(jan[1])} "
+                     f"({_num(e.get('dias_com_ata'))} dias com ata); {_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte.")
+            if not _janela(jan)[1]:  # com 30 dias ou menos de série, "nos últimos 30 dias" repetiria o total
+                texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} distribuídos e {_num(u30.get('heranca'))} por atribuição."
+        else:  # o totalizador da ata do STF só tem "distribuído" e "redistribuído"
+            texto = (f"{_num(tot.get('sorteio'))} processos distribuídos e {_num(tot.get('heranca'))} redistribuídos (impedimento, prevenção "
+                     f"ou cadeira vaga; a ata não diz) entre {_data(jan[0])} e {_data(jan[1])} ({_num(e.get('dias_com_ata'))} dias com ata).")
+            if not _janela(jan)[1]:
+                texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} distribuídos e {_num(u30.get('heranca'))} redistribuídos."
         if tot.get("registro"):
             texto += f" Outros {_num(tot.get('registro'))} foram registrados à Presidência ou à Vice, que não são entrada de ministro."
         blocos.append({"titulo": "O que entrou", "texto": texto, "fonte": _selo_fonte(fontes.get(e.get("fonte") or ""))})
@@ -995,13 +1185,41 @@ def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str,
         blocos.append({"titulo": "O que foi decidido", "texto": texto, "fonte": _selo_fonte(fontes.get(de.get("fonte") or ""))})
     te = p.get("temas")
     if isinstance(te, dict):
-        tipos = ", ".join(f"{TIPOS_TEMA.get(k, k).lower()} {_num(v)}" for k, v in (te.get("por_tipo") or {}).items() if v)
-        texto = f"{_num(te.get('pendentes'))} temas sem julgamento sob relatoria" + (f" ({tipos})" if tipos else "") + "."
+        por_tipo = {k: v for k, v in (te.get("por_tipo") or {}).items() if v}
+        if trib == "stj":  # o total conta só repetitivo e IAC (os temas sob relatoria); o resto vem à parte, sem somar
+            dentro = [f"{_tipo_tema(k)} {_num(por_tipo[k])}" for k in ("repetitivo", "iac") if por_tipo.get(k)]
+            fora = [f"{_num(v)} {_tipo_tema_plural(k, v)}" for k, v in por_tipo.items() if k not in ("repetitivo", "iac", "rg")]
+            texto = (f"{_num(te.get('pendentes'))} temas (repetitivos e IACs) sem julgamento sob relatoria"
+                     + (f" ({', '.join(dentro)})" if dentro else "") + "."
+                     + (f" Além disso, {' e '.join(fora) if len(fora) <= 2 else ', '.join(fora[:-1]) + ' e ' + fora[-1]}." if fora else ""))
+        else:
+            texto = f"{_num(te.get('pendentes'))} temas de repercussão geral sem julgamento sob relatoria."
         saiu = te.get("relator_saiu") or []
         if saiu:
-            texto += " Ainda em nome de quem deixou o tribunal: " + ", ".join(f"{n} ({_num(k)})" for n, k in saiu) + "."
+            texto += (" Ainda em nome de quem não está mais na composição: "
+                      + ", ".join(f"{x[0]}{(', ' + _motivo_saida(x[2])) if len(x) > 2 and x[2] else ''} ({_num(x[1])})" for x in saiu) + ".")
+        if te.get("sem_relator"):
+            texto += f" {_plural(int(te['sem_relator']), 'tema sem relator informado', 'temas sem relator informado')}."
         blocos.append({"titulo": "Temas que pesam para o país", "texto": texto, "fonte": _selo_fonte(fontes.get(te.get("fonte") or ""))})
     return blocos
+
+
+def _tipo_tema(k: str) -> str:
+    """O tipo de tema na frase: em minúsculas, menos a sigla ("repetitivo", "IAC", "relevância")."""
+    nome = TIPOS_TEMA.get(k, k)
+    return nome if nome.isupper() else nome[:1].lower() + nome[1:]
+
+
+def _tipo_tema_plural(k: str, n: int) -> str:
+    plurais = {"controversia": ("controvérsia", "controvérsias"), "relevancia": ("tema de relevância", "temas de relevância"),
+               "repetitivo": ("repetitivo", "repetitivos"), "iac": ("IAC", "IACs")}
+    um, varios = plurais.get(k, (_tipo_tema(k), _tipo_tema(k)))
+    return um if n == 1 else varios
+
+
+def _motivo_saida(motivo: str) -> str:
+    """O motivo do config sem o parêntese de conferência ("em disponibilidade (PDF de 18/11/2026)" → "em disponibilidade")."""
+    return re.sub(r"\s*\([^)]*\)", "", str(motivo or "")).split(";")[0].strip()
 
 
 def _selo_fonte(f: Any) -> str:
@@ -1060,6 +1278,10 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
     rampa = [float(x) for x in lim.get("rampa") or [0.02, 0.05, 0.10, 0.25]]
     por_classe = [a for a in r.areas if (a.get("regra") or {}).get("classes")]
     classes_txt = "; ".join(f"{', '.join(a['regra']['classes'])} → {a['curto']}" for a in por_classe)
+    cede = [(a, (a.get("regra") or {}).get("cede") or {}) for a in r.areas if ((a.get("regra") or {}).get("cede") or {}).get("classes")]
+    cede_txt = " ".join(f"O {' e o '.join(c['classes'])} cujo assunto de mérito é de {' ou de '.join(r.area(x)['curto'] for x in c.get('areas') or [])} "
+                        "(a prisão civil do devedor de alimentos, a guarda, o acolhimento, a internação compulsória) fica na área do assunto."
+                        for _a, c in cede)
     fontes = d.meta.get("fontes") or {}
     datajud = fontes.get("datajud") or {}
     textos = [
@@ -1072,33 +1294,49 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         ("A foto do dia", "O acervo é o retrato da data do arquivo, não a soma do ano. \"Com o ministro\" quer dizer: o processo está em tramitação e ele é o "
          "relator hoje. A triagem da Presidência, os processos sem relator e os de quem deixou a Turma aparecem em linhas próprias, fora da conta dos ministros."),
         ("Uma área por processo", f"Cada processo cai numa área pelo código do assunto principal na Tabela Processual Unificada do CNJ, nunca pelo texto do ramo. "
-         f"A classe vale antes do assunto ({classes_txt}); depois, o nó mais específico listado na árvore; depois, a raiz. Quando o assunto principal é só de "
+         f"A classe vale antes do assunto ({classes_txt}). {cede_txt} Depois, o nó mais específico listado na árvore; depois, a raiz. Quando o assunto principal é só de "
          "rito, vale o primeiro assunto de mérito da lista; sem nenhum, o processo fica em \"Só processual\", à mostra. Os outros assuntos aparecem em "
          "\"também toca\" e não somam. No STF os assuntos vêm em texto: o caminho é casado com a árvore pelo nome, nível a nível."),
-        ("No STJ, o que entra é sorteado", "Dentro de cada Turma os ministros recebem processos parecidos em número e em assunto. Quando o acervo de um tem mais "
-         "de uma área que o dos colegas, a diferença está no que ficou: o que ainda não foi decidido, o que veio por prevenção ou o que foi herdado. Não é "
-         "escolha nem especialidade."),
+        ("Como o processo chega ao gabinete", "Dentro de cada Turma os processos chegam por sorteio ou por prevenção (as atas do STJ não "
+         "distinguem as duas formas). Quem acumula o TSE, o CNJ ou a direção do tribunal recebe menos e fica fora da comparação da mesa, com o selo; "
+         "os outros recebem números parecidos. Quando o acervo de um tem mais de uma área que o dos colegas, a diferença está no que ficou: o que "
+         "ainda não foi decidido, o que veio por prevenção ou o que foi herdado. Não é escolha nem especialidade."),
         ("Só com os pares, e só com teste", f"No STJ cada ministro é comparado com os colegas da mesma Turma, sem ele; no STF, com o tribunal sem ele e sem a "
          f"Presidência. A marca ▲/▽ aparece quando a diferença passa do acaso (binomial exata, {_pct(c.get('confianca', 0.99))}, contando todas as comparações "
          f"do tribunal pelo método de Holm) e é grande o bastante: {_decimal((c.get('razao') or [0.8, 1.25])[1])} vez ou mais, ou {_decimal((c.get('razao') or [0.8, 1.25])[0])} "
          f"ou menos, e {c.get('pontos', 2)} pontos ou mais. Só entram áreas com {c.get('minimo_area', 30)} processos ou mais e ministros com "
          f"{_num(c.get('minimo_acervo', 1000))} ou mais no acervo. Quem herdou acervo ou chegou há menos de {lim.get('nao_comparavel_meses', 6)} meses aparece "
-         "sem marca, com o selo. A linha \"média\" de cada grupo, em itálico, é contexto: soma os ministros da grade do grupo."),
+         "sem marca, com o selo. No STF, em que os pares são o tribunal inteiro, o gabinete que fica bem acima numa área sai da conta dos outros "
+         "naquela área: as ações e execuções penais que um ministro concentra por prevenção não podem marcar os demais \"abaixo\". A linha "
+         "\"média\" de cada grupo, em itálico, é contexto: as porcentagens são as do grupo somado, e a coluna Acervo é a média por gabinete. "
+         "A comparação da mesa (há quanto tempo) deixa de fora, nos dois lados, quem chegou à Turma ou herdou acervo há menos de um ano e quem "
+         "recebe menos por distribuição."),
         ("A cor da tabela", "A célula é a parte do acervo do ministro naquela área, com o número sempre escrito. A cor tem cinco degraus: "
          + ", ".join(f["rotulo"] for f in _faixas_rampa(rampa)) + ". A cor da área só aparece na faixa do alto de cada coluna e nos quadradinhos, sempre com o nome."),
-        ("Na mesa", f"É o processo do ministro que está no gabinete dele. O que está no cartório (prazo, intimação, publicação), com o Ministério Público para "
-         f"parecer ou suspenso à espera de um precedente está no acervo, mas não na mesa. No STJ, \"sem decisão há N dias\" conta da última distribuição "
-         f"ou da última decisão, a mais recente; não é a data em que o processo foi concluso. No STF, conta desde o andamento \"Conclusos ao Relator\". "
+        ("Na mesa", f"É o processo do ministro que está no gabinete dele. O que está no cartório (prazo, intimação, publicação) ou com o Ministério Público "
+         f"para parecer está no acervo, mas não na mesa. Os suspensos à espera de um precedente que estão no gabinete contam na mesa, mas ficam fora da "
+         f"conta da idade. No STJ, \"sem decisão terminativa há N dias\" conta da última distribuição ou da última decisão terminativa, a mais recente: "
+         f"decisão terminativa é a que encerra o processo ou o recurso no STJ; liminares, despachos e decisões no meio do caminho não entram no arquivo "
+         f"do STJ. Redistribuição e atribuição também zeram a conta: quem chegou à Turma ou herdou acervo há menos de um ano aparece com \"o relógio "
+         f"recomeçou\", sem o número. Não é a data em que o processo foi concluso. No STF, conta desde o andamento \"Conclusos ao Relator\". "
          f"Os cortes da página: {_num(mesa[0])} e {_num(mesa[-1])} dias. A idade do processo conta da chegada ao tribunal, em faixas de "
-         + ", ".join(f"{m} meses" for m in faixas) + "."),
+         + ", ".join(f"{m} meses" for m in faixas) + "; no STF, que só publica o ano da autuação, vale o ano."),
         ("Quanto vale", "Nenhuma fonte aberta do STF nem do STJ publica o valor da causa. A página não estima. O valor citado no texto das decisões não serve: "
          "em geral é o de um pedido, de uma lei ou de uma multa, não o que está em jogo. No lugar, a página mostra onde há dinheiro público no recurso "
-         "(um ente público num dos polos), quantos pedem liminar e quantos processos são de "
+         f"({DINHEIRO_PUBLICO_LISTA}), a liminar (no STJ, quantos chegaram com pedido de liminar, decidida ou não; no STF, quantos têm liminar ou "
+         "tutela pendente) e quantos processos são de "
          + ", ".join(((r.recortes.get(x) or {}).get("nome") or x).lower() for x in r.recortes_economicos) + "."),
         ("Quem se repete", f"Contamos pessoas jurídicas e entes públicos, agrupados (a União e a Fazenda Nacional, por exemplo), em quantos processos distintos "
-         f"aparecem, como quem recorre ou como quem responde. Um litigante só ganha nome com {lim.get('nome_parte_tribunal', 20)} processos ou mais no "
-         f"tribunal, ou {lim.get('nome_parte_ministro', 5)} ou mais na mesa de um ministro. A autoridade coatora de um habeas corpus não é parte e fica fora. "
-         "Pessoa física e MEI nunca têm o nome na página. Processo em segredo de justiça conta nos números e não aparece em lista nenhuma."),
+         f"aparecem, como quem recorre, quem responde ou interessado (o Ministério Público no habeas corpus, por exemplo). Um litigante só ganha nome "
+         f"com {lim.get('nome_parte_tribunal', 20)} processos ou mais no tribunal, ou {lim.get('nome_parte_ministro', 5)} ou mais na mesa de um "
+         "ministro. A autoridade coatora de um habeas corpus não é parte e fica fora. Pessoa física e MEI nunca têm o nome na página. Os processos "
+         "em segredo de justiça contam no acervo, nas áreas e no dinheiro público, mas ficam fora desta conta (como os precatórios, em que o "
+         "requerente é o credor) e de lista nenhuma; a porcentagem de cada litigante é sobre os processos que entram nela"
+         + (": " + "; ".join(f"{t.upper()}, {_num(((d.meta.get('cobertura') or {}).get(t) or {}).get('partes', {}).get('base'))}"
+                             for t in TRIBUNAIS if (((d.meta.get("cobertura") or {}).get(t) or {}).get("partes") or {}).get("base")) + "."
+            if any((((d.meta.get("cobertura") or {}).get(t) or {}).get("partes") or {}).get("base") for t in TRIBUNAIS) else ".")
+         + " Nas ações originárias (ADI, HC, MS, ação rescisória, reclamação), as listas dizem \"polo ativo\" e \"polo passivo\": só no recurso "
+         "há quem recorre e quem responde."),
         ("Recursos internos", "Agravo interno, agravo regimental e embargos de declaração não são processos novos: o processo continua um só. Nas pautas e nas "
          "decisões eles contam como itens."),
     ]
@@ -1112,8 +1350,11 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         textos = [(t, x.replace("a data exata da conclusão no STJ, ", "").replace("a data exata da conclusão no STJ e ", ""))
                   if t == "O que fica de fora" else (t, x) for t, x in textos]
     textos.append(("O que isto não diz", "Número de processos não é produtividade nem orientação de quem julga. Acervo grande pode ser herança, prevenção ou "
-                   "uma Turma com mais entrada. A área do processo é a que o tribunal registrou, não uma leitura do caso. A página não diz quem tem razão, "
-                   "nem como um ministro vai votar. As escolhas editoriais estão escritas aqui para poderem ser contestadas."))
+                   "uma Turma com mais entrada. \"Sem decisão terminativa registrada\" não quer dizer que nada aconteceu no processo: liminares, "
+                   "despachos e diligências não entram no arquivo do STJ, e a fonte não diz por que um processo espera (parecer, pauta, julgamento "
+                   "colegiado). A área do processo é a que o tribunal registrou, não uma leitura do caso. A página não diz quem tem razão, "
+                   "nem como um ministro vai votar. As escolhas editoriais estão escritas aqui para poderem ser contestadas: cada achado, cada mesa "
+                   "e a lista de quem se repete têm o link \"Contestar este número\"."))
     # o que entra em cada área
     def _codigos(lista: list[int]) -> str:
         return "; ".join(f"{(tpu.nome(cod) if tpu else None) or 'código'} ({cod})" for cod in lista)
@@ -1149,7 +1390,8 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         if not isinstance(cob, dict):
             continue
         sigla = trib.upper()
-        frase = f"{sigla}: {_num(cob.get('processos'))} processos lidos; {_num(cob.get('segredo'))} em segredo de justiça (contam nos números, nunca em lista)."
+        frase = (f"{sigla}: {_num(cob.get('processos'))} processos lidos; {_num(cob.get('segredo'))} em segredo de justiça (contam no acervo, "
+                 "nas áreas e no dinheiro público, fora de quem se repete; nunca em lista).")
         cas = cob.get("casamento")
         if isinstance(cas, dict) and cob.get("linhas_de_assunto"):
             total = cob["linhas_de_assunto"]
@@ -1221,27 +1463,26 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
     colunas, fora_colunas = _colunas(p, r)
     pares_longo, _ = _texto_pares(trib, r.limiares)
     n_grade = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr")
-    v_idade, u_idade = _anos((idade.get("no_tribunal") or {}).get("mediana"))
+    relatores_txt, relatores_curto = _relatores_turmas(p)
     valor = p.get("valor") or {}
     medidas = valor.get("medidas") or {}
     ente, liminar = medidas.get("ente_publico") or {}, medidas.get("liminar") or {}
     recortes_valor = [{"nome": (r.recortes.get(k) or {}).get("nome") or k, "n": _num(n)} for k, n in (medidas.get("recortes") or {}).items()]
-    sd_rot = "sem decisão registrada" if trib == "stj" else "conclusos ao relator"
+    sd_rot = "sem decisão terminativa registrada" if trib == "stj" else "conclusos ao relator"
     tiles = [
         {"k": f"Na mesa dos {n_grade}", "dica": "mesa_tribunal",
          "v": _num(u.get("na_mesa")), "u": "", "x": f"de {_num(u.get('na_grade'))} com eles; {_num(u.get('processos'))} no tribunal, em {_data(p.get('data_dados'))}"},
-        {"k": "Sem decisão há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
+        {"k": "Sem decisão terminativa há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
          "dica": f"sem_decisao_{trib}",
          "v": _num(u.get("sem_decisao_365")), "u": "", "x": f"{_pct((u.get('sem_decisao_365') or 0) / u['na_mesa'] if u.get('na_mesa') else 0, fino=True)} da mesa; {_num(u.get('sem_decisao_180'))} há mais de {_num((r.limiares.get('mesa_dias') or [180])[0])} dias"},
-        {"k": "Idade mediana", "dica": "idade", "v": v_idade, "u": u_idade,
-         "x": f"desde a chegada ao {trib.upper()}"},
+        _tile_idade(trib, p, idade.get("no_tribunal") or {}, idade.get("autuacao")),
         {"k": "Valor da causa", "dica": "valor", "v": "", "u": "", "sem_numero": True,
-         "x": f"as fontes abertas não publicam. Ente público num polo: {_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))})"},
+         "x": f"as fontes abertas não publicam. Dinheiro público num polo: {_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))})"},
     ]
     for k in tiles:
         k.setdefault("sem_numero", False)
     mapa = [
-        {"vista": "ministros", "nome": "Ministros", "texto": "Quem está com o quê: a matriz ministro × área e a mesa de cada um.", "n": _num(n_grade), "n_txt": "ministros nas Turmas"},
+        {"vista": "ministros", "nome": "Ministros", "texto": "Quem está com o quê: a matriz ministro × área e a mesa de cada um.", "n": _num(n_grade), "n_txt": relatores_curto},
         {"vista": "assuntos", "nome": "Assuntos", "texto": f"De que se ocupa o {trib.upper()}, e quem cuida de cada assunto.", "n": _num(sum(1 for a in p.get("areas") or [] if a.get("n"))), "n_txt": "áreas com processo"},
         {"vista": "partes", "nome": "Partes", "texto": "Quem mais aparece, de que lado e em quantas mesas.", "n": _num(len((p.get("partes") or {}).get("top") or [])), "n_txt": "litigantes com nome"},
         {"vista": "fila", "nome": "A fila", "texto": "O que espera há mais tempo, e na mesa de quem.", "n": _num(u.get("sem_decisao_365")), "n_txt": f"{sd_rot} há mais de um ano"},
@@ -1263,11 +1504,16 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
         **base, "tem": True, "n_ministros": len(p.get("ministros") or []), "data": _data(p.get("data_dados")), "data_curta": _data(p.get("data_dados"), ano=False),
         "leitura": _leitura(trib, p, d.achados, r), "tiles": tiles, "mapa": mapa,
         "valor": {"texto": str(valor.get("texto") or ""), "ente": f"{_pct(ente.get('p'), fino=True)} ({_num(ente.get('n'))} processos)",
-                  "liminar": f"{_pct(liminar.get('p'), fino=True)} ({_num(liminar.get('n'))} processos)", "recortes": recortes_valor},
+                  "liminar": f"{_pct(liminar.get('p'), fino=True)} ({_num(liminar.get('n'))} processos)", "recortes": recortes_valor,
+                  "liminar_rot": "Chegaram com pedido de liminar" if trib == "stj" else "Com liminar ou tutela pendente",
+                  "liminar_nota": ("o arquivo do STJ diz se o processo chegou com pedido de liminar, não se ela foi decidida" if trib == "stj" else "")},
+        "relatores": relatores_txt,
         "pares": pares_longo, "colunas": colunas, "nota_colunas": _nota_colunas(fora_colunas),
         "matriz": _matriz(trib, p, r, colunas), "chips": chips, "lista_mesa": lista_mesa,
         "cartoes": [_cartao(trib, p, m, r, nomes, relatores, d.cnj) for m in p.get("ministros") or []],
-        "assuntos": _assuntos(trib, p, r, nomes, tpu), "partes": _partes(trib, p, r), "fila": _fila(trib, p, r, nomes, relatores, d.cnj),
+        "assuntos": _assuntos(trib, p, r, nomes, tpu),
+        "partes": _partes(trib, p, r, ((((d.meta.get("cobertura") or {}).get(trib) or {}).get("partes")) or {}).get("base")),
+        "fila": _fila(trib, p, r, nomes, relatores, d.cnj),
         "fluxo": _fluxo(trib, p, d.meta),
         "colunas_grupo": {g.get("id"): sorted(a for a, (n, frac) in (g.get("areas") or {}).items() if frac < 0.01) for g in p.get("grupos") or [] if g.get("id") != "pr"},
     }
@@ -1312,13 +1558,15 @@ def tribunais_view(d: Dados, config: Config) -> dict[str, Any]:
         "areas": {a["id"]: [a["curto"], a["nome"]] for a in r.areas}, "ordem": [a["id"] for a in r.areas],
         "subareas": r.subareas, "recortes": {k: (v.get("nome") or k) for k, v in r.recortes.items()},
         "partes": nomes, "classes": _classes(tpu), "onde": ONDE, "motivos": MOTIVOS, "tiposTema": TIPOS_TEMA, "tiposParte": TIPOS_PARTE,
+        "empresas": sorted(g for g, c in r.categorias.items() if c in CATEGORIAS_EMPRESA),
         "faixas": _rotulos_faixas(r.limiares.get("idade_faixas_meses") or [6, 12, 24, 36, 60]),
         "gloss": GLOSSARIO,
         "ministros": ministros,
         "generos": {m["id"]: m.get("genero") or "m" for p in d.paineis.values() for m in p.get("ministros") or []},
         "t": {t["id"]: {"sigla": t["sigla"], "nome": t["nome"], "pares": _texto_pares(t["id"], r.limiares)[1],
                         "grupos": r.grupos.get(t["id"], {}), "orgaos": r.orgaos.get(t["id"], {}),
-                        "colunasGrupo": t.get("colunas_grupo", {}), "rotDias": "sem decisão há" if t["id"] == "stj" else "concluso há",
+                        "colunasGrupo": t.get("colunas_grupo", {}), "rotDias": "sem decisão terminativa há" if t["id"] == "stj" else "concluso há",
+                        "recurso": list(((r.limiares.get("classes_recurso") or {}).get(t["id"])) or []),
                         "data": (d.paineis.get(t["id"]) or {}).get("data_dados") or hoje}
               for t in tribunais if t["tem"]},
     }

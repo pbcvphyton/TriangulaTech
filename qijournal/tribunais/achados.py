@@ -8,10 +8,12 @@ de maior ``peso`` = ``pesos_achados[tipo] × log10(1 + n)``, com ``n`` o número
 Os tipos (analista jurídico §7.2):
 
 - ``heranca`` — atribuição de ``achado_heranca`` (300) processos ou mais a um relator num dia da
-  última semana (atas): herança de acervo, não sorteio;
+  última semana (atas): herança de acervo, não distribuição; o título soma os dias grandes da
+  semana (no STF, a ata só diz "redistribuído": o título diz isso);
 - ``mesa_antiga`` — em cada Turma (STJ) ou grupo (STF), o ministro com a maior parte da mesa sem
-  decisão (STJ) ou conclusa (STF) há mais de um ano, **se** a diferença para o resto da Turma passa
-  no teste (binomial exata, Holm a 99%) e no piso de efeito;
+  decisão terminativa registrada (STJ) ou conclusa (STF) há mais de um ano, **se** a diferença para
+  os pares que entram na comparação (sem quem chegou ou herdou há menos de um ano e sem quem recebe
+  menos por distribuição) passa no teste (binomial exata, Holm a 99%) e no piso de efeito;
 - ``fora_do_padrao`` — a marca da matriz ministro × área com mais processos (o maior peso; no
   empate, o maior afastamento), só o que passou no teste e no piso, de ministro comparável;
 - ``litigante`` — grupo cuja entrada da semana (atas) passa de 3 vezes a média semanal das 12
@@ -75,6 +77,12 @@ def data_br(iso: str | None, *, ano: bool = True) -> str:
 
 def extenso(n: int) -> str:
     return _EXTENSO.get(n, numero(n))
+
+
+def _lista(nomes: Sequence[str]) -> str:
+    """``["A", "B", "C"]`` → ``"A, B e C"``."""
+    nomes = list(nomes)
+    return nomes[0] if len(nomes) == 1 else ", ".join(nomes[:-1]) + " e " + nomes[-1]
 
 
 def peso(regras: Regras, tipo: str, n: float) -> float:
@@ -150,10 +158,12 @@ def achados_heranca(regras: Regras, trib: str, painel: Mapping[str, Any], sinais
         m = ministros.get(mid)
         if m is None:
             continue
-        recentes = [(d, n) for d, n in dias if n >= minimo and (hoje - date.fromisoformat(d)).days < DIAS_DA_SEMANA]
+        recentes = sorted((d, n) for d, n in dias if n >= minimo and (hoje - date.fromisoformat(d)).days < DIAS_DA_SEMANA)
         if not recentes:
             continue
-        dia, n = max(recentes, key=lambda x: (x[1], x[0]))
+        dia, maior = max(recentes, key=lambda x: (x[1], x[0]))
+        n = sum(k for _d, k in recentes)
+        ini, fim = recentes[0][0], recentes[-1][0]
         quem = m["nome"]
         conv = m.get("convocado")
         if conv:
@@ -161,10 +171,22 @@ def achados_heranca(regras: Regras, trib: str, painel: Mapping[str, Any], sinais
             desde = f" desde {data_br(conv.get('desde'), ano=False)}" if conv.get("desde") else ""
             quem += f", {artigo} do {conv.get('tribunal')} na {_turma(regras, trib, m)}{desde},"
         ela, dela = ("ela", "dela") if m.get("genero") == "f" else ("ele", "dele")
-        titulo = f"{quem} recebeu {numero(n)} processos por atribuição em {data_br(dia)}"
-        texto = (f"A atribuição é herança de acervo, não sorteio: aparece à parte e não soma no que {ela} recebeu por "
-                 f"distribuição. O acervo {dela} em {data_br(painel.get('data_dados'))}: {numero(m.get('processos') or 0)} processos.")
-        saida.append(_achado(regras, "heranca", trib, n, titulo, texto, f"#v=ministros&t={trib}&min={mid}", mid, fonte, dia))
+        forma = "por atribuição" if trib == "stj" else "redistribuídos"
+        if len(recentes) == 1:
+            titulo = f"{quem} recebeu {numero(n)} processos {forma} em {data_br(dia)}"
+        else:
+            titulo = (f"{quem} recebeu {numero(n)} processos {forma} entre {data_br(ini, ano=False)} e {data_br(fim)} "
+                      f"({numero(maior)} só em {data_br(dia, ano=False)})")
+        recebido = int(((m.get("entradas") or {}).get("sorteio_30d")) or 0)
+        if trib == "stj":
+            texto = (f"A atribuição é herança de acervo, não distribuição: aparece à parte e não soma no que {ela} recebeu por "
+                     f"distribuição ({numero(recebido)} em 30 dias, sorteio ou prevenção). O acervo {dela} em "
+                     f"{data_br(painel.get('data_dados'))}: {numero(m.get('processos') or 0)} processos.")
+        else:
+            texto = (f"A ata do STF diz só \"redistribuído\" (por impedimento, prevenção ou cadeira vaga), à parte do que {ela} "
+                     f"recebeu por distribuição ({numero(recebido)} em 30 dias). O acervo {dela} em "
+                     f"{data_br(painel.get('data_dados'))}: {numero(m.get('processos') or 0)} processos.")
+        saida.append(_achado(regras, "heranca", trib, n, titulo, texto, f"#v=ministros&t={trib}&min={mid}", mid, fonte, fim))
     return saida
 
 
@@ -178,21 +200,27 @@ def achados_mesa(regras: Regras, trib: str, painel: Mapping[str, Any], sinais: M
         m = ministros.get(v["ministro"])
         if m is None or not m.get("comparavel"):
             continue
-        n_pares = sum(1 for x in ministros.values() if x.get("grupo") != "pr" and x["id"] != v["ministro"]
-                      and x.get("turma") == m.get("turma"))
+        n_pares = v.get("n_pares")
+        if n_pares is None:  # sinal antigo, sem a lista dos pares
+            n_pares = sum(1 for x in ministros.values() if x.get("grupo") != "pr" and x["id"] != v["ministro"]
+                          and x.get("turma") == m.get("turma"))
         if trib == "stj":
-            titulo = (f"{m['nome']}: {numero(v['k'])} dos {numero(v['n'])} processos na mesa estão sem decisão registrada há "
-                      f"mais de um ano ({pct(v['p'], 0)})")
-            nota = ("\"Sem decisão registrada\" conta da última distribuição ou decisão, a mais recente; sobrestados ficam fora. "
-                    "Não é a data em que o processo foi concluso.")
+            titulo = (f"{m['nome']}: {numero(v['k'])} dos {numero(v['n'])} processos na mesa estão sem decisão terminativa "
+                      f"registrada há mais de um ano ({pct(v['p'], 0)})")
+            nota = ("\"Sem decisão terminativa registrada\" conta da última distribuição ou da última decisão terminativa, a mais "
+                    "recente; liminares e despachos não entram, e os suspensos ficam fora. Não é a data em que o processo foi concluso.")
             grupo = f"da {_turma(regras, trib, m)}"
         else:
             titulo = (f"{m['nome']}: {numero(v['k'])} dos {numero(v['n'])} processos conclusos na mesa estão conclusos há "
                       f"mais de um ano ({pct(v['p'], 0)})")
             nota = "Conta do andamento \"Conclusos ao(à) Relator(a)\" da planilha do STF; sobrestados ficam fora."
             grupo = f"da {_turma(regras, trib, m)}" if m.get("turma") else "do grupo"
-        texto = (f"Em {data_br(data)}. Nos outros {extenso(n_pares)} gabinetes {grupo}, {pct(v['pares'])} "
+        fora = [ministros[o]["nome"] for o in v.get("fora") or () if o in ministros]
+        texto = (f"Em {data_br(data)}. Nos outros {extenso(n_pares)} gabinetes {grupo} que entram na comparação, {pct(v['pares'])} "
                  f"({numero(v['pares_k'])} de {numero(v['pares_n'])}). Diferença que passa do acaso (binomial exata, 99%, Holm). {nota}")
+        if fora:
+            texto += (f" Ficam fora da comparação {_lista(fora)}: chegaram à Turma ou herdaram acervo há menos de um ano (o relógio "
+                      "recomeçou) ou recebem menos processos por distribuição.")
         saida.append(_achado(regras, "mesa_antiga", trib, v["k"], titulo, texto, f"#v=ministros&t={trib}&min={v['ministro']}",
                              v["ministro"], f"{trib}_acervo", data))
     return saida
@@ -219,9 +247,18 @@ def achados_area(regras: Regras, trib: str, painel: Mapping[str, Any], sinais: M
         n_pares = _pares_de(regras, trib, painel, mid)
         alvo_pares = (f"dos colegas da {_turma(regras, trib, m)}" if trib == "stj"
                       else "dos outros ministros do tribunal (sem a Presidência)")
+        fora = [ministros[o]["nome"] for o in x.get("fora") or () if o in ministros]
+        n_pares -= len(fora)
+        if fora:
+            alvo_pares = (f"dos colegas da {_turma(regras, trib, m)}, sem {_lista(fora)}" if trib == "stj"
+                          else f"dos outros ministros do tribunal (sem a Presidência e sem {_lista(fora)})")
         titulo = f"{area} é {pct(x['p'])} do acervo de {m['nome']}, {vezes(x['razao'])} a parte {alvo_pares}"
         texto = (f"{numero(x['k'])} de {numero(x['n'])} processos em {data_br(data)}; {_colegas(regras, trib, m, n_pares)}, "
                  f"{pct(x['pares'])}. Diferença que passa do acaso (binomial exata, 99%, Holm).")
+        if fora:
+            texto += (f" {_lista(fora)} {'fica' if len(fora) == 1 else 'ficam'} fora desta conta: "
+                      f"{'está' if len(fora) == 1 else 'estão'} bem acima dos outros em {area}, e um acervo concentrado num "
+                      "gabinete (por prevenção, por exemplo) não pode marcar os demais.")
         saida.append(_achado(regras, "fora_do_padrao", trib, x["k"], titulo, texto,
                              f"#v=ministros&t={trib}&min={mid}&area={x['area']}", mid, f"{trib}_acervo", data))
     return saida

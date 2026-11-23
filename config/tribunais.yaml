@@ -16,7 +16,10 @@ versao: 1
 #
 # Como um processo cai numa área (o analista jurídico decide; a régua usa sempre o CÓDIGO da
 # Tabela Processual Unificada do CNJ, nunca o texto do ramo, que vem fora do padrão nas fontes):
-#   1. a CLASSE vale antes do assunto (classes: HC, RHC... → penal; ADI, ADC... → constitucional);
+#   1. a CLASSE vale antes do assunto (classes: HC, RHC... → penal; ADI, ADC... → constitucional),
+#      salvo quando ela cede ao mérito (cede_ao_merito): o HC e o RHC cujo assunto de mérito é de
+#      Família ou de Saúde (prisão civil por alimentos, guarda, acolhimento institucional,
+#      internação compulsória: CPC, art. 528, §3º) ficam na área do assunto, não em Penal;
 #   2. depois o NÓ MAIS ESPECÍFICO listado na árvore do assunto principal (nos: Família 5626 vence
 #      a raiz Civil 899; Infância, Seção Cível 9964, vence a raiz da Criança e do Adolescente 9633);
 #   3. depois a RAIZ da árvore (raizes);
@@ -124,9 +127,13 @@ areas:
     nome_curto: "Penal"
     cor: ["#4743a8", "#6162f4"]
     texto: "#fff"
-    raizes: [287, 1209, 11068, 11049, 9633]  # Penal, Processual Penal (no HC, a prisão é o mérito), militares, Criança e Adolescente
+    raizes: [287, 1209, 11068, 11049, 9633]  # Penal, Processual Penal, militares, Criança e Adolescente
     nos: [9634, 10688]               # Ato infracional, Medidas socioeducativas
     classes: [HC, RHC, APn, AP, Inq, RvCr, RvC]  # STJ: APn e RvCr; STF: AP e RvC
+    # O HC e o RHC da Segunda Seção são quase todos de prisão civil do devedor de alimentos, guarda,
+    # acolhimento ou internação compulsória (STJ, 20/11/2026: 216 nas Turmas 3 e 4, 169 de alimentos):
+    # com o mérito em Família ou Saúde, a área é a do mérito.
+    cede_ao_merito: {classes: [HC, RHC], areas: [familia, saude]}
   - id: outros
     nome: "Outros"
     nome_curto: "Outros"
@@ -227,7 +234,9 @@ recortes_economicos: [execucao_fiscal, recuperacao_falencia, bancario, planos_sa
 # Campos: id (<tribunal>-<slug>, endereço do dossiê), nome (como a página mostra), nome_completo,
 # genero (f/m: "a ministra", "o ministro"), turma e secao (STJ: T1..T6, S1..S3; STF: T1, T2),
 # corte_especial (STJ), cargos (presidente, vice_presidente, corregedor_cnj, presidente_turma,
-# presidente_secao, decano), grade (false: fora da matriz e das médias — Presidência, Vice e
+# presidente_secao, decano, tse_corregedor, tse_efetivo: quem acumula o TSE recebe menos processos
+# por distribuição; o selo "distribuicao_reduzida" sai das atas e tira o gabinete da comparação da
+# mesa), grade (false: fora da matriz e das médias — Presidência, Vice e
 # Corregedoria não recebem distribuição comum), posse (no tribunal), turma_desde (ingresso no
 # colegiado atual; menos de 6 meses = "não comparável"), convocado ({tribunal, vaga_de}: o
 # desembargador convocado), gabinete (o texto oficial do local "na mesa"), aliases (como o nome
@@ -283,8 +292,10 @@ composicao:
       - {id: stj-humberto-martins, nome: "Humberto Martins", nome_completo: "Humberto Eustáquio Soares Martins", genero: m,
          turma: T3, secao: S2, corte_especial: true, posse: "2006-06-14", turma_desde: "2023-06-01",
          gabinete: "GABINETE DO MINISTRO HUMBERTO EUSTÁQUIO SOARES MARTINS", aliases: ["HUMBERTO MARTINS"]}
+      # Corregedor-Geral Eleitoral, efetivo no TSE (2025/27), pelo PDF de 18/11/2026: recebe cerca de 1/10
+      # do que os pares recebem por distribuição (atas de 24/10 a 22/11: 129 contra 1.121 a 1.199).
       - {id: stj-ricardo-villas-boas-cueva, nome: "Ricardo Villas Bôas Cueva", nome_completo: "Ricardo Villas Bôas Cueva", genero: m,
-         turma: T3, secao: S2, corte_especial: true, posse: "2011-06-13", turma_desde: "2011-06-14",
+         turma: T3, secao: S2, corte_especial: true, cargos: [tse_corregedor], posse: "2011-06-13", turma_desde: "2011-06-14",
          gabinete: "GABINETE DO MINISTRO RICARDO VILLAS BÔAS CUEVA", aliases: ["RICARDO VILLAS BÔAS CUEVA", "Villas Bôas Cueva"]}
       - {id: stj-moura-ribeiro, nome: "Moura Ribeiro", nome_completo: "Paulo Dias de Moura Ribeiro", genero: m,
          turma: T3, secao: S2, cargos: [presidente_secao], posse: "2013-08-28", turma_desde: "2014-08-29",
@@ -324,8 +335,10 @@ composicao:
       - {id: stj-maria-marluce-caldas, nome: "Maria Marluce Caldas", nome_completo: "Maria Marluce Caldas Bezerra", genero: f,
          turma: T5, secao: S3, posse: "2025-09-04", turma_desde: "2025-09-05",
          gabinete: "GABINETE DA MINISTRA MARIA MARLUCE CALDAS", aliases: ["MARIA MARLUCE CALDAS"]}
+      # Efetivo no TSE (2026/28), pelo PDF de 18/11/2026: recebe menos por distribuição (atas de 24/10 a
+      # 22/11: 421 contra 1.413 a 1.443 dos pares).
       - {id: stj-sebastiao-reis-junior, nome: "Sebastião Reis Júnior", nome_completo: "Sebastião Alves dos Reis Júnior", genero: m,
-         turma: T6, secao: S3, corte_especial: true, posse: "2011-06-13", turma_desde: "2011-06-14",
+         turma: T6, secao: S3, corte_especial: true, cargos: [tse_efetivo], posse: "2011-06-13", turma_desde: "2011-06-14",
          gabinete: "GABINETE DO MINISTRO SEBASTIÃO REIS JUNIOR", aliases: ["SEBASTIÃO REIS JÚNIOR"]}
       - {id: stj-rogerio-schietti, nome: "Rogerio Schietti", nome_completo: "Rogerio Schietti Machado Cruz", genero: m,
          turma: T6, secao: S3, posse: "2013-08-28", turma_desde: "2013-08-29",
@@ -342,8 +355,9 @@ composicao:
          gabinete: "GABINETE DA DESEMBARGADORA CONVOCADA DO TJPB FÁTIMA MARANHÃO",
          aliases: ["Fátima Maranhão (Desembargadora convocada do TJPB)", "FÁTIMA MARANHÃO (DESEMBARGADORA CONVOCADA DO TJPB)"]}
       # O PDF de 18/11/2026 marca a Sexta Turma com "Vaga do Min. Antonio Palheiro" sem dizer de qual das
-      # duas convocadas; o acervo de Og Fernandes (que deixou o colegiado) está em redistribuição e
-      # 1.014 processos foram atribuídos a Fátima Maranhão em 19/11 (ata). Por isso vaga_de: null nas duas.
+      # duas convocadas; o acervo de Og Fernandes (que deixou o tribunal) foi redistribuído e, pelas atas,
+      # 4.467 processos foram atribuídos a Fátima Maranhão entre 17 e 21/11 (660 em 17/11, 2.791 em 18/11,
+      # 1.014 em 19/11 e 2 em 21/11). Por isso vaga_de: null nas duas.
       # Sem Turma: cargos de direção (acervo residual; fora da matriz e das médias)
       - {id: stj-luis-felipe-salomao, nome: "Luis Felipe Salomão", nome_completo: "Luis Felipe Salomão", genero: m,
          corte_especial: true, cargos: [presidente], grade: false, posse: "2008-06-17",
@@ -357,8 +371,8 @@ composicao:
     # Relatores do arquivo que não são ministros da grade: cada linha vira uma linha própria da página.
     # "relatores" casa o nome inteiro (sem acento e sem caixa); "prefixos", o começo.
     fora_da_grade:
-      - {id: presidencia, rotulo: "A triagem (Presidência)", relatores: ["Presidente do STJ"],
-         nota: "A fila antes do sorteio: o Presidente decide os recursos inadmissíveis antes da distribuição (Assessoria de Admissibilidade, Recursos Repetitivos e Relevância, a ARP), e os precatórios."}
+      - {id: presidencia, rotulo: "Presidência", relatores: ["Presidente do STJ"],
+         nota: "Triagem de admissibilidade antes da distribuição (ARP), homologação de decisão estrangeira, cartas rogatórias, suspensões de liminar, precatórios e RPV; parte já decidida, no cartório ou remetida ao STF."}
       - {id: vice, rotulo: "Vice-Presidência", relatores: ["Vice-Presidente do STJ"],
          nota: "A admissibilidade do recurso extraordinário ao STF; inclui os sobrestados à espera da repercussão geral."}
       - {id: sem_relator, rotulo: "Ainda sem relator", relatores: ["Não Informado"],
@@ -373,9 +387,9 @@ composicao:
          nota: "Registros sem relator, local ou assunto no arquivo do dia."}
     # Quem saiu (resíduos): o nome vai para a linha "residuos", nunca para um cartão.
     saiu:
-      - {nome: "Og Fernandes", motivo: "deixou a Sexta Turma; acervo em redistribuição"}
+      - {nome: "Og Fernandes", motivo: "deixou o tribunal; acervo da Corte Especial atribuído a Bellizze em 17 e 18/11"}
       - {nome: "Antonio Saldanha Palheiro", motivo: "aposentado"}
-      - {nome: "Marco Buzzi", motivo: "em disponibilidade (PDF de 18/11/2026)"}
+      - {nome: "Marco Buzzi", motivo: "em disponibilidade"}   # PDF de 18/11/2026: membro do Plenário, sem Turma
       - {nome: "Jorge Mussi", motivo: "aposentado"}
       - {nome: "Assusete Magalhães", motivo: "aposentada"}
       - {nome: "Massami Uyeda", motivo: "aposentado"}
@@ -437,7 +451,7 @@ composicao:
          nota: "O Presidente não recebe distribuição comum e decide antes da distribuição os recursos inadmissíveis; o que ele decide como Presidente conta aqui, nunca no cartão do ministro."}
       - {id: vice, rotulo: "Vice-Presidência", relatores: ["VICE-PRESIDENTE"], nota: "O que está com a Vice-Presidência como tal."}
       - {id: residuos, rotulo: "Relatores que deixaram o tribunal", relatores: [],
-         nota: "Processos e temas ainda em nome de quem saiu: o campo guarda o relator original, não o sucessor."}
+         nota: "Na maior parte, o acervo da cadeira vaga de Luís Roberto Barroso, à espera do novo ministro; o resto, processos antigos ainda em nome de relatores aposentados."}
       - {id: sem_relator, rotulo: "Sem relator", relatores: [""], nota: "Processos ainda não distribuídos, na planilha sem relator."}
     saiu:
       - {nome: "Luís Roberto Barroso", motivo: "aposentado em 2025 (cadeira vaga)"}
@@ -465,8 +479,18 @@ limiares:
     minimo_area: 30              # processos da área no ministro ou nos pares para testar
     minimo_acervo: 1000          # acervo mínimo do ministro para entrar no teste ("poucos processos para comparar")
     pares: {stj: turma, stf: tribunal}   # STJ: a mesma Turma, sem ele; STF: o tribunal sem ele e sem a Presidência
+    # Onde os pares são o tribunal inteiro (STF), o gabinete que fica bem acima numa área (▲) sai da
+    # conta dos outros naquela área: as ações e execuções penais que Alexandre de Moraes concentra por
+    # prevenção marcavam Penal "abaixo" em quem não as tem (Flávio Dino: 0,7 vez com ele, 0,8 sem ele).
+    sem_destoante: [stf]
   nao_comparavel_meses: 6        # herança recente, chegada à Turma ou convocação há menos que isto: selo, sem marca
   heranca_parte: 0.30            # "acervo herdado": atribuições de 30% ou mais do acervo nos últimos 6 meses
+  distribuicao_reduzida: 0.5     # com 20 dias de ata ou mais: o gabinete que recebeu por distribuição em 30 dias menos que
+                                 # isto × a mediana da Turma (STJ) ou do grupo (STF) ganha o selo "recebe menos processos"
+                                 # e sai da comparação da mesa (quem acumula o TSE, por exemplo)
+  classes_recurso:               # "recorre" e "responde" só nos recursos; nas ações originárias (ADI, HC, MS, AR, Rcl...), "polo ativo" e "polo passivo"
+    stj: [REsp, AREsp, RHC, RMS, EREsp, EAREsp, RO, Ag, EAg]
+    stf: [RE, ARE, RHC, RMS, AI, RO]
   nome_parte_tribunal: 20        # processos para um litigante (PJ ou ente) aparecer com nome na lista do tribunal
   nome_parte_ministro: 5         # ... no cartão do ministro
   achado_heranca: 300            # atribuições a um relator num dia para virar achado

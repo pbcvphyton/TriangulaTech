@@ -392,6 +392,11 @@ class Area:
     nos: tuple[int, ...] = ()
     classes: tuple[str, ...] = ()
     residual: bool = False
+    # A classe cede ao mérito: estas classes (HC, RHC) vão para a área da classe salvo quando o
+    # assunto de mérito do processo é de uma destas áreas (o HC da prisão civil por alimentos é
+    # Família, não Penal).
+    cede_classes: tuple[str, ...] = ()
+    cede_areas: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -500,6 +505,16 @@ class Composicao:
     def ministro(self, ministro_id: str) -> Ministro | None:
         return next((m for m in self.ministros if m.id == ministro_id), None)
 
+    def saida(self, texto: str | None) -> tuple[str, str] | None:
+        """Quem saiu (``saiu`` no config), pelo nome como a fonte o escreve: ``(nome, motivo)``
+        com o nome canônico (``"Carlos Cini Marchionatti (DESEMBARGADOR Convocado Tjrs)"`` →
+        ``("Carlos Cini Marchionatti", "convocação encerrada")``); ``None`` fora da lista."""
+        nome = self._saiu.get(chave_nome(texto)) if texto else None
+        if nome is None:
+            return None
+        motivo = next((str(s.get("motivo") or "") for s in self.saiu if str(s.get("nome")) == nome), "")
+        return nome, motivo
+
     def por_nome(self, texto: str | None) -> Ministro | None:
         """O ministro pelo nome como qualquer fonte o escreve (``"MIN. ANDRÉ MENDONÇA"``,
         ``"NANCY ANDRIGHI"``, ``"Luís Carlos Gambogi (Desembargador Convocado do TJMG)"``)."""
@@ -606,7 +621,8 @@ class Regras:
                     "nome_curto": a.nome_curto,
                     "cor": list(a.cor) if a.cor else None,
                     "texto": a.texto,
-                    "regra": {"classes": list(a.classes), "nos": list(a.nos), "raizes": list(a.raizes), "residual": a.residual},
+                    "regra": {"classes": list(a.classes), "nos": list(a.nos), "raizes": list(a.raizes), "residual": a.residual,
+                              **({"cede": {"classes": list(a.cede_classes), "areas": list(a.cede_areas)}} if a.cede_classes else {})},
                 }
                 for a in self.areas
             ],
@@ -624,6 +640,9 @@ LIMIARES_PADRAO: dict[str, Any] = {
                    "pares": {"stj": "turma", "stf": "tribunal"}},
     "nao_comparavel_meses": 6,
     "heranca_parte": 0.30,
+    "distribuicao_reduzida": 0.5,
+    "classes_recurso": {"stj": ["REsp", "AREsp", "RHC", "RMS", "EREsp", "EAREsp", "RO", "Ag", "EAg"],
+                        "stf": ["RE", "ARE", "RHC", "RMS", "AI", "RO"]},
     "nome_parte_tribunal": 20,
     "nome_parte_ministro": 5,
     "achado_heranca": 300,
@@ -753,7 +772,9 @@ def de_dict(bruto: Mapping[str, Any]) -> Regras:
             Area(id=str(_exigir(a, "id", onde)), nome=str(_exigir(a, "nome", onde)), nome_curto=nome_curto,
                  cor=(str(cor[0]), str(cor[1])) if cor else None, texto=a.get("texto"),
                  raizes=_inteiros(a.get("raizes"), f"{onde}.raizes"), nos=_inteiros(a.get("nos"), f"{onde}.nos"),
-                 classes=tuple(str(c) for c in (a.get("classes") or ())), residual=bool(a.get("residual")))
+                 classes=tuple(str(c) for c in (a.get("classes") or ())), residual=bool(a.get("residual")),
+                 cede_classes=tuple(str(c) for c in ((a.get("cede_ao_merito") or {}).get("classes") or ())),
+                 cede_areas=tuple(str(c) for c in ((a.get("cede_ao_merito") or {}).get("areas") or ())))
         )
     ids = [a.id for a in areas]
     for obrigatoria in ("processual", "outros", "sem_assunto"):
@@ -761,6 +782,10 @@ def de_dict(bruto: Mapping[str, Any]) -> Regras:
             raise ErroDeConfig(f"config/{ARQUIVO}: areas precisa da área {obrigatoria}")
     if len(ids) != len(set(ids)):
         raise ErroDeConfig(f"config/{ARQUIVO}: areas tem id repetido")
+    for a in areas:
+        for alvo in a.cede_areas:
+            if alvo not in ids:
+                raise ErroDeConfig(f"config/{ARQUIVO}: areas.{a.id}.cede_ao_merito cita a área {alvo!r}, que não existe")
     vistos: dict[int, str] = {}
     for a in areas:
         for c in (*a.raizes, *a.nos):
