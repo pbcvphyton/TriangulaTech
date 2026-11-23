@@ -61,6 +61,9 @@ jobs:
         env:
           QIJ_BRAND: ${{ vars.QIJ_BRAND }}
           QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          # Só para o botão "Tribunais" no cabeçalho da aba Congresso (some com a aba desligada).
+          # O "Publicar" daqui não precisa da exclusão do daily.yml: só leva data/congresso e a aba.
+          QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
           INPUT_COMPLETO: ${{ inputs.completo }}
           TZ: America/Sao_Paulo
           PYTHONUNBUFFERED: "1"

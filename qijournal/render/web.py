@@ -260,6 +260,7 @@ class BrandView:
     email_header: EmailLogo | None = None  # faixa do topo do e-mail (modelo do TSA Tech)
     termometro: bool = False  # marca com Termômetro de Viés (estilos do bloco do dia e da aba Analítico Político)
     congresso: bool = False  # aba Congresso publicada: botão no cabeçalho e fichas nas matérias
+    tribunais: bool = False  # aba Tribunais publicada (ligada para a marca e com a página gravada): botão no cabeçalho
 
 
 @dataclass
@@ -397,6 +398,7 @@ def brand_view(config: Config) -> BrandView:
         email_header=_email_logo(brand.email_header, config.site.base_url),
         termometro=config.termometro_ativo,
         congresso=config.congresso_ativo and config.congresso.publicado,
+        tribunais=config.tribunais_ativo and config.tribunais.publicado,
     )
 
 

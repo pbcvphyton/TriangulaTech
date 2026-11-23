@@ -1,0 +1,14 @@
+{#- A cor de cada área do direito (aba Tribunais). Sai de config/tribunais.yaml → areas.cor, copiada
+    no meta.json (t.areas_css): nenhuma cor nem nome de área mora aqui. A paleta é a do designer
+    (designer.md §3: as 13 cores dos temas do Congresso, atribuídas por sentido) mais a 14ª cor
+    (a ameixa), conferida no validador; o teste da tela confere 3:1 contra o papel, a página e o
+    fundo suave, e 4,5:1 do texto sobre a cor, no claro e no escuro. A cor diz uma coisa só (a
+    área) e nunca vai sozinha: o nome vai escrito ao lado. A área sem código válido não tem cor:
+    é hachura (falta de dado, não uma área). O resto da impressão digital ("outras") é o cinza de --tb-a-resto. -#}
+:root{ {%- for a in t.areas_css %}--tb-a-{{ a.id }}:{{ a.claro }};{% endfor %}--tb-a-resto:#b9c0cb}
+:root[data-theme="dark"]{ {%- for a in t.areas_css %}--tb-a-{{ a.id }}:{{ a.escuro }};{% endfor %}--tb-a-resto:#55606f}
+{% for a in t.areas_css %}
+.tb-a-{{ a.id }}{--tb-a:var(--tb-a-{{ a.id }});--cg-t:var(--tb-a-{{ a.id }});--tb-on:{{ a.texto }}}
+{% endfor %}
+.tb-a-sem_assunto{--tb-a:repeating-linear-gradient(135deg,var(--muted) 0 1.5px,transparent 1.5px 4px);--cg-t:var(--muted)}
+.tb-a-outros-fp{--tb-a:var(--tb-a-resto)}

@@ -92,6 +92,11 @@ button{font:inherit;color:inherit}
 .tool .i-sun{display:none}
 :root[data-theme="dark"] .tool .i-sun{display:block}
 :root[data-theme="dark"] .tool .i-moon{display:none}
+/* Os botões do cabeçalho vêm em dois grupos (macros.html.j2, ferramentas): as abas especiais e as
+   ferramentas; o botão da aba em que se está leva aria-current (o contorno na cor do texto). */
+.mt-g{display:flex;gap:6px}
+.tool[aria-current="page"]{border-color:currentColor}
+.mast-wrap:not(.solid) .tool[aria-current="page"]{color:var(--ink)}
 
 /* Ticker de cotações */
 .tk{position:relative;background:var(--qn);font-family:var(--mn);font-size:10.5px;color:rgba(255,255,255,.62);overflow:hidden}
@@ -879,17 +884,6 @@ body.modal-open .btt{visibility:hidden}
 .mcg-f{margin-top:8px;padding-top:9px;border-top:1px solid var(--rl);font-family:var(--ss);font-size:11.5px;line-height:1.5;color:var(--muted)}
 .mcg-f a{font-weight:700;color:var(--link);white-space:nowrap}
 .mcg-f a:hover{text-decoration:underline}
-/* No celular, o Congresso é o único botão com o nome (sem ele, o ícone sozinho não
-   se acha): Buscar e Escuro ficam só com o ícone, e o Edições também abaixo de 350 px.
-   O nome some só da tela (o leitor de tela continua a lê-lo). */
-@media (max-width:480px){
-  .tool.tool-an span{display:none}
-  .mast-tools a[href$="pesquisa.html"] span,#dmBtn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-}
-@media (max-width:350px){
-  .mast-tools a[title="Edições anteriores"] span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-}
-
 {% endif %}
 /* ── Computador (a partir de 1024 px): primeira página no desenho de jornal ──
    Cabeçalho compacto (data e hora da edição à esquerda, logo ao centro, ferramentas
@@ -1343,6 +1337,33 @@ body.modal-open .btt{visibility:hidden}
   .mast-date{letter-spacing:.4px}
   .mast h1{font-size:32px}
 }
+{% if brand.congresso or brand.tribunais %}
+/* ── Cabeçalho com as abas especiais (designer.md §5) ──
+   Dois grupos: as abas (Analítico · Congresso · Tribunais) e as ferramentas (Edições · Buscar,
+   e o Escuro, que o layout põe logo depois). Duas linhas alinhadas à direita de 1024 a 1599 px
+   (numa linha só, os botões cruzariam o logo) e duas linhas centradas no celular; uma linha de 761
+   a 1023 px (o logo desce para baixo delas) e a partir de 1600 px. Medido de 320 a 1920 px, claro
+   e escuro: nenhum botão sai da tela nem cruza o logo. No celular as ferramentas ficam só com o
+   ícone (o nome segue para o leitor de tela); Congresso e Tribunais levam o nome escrito: sem ele,
+   o ícone sozinho não se acha. Este bloco vem no fim para valer sobre os ajustes de largura acima. */
+.mast-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;justify-items:end;align-items:center}
+.mt-abas{grid-column:1/-1}
+@media (min-width:761px) and (max-width:1023.98px),(min-width:1600px){
+  .mast-tools{display:flex}
+}
+@media (min-width:761px) and (max-width:1023.98px){
+  .mast{padding-top:52px}
+}
+@media (max-width:760px){
+  .mast-tools{display:flex;flex-wrap:wrap;justify-content:center}
+  .mt-abas{flex-basis:100%;justify-content:center}
+  .mast{padding-top:86px}
+  .mt-fer .tool span,#dmBtn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@media (max-width:480px){
+  .mt-abas .tool-an span{display:none}
+}
+{% endif %}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
   .cl:hover{transform:none}

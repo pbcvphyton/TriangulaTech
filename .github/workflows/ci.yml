@@ -25,7 +25,9 @@ jobs:
     # Ubuntu 24.04 fixo: o ubuntu-latest passou a 26.04 (nov/2026) e o Playwright
     # 1.55.0 não instala o Chromium nele ("does not support chromium on ubuntu26.04").
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    # A suíte levou 9 min 9 s em 17/11/2026 (de 10 min 50 s do job inteiro): 15 deixava pouca
+    # folga para os testes da aba Tribunais (sem rede, com fixtures reais pequenas).
+    timeout-minutes: 20
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v5
@@ -41,7 +43,27 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Testes
-        run: pytest
+        # --durations: os 15 testes mais lentos no fim do log, para ver quem come a folga.
+        run: pytest --durations=15
+
+      - name: Aba Tribunais de exemplo (offline)
+        # Refaz a aba a partir de dados de exemplo no formato do contrato (tests/fixtures/tribunais/
+        # fabrica.py: ministros, partes e números inventados, com as réguas reais do config), sem
+        # rede: a página tem de sair e caber no teto de 1,5 MB (o dossiê de cada ministro é lido
+        # sob demanda, fora da página). Liga-se sozinho quando o comando "tribunais" existir.
+        run: |
+          if [ ! -f qijournal/tribunais/cli.py ] || [ ! -f tests/fixtures/tribunais/fabrica.py ]; then
+            echo "::notice::Sem o comando tribunais (qijournal/tribunais/cli.py) ou sem a fábrica de exemplo; passo pulado."
+            exit 0
+          fi
+          dir="$RUNNER_TEMP/tribunais"
+          python -c 'import sys; from pathlib import Path; from tests.fixtures.tribunais import fabrica; fabrica.gravar(Path(sys.argv[1]) / "data")' "$dir"
+          python -m qijournal tribunais pagina --dir "$dir"
+          page="$dir/edicoes/tribunais.html"
+          test -s "$page" || { echo "::error::edicoes/tribunais.html não foi gerado"; exit 1; }
+          size=$(wc -c < "$page")
+          echo "tribunais.html do exemplo: $size bytes"
+          [ "$size" -le 1500000 ] || { echo "::error::tribunais.html do exemplo com $size bytes (limite 1500000)"; exit 1; }
 
       - name: Edição de exemplo (offline)
         run: |

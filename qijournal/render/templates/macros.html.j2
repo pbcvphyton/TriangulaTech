@@ -13,9 +13,49 @@
 {%- endmacro %}
 
 {#- Botão "Congresso" do cabeçalho: a aba com o que faz quem está sentado na Câmara e no
-    Senado. base: caminho da pasta das edições, como em search_tool. -#}
-{% macro congresso_tool(base) -%}
-<a class="tool tool-cg" href="{{ base }}congresso.html" title="Congresso: com quem cada um vota, o que propõe e o que deixa parado" aria-label="Congresso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M9.7 21V10M14.3 21V10M19 21V10M2.5 10 12 4l9.5 6z"/></svg><span>Congresso</span></a>
+    Senado. base: caminho da pasta das edições, como em search_tool. atual: na própria aba. -#}
+{% macro congresso_tool(base, atual=False) -%}
+<a class="tool tool-cg" href="{{ base }}congresso.html" title="Congresso: com quem cada um vota, o que propõe e o que deixa parado" aria-label="Congresso"{% if atual %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10M9.7 21V10M14.3 21V10M19 21V10M2.5 10 12 4l9.5 6z"/></svg><span>Congresso</span></a>
+{%- endmacro %}
+
+{#- Botão "Tribunais" do cabeçalho: que ministro do STF e do STJ está com o quê. O ícone é a
+    balança (a coluna já é o Congresso), 24 × 24, traço 2, um path só, como o do Congresso. -#}
+{% macro tribunais_tool(base, atual=False) -%}
+<a class="tool tool-tb" href="{{ base }}tribunais.html" title="Tribunais: que ministro do STF e do STJ está com o quê" aria-label="Tribunais"{% if atual %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16M8 20h8M5 7h14M5 7 2.5 13M5 7l2.5 6M19 7l-2.5 6M19 7l2.5 6M2.5 13a2.5 2.5 0 0 0 5 0M16.5 13a2.5 2.5 0 0 0 5 0"/></svg><span>Tribunais</span></a>
+{%- endmacro %}
+
+{#- Botão "Analítico" do cabeçalho (o histórico do termômetro). -#}
+{% macro analitico_tool(href, titulo="Analítico Político: todo o histórico do termômetro", atual=False) -%}
+<a class="tool tool-an" href="{{ href }}" title="{{ titulo }}" aria-label="Analítico Político"{% if atual %} aria-current="page"{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
+{%- endmacro %}
+
+{#- Botão "Edições" do cabeçalho (o arquivo). -#}
+{% macro edicoes_tool(href) -%}
+<a class="tool" href="{{ href }}" title="Edições anteriores"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Edições</span></a>
+{%- endmacro %}
+
+{#- Os botões do cabeçalho em dois grupos (designer.md §5): as abas especiais (Analítico ·
+    Congresso · Tribunais) e as ferramentas (Edições · Buscar; o Escuro vem do layout, logo
+    depois). A ordem do HTML é a ordem na tela, então o Tab segue o que se vê. O CSS põe os dois
+    grupos em duas linhas no celular e de 1024 a 1599 px, e numa linha no resto.
+    brand: BrandView (os macros não veem o contexto da página); base: caminho da pasta das
+    edições; analitico: endereço do Analítico ("" sem ele); atual: "analitico", "congresso" ou
+    "tribunais" na própria aba (o botão dela leva aria-current); edicoes/buscar: False na página
+    que já é o arquivo ou a busca. -#}
+{% macro ferramentas(brand, base, analitico="", analitico_titulo="Analítico Político: todo o histórico do termômetro", atual="", edicoes=True, buscar=True) -%}
+{% if analitico or brand.congresso or brand.tribunais %}
+    <nav class="mt-g mt-abas" aria-label="Abas especiais">
+      {% if analitico %}{{ analitico_tool(analitico, analitico_titulo, atual == "analitico") }}{% endif %}
+      {% if brand.congresso %}{{ congresso_tool(base, atual == "congresso") }}{% endif %}
+      {% if brand.tribunais %}{{ tribunais_tool(base, atual == "tribunais") }}{% endif %}
+    </nav>
+{% endif %}
+{% if edicoes or buscar %}
+    <div class="mt-g mt-fer">
+      {% if edicoes %}{{ edicoes_tool(base) }}{% endif %}
+      {% if buscar %}{{ search_tool(base) }}{% endif %}
+    </div>
+{% endif %}
 {%- endmacro %}
 
 {#- Envia a caixa de busca da edição para a Pesquisa analítica. -#}

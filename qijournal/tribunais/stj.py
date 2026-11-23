@@ -8,7 +8,7 @@ robots.txt e nunca é pedido; a trava do coletor (``fontes.proibidos``) recusa a
 - **acervo em tramitação** (``processos_tramitando_AAAAMMDD.json.gz``, ~82 MB com gzip, 518 MB
   aberto, um processo por linha; só o último dia fica publicado): lido **em fluxo**, um registro
   por vez, e entregue como :class:`~.modelo.Processo` (contrato §1). Em 20/11/2026: 352.239
-  processos, lidos em ~30 s com ~60 MB de memória;
+  processos, lidos em ~23 s com pico de ~300 MB (os caches de nomes e de classificação incluídos);
 - **atas de distribuição** (``ataAAAAMMDD.json``, uma por dia): o que entrou, por relator e por
   forma. ``Distribuição`` e ``Redistribuição`` contam como sorteio (a Redistribuição do STJ é, na
   maior parte, a saída da triagem da Presidência para o sorteio); ``Atribuição`` é herança de
@@ -233,17 +233,17 @@ SEGREDO_PARTE = "PARTE EM SEGREDO DE JUSTICA"
 _SEM_NOME = frozenset({"", "-", "_", "NAO CONSTA", "NAO INDICADO", "NAO INFORMADO", "OS MESMOS", "O MESMO",
                        "A MESMA", "AS MESMAS", "SEM NOME", "DESCONHECIDO", "IGNORADO"})
 # Nome que termina com um CPF (11 dígitos, com ou sem pontuação): MEI, tratado como pessoa física.
-_CPF_NO_FIM = re.compile(r"(?:\d{11}|\d{3}\.\d{3}\.\d{3}-\d{2})\s*$")
+_CPF_NO_FIM = re.compile(r"(?:(?<![\d./-])\d{11}|(?<!\d)\d{3}\.\d{3}\.\d{3}-\d{2})\s*$")
 _ENTE = re.compile(
     r"^(?:UNIAO\b|FAZENDA (?:NACIONAL|PUBLICA|DO ESTADO|ESTADUAL|MUNICIPAL|DO MUNICIPIO)|ESTADO D[OAE]S? |"
     r"DISTRITO FEDERAL\b|MUNICIPIO D|PREFEITURA|CAMARA (?:MUNICIPAL|DOS DEPUTADOS)|SENADO FEDERAL|"
     r"ASSEMBLEIA LEGISLATIVA|INSTITUTO NACIONAL DO SEGURO SOCIAL|INSS\b|AGENCIA NACIONAL|BANCO CENTRAL DO BRASIL|"
     r"CONSELHO (?:FEDERAL|REGIONAL|NACIONAL)|DEPARTAMENTO (?:NACIONAL|ESTADUAL|DE ESTRADAS)|"
     r"UNIVERSIDADE (?:FEDERAL|ESTADUAL)|INSTITUTO FEDERAL|AUTARQUIA|SECRETARIA\b)"
-    r"|MINISTERIO PUBLICO|DEFENSORIAS? PUBLICAS?|PROCURADORIA|ADVOCACIA[- ]GERAL"
+    r"|MINISTERIO PUBLICO|JUSTICA PUBLICA|DEFENSORIAS? PUBLICAS?|PROCURADORIA|ADVOCACIA[- ]GERAL"
 )
 _ORGAO_JULGADOR = re.compile(
-    r"^(?:TRIBUNALE?\b|SUPERIOR TRIBUNAL|SUPREMO TRIBUNAL|JUIZO\b|JUIZ\b|JUIZA\b|JUZGADO|JUSTICA\b|VARA\b|"
+    r"^(?:TRIBUNALE?\b|SUPERIOR TRIBUNAL|SUPREMO TRIBUNAL|JUIZO\b|JUIZ\b|JUIZA\b|JUZGADO|JUSTICA\b(?! PUBLICA)|VARA\b|"
     r"TURMA RECURSAL|(?:PRIMEIRA|SEGUNDA|TERCEIRA|QUARTA|QUINTA|SEXTA) (?:TURMA|SECAO|CAMARA)|SECAO\b|"
     r"CORREGEDORIA\b|MINISTR[OA] D[OAE]S? |SECRETARIO\b|GOVERNADORA?\b|PREFEIT[OA]\b|"
     r"PRESIDENTE D|DELEGAD[OA] D|DIRETORA?\b|COMANDANTE\b|CHEFE D|REITORA?\b|SUPERINTENDENTE\b|"
@@ -389,7 +389,7 @@ def objetos_json(texto: IO[str], leitura: Leitura | None = None, *, bloco: int =
     seguinte que abre um objeto)."""
     decodificar = json.JSONDecoder().raw_decode
     leitura = leitura if leitura is not None else Leitura()
-    separadores = " \t\r\n,[]﻿"
+    separadores = " \t\r\n,[]\ufeff"
     folga = 1 << 16  # erro a menos disto do fim do bloco: o objeto só está cortado; ler mais
     buf, i, fim = "", 0, False
     while True:
@@ -428,6 +428,13 @@ def objetos_json(texto: IO[str], leitura: Leitura | None = None, *, bloco: int =
             buf, i = buf[i:], 0
 
 
+def _origem(origem: Any) -> str:
+    """O nome da origem para a mensagem de erro (nunca o conteúdo: bytes podem ter 82 MB)."""
+    if isinstance(origem, (str, Path)):
+        return str(origem)
+    return f"<{type(origem).__name__}>"
+
+
 def _carregar_json(origem: Path | str | bytes | Any) -> Any:
     """JSON pequeno (ata, pauta, metadados): de um caminho, bytes (gzip ou não) ou já carregado."""
     if isinstance(origem, (list, dict)):
@@ -436,7 +443,7 @@ def _carregar_json(origem: Path | str | bytes | Any) -> Any:
         try:
             return json.load(texto)
         except (ValueError, EOFError, OSError, zlib.error) as exc:
-            raise FormatoInesperado(str(origem)[:200], f"JSON ilegível ({exc})") from exc
+            raise FormatoInesperado(_origem(origem), f"JSON ilegível ({exc})") from exc
 
 
 # ── 4. o leitor (composição, classificação e partes com cache) ───────────────────────────────
@@ -546,8 +553,9 @@ class LeitorSTJ:
                 saida.append(self.tipificar({k: v for k, v in bruta.items() if k != "advogados"}, TRIB))
                 continue
             cnpj = str(bruta.get("numeroCNPJ") or "")
-            if cnpj:  # PJ e ente se repetem muito: cache pelo trio
-                chave = (str(bruta.get("descTipoParte") or ""), str(bruta.get("nomeParte") or ""), cnpj)
+            nome = str(bruta.get("nomeParte") or "")
+            if cnpj and not _CPF_NO_FIM.search(nome):  # PJ e ente se repetem muito: cache pelo trio (MEI fora: nome de gente)
+                chave = (str(bruta.get("descTipoParte") or ""), nome, cnpj)
                 parte = self._pj.get(chave)
                 if parte is None:
                     parte = parte_preliminar(bruta)
@@ -600,6 +608,16 @@ def _id(classe: str, numero: str, registro: str | None) -> str:
 # ── 5. o acervo em tramitação ────────────────────────────────────────────────────────────────
 
 
+ORDEM_AREA_POR = ("principal", "classe", "lista", "so_processual", "sem_assunto", "ramo")
+
+
+def _em_ordem(contagem: Mapping[str, int], ordem: Sequence[str]) -> dict[str, int]:
+    """As chaves com contagem, na ordem dada; as que a ordem não prevê vão no fim, por nome."""
+    saida = {k: contagem[k] for k in ordem if contagem.get(k)}
+    saida.update({k: v for k, v in sorted(contagem.items()) if k not in saida and v})
+    return saida
+
+
 @dataclass
 class ResumoAcervo:
     """O que a leitura do acervo contou (sanidade e ``meta.json → cobertura.stj``). Preenchido
@@ -614,7 +632,7 @@ class ResumoAcervo:
     na_mesa: int = 0
     segredo: int = 0
     sem_numero: int = 0  # numeroNaClasse nulo (o id usa o registro)
-    sem_assunto: int = 0
+    sem_codigo_principal: int = 0  # assunto principal sem código da TPU (vazio, "Nao Informado" ou fora da TPU)
     area_por: Counter[str] = field(default_factory=Counter)
     codigos_fora_da_tpu: int = 0  # código de assunto principal que a TPU versionada não tem
     fora_da_grade: Counter[str] = field(default_factory=Counter)
@@ -622,6 +640,7 @@ class ResumoAcervo:
     relatores: Counter[str] = field(default_factory=Counter)  # rótulo do arquivo → processos
     fora_do_mapa: Counter[str] = field(default_factory=Counter)  # nome que a composição não conhece
     segundos: float = 0.0
+    ordem_fora: tuple[str, ...] = ()  # a ordem das linhas fora da grade no config (a do meta.json)
 
     @property
     def data(self) -> str | None:
@@ -634,10 +653,10 @@ class ResumoAcervo:
             "processos": self.processos,
             "na_grade": self.na_grade,
             "segredo": self.segredo,
-            "area_por": dict(sorted(self.area_por.items(), key=lambda kv: (-kv[1], kv[0]))),
+            "area_por": _em_ordem(self.area_por, ORDEM_AREA_POR),
             "codigos_fora_da_tpu": self.codigos_fora_da_tpu,
             "relatores_fora_do_mapa": [[n, q] for n, q in sorted(self.fora_do_mapa.items(), key=lambda kv: (-kv[1], kv[0]))],
-            "fora_da_grade": dict(sorted(self.fora_da_grade.items(), key=lambda kv: (-kv[1], kv[0]))),
+            "fora_da_grade": _em_ordem(self.fora_da_grade, self.ordem_fora),
         }
 
     def problemas(self, minimo_reconhecido: float = 0.95, maximo_ilegivel: float = 0.001) -> list[str]:
@@ -647,7 +666,9 @@ class ResumoAcervo:
         if not self.processos:
             saida.append("O arquivo do acervo não trouxe nenhum processo.")
             return saida
-        if self.arquivo_data and set(self.datas) != {self.arquivo_data}:
+        if self.arquivo_data and not self.datas:
+            saida.append("Os registros do acervo não trazem o campo Data.")
+        elif self.arquivo_data and set(self.datas) != {self.arquivo_data}:
             outras = sorted(d for d in self.datas if d != self.arquivo_data)
             saida.append(f"O campo Data dos registros ({', '.join(outras[:3])}) difere do nome do arquivo ({self.arquivo_data}).")
         if self.ilegiveis > maximo_ilegivel * max(1, self.lidos + self.ilegiveis):
@@ -743,7 +764,7 @@ def _contar(resumo: ResumoAcervo, p: Processo, registro: Mapping[str, Any], leit
     resumo.area_por[p["area_por"]] += 1
     bruto = str(registro.get("codigoAssuntoCNJ") or "").strip()
     if p["assunto"]["codigo"] is None:
-        resumo.sem_assunto += 1
+        resumo.sem_codigo_principal += 1
         if bruto.isdigit():
             resumo.codigos_fora_da_tpu += 1
     data = registro.get("Data")
@@ -771,6 +792,7 @@ def ler_acervo(
     leitor = leitor or LeitorSTJ(regras, classificador, tipificar=tipificar)
     resumo = resumo if resumo is not None else ResumoAcervo()
     resumo.arquivo_data = resumo.arquivo_data or data_dados
+    resumo.ordem_fora = tuple(linha.id for linha in leitor.composicao.fora_da_grade)
     leitura = Leitura()
     inicio = time.monotonic()
     try:
@@ -788,7 +810,7 @@ def ler_acervo(
                 _contar(resumo, p, registro, leitor)
                 yield p
     except (EOFError, zlib.error, gzip.BadGzipFile, UnicodeDecodeError) as exc:
-        raise FormatoInesperado(str(origem)[:200], f"arquivo do acervo truncado ou corrompido ({exc})") from exc
+        raise FormatoInesperado(_origem(origem), f"arquivo do acervo truncado ou corrompido ({exc})") from exc
     finally:
         resumo.lidos = leitura.objetos
         resumo.ilegiveis = leitura.ilegiveis
@@ -834,7 +856,7 @@ def ler_ata(
     leitor = leitor or LeitorSTJ(regras, classificador, tipificar=tipificar)
     dados = _carregar_json(origem)
     if not isinstance(dados, list):
-        raise FormatoInesperado(str(origem)[:200], "a ata não é uma lista de distribuições")
+        raise FormatoInesperado(_origem(origem), "a ata não é uma lista de distribuições")
     saida = []
     for item in dados:
         if not isinstance(item, Mapping):
@@ -900,7 +922,7 @@ def ler_pautas(
     leitor = leitor or LeitorSTJ(regras, classificador, tipificar=tipificar)
     dados = _carregar_json(origem)
     if not isinstance(dados, list):
-        raise FormatoInesperado(str(origem)[:200], "a pauta não é uma lista")
+        raise FormatoInesperado(_origem(origem), "a pauta não é uma lista")
     saida = []
     for item in dados:
         if not isinstance(item, Mapping):
@@ -1158,7 +1180,7 @@ def ler_integras(
     leitor = leitor or LeitorSTJ(regras, classificador)
     dados = _carregar_json(origem)
     if not isinstance(dados, list):
-        raise FormatoInesperado(str(origem)[:200], "os metadados das íntegras não são uma lista")
+        raise FormatoInesperado(_origem(origem), "os metadados das íntegras não são uma lista")
     saida = []
     for item in dados:
         if not isinstance(item, Mapping):

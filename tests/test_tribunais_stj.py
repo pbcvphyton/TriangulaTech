@@ -160,12 +160,14 @@ def test_acervo_resumo_bate_com_a_amostra(acervo):
     processos, resumo = acervo
     assert len(processos) == 44 and resumo.processos == resumo.lidos == 44 and resumo.ilegiveis == 0
     assert resumo.data == "2026-11-20" and resumo.problemas() == []
+    assert list(resumo.para_meta()["fora_da_grade"]) == ["presidencia", "vice", "sem_relator", "presidentes_orgao",
+                                                          "residuos", "sem_relator_arquivo"]
     assert resumo.para_meta() == {
         "processos": 44, "na_grade": 26, "segredo": 5,
         "area_por": {"principal": 40, "classe": 3, "sem_assunto": 1},
         "codigos_fora_da_tpu": 0, "relatores_fora_do_mapa": [],
-        "fora_da_grade": {"presidencia": 4, "residuos": 3, "sem_relator": 3, "presidentes_orgao": 2, "vice": 2,
-                          "sem_relator_arquivo": 1},
+        "fora_da_grade": {"presidencia": 4, "vice": 2, "sem_relator": 3, "presidentes_orgao": 2, "residuos": 3,
+                          "sem_relator_arquivo": 1},  # na ordem do config
     }
     assert resumo.na_mesa == 12 and resumo.sem_numero == 1
     assert dict(resumo.cargos) == {"stj-mauro-campbell-marques": 2, "stj-benedito-goncalves": 1}
