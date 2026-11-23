@@ -325,6 +325,19 @@ class CongressoConfig:
 
 
 @dataclass
+class TribunaisConfig:
+    """Analítico dos Tribunais (``qijournal/tribunais``): a aba "Tribunais" (STF e STJ),
+    com a coleta num fluxo próprio (``tribunais.yml``). As réguas das contas (áreas, composição,
+    limiares, fontes) ficam em ``config/tribunais.yaml``."""
+
+    enabled: bool = True
+    marcas: list[str] = field(default_factory=lambda: ["tech"])
+    # Preenchido na publicação (não vem do YAML): há dados em data/tribunais/ e a aba existe,
+    # então as páginas mostram o botão "Tribunais" no cabeçalho.
+    publicado: bool = False
+
+
+@dataclass
 class InstagramSlot:
     """Horário-alvo de uma publicação diária (BRT) e até quando ela ainda pode sair."""
 
@@ -432,6 +445,7 @@ class Config:
     termometro: TermometroConfig = field(default_factory=TermometroConfig)
     instagram: InstagramConfig = field(default_factory=InstagramConfig)
     congresso: CongressoConfig = field(default_factory=CongressoConfig)
+    tribunais: TribunaisConfig = field(default_factory=TribunaisConfig)
 
     def section(self, section_id: str) -> SectionConfig:
         for s in self.sections:
@@ -452,6 +466,11 @@ class Config:
     def congresso_ativo(self) -> bool:
         """Aba Congresso e fichas nas matérias ligadas para a marca ativa."""
         return self.congresso.enabled and self.brand.key in self.congresso.marcas
+
+    @property
+    def tribunais_ativo(self) -> bool:
+        """Aba Tribunais (e o botão no cabeçalho) ligada para a marca ativa."""
+        return self.tribunais.enabled and self.brand.key in self.tribunais.marcas
 
 
 def _truthy(value: str | None) -> bool:
@@ -552,6 +571,11 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
     if _truthy(env.get("QIJ_NO_CONGRESSO")):
         congresso.enabled = False
 
+    tribunais = TribunaisConfig(**_known(TribunaisConfig, site_raw.get("tribunais")))
+    tribunais.publicado = False  # não vem do YAML: a publicação acende
+    if _truthy(env.get("QIJ_NO_TRIBUNAIS")):
+        tribunais.enabled = False
+
     instagram_raw = dict(site_raw.get("instagram") or {})
     slots = _instagram_slots(instagram_raw.pop("slots", None))
     eleicao = EleicaoConfig(**_known(EleicaoConfig, instagram_raw.pop("eleicao", None)))
@@ -572,4 +596,5 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
         termometro=termometro,
         instagram=instagram,
         congresso=congresso,
+        tribunais=tribunais,
     )
