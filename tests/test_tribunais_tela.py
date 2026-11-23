@@ -140,7 +140,7 @@ def test_a_marca_que_nao_usa_a_aba_nao_grava(tmp_path: Path):
 
 def test_a_matriz_e_uma_tabela_acessivel_agrupada(site: tuple[Path, str]):
     raiz, html = site
-    tabela = re.search(r'<table class="tb-mx" id="tb-mx-stj">.*?</table>', html, re.DOTALL).group(0)
+    tabela = re.search(r'<table class="tb-mx" id="tb-mx-stj"[^>]*>.*?</table>', html, re.DOTALL).group(0)
     assert "<caption>" in tabela and 'scope="col"' in tabela and 'scope="row"' in tabela and 'scope="rowgroup"' in tabela
     # agrupada por Seção no STJ, com a linha "média da Seção" em cada grupo de Turma (e sem média na Presidência)
     assert re.findall(r'<tbody data-grupo="(\w*)">', tabela) == ["s1", "s2", "s3", "pr", "fora"]
@@ -155,8 +155,23 @@ def test_a_matriz_e_uma_tabela_acessivel_agrupada(site: tuple[Path, str]):
     # a área sem processo relevante em nenhuma mesa fica fora das colunas, escrita na nota
     assert "constitucional" not in colunas and "Áreas com menos de 0,5% em todas as mesas ficam fora das colunas" in html
     # STF: a média do tribunal sem a Presidência é a linha de comparação, no alto
-    stf = re.search(r'<table class="tb-mx" id="tb-mx-stf">.*?</table>', html, re.DOTALL).group(0)
+    stf = re.search(r'<table class="tb-mx" id="tb-mx-stf"[^>]*>.*?</table>', html, re.DOTALL).group(0)
     assert stf.index("média do tribunal, sem a Presidência") < stf.index('data-grupo="t1"')
+
+
+def test_cada_coluna_da_matriz_cabe_o_nome_da_area(html: str):
+    """O cabeçalho quebra entre palavras, nunca no meio: cada coluna tem largura para a palavra mais
+    longa do nome curto, e a tabela declara a soma (a moldura rola quando não cabe; com um grupo à
+    vista, o script refaz a soma com as colunas que ficaram)."""
+    for trib in ("stj", "stf"):
+        tabela = re.search(rf'<table class="tb-mx" id="tb-mx-{trib}" style="--tb-cols-w:(\d+)px">.*?</table>', html, re.DOTALL)
+        assert tabela, trib
+        cols = re.findall(r'<th scope="col" class="tb-a-\w+" data-a="\w+" data-w="(\d+)" style="width:(\d+)px" title="[^"]*"><a [^>]*>([^<]+)</a>', tabela.group(0))
+        assert len(cols) >= 8
+        for w, largura, nome in cols:
+            assert w == largura and int(w) >= max(pagina.COLUNA_PX_MINIMA, 6 * max(len(p) for p in nome.split())), (trib, nome, w)
+        assert int(tabela.group(1)) == sum(int(w) + 2 for w, _, _ in cols)
+    assert "setProperty('--tb-cols-w'" in html
 
 
 def test_a_celula_usa_a_rampa_do_config(site: tuple[Path, str]):
@@ -164,7 +179,7 @@ def test_a_celula_usa_a_rampa_do_config(site: tuple[Path, str]):
     painel = _paineis(raiz)["stj"]
     m = painel["ministros"][0]
     rampa = modelo.carregar_regras().limiares["rampa"]
-    tabela = re.search(r'<table class="tb-mx" id="tb-mx-stj">.*?</table>', html, re.DOTALL).group(0)
+    tabela = re.search(r'<table class="tb-mx" id="tb-mx-stj"[^>]*>.*?</table>', html, re.DOTALL).group(0)
     conferidas = 0
     for a, c in m["areas"].items():
         if not c["n"] or f'<th scope="col" class="tb-a-{a}" data-a="{a}"' not in tabela:
@@ -221,6 +236,14 @@ def test_partes_sem_pessoa_fisica_com_nome(html: str):
     assert "Pessoas físicas:" in html and "somadas, sem nome" in html
     assert "Responde: pessoa física" in html or "Recorre: pessoa física" in html  # o tipo, nunca o nome
     assert "recorre" in html and "responde" in html and 'class="tb-bf"' in html  # a borboleta
+
+
+def test_o_nome_do_litigante_vem_do_mapa_de_nomes(html: str):
+    """Grupo citado numa lista e fora do topo do tribunal: o nome sai de ``partes.nomes`` do painel
+    (``{grupo: {nome, tipo}}``), nunca o id por extenso; o dossiê traz o seu mapa e o script o soma."""
+    assert "empresa (Cooperativa K)" in html
+    assert "Nome Cooperativa" not in html and "nome-cooperativa-k" in _manifesto(html)["partes"]
+    assert "guardarNomes(x)" in html
 
 
 # ── o "Como ler" e as réguas ─────────────────────────────────────────────────
@@ -414,3 +437,12 @@ def test_a_pagina_aguenta_o_que_a_fonte_nao_trouxe(tmp_path: Path):
     assert "Nenhum processo público na mesa nesta lista" in html
     # sem achado, a manchete sai dos números do dia, escrita por regra
     assert re.search(r'<h4 class="az-manchete">No STF, [\d.]+ processos estão na mesa dos ministros; [\d.]+ conclusos ao relator há mais de um ano</h4>', html)
+
+
+def test_a_janela_da_serie_e_dita_como_e():
+    """A série das atas e das íntegras cresce no cache: enquanto não cobre o ano, o cartão diz de
+    quando a quando ela vai, não "em 12 meses" (integração, 23/11/2026)."""
+    assert pagina._janela(["2025-10-16", "2026-10-15"]) == ("em 12 meses", False)
+    assert pagina._janela(["2026-08-01", "2026-10-15"]) == ("entre 01/08 e 15/10", False)
+    assert pagina._janela(["2026-10-24", "2026-11-22"]) == ("entre 24/10 e 22/11", True)
+    assert pagina._janela(None) == ("em 12 meses", False)

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 from dataclasses import dataclass
 from datetime import date
 from itertools import pairwise
@@ -38,6 +39,13 @@ log = logging.getLogger(__name__)
 
 TETO_BYTES = 1_500_000  # contrato §9: a página passa disto, não é gravada (o celular sente; o Congresso tem 4,3 MB)
 COLUNA_MINIMA = 0.005  # área abaixo de 0,5% em todas as mesas da grade sai das colunas da matriz (vai escrita na nota)
+# A largura de cada coluna da matriz sai da palavra mais longa do nome curto da área (o cabeçalho
+# quebra entre palavras, nunca no meio de uma): 6 px por letra no corpo do cabeçalho (10,5 px,
+# negrito; "Administrativo" mede 74 px) mais a folga, e nunca menos que o número da célula com a
+# marca ▲/▽. A tabela rola dentro da moldura quando a soma não cabe; o nome nunca se cruza com o vizinho.
+PX_POR_LETRA = 6.0
+FOLGA_COLUNA = 8
+COLUNA_PX_MINIMA = 44
 AREAS_NO_CARTAO = 8  # barras ordenadas no cartão do ministro; as demais somam em "outras"
 PARTES_DA_DIGITAL = 5  # a impressão digital da mesa: as 5 maiores áreas + "outras" (no máximo 6 partes: designer.md §2.2)
 MINISTROS_POR_AREA = 12  # na aba Assuntos, quantos ministros cada área mostra (os demais, somados)
@@ -214,6 +222,20 @@ def _anos(dias: Any) -> tuple[str, str]:
     return text.format_number_pt(anos, 1), "ano" if anos < 2 else "anos"
 
 
+def _janela(janela: Any) -> tuple[str, bool]:
+    """A janela de uma série (``[ini, fim]``) dita como ela é: "em 12 meses" quando cobre o ano
+    (360 dias ou mais), senão "entre DD/MM e DD/MM" (a série ainda cresce no cache). O segundo
+    valor diz se a série tem 30 dias ou menos (aí "nos últimos 30 dias" não acrescenta nada)."""
+    try:
+        ini, fim = (date.fromisoformat(str(x)[:10]) for x in janela)
+    except (TypeError, ValueError):
+        return "em 12 meses", False
+    dias = (fim - ini).days + 1
+    if dias >= 360:
+        return "em 12 meses", False
+    return f"entre {_data(ini.isoformat(), ano=False)} e {_data(fim.isoformat(), ano=False)}", dias <= 30
+
+
 def _plural(n: int, um: str, varios: str) -> str:
     return f"{_num(n)} {um if n == 1 else varios}"
 
@@ -248,11 +270,13 @@ def _iniciais(nome: str) -> str:
 
 def _humano(grupo: str) -> str:
     """Nome de reserva para um litigante sem nome no painel: o id do catálogo por extenso
-    (``banco-do-brasil`` → ``Banco do Brasil``) ou a raiz do CNPJ (``cnpj-12345678`` → ``CNPJ 12.345.678``)."""
+    (``banco-do-brasil`` → ``Banco do Brasil``; ``nome-cooperativa-x`` → ``Cooperativa X``) ou a raiz do CNPJ
+    (``cnpj-12345678`` → ``CNPJ 12.345.678``)."""
     if grupo.startswith("cnpj-") and grupo[5:].isdigit() and len(grupo) == 13:
         r = grupo[5:]
         return f"CNPJ {r[:2]}.{r[2:5]}.{r[5:]}"
     miudas = {"de", "da", "do", "dos", "das", "e"}
+    grupo = grupo.removeprefix("nome-")  # PJ sem CNPJ: o id é o nome normalizado
     return " ".join(p if p in miudas else p[:1].upper() + p[1:] for p in grupo.split("-"))
 
 
@@ -384,7 +408,8 @@ def _item_fila(folha: dict[str, Any], trib: str, r: Reguas, nomes: dict[str, str
         desde = datas.get("ultima_decisao") or datas.get("distribuicao")
         quando = f"sem decisão desde {_mes_ano(desde)}" if desde else ""
     else:
-        quando = f"concluso desde {_mes_ano(datas.get('andamento'))}" if datas.get("andamento") else ""
+        rotulo = "concluso desde" if folha.get("concluso_dias") is not None else "último andamento em"  # concluso só com a conclusão ao relator
+        quando = f"{rotulo} {_mes_ano(datas.get('andamento'))}" if datas.get("andamento") else ""
     area = r.area(folha.get("area") or "outros")
     extras = [x for x in (_partes_folha(folha, nomes), quando) if x]
     if (folha.get("flags") or {}).get("liminar"):
@@ -494,10 +519,16 @@ def _colunas(p: dict[str, Any], r: Reguas) -> tuple[list[dict[str, Any]], list[s
         total = (por_area.get(a["id"]) or {}).get("n") or 0
         if maior >= COLUNA_MINIMA:
             n_txt = f"{_num(round(total / 1000))} mil" if total >= 10_000 else _num(total)
-            colunas.append({"id": a["id"], "curto": a["curto"], "nome": a["nome"], "n_txt": n_txt, "n": total})
+            colunas.append({"id": a["id"], "curto": a["curto"], "nome": a["nome"], "n_txt": n_txt, "n": total, "w": _largura_coluna(a["curto"])})
         elif total:
             fora.append(f"{a['curto']} ({_num(total)})")
     return colunas, fora
+
+
+def _largura_coluna(curto: str) -> int:
+    """A largura mínima da coluna (px) para o nome curto da área caber sem cruzar o vizinho."""
+    maior = max((len(p) for p in str(curto).split()), default=0)
+    return max(COLUNA_PX_MINIMA, math.ceil(maior * PX_POR_LETRA) + FOLGA_COLUNA)
 
 
 def _nota_colunas(fora: list[str]) -> str:
@@ -571,7 +602,8 @@ def _matriz(trib: str, p: dict[str, Any], r: Reguas, colunas: list[dict[str, Any
     caption = (f"A parte do acervo de cada ministro em cada área, em %. ▲ bem acima {_de(pares_longo)}; ▽ bem abaixo "
                f"(só onde {_regua_marca(r.limiares)}).")
     return {"caption": caption, "grupos": grupos, "fora": fora, "linha_tribunal": linha_tribunal,
-            "legenda": _faixas_rampa(rampa), "pares": pares_curto, "pares_de": _de(pares_curto), "colspan": len(colunas) + 2}
+            "legenda": _faixas_rampa(rampa), "pares": pares_curto, "pares_de": _de(pares_curto), "colspan": len(colunas) + 2,
+            "largura": sum(c["w"] + 2 for c in colunas)}  # as colunas de área com o espaçamento (border-spacing: 2px)
 
 
 def _digital(m: dict[str, Any], r: Reguas) -> tuple[list[dict[str, Any]], str]:
@@ -679,7 +711,8 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     fluxo = []
     e = m.get("entradas")
     if isinstance(e, dict):
-        frase = f"Entraram {_num(e.get('sorteio_12m'))} por sorteio em 12 meses ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)"
+        janela, curta = _janela((p.get("entradas") or {}).get("janela"))
+        frase = f"Entraram {_num(e.get('sorteio_12m'))} por sorteio {janela}" + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)")
         if e.get("heranca_12m"):
             frase += f"; {_num(e.get('heranca_12m'))} por atribuição (herança de acervo), à parte"
         fluxo.append(frase + ".")
@@ -688,7 +721,8 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
         fluxo.append(f"Em pauta: {_plural(int(pa['itens']), 'item', 'itens')} ({_num(pa.get('principal'))} recursos principais, {_num(pa.get('interno'))} recursos internos).")
     de = m.get("decisoes")
     if isinstance(de, dict) and de.get("processos") is not None:
-        fluxo.append(f"Decidiu {_num(de.get('processos'))} processos em 12 meses ({_num(de.get('monocraticas'))} decisões monocráticas, {_num(de.get('acordaos'))} acórdãos).")
+        janela, _curta = _janela((p.get("decisoes") or {}).get("janela"))
+        fluxo.append(f"Decidiu {_num(de.get('processos'))} processos {janela} ({_num(de.get('monocraticas'))} decisões monocráticas, {_num(de.get('acordaos'))} acórdãos).")
     if isinstance(m.get("temas"), int):
         fluxo.append(f"Temas sob relatoria, sem julgamento: {_num(m['temas'])}.")
     return {
@@ -828,7 +862,9 @@ def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str,
         jan = e.get("janela") or [None, None]
         tot, u30 = e.get("total") or {}, e.get("ultimos_30d") or {}
         texto = (f"{_num(tot.get('sorteio'))} processos distribuídos por sorteio entre {_data(jan[0])} e {_data(jan[1])} ({_num(e.get('dias_com_ata'))} dias com ata); "
-                 f"{_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte. Nos últimos 30 dias: {_num(u30.get('sorteio'))} por sorteio e {_num(u30.get('heranca'))} por herança.")
+                 f"{_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte.")
+        if not _janela(jan)[1]:  # com 30 dias ou menos de série, "nos últimos 30 dias" repetiria o total
+            texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} por sorteio e {_num(u30.get('heranca'))} por herança."
         if tot.get("registro"):
             texto += f" Outros {_num(tot.get('registro'))} foram registrados à Presidência ou à Vice, que não são entrada de ministro."
         blocos.append({"titulo": "O que entrou", "texto": texto, "fonte": _selo_fonte(fontes.get(e.get("fonte") or ""))})
@@ -844,7 +880,9 @@ def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str,
     if isinstance(de, dict):
         jan = de.get("janela") or [None, None]
         texto = (f"{_num(de.get('processos'))} processos com decisão publicada entre {_data(jan[0])} e {_data(jan[1])}: {_num(de.get('monocraticas'))} decisões monocráticas "
-                 f"e {_num(de.get('acordaos'))} acórdãos ({_num(de.get('acordaos_recurso_interno'))} em recurso interno). Da Presidência: {_num(de.get('presidencia'))}.")
+                 f"e {_num(de.get('acordaos'))} acórdãos"
+                 + (f" ({_num(de.get('acordaos_recurso_interno'))} em recurso interno)" if de.get("acordaos_recurso_interno") is not None else "")
+                 + f". Da Presidência: {_num(de.get('presidencia'))}.")
         if de.get("atraso_dias"):
             texto += f" O último arquivo publicado pelo tribunal é de {_data(de.get('ultimo_arquivo'))}: {_dias(de.get('atraso_dias'))} de atraso."
         blocos.append({"titulo": "O que foi decidido", "texto": texto, "fonte": _selo_fonte(fontes.get(de.get("fonte") or ""))})
@@ -981,8 +1019,8 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
 
 
 def _nomes_partes(d: Dados, config: Config) -> dict[str, str]:
-    """Nome de cada litigante citado (só PJ e ente público): o do painel e, de reserva, o do
-    catálogo ``config/tribunais_partes.yaml`` (quando existe)."""
+    """Nome de cada litigante citado (só PJ e ente público): o do painel (``partes.top`` e o mapa
+    ``partes.nomes``) e, de reserva, o do catálogo ``config/tribunais_partes.yaml``."""
     nomes: dict[str, str] = {}
     try:
         import yaml  # o catálogo é do módulo de partes: aqui só os nomes
@@ -994,6 +1032,10 @@ def _nomes_partes(d: Dados, config: Config) -> dict[str, str]:
     except (OSError, ValueError, AttributeError):
         pass
     for p in d.paineis.values():
+        for gid, v in ((p.get("partes") or {}).get("nomes") or {}).items():  # {grupo: {nome, tipo}} de todo grupo citado
+            nome = v.get("nome") if isinstance(v, dict) else v
+            if gid and nome:
+                nomes[str(gid)] = str(nome)
         for x in (p.get("partes") or {}).get("top") or []:
             if x.get("id") and x.get("nome"):
                 nomes[str(x["id"])] = str(x["nome"])

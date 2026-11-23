@@ -1,0 +1,253 @@
+# Analítico dos Tribunais: o catálogo de litigantes ("Quem se repete").
+#
+# Lido por qijournal/tribunais/partes.py (carregar_catalogo). Tudo aqui é escolha editorial ou
+# registro conferido à mão no acervo do STJ de 20/11/2026 e na planilha do STF de 22/11/2026, e vai
+# escrito no "Como ler".
+#
+# Como uma parte vira um litigante (analista jurídico §5):
+#   1. o PAPEL decide antes de tudo: autoridade (o tribunal impetrado no HC, os juízos do conflito,
+#      o próprio STJ como requisitante do precatório) e qualificador (representado por, herdeiros de,
+#      outro nome) nunca são litigantes; pessoa física e MEI (CNPJ com CPF no fim do nome) nunca têm
+#      nome, em lugar nenhum;
+#   2. STJ: a RAIZ DO CNPJ (8 dígitos, com o dígito verificador conferido) — nunca um prefixo solto:
+#      00394 começa a Fazenda Nacional (00394460), o Distrito Federal (00394601) e o Ministério da
+#      Justiça (00394494);
+#   3. STF (a planilha não traz CNPJ) e partes do STJ sem CNPJ: o NOME, pelos padrões abaixo, sem
+#      acento e em maiúsculas; no texto bruto de um polo do STF os nomes às vezes vêm COLADOS
+#      ("UNIÃOFUNDAÇÃO NACIONAL…"): a busca aceita o começo de um nome colado no fim de outro;
+#   4. pessoa jurídica fora do catálogo: o grupo é a própria raiz ("cnpj-<raiz>"), com o nome mais
+#      frequente no arquivo; sem CNPJ, o nome normalizado ("nome-<slug>").
+# Nome na página só com 20 processos ou mais no tribunal, ou 5 ou mais no acervo do ministro
+# (limiares do config/tribunais.yaml). Grupos econômicos (o Itaú e as suas várias raízes, a Aymoré
+# dentro do Santander) NÃO são juntados: precisaria de fonte (a lista de conglomerados do Banco
+# Central) e é escolha sujeita a erro (fase 2).
+
+versao: 1
+
+# Categorias: "ente" (pessoa jurídica de direito público ou órgão que litiga em nome dele) ou "pj".
+# dinheiro_publico: entra na medida "dinheiro público no recurso" da vista "Quanto vale" (a parte do
+# acervo em que a União, a Fazenda Nacional, o INSS, um Estado ou o DF, ou um Município está como
+# quem recorre ou quem responde: 22,4% do STJ em 20/11/2026, a conta do analista).
+categorias:
+  uniao:            {nome: "União", tipo: ente, dinheiro_publico: true}
+  fazenda_nacional: {nome: "Fazenda Nacional", tipo: ente, dinheiro_publico: true}
+  inss:             {nome: "INSS", tipo: ente, dinheiro_publico: true}
+  estado:           {nome: "Estados e DF", tipo: ente, dinheiro_publico: true}
+  municipio:        {nome: "Municípios", tipo: ente, dinheiro_publico: true}
+  autarquia:        {nome: "Autarquias e fundações públicas", tipo: ente}
+  mp:               {nome: "Ministério Público", tipo: ente}
+  defensoria:       {nome: "Defensoria Pública", tipo: ente}
+  legislativo:      {nome: "Poder Legislativo", tipo: ente}   # no STF, quem editou a lei questionada (ADI, ADPF)
+  banco:            {nome: "Bancos e financeiras", tipo: pj}
+  plano_saude:      {nome: "Planos de saúde", tipo: pj}
+  seguradora:       {nome: "Seguradoras", tipo: pj}
+  previdencia_privada: {nome: "Previdência complementar", tipo: pj}
+  concessionaria:   {nome: "Energia, água e telefonia", tipo: pj}
+  empresa:          {nome: "Outras empresas", tipo: pj}
+  outro_ente:       {nome: "Outros entes públicos", tipo: ente}
+  outra_pj:         {nome: "Outras pessoas jurídicas", tipo: pj}
+
+# Classes que não entram em "quem se repete": nos precatórios (Prc, RPV, na Presidência) o
+# requerente é o credor ou o cessionário (escritório de advocacia, fundo de precatórios).
+fora_de_quem_se_repete_classes: [Prc, RPV]
+
+# Os 27 entes da Federação, para as famílias por nome (Estado, Ministério Público e Defensoria de
+# cada UF). Nome sem acento, em maiúsculas, como a normalização o deixa.
+ufs:
+  AC: ACRE
+  AL: ALAGOAS
+  AP: AMAPA
+  AM: AMAZONAS
+  BA: BAHIA
+  CE: CEARA
+  DF: DISTRITO FEDERAL
+  ES: ESPIRITO SANTO
+  GO: GOIAS
+  MA: MARANHAO
+  MT: MATO GROSSO
+  MS: MATO GROSSO DO SUL
+  MG: MINAS GERAIS
+  PA: PARA
+  PB: PARAIBA
+  PR: PARANA
+  PE: PERNAMBUCO
+  PI: PIAUI
+  RJ: RIO DE JANEIRO
+  RN: RIO GRANDE DO NORTE
+  RS: RIO GRANDE DO SUL
+  RO: RONDONIA
+  RR: RORAIMA
+  SC: SANTA CATARINA
+  SP: SAO PAULO
+  SE: SERGIPE
+  TO: TOCANTINS
+# Nome de exibição de cada UF (com acento).
+ufs_nome:
+  AC: Acre
+  AL: Alagoas
+  AP: Amapá
+  AM: Amazonas
+  BA: Bahia
+  CE: Ceará
+  DF: Distrito Federal
+  ES: Espírito Santo
+  GO: Goiás
+  MA: Maranhão
+  MT: Mato Grosso
+  MS: Mato Grosso do Sul
+  MG: Minas Gerais
+  PA: Pará
+  PB: Paraíba
+  PR: Paraná
+  PE: Pernambuco
+  PI: Piauí
+  RJ: Rio de Janeiro
+  RN: Rio Grande do Norte
+  RS: Rio Grande do Sul
+  RO: Rondônia
+  RR: Roraima
+  SC: Santa Catarina
+  SP: São Paulo
+  SE: Sergipe
+  TO: Tocantins
+
+# Famílias: um grupo por UF (ou por município), reconhecido pelo nome. {uf} é o nome da UF sem
+# acento (ufs); o id e o nome de exibição usam a sigla e o nome com acento. As raízes conferidas
+# no acervo do STJ entram em "raizes_por_uf" (reforço: o nome já basta).
+familias:
+  - id: estado
+    categoria: estado
+    grupo: "estado-{sigla}"          # estado-sp
+    nome: "{artigo_uf} {uf_nome}"    # "Estado de São Paulo"; DF: "Distrito Federal"
+    padroes:
+      - "(?:FAZENDA (?:PUBLICA )?(?:D[OAE] )?)?ESTADO D[OAE] {uf}"
+      - "FAZENDA PUBLICA ESTADUAL D[OAE] {uf}"
+    distrito_federal: ["DISTRITO FEDERAL", "FAZENDA PUBLICA DO DISTRITO FEDERAL"]
+    raizes_por_uf:
+      SP: ["46379400", "46377222"]   # Estado de São Paulo; Fazenda do Estado de São Paulo
+      RJ: ["42498600"]
+      MG: ["18715615"]
+      GO: ["01409580"]
+      RS: ["87934675"]
+      SC: ["82951229"]
+      PR: ["76416940"]
+      BA: ["13937032"]
+      MT: ["03507415"]
+      TO: ["01786029"]
+      MA: ["06354468"]
+      MS: ["15412257"]
+      ES: ["27080530"]
+      CE: ["07954480"]
+      PB: ["08761124"]
+      PE: ["10571982"]
+      PI: ["06553481"]
+      RN: ["08241739"]
+      DF: ["00394601"]
+  - id: mp
+    categoria: mp
+    grupo: "mp-{sigla}"              # mp-sp
+    nome: "Ministério Público de {uf_nome}"
+    padroes: ["MINISTERIO PUBLICO DO ESTADO D[OAE] {uf}", "PROCURADORIA[- ]GERAL DE JUSTICA DO ESTADO D[OAE] {uf}"]
+  - id: defensoria
+    categoria: defensoria
+    grupo: "dpe-{sigla}"             # dpe-sp
+    nome: "Defensoria Pública de {uf_nome}"
+    padroes: ["DEFENSORIA PUBLICA DO ESTADO D[OAE] {uf}", "DEFENSORIA PUBLICA D[OA] {uf}"]
+  - id: assembleia
+    categoria: legislativo
+    grupo: "assembleia-{sigla}"      # assembleia-sp
+    nome: "Assembleia Legislativa de {uf_nome}"
+    padroes: ["(?:MESA DA )?ASSEMBLEIA LEGISLATIVA DO ESTADO D[OAE] {uf}", "(?:MESA DA )?ASSEMBLEIA LEGISLATIVA D[OAE] {uf}"]
+  - id: municipio
+    categoria: municipio
+    grupo: "municipio-{slug}"        # municipio-sao-paulo (sem a UF: a fonte não a traz junto)
+    nome: "Município de {nome}"
+    # o nome do município vai até a vírgula, o " - " ou o fim (grupo "nome" da expressão)
+    padroes: ["(?:FAZENDA PUBLICA DO )?MUNICIPIO D[EOA]S? (?P<nome>[A-Z][A-Z' ]*?[A-Z])", "PREFEITURA MUNICIPAL D[EOA]S? (?P<nome>[A-Z][A-Z' ]*?[A-Z])"]
+
+# Grupos com nome próprio. raizes: as raízes do CNPJ (STJ); padroes: o nome sem acento e em
+# maiúsculas (expressão regular, casada do começo ao fim do nome, ou no meio do texto colado do
+# STF); contem: true = o padrão vale em qualquer parte do nome (as Unimed, cooperativas com CNPJ
+# próprio, uma por cidade). Contagens (processos distintos no STJ em 20/11/2026) no comentário.
+grupos:
+  # Entes federais
+  - {id: uniao, nome: "União", categoria: uniao, raizes: ["26994558", "00394494"], padroes: ["UNIAO(?: FEDERAL)?"]}   # 18.945; 00394494 = Ministério da Justiça (fora quando AUTORIDADE CENTRAL: o papel decide antes)
+  - {id: fazenda-nacional, nome: "Fazenda Nacional", categoria: fazenda_nacional, raizes: ["00394460"], padroes: ["FAZENDA NACIONAL"]}  # 14.163
+  - {id: inss, nome: "INSS", categoria: inss, raizes: ["29979036"], padroes: ["INSTITUTO NACIONAL DO SEGURO SOCIAL", "INSS"]}  # 10.790
+  - {id: mpf, nome: "Ministério Público Federal", categoria: mp, raizes: ["03636198"], padroes: ["MINISTERIO PUBLICO FEDERAL"]}  # 7.037
+  - {id: mpdft, nome: "Ministério Público do DF e Territórios", categoria: mp, raizes: ["26989715"], padroes: ["MINISTERIO PUBLICO DO DISTRITO FEDERAL E (?:DOS )?TERRITORIOS"]}  # 2.971
+  - {id: mp-eleitoral, nome: "Ministério Público Eleitoral", categoria: mp, padroes: ["MINISTERIO PUBLICO ELEITORAL"]}
+  - {id: mpt, nome: "Ministério Público do Trabalho", categoria: mp, padroes: ["MINISTERIO PUBLICO DO TRABALHO"]}
+  - {id: mpm, nome: "Ministério Público Militar", categoria: mp, padroes: ["MINISTERIO PUBLICO MILITAR"]}
+  - {id: dpu, nome: "Defensoria Pública da União", categoria: defensoria, raizes: ["00375114"], padroes: ["DEFENSORIA PUBLICA DA UNIAO"]}  # 444
+  - {id: ibama, nome: "Ibama", categoria: autarquia, raizes: ["03659166"], padroes: ["INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS", "IBAMA"]}  # 822
+  - {id: incra, nome: "Incra", categoria: autarquia, raizes: ["00375972"], padroes: ["INSTITUTO NACIONAL DE COLONIZACAO E REFORMA AGRARIA", "INCRA"]}  # 421
+  - {id: ans, nome: "Agência Nacional de Saúde Suplementar", categoria: autarquia, raizes: ["03589068"], padroes: ["AGENCIA NACIONAL DE SAUDE SUPLEMENTAR"]}  # 459
+  - {id: antt, nome: "ANTT", categoria: autarquia, raizes: ["04898488"], padroes: ["AGENCIA NACIONAL DE TRANSPORTES TERRESTRES"]}  # 352
+  - {id: dnit, nome: "DNIT", categoria: autarquia, raizes: ["04892707"], padroes: ["DEPARTAMENTO NACIONAL DE INFRA ?ESTRUTURA DE TRANSPORTES", "DNIT"]}  # 321
+  - {id: funasa, nome: "Funasa", categoria: autarquia, raizes: ["26989350"], padroes: ["FUNDACAO NACIONAL DE SAUDE"]}  # 320
+  - {id: fnde, nome: "FNDE", categoria: autarquia, raizes: ["00378257"], padroes: ["FUNDO NACIONAL DE DESENVOLVIMENTO DA EDUCACAO"]}  # 300
+  - {id: inpi, nome: "INPI", categoria: autarquia, raizes: ["42521088"], padroes: ["INSTITUTO NACIONAL DA PROPRIEDADE INDUSTRIAL"]}  # 432
+  - {id: banco-central, nome: "Banco Central", categoria: autarquia, raizes: ["00038166"], padroes: ["BANCO CENTRAL DO BRASIL"]}  # 384
+  - {id: spprev, nome: "SPPrev", categoria: autarquia, raizes: ["09041213"], padroes: ["SAO PAULO PREVIDENCIA"]}  # 349
+  - {id: goiasprev, nome: "GoiasPrev", categoria: autarquia, padroes: ["GOIAS PREVIDENCIA"]}
+  - {id: igeprev-to, nome: "Igeprev (Tocantins)", categoria: autarquia, padroes: ["INSTITUTO DE GESTAO PREVIDENCIARIA DO ESTADO DO TOCANTINS"]}
+  - {id: rioprevidencia, nome: "Rioprevidência", categoria: autarquia, padroes: ["FUNDO UNICO DE PREVIDENCIA SOCIAL DO ESTADO DO RIO DE JANEIRO", "RIOPREVIDENCIA"]}
+  - {id: ipe-rs, nome: "IPE Prev (Rio Grande do Sul)", categoria: autarquia, padroes: ["INSTITUTO DE PREVIDENCIA DO ESTADO DO RIO GRANDE DO SUL"]}
+  - {id: correios, nome: "Correios", categoria: empresa, raizes: ["34028316"], padroes: ["EMPRESA BRASILEIRA DE CORREIOS E TELEGRAFOS"]}
+  # Poder Legislativo federal (no STF, em geral quem editou a norma questionada)
+  - {id: congresso-nacional, nome: "Congresso Nacional", categoria: legislativo, padroes: ["(?:MESA DO )?CONGRESSO NACIONAL"]}
+  - {id: senado-federal, nome: "Senado Federal", categoria: legislativo, padroes: ["(?:MESA DO )?SENADO FEDERAL"]}
+  - {id: camara-dos-deputados, nome: "Câmara dos Deputados", categoria: legislativo, padroes: ["(?:MESA DA )?CAMARA DOS DEPUTADOS"]}
+  # Bancos e financeiras
+  - {id: banco-do-brasil, nome: "Banco do Brasil", categoria: banco, raizes: ["00000000"], padroes: ["BANCO DO BRASIL(?: S ?[/.]? ?A\\.?)?"]}  # 8.345 (raiz 00000000, CNPJ 00.000.000/0001-91, válido)
+  - {id: caixa, nome: "Caixa Econômica Federal", categoria: banco, raizes: ["00360305"], padroes: ["CAIXA ECONOMICA FEDERAL"]}  # 4.025
+  - {id: bradesco, nome: "Bradesco", categoria: banco, raizes: ["60746948"], padroes: ["BANCO BRADESCO(?: S ?[/.]? ?A\\.?)?"]}  # 5.481
+  - {id: santander, nome: "Santander", categoria: banco, raizes: ["90400888"], padroes: ["BANCO SANTANDER(?: \\(?BRASIL\\)?)?(?: S ?[/.]? ?A\\.?)?"]}  # 2.949
+  - {id: itau, nome: "Itaú Unibanco", categoria: banco, raizes: ["60701190"], padroes: ["ITAU UNIBANCO(?: S ?[/.]? ?A\\.?)?"]}  # 2.439
+  - {id: safra, nome: "Banco Safra", categoria: banco, raizes: ["58160789"], padroes: ["BANCO SAFRA"]}  # 1.119
+  - {id: banco-pan, nome: "Banco Pan", categoria: banco, raizes: ["59285411"], padroes: ["BANCO PAN"]}  # 1.165
+  - {id: bmg, nome: "Banco BMG", categoria: banco, raizes: ["61186680"], padroes: ["BANCO BMG"]}  # 839
+  - {id: daycoval, nome: "Banco Daycoval", categoria: banco, raizes: ["62232889"], padroes: ["BANCO DAYCOVAL"]}  # 897
+  - {id: aymore, nome: "Aymoré Financiamentos", categoria: banco, raizes: ["07707650"], padroes: ["AYMORE CREDITO"]}  # 839
+  - {id: crefisa, nome: "Crefisa", categoria: banco, raizes: ["60779196"], padroes: ["CREFISA"]}  # 822
+  - {id: banrisul, nome: "Banrisul", categoria: banco, raizes: ["92702067"], padroes: ["BANCO DO ESTADO DO RIO GRANDE DO SUL"]}  # 657
+  - {id: banco-do-nordeste, nome: "Banco do Nordeste", categoria: banco, raizes: ["07237373"], padroes: ["BANCO DO NORDESTE DO BRASIL"]}  # 604
+  - {id: brb, nome: "BRB (Banco de Brasília)", categoria: banco, raizes: ["00000208"], padroes: ["BRB[ -]+BANCO DE BRASILIA"]}  # 528
+  - {id: votorantim, nome: "Banco Votorantim", categoria: banco, raizes: ["59588111"], padroes: ["BANCO VOTORANTIM"]}  # 520
+  - {id: mercantil, nome: "Banco Mercantil do Brasil", categoria: banco, raizes: ["17184037"], padroes: ["BANCO MERCANTIL DO BRASIL"]}  # 395
+  - {id: agibank, nome: "Agibank", categoria: banco, raizes: ["10664513"], padroes: ["BANCO AGIBANK"]}  # 340
+  - {id: nubank, nome: "Nubank (Nu Pagamentos)", categoria: banco, raizes: ["18236120"], padroes: ["NU PAGAMENTOS"]}  # 344
+  # Planos de saúde
+  - {id: notredame-intermedica, nome: "NotreDame Intermédica", categoria: plano_saude, raizes: ["44649812"], padroes: ["NOTRE ?DAME INTERMEDICA"]}  # 1.932
+  - {id: hapvida, nome: "Hapvida", categoria: plano_saude, raizes: ["63554067"], padroes: ["HAPVIDA ASSISTENCIA MEDICA"]}  # 1.123
+  - {id: amil, nome: "Amil", categoria: plano_saude, raizes: ["29309127"], padroes: ["AMIL ASSISTENCIA MEDICA"]}  # 736
+  - {id: sulamerica-saude, nome: "SulAmérica Saúde", categoria: plano_saude, raizes: ["01685053"], padroes: ["SUL AMERICA COMPANHIA DE SEGURO SAUDE"]}  # 724
+  - {id: bradesco-saude, nome: "Bradesco Saúde", categoria: plano_saude, raizes: ["92693118"], padroes: ["BRADESCO SAUDE"]}  # 569
+  - {id: geap, nome: "Geap", categoria: plano_saude, raizes: ["03658432"], padroes: ["GEAP AUTOGESTAO EM SAUDE"]}  # 401
+  - {id: cassi, nome: "Cassi", categoria: plano_saude, raizes: ["33719485"], padroes: ["CAIXA DE ASSISTENCIA DOS FUNCIONARIOS DO BANCO DO BRASIL"]}  # 315
+  - {id: unimed, nome: "Unimed (cooperativas)", categoria: plano_saude, padroes: ["UNIMED"], contem: true}  # cada Unimed tem CNPJ próprio
+  # Seguradoras e previdência complementar
+  - {id: caixa-seguradora, nome: "Caixa Seguradora", categoria: seguradora, raizes: ["34020354"], padroes: ["CAIXA SEGURADORA"]}  # 603
+  - {id: sulamerica-seguros, nome: "SulAmérica Seguros", categoria: seguradora, raizes: ["33041062"], padroes: ["SUL AMERICA COMPANHIA NACIONAL DE SEGUROS"]}  # 518
+  - {id: mapfre, nome: "Mapfre Seguros", categoria: seguradora, raizes: ["61074175"], padroes: ["MAPFRE SEGUROS GERAIS"]}  # 405
+  - {id: brasilseg, nome: "Brasilseg", categoria: seguradora, raizes: ["28196889"], padroes: ["BRASILSEG"]}  # 404
+  - {id: tokio-marine, nome: "Tokio Marine", categoria: seguradora, raizes: ["33164021"], padroes: ["TOKIO MARINE SEGURADORA"]}  # 302
+  - {id: previ, nome: "Previ", categoria: previdencia_privada, raizes: ["33754482"], padroes: ["CAIXA DE PREVIDENCIA DOS FUNCIONARIOS DO BANCO DO BRASIL"]}  # 859
+  - {id: funcef, nome: "Funcef", categoria: previdencia_privada, raizes: ["00436923"], padroes: ["FUNDACAO DOS ECONOMIARIOS FEDERAIS"]}  # 551
+  - {id: petros, nome: "Petros", categoria: previdencia_privada, raizes: ["34053942"], padroes: ["FUNDACAO PETROBRAS DE SEGURIDADE SOCIAL"]}  # 302
+  # Energia, água e telefonia; grandes empresas
+  - {id: sabesp, nome: "Sabesp", categoria: concessionaria, raizes: ["43776517"], padroes: ["COMPANHIA DE SANEAMENTO BASICO DO ESTADO DE SAO PAULO"]}  # 447
+  - {id: eletropaulo, nome: "Eletropaulo (Enel SP)", categoria: concessionaria, raizes: ["61695227"], padroes: ["ELETROPAULO METROPOLITANA"]}  # 435
+  - {id: equatorial-goias, nome: "Equatorial Goiás", categoria: concessionaria, raizes: ["01543032"], padroes: ["EQUATORIAL GOIAS DISTRIBUIDORA"]}  # 354
+  - {id: oi, nome: "Oi", categoria: concessionaria, raizes: ["76535764"], padroes: ["OI S ?[/.]? ?A\\.?"]}  # 738
+  - {id: telefonica, nome: "Telefônica (Vivo)", categoria: concessionaria, raizes: ["02558157"], padroes: ["TELEFONICA BRASIL"]}  # 494
+  - {id: claro, nome: "Claro", categoria: concessionaria, raizes: ["40432544"], padroes: ["CLARO S ?[/.]? ?A\\.?"]}  # 357
+  - {id: tim, nome: "TIM", categoria: concessionaria, raizes: ["02421421"], padroes: ["TIM S ?[/.]? ?A\\.?"]}
+  - {id: eletrobras, nome: "Eletrobras", categoria: concessionaria, raizes: ["00001180"], padroes: ["CENTRAIS ELETRICAS BRASILEIRAS"]}  # 301
+  - {id: petrobras, nome: "Petrobras", categoria: empresa, raizes: ["33000167"], padroes: ["PETROLEO BRASILEIRO S ?[/.]? ?A(?: ?-? ?PETROBRAS)?"]}  # 668
+  - {id: vale, nome: "Vale", categoria: empresa, raizes: ["33592510"], padroes: ["VALE S ?[/.]? ?A\\.?"]}  # 922
+  - {id: braskem, nome: "Braskem", categoria: empresa, raizes: ["42150391"], padroes: ["BRASKEM"]}  # 1.168
+  - {id: vibra, nome: "Vibra Energia", categoria: empresa, raizes: ["34274233"], padroes: ["VIBRA ENERGIA"]}  # 359
+  - {id: facebook, nome: "Facebook (Meta)", categoria: empresa, raizes: ["13347016"], padroes: ["FACEBOOK SERVICOS ONLINE DO BRASIL"]}  # 342
+  - {id: cdhu, nome: "CDHU (São Paulo)", categoria: empresa, raizes: ["47865597"], padroes: ["COMPANHIA DE DESENVOLVIMENTO HABITACIONAL E URBANO DO ESTADO DE SAO PAULO"]}  # 430

@@ -28,8 +28,10 @@ from pathlib import Path
 from typing import Any
 
 from qijournal.tribunais import VERSAO, modelo
+from qijournal.tribunais.tpu import TPU
 
 REGRAS = modelo.carregar_regras()
+_TPU = TPU.carregar()
 AREAS = REGRAS.ids_areas
 HOJE = "2026-11-23"
 DATA_DADOS = {"stj": "2026-11-20", "stf": "2026-11-22"}
@@ -74,6 +76,10 @@ _PARTES = [
     ("concessionaria-g", "Concessionária G", "pj"), ("cnpj-12345678", "Construtora H Ltda.", "pj"),
     ("telefonica-i", "Telefônica I S.A.", "pj"), ("ministerio-publico-j", "Ministério Público J", "ente"),
 ]
+# Litigante que só tem nome no mapa ``partes.nomes`` (o contas.py publica ali o nome de todo grupo
+# citado nas listas): aparece nas mini-folhas, fora do topo do tribunal. Id "nome-…" = PJ sem CNPJ.
+_PARTES_SO_NOMES = [("nome-cooperativa-k", "Cooperativa K", "pj")]
+_NOMES = {pid: {"nome": nome, "tipo": tipo} for pid, nome, tipo in _PARTES + _PARTES_SO_NOMES}
 _ORGAO_NOME = {"T1": "Primeira Turma", "T2": "Segunda Turma", "T3": "Terceira Turma", "T4": "Quarta Turma",
                "T5": "Quinta Turma", "T6": "Sexta Turma"}
 
@@ -122,6 +128,16 @@ def _ministros(trib: str, rnd: random.Random) -> list[dict[str, Any]]:
     return saida
 
 
+def _assunto(area: str, sub: str | None) -> dict[str, Any]:
+    """O assunto de uma mini-folha: um código de verdade da TPU, o da subárea ou o da área (a raiz antes do nó) (o nome e o
+    caminho saem da TPU versionada, como o ``contas.py`` faz); sem código na régua, nada."""
+    codigos = [s.codigos for s in REGRAS.subareas if s.id == sub and s.codigos] + [REGRAS.area(area).raizes, REGRAS.area(area).nos]
+    codigo = next((c[0] for c in codigos if c), None)
+    if codigo is None:
+        return {"codigo": None, "nome": None, "caminho": None}
+    return {"codigo": codigo, "nome": _TPU.nome(codigo), "caminho": _TPU.caminho(codigo)}
+
+
 def _folha(trib: str, rnd: random.Random, ministro: dict[str, Any] | None, area: str, dias: int, hoje: date, segredo: bool = False) -> dict[str, Any]:
     """Uma mini-folha (contrato §7): sem nome de parte, sem processo em segredo."""
     classe = rnd.choice(_CLASSES[trib])
@@ -132,16 +148,14 @@ def _folha(trib: str, rnd: random.Random, ministro: dict[str, Any] | None, area:
     subareas = REGRAS.subareas_de(area)
     sub = subareas[rnd.randrange(len(subareas))].id if subareas else None
     ativo = rnd.choice([("ente", "ente-federal-a"), ("pj", "banco-exemplo"), ("pf", None), ("ente", "instituto-previdenciario-b")])
-    passivo = rnd.choice([("pf", None), ("pj", "seguradora-f"), ("ente", "estado-c")])
+    passivo = rnd.choice([("pf", None), ("pj", "seguradora-f"), ("ente", "estado-c"), ("pj", "nome-cooperativa-k")])
     link = REGRAS.fontes["links_oficiais"][trib].format(registro=registro or "", classe=classe, numero=numero)
     flags = {"liminar": True} if rnd.random() < 0.2 else {}
     return {
         "id": f"{trib}-{classe}-{numero}", "classe": classe, "numero": numero,
         "cnj": f"{rnd.randint(0, 9999999):07d}{rnd.randint(10, 99)}{autuacao.year}8{rnd.randint(10, 26):02d}{rnd.randint(1, 9999):04d}",
         "registro": registro, "uf": rnd.choice(["SP", "RJ", "MG", "RS", "PR", "BA", "DF"]), "area": area, "subarea": sub,
-        "assunto": {"codigo": 7681, "nome": "Obrigações", "caminho": "DIREITO CIVIL › Obrigações"} if area in ("civil", "consumidor")
-        else {"codigo": 3607, "nome": "Tráfico de Drogas e Condutas Afins", "caminho": "DIREITO PENAL › Crimes Previstos na Legislação Extravagante › Tráfico de Drogas e Condutas Afins"}
-        if area == "penal" else {"codigo": None, "nome": None, "caminho": None},
+        "assunto": _assunto(area, sub),
         "relator_id": ministro["id"] if ministro else None,
         "local": f"GABINETE DO MINISTRO {ministro['nome'].upper()}" if ministro else "COORDENADORIA DA SEGUNDA TURMA",
         "na_mesa": ministro is not None,
@@ -305,7 +319,7 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
         "grupos": grupos, "media": media, "ministros": resumo, "fora_da_grade": fora, "areas": areas, "recortes": recortes,
         "partes": {"top": top, "pessoas_fisicas": universo["pessoas_fisicas"],
                    "ente_publico": {"n": ente_n, "p": _r4(ente_n / total_trib), "por_grupo": {g["id"]: [sum(r["ente_publico"] for r in resumo if r["grupo"] == g["id"]), g["processos"]] for g in grupos if g["id"] != "pr"}},
-                   "concentracao_top20": 0.41},
+                   "concentracao_top20": 0.41, "nomes": _NOMES},
         "fila": {"mais_antigos": folhas_fila[: lim["listas"]["fila_mais_antigos"]],
                  "por_grupo": {g["id"]: {"na_mesa": g["na_mesa"], "mais_180": int(g["na_mesa"] * 0.21), "mais_365": int(g["na_mesa"] * 0.09)} for g in grupos if g["id"] != "pr"},
                  "sobrestados": {"total": universo["sobrestados"], "por_motivo": {"ST": int(universo["sobrestados"] * 0.54), "RG": int(universo["sobrestados"] * 0.42), "T": int(universo["sobrestados"] * 0.04)}},
@@ -364,7 +378,8 @@ def _dossie(trib: str, item: dict[str, Any], m: dict[str, Any], antigos: list[di
         "em_vista": em_vista,
         "partes": {"top": [{"id": pid, "nome": nome, "tipo": tipo, "n": n, "recorre": int(n * 0.4), "responde": n - int(n * 0.4), "outro": 0,
                             "pares": 0.041, "razao": 1.26} for (pid, nome, tipo), n in zip(_PARTES[:6], (321, 290, 180, 120, 90, 60), strict=True)],
-                   "pessoas_fisicas": int(total * 0.43), "ente_publico": {"n": item["ente_publico"], "p": _r4(item["ente_publico"] / total), "pares": 0.2}},
+                   "pessoas_fisicas": int(total * 0.43), "ente_publico": {"n": item["ente_publico"], "p": _r4(item["ente_publico"] / total), "pares": 0.2},
+                   "nomes": _NOMES},
         "entradas": {"janela": ["2025-11-21", DATA_DADOS[trib]], "sorteio": (item["entradas"] or {}).get("sorteio_12m", 0), "heranca": (item["entradas"] or {}).get("heranca_12m", 0),
                      "ultimos_30d": {"sorteio": (item["entradas"] or {}).get("sorteio_30d", 0), "heranca": (item["entradas"] or {}).get("heranca_30d", 0)},
                      "por_mes": [[mes, int(total * rnd.uniform(0.03, 0.05)), 1014 if ("heranca" in item["selos"] and i == 11) else 0] for i, mes in enumerate(meses)],

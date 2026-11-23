@@ -470,7 +470,8 @@ def test_decisoes_por_ministro_e_as_etiquetas_do_presidente(regras: Regras) -> N
     assert d["fora"]["vice"]["documentos"] == 87  # "VICE-PRESIDENTE" + "ALEXANDRE DE MORAES (Vice-Presidente)"
     assert d["ministros"]["stf-alexandre-de-moraes"]["documentos"] == 8634
     assert d["fora"]["residuos"]["documentos"] == 47
-    assert d["relatores_fora_do_mapa"] == [["SEPÚLVEDA PERTENCE", 1]]
+    # Sepúlveda Pertence (1 acórdão na janela) entrou em composicao.stf.saiu na integração: resíduo conhecido, fora do alarme
+    assert d["relatores_fora_do_mapa"] == []
     soma = sum(v["documentos"] for v in d["ministros"].values()) + sum(v["documentos"] for v in d["fora"].values())
     assert soma + d["sem_relator"] == d["documentos"] and d["sem_relator"] == 1
     assert list(d["ministros"])[:3] == ["stf-flavio-dino", "stf-carmen-lucia", "stf-alexandre-de-moraes"]  # a ordem do config

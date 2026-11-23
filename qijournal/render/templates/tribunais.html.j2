@@ -196,10 +196,11 @@
       <div class="az-blk">
         <h5 class="az-h">De que é cada acervo <span>a parte de cada área, em %; clique no nome para abrir a mesa</span></h5>
         <div class="tb-sec" role="group" aria-label="Ver um grupo" data-com-script hidden><span class="cg-lg-k">Ver</span>{% for g in tr.chips %}<button class="cg-lg-b" type="button" data-o="{{ g.id }}" aria-pressed="{{ 'false' if g.id else 'true' }}">{{ g.nome }} <b>{{ g.n }}</b></button>{% endfor %}</div>
+        <p class="tb-mx-cap" aria-hidden="true">{{ mx.caption }}</p>
         <div class="tb-mx-wrap">
-          <table class="tb-mx" id="tb-mx-{{ tr.id }}">
+          <table class="tb-mx" id="tb-mx-{{ tr.id }}" style="--tb-cols-w:{{ mx.largura }}px">
             <caption>{{ mx.caption }}</caption>
-            <thead><tr><th scope="col" class="tb-mx-v">Ministro</th><th scope="col" class="tb-mx-n">Acervo</th>{% for c in tr.colunas %}<th scope="col" class="tb-a-{{ c.id }}" data-a="{{ c.id }}" title="{{ c.nome }}"><a href="#tb-area-{{ tr.id }}-{{ c.id }}" data-alvo="#v=assuntos&amp;t={{ tr.id }}&amp;area={{ c.id }}">{{ c.curto }}</a><small>{{ c.n_txt }}</small></th>{% endfor %}</tr></thead>
+            <thead><tr><th scope="col" class="tb-mx-v">Ministro</th><th scope="col" class="tb-mx-n">Acervo</th>{% for c in tr.colunas %}<th scope="col" class="tb-a-{{ c.id }}" data-a="{{ c.id }}" data-w="{{ c.w }}" style="width:{{ c.w }}px" title="{{ c.nome }}"><a href="#tb-area-{{ tr.id }}-{{ c.id }}" data-alvo="#v=assuntos&amp;t={{ tr.id }}&amp;area={{ c.id }}">{{ c.curto }}</a><small>{{ c.n_txt }}</small></th>{% endfor %}</tr></thead>
             {% if mx.linha_tribunal %}{% set lt = mx.linha_tribunal %}
             <tbody data-grupo="">
               <tr class="tb-mx-m tb-mx-t"><th scope="row">{{ lt.rotulo }}</th><td class="tb-n">{{ lt.processos }}</td>{% for c in lt.celulas %}<td data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}</td>{% endfor %}</tr>
@@ -210,7 +211,7 @@
               <tr class="tb-mx-g"><th scope="rowgroup" colspan="{{ mx.colspan }}">{{ g.nome }}<span>{{ g.desc }}</span></th></tr>
               {% if g.media %}<tr class="tb-mx-m"><th scope="row">{{ g.media.rotulo }}</th><td class="tb-n">{{ g.media.processos }}</td>{% for c in g.media.celulas %}<td data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}</td>{% endfor %}</tr>{% endif %}
               {% for l in g.linhas %}
-              <tr data-min="{{ l.id }}"><th scope="row"><a href="#tb-mesa-{{ l.id }}" data-min="{{ l.id }}"{% if l.selos %} title="{{ l.selos }}"{% endif %}>{{ l.nome }}</a><small>{{ l.curta }}{% if l.conv %} conv.{% endif %}</small></th><td class="tb-n" title="{{ l.processos }} processos; {{ l.na_mesa }} na mesa">{{ l.processos }}</td>{% for c in l.celulas %}<td class="{{ c.classe }}" data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}{% if c.sr %}<span class="sr-only">{{ c.sr }}</span>{% endif %}</td>{% endfor %}</tr>
+              <tr data-min="{{ l.id }}"><th scope="row"><a href="#tb-mesa-{{ l.id }}" data-min="{{ l.id }}" title="{{ l.nome }}{% if l.selos %} · {{ l.selos }}{% endif %}">{{ l.nome }}</a><small>{{ l.curta }}{% if l.conv %} conv.{% endif %}</small></th><td class="tb-n" title="{{ l.processos }} processos; {{ l.na_mesa }} na mesa">{{ l.processos }}</td>{% for c in l.celulas %}<td class="{{ c.classe }}" data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}{% if c.sr %}<span class="sr-only">{{ c.sr }}</span>{% endif %}</td>{% endfor %}</tr>
               {% endfor %}
             </tbody>
             {% endfor %}

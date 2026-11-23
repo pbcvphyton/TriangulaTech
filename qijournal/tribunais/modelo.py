@@ -475,6 +475,10 @@ class Composicao:
     fora_da_grade: tuple[LinhaFora, ...]
     saiu: tuple[Mapping[str, Any], ...] = ()
     cadeiras: int | None = None
+    # Quem presidiu o tribunal e quando (``[{id, de, ate}]``, datas de publicação): o que a pessoa
+    # assinou como Presidente é da Presidência, nunca do cartão dela (as íntegras do STJ dão o nome,
+    # não o cargo).
+    presidencias: tuple[Mapping[str, Any], ...] = ()
     _indice: dict[str, Ministro] = field(default_factory=dict, compare=False, repr=False)
     _saiu: dict[str, str] = field(default_factory=dict, compare=False, repr=False)
 
@@ -526,6 +530,15 @@ class Composicao:
                 return Relator(None, linha.id, True)
         conhecido = chave_nome(texto) in self._saiu
         return Relator(None, "residuos", conhecido)
+
+    def presidente_em(self, dia: str | None) -> str | None:
+        """O id de quem presidia o tribunal em ``dia`` (``"AAAA-MM-DD"``), pelas ``presidencias``."""
+        if not dia:
+            return None
+        for p in self.presidencias:
+            if str(p.get("de") or "") <= dia and (not p.get("ate") or dia <= str(p["ate"])):
+                return str(p.get("id"))
+        return None
 
     def grupo_de(self, m: Ministro) -> str:
         """O grupo da matriz: o que contém a Turma do ministro; quem está fora da grade vai para o
@@ -619,7 +632,8 @@ LIMIARES_PADRAO: dict[str, Any] = {
     "litigante_semana_vezes": 3,
     "litigante_semana_minimo": 100,
     "vista_dias": 90,
-    "recusa_arquivo_menor_que": 0.90,
+    "recusa_arquivo_menor_que": 0.85,
+    "recusa_arquivo_maior_que": 1.15,
     "recortes_por": "principal",
     "rampa": [0.02, 0.05, 0.10, 0.25],
     "listas": {"painel_mais_antigos": 5, "fila_mais_antigos": 30, "dossie_mais_antigos": 15, "dossie_em_pauta": 20,
@@ -716,6 +730,11 @@ def _composicao(trib: str, bruto: Mapping[str, Any]) -> Composicao:
         trib=trib, data=str(bruto.get("data") or ""), fonte=str(bruto.get("fonte") or ""), grupos=grupos,
         orgaos=dict(bruto.get("orgaos") or {}), ministros=tuple(ministros), fora_da_grade=fora,
         saiu=tuple(dict(s) for s in (bruto.get("saiu") or ())), cadeiras=bruto.get("cadeiras"),
+        presidencias=tuple(
+            {"id": str(_exigir(x, "id", f"{onde}.presidencias")), "de": _data(x.get("de"), f"{onde}.presidencias.de"),
+             "ate": _data(x.get("ate"), f"{onde}.presidencias.ate")}
+            for x in (bruto.get("presidencias") or ())
+        ),
     )
 
 

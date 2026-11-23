@@ -11,6 +11,7 @@ Layout publicado (raiz do GitHub Pages)::
     edicoes/analitico.html     aba "Analítico Político": todo o histórico do termômetro (marca com termômetro)
     edicoes/pesquisa.html      Pesquisa analítica: busca em todas as edições
     edicoes/congresso.html     aba "Congresso" (gravada por ``congresso atualizar``, antes da edição)
+    edicoes/tribunais.html     aba "Tribunais" (gravada por ``tribunais atualizar``, no fluxo próprio)
     data/congresso/            base de votos, fichas e painéis do Congresso (``qijournal.congresso``)
     data/AAAA-MM-DD.json       edição em JSON (``Edition.to_dict``)
     data/busca/AAAA-MM-DD.json  o que a edição publicou, compacto, para a Pesquisa analítica
@@ -53,6 +54,7 @@ from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
 from qijournal.render import congresso as congresso_pagina
 from qijournal.render import lados, midia, pesquisa
+from qijournal.render import tribunais as tribunais_pagina
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
 from qijournal.render.web import index_page_name, render_archive_index, render_edition_page, render_index_page
@@ -712,6 +714,19 @@ def anexar_congresso(edition: Edition, config: Config, out_dir: Path) -> None:
         edition.congresso = None
 
 
+def anexar_tribunais(config: Config, out_dir: Path) -> None:
+    """Marca na configuração se a aba Tribunais está publicada (o botão "Tribunais" no cabeçalho
+    da edição, do arquivo, do Analítico e da Pesquisa). A aba é gravada no fluxo próprio
+    (``tribunais.yml``); aqui só se confere que ela e os dados dela existem. Nunca derruba a edição."""
+    config.tribunais.publicado = False
+    try:
+        if tribunais_pagina.marcar_publicada(config, out_dir):
+            log.info("Tribunais: aba publicada; botão no cabeçalho")
+    except Exception as exc:  # noqa: BLE001 — nunca derruba a edição
+        log.warning("Tribunais: não foi possível conferir a aba (%s) — cabeçalho sem o botão", exc)
+        config.tribunais.publicado = False
+
+
 # ── E-mail ───────────────────────────────────────────────────────────────────
 
 
@@ -1009,6 +1024,7 @@ def run(
         except (OSError, TypeError, ValueError) as exc:
             log.warning("Páginas enriquecidas não salvas (%s): %s", pages_path, exc)
     anexar_congresso(edition, config, out_dir)
+    anexar_tribunais(config, out_dir)
     subject, email_html, email_text = render_email(edition, config)
     previous = previous_manifest(out_dir)
     already_sent = previous.get("date") == edition.date and previous.get("email_sent") is True

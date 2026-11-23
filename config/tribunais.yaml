@@ -383,6 +383,14 @@ composicao:
       - {nome: "Otávio de Almeida Toledo", motivo: "convocação encerrada", aliases: ["Otávio de Almeida Toledo (Desembargador Convocado do TJSP)"]}
       - {nome: "Jesuíno Rissato", motivo: "convocação encerrada", aliases: ["Jesuíno Rissato (Desembargador Convocado do TJDFT)"]}
       - {nome: "Carlos Cini Marchionatti", motivo: "convocação encerrada", aliases: ["Carlos Cini Marchionatti (Desembargador Convocado TJRS)"]}
+    # Quem presidiu o STJ e quando (datas de publicação no DJ): o que a pessoa assinou como
+    # Presidente vai para a linha da Presidência, nunca para o cartão dela. Herman Benjamin presidiu
+    # até 24/08/2026 e voltou à Primeira Turma em 25/08; nas íntegras de 12 meses, 150 mil decisões
+    # dele são da Presidência (conferido em 23/11/2026: as últimas em 21/08, as de Salomão como
+    # Presidente a partir de 28/08).
+    presidencias:
+      - {id: stj-herman-benjamin, de: "2024-08-22", ate: "2026-08-24"}
+      - {id: stj-luis-felipe-salomao, de: "2026-08-25"}
   stf:
     data: "2026-08-06"
     fonte: "https://portal.stf.jus.br/textos/verTexto.asp?servico=sobreStfComposicaoTurma&pagina=principal"
@@ -444,6 +452,7 @@ composicao:
       - {nome: "Ellen Gracie", motivo: "aposentada"}
       - {nome: "Cezar Peluso", motivo: "aposentado"}
       - {nome: "Menezes Direito", motivo: "falecido em 2009"}
+      - {nome: "Sepúlveda Pertence", motivo: "aposentado (relator de acórdão na pesquisa de jurisprudência de 12 meses)"}
 
 # ── Limiares (as réguas das contas) ──────────────────────────────────────────────────────────
 limiares:
@@ -466,7 +475,8 @@ limiares:
   litigante_semana_vezes: 3      # entrada de 7 dias de um litigante × a média semanal das 12 semanas anteriores
   litigante_semana_minimo: 100
   vista_dias: 90                 # STF: vista vencida (RISTF, art. 134, com a ER 58/2022; conferir) — fase 2
-  recusa_arquivo_menor_que: 0.90 # arquivo do dia com menos que isto do último dia bom é recusado (fica o anterior)
+  recusa_arquivo_menor_que: 0.85 # acervo do dia com total fora de [menor_que, maior_que] × o do último dia bom é
+  recusa_arquivo_maior_que: 1.15 # recusado: fica o painel daquele dia (dados.py; a faixa é a da integração)
   recortes_por: principal        # principal (o assunto que decidiu a área) ou todos (qualquer assunto do processo)
   rampa: [0.02, 0.05, 0.10, 0.25]  # faixas da cor da célula da matriz: <2%, 2–4, 5–9, 10–24, 25% ou mais (designer)
   listas:                        # quantos itens cada lista leva (os tetos de tamanho dos JSON dependem disto)
@@ -538,7 +548,7 @@ fontes:
     rg_exportar: "https://portal.stf.jus.br/jurisprudenciaRepercussao/exportarDados.asp"
     pauta: "https://portal.stf.jus.br/pauta/services/calendario-service.asp"
     validade_h: {acervo: 20, atas: 20, jurisprudencia: 20, rg: 160, pauta: 20}
-    velho_dias: {acervo: 3, atas: 4, jurisprudencia: 4, rg: 10, pauta: 4}
+    velho_dias: {acervo: 3, atas: 4, jurisprudencia: 10, rg: 10, pauta: 4}   # jurisprudência: a última data de julgamento indexada anda 4 a 6 dias atrás (18/11 em 23/11/2026)
     atribuicao: "Fonte: STF (portal, pesquisa de jurisprudência e acervo em www.stf.jus.br)"
   tpu:
     versao_soap: "https://www.cnj.jus.br/sgt/sgt_ws.php"   # getDataUltimaVersao (depreciado: o CNJ anuncia sgt.cloud.cnj.jus.br)

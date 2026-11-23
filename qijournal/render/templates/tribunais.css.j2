@@ -30,8 +30,8 @@
 
 /* As fontes de hoje: uma linha, o estado escrito e a forma (● completa, ◐ com aviso, ■ falhou, ○ desligada) */
 .tb-fn{display:flex;flex-wrap:wrap;gap:6px 18px;max-width:1180px;margin-top:12px;font-family:var(--mn);font-size:10.5px;line-height:1.5;color:var(--muted)}
-.tb-fn span{display:inline-flex;align-items:baseline;gap:5px}
-.tb-fn i{flex:none;font-style:normal;font-size:11px}
+.tb-fn span{display:inline-block}
+.tb-fn i{font-style:normal;font-size:11px;margin-right:5px}
 .tb-fn a{color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule)}
 .tb-fn a:hover{color:var(--link)}
 .tb-fn-ok i{color:var(--cg-ok)}
@@ -55,8 +55,13 @@
    escrito); ▲/▽ só onde o JSON marca (passou do teste e do piso de efeito). A cor da área mora só na
    faixa de 4 px do alto da coluna; o nome vai escrito. */
 .tb-mx-wrap{position:relative;max-width:1320px;margin-top:14px;overflow-x:auto;scrollbar-width:thin}
-.tb-mx{width:100%;min-width:980px;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-family:var(--mn);font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink)}
-.tb-mx caption{margin-bottom:6px;text-align:left;font-family:var(--ss);font-size:12px;font-weight:600;line-height:1.45;color:var(--muted)}
+/* largura mínima = as colunas de área (--tb-cols-w, calculada no Python e refeita pelo script quando um grupo esconde colunas) + o nome (176) + o acervo (64) + o espaçamento */
+.tb-mx{width:100%;min-width:calc(var(--tb-cols-w, 880px) + 248px);border-collapse:separate;border-spacing:2px;table-layout:fixed;font-family:var(--mn);font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* A legenda da tabela fica fora da moldura que rola (no celular a tabela é mais larga que a tela e a
+   legenda, dentro dela, saía cortada): o texto visível é o parágrafo; o <caption> fica para o leitor de tela. */
+.tb-mx-cap{max-width:1320px;margin:14px 0 6px;font-family:var(--ss);font-size:12px;font-weight:600;line-height:1.45;color:var(--muted)}
+.tb-mx-cap + .tb-mx-wrap{margin-top:0}
+.tb-mx caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .tb-mx thead th{position:relative;padding:10px 2px 6px;vertical-align:bottom;font-family:var(--ss);font-size:10.5px;font-weight:700;line-height:1.2;white-space:normal;overflow-wrap:normal;hyphens:manual;text-align:center;color:var(--ink)}
 .tb-mx thead th[data-a]::before{content:"";position:absolute;left:2px;right:2px;top:0;height:4px;border-radius:2px;background:var(--tb-a)}
 .tb-mx thead th small{display:block;margin-top:2px;font-family:var(--mn);font-size:9.5px;font-weight:400;color:var(--faint)}
@@ -78,9 +83,9 @@
 .tb-mx td.tb-dn::after{content:"▽"}
 .tb-mx tr.tb-mx-g th{position:sticky;left:0;padding:16px 0 5px;border-bottom:1px solid var(--rule);background:var(--paper);font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--head);overflow:visible;white-space:normal}
 .tb-mx tr.tb-mx-g th span{margin-left:8px;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)}
-.tb-mx tr.tb-mx-m th{font-weight:400;font-style:italic;color:var(--muted)}
+.tb-mx tr.tb-mx-m th{font-weight:400;font-style:italic;color:var(--muted);white-space:normal;line-height:1.2}
 .tb-mx tr.tb-mx-m td{background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--muted);font-style:italic}
-.tb-mx tr.tb-mx-f th{font-weight:500;color:var(--body)}
+.tb-mx tr.tb-mx-f th{font-weight:500;color:var(--body);white-space:normal;line-height:1.2}
 .tb-mx tbody tr:not(.tb-mx-g):hover th a{color:var(--link)}
 .tb-mx td[title]:hover{outline:2px solid var(--link);outline-offset:-2px}
 .tb-mx tr[aria-current="true"] th{box-shadow:inset 3px 0 0 var(--qc);padding-left:8px}
@@ -108,7 +113,6 @@
 .tb-me-b .tb-me-c{font-family:var(--mn);font-size:11px;color:var(--muted);text-align:right}
 .tb-me-b .tb-fp{grid-column:1/-1;height:4px;margin-top:3px}
 .tb-me-cs{min-width:0}
-.tb-mx.tb-mx-o{min-width:0}
 .tb-mx thead th.tb-mx-af{box-shadow:inset 0 -2px 0 var(--qc)}
 .tb-mx td.tb-mx-af{box-shadow:inset 0 0 0 2px var(--qc)}
 .tb-mesa{border-top:1px solid var(--rl)}
@@ -307,7 +311,7 @@ a.tb-br-n:hover{color:var(--link)}
   .tb-mc li{padding:0 0 12px 22px}
   .tb-mc li::before{left:5px;right:auto;top:12px;bottom:0;width:2px;height:auto}
   .tb-mc em{position:static;transform:none;display:block}
-  .tb-mx{min-width:820px}
+  .tb-mx{min-width:calc(var(--tb-cols-w, 880px) + 190px)}
   .tb-mx .tb-mx-v,.tb-mx tbody th{width:118px}
   .tb-vl-l li{flex-direction:column;gap:0}
   .tb-vl-l b{text-align:left}

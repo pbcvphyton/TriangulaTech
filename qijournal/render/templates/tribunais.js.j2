@@ -27,6 +27,9 @@
   }
   function razao(r) { return r == null ? '—' : (r < 10 ? (Math.round(r * 10) / 10).toFixed(1) : String(Math.round(r))).replace('.', ','); }
   function dataBr(iso) { return iso && iso.length >= 10 ? iso.slice(8, 10) + '/' + iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
+  var MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  function mesBr(am) { var i = parseInt(String(am).slice(5, 7), 10); return MESES[i - 1] || String(am); }  /* "2026-10" → "out" */
+  function diasDe(j) { var a = Date.parse((j || [])[0]), b = Date.parse((j || [])[1]); return isNaN(a) || isNaN(b) ? 0 : Math.round((b - a) / 864e5) + 1; }
   function mesAno(iso) { return iso && iso.length >= 7 ? iso.slice(5, 7) + '/' + iso.slice(0, 4) : ''; }
   function dias(n) {
     if (n == null) return '—';
@@ -61,7 +64,7 @@
   function nomeParte(g) {
     if ((M.partes || {})[g]) return M.partes[g];
     var c = /^cnpj-(\d{2})(\d{3})(\d{3})$/.exec(g || '');
-    return c ? 'CNPJ ' + c[1] + '.' + c[2] + '.' + c[3] : String(g || '').split('-').map(function (p) { return /^(de|da|do|dos|das|e)$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1); }).join(' ');
+    return c ? 'CNPJ ' + c[1] + '.' + c[2] + '.' + c[3] : String(g || '').replace(/^nome-/, '').split('-').map(function (p) { return /^(de|da|do|dos|das|e)$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1); }).join(' ');
   }
   function parteCurta(p) {
     var rot = (M.tiposParte || {})[p.tipo] || 'parte';
@@ -104,7 +107,13 @@
       pronto(erro, x);
     });
   }
-  function dossieDe(id, pronto) { arquivo(M.base + id + '.json', pronto); }
+  /* os nomes que o dossiê traz (partes.nomes: {grupo: {nome, tipo}}) somam aos do manifesto */
+  function guardarNomes(x) {
+    var n = ((x || {}).partes || {}).nomes || {};
+    M.partes = M.partes || {};
+    Object.keys(n).forEach(function (g) { var v = n[g], nome = v && typeof v === 'object' ? v.nome : v; if (nome && !M.partes[g]) M.partes[g] = String(nome); });
+  }
+  function dossieDe(id, pronto) { arquivo(M.base + id + '.json', function (erro, x) { if (!erro) guardarNomes(x); pronto(erro, x); }); }
   function painelDe(t, pronto) { arquivo(M.dados + t + '.json', pronto); }
 
   /* ── O estado (o que está à vista) e o endereço ── */
@@ -197,6 +206,10 @@
       c.classList.toggle('tb-mx-af', !!E.area && a === E.area);
     });
     tab.classList.toggle('tb-mx-o', !!E.o);
+    /* a largura mínima acompanha as colunas que ficaram: cada uma com a do nome da área */
+    var soma = 0;
+    lista(tab.querySelectorAll('thead th[data-w]')).forEach(function (c) { if (!c.hidden) soma += (+c.getAttribute('data-w') || 0) + 2; });
+    tab.style.setProperty('--tb-cols-w', soma + 'px');
   }
   /* A mesa: um ministro de cada vez; o dossiê é lido quando a aba Ministros está à vista. */
   function mesasDe(t) { var b = d.getElementById('tb-ministros-' + t); return lista(b ? b.querySelectorAll('details.tb-mesa') : []); }
@@ -273,12 +286,13 @@
     if (a) extras.push('Recorre: ' + a);
     if (b) extras.push('Responde: ' + b);
     if (t === 'stj' && (datas.ultima_decisao || datas.distribuicao)) extras.push('sem decisão desde ' + mesAno(datas.ultima_decisao || datas.distribuicao));
-    if (t === 'stf' && datas.andamento) extras.push('concluso desde ' + mesAno(datas.andamento));
+    /* STF: "concluso" só quando o andamento atual é a conclusão ao relator (concluso_dias); senão, a data do último andamento */
+    if (t === 'stf' && datas.andamento) extras.push((f.concluso_dias != null ? 'concluso desde ' : 'último andamento em ') + mesAno(datas.andamento));
     if ((f.flags || {}).liminar) extras.push('liminar pendente');
     var link = seguro(f.link);
     var num1 = link ? h('a', { href: link, 'data-pr': f.id, 'data-de': de, target: '_blank', rel: 'noopener noreferrer', text: rotuloProc(f) }) : h('b', { text: rotuloProc(f) });
     return h('li', {}, [
-      h('p', { cls: 'tb-fi-d' }, [dd == null ? '—' : num(dd), h('small', { text: 'dias' })]),
+      h('p', { cls: 'tb-fi-d' }, [dd == null ? '—' : num(dd), h('small', { text: dd == null ? '' : 'dias' })]),  /* vista: a fonte não dá o dia; a pauta troca os dois pela sessão */
       h('p', { cls: 'tb-fi-p' }, [num1, area(f.area)]),
       h('p', { cls: 'tb-fi-x', text: extras.join(' · ') })
     ]);
@@ -359,17 +373,18 @@
     var en = x.entradas;
     if (en && (en.por_mes || []).length) {
       var mx = Math.max.apply(null, en.por_mes.map(function (m) { return (m[1] || 0) + (m[2] || 0); }).concat([1]));
-      var barras = h('div', { cls: 'cg-sm', role: 'img', 'aria-label': 'Entradas por mês, por sorteio: ' + en.por_mes.map(function (m) { return m[0] + ' ' + num(m[1]) + (m[2] ? ' e ' + num(m[2]) + ' por herança' : ''); }).join('; ') }, en.por_mes.map(function (m) {
-        var s = h('span', { title: m[0] + ': ' + num(m[1]) + ' por sorteio' + (m[2] ? ', ' + num(m[2]) + ' por herança' : '') });
+      var barras = h('div', { cls: 'cg-sm', role: 'img', 'aria-label': 'Entradas por mês, por sorteio: ' + en.por_mes.map(function (m) { return mesBr(m[0]) + '/' + String(m[0]).slice(0, 4) + ' ' + num(m[1]) + (m[2] ? ' e ' + num(m[2]) + ' por herança' : ''); }).join('; ') }, en.por_mes.map(function (m) {
+        var s = h('span', { title: mesBr(m[0]) + '/' + String(m[0]).slice(0, 4) + ': ' + num(m[1]) + ' por sorteio' + (m[2] ? ', ' + num(m[2]) + ' por herança' : '') });
         s.style.height = Math.round(100 * (m[1] || 0) / mx) + '%';
         return s;
       }));
-      var txt = num(en.sorteio) + ' por sorteio entre ' + dataBr((en.janela || [])[0]) + ' e ' + dataBr((en.janela || [])[1]) + '; ' + num((en.ultimos_30d || {}).sorteio) + ' nos últimos 30 dias.';
+      /* a série das atas cresce no cache: com 30 dias ou menos, "nos últimos 30 dias" repetiria o total */
+      var txt = num(en.sorteio) + ' por sorteio entre ' + dataBr((en.janela || [])[0]) + ' e ' + dataBr((en.janela || [])[1]) + (diasDe(en.janela) > 30 ? '; ' + num((en.ultimos_30d || {}).sorteio) + ' nos últimos 30 dias.' : '.');
       if (en.heranca) txt += ' Por atribuição (herança de acervo), à parte: ' + num(en.heranca) + (en.heranca_dias || []).map(function (x2) { return ', ' + num(x2[1]) + ' em ' + dataBr(x2[0]); }).join('') + '.';
-      nos.push(secao('O que entrou', 'por mês, distribuídos por sorteio', [barras, h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, en.por_mes.map(function (m) { return h('span', { text: String(m[0]).slice(5, 7) }); })), h('p', { cls: 'cg-d-n', text: txt })]));
+      nos.push(secao('O que entrou', 'por mês, distribuídos por sorteio', [barras, h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, en.por_mes.map(function (m) { return h('span', { text: mesBr(m[0]) }); })), h('p', { cls: 'cg-d-n', text: txt })]));
     }
     var de = x.decisoes;
-    if (de && de.processos != null) nos.push(secao('O que decidiu', 'decisões publicadas', [h('p', { cls: 'cg-d-n', text: num(de.processos) + ' processos com decisão publicada entre ' + dataBr((de.janela || [])[0]) + ' e ' + dataBr((de.janela || [])[1]) + ': ' + num(de.monocraticas) + ' decisões monocráticas e ' + num(de.acordaos) + ' acórdãos (' + num(de.acordaos_recurso_interno) + ' em recurso interno).' + (de.ultimo_arquivo ? ' Último arquivo publicado: ' + dataBr(de.ultimo_arquivo) + '.' : '') })]));
+    if (de && de.processos != null) nos.push(secao('O que decidiu', 'decisões publicadas', [h('p', { cls: 'cg-d-n', text: num(de.processos) + ' processos com decisão publicada entre ' + dataBr((de.janela || [])[0]) + ' e ' + dataBr((de.janela || [])[1]) + ': ' + num(de.monocraticas) + ' decisões monocráticas e ' + num(de.acordaos) + ' acórdãos' + (de.acordaos_recurso_interno != null ? ' (' + num(de.acordaos_recurso_interno) + ' em recurso interno)' : '') + '.' + (de.ultimo_arquivo ? ' Último arquivo publicado: ' + dataBr(de.ultimo_arquivo) + '.' : '') })]));
     if ((x.temas || []).length) nos.push(secao('Temas sob relatoria', 'sem julgamento: pesam para o país', [h('ol', { cls: 'cg-ls' }, x.temas.map(function (te) {
       var link = seguro(te.link);
       return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', {}, [link ? h('a', { href: link, target: '_blank', rel: 'noopener noreferrer', text: 'Tema ' + te.numero }) : 'Tema ' + te.numero]), h('span', { text: ((M.tiposTema || {})[te.tipo] || te.tipo) + ' · ' + (te.situacao || '') + (te.desde ? ' desde ' + dataBr(te.desde) : '') })]), h('p', { cls: 'cg-ls-x', text: te.titulo || '' })]);
