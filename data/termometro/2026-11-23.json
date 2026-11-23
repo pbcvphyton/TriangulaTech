@@ -1,0 +1,6591 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-23",
+ "analises": [
+  {
+   "id": "eb8128966a09",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/23/camara-deve-votar-ajuste-fiscal-nesta-segunda-feira.ghtml",
+   "titulo": "Câmara vota projeto de ajuste fiscal nesta segunda-feira",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-dos-deputados-tenta-votar-nesta-segunda-f",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a tramitação e as negociações em torno do pacote de ajuste fiscal do governo federal na Câmara dos Deputados."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1166,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de aprovação de ajuste fiscal para evitar contingenciamentos e fechar o Orçamento.",
+    "causa": "Desequilíbrios nas contas públicas e obrigatoriedade de cumprimento de metas fiscais.",
+    "vitima": "Governo sob risco de contingenciamento e setor produtivo afetado por novas regras tributárias.",
+    "culpado": "Rigidez orçamentária e necessidade de acomodar promessas de campanha.",
+    "solucao": "Aprovação rápida do pacote fiscal negociado entre Executivo e Congresso.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto apresenta de forma equilibrada as posições do relator governista e do representante do setor produtivo, mantendo o tom informativo e neutro. Seria escrito da mesma forma se os papéis estivessem invertidos.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Hugo Motta",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Setor produtivo / FPE",
+     "campo": "direita"
+    },
+    {
+     "nome": "Mauro Benevides Filho",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Pedro Uczai",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "relator, deputado Mauro Benevides Filho (União-CE)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 133,
+     "ultima": true
+    },
+    {
+     "rotulo": "presidente da Frente Parlamentar do Empreendedorismo (FPE), Joaquim Passarinho (PL-PA)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": false
+    },
+    {
+     "rotulo": "líder do PT na Câmara, deputado Pedro Uczai (SC)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 135,
+    "direita": 41
+   },
+   "falas": 8,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Benevides defendeu a aprovação do texto",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro/institucional para descrever a atuação do relator.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Governo Federal"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "da17e835c062",
+   "url": "https://www.cnnbrasil.com.br/internacional/houthis-denunciam-81-ataques-aereos-da-arabia-saudita-no-iemen/",
+   "titulo": "Houthis denunciam 81 ataques aéreos da Arábia Saudita no Iêmen",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "conflito-no-oriente-medio-atinge-setor-energetic",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "Trata de conflito geopolítico envolvendo ataques militares no Iêmen e a coalizão liderada pela Arábia Saudita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 343,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "OMISSAO": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Escalada de ataques aéreos e operações militares no Iêmen com vítimas civis.",
+    "causa": "Conflito armado prolongado desde 2014.",
+    "vitima": "População civil do Iêmen.",
+    "culpado": "Partes em conflito (houthis e coalizão saudita).",
+    "solucao": "Nenhuma apontada.",
+    "motor_moral": "direitos_humanos"
+   },
+   "teste_inversao": "O texto relata alegações de ambas as partes de forma estritamente factual e neutra, incluindo avisos de que não há verificação independente.",
+   "atores": [
+    {
+     "nome": "Houthis",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Arábia Saudita e coalizão",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "porta-voz militar dos houthis, Yahya Sarea",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 7,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "OMISSAO",
+     "citacao": "As alegações não puderam ser verificadas de forma independente.",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O veículo cumpre o dever de ressalvar que as informações unilaterais não foram verificadas independentemente.",
+     "intensidade": 1,
+     "certeza": 0.7,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "048c0c20345a",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/23/como-foi-a-captura-de-narcotraficante-mexicano-na-lista-dos-10-mais-procurados-do-fbi.ghtml",
+   "titulo": "Como foi a captura de narcotraficante mexicano na lista dos 10 mais procurados do FBI",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca"
+    ],
+    "justificativa": "Cobertura de operação policial internacional para captura de narcotraficante com cooperação entre México e EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 804,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atuação de cartéis de drogas e violência associada ao narcotráfico.",
+    "causa": "Ação de organizações criminosas transnacionais.",
+    "vitima": "Sociedade afetada pela violência e pelo tráfico de drogas.",
+    "culpado": "Cartéis e narcotraficantes.",
+    "solucao": "Operações de segurança enérgicas e cooperação internacional.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia relata fatos de uma operação policial de grande repercussão de forma padrão, sem juízos de valor da redação.",
+   "atores": [
+    {
+     "nome": "Governo do México",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos Estados Unidos / FBI",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Fausto Isidro Meza Flores",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Secretaria de Defesa do México",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 6,
+     "ultima": false
+    },
+    {
+     "rotulo": "Consulado Geral dos EUA na cidade de Hermosillo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "diretor interino do FBI, Brian Driscoll",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 4,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8d8e9ad1e42f",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/lula-diz-nao-saber-se-foi-responsavel-por-reuniao-de-trump-putin-e-xi-mas-que-sugeriu-conversa-aos-tres.shtml",
+   "titulo": "Lula diz não saber se foi responsável por reunião de Trump, Putin e Xi, mas que sugeriu conversa aos três",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda declarações do presidente Lula sobre articulação internacional e críticas à imprensa e à ONU."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 67,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 617,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Conflitos globais e suposta falta de eficácia do Conselho de Segurança da ONU.",
+    "causa": "Falta de diálogo entre potências militares mundiais.",
+    "vitima": "Vítimas de guerras globais.",
+    "culpado": "Lideranças das grandes potências e Conselho de Segurança.",
+    "solucao": "Diálogo direto entre líderes mundiais sugerido pelo presidente brasileiro.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata declarações oficiais do presidente e o respaldo dado por outra autoridade estrangeira, mantendo o padrão de cobertura de declarações presidenciais.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Imprensa brasileira",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Luiz Inácio Lula da Silva (PT)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 137,
+     "ultima": true
+    },
+    {
+     "rotulo": "primeiro-ministro do Canadá, Mark Carney",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 137,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c55acd7b8138",
+   "url": "https://climainfo.org.br/2026/11/22/clima-extremo-causa-mortes-e-destruicao-na-regiao-sul/",
+   "titulo": "Clima extremo causa mortes e destruição na Região Sul",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata impactos de eventos climáticos extremos na Região Sul do Brasil."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 469,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Danos humanos e materiais decorrentes de tempestades severas e eventos climáticos extremos no Sul.",
+    "causa": "Fenômenos meteorológicos (canal de umidade, ciclone extratropical, tornados).",
+    "vitima": "População dos municípios atingidos no Sul do país.",
+    "culpado": "Fenômenos naturais.",
+    "solucao": "Monitoramento e ação de órgãos de Defesa Civil.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Tratando-se de notícia sobre desastres naturais e dados meteorológicos, o texto é puramente descritivo e utilitário.",
+   "atores": [
+    {
+     "nome": "Defesa Civil",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil gaúcha",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "095179ddb039",
+   "url": "https://www.infomoney.com.br/mercados/dolar-hoje-abertura-fechamento-comercial-turismo-23112026/",
+   "titulo": "Dólar hoje sobe e se aproxima dos R$ 6 com tensão fiscal no retorno do feriado",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "dolar-supera-r-5-98-e-ibovespa-futuro-cai-com-te",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a alta do dólar ligada à apreensão fiscal com contas públicas e votações no Congresso, além de projeções econômicas e atuação de autoridades monetárias."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 324,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alta do dólar decorrente de preocupações fiscais e inflacionárias.",
+    "causa": "Nervosismo dos investidores com as contas públicas e cenário fiscal.",
+    "vitima": "Economia nacional e poder de compra afetados pela alta da moeda e inflação.",
+    "culpado": "Incerteza fiscal e atrasos em ajustes nas contas públicas.",
+    "solucao": "Aprovação do projeto de ajuste fiscal na Câmara.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto tem tom estritamente informativo sobre indicadores de mercado e agendas oficiais, sendo neutro em relação a governos ou oposições.",
+   "atores": [
+    {
+     "nome": "Hugo Motta",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Gabriel Galípolo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Dario Durigan",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente da Casa, Hugo Motta (Republicanos-PB)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Relatório Focus divulgado pelo Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A mediana para o IPCA deste ano passou de 5,11% para 5,15%, enquanto a estimativa para 2027 avançou de 5,00% para 5,12%.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados oficiais com base e período claros (Relatório Focus do Banco Central).",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e197f4e600a5",
+   "url": "https://www.seudinheiro.com/2026/empresas/rd-saude-radl3-vai-as-compras-empresa-aprova-recompra-de-ate-r-600-milhoes-em-acoes-lmrs/",
+   "titulo": "RD Saúde (RADL3) vai às compras: empresa aprova recompra de até R$ 600 milhões em ações",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia sobre programa de recompra de ações de empresa privada de saúde e resultados financeiros."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 571,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Flutuação e valorização de ativos corporativos.",
+    "causa": "Decisão estratégica de gestão de capital por parte da empresa.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Aprovação de programa de recompra de ações.",
+    "motor_moral": "eficiencia_economica"
+   },
+   "teste_inversao": "O texto relata um evento corporativo padronizado e seria redigido exatamente da mesma forma para qualquer outra empresa.",
+   "atores": [
+    {
+     "nome": "RD Saúde",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fato relevante divulgado nesta segunda-feira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "lucro líquido ajustado de R$ 439,1 milhões no terceiro trimestre de 2026, alta de 9,2%",
+     "paragrafo": "P11",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados financeiros com base em fato relevante da companhia.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "de59595fd501",
+   "url": "https://www.moneytimes.com.br/trump-organiza-jantar-esvaziado-para-investidores-de-moeda-meme-trump-que-atinge-minima-recorde-fets/",
+   "titulo": "Trump organiza jantar esvaziado para investidores de moeda meme $TRUMP, que atinge mínima recorde",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda negócios de criptomoedas e o envolvimento financeiro do presidente dos EUA Donald Trump, gerando debate sobre conflito de interesses."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 800,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desvalorização de ativos de criptomoedas associados a figuras públicas e questões de transparência.",
+    "causa": "Flutuações de mercado e diminuição de interesse em tokens especulativos.",
+    "vitima": "Investidores externos de criptoativos.",
+    "culpado": "Volatilidade do mercado de criptomoedas e projetos associados.",
+    "solucao": "Nenhuma apontada.",
+    "motor_moral": "transparencia_publica"
+   },
+   "teste_inversao": "O tom crítico sobre ganhos financeiros pessoais de um governante por meio de criptoativos seria aplicado a qualquer líder político em situação similar.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 14,
+     "ultima": false
+    },
+    {
+     "rotulo": "Morten Christensen",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 14
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Juntos, os investidores externos em seus cinco principais projetos de criptomoedas e relacionados a elas perderam mais de US$ 5 bilhões",
+     "paragrafo": "P19",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Uso de dados de análise da Reuters sobre as perdas financeiras em projetos associados ao político.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "desfavorece": "Donald Trump"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4cb2d0ab653b",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/temporais-atingem-46-municipios-e-mais-de-25-mil-pessoas-no-rs",
+   "titulo": "Temporais atingem 46 municípios e mais de 25 mil pessoas no RS",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata os impactos de temporais no Rio Grande do Sul e ações governamentais de emergência."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 219 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 219,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Destruição e vítimas causadas por temporais severos no estado.",
+    "causa": "Fenômenos meteorológicos extremos (chuvas fortes e vendavais).",
+    "vitima": "População dos municípios atingidos no Rio Grande do Sul.",
+    "culpado": "Nenhum.",
+    "solucao": "Ações de assistência humanitária e reconhecimento de calamidade pública.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é um boletim informativo padrão de agência pública de notícias, sem viés político identificável.",
+   "atores": [
+    {
+     "nome": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "No total, 25.212 pessoas foram afetadas, 19.854 desalojadas, 48 desabrigadas, 265 feridas e cinco mortes foram confirmados.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso estrito de dados oficiais fornecidos pela Defesa Civil.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "8d14a64e68e7",
+   "url": "https://www.poder360.com.br/poder-governo/governo-federal-libera-r-47-milhoes-para-tupancireta-rs/",
+   "titulo": "Governo federal libera R$ 4,7 milhões para Tupanciretã (RS)",
+   "veiculo": "Poder360",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-federal-reconhece-calamidade-publica-e-l",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Informa sobre a liberação de verbas e ações de socorro do governo federal a município afetado por temporal no RS."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 590,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "População desamparada e infraestrutura destruída após tempestade.",
+    "causa": "Temporal severo com ventos intensos e granizo.",
+    "vitima": "Moradores do município de Tupanciretã.",
+    "culpado": "Nenhum.",
+    "solucao": "Liberação de recursos financeiros e envio de equipes humanitárias pelo governo federal.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata ações administrativas de socorro a desastres e seria publicado da mesma forma independentemente da orientação político-partidária da gestão federal.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Prefeitura de Tupanciretã",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "prefeitura",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O governo federal aprovou no domingo (22.nov.2026) R$ 4,7 milhões para ações de assistência humanitária",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Relato detalhado com base em portaria publicada em Diário Oficial e dados institucionais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "121d0a1c3c76",
+   "url": "https://braziljournal.com/cop31-termina-em-impasse-o-que-fazer-com-o-petroleo",
+   "titulo": "COP31 termina em impasse: o que fazer com o petróleo?",
+   "veiculo": "Brazil Journal",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Cobertura das negociações climáticas globais da COP31, abordando impasses econômicos, geopolíticos e transição energética."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 979,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impasse e falta de acordo político sobre combustíveis fósseis na COP31.",
+    "causa": "Disputas geopolíticas e econômicas entre países produtores e defensores de metas rígidas.",
+    "vitima": "O multilateralismo climático e as populações vulneráveis aos impactos do aquecimento.",
+    "culpado": "Países produtores de petróleo e presidência da conferência.",
+    "solucao": "Avançar na implementação voluntária e na transição energética.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve com imparcialidade o impasse diplomático, ouvindo diferentes lados sem viés estrutural evidente.",
+   "atores": [
+    {
+     "nome": "União Europeia",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Países produtores de petróleo (Arábia Saudita, Rússia)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Brasil",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Darragh O'Brien, o ministro do Clima da Irlanda",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "representante da Rússia",
+     "campo": "direita",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ana Toni, CEO da COP30 em Belém",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 98,
+     "ultima": true
+    },
+    {
+     "rotulo": "Simon Stiell, o secretário-executivo da ONU para Mudança do Clima",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 68,
+     "ultima": false
+    },
+    {
+     "rotulo": "Izabella Teixeira, a ex-ministra do Meio Ambiente",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 171,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "defendeu a oposição do país a um compromisso",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro/atribucional adequado para relatar a posição russa.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral",
+     "desfavorece": "Países produtores de petróleo (Arábia Saudita, Rússia)"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "cf3de5a587e0",
+   "url": "https://oeco.org.br/noticias/cop31-termina-sem-acordo-politico-e-expoe-divisao-global-sobre-combustiveis-fosseis/",
+   "titulo": "COP31 termina sem acordo político e expõe divisão global sobre combustíveis fósseis",
+   "veiculo": "((o))eco",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Cobertura do encerramento da COP31, impasses, financiamento climático e posições de ONGs e governos."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1197,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": -2.61,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "LEXICO": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso em obter acordo político e menção a combustíveis fósseis na COP31.",
+    "causa": "Resistência de produtores de petróleo e inabilidade da presidência da COP.",
+    "vitima": "Esforços globais contra a crise climática.",
+    "culpado": "Presidência turco-australiana e países produtores.",
+    "solucao": "Respeito ao Acordo de Paris e financiamento climático adequado.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A escolha de fontes e o enquadramento refletem a ótica de organizações ambientalistas tradicionais.",
+   "atores": [
+    {
+     "nome": "União Europeia e países vulneráveis",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Rússia e Arábia Saudita",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Camila Jardim, especialista em política internacional do Greenpeace Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 101,
+     "ultima": false
+    },
+    {
+     "rotulo": "Stela Herschmann, Líder de Política internacional do Observatório do Clima",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 72,
+     "ultima": false
+    },
+    {
+     "rotulo": "Tatiana Oliveira, Líder de Estratégia Internacional do WWF-Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 119,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 292,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "LEXICO",
+     "citacao": "retrocesso",
+     "paragrafo": "P16",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Uso do termo codificado dentro de citação de fonte ativista.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "geral",
+     "ressalva": "O termo está em fala direta (Q4)."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "89c23a00bcaa",
+   "url": "https://www.cnnbrasil.com.br/internacional/russia-e-ucrania-relatam-destruicao-de-mais-de-2-mil-drones-em-24-horas/",
+   "titulo": "Rússia e Ucrânia relatam destruição de mais de 2 mil drones em 24 horas",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Relato de ataques com drones no conflito entre Rússia e Ucrânia e incidente na Líbia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 804,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Escalada de ataques com drones e destruição de equipamentos militares.",
+    "causa": "Guerra em curso entre Rússia e Ucrânia com desdobramentos internacionais.",
+    "vitima": "Feridos em incidentes e infraestruturas atingidas.",
+    "culpado": "Partes beligerantes.",
+    "solucao": "Investigação internacional e respeito à soberania territorial.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta os balanços de ambos os lados de maneira equilibrada.",
+   "atores": [
+    {
+     "nome": "Rússia",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ucrânia",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Governo do leste da Líbia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério da Defesa da Rússia",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Estado-Maior das Forças Armadas da Ucrânia",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "primeiro-ministro Osama Hamad",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 61,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "afirmou",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso simétrico de verbos de atribuição para Rússia e Ucrânia.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "fe14aec88814",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/ataque-de-grupo-paramilitar-deixa-ao-menos-24-mortos-no-sudao-do-sul.shtml",
+   "titulo": "Ataque de grupo paramilitar deixa ao menos 24 mortos no Sudão do Sul",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "Ataque paramilitar no Sudão do Sul com dezenas de mortes e contexto de conflito faccional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 477,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataque armado violento contra civis no Sudão do Sul.",
+    "causa": "Conflitos entre facções políticas rivais e proliferação de armas.",
+    "vitima": "Civis, mulheres e crianças mortas no ataque.",
+    "culpado": "Grupo paramilitar agressor.",
+    "solucao": "Contenção da violência e pacificação regional.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Cobertura factual padrão de evento violento internacional.",
+   "atores": [
+    {
+     "nome": "Grupo paramilitar SPLA-IO",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Autoridades locais de Tonj Oriental",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Machuei Bith, comissário interino do condado de Tonj Oriental",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "ao menos 24 mortos",
+     "paragrafo": "P0",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados numéricos atribuídos a autoridades locais e com fontes claras.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e00ee6b715bb",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/22/incendio-em-fabrica-de-doces-deixa-mortos-e-dezenas-de-desaparecidos-na-indonesia.ghtml",
+   "titulo": "Incêndio em fábrica de doces deixa mortos e dezenas de desaparecidos na Indonésia",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "incendio-em-fabrica-de-doces-deixa-dezenas-de-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Incêndio em fábrica na Indonésia com vítimas fatais e desaparecidos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 305,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incêndio de grandes proporções em fábrica de doces na Indonésia.",
+    "causa": "Sob investigação pelas autoridades locais.",
+    "vitima": "Trabalhadores mortos e desaparecidos.",
+    "culpado": "Indeterminado.",
+    "solucao": "Resgate de vítimas e investigação das causas.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Notícia factual e estritamente informativa.",
+   "atores": [
+    {
+     "nome": "Empresa PT Fonusa Agung Mulia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "polícia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "pelo menos 50 estão desaparecidas",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Informações quantitativas atribuídas a agências de notícias e autoridades.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d7261efc62df",
+   "url": "https://www.infomoney.com.br/politica/escala-6x1-governo-publica-hoje-regras-da-nova-jornada-veja-o-que-falta-definir/",
+   "titulo": "Escala 6×1: governo publica hoje regras da nova jornada. Veja o que falta definir",
+   "veiculo": "InfoMoney",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a regulamentação governamental do fim da escala 6x1, medida de impacto trabalhista e econômico conduzida pela gestão federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 487,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Necessidade de regulamentar os detalhes práticos e jurídicos da transição para a nova jornada de trabalho.",
+    "causa": "Aprovação e decreto de redução da escala 6x1 pelo governo.",
+    "vitima": "Trabalhadores com jornadas especiais e horistas que aguardam definição.",
+    "culpado": "Incertezas regulatórias iniciais do decreto.",
+    "solucao": "Publicação de portarias pelo MTE e decisão definitiva do STF.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta um relato factual de medidas administrativas e jurídicas, sem viés partidário evidente, mantendo o mesmo tom independentemente de quem estivesse no governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula / MTE",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Entidades empresariais",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Para um trabalhador que recebe R$ 3 mil mensais, por exemplo, o valor da hora passará dos atuais R$ 13,64 para R$ 14,29 em dezembro e R$ 15 em 2027.",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de exemplo numérico claro e contextualizado com base na mudança de divisor salarial.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "373f1bf2f7c5",
+   "url": "https://www.moneytimes.com.br/bolsas-da-asia-fecham-mistas-apos-novas-medidas-para-conter-turbulencia-ligada-a-ia-fets/",
+   "titulo": "Bolsas da Ásia fecham mistas após novas medidas para conter turbulência ligada à IA",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de oscilações em bolsas internacionais e medidas de intervenção regulatória de governos asiáticos no mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 538,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Turbulência e volatilidade nas bolsas asiáticas e globais ligadas ao setor de inteligência artificial.",
+    "causa": "Onda global de vendas de ações de tecnologia e incertezas regulatórias.",
+    "vitima": "Investidores e empresas de tecnologia.",
+    "culpado": "Instabilidade no setor de semicondutores e IA.",
+    "solucao": "Medidas de estabilização, fundos de apoio e endurecimento de regras para margens de garantia.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve dados de mercado e movimentações financeiras internacionais de forma puramente factual e descritiva.",
+   "atores": [
+    {
+     "nome": "Reguladores asiáticos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro das Finanças sul-coreano, Lee Hyoung-il",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "alertou nesta segunda-feira",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição neutro para relatar a declaração da autoridade econômica.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "aea8569c8638",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/tempestades-no-parana-deixam-mais-de-250-casas-danificadas",
+   "titulo": "Tempestades no Paraná deixam mais de 250 casas danificadas",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia factual sobre danos causados por tempestades climáticas e atuação da Defesa Civil e concessionária de energia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 318,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Danos materiais e transtornos à população causados por tempestades severas no Paraná.",
+    "causa": "Fenômenos meteorológicos extremos (vendavais, granizo e tornado).",
+    "vitima": "População afetada e desalojada no estado.",
+    "culpado": "Fatores climáticos adversos.",
+    "solucao": "Atuação de equipes de emergência e recomposição da rede elétrica.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Reportagem puramente informativa sobre evento climático, sem viés político.",
+   "atores": [
+    {
+     "nome": "Defesa Civil do Paraná",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 41,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Há 18 pessoas desalojadas e 907 afetadas – atingidas de alguma forma pelo desastre",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação detalhada e quantificada dos impactos com base em dados oficiais da Defesa Civil.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "fab15bfdf695",
+   "url": "https://www.poder360.com.br/poder-economia/mercado-eleva-projecao-de-inflacao-para-515-em-2026/",
+   "titulo": "Mercado eleva projeção de inflação para 5,15% em 2026",
+   "veiculo": "Poder360",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "mercado-financeiro-eleva-projecao-da-inflacao-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação do Boletim Focus do Banco Central, indicador de grande relevância para a política econômica."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 191 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 191,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Expectativas inflacionárias e cambiais em descompasso com metas anteriores.",
+    "causa": "Revisões nas projeções econômicas por agentes do mercado.",
+    "vitima": "Economia nacional e poder de compra.",
+    "culpado": "Ambiente macroeconômico projetado.",
+    "solucao": "Monitoramento por meio de indicadores oficiais.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Notícia padrão baseada em boletim estatístico oficial, mantida independentemente de governos.",
+   "atores": [
+    {
+     "nome": "Banco Central",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Mercado financeiro",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O mercado financeiro elevou de 5,11% para 5,15% a projeção para a inflação de 2026",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso transparente de dados numéricos comparativos extraídos diretamente do Boletim Focus.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "419a7a6ea5e6",
+   "url": "https://climainfo.org.br/2026/11/23/cop31-termina-sem-acordo-politico-central-e-mostra-falta-de-engajamento-dos-paises/",
+   "titulo": "COP31 termina sem acordo político central e mostra falta de engajamento dos países",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Texto analítico sobre os resultados da COP31, criticando a atuação de governos e apontando pressões de lobbies de combustíveis fósseis."
+   },
+   "estado": "ok",
+   "T": -7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 647,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -6.8,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ADJETIVOS": -4.71,
+    "HUMANIZACAO": -2.09
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso na obtenção de um acordo político central na COP31.",
+    "causa": "Falta de liderança dos anfitriões e forte resistência de produtores de petróleo e lobistas.",
+    "vitima": "Países vulneráveis e eficácia da diplomacia climática multilateral.",
+    "culpado": "Austrália, Turquia e países produtores de combustíveis fósseis.",
+    "solucao": "Reforma dos processos das COPs e foco em coalizões de implementação prática.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Um veículo com alinhamento corporativo ou desenvolvimentista tradicional abordaria a COP31 focando nos avanços econômicos e na superação do ativismo excessivo, omitindo críticas severas aos países produtores de petróleo.",
+   "atores": [
+    {
+     "nome": "Governos da Austrália e da Turquia",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo brasileiro",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Lobistas de CCS e produtores de petróleo",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Inger Andersen",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "expôs uma grave falha de liderança e estratégia",
+     "paragrafo": "P1",
+     "direcao": "esquerda",
+     "contribuicao": -4.71,
+     "explicacao": "A voz da redação qualifica severamente a condução dos governos organizadores da conferência.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Governos da Austrália e da Turquia",
+     "ressalva": "É um texto de análise/opinião especializada sobre meio ambiente."
+    },
+    {
+     "id": "E2",
+     "criterio": "HUMANIZACAO",
+     "citacao": "A presença do presidente Lula na Cúpula de Líderes, que gerou um arroubo de esperança",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -2.09,
+     "explicacao": "Atribui tom positivo e esperançoso à atuação do presidente brasileiro em contraste com as críticas aos demais líderes.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "geral",
+     "favorece": "Governo brasileiro"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "caa21c3d04fc",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/23/mercado-eleva-projecoes-de-inflacao-e-espera-selic-em-13percent-em-2027-aponta-focus.ghtml",
+   "titulo": "Mercado eleva projeções de inflação e espera Selic em 13% em 2027, aponta Focus",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "mercado-financeiro-eleva-projecao-da-inflacao-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata dados econômicos do relatório Focus do Banco Central sem tom partidário ou disputa ideológica direta."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 232 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 232,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Elevação das projeções de inflação e juros pelo mercado financeiro",
+    "causa": "Dinâmica macroeconômica recente",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Nenhuma",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, o texto é estritamente informativo e baseado em dados numéricos padronizados.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "relatório Focus, do Banco Central (BC)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b2875568deec",
+   "url": "https://c-level.folha.uol.com.br/ia/2026/11/espionagem-chinesa-que-mira-chips-de-ia-antecede-escandalo-envolvendo-nvidia.shtml",
+   "titulo": "Espionagem chinesa que mira chips de IA antecede escândalo envolvendo Nvidia",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Trata de espionagem internacional envolvendo governos de potências globais (China e EUA) e restrições tecnológicas."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1218,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Esforços ilícitos da China para burlar restrições ocidentais de chips de IA",
+    "causa": "Busca por supremacia tecnológica e militar",
+    "vitima": "Empresas e segurança nacional dos EUA",
+    "culpado": "Governo e agências de inteligência da China",
+    "solucao": "Controles de exportação e investigações",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O tratamento reflete o padrão de cobertura da imprensa ocidental sobre investigações de espionagem envolvendo a China.",
+   "atores": [
+    {
+     "nome": "Governo da China",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos Estados Unidos",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "vários funcionários de segurança e inteligência, atuais e antigos, de governos de países…",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Alex Joske",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 83,
+     "ultima": false
+    },
+    {
+     "rotulo": "um porta-voz da Alibaba",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 34,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 14,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "vários funcionários de segurança e inteligência, atuais e antigos, de governos de países da Ásia, dos Estados Unidos e da Europa",
+     "paragrafo": "P5",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "Uso de fontes anônimas ocidentais para sustentar acusações graves contra o governo chinês.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes",
+     "desfavorece": "Governo da China",
+     "ressalva": "Comum em reportagens de segurança nacional e inteligência."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ea777deebe34",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/23/pai-e-filha-presos-pelo-ice-nos-eua.ghtml",
+   "titulo": "Pai e filha presos pelo ICE nos EUA estavam viajando para um batismo; VÍDEO mostra abordagem",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "costumes",
+     "instituicoes"
+    ],
+    "justificativa": "Reportagem sobre imigração, ação policial nos EUA e críticas de autoridade democrata à política migratória."
+   },
+   "estado": "ok",
+   "T": -5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 715,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -4.71,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ADJETIVOS": -4.71
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Abordagem violenta e controversa do ICE em aeroporto",
+    "causa": "Intensificação de prisões de imigrantes ilegais pelo ICE",
+    "vitima": "Pai e filha mexicanos detidos",
+    "culpado": "ICE e táticas agressivas de imigração",
+    "solucao": "Críticas públicas e pedido de extinção da agência",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o foco fosse a legalidade estrita, a violação de vistos ganharia o centro em vez da comoção com a família.",
+   "atores": [
+    {
+     "nome": "Serviço de Imigração e Alfândega (ICE)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Bob Ferguson (Governador de Washington)",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Olia Catala, advogada do pai e da filha",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 80,
+     "ultima": false
+    },
+    {
+     "rotulo": "Serviço de Imigração e Alfândega dos Estados Unidos (ICE)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "Bob Ferguson, do Partido Democrata",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 11,
+    "direita": 12
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "abordagem violenta",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -4.71,
+     "explicacao": "A redação qualifica a operação do ICE como 'violenta' no subtítulo sem uso de aspas ou atribuição direta.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "costumes",
+     "desfavorece": "Serviço de Imigração e Alfândega (ICE)",
+     "ressalva": "Imagens mostram confronto, mas o termo na voz da redação carrega juízo de valor."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "95c3fc251f5b",
+   "url": "https://www.cnnbrasil.com.br/internacional/incendio-em-fabrica-de-doces-deixa-mortos-na-indonesia/",
+   "titulo": "Incêndio em fábrica de doces deixa ao menos 24 mortos na Indonésia",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "incendio-em-fabrica-de-doces-deixa-dezenas-de-mo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia de acidente/incidente industrial com vítimas fatais na Indonésia, sem debate político partidário nacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 375,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incêndio fatal em fábrica de doces na Indonésia",
+    "causa": "Possível curto-circuito em ar-condicionado",
+    "vitima": "Trabalhadores da fábrica",
+    "culpado": "Possível falha em protocolos de segurança",
+    "solucao": "Busca por desaparecidos e investigação de responsabilidades",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Sim, é uma notícia factual padrão sobre tragédia internacional.",
+   "atores": [
+    {
+     "nome": "United Family Food (Empresa)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Said Iqbal, assessor presidencial para assuntos trabalhistas",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Al Amrad, chefe da agência de busca e resgate da província de Banten",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7c8ff2d28029",
+   "url": "https://www.infomoney.com.br/mercados/ibovespa-futuro-cai-1-no-retorno-do-feriado-com-mercado-de-olho-no-fiscal/",
+   "titulo": "Ibovespa Futuro cai 1% no retorno do feriado com mercado de olho no fiscal",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "dolar-supera-r-5-98-e-ibovespa-futuro-cai-com-te",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Cobre o impacto nos mercados financeiros, indicadores econômicos e tramitação de ajuste fiscal no governo brasileiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 598,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda nos mercados e nervosismo fiscal",
+    "causa": "Preocupações com as contas públicas e inflação",
+    "vitima": "Investidores e ativos locais",
+    "culpado": "Cenário fiscal do governo",
+    "solucao": "Votação de projeto de ajuste fiscal",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Sim, segue o padrão de boletins diários de mercado financeiro.",
+   "atores": [
+    {
+     "nome": "Ministério da Fazenda",
+     "campo": "centro"
+    },
+    {
+     "nome": "Mercado Financeiro / Investidores",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Hugo Motta (Republicanos-PB)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e3bc99d117c0",
+   "url": "https://www.moneytimes.com.br/rd-saude-radl3-anuncia-programa-de-recompra-de-ate-1275-milhoes-de-acoes-veja-os-objetivos-lmrs/",
+   "titulo": "RD Saúde (RADL3) lança programa de recompra de ações de até R$ 600 milhões; veja os objetivos",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata a aprovação de um programa de recompra de ações e resultados financeiros de uma empresa privada (RD Saúde), sem embate político-ideológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 332,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Nenhum problema político reportado.",
+    "causa": "Nenhuma causa política reportada.",
+    "vitima": "Nenhuma vítima.",
+    "culpado": "Nenhum culpado.",
+    "solucao": "Recompra de ações para maximizar valor aos acionistas.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre o mercado financeiro, sem viés político aplicável.",
+   "atores": [
+    {
+     "nome": "RD Saúde",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9c57411819f1",
+   "url": "https://www.poder360.com.br/poder-internacional/exercito-dos-eua-planeja-detonar-5-toneladas-de-explosivos-em-iowa/",
+   "titulo": "Exército dos EUA planeja detonar 5 toneladas de explosivos em Iowa",
+   "veiculo": "Poder360",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão judicial, cont ঠroversia ambiental e disputa política entre órgãos do governo federal dos EUA, governadores estaduais e ambientalistas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 793,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Exército dos EUA planeja detonar explosivos perigosos apesar de suspensão judicial.",
+    "causa": "Degradação de material militar armazenado que se tornou instável.",
+    "vitima": "Moradores de Iowa e Illinois sob risco de contaminação.",
+    "culpado": "Exército e governo federal por falta de transparência e tentativa de contornar a Justiça.",
+    "solucao": "Realizar detonação controlada com medidas de mitigação ou buscar alternativas mais seguras.",
+    "motor_moral": "segurança_publica"
+   },
+   "teste_inversao": "O texto relata fatos de maneira factual, cobrindo argumentos tanto do governo quanto de críticos e ambientalistas de diferentes partidos.",
+   "atores": [
+    {
+     "nome": "Exército dos EUA / Departamento de Justiça",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Grupos ambientalistas (Earthjustice)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Kim Reynolds (Governadora de Iowa - Republicano)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Josh Turek, Rob Sand e JB Pritzker (Democratas)",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "CNN Internacional",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "AP (Associated Press)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "coronel Aaron Teller",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": false
+    },
+    {
+     "rotulo": "Rachel Rintelmann, advogada-chefe da organização Earthjustice",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": true
+    },
+    {
+     "rotulo": "administrador municipal de Iowa City, Geoff Fruin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 18,
+    "direita": 3
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Plano contraria decisão judicial; ambientalistas temem que nuvem de poeira de chumbo alcance o rio Mississippi e Illinois.",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A linha fina expõe de forma equilibrada tanto o conflito legal quanto o temor ambiental e a justificativa do Exército.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Grupos ambientalistas (Earthjustice)",
+     "desfavorece": "Exército dos EUA / Departamento de Justiça"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2e246259ca50",
+   "url": "https://climainfo.org.br/2026/11/23/o-outro-lado-da-cop31-o-copo-meio-cheio-da-conferencia-do-clima/",
+   "titulo": "O outro lado da COP31: o copo “meio cheio” da conferência do clima",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Balanço político e ambiental da conferência climática COP31, abordando impasses de financiamento e transição energética."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 560,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de financiamento e resistência de países produtores de combustíveis fósseis nas negociações climáticas.",
+    "causa": "Falta de flexibilidade de países desenvolvidos e interesses ligados a combustíveis fósseis.",
+    "vitima": "Países vulneráveis sem previsibilidade financeira.",
+    "culpado": "Países desenvolvidos e nações produtoras de petróleo.",
+    "solucao": "Acelerar a transição energética, a eletrificação e o financiamento verde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto analisa os resultados da COP de forma estruturada, apontando avanços e retrocessos de maneira técnica.",
+   "atores": [
+    {
+     "nome": "União Europeia e países desenvolvidos",
+     "campo": "centro"
+    },
+    {
+     "nome": "Rússia e Arábia Saudita",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Climate Action Tracker",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a3a03d084ea0",
+   "url": "https://valor.globo.com/empresas/noticia/2026/11/22/novo-plano-da-petrobras-ronda-os-us-115-bilhoes-com-dividendos-no-radar.ghtml",
+   "titulo": "Novo plano da Petrobras ronda os US$ 115 bilhões, com dividendos no radar",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-divulga-novo-plano-de-investimentos-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Discute o plano de negócios da Petrobras, investimentos estatais, dividendos e expectativas de analistas de mercado sob o governo Lula."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 767,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Equilíbrio entre o aumento de investimentos da Petrobras e a remuneração dos acionistas (dividendos).",
+    "causa": "Aumento de capex e novos projetos na carteira da estatal.",
+    "vitima": "Investidores cautelosos com a redução potencial de dividendos.",
+    "culpado": "Gestão da empresa voltada a maiores investimentos e diretrizes de refino.",
+    "solucao": "Monitorar o fluxo de caixa e o preço do petróleo Brent.",
+    "motor_moral": "desenvolvimento_economico"
+   },
+   "teste_inversao": "O texto apresenta projeções de analistas financeiros de mercado sobre a estatal de forma neutra e técnica.",
+   "atores": [
+    {
+     "nome": "Petrobras / Gestão da empresa",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Mercado financeiro / Bancos (BTG Pactual, UBS BB, Ativa)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "analistas do BTG Pactual",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 79,
+     "ultima": true
+    },
+    {
+     "rotulo": "UBS BB",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 42,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ativa Investimentos",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 121
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "97212b258f58",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/democratas-garantem-258-cadeiras-na-camara-melhor-resultado-desde-1992.shtml",
+   "titulo": "Democratas garantem 258 cadeiras na Câmara dos EUA, melhor resultado desde 1992",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "democratas-conquistam-258-cadeiras-na-camara-dos",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Analisa a vitória eleitoral expressiva dos democratas nas eleições para a Câmara dos EUA, o impacto sobre o governo Trump e a nova maioria legislativa."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1272,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insatisfação dos eleitores com a inflação e gestão republicana resulta em maioria histórica democrata.",
+    "causa": "Alta dos preços, tumultuado segundo mandato de Trump e falhas em estratégias de distritos.",
+    "vitima": "Eleitores afetados pela inflação e altos custos de vida.",
+    "culpado": "Governo Donald Trump e Partido Republicano.",
+    "solucao": "Mudança de rumo legislativo liderada pelos democratas.",
+    "motor_moral": "democracia"
+   },
+   "teste_inversao": "A matéria cobre o resultado eleitoral e traz extensas falas e reações tanto de líderes democratas quanto de figuras republicanas de proeminência.",
+   "atores": [
+    {
+     "nome": "Partido Democrata (Hakeem Jeffries)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Partido Republicano (Donald Trump, Mike Johnson, Kevin McCarthy)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Associated Press",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Hakeem Jeffries",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 40,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kevin McCarthy",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": true
+    },
+    {
+     "rotulo": "Mike Johnson",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": false
+    },
+    {
+     "rotulo": "Newt Gingrich",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    },
+    {
+     "rotulo": "Steve Israel",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": false
+    },
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 86,
+    "direita": 76
+   },
+   "falas": 19,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "conquistando pelo menos 258 cadeiras na Casa em uma reação avassaladora à alta dos preços e ao tumultuado segundo mandato do presidente Donald Trump.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta o resultado eleitoral ouvindo lideranças de ambos os partidos (Democratas e Republicanos como McCarthy e Johnson).",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Partido Democrata (Hakeem Jeffries)",
+     "desfavorece": "Partido Republicano (Donald Trump, Mike Johnson, Kevin McCarthy)"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ef9cfef29688",
+   "url": "https://g1.globo.com/podcast/o-assunto/noticia/2026/11/23/sudao-do-sul-a-tragedia-ignorada-pelo-mundo-o-assunto-1850.ghtml",
+   "titulo": "Sudão do Sul: a tragédia ignorada pelo mundo - O Assunto #1850",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda a crise política, adiamento de eleições e conflitos no Sudão do Sul."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 414,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise política e humanitária decorrente de disputas de poder e adiamento de eleições no Sudão do Sul.",
+    "causa": "Rivalidades étnicas, disputas pelo controle do petróleo e herança colonial.",
+    "vitima": "População civil do Sudão do Sul.",
+    "culpado": "Lideranças políticas em disputa.",
+    "solucao": "Não apontada claramente no texto.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve uma situação humanitária e internacional sem viés partidário nacional, aplicando-se de forma neutra.",
+   "atores": [
+    {
+     "nome": "Salva Kiir",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Riek Machar",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Pedro Borges",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "César Augusto Chidozie",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "034de019a2c4",
+   "url": "https://www.cnnbrasil.com.br/politica/ministerio-do-trabalho-deve-publicar-portaria-para-regulamentar-fim-da-6x1/",
+   "titulo": "Ministério do Trabalho deve publicar portaria para regulamentar fim da 6×1",
+   "veiculo": "CNN Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata da regulamentação do fim da escala 6x1 pelo governo federal e desdobramentos jurídicos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 907,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de regulamentar a transição para o novo modelo de jornada de trabalho.",
+    "causa": "Aprovação de emenda constitucional extinguindo a escala 6x1.",
+    "vitima": "Trabalhadores submetidos a jornadas extenuantes.",
+    "culpado": "Empresariado resistente às novas regras, segundo o governo.",
+    "solucao": "Publicação de portarias, regulamentações e negociação coletiva.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata atos normativos e declarações oficiais de forma padrão, mantendo espaço para as explicações governamentais.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Luiz Marinho",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": true
+    },
+    {
+     "rotulo": "Luiz Marinho",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 47,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "428b97cd5546",
+   "url": "https://www.infomoney.com.br/mercados/petr4-plano-de-investimentos-da-petrobras-2027-2031-deve-superar-us-120-bi-dizem-fontes/",
+   "titulo": "Plano de investimentos da Petrobras 2027-2031 deve superar US$ 120 bi, dizem fontes",
+   "veiculo": "InfoMoney",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-divulga-novo-plano-de-investimentos-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda o plano de investimentos da Petrobras e metas de autossuficiência."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 758,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dependência de importações de diesel e necessidade de expansão de investimentos.",
+    "causa": "Contexto geopolítico internacional e pressões de mercado.",
+    "vitima": "Consumidores expostos a variações de preços.",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Aumento dos investimentos em refino e exploração.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O uso de fontes anônimas para antecipar dados corporativos é padrão no jornalismo econômico e seria mantido independentemente do teor dos dados.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fontes próximas às discussões",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8ee682500903",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/chuvas-no-rs-afetam-mais-de-25-mil-pessoas-em-42-cidades",
+   "titulo": "Chuvas no RS afetam mais de 25 mil pessoas em 42 cidades",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata os impactos e danos causados por chuvas e temporais no Rio Grande do Sul."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 529,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Danos humanos e materiais provocados por intempéries climáticas no RS.",
+    "causa": "Eventos climáticos extremos (tempestades, vendavais, chuvas intensas).",
+    "vitima": "População dos municípios afetados.",
+    "culpado": "Nenhum.",
+    "solucao": "Ações de assistência da Defesa Civil e mobilização de recursos federais.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Reportagem factual baseada em boletins oficiais de órgãos de proteção civil, sem juízos de valor político.",
+   "atores": [
+    {
+     "nome": "Defesa Civil do Rio Grande do Sul",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Defesa Civil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2fe782ea7402",
+   "url": "https://www.moneytimes.com.br/economistas-elevam-projecoes-para-selic-e-inflacao-em-2027-confira-o-focus-desta-segunda-feira-23-jcav/",
+   "titulo": "Economistas elevam projeções para Selic e inflação em 2027; confira o Focus desta segunda-feira (23)",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "mercado-financeiro-eleva-projecao-da-inflacao-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Apresenta as projeções econômicas do Relatório Focus do Banco Central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 364,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Elevação das projeções de inflação e juros e redução do crescimento econômico.",
+    "causa": "Pressões inflacionárias persistentes.",
+    "vitima": "Economia nacional.",
+    "culpado": "Nenhum apontado.",
+    "solucao": "Manutenção ou aperto da política monetária (Selic).",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto reporta dados estatísticos consolidados pelo Banco Central de maneira padrão e impessoal.",
+   "atores": [
+    {
+     "nome": "Economistas / Mercado",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "economistas ouvidos pelo Banco Central",
+     "campo": "centro_direita",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "22a5f8bfd0dd",
+   "url": "https://www.poder360.com.br/poder-internacional/amante-de-fundador-da-nvidia-teve-contato-com-agente-chines-diz-nyt/",
+   "titulo": "Amante de fundador da Nvidia teve contato com agente chinês, diz NYT",
+   "veiculo": "Poder360",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "amante-de-ex-ceo-da-nvidia-manteve-contato-com-a",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Relata ligações de pessoas ligadas a executivo de tecnologia com espionagem chinesa e a reação do governo americano."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 380,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possível espionagem chinesa e contrabando de chips envolvendo pessoas com laços com o ex-CEO da Nvidia e suposta negligência da Casa Branca.",
+    "causa": "Relações pessoais e falhas de segurança e controle de exportação.",
+    "vitima": "Segurança nacional dos Estados Unidos.",
+    "culpado": "Alice Huang e Kang Wei (supostamente), com críticas à minimização por parte de Donald Trump.",
+    "solucao": "Investigação pelas autoridades norte-americanas.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata apuração de jornal estrangeiro sobre figuras públicas e autoridades com tom estritamente informativo e impessoal.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Jensen Huang",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Alice Huang",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "The New York Times",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "102a617131f0",
+   "url": "https://climainfo.org.br/2026/11/22/as-opinioes-sobre-os-resultados-da-cop31/",
+   "titulo": "As opiniões sobre os resultados da COP31",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Reúne reações e críticas de especialistas e ex-autoridades sobre os impasses na conferência climática COP31."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 61,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1252,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso da COP31 em avançar na eliminação de combustíveis fósseis e financiamento climático.",
+    "causa": "Omissão de países desenvolvidos e condução falha das presidências da conferência.",
+    "vitima": "Comunidades vulneráveis e o futuro climático global.",
+    "culpado": "Grandes produtores de petróleo e presidências da COP31.",
+    "solucao": "Adoção de metas concretas de transição energética e financiamento por nações ricas.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto compila opiniões de ativistas e especialistas ambientais, focando em críticas à condução da COP31 sob uma perspectiva progressista/ambientalista.",
+   "atores": [
+    {
+     "nome": "Presidências da COP31 (turco-australiana)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Países desenvolvidos",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Irene Vélez-Torres",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 259,
+     "ultima": false
+    },
+    {
+     "rotulo": "Bruno Toledo Hisamoto",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 132,
+     "ultima": false
+    },
+    {
+     "rotulo": "Stela Herschmann",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 82,
+     "ultima": false
+    },
+    {
+     "rotulo": "Thaynah Gutierrez",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 115,
+     "ultima": false
+    },
+    {
+     "rotulo": "Anna Cárcamo",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 95,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ricardo Baitelo",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 236,
+     "ultima": false
+    },
+    {
+     "rotulo": "Tatiana Oliveira",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 86,
+     "ultima": false
+    },
+    {
+     "rotulo": "João Cerqueira",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 120,
+     "ultima": false
+    },
+    {
+     "rotulo": "Stela Herschmann",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 1161,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "84a804ab5874",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/22/governo-federal-reconhece-calamidade-em-cidade-do-rs-aps-temporal-que-deixou-5-mortos.ghtml",
+   "titulo": "Governo federal reconhece calamidade em cidade do RS após temporal que deixou 5 mortos",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-federal-reconhece-calamidade-publica-e-l",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Informa ações do governo federal em resposta a desastre natural em município do Rio Grande do Sul."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 383,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Temporal severo causa mortes, feridos e destruição em cidade gaúcha.",
+    "causa": "Fenômeno climático extremo.",
+    "vitima": "População de Tupanciretã (RS).",
+    "culpado": "Nenhum (evento natural).",
+    "solucao": "Mobilização federal, estadual e municipal de ajuda humanitária e recursos.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata medidas administrativas institucionais diante de uma tragédia climática de forma sóbria e descritiva.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Governo federal",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Waldez Góes",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "656772401f06",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/donald-trump-assina-lei-que-extingue-moeda-de-us-001.shtml",
+   "titulo": "Donald Trump assina lei que extingue moeda de US$ 0,01",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Noticia a sanção de lei nos EUA extinguindo a moeda de 1 centavo, com foco em corte de gastos e histórico da medida."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 756,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alto custo de produção da moeda de 1 centavo em relação ao seu valor nominal.",
+    "causa": "Desatualização do sistema monetário e inflação histórica de custos.",
+    "vitima": "Governo federal dos EUA.",
+    "culpado": "Ineficiência estrutural anterior.",
+    "solucao": "Extinção da moeda e arredondamento de valores.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "A matéria relata um fato legislativo e econômico estrangeiro com dados objetivos e sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Lisa McClain",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": false
+    },
+    {
+     "rotulo": "Cynthia Lummis",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 5,
+     "ultima": false
+    },
+    {
+     "rotulo": "Donald Trump",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 32
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "85b2a0627e8c",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/23/mercado-financeiro-eleva-estimativa-de-inflacao-em-2026-e-2027-e-projeta-corte-menor-dos-juros-no-ano-que-vem.ghtml",
+   "titulo": "Mercado financeiro eleva estimativa de inflação em 2026 e 2027 e projeta corte menor dos juros no ano que vem",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "mercado-financeiro-eleva-projecao-da-inflacao-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de projeções do mercado financeiro sobre inflação, juros e PIB, ligando a políticas econômicas do governo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 618,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Elevação da inflação e projeção de juros mais altos pelo mercado financeiro.",
+    "causa": "Ações do governo para estimular a economia em ano eleitoral, dificultando o controle inflacionário.",
+    "vitima": "População com menor poder de compra.",
+    "culpado": "Estratégia econômica do governo.",
+    "solucao": "Desaceleração econômica promovida pelo Banco Central.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata dados do Boletim Focus e análises econômicas padronizadas de grande imprensa sem viés partidário explícito.",
+   "atores": [
+    {
+     "nome": "Governo federal",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Banco Central",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Mercado financeiro / Analistas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a784573befd3",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/trump-reune-investidores-em-jantar-enquanto-criptomoeda-propria-despenca/",
+   "titulo": "Trump reúne investidores em jantar enquanto criptomoeda própria despenca",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda as finanças e empreendimentos do presidente dos EUA, Donald Trump, e eventos com investidores de criptomoedas, além de repercussão política."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 811,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda drástica no valor de criptomoedas associadas a Donald Trump e restrições a participantes de eventos.",
+    "causa": "Flutuações de mercado e estratégias financeiras associadas a tokens meme.",
+    "vitima": "Investidores que acumularam perdas.",
+    "culpado": "Projetos de criptomoedas da família Trump.",
+    "solucao": "Nenhuma apontada diretamente.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto foca em dados econômicos e relatos de participantes sobre um evento associado a um governante. Se o governante fosse de outro espectro político, a estrutura de apuração e menção a perdas financeiras seria mantida de forma similar, focando nos relatórios independentes citados.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Morten Christensen",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Morten Christensen",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ba85e4d8ec33",
+   "url": "https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-23112026/",
+   "titulo": "Ibovespa Hoje Ao Vivo: Confira o que movimenta Bolsa, Dólar e Juros nesta segunda",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "dolar-supera-r-5-98-e-ibovespa-futuro-cai-com-te",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura de mercado financeiro, movimentações da bolsa, juros, câmbio e declarações de autoridades econômicas e geopolíticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1335,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Cenário desafiador para mercados, pressões inflacionárias e tensões geopolíticas.",
+    "causa": "Taxas de juros elevadas e bloqueios navais.",
+    "vitima": "Mercados e investidores.",
+    "culpado": "Indefinido.",
+    "solucao": "Monitoramento de indicadores e ajustes de portfólio.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta um boletim de mercado padrão com cotações, projeções e declarações técnicas sem viés ideológico partidário.",
+   "atores": [
+    {
+     "nome": "Kaio Prato e equipe",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Gediminas Simkus",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Esmaeil Baghaei",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Kaio Prato e equipe",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 85,
+     "ultima": false
+    },
+    {
+     "rotulo": "Gediminas Simkus",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 37,
+     "ultima": false
+    },
+    {
+     "rotulo": "Esmaeil Baghaei",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2016373fc87c",
+   "url": "https://www.moneytimes.com.br/plano-de-investimentos-da-petrobras-2027-2031-deve-superar-us120-bi-dizem-fontes/",
+   "titulo": "Plano de investimentos da Petrobras 2027-2031 deve superar US$ 120 bi, dizem fontes",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-divulga-novo-plano-de-investimentos-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata do plano de investimentos da Petrobras, empresa estatal de economia mista, e decisões estratégicas de governo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 79,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 753,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de expansão e modernização na exploração e refino para garantir autossuficiência.",
+    "causa": "Dependência de importações de combustíveis e instabilidade internacional.",
+    "vitima": "Consumidores expostos à volatilidade de preços.",
+    "culpado": "Indefinido.",
+    "solucao": "Aumento de investimentos no plano estratégico da Petrobras.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata previsões sobre um plano de investimentos corporativo com base em fontes anônimas do setor, mantendo o padrão de cobertura econômica.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "três fontes próximas às discussões",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 209,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ca656ba50c56",
+   "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-11/bolsonaro-segue-internado-na-uti-sem-previsao-de-alta",
+   "titulo": "Bolsonaro segue internado na UTI sem previsão de alta",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "bolsonaro-segue-internado-em-uti-de-brasilia-com",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda a internação hospitalar de um ex-presidente da República, sua situação jurídica e decisões do STF."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 308,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Estado de saúde do ex-presidente Jair Bolsonaro.",
+    "causa": "Quadro de abdômen agudo obstrutivo.",
+    "vitima": "Jair Bolsonaro.",
+    "culpado": "Indefinido.",
+    "solucao": "Tratamento médico hospitalar e acompanhamento judiciário.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto reporta um boletim médico oficial e decisões judiciais sobre um ator político de forma factual, mantendo o mesmo tratamento independentemente da figura pública em questão.",
+   "atores": [
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Alexandre de Moraes",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "boletim médico divulgado neste domingo (22)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "250196cdbb0c",
+   "url": "https://valor.globo.com/mundo/noticia/2026/11/23/ucrnia-afunda-navio-russo-na-lbia-e-leva-guerra-para-alm-da-europa.ghtml",
+   "titulo": "Ucrânia afunda navio russo na Líbia e leva guerra para além da Europa",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ucrania-afunda-navio-russo-na-libia-e-atinge-emb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Relata desdobramentos da guerra entre Ucrânia e Rússia, envolvendo ataques a navios e ramificações geopolíticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 664,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Expansão territorial e militar de conflito armado internacional.",
+    "causa": "Guerra entre Ucrânia e Rússia e busca por vantagem estratégica.",
+    "vitima": "Tripulações e embarcações atacadas.",
+    "culpado": "Indefinido.",
+    "solucao": "Busca por acordos e pressões militares recíprocas.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A matéria relata os fatos de um conflito internacional ouvindo representantes de ambos os lados e especialistas, sem favoritismo estrutural na voz da redação.",
+   "atores": [
+    {
+     "nome": "Volodymyr Zelensky",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo da Rússia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Volodymyr Zelensky",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "Osama Hamad",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": false
+    },
+    {
+     "rotulo": "Dmitry Peskov",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 6,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mykola Bielieskov",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e4a0862d1253",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/13o-salario-deve-ser-pago-ate-segunda-feira-30-veja-quem-tem-direito.shtml",
+   "titulo": "13º salário deve ser pago até segunda-feira (30); veja quem tem direito",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda regras, prazos e impactos econômicos do pagamento do 13º salário, incluindo dados estatísticos e menção a leis."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1173,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dúvidas e prazos sobre o pagamento do 13º salário e seus reflexos na economia.",
+    "causa": "Obrigatoriedade legal da gratificação natalina para trabalhadores formais e aposentados.",
+    "vitima": "Trabalhadores que eventualmente sofram atrasos no pagamento por parte dos empregadores.",
+    "culpado": "Empresas que descumprem o prazo legal para o pagamento do benefício.",
+    "solucao": "Fiscalização do Ministério do Trabalho, cobrança sindical e recursos à Justiça do Trabalho.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto apresenta um serviço informativo de utilidade pública baseado em dados oficiais e estatísticas do Dieese, sem viés político perceptível, focando em regras trabalhistas aplicáveis a qualquer governo.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Dieese (Departamento Intersindical de Estatística e Estudos Socioeconômicos)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "o pagamento do 13º salário deve movimentar R$ 399,1 bilhões na economia brasileira em 2026",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados estatísticos com fonte institucional informada (Dieese) para dimensionar o impacto econômico.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "e95c9ad7aba2",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/23/exercito-dos-eua-planeja-detonar-5-toneladas-de-explosivos-apesar-de-ordem-judicial-e-de-alerta-de-ambientalistas.ghtml",
+   "titulo": "Exército dos EUA planeja detonar 5 toneladas de explosivos apesar de ordem judicial e de alerta de ambientalistas",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "Envolve conflito entre decisões de tribunais, agências governamentais e grupos ambientalistas sobre a detonação de explosivos militares."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 882,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.53,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.53
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Risco de explosão de material deteriorado em base militar versus perigos ambientais e de saúde para a comunidade local.",
+    "causa": "Deterioração de barris de azida de chumbo armazenados em instalação do Exército.",
+    "vitima": "Moradores da região de Middletown expostos a potenciais partículas de chumbo.",
+    "culpado": "Exército dos EUA, apontado por falhas na comunicação e por buscar contornar decisões judiciais.",
+    "solucao": "Detonação de emergência autorizada pela EPA ou suspensão judicial da operação.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um impasse legal e técnico entre o governo e ambientalistas, ouvindo ambos os lados com menção a documentos oficiais e relatórios.",
+   "atores": [
+    {
+     "nome": "Exército dos EUA",
+     "campo": "centro"
+    },
+    {
+     "nome": "Grupos ambientalistas (Iowa Environmental Council e Sierra Club)",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "advogados do governo",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 61,
+     "ultima": false
+    },
+    {
+     "rotulo": "Iowa Environmental Council",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": false
+    },
+    {
+     "rotulo": "Thien Chau, da Earthjustice",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 78,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O Exército pareceu mais preocupado durante o fim de semana em encontrar uma maneira de contornar o processo judicial",
+     "paragrafo": "P22",
+     "direcao": "esquerda",
+     "contribuicao": -3.53,
+     "explicacao": "Espaço dado a críticas contundentes de ambientalistas contra a postura do Exército sem contraponto imediato na mesma frase.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "seguranca",
+     "favorece": "Grupos ambientalistas (Iowa Environmental Council e Sierra Club)",
+     "desfavorece": "Exército dos EUA",
+     "ressalva": "Trata-se de citação direta de fonte identificada (advogado da Earthjustice)."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "284ca3ff2f70",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/bolsas-da-asia-fecham-mistas-apos-onda-de-venda-de-acoes-de-ia/",
+   "titulo": "Bolsas da Ásia fecham mistas após onda de venda de ações de IA",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata do comportamento dos mercados financeiros na Ásia e de medidas regulatórias adotadas por governos locais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 533,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Turbulência e volatilidade nas bolsas asiáticas motivadas pela queda de ações de inteligência artificial.",
+    "causa": "Onda global de vendas de ações de empresas de tecnologia e incertezas regulatórias.",
+    "vitima": "Investidores e mercados financeiros da região asiática.",
+    "culpado": "Ambiente de volatilidade externa e ajuste no setor de tecnologia.",
+    "solucao": "Reforço de medidas regulatórias, fundos de estabilização e controle de vendas a descoberto.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A notícia é estritamente de cobertura de mercados financeiros internacionais, sem viés ideológico partidário.",
+   "atores": [
+    {
+     "nome": "Governo da Coreia do Sul",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro das Finanças sul-coreano, Lee Hyoung-il",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "o índice Kospi recuou 3,31%, para 4.708,54 pontos",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados quantitativos precisos sobre o desempenho dos índices bursáteis.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3dbac690da20",
+   "url": "https://www.infomoney.com.br/politica/camara-tenta-votar-pacote-fiscal-de-r-50-bilhoes-de-lula-nesta-segunda-feira/",
+   "titulo": "Câmara tenta votar pacote fiscal de R$ 50 bilhões de Lula nesta segunda-feira",
+   "veiculo": "InfoMoney",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "camara-dos-deputados-tenta-votar-nesta-segunda-f",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata da tramitação e votação de pacote fiscal do governo federal no Congresso Nacional."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 573,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de ajuste nas contas públicas e controle do crescimento das despesas federais.",
+    "causa": "Dificuldades na execução do orçamento federal e expansão de gastos públicos.",
+    "vitima": "Empresas afetadas por limitações no uso de créditos tributários.",
+    "culpado": "Falta de governança orçamentária prévia apontada pelo Executivo.",
+    "solucao": "Aprovação de pacote de restrição de despesas e corte de benefícios tributários.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto relata o processo legislativo de forma padrão, cobrindo tanto os argumentos do governo quanto as resistências de empresários e oposição.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Câmara dos Deputados e Senado",
+     "campo": "centro"
+    },
+    {
+     "nome": "Entidades empresariais (CNI, Fiesp, Fiemg)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Luiz Inácio Lula da Silva",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 39,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "afirmou que as medidas são necessárias",
+     "paragrafo": "P15",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Uso de verbo de atribuição neutro/positivo para relatar a justificativa do presidente da República.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Governo Lula"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "40a376cb87c2",
+   "url": "https://www.moneytimes.com.br/alice-huang-manteve-contato-com-agencia-de-espionagem-chinesa-durante-caso-com-ceo-da-nvidia-diz-jornal-mlem/",
+   "titulo": "Alice Huang manteve contato com agência de espionagem chinesa durante caso com CEO da Nvidia, diz jornal",
+   "veiculo": "Money Times",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "amante-de-ex-ceo-da-nvidia-manteve-contato-com-a",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Envolve investigações de inteligência envolvendo autoridades americanas, empresas de tecnologia e relações geopolíticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 483,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspeitas de espionagem e violação de controles de exportação de chips avançados para a China.",
+    "causa": "Relações pessoais e profissionais entre executivo da Nvidia e empresária investigada.",
+    "vitima": "Reputação da empresa Nvidia e segurança regulatória americana.",
+    "culpado": "Possível negligência em controles de exportação e espionagem internacional.",
+    "solucao": "Investigação em curso por agências de inteligência e pelo Departamento de Justiça dos EUA.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto resume informações divulgadas pela imprensa estrangeira (New York Times) sobre investigações oficiais, sem viés ideológico próprio.",
+   "atores": [
+    {
+     "nome": "Jensen Huang",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Alice Huang",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo dos EUA",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "diretor de Inteligência Nacional dos EUA, Jay Clayton",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": false
+    },
+    {
+     "rotulo": "senador John Kennedy",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 15,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 15
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "4535cfd2c72b",
+   "url": "https://agenciabrasil.ebc.com.br/internacional/noticia/2026-11/cop-nao-terminava-sem-acordo-desde-2009",
+   "titulo": "COP não terminava sem acordo desde 2009",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata de negociações internacionais sobre mudanças climáticas e transição energética na COP31."
+   },
+   "estado": "ok",
+   "T": -7,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 60,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 510,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -7.06,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -7.06
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fracasso na obtenção de acordo final na COP31 devido a impasses sobre combustíveis fósseis",
+    "causa": "Resistência de países produtores de petróleo em aceitar metas de transição energética",
+    "vitima": "Nações mais vulneráveis e futuras gerações afetadas pelas mudanças climáticas",
+    "culpado": "Países produtores de petróleo e lobby do setor fóssil",
+    "solucao": "Adpatação de prazos rígidos para substituição de combustíveis fósseis e financiamento para transição",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o impasse fosse causado por exigências consideradas excessivas por países em desenvolvimento e a cobertura desse lado estivesse ausente, haveria forte desbalanceamento. No entanto, o padrão segue a cobertura tradicional de conferências da ONU.",
+   "atores": [
+    {
+     "nome": "Países produtores de petróleo (Arábia Saudita)",
+     "campo": "direita"
+    },
+    {
+     "nome": "União Europeia e Países em desenvolvimento",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Observatório do Clima, Greenpeace, WWF",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Observatório do Clima",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 44,
+     "ultima": false
+    },
+    {
+     "rotulo": "Greenpeace Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": false
+    },
+    {
+     "rotulo": "WWF Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 38,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 121,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Para o Observatório do Clima, os interesses da Arábia Saudita e do \"lobby do gás\" foram barrados",
+     "paragrafo": "P11",
+     "direcao": "esquerda",
+     "contribuicao": -7.06,
+     "explicacao": "O texto prioriza amplamente as visões de entidades ambientalistas (Observatório do Clima, Greenpeace e WWF), sem trazer uma fala direta de representantes dos países produtores de petróleo criticados.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "União Europeia e Países em desenvolvimento",
+     "desfavorece": "Países produtores de petróleo (Arábia Saudita)",
+     "ressalva": "Trata-se de cobertura de evento multilateral onde os grupos ambientalistas emitem balanços públicos do resultado."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "52f5354aac91",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/22/bancada-democrata-na-camara-dos-eua-atinge-marca-historica.ghtml",
+   "titulo": "Bancada democrata na Câmara dos EUA atinge marca histórica e é a maior em 34 anos",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "democratas-conquistam-258-cadeiras-na-camara-dos",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Aborda a vitória histórica dos democratas na Câmara dos EUA, o cenário de governo dividido e planos de investigação contra Donald Trump."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1102,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Polarização institucional e embates sobre custos de vida e investigações governamentais nos EUA",
+    "causa": "Insatisfação eleitoral com a administração anterior e ampliação da maioria democrata no Congresso",
+    "vitima": "População vulnerável afetada por custos elevados e políticas de saúde",
+    "culpado": "Governo Trump e políticas republicanas",
+    "solucao": "Aprovação de agendas de 100 dias e intensificação de fiscalização parlamentar",
+    "motor_moral": "poder"
+   },
+   "teste_inversao": "Se os republicanos tivessem atingido uma marca histórica inédita na Câmara e ameaçassem investigações sobre um presidente opositor, a estrutura da matéria daria primazia ao partido vencedor da mesma forma.",
+   "atores": [
+    {
+     "nome": "Partidos Democratas",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Donald Trump e Partido Republicano",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado democrata Jason Crow",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputada progressista Alexandria Ocasio-Cortez",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Tom Suozzi",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "Casa Branca",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Troy Carter",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 16,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Jim Jordan",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 93,
+    "direita": 14
+   },
+   "falas": 10,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Fortalecidos, os democratas preparam uma agenda para os primeiros 100 dias, voltada ao combate ao alto custo de vida. Ao mesmo tempo, planejam intensificar a fiscalização sobre Trump",
+     "paragrafo": "P10",
+     "direcao": "esquerda",
+     "contribuicao": -3.14,
+     "explicacao": "O texto dá amplo espaço para múltiplos parlamentares democratas detalharem seus planos de investigação e agendas, enquanto o lado republicano tem espaço mais reduzido apenas no final.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "instituicoes",
+     "favorece": "Partidos Democratas",
+     "desfavorece": "Donald Trump e Partido Republicano",
+     "ressalva": "Reflete proporcionalmente a vitória expressiva e histórica dos democratas nas eleições descritas."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4c8eb2ca287c",
+   "url": "https://www.cnnbrasil.com.br/internacional/exercito-dos-eua-deve-detonar-explosivos-em-iowa-apesar-de-ordem-judicial/",
+   "titulo": "Exército dos EUA planeja detonar explosivo em Iowa apesar de ordem judicial",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão do Exército dos EUA de usar poderes de emergência para detonar explosivos apesar de ordens judiciais e protestos locais."
+   },
+   "estado": "ok",
+   "T": -2,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 753,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.09,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HUMANIZACAO": -2.09
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Risco de contaminação ambiental e conflito institucional em torno da detonação de explosivos tóxicos",
+    "causa": "Necessidade técnica de destruir material instável contraposta à falta de aviso prévio e ordens judiciais",
+    "vitima": "Moradores, agricultores e animais na região de Iowa",
+    "culpado": "Exército dos EUA e governo federal",
+    "solucao": "Fornecer mais informações, medidas de mitigação e avaliar alternativas",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se a prioridade fosse exclusivamente a versão oficial militar, a inclusão detalhada dos temores da comunidade seria omitida. O texto apresenta ambos os lados com clareza.",
+   "atores": [
+    {
+     "nome": "Governo Trump e Exército dos EUA",
+     "campo": "direita"
+    },
+    {
+     "nome": "Conselho Ambiental de Iowa e Sierra Club",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Departamento de Justiça",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "instituição",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kerri Johannsen",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 58,
+     "ultima": false
+    },
+    {
+     "rotulo": "Jeremy Atwater",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 58,
+    "direita": 44
+   },
+   "falas": 7,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HUMANIZACAO",
+     "citacao": "Jeremy Atwater, morador de Augusta, em Iowa, disse que pretende seguir para o oeste, pois espera que a nuvem tóxica se desloque para o sul",
+     "paragrafo": "P18",
+     "direcao": "esquerda",
+     "contribuicao": -2.09,
+     "explicacao": "O texto dá voz humanizada e espaço dramático a moradores locais preocupados, o que contrasta com as notas formais do Exército e do Departamento de Justiça.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "seguranca",
+     "favorece": "Conselho Ambiental de Iowa e Sierra Club",
+     "desfavorece": "Governo Trump e Exército dos EUA",
+     "ressalva": "É prática comum no jornalismo incluir relatos da população afetada por eventos de risco."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "045ccd08be1c",
+   "url": "https://www.infomoney.com.br/politica/michelle-diz-que-resultado-de-exame-de-bolsonaro-foi-muito-positivo/",
+   "titulo": "Michelle diz que resultado de exame de Bolsonaro foi ‘muito positivo’",
+   "veiculo": "InfoMoney",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "bolsonaro-segue-internado-em-uti-de-brasilia-com",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata da internação hospitalar e decisões judiciais do STF envolvendo o ex-presidente Jair Bolsonaro e sua família."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 370,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Estado de saúde do ex-presidente Jair Bolsonaro durante o cumprimento de pena",
+    "causa": "Obstrução intestinal diagnosticada em exames médicos",
+    "vitima": "Jair Bolsonaro",
+    "culpado": "Nenhum atribuído no texto",
+    "solucao": "Internação hospitalar e medidas judiciais emergenciais de flexibilização da custódia",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A menção ao status judicial e aos despachos do STF ocorreria de maneira idêntica independentemente de qual figura política estivesse sob custódia e internação.",
+   "atores": [
+    {
+     "nome": "Jair Bolsonaro e Família",
+     "campo": "direita"
+    },
+    {
+     "nome": "Alexandre de Moraes (STF)",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Michelle Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 37,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 67,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 37
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "O político, que cumpre pena pela participação na trama golpista",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "A menção ao cumprimento de pena por participação na trama golpista é inserida descritivamente no lead para contextualizar a situação jurídica do personagem central.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Jair Bolsonaro e Família",
+     "ressalva": "Fato jurídico notório relatado de forma objetiva."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a4dc7bf581eb",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/com-impasse-sobre-combustiveis-fosseis-cop31-termina-sem-acordo-final",
+   "titulo": "Com impasse sobre combustíveis fósseis, COP31 termina sem acordo final",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-apos-impasse-sobre-comb",
+   "origem": "materia",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Cobre o encerramento da COP31 sem acordo final devido a impasses sobre combustíveis fósseis."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 280 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 280,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Encerramento da COP31 sem acordo final",
+    "causa": "Divergências sobre o fim do uso de combustíveis fósseis",
+    "vitima": "Esforços globais contra as mudanças climáticas",
+    "culpado": "Países produtores de petróleo",
+    "solucao": "Definição de metas claras para eliminação de combustíveis fósseis",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o texto fosse focado na perspectiva dos países produtores de petróleo, traria justificativas econômicas para a recusa das metas, invertendo o tom avaliativo.",
+   "atores": [
+    {
+     "nome": "Países produtores de petróleo",
+     "campo": "direita"
+    },
+    {
+     "nome": "Greenpeace Brasil e WWF Brasil",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Greenpeace Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": false
+    },
+    {
+     "rotulo": "WWF Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 35,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 74,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O Greenpeace Brasil classificou o resultado da COP31 como decepcionante.",
+     "paragrafo": "P6",
+     "direcao": "esquerda",
+     "contribuicao": -3.14,
+     "explicacao": "O texto utiliza avaliações de ONGs ambientalistas para qualificar o resultado do evento, sem apresentar o contraponto direto dos negociadores contrários às metas.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Greenpeace Brasil e WWF Brasil",
+     "desfavorece": "Países produtores de petróleo",
+     "ressalva": "Trata-se de uma versão resumida da cobertura da COP31, focada na repercussão junto às entidades civis."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a46a536c7fda",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/22/suspensao-temporaria-voos-companhia-aerea-eua-falha-em-sistema.ghtml",
+   "titulo": "Agência de aviação dos EUA suspende voos de companhia aérea após falha em sistema",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre suspensão temporária de voos devido a falha técnica em companhia aérea dos EUA, sem debate político partidário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 290 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 290,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falha em sistema automatizado gerou suspensão temporária de voos",
+    "causa": "Falha no sistema de cálculo de peso e balanceamento",
+    "vitima": "Passageiros afetados por atrasos",
+    "culpado": "Delta Air Lines (problema técnico interno)",
+    "solucao": "Uso de procedimentos manuais alternativos e restabelecimento do sistema",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre um incidente técnico internacional e não possui viés político.",
+   "atores": [
+    {
+     "nome": "Delta Air Lines",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "FAA (Administração Federal de Aviação dos EUA)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Delta",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 3,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "423977d76bf6",
+   "url": "https://www.cnnbrasil.com.br/infra/petrobras-deve-anunciar-investimentos-de-ate-us-120-bi-nos-proximos-5-anos/",
+   "titulo": "Petrobras deve anunciar investimentos de até US$ 120 bi nos próximos 5 anos",
+   "veiculo": "CNN Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-divulga-novo-plano-de-investimentos-pa",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de investimentos bilionários da estatal Petrobras e metas de autossuficiência energética."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 427,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de resiliência e expansão de investimentos em meio a variações no mercado de petróleo",
+    "causa": "Cenário geopolítico e oscilações nos preços internacionais",
+    "vitima": "nenhuma",
+    "culpado": "nenhum",
+    "solucao": "Aumento de investimentos e busca por autossuficiência em refino",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta fatos e expectativas econômicas de forma neutra e descritiva.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Magda Chambriard",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard, presidente da Petrobras",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 6,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "80d5dc5e758b",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/venda-de-acoes-de-tecnologia-se-intensifica-na-asia-no-comeco-da-semana.shtml",
+   "titulo": "Venda de ações de tecnologia se intensifica na Ásia no começo da semana",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-22",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Cobertura de mercado financeiro e queda de ações de tecnologia na Ásia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 492,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda nas ações de tecnologia e volatilidade no mercado asiático",
+    "causa": "Perdas em Wall Street e escândalo corporativo envolvendo executivo",
+    "vitima": "Investidores",
+    "culpado": "nenhum",
+    "solucao": "Intervenção governamental com fundo de estabilização",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Reportagem financeira padrão baseada em agência internacional e analistas de mercado.",
+   "atores": [
+    {
+     "nome": "Governo sul-coreano",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Han Ji-young, analista da Kiwoom Securities",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 69,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "73e93c9a6a3f",
+   "url": "https://www.cnnbrasil.com.br/economia/money/macroeconomia/voos-nos-eua-podem-voltar-ser-interrompidos-o-vilao-da-vez-o-shutdown/",
+   "titulo": "Voos nos EUA podem voltar a ser interrompidos; o vilão da vez? O shutdown",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Envolve impasse no Congresso americano, risco de paralisação do governo (shutdown) e impactos sobre servidores públicos e aviação."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1054,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Risco de paralisação do governo (shutdown) e falta de salários para controladores e agentes de segurança",
+    "causa": "Impasse político no Congresso dos EUA",
+    "vitima": "Trabalhadores e passageiros de aviação",
+    "culpado": "Políticos e partidos em disputa",
+    "solucao": "Aprovação de projeto de lei de financiamento provisório",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata riscos operacionais e o ponto de vista de líderes sindicais e especialistas de forma equilibrada em relação às dificuldades institucionais.",
+   "atores": [
+    {
+     "nome": "Governo Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Lideranças democratas",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Sindicatos (AFGE / TSA)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Zach Griff",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": false
+    },
+    {
+     "rotulo": "Hydrick Thomas",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 89,
+     "ultima": true
+    },
+    {
+     "rotulo": "Nick Daniels",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 52,
+     "ultima": false
+    },
+    {
+     "rotulo": "LaShanda Palmer",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b6a3f93c5c15",
+   "url": "https://valor.globo.com/empresas/noticia/2026/11/23/crowdstrike-compra-zscaler-por-us-439-bi-em-aposta-em-seguranca-de-redes.ghtml",
+   "titulo": "CrowdStrike compra Zscaler por US$ 43,9 bi em aposta em segurança de redes",
+   "veiculo": "Valor Econômico",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "crowdstrike-compra-zscaler-por-us-43-9-bi-em-tra",
+   "origem": "materia",
+   "data_publicacao": "2026-11-23",
+   "analisado_em": "2026-11-23",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Anúncio de fusão e aquisição no setor corporativo de tecnologia e segurança cibernética."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 222 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 222,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Clientes corporativos buscam reduzir o número de fornecedores de segurança",
+    "causa": "Necessidade de consolidação de mercado",
+    "vitima": "nenhuma",
+    "culpado": "nenhum",
+    "solucao": "Transação de fusão entre CrowdStrike e Zscaler",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Reportagem estritamente empresarial sobre fusão de companhias.",
+   "atores": [
+    {
+     "nome": "CrowdStrike",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Zscaler",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-23T12:55:09+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 120,
+   "textos_curtos": 20,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 98058,
+    "saida": 46484
+   },
+   "analises": [
+    "eb8128966a09",
+    "da17e835c062",
+    "048c0c20345a",
+    "8d8e9ad1e42f",
+    "c55acd7b8138",
+    "095179ddb039",
+    "e197f4e600a5",
+    "de59595fd501",
+    "4cb2d0ab653b",
+    "8d14a64e68e7",
+    "121d0a1c3c76",
+    "cf3de5a587e0",
+    "89c23a00bcaa",
+    "fe14aec88814",
+    "e00ee6b715bb",
+    "d7261efc62df",
+    "373f1bf2f7c5",
+    "aea8569c8638",
+    "fab15bfdf695",
+    "419a7a6ea5e6",
+    "caa21c3d04fc",
+    "b2875568deec",
+    "ea777deebe34",
+    "95c3fc251f5b",
+    "7c8ff2d28029",
+    "e3bc99d117c0",
+    "9c57411819f1",
+    "2e246259ca50",
+    "a3a03d084ea0",
+    "97212b258f58",
+    "ef9cfef29688",
+    "034de019a2c4",
+    "428b97cd5546",
+    "8ee682500903",
+    "2fe782ea7402",
+    "22a5f8bfd0dd",
+    "102a617131f0",
+    "84a804ab5874",
+    "656772401f06",
+    "85b2a0627e8c",
+    "a784573befd3",
+    "ba85e4d8ec33",
+    "2016373fc87c",
+    "ca656ba50c56",
+    "250196cdbb0c",
+    "e4a0862d1253",
+    "e95c9ad7aba2",
+    "284ca3ff2f70",
+    "3dbac690da20",
+    "40a376cb87c2",
+    "4535cfd2c72b",
+    "52f5354aac91",
+    "4c8eb2ca287c",
+    "045ccd08be1c",
+    "a4dc7bf581eb",
+    "a46a536c7fda",
+    "423977d76bf6",
+    "80d5dc5e758b",
+    "73e93c9a6a3f",
+    "b6a3f93c5c15"
+   ]
+  }
+ ]
+}
