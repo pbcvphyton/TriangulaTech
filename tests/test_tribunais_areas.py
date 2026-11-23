@@ -126,8 +126,9 @@ def test_config_com_erro_derruba_com_o_caminho(bruto: dict) -> None:
         de_dict(mal)
 
 
-def test_datajud_ligado_para_uso_pessoal_sem_publicar(regras: Regras) -> None:
-    assert regras.datajud["ativo"] is True and regras.datajud["publicar"] is False and regras.datajud["por_minuto"] == 120
+def test_datajud_ligado_e_publicado_por_decisao_do_dono(regras: Regras) -> None:
+    """O dono decidiu (23/11/2026) publicar a camada do CNJ: uso pessoal, repositório público."""
+    assert regras.datajud["ativo"] is True and regras.datajud["publicar"] is True and regras.datajud["por_minuto"] == 120
     assert regras.pausa_do_host("dadosabertos.web.stj.jus.br") == 10.0
     assert regras.pausa_do_host("portal.stf.jus.br") == 1.0
     assert "https://dadosabertos.web.stj.jus.br/api/" in regras.fontes["proibidos"]
@@ -319,3 +320,16 @@ def test_amostra_real_do_stf_sai_inteira_classificada(k: Classificador, regras: 
     processos = json.loads(fx.ler("stf_assuntos_amostra.json"))["processos"]
     areas = {k.classificar_stf(classe=p["classe"], assuntos_texto=p["assuntos"], ramo=p["ramo"])[0]["area"] for p in processos}
     assert areas <= set(regras.ids_areas) and {"constitucional", "penal", "tributario", "trabalho", "sem_assunto"} <= areas
+
+
+def test_hc_de_alimentos_e_familia_nao_penal(k: Classificador) -> None:
+    """J6: o HC da Terceira Turma contra a prisão civil do devedor de alimentos (assunto 5779,
+    Família > Alimentos) é Família; o de acolhimento (12002) e o de internação compulsória (12508)
+    seguem o mérito; o HC penal continua Penal (a classe vale antes do assunto)."""
+    assert k.classificar(classe="HC", principal=5779, assuntos=[5779])["area"] == "familia"
+    assert k.classificar(classe="RHC", principal=5779, assuntos=[5779])["area"] == "familia"
+    assert k.classificar(classe="HC", principal=12508, assuntos=[12508])["area"] == "saude"
+    assert k.classificar(classe="HC", principal=3607, assuntos=[3607])["area"] == "penal"
+    assert k.classificar(classe="HC", principal=None, assuntos=[])["area"] == "penal"
+    # rito no principal, mérito de família na lista: o mérito decide
+    assert k.classificar(classe="HC", principal=None, assuntos=[5779])["area"] == "familia"

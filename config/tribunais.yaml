@@ -6,7 +6,7 @@
 # chave obrigatória ausente derruba a leitura com o caminho do erro.
 #
 # Seções: areas (macroáreas, cores e regras), subareas, recortes, composicao (quem é quem no STJ
-# e no STF), limiares (as réguas das contas), fontes (endereços e ritmo), datajud (desligado).
+# e no STF), limiares (as réguas das contas), fontes (endereços e ritmo), datajud (ligado e publicado).
 
 versao: 1
 
@@ -504,7 +504,8 @@ limiares:
   recortes_por: principal        # principal (o assunto que decidiu a área) ou todos (qualquer assunto do processo)
   rampa: [0.02, 0.05, 0.10, 0.25]  # faixas da cor da célula da matriz: <2%, 2–4, 5–9, 10–24, 25% ou mais (designer)
   listas:                        # quantos itens cada lista leva (os tetos de tamanho dos JSON dependem disto)
-    painel_mais_antigos: 5       # por ministro, no painel (a mesa compacta sem script)
+    painel_mais_antigos: 3       # por ministro, no painel (a mesa compacta sem script); a lista inteira fica no dossiê.
+                                 # Era 5: com 3, o stj.json e a página abrem folga para a camada do DJe (23/11/2026)
     fila_mais_antigos: 30        # o tribunal inteiro, na aba "A fila"
     dossie_mais_antigos: 15      # no dossiê do ministro
     dossie_em_pauta: 20
@@ -539,7 +540,7 @@ fontes:
   recusa_espera_s: 120
   hosts:
     dadosabertos.web.stj.jus.br: {pausa_s: 10}       # Crawl-Delay: 10 no robots.txt (lido em 23/11/2026)
-    www.stf.jus.br: {pausa_s: 1}
+    www.stf.jus.br: {pausa_s: 1, timeout_s: 60, tentativas: 1}   # a planilha (5,8 MB) vem em ~2 s; servidor mudo custava 4 × 180 s
     portal.stf.jus.br: {pausa_s: 1}
     jurisprudencia.stf.jus.br: {pausa_s: 1}
     www.cnj.jus.br: {pausa_s: 1}
@@ -563,7 +564,12 @@ fontes:
       precedentes: precedentes-qualificados        # Temas.csv, Processos.csv
       integras: integras-de-decisoes-terminativas-e-acordaos-do-diario-da-justica   # metadadosAAAAMMDD.json (~38 dias de atraso em 22/11)
     validade_h: {acervo: 20, atas: 20, pautas: 20, precedentes: 20, integras: 20, pagina: 6}
-    velho_dias: {acervo: 3, atas: 4, pautas: 4, precedentes: 8, integras: 45}
+    # O acervo do STJ não sai de sábado nem de domingo (o arquivo de sexta sai no sábado; o de segunda,
+    # na terça à tarde): a validade dele conta de segunda a sexta (dias_da_semana). 2 dias da semana sem
+    # arquivo novo = parado; na terça de manhã, com o de sexta, ainda está em dia. Feriado conta (o STJ
+    # publicou o de 20/11, feriado).
+    velho_dias: {acervo: 2, atas: 4, pautas: 4, precedentes: 8, integras: 45}
+    dias_da_semana: [acervo]
     atribuicao: "Fonte: STJ, Portal de Dados Abertos (CC-BY)"
     licenca: "CC-BY"
   stf:
@@ -585,19 +591,18 @@ fontes:
   links_oficiais:
     stj: "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo={registro}"
     stf: "https://portal.stf.jus.br/processos/listarProcessos.asp?classe={classe}&numeroProcesso={numero}"
-  # DJEN (comunicaapi.pje.jus.br): 403 geográfico (CloudFront) fora do Brasil. Não implementado; fase 2
-  # só com um executor no Brasil, sem nada que mascare a origem.
-  djen: {ativo: false}
 
 # ── DataJud (CNJ, API Pública) ───────────────────────────────────────────────────────────────
-# LIGADO PARA USO PESSOAL (decisão do dono, 23/11/2026: "não vou distribuir informação; é para uso
-# pessoal"). O Termo de Uso da API (v1.2, lido em scratchpad/amostras/termos/datajud_termos_v1.2.txt):
+# LIGADO E PUBLICADO PARA USO PESSOAL (decisões do dono, 23/11/2026: "não vou distribuir
+# informação; é para uso pessoal" e, sabendo que o repositório é público, "quero os números do
+# DataJud no site sim; está público apenas pra eu ter fácil acesso, mas só eu uso"). O Termo de Uso
+# da API (v1.2, lido em scratchpad/amostras/termos/datajud_termos_v1.2.txt):
 #   3.3  "fornecida exclusivamente para fins legais, não comerciais e autorizados";
 #   3.8  "não modificar, distribuir, vender ou explorar comercialmente a API ou qualquer informação
-#        derivada dela" — o repositório e o site são públicos: o que entra em data/tribunais/ ou na
-#        página é distribuído. Por isso publicar: false;
+#        derivada dela" — o repositório e o site são públicos: o dono decidiu publicar assim mesmo,
+#        para o uso dele (publicar: true abaixo);
 #   3.9  "dar ciência ao CNJ de qualquer informação [...] disponibilizado ao público em geral" —
-#        publicar exige avisar o CNJ antes;
+#        dar essa ciência fica com o dono;
 #   3.13 "não realizar mais de 120 requisições por minuto" — o teto do cliente (por_minuto).
 # O serviço vive sobrecarregado (22 e 23/11/2026: 16 de 102 e 1 de 22 tentativas completas; em
 # 23/11 de manhã, 0 de 25: 429 e 504). Nada dele está no caminho crítico: falha vira aviso.
@@ -605,12 +610,14 @@ fontes:
 # movimentos dos processos na mesa (o "concluso há N dias" do STJ; ver movimentos abaixo).
 datajud:
   ativo: true
-  # publicar: false (padrão) = o DataJud é consultado, o resultado fica só no cache (fora do git) e
-  # nada derivado dele entra em data/tribunais/ nem na página; no meta.json a fonte sai "ligada para
-  # uso pessoal; não publicada", sem número. true = a camada do CNJ vai aos painéis e à página, com
-  # o selo "CNJ · DataJud" (só depois de dar ciência ao CNJ, item 3.9). A variável de ambiente
-  # QIJ_DATAJUD_PUBLICAR=1 liga numa execução (a prévia privada), =0 desliga.
-  publicar: false
+  # publicar: true = a camada do CNJ (cnj.json: "concluso há N dias", com o selo "CNJ · DataJud", a
+  # cobertura e o "Como ler") vai aos painéis e à página. Decisão do dono em 23/11/2026, sabendo que o
+  # repositório é público: "Quero os números do DataJud no site sim. Está público apenas pra eu ter
+  # fácil acesso, mas só eu uso." O uso é pessoal; dar ciência ao CNJ (item 3.9 do termo de uso)
+  # fica com o dono. false = o DataJud é consultado, o resultado fica só no cache (fora do git) e nada
+  # derivado dele entra em data/tribunais/ nem na página (a fonte sai "ligada para uso pessoal; não
+  # publicada", sem número). A variável QIJ_DATAJUD_PUBLICAR=1 liga numa execução, =0 desliga.
+  publicar: true
   url: "https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search"   # o STF não está no DataJud (404 index_not_found)
   chave: "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="    # pública (wiki do CNJ); a variável DATAJUD_API_KEY a substitui
   chave_wiki: "https://datajud-wiki.cnj.jus.br/api-publica/acesso/"
@@ -642,8 +649,9 @@ datajud:
     cobertura_minima: 0.80       # faixa "conclusos há mais de 180/365 dias" do ministro só com 80% ou mais dos candidatos com data no CNJ
 
 # ── DJEN: Diário de Justiça Eletrônico Nacional (CNJ) ────────────────────────────────────────
-# Lido só por qijournal/tribunais/djen.py ("python -m qijournal tribunais djen"); o fontes.djen
-# acima é o marcador antigo e não vale mais. Desde 29/11/2024 os atos judiciais do STJ saem no DJEN
+# Lido por qijournal/tribunais/djen.py ("python -m qijournal tribunais djen", na máquina do dono) e,
+# do lado do GitHub, por dados.py e pela página, que só leem o data/tribunais/djen.json (validade_dias
+# abaixo). Desde 29/11/2024 os atos judiciais do STJ saem no DJEN
 # (Res. STJ/GP 19/2024; a página "Publicações Oficiais do STJ" aponta para
 # comunica.pje.jus.br/consulta?siglaTribunal=STJ&meio=D). O STF tem DJe próprio (Res. STF 700/2020 e
 # 725/2021) e, até onde se sabe, não publica no DJEN: a sonda confere e, sem publicação em
@@ -665,6 +673,7 @@ djen:
   prazo_s: 2400                  # teto de uma execução (com o acervo refeito)
   guardar_dias: 40               # o cache da máquina guarda os dias por isto
   sem_publicacao_dias: 3         # dias úteis fechados sem nada: "o tribunal não publica no DJEN"
+  validade_dias_uteis: 4         # a aba mostra a camada com o último dia a até 4 dias (de segunda a sexta) de hoje; depois, só a nota
   origem: "coletado no Brasil, fora do GitHub Actions"   # vai no djen.json (público): sem cidade, sem nome
   atribuicao: "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)"
   # O casamento com o acervo (a "mesa"): o retrato que o fluxo dos Tribunais deixa no cache; sem ele,

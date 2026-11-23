@@ -844,6 +844,7 @@ class Contas:
             if m.recem_chegado(ref, meses_nc):
                 s.append("recem_chegado")
             if (mid in self.grade and entradas_painel is not None and entradas_painel["dias_com_ata"] >= 20
+                    and not self._chegou_na_janela(m, ref)
                     and not (entradas_por.get(mid) or {}).get("resumo", {}).get("sorteio_30d")):
                 s.append("sem_distribuicao")
             elif mid in reduzida:
@@ -960,7 +961,7 @@ class Contas:
         # ministros: resumo e dossiê
         resumos: list[dict[str, Any]] = []
         dossies: dict[str, dict[str, Any]] = {}
-        n_painel = int(self.listas.get("painel_mais_antigos", 5))
+        n_painel = int(self.listas.get("painel_mais_antigos", 3))
         meses = list(lim.get("idade_faixas_meses") or (6, 12, 24, 36, 60))
         for mid, m in self.ministros.items():
             c = self.contas[mid]
@@ -1192,6 +1193,16 @@ class Contas:
         }
         return Resultado(painel=painel, dossies=dossies, cobertura=cobertura, sinais=sinais)
 
+    def _chegou_na_janela(self, m: Any, ref: date) -> bool:
+        """Chegou à Turma, foi convocado ou tomou posse há menos de ``janelas.entradas_recentes_dias``
+        (30) dias da data dos dados: o sorteio de 30 dias dele não é comparável ao dos pares."""
+        dias = int(((self.regras.limiares.get("janelas") or {}).get("entradas_recentes_dias")) or 30)
+        for marco in (getattr(m, "turma_desde", None), getattr(m, "posse", None)):
+            d = _data(marco)
+            if d is not None and 0 <= (ref - d).days < dias:
+                return True
+        return False
+
     def _distribuicao_reduzida(self, entradas_painel: Mapping[str, Any] | None, entradas_por: Mapping[str, Any]) -> set[str]:
         """Os gabinetes da grade que recebem por distribuição bem menos que os pares (quem acumula o
         TSE, por exemplo): com 20 dias de ata ou mais, sorteio de 30 dias abaixo de
@@ -1199,10 +1210,15 @@ class Contas:
         "sem distribuição" (outro selo)."""
         if entradas_painel is None or entradas_painel.get("dias_com_ata", 0) < 20:
             return set()
+        ref = _data(self.data_dados) or self.hoje
         fator = float(self.regras.limiares.get("distribuicao_reduzida", 0.5))
         chave = (lambda m: m.turma) if self.trib == "stj" else (lambda m: self.grupo_de[m.id])
         por_turma: dict[str, list[str]] = defaultdict(list)
         for mid in sorted(self.grade):
+            # Quem chegou à Turma (ou tomou posse) dentro da janela de 30 dias não teve os 30 dias de
+            # sorteio: nem é marcado, nem entra na mediana dos pares.
+            if self._chegou_na_janela(self.ministros[mid], ref):
+                continue
             por_turma[str(chave(self.ministros[mid]))].append(mid)
         saida = set()
         for ids in por_turma.values():

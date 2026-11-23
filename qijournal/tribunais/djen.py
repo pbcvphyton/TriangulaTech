@@ -119,6 +119,7 @@ PADRAO: dict[str, Any] = {
     "prazo_s": 2400,
     "guardar_dias": 40,
     "sem_publicacao_dias": 3,
+    "validade_dias_uteis": 4,  # a aba mostra a camada com o último dia a até isto de hoje (de segunda a sexta)
     "origem": "coletado no Brasil, fora do GitHub Actions",
     "atribuicao": "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)",
     "acervo": {"baixar": True, "retrato_validade_h": 30},

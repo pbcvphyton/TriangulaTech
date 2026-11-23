@@ -131,6 +131,19 @@ def test_pagina_sem_rede(tmp_path: Path) -> None:
     assert caminho.is_file() and caminho.stat().st_size <= pagina.TETO_BYTES
 
 
+def test_pagina_acima_do_teto_deixa_a_execucao_vermelha(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """OP-10: acima do teto a página não é gravada e o comando sai 1 (os dois: atualizar e pagina):
+    o passo "Publicar" não roda e nada sai com os dados novos e a página velha."""
+    _site(tmp_path)
+    monkeypatch.setattr(pagina, "TETO_BYTES", 10_000)
+    monkeypatch.setattr(dados, "atualizar", lambda *a, **k: _resultado(tmp_path))
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    argv = ["tribunais", "atualizar", "--dir", str(tmp_path), "--cache", str(tmp_path / "c")]
+    assert principal.main(argv, config_loader=_config) == principal.EXIT_ERROR
+    assert principal.main(["tribunais", "pagina", "--dir", str(tmp_path)], config_loader=_config) == principal.EXIT_ERROR
+    assert not (tmp_path / "edicoes" / "tribunais.html").exists()
+
+
 def test_atualizar_de_verdade_sem_rede_nao_derruba(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Sem rede nenhuma (todo pedido falha): avisos no meta.json, nenhuma página, saída 0."""
     from qijournal.net import FetchError

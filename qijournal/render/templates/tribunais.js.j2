@@ -15,10 +15,12 @@
   var VISTAS = ['resumo', 'ministros', 'assuntos', 'partes', 'fila', 'metodo'];
   function lista(nos) { return Array.prototype.slice.call(nos || []); }
   function num(n) { return (n == null || isNaN(n)) ? '—' : String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
-  function pct(f, fino) {
+  function plural(n, um, varios) { return num(n) + ' ' + (n === 1 ? um : varios); }  /* "1 processo", "2 processos" */
+  /* n: a contagem por trás da fração; com processo, nunca "0%" (a fração de 4 casas zera abaixo de 0,005%) */
+  function pct(f, fino, n) {
     if (f == null || isNaN(f)) return '—';
     var v = f * 100;
-    if (v === 0) return '0%';
+    if (v === 0) return n > 0 ? '<0,1%' : '0%';
     if (v < 1 || (fino && v < 10)) {
       var s = (Math.round(v * 10) / 10).toFixed(1).replace('.', ',');
       return (s === '0,0' ? '<0,1' : s) + '%';
@@ -361,7 +363,7 @@
       })));
       secPartes.parentNode.replaceChild(bf, secPartes);
       var pf = (x.partes || {}).pessoas_fisicas, ente = (x.partes || {}).ente_publico || {};
-      bf.parentNode.insertBefore(h('p', { cls: 'tb-pf', text: 'À esquerda, no polo ativo (quem recorre ou pede); à direita, no passivo. Pessoas físicas: ' + num(pf) + ' processos, somadas, sem nome. Dinheiro público num polo (União, Fazenda Nacional, INSS, Estado ou DF, Município): ' + pct(ente.p, true) + (ente.pares != null ? ' (os pares: ' + pct(ente.pares, true) + ')' : '') + '.' }), bf.nextSibling);
+      bf.parentNode.insertBefore(h('p', { cls: 'tb-pf', text: 'À esquerda, no polo ativo (quem recorre ou pede); à direita, no passivo. Pessoas físicas: ' + plural(pf, 'processo', 'processos') + ', somadas, sem nome. Dinheiro público num polo (União, Fazenda Nacional, INSS, Estado ou DF, Município): ' + pct(ente.p, true, ente.n) + (ente.pares != null ? ' (os pares: ' + pct(ente.pares, true) + ')' : '') + '.' }), bf.nextSibling);
     }
     /* no detalhe: subáreas e recortes, com a parte nos pares */
     var subs = (x.subareas || []).slice(0, 12);
@@ -372,10 +374,10 @@
           var i = h('i'); i.style.width = (100 * (s.n || 0) / maiorSub).toFixed(1) + '%';
           var aq = (M.areas || {})[s.area];
           return h('li', {}, [h('span', { cls: 'tb-br-n', title: (aq ? aq[0] + ' · ' : '') + nomeSub(s.id) }, [h('span', { cls: 'tb-ar tb-a-' + s.area }, [h('i', { role: 'img', 'aria-label': aq ? aq[0] : String(s.area || '') })]), ' ', nomeSub(s.id)]), h('span', { cls: 'tb-br-b', 'aria-hidden': 'true' }, [i]),
-            h('span', { cls: 'tb-br-v' }, [num(s.n), h('small', { text: pct(s.p, true) + (s.pares != null ? ' (' + pct(s.pares, true) + ')' : '') })])]);
+            h('span', { cls: 'tb-br-v' }, [num(s.n), h('small', { text: pct(s.p, true, s.n) + (s.pares != null ? ' (' + pct(s.pares, true) + ')' : '') })])]);
         })),
         (x.recortes || []).length ? h('p', { cls: 'tb-cl' }, [h('span', { cls: 'cg-lg-k', text: 'Recortes' })].concat(x.recortes.map(function (r) {
-          return h('span', { cls: 'cg-chip' }, [((M.recortes || {})[r.id] || r.id) + ' ', h('b', { text: pct(r.p, true) }), r.pares != null ? ' (' + pct(r.pares, true) + ')' : '']);
+          return h('span', { cls: 'cg-chip' }, [((M.recortes || {})[r.id] || r.id) + ' ', h('b', { text: pct(r.p, true, r.n) }), r.pares != null ? ' (' + pct(r.pares, true) + ')' : '']);
         }))) : null
       ]));
     }
@@ -442,7 +444,7 @@
       nos.push(secao('O que entrou', 'média por dia em cada pedaço de mês; ' + (stjE ? 'distribuídos (sorteio ou prevenção)' : 'distribuídos'), [barras, h('div', { cls: 'cg-sm-x', 'aria-hidden': 'true' }, pedacos.map(function (q) { return h('span', { text: q.rot }); })), h('p', { cls: 'cg-d-n', text: txt })]));
     }
     var de = x.decisoes;
-    if (de && de.processos != null) nos.push(secao('O que decidiu', 'decisões publicadas', [h('p', { cls: 'cg-d-n', text: num(de.processos) + ' processos com decisão publicada entre ' + dataBr((de.janela || [])[0]) + ' e ' + dataBr((de.janela || [])[1]) + ': ' + num(de.monocraticas) + ' decisões monocráticas e ' + num(de.acordaos) + ' acórdãos' + (de.acordaos_recurso_interno != null ? ' (' + num(de.acordaos_recurso_interno) + ' em recurso interno)' : '') + '.' + (de.ultimo_arquivo ? ' Último arquivo publicado: ' + dataBr(de.ultimo_arquivo) + '.' : '') })]));
+    if (de && de.processos != null) nos.push(secao('O que decidiu', 'decisões publicadas', [h('p', { cls: 'cg-d-n', text: plural(de.processos, 'processo', 'processos') + ' com decisão publicada entre ' + dataBr((de.janela || [])[0]) + ' e ' + dataBr((de.janela || [])[1]) + ': ' + plural(de.monocraticas, 'decisão monocrática', 'decisões monocráticas') + ' e ' + plural(de.acordaos, 'acórdão', 'acórdãos') + (de.acordaos_recurso_interno != null ? ' (' + num(de.acordaos_recurso_interno) + ' em recurso interno)' : '') + '.' + (de.ultimo_arquivo ? ' Último arquivo publicado: ' + dataBr(de.ultimo_arquivo) + '.' : '') })]));
     if ((x.temas || []).length) nos.push(secao('Temas sob relatoria', 'sem julgamento: pesam para o país', [h('ol', { cls: 'cg-ls' }, x.temas.map(function (te) {
       var link = seguro(te.link);
       return h('li', {}, [h('p', { cls: 'cg-ls-k' }, [h('b', {}, [link ? h('a', { href: link, target: '_blank', rel: 'noopener noreferrer', text: 'Tema ' + te.numero }) : 'Tema ' + te.numero]), h('span', { text: ((M.tiposTema || {})[te.tipo] || te.tipo) + ' · ' + (te.situacao || '') + (te.desde ? ' desde ' + dataBr(te.desde) : '') })]), h('p', { cls: 'cg-ls-x', text: te.titulo || '' })]);
@@ -521,7 +523,7 @@
       ])
     ]);
     var ol = h('ol', { cls: 'tb-mc' }, marcos.map(function (k) {
-      return h('li', { cls: k.cls }, [k.dias != null ? h('em', { text: num(k.dias) + ' dias' }) : null, h('b', { text: k.nome }), h('time', { datetime: k.iso || '', text: k.iso ? dataBr(k.iso) : '—' })]);
+      return h('li', { cls: k.cls }, [k.dias != null ? h('em', { text: plural(k.dias, 'dia', 'dias') }) : null, h('b', { text: k.nome }), h('time', { datetime: k.iso || '', text: k.iso ? dataBr(k.iso) : '—' })]);
     }));
     return [
       h('div', { cls: 'cg-me-g tb-fo-g' }, [

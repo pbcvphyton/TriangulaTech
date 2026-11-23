@@ -409,3 +409,146 @@ def test_motivos_curtos_sem_hora() -> None:
     assert dados._motivo(CaminhoVedado("u", "x")) == "o robots.txt do tribunal veda o endereço"
     assert dados._motivo(FetchError("u", "x", 504)) == "o servidor respondeu 504"
     assert dados._motivo(stj.FormatoInesperado("u", "x")) == "o arquivo veio fora do formato esperado"
+
+
+# ── a operação (revisão de 23/11/2026) ───────────────────────────────────────
+
+
+def test_aceitar_acervo_a_mao(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras) -> None:
+    """OP-9: a mudança real de mais de 15% no acervo, conferida pelo dono, entra uma vez com
+    ``--aceitar-acervo`` (o "aceitar_acervo" do disparo manual)."""
+    tmp, portal, _r = carga
+    meta = _meta(tmp)
+    meta["fontes"]["stj_acervo"]["registros"] = 60
+    (_pasta(tmp) / "meta.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+    r = _rodar(tmp, portal, regras, aceitar=("stj",))
+    assert "stj" in r.refeitos
+    f = _meta(tmp)["fontes"]["stj_acervo"]
+    assert f["ok"] is True and f["registros"] == 44
+    assert any("aceito à mão" in a for a in r.avisos)
+
+
+def test_so_a_proxima_execucao_nao_regrava_o_meta(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras) -> None:
+    """OP-8: fonte atrasada muda a proxima_execucao a cada execução; sem mais nada novo, nada é
+    regravado (sem commit, sem build do Pages)."""
+    tmp, portal, _r = carga
+    antes = _meta(tmp)["proxima_execucao"]
+    r = _rodar(tmp, portal, regras, agora=AGORA.replace(hour=19))  # a planilha do STF de 23/11 já devia ter saído: atrasada
+    assert (r.gravados, r.apagados) == (0, 0) and _meta(tmp)["proxima_execucao"] == antes
+
+
+def test_proxima_do_acervo_do_stj_pula_o_fim_de_semana() -> None:
+    """OP-4: o arquivo de sexta sai no sábado; o seguinte (o de segunda) só na terça às 17:45 UTC."""
+    seg = datetime(2026, 11, 23, 12, 0, tzinfo=UTC)
+    assert dados.proxima_execucao({"stj_acervo": {"ok": True, "data_dados": "2026-11-20"}}, seg) == "2026-11-24T17:45:00Z"
+    qui = {"stj_acervo": {"ok": True, "data_dados": "2026-11-19"}}
+    assert dados.proxima_execucao(qui, datetime(2026, 11, 20, 12, 0, tzinfo=UTC)) == "2026-11-21T17:45:00Z"  # o de sexta, no sábado
+    from datetime import date
+
+    assert dados.dias_da_semana(date(2026, 11, 20), date(2026, 11, 24)) == 2  # sexta → terça
+    assert dados.dias_da_semana(date(2026, 11, 20), date(2026, 11, 22)) == 0
+
+
+def test_aviso_da_serie_com_o_ano() -> None:
+    """OP-6: a série de 12 meses das íntegras diz o ano (sem ele, "de 16/10 a 08/10" se lê ao contrário)."""
+    from types import SimpleNamespace
+
+    pend = [SimpleNamespace(data="2025-10-16"), SimpleNamespace(data="2026-10-08")]
+    serie = SimpleNamespace(data_dados="2026-10-15", ultimo_publicado="2026-10-15", erro=None, pendentes=pend, baixados=[1, 2, 3, 4])
+    r = SimpleNamespace(opcoes=SimpleNamespace(hoje=HOJE))
+    texto, ok = dados._aviso_da_serie(r, serie, "integras")  # type: ignore[arg-type]
+    assert ok and "(de 16/10/2025 a 08/10/2026)" in texto
+
+
+def test_cache_frio_recupera_e_nao_troca_o_publicado_por_menos(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras) -> None:
+    """OP-2: com o cache frio, a série já publicada baixa sem o teto por execução (recuperação); e
+    a série que ainda cobre menos que a publicada não a substitui: o bloco publicado fica (painel,
+    ministros, dossiês) e a entrada da fonte no meta.json também."""
+    tmp, portal, _r = carga
+    stj_json = json.loads((_pasta(tmp) / "stj.json").read_text(encoding="utf-8"))
+    stj_json["decisoes"]["documentos"] += 100_000  # o publicado cobria mais (os 12 meses)
+    (_pasta(tmp) / "stj.json").write_text(json.dumps(stj_json, ensure_ascii=False), encoding="utf-8")
+    meta = _meta(tmp)
+    meta["fontes"]["stj_integras"]["registros"] = 99_999
+    (_pasta(tmp) / "meta.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+    portal.urls.clear()
+    r = _rodar(tmp, portal, regras, cache="frio")  # um cache vazio, execução comum
+    assert len([u for u in portal.urls if "/download/ata2026" in u]) > dados.SERIE_MAXIMO[False]["atas"]  # recuperação
+    assert any("modo de recuperação" in a for a in r.avisos)
+    novo = json.loads((_pasta(tmp) / "stj.json").read_text(encoding="utf-8"))
+    assert novo["decisoes"] == stj_json["decisoes"]
+    assert _meta(tmp)["fontes"]["stj_integras"]["registros"] == 99_999
+    assert any("fica o bloco publicado" in a for a in r.avisos)
+
+
+def test_a_poda_do_cache_roda_sempre_e_guarda_o_que_o_estado_cita(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras) -> None:
+    """OP-3 e OP-5: a poda roda mesmo com o aviso informativo das íntegras; nunca apaga o que um
+    estado cita (o acervo em uso, de sexta a terça, mesmo com mais de um dia); apaga a sobra de mais
+    de 10 dias e o arquivo grande fora de uso."""
+    import os
+
+    tmp, portal, _r = carga
+    cache = tmp / "cache"
+    estado = json.loads((cache / "estado" / "stj_acervo.json").read_text(encoding="utf-8"))
+    acervo = cache / estado["caminho"]
+    velho = 1_000_000.0 - 20 * 86400
+    sobra = cache / "arquivos" / "sobra-antiga.json"
+    sobra.write_text("{}", encoding="utf-8")
+    grande = cache / "arquivos" / "acervo-de-outro-dia.json.gz"
+    with grande.open("wb") as f:
+        f.truncate(41 * 1024 * 1024)
+    for c in (sobra, acervo):
+        os.utime(c, (velho, velho))
+    portal.falhas["/download/processos_tramitando"] = FetchError("x", "HTTP 500", status=500)  # o acervo de hoje não vem: vale o do estado
+    _rodar(tmp, portal, regras)
+    assert acervo.is_file()  # citado pelo estado: fica
+    assert not sobra.exists() and not grande.exists()
+
+
+# ── o DJe (DJEN): só lido aqui ──────────────────────────────────────────────
+
+
+def test_fonte_djen_no_meta_e_fora_do_teto(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras,
+                                          monkeypatch: pytest.MonkeyPatch) -> None:
+    """Sem ``djen.json``: a fonte sai ``ok: null`` com a frase de que a coleta só roda no Brasil. Com
+    ele (o que a máquina do dono envia): a data é o último dia, ``coletado_em`` é o ``gerado_em``, os
+    registros somam o mês; velho (mais de 4 dias de segunda a sexta), o aviso. O arquivo não conta no
+    teto da pasta (a aba nunca depende dele) e nenhum pedido vai ao DJEN."""
+    from tests.fixtures.tribunais import fabrica
+
+    tmp, portal, _r = carga
+    f = _meta(tmp)["fontes"]["djen"]
+    assert f["ok"] is None and f["aviso"] == dados.SEM_DJEN and f["velho_dias"] == 4 and f["dias_da_semana"] is True
+    paineis = {t: json.loads((_pasta(tmp) / f"{t}.json").read_text(encoding="utf-8")) for t in ("stj",)}
+    paineis["stj"]["ministros"] = [m for m in paineis["stj"]["ministros"] if m.get("mais_antigos")]
+    djen = fabrica.djen(paineis, ultimo_dia="2026-11-20")
+    (_pasta(tmp) / "djen.json").write_text(json.dumps(djen, ensure_ascii=False), encoding="utf-8")
+    _rodar(tmp, portal, regras)
+    f = _meta(tmp)["fontes"]["djen"]
+    assert (f["ok"], f["data_dados"], f["coletado_em"], f["registros"], f["tribunais"], f["aviso"]) == (
+        True, "2026-11-20", "2026-11-23T11:17:00Z", 4210, ["stj"], None)
+    assert not any("comunicaapi" in u or "comunica.pje" in u for u in portal.urls)
+    # velho: o último dia é a sexta de 13/11
+    djen["tribunais"]["stj"]["ultimo_dia"] = "2026-11-13"
+    (_pasta(tmp) / "djen.json").write_text(json.dumps(djen, ensure_ascii=False), encoding="utf-8")
+    _rodar(tmp, portal, regras)
+    assert "Sem atualização desde 13/11/2026" in _meta(tmp)["fontes"]["djen"]["aviso"]
+    # o teto da pasta não conta o djen.json
+    grande = "x" * 200_000
+    (_pasta(tmp) / "djen.json").write_text(json.dumps({**djen, "lixo": grande}), encoding="utf-8")
+    atual = dados._tamanho_atual(_pasta(tmp), set())
+    monkeypatch.setattr(dados, "TETO_PASTA", atual - 100_000)  # com o djen.json, a pasta passaria do teto
+    r = _rodar(tmp, portal, regras)
+    assert not any("acima do teto" in a for a in r.avisos)
+
+
+
+def test_os_citados_do_estado_ignoram_o_que_nao_e_caminho(tmp_path: Path) -> None:
+    """O estado da repercussão geral guarda os temas (títulos com "/" e de 300 letras): a poda só
+    olha o que tem cara de caminho do cache e nunca derruba a execução (23/11: "File name too long")."""
+    cache = tmp_path / "cache"
+    (cache / "arquivos").mkdir(parents=True)
+    (cache / "arquivos" / "a.json").write_text("{}", encoding="utf-8")
+    longo = "Constitucionalidade das contribuições / " + "x" * 400
+    dados.Estado(cache).gravar("stf_rg", {"caminho": "arquivos/a.json", "dados": {"temas": [{"titulo": longo}, {"titulo": "Lei 8.870/1994"}]}})
+    assert dados.Estado(cache).citados() == {cache / "arquivos" / "a.json"}

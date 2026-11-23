@@ -159,6 +159,15 @@ def ancora(regex: str) -> str:
     return max(trechos, key=len) if trechos else ""
 
 
+# Onde o nome de um município colado acaba: o começo de outra instituição grudado na última letra
+# dele, sem espaço ("MUNICIPIO DE MINEIROSMUNICIPIO DE TAUBATE", "...SAO LEOPOLDOPREFEITO DO
+# MUNICIPIO DE SAO LEOPOLDO", "...IBIPORAINSTITUTO DE PREVIDENCIA..."). Nome de cidade é palavra
+# separada por espaço: uma dessas marcas colada no meio de uma palavra é a emenda do STF.
+_EMENDA_NO_MUNICIPIO = re.compile(
+    r"(?<=[A-Z0-9])(?=(?:FAZENDA PUBLICA DO )?MUNICIPIO D[EOA]S? |PREFEITURA MUNICIPAL D|PREFEIT[OA] (?:DO MUNICIPIO|MUNICIPAL)|"
+    r"CAMARA MUNICIPAL|SECRETARI[OA] MUNICIPAL|SECRETARIA D|INSTITUTO D[EOA] |SERVICO AUTONOMO|FUNDACAO |AGENCIA |"
+    r"SINDICATO D|ESTADO D[OAE] |MINISTERIO PUBLICO|DEFENSORIA PUBLICA|CAIXA ECONOMICA|BANCO D)"
+)
 # Um nome do catálogo seguido só da sigla ("FUNDACAO DOS ECONOMIARIOS FEDERAIS FUNCEF").
 _SIGLA_NO_FIM = re.compile(r"\s*-?\s*[A-Z0-9]{2,10}\.?\s*")
 # Onde um nome pode terminar dentro de um texto (sem contar a emenda colada).
@@ -215,7 +224,7 @@ class Catalogo:
                 raise ErroDoCatalogo(f"config/{ARQUIVO}: padrão inválido {p.regex!r} ({exc})") from exc
             self._individuais.append((ancora(p.regex), compilado, p))
         self._cache_nome: dict[str, str | None] = {}
-        self._cache_texto: dict[str, list[tuple[str, int, int]]] = {}
+        self._cache_texto: dict[tuple[str, bool], list[tuple[str, int, int]]] = {}
         self._cache_stf: dict[tuple[str, bool], list[tuple[str, str | None, str | None]]] = {}
         self.nomes_vistos: dict[str, Counter[str]] = {}
 
@@ -341,30 +350,64 @@ class Catalogo:
         self._cache_nome[chave] = achado
         return achado
 
-    def reconhecer_texto(self, texto: str | None) -> list[tuple[str, int, int]]:
+    def reconhecer_texto(self, texto: str | None, colado: bool = False) -> list[tuple[str, int, int]]:
         """As entidades do catálogo num texto bruto de polo do STF, colado ou não:
         ``[(grupo, início, fim)]`` no texto normalizado. Um nome vale quando começa no início,
         depois de ``", "`` ou colado no fim de outro (sem espaço na emenda), e termina no fim,
         antes de ``", "``/``" - "``/``" ("`` ou colado no começo de outro. Nome curto (até 8
-        letras, "UNIÃO", "INSS") precisa de uma ponta limpa: no meio de uma palavra não vale."""
+        letras, "UNIÃO", "INSS") precisa de uma ponta limpa: no meio de uma palavra não vale.
+
+        O município é o único nome que sai do próprio texto (``municipio-<slug>``), e o STF cola a
+        parte seguinte na última letra dele. O nome do município acaba na emenda com outra
+        entidade achada no texto ou com outra instituição colada (:data:`_EMENDA_NO_MUNICIPIO`).
+        ``colado``: o texto é a cabeça colada de um polo (``P1P2``); um município no começo dela que
+        vai até o fim sem emenda à vista levaria o nome da parte seguinte (às vezes uma pessoa) e
+        fica sem grupo (a parte sai sem nome)."""
         chave = normalizar(texto)
         if not chave:
             return []
-        if chave in self._cache_texto:
-            return self._cache_texto[chave]
+        if (chave, colado) in self._cache_texto:
+            return self._cache_texto[(chave, colado)]
+
+        def vale(ini: int, fim: int) -> bool:
+            inicio_limpo = ini == 0 or chave[ini - 1] == "," or chave[max(0, ini - 2):ini] == ", " or chave[max(0, ini - 3):ini] == " - "
+            inicio_colado = ini > 0 and chave[ini - 1] not in " ,-("
+            fim_limpo = fim == len(chave) or chave.startswith(_FIM_OK, fim)
+            fim_colado = fim < len(chave) and chave[fim] not in " ,-()/"
+            curto = fim - ini <= 8
+            return (inicio_limpo or inicio_colado) and (fim_limpo or fim_colado) and (not curto or inicio_limpo or fim_limpo)
+
         casados: list[tuple[int, int, str]] = []
+        municipais: list[tuple[re.Pattern[str], _Padrao]] = []
         for _a, compilado, p in self._candidatos(chave):
+            if p.grupo is None:  # família dos municípios: depois, com as emendas à vista
+                municipais.append((compilado, p))
+                continue
             for m in compilado.finditer(chave):
-                ini, fim = m.start(), m.end()
-                inicio_limpo = ini == 0 or chave[ini - 1] == "," or chave[max(0, ini - 2):ini] == ", " or chave[max(0, ini - 3):ini] == " - "
-                inicio_colado = ini > 0 and chave[ini - 1] not in " ,-("
-                fim_limpo = fim == len(chave) or chave.startswith(_FIM_OK, fim)
-                fim_colado = fim < len(chave) and chave[fim] not in " ,-()/"
-                curto = fim - ini <= 8
-                if (inicio_limpo or inicio_colado) and (fim_limpo or fim_colado) and (not curto or inicio_limpo or fim_limpo):
+                if vale(m.start(), m.end()):
                     grupo = self._grupo_do_casamento(m, p)
                     if grupo:
-                        casados.append((ini, fim, grupo))
+                        casados.append((m.start(), m.end(), grupo))
+        fixos = sorted(ini for ini, _fim, _g in casados)
+        for compilado, p in municipais:
+            pos = 0
+            while (m := compilado.search(chave, pos)) is not None:
+                ini, fim, ini_nome = m.start(), m.end(), m.start("nome")
+                emendas = [i for i in fixos if ini_nome < i < fim and chave[i - 1].isalnum()]
+                e = _EMENDA_NO_MUNICIPIO.search(chave, ini_nome + 1, fim)
+                if e is not None:
+                    emendas.append(e.start())
+                if emendas:
+                    fim = min(emendas)
+                    nome = chave[ini_nome:fim].strip()
+                    pos = fim
+                else:
+                    nome = m.group("nome")
+                    pos = max(fim, ini + 1)
+                    if colado and ini == 0 and fim == len(chave):
+                        continue  # o nome pode levar a parte seguinte, colada: sem grupo
+                if nome and vale(ini, fim):
+                    casados.append((ini, fim, self._municipio(nome)))
         # sobreposição: vence o mais longo ("ESTADO DO PARANA" e não "ESTADO DO PARA")
         achados: list[tuple[str, int, int]] = []
         for ini, fim, grupo in sorted(casados, key=lambda x: (-(x[1] - x[0]), x[0], x[2])):
@@ -375,7 +418,7 @@ class Catalogo:
                 if not any(a <= m.start() < b for _, a, b in achados):
                     achados.append((g, m.start(), m.end()))
         achados.sort(key=lambda x: x[1])
-        self._cache_texto[chave] = achados
+        self._cache_texto[(chave, colado)] = achados
         return achados
 
     # ── tipificação ──────────────────────────────────────────────────────────────────────────
@@ -488,7 +531,7 @@ class Catalogo:
                 return [("autoridade", None, nome)]
             s = slug(nome)
             return [(tipo, f"nome-{s}" if s else None, nome)]
-        achados = self.reconhecer_texto(nome)
+        achados = self.reconhecer_texto(nome, colado=True)
         saida: list[tuple[str, str | None, str | None]] = []
         resto = normalizar(nome)
         for gid, ini, fim in achados:
@@ -617,7 +660,7 @@ class CoberturaSTF:
         for parte in partes_brutas:
             if parte.get("colado"):
                 self.colados += 1
-                if catalogo.reconhecer_texto(parte.get("nome")):
+                if catalogo.reconhecer_texto(parte.get("nome"), colado=True):
                     self.colados_reconhecidos += 1
 
     def para_meta(self) -> dict[str, Any]:

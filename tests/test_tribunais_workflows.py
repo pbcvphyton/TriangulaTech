@@ -61,7 +61,8 @@ def test_gatilhos_edicao_reserva_e_disparo_manual():
     (cron,) = on["schedule"]
     assert cron == {"cron": "41 1 * * *"}  # 22:41 em Brasília, depois da ata (19:30) e do acervo da véspera
     entradas = on["workflow_dispatch"]["inputs"]
-    assert list(entradas) == ["completo", "so", "ensaio"]
+    assert list(entradas) == ["completo", "so", "ensaio", "aceitar_acervo"]
+    assert entradas["aceitar_acervo"]["options"] == ["nenhum", "stj", "stf"] and entradas["aceitar_acervo"]["default"] == "nenhum"
     assert entradas["completo"]["type"] == "boolean" and entradas["completo"]["default"] is False
     assert entradas["so"]["type"] == "choice" and entradas["so"]["options"] == ["ambos", "stj", "stf"] and entradas["so"]["default"] == "ambos"
     assert entradas["ensaio"]["type"] == "boolean" and entradas["ensaio"]["default"] is False
@@ -85,7 +86,8 @@ def test_o_decidir_e_leve():
     assert DECIDIR["if"] == "github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled'"
     baixar, decidir = DECIDIR["steps"]
     assert baixar["uses"] == "actions/checkout@v5"
-    assert baixar["with"] == {"ref": "${{ github.ref_name }}", "sparse-checkout": "data/tribunais/meta.json", "sparse-checkout-cone-mode": False}
+    assert baixar["with"] == {"ref": "${{ github.ref_name }}", "sparse-checkout": "data/tribunais/meta.json\ndata/tribunais/djen.json\n",
+                              "sparse-checkout-cone-mode": False}  # o djen.json: a máquina do dono pode ter mandado um novo
     assert decidir["id"] == "decidir" and "uses" not in decidir
     assert decidir["env"] == {"EVENT": "${{ github.event_name }}", "QIJ_NO_TRIBUNAIS": "${{ vars.QIJ_NO_TRIBUNAIS }}", "INPUT_ENSAIO": "${{ inputs.ensaio }}"}
 
@@ -102,17 +104,23 @@ def test_passos_tempos_e_a_linha_de_comando_fixa():
         "Guardar o diário da coleta", "Preparar o cache", "Guardar o cache", "Resultado",
     ]  # fmt: skip
     assert all("${{" not in p.get("run", "") for job in TRIB["jobs"].values() for p in job["steps"])
-    assert JOB["timeout-minutes"] == "${{ inputs.completo && 95 || 45 }}"
+    assert JOB["timeout-minutes"] == 95  # o cache frio só se sabe no passo
     atualizar = _passo(JOB, "Atualizar os Tribunais")
-    assert atualizar["timeout-minutes"] == "${{ inputs.completo && 75 || 30 }}" and atualizar["continue-on-error"] is True
+    assert atualizar["timeout-minutes"] == "${{ (inputs.completo || steps.restaurar.outputs.cache-matched-key == '') && 75 || 30 }}"
+    assert atualizar["continue-on-error"] is True
     assert 'args=(--dir . --cache "$RUNNER_TEMP/tribunais")' in atualizar["run"]
     assert 'if [ "$INPUT_COMPLETO" = "true" ]; then args+=(--completo); fi' in atualizar["run"]
     assert 'stj|stf) args+=(--so "$INPUT_SO") ;;' in atualizar["run"]
+    assert 'stj|stf) args+=(--aceitar-acervo "$INPUT_ACEITAR") ;;' in atualizar["run"]
+    # OP-2: o cache frio (o primeiro dia na main) vira carga completa
+    assert atualizar["env"]["FRIO"] == "${{ steps.restaurar.outputs.cache-matched-key == '' }}"
+    assert 'if [ "$INPUT_COMPLETO" != "true" ] && [ "$FRIO" = "true" ]; then' in atualizar["run"]
     assert atualizar["run"].rstrip().endswith('python -m qijournal tribunais atualizar "${args[@]}"')
     env = atualizar["env"]
     assert env["QIJ_NO_TRIBUNAIS"] == "${{ !inputs.ensaio && vars.QIJ_NO_TRIBUNAIS || '' }}"
     assert env["DATAJUD_API_KEY"] == "${{ vars.DATAJUD_API_KEY }}" and "secrets." not in json.dumps(env)  # nenhum segredo novo
-    assert {env[k] for k in ("INPUT_COMPLETO", "INPUT_SO")} == {"${{ inputs.completo }}", "${{ inputs.so }}"} and env["TZ"] == "America/Sao_Paulo"
+    assert {env[k] for k in ("INPUT_COMPLETO", "INPUT_SO", "INPUT_ACEITAR")} == {"${{ inputs.completo }}", "${{ inputs.so }}", "${{ inputs.aceitar_acervo }}"}
+    assert env["TZ"] == "America/Sao_Paulo"
     pagina = _passo(JOB, "Refazer a aba com o que ficou gravado")
     assert pagina["run"] == "python -m qijournal tribunais pagina --dir ." and pagina["timeout-minutes"] == 5
     assert pagina["if"] == "${{ !cancelled() && steps.atualizar.outcome != 'success' }}"
@@ -514,9 +522,10 @@ def test_sem_alerta_a_issue_aberta_e_fechada(tmp_path: Path):
 
 @precisa_de_bash
 def test_preparar_o_cache(tmp_path: Path):
-    """Sai do cache: o diário (já é artefato), sobra de download e arquivo grande de outro dia (o
-    acervo do STJ de ontem); fica o grande de hoje e as atas. A chave muda com o que foi baixado,
-    não com o robots.txt nem com as páginas relidas: sem nada novo, nenhuma entrada nova."""
+    """Sai do cache: o diário (já é artefato) e sobra de download. Arquivo grande não sai por idade
+    (OP-3: o acervo do STJ em uso fica de sexta a terça; quem poda é o comando, pela referência do
+    estado). A chave muda com o que foi baixado, não com o robots.txt nem com as páginas relidas:
+    sem nada novo, nenhuma entrada nova."""
     cache = tmp_path / "runner-temp" / "tribunais"
     arquivos = {"robots/a.txt": "User-agent: *\n", "paginas/b.txt": "<html>", "arquivos/ata.json": "{}", "api/c.json": "[]", "diario/x.jsonl": "{}\n",
                 "arquivos/.d.json.gz.123.tmp": "pela"}  # fmt: skip
@@ -535,7 +544,7 @@ def test_preparar_o_cache(tmp_path: Path):
     assert feito.returncode == 0, feito.stdout + feito.stderr
     saida = _saida(tmp_path)
     assert saida["guardar"] == "true" and re.fullmatch(r"tribunais-2026-11-23-[0-9a-f]{16}", saida["chave"])
-    assert not ontem.exists() and hoje_.exists() and not (cache / "diario").exists() and not (cache / "arquivos" / ".d.json.gz.123.tmp").exists()
+    assert ontem.exists() and hoje_.exists() and not (cache / "diario").exists() and not (cache / "arquivos" / ".d.json.gz.123.tmp").exists()
     assert (cache / "arquivos" / "ata.json").exists() and (cache / "robots" / "a.txt").exists()
     chave = saida["chave"]
 
@@ -551,3 +560,50 @@ def test_preparar_o_cache(tmp_path: Path):
     shutil.rmtree(cache)
     _rodar(script, tmp_path, tmp_path, RESTAURADO="")
     assert _saida(tmp_path) == {"guardar": "false"}
+
+
+@precisa_de_bash
+def test_acervo_do_stj_conta_de_segunda_a_sexta(tmp_path: Path):
+    """OP-4: o STJ não publica acervo de fim de semana; na terça de manhã, com o arquivo de sexta, a
+    fonte está em dia (2 dias da semana); na quarta, não."""
+    meta = json.loads(json.dumps(META_BOA))
+    meta["fontes"]["stj_acervo"] = {**_fonte("STJ · acervo em tramitação", "2026-11-20", 2), "dias_da_semana": True}
+    feito, alerta = _validade(tmp_path, meta, hoje_falso="2026-11-24")  # terça
+    assert feito.returncode == 0, feito.stderr
+    assert alerta is None
+    _, alerta = _validade(tmp_path, meta, hoje_falso="2026-11-25")  # quarta: o de segunda já devia ter saído
+    assert alerta is not None and "stj_acervo:velho" in alerta.splitlines()[0]
+    assert "há 5 dias (validade: 2 dias de segunda a sexta)" in alerta
+
+
+def test_a_issue_aponta_para_a_secao_dos_tribunais_no_readme():
+    """OP-9: o link da issue leva à subseção dos Tribunais em "Quando algo dá errado"."""
+    script = _passo(JOB, "Avisar o dono (issue)")["run"]
+    assert "README.md#tribunais-quando-algo-dá-errado" in script
+    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+    assert "### Tribunais: quando algo dá errado" in readme
+
+
+
+@precisa_de_bash
+@pytest.mark.parametrize(("gerado", "registrado", "rodar"), [("2026-11-23T11:00:00Z", "2026-11-22T23:00:00Z", "true"),
+                                                             ("2026-11-23T11:00:00Z", "2026-11-23T11:00:00Z", "false"),
+                                                             (None, None, "false")])
+def test_o_decidir_refaz_a_aba_quando_chega_djen_novo(tmp_path: Path, gerado: str | None, registrado: str | None, rodar: str):
+    """O djen.json chega da máquina do dono num commit próprio: mais novo que o ``fontes.djen.coletado_em``
+    do meta.json, a aba é refeita, mesmo antes da proxima_execucao."""
+    repo = tmp_path / "repo"
+    (repo / "data" / "tribunais").mkdir(parents=True)
+    meta = {"v": 1, "proxima_execucao": "2026-11-23T22:40:00Z", "fontes": {"djen": {"coletado_em": registrado}}}
+    (repo / "data" / "tribunais" / "meta.json").write_text(json.dumps(meta), encoding="utf-8")
+    if gerado:
+        (repo / "data" / "tribunais" / "djen.json").write_text(json.dumps({"v": 1, "gerado_em": gerado}), encoding="utf-8")
+    feito = _rodar(_passo(DECIDIR, "Verificar se há o que fazer")["run"], repo, tmp_path, EVENT="workflow_run")
+    assert feito.returncode == 0, feito.stdout + feito.stderr
+    assert _saida(tmp_path) == {"rodar": rodar}
+
+
+def test_o_djen_nunca_roda_no_github():
+    """OP-7: a coleta do DJEN (recusa fora do Brasil) é só da máquina do dono: nenhum fluxo a chama."""
+    for fluxo in (Path(__file__).resolve().parents[1] / ".github" / "workflows").glob("*.yml"):
+        assert "tribunais djen" not in fluxo.read_text(encoding="utf-8"), fluxo.name

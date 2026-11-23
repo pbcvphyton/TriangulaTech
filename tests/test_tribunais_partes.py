@@ -200,7 +200,7 @@ def test_stf_nome_inteiro(cat: partes.Catalogo) -> None:
     [gente] = cat.partes_stf(_parte_stf("ativo", "FULANO BELTRANO DE TAL"))
     assert (gente["tipo"], gente["nome"], gente["grupo"]) == ("pf", None, None)
     [partido] = cat.partes_stf(_parte_stf("ativo", "PARTIDO VERDE"))
-    assert (partido["tipo"], partido["grupo"]) == ("pj", "nome-partido-verde")
+    assert (partido["tipo"], partido["grupo"]) == ("pj", "partido-pv")  # partido: grupo do catálogo
     [autoridade] = cat.partes_stf(_parte_stf("passivo", "PRESIDENTE DA REPÚBLICA"))
     assert (autoridade["polo"], autoridade["tipo"], autoridade["grupo"]) == (None, "autoridade", None)
 
@@ -240,3 +240,185 @@ def test_nome_de_grupo_feito_na_hora(cat: partes.Catalogo) -> None:
         c.completar_stj(stj.parte_preliminar(_parte_stj("AGRAVADO", "GALERA MARI E ADVOGADOS ASSOCIADOS", _cnpj("002905720001"))))
     lit = c.litigante("cnpj-00290572")
     assert lit is not None and lit.nome == "Galera Mari e Advogados Associados" and lit.tipo == "pj" and not lit.catalogo
+
+
+# ── a revisão de privacidade e de tipificação (23/11/2026) ──────────────────────────────────
+
+
+@pytest.mark.parametrize("nome", ["FULANA DE JESUS CAMARA", "FULANO DE SA", "FULANO DE TAL SA", "FULANO BRASILEIRO SANTOS",
+                                  "FULANO DE TAL - ME", "W. DE A. CÂMARA"])
+def test_stf_sobrenome_nao_e_instituicao(nome: str) -> None:
+    """PRIV-1: Câmara, Sá e Brasileiro são sobrenomes; "- ME" é a firma individual (a própria pessoa):
+    pessoa física, sem nome, nem em memória."""
+    c = partes.carregar_catalogo()
+    assert c._resolver_stf(nome, False) == [("pf", None, None)]
+    c.partes_stf(_parte_stf("ativo", nome))
+    assert c.nomes_vistos == {}
+
+
+@pytest.mark.parametrize(("nome", "tipo"), [("CAMARA MUNICIPAL DE SAO PAULO", "ente"), ("USINA ACUCAREIRA X S A", "pj"), ("X S.A.", "pj"),
+                                            ("ASSOC BRASILEIRA DE X", "pj"), ("FULANO CAMARA DE VEREADORES DE Y", "ente")])
+def test_stf_instituicao_continua_instituicao(nome: str, tipo: str) -> None:
+    """PRIV-1, os contra-testes: as marcas de instituição que ficaram não regridem."""
+    assert partes.carregar_catalogo().tipo_pelo_nome(nome) == tipo
+
+
+@pytest.mark.parametrize("nome", ["11.222.333 FULANA DE TAL", "11222333 FULANA DE TAL", "FULANO DE TAL - ME", "FULANO DE TAL ME", "FULANO DE TAL MEI"])
+def test_stj_mei_no_formato_atual_e_empresario_individual(nome: str) -> None:
+    """PRIV-2: o MEI de hoje traz a raiz do CNPJ antes do nome; o empresário individual, o sufixo
+    ME: é gente, pessoa física, sem nome e sem raiz."""
+    parte = stj.parte_preliminar(_parte_stj("RECORRENTE", nome, "11222333000181"))
+    assert (parte["tipo"], parte["nome"], parte["cnpj_raiz"]) == ("pf", None, None)
+
+
+@pytest.mark.parametrize("nome", ["11.222.333 LTDA", "X COMERCIO LTDA - ME"])
+def test_stj_empresa_com_raiz_ou_me_continua_empresa(nome: str) -> None:
+    parte = stj.parte_preliminar(_parte_stj("RECORRENTE", nome, "11222333000181"))
+    assert parte["tipo"] == "pj" and parte["cnpj_raiz"] == "11222333"
+
+
+def test_stj_leitor_nunca_guarda_nome_de_mei(leitor: stj.LeitorSTJ) -> None:
+    """PRIV-2: o cache por trio do leitor nunca tem nome de MEI como chave."""
+    brutas = [_parte_stj("RECORRENTE", "11.222.333 FULANA DE TAL", "11222333000181"), _parte_stj("RECORRIDO", "EMPRESA X LTDA", _cnpj("112223330001"))]
+    leitor.partes(brutas)
+    assert not any("FULANA" in str(k) for k in leitor._pj)
+
+
+@pytest.mark.parametrize(("nome", "tipo", "grupo"), [
+    ("SOLIDARIEDADE", "pj", "partido-solidariedade"), ("REPUBLICANOS - NACIONAL", "pj", "partido-republicanos"),
+    ("PODEMOS - SAO PAULO - SP - MUNICIPAL", "pj", "partido-podemos"), ("UNIÃO BRASIL", "pj", "partido-uniao-brasil"),
+])
+def test_stf_partido_de_uma_palavra(cat: partes.Catalogo, nome: str, tipo: str, grupo: str) -> None:
+    """PRIV-4: partido de uma palavra não é pessoa física (a ADI do Solidariedade saía "pessoa
+    física"); "União Brasil" nunca é a União."""
+    [p] = cat.partes_stf(_parte_stf("ativo", nome))
+    assert (p["tipo"], p["grupo"]) == (tipo, grupo)
+
+
+def test_juizados_sao_autoridade_e_sindicato_e_privado(cat: partes.Catalogo) -> None:
+    """PRIV-4 e J9: o juizado é órgão julgador; o sindicato com "Ministério Público" no nome é pessoa
+    jurídica de direito privado; a OAB é a mesma coisa no Conselho Federal e nas seccionais."""
+    assert cat.tipo_pelo_nome("JUIZADOS ESPECIAIS FEDERAIS DA SEÇÃO JUDICIÁRIA DO RIO DE JANEIRO") == "autoridade"
+    assert cat.tipo_pelo_nome("TURMAS RECURSAIS DO ESTADO X") == "autoridade"
+    sind = stj.parte_preliminar(_parte_stj("RECORRENTE", "SINDICATO DOS SERVIDORES DO PODER JUDICIARIO E DO MINISTERIO PUBLICO DA UNIAO NO DISTRITO FEDERAL - SINDJUS/DF",
+                                           _cnpj("264467810001")))
+    assert sind["tipo"] == "pj"
+    assert cat.tipo_pelo_nome("SINDICATO DOS SERVIDORES DO MINISTERIO PUBLICO") == "pj"
+    oab_cf = stj.parte_preliminar(_parte_stj("RECORRENTE", "ORDEM DOS ADVOGADOS DO BRASIL CONSELHO FEDERAL", _cnpj("330002640001")))
+    oab_sc = stj.parte_preliminar(_parte_stj("RECORRENTE", "ORDEM DOS ADVOGADOS DO BRASIL SANTA CATARINA", _cnpj("829141200001")))
+    assert oab_cf["tipo"] == oab_sc["tipo"] == "pj"
+    # o MP no começo continua ente; depois de " - " também
+    assert stj.parte_preliminar(_parte_stj("RECORRIDO", "MINISTERIO PUBLICO DO ESTADO DE SAO PAULO", _cnpj("012235010001")))["tipo"] == "ente"
+    assert stj.parte_preliminar(_parte_stj("RECORRIDO", "ESTADO X - PROCURADORIA GERAL", None))["tipo"] == "ente"
+
+
+def test_saida_sem_nome_de_gente() -> None:
+    """PRIV-9: pessoa física (sobrenome Câmara, Sá), MEI com a raiz no começo e empresário individual,
+    todos acima dos limiares (5 no ministro, 20 no tribunal): nenhum nome sai no painel, nos dossiês
+    nem fica no catálogo."""
+    from qijournal.tribunais import contas
+    from tests.test_tribunais_contas import DATA, HOJE, T4, proc
+
+    gente = ["FULANA DE JESUS CAMARA", "FULANO DE SA", "11.222.333 FULANA DE TAL", "FULANO DE TAL - ME"]
+    lote, i = [], 0
+    regras = carregar_regras()
+    for nome in gente:
+        for j in range(25):
+            i += 1
+            bruta = stj.parte_preliminar(_parte_stj("RECORRENTE", nome, "11222333000181" if nome[0].isdigit() else None))
+            lote.append(proc(i, T4[j % 4], partes_=(bruta,)))
+    c = partes.carregar_catalogo()
+    r = contas.montar("stj", lote, regras, data_dados=DATA, hoje=HOJE, catalogo=c)
+    texto = json.dumps(r.painel, ensure_ascii=False) + json.dumps(r.dossies, ensure_ascii=False)
+    for nome in ("CAMARA", "Camara", "Câmara", "FULANO", "Fulano", "FULANA", "Fulana", "DE SA", "De Sa"):
+        assert nome not in texto, nome
+    assert c.nomes_vistos == {}
+
+
+@pytest.mark.parametrize(("colado", "esperado"), [
+    ("MUNICÍPIO DE MINEIROSMUNICÍPIO DE TAUBATÉ", [("ente", "municipio-mineiros"), ("ente", "municipio-taubate")]),
+    ("MUNICIPIO DE MAGEMUNICIPIO DE GUAPIMIRIM", [("ente", "municipio-mage"), ("ente", "municipio-guapimirim")]),
+    ("MUNICIPIO DE JACAREACANGAESTADO DO PARÁ", [("ente", "municipio-jacareacanga"), ("ente", "estado-pa")]),
+    ("MUNICIPIO DE CRUZ ALTAUNIÃO", [("ente", "municipio-cruz-alta"), ("ente", "uniao")]),
+    ("MUNICIPIO DE SAO JOAO DE MERITICAIXA ECONOMICA FEDERAL", [("ente", "municipio-sao-joao-de-meriti"), ("pj", "caixa")]),
+    ("MUNICIPIO DE IBIPORAINSTITUTO DE PREVIDENCIA DE IBIPORA", [("ente", "municipio-ibipora"), ("desconhecido", None)]),
+    ("MUNICIPIO DE SAO BERNARDO DO CAMPOPREFEITO DO MUNICÍPIO DE SÃO BERNARDO DO CAMPO",
+     [("ente", "municipio-sao-bernardo-do-campo"), ("desconhecido", None)]),
+    ("UNIÃOMUNICÍPIO DE TAUBATÉ", [("ente", "uniao"), ("ente", "municipio-taubate")]),  # o município no fim vai até o fim
+    ("FULANO DE TALMUNICIPIO DE CANOAS", [("ente", "municipio-canoas"), ("desconhecido", None)]),
+    # sem emenda à vista, o nome do município levaria a pessoa colada atrás dele: sem grupo, sem nome
+    ("MUNICIPIO DE EUNAPOLISFULANA BELTRANA DE TAL", [("desconhecido", None)]),
+    ("MUNICÍPIO DE ARACAJUFULANO DOS SANTOS", [("desconhecido", None)]),
+])
+def test_stf_municipio_colado_corta_na_emenda(colado: str, esperado: list) -> None:
+    """PRIV-9: o STF cola a parte seguinte na última letra do município (``P1P2``). O nome do
+    município acaba na emenda com outra entidade ou instituição; sem emenda, o município do começo
+    não ganha grupo (o nome levaria a parte colada, às vezes uma pessoa)."""
+    c = partes.carregar_catalogo()
+    saida = c.partes_stf(_parte_stf("passivo", colado, colado=True))
+    assert [(p["tipo"], p["grupo"]) for p in saida] == esperado
+    assert all(p["nome"] is None or p["grupo"] for p in saida)
+    nomes = " ".join(c.litigante(p["grupo"]).nome for p in saida if p["grupo"]) + " " + " ".join(c.grupos)
+    for pedaco in ("FULAN", "Fulan", "BELTRAN", "Beltran", "Santos", "SANTOS", "municipio-de", "Municipio de", "Prefeito", "Instituto"):
+        assert pedaco not in nomes, pedaco
+
+
+def test_municipio_sozinho_continua_municipio(cat: partes.Catalogo) -> None:
+    """Fora da cabeça colada, o município vai até o fim, como sempre (inclusive "União da Vitória")."""
+    assert cat.reconhecer_nome("MUNICIPIO DE UNIAO DA VITORIA") == "municipio-uniao-da-vitoria"
+    assert [g for g, *_ in cat.reconhecer_texto("MUNICÍPIO DE SÃO PAULO")] == ["municipio-sao-paulo"]
+    assert [p["grupo"] for p in cat.partes_stf(_parte_stf("ativo", "MUNICÍPIO DE SÃO PAULO"))] == ["municipio-sao-paulo"]
+    assert [g for g, *_ in cat.reconhecer_texto("MUNICIPIO DE SAO PAULO - SPFULANO", colado=True)] == ["municipio-sao-paulo"]
+
+
+def _nomes_publicados(dado, chave: str | None = None):
+    """Cada litigante com nome num JSON publicado: ``(id, nome, tipo)``, das listas (``{"id", "nome",
+    "tipo"}``) e dos mapas (``{id: {"nome", "tipo"}}``)."""
+    if isinstance(dado, dict):
+        if "nome" in dado and "tipo" in dado:
+            yield str(dado.get("id") or chave), dado["nome"], dado["tipo"]
+        for k, v in dado.items():
+            yield from _nomes_publicados(v, k)
+    elif isinstance(dado, list):
+        for v in dado:
+            yield from _nomes_publicados(v, chave)
+
+
+def test_a_pasta_publicada_so_tem_nome_de_instituicao() -> None:
+    """PRIV-9 na saída real (``data/tribunais/*.json`` e ``ministros/*.json``): todo litigante com nome
+    é um grupo do catálogo, ``cnpj-<raiz>``, ``nome-<slug>`` ou ``municipio-<slug>``, do tipo PJ ou
+    ente; o de CNPJ não é firma individual nem traz CPF; o feito só do nome (``nome-``,
+    ``municipio-``) tem marca de instituição (``tipo_pelo_nome`` diferente de ``pf``); e o nome de
+    município não traz outra parte colada (relido, dá ele mesmo e só ele)."""
+    import re
+    from pathlib import Path
+
+    pasta = Path(__file__).resolve().parents[1] / "data" / "tribunais"
+    arquivos = sorted(pasta.glob("*.json")) + sorted((pasta / "ministros").glob("*.json"))
+    if not arquivos:
+        pytest.skip("sem a pasta publicada")
+    c = partes.carregar_catalogo()
+    fixos = set(c.grupos)
+    vistos: dict[str, str] = {}
+    for arq in arquivos:
+        for gid, nome, tipo in _nomes_publicados(json.loads(arq.read_text(encoding="utf-8"))):
+            if tipo not in ("pj", "ente", "pf", "autoridade", "desconhecido"):
+                continue  # outro dicionário com "nome" e "tipo" (não é litigante)
+            onde = f"{arq.name}: {gid} {nome!r}"
+            assert tipo in ("pj", "ente"), onde
+            assert gid in fixos or re.fullmatch(r"cnpj-\d{8}|nome-[a-z0-9-]+|municipio-[a-z0-9-]+", gid), onde
+            if gid in fixos:
+                continue  # nome escrito à mão no catálogo ("Hapvida", "SPPrev")
+            if gid.startswith("cnpj-"):
+                # CNPJ válido é pessoa jurídica, salvo a firma individual com nome de gente (MEI,
+                # empresário individual) e o CPF no fim do nome: a mesma régua de stj.parte_preliminar.
+                # O nome sozinho não basta aqui ("Escritório Central de Arrecadação e Distribuição Ecad").
+                chave = stj.chave_rapida(nome)
+                assert not stj.firma_individual(chave, marca=partes._marca_instituicao), onde
+                assert not stj._CPF_NO_FIM.search(nome), onde
+                continue
+            assert c.tipo_pelo_nome(nome) != "pf", onde  # sem CNPJ: só com marca de instituição
+            if gid.startswith("municipio-"):
+                assert [g for g, *_ in c.reconhecer_texto(nome)] == [gid], onde
+            vistos[gid] = nome
+    assert vistos  # a varredura leu alguma coisa

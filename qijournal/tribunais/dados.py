@@ -57,9 +57,10 @@ from ..congresso.dados import _gravar, _json
 from ..net import FetchError
 from . import PASTA, VERSAO, contas, datajud, modelo, stf, stj
 from . import achados as achados_mod
+from . import djen as djen_mod
 from . import tpu as tpu_mod
 from .areas import Classificador
-from .fontes import CaminhoVedado, ColetorTribunais, RecusaDoHost
+from .fontes import CaminhoVedado, ColetorTribunais, PrazoEsgotado, RecusaDoHost
 from .modelo import Regras
 from .partes import carregar_catalogo
 from .tpu import TPU
@@ -69,6 +70,9 @@ log = logging.getLogger(__name__)
 META = "meta.json"
 ACHADOS = "achados.json"
 CNJ = "cnj.json"  # a camada do DataJud: só existe com datajud.publicar (ou QIJ_DATAJUD_PUBLICAR=1)
+DJEN = "djen.json"  # a camada do DJe (DJEN): escrita só pela máquina do dono, no Brasil (djen.py); aqui só é lida
+NOME_DJEN = "CNJ · DJe (DJEN)"
+SEM_DJEN = "Coletado só no Brasil (a API do CNJ recusa quem está fora do país), na máquina do dono; ainda sem coleta."
 RESERVA_DATAJUD_S = 5 * 60  # o que o DataJud deixa do prazo para a camada, a gravação e a página
 MINISTROS = "ministros"
 PASTA_TPU = "tpu"
@@ -83,7 +87,7 @@ CAMPOS_INTEGRA = ("arquivo", "data", "registro", "id", "relator_id", "fora", "do
 
 IDS_FONTES = (
     "stj_acervo", "stj_atas", "stj_pautas", "stj_precedentes", "stj_integras",
-    "stf_acervo", "stf_atas", "stf_jurisprudencia", "stf_rg", "stf_pauta", "tpu", "datajud",
+    "stf_acervo", "stf_atas", "stf_jurisprudencia", "stf_rg", "stf_pauta", "tpu", "datajud", "djen",
 )  # fmt: skip
 NOMES_FONTES = {
     "stj_acervo": "STJ · acervo em tramitação",
@@ -106,7 +110,10 @@ VELHO_TPU = 120
 # Quando cada fonte publica o dado seguinte (dias depois da data do dado em uso, hora UTC): o
 # arquivo do acervo do STJ de D sai em D+1 à tarde (17:37 UTC no de 20/11/2026); a ata de D, às
 # 22:30 UTC de D; a planilha do STF de D, às 17:40 UTC de D. Fonte atrasada: agora + 2 h.
+# O STJ não publica acervo de sábado nem de domingo (o de sexta sai no sábado, o de segunda só na
+# terça): o próximo dado do acervo é o do dia da semana seguinte, um dia depois (DIAS_DA_SEMANA).
 AGENDA = {"stj_acervo": (2, hora(17, 45)), "stj_atas": (1, hora(22, 40)), "stf_acervo": (1, hora(17, 45))}
+DIAS_DA_SEMANA = frozenset({"stj_acervo"})  # na AGENDA: o dado seguinte é o do próximo dia de segunda a sexta
 ATRASADA_H = 2
 PROXIMA_MIN_H, PROXIMA_MAX_H = 1, 30  # o "decidir" ignora proxima_execucao a mais de 36 h
 # Erros de formato do lado da fonte (planilha corrompida, XML quebrado): viram aviso como a falha de rede.
@@ -123,6 +130,7 @@ class Opcoes:
     so: str | None = None  # "stj" ou "stf": só um tribunal (o outro fica como está)
     prazo_s: float | None = None  # padrão: PRAZO_S[completo]
     ambiente: Mapping[str, str] | None = None  # variáveis (a chave do DataJud); padrão: os.environ
+    aceitar: tuple[str, ...] = ()  # "stj"/"stf": aceita uma vez o acervo fora da faixa da sanidade (mudança real, conferida à mão)
 
 
 @dataclass
@@ -189,6 +197,14 @@ def _br(iso: str | None, ano: bool = True) -> str:
     return f"{iso[8:10]}/{iso[5:7]}/{iso[:4]}" if ano else f"{iso[8:10]}/{iso[5:7]}"
 
 
+def dias_da_semana(de: date, ate: date) -> int:
+    """Quantos dias de segunda a sexta há depois de ``de`` até ``ate`` (inclusive): a idade de uma
+    fonte que não publica no fim de semana (feriado conta: o STJ publicou o acervo de 20/11)."""
+    if ate <= de:
+        return 0
+    return sum(1 for i in range(1, (ate - de).days + 1) if (de + timedelta(days=i)).weekday() < 5)
+
+
 def _milhar(n: int) -> str:
     return f"{n:,}".replace(",", ".")
 
@@ -199,6 +215,8 @@ def _instante(momento: datetime) -> str:
 
 def _motivo(exc: BaseException) -> str:
     """O motivo de uma falha, curto e sem hora (vai ao meta.json: não pode mudar a cada execução)."""
+    if isinstance(exc, PrazoEsgotado):
+        return "o prazo da coleta acabou antes; fica para a próxima"
     if isinstance(exc, RecusaDoHost):
         return "o portal recusou o acesso (403) duas vezes"
     if isinstance(exc, CaminhoVedado):
@@ -231,6 +249,9 @@ def _no_cache(coletor: ColetorTribunais, url: str) -> Path | None:
     return caminho if caminho.is_file() else None
 
 
+PASTAS_CITAVEIS = frozenset({"arquivos", "api", "paginas", "robots", "retratos", "datajud"})  # o que um estado pode citar no cache
+
+
 class Estado:
     """A última coleta boa de cada fonte, no cache (``<cache>/estado/<fonte>.json``): o que o
     fallback usa quando a fonte falha. Fica fora do git; perder o cache só perde o fallback."""
@@ -254,6 +275,32 @@ class Estado:
             return None
         caminho = self.raiz / relativo
         return caminho if caminho.is_file() else None
+
+    def citados(self) -> set[Path]:
+        """Os arquivos do cache que algum estado cita (caminho, série, temas...): a poda não os toca."""
+        saida: set[Path] = set()
+
+        def andar(x: Any) -> None:
+            if isinstance(x, str):
+                # Só o que tem cara de caminho relativo do cache ("arquivos/…"): o estado também guarda
+                # dados (temas da repercussão geral, com "/" no título), que não são arquivo nenhum.
+                if len(x) < 400 and "\n" not in x and x.split("/", 1)[0] in PASTAS_CITAVEIS:
+                    try:
+                        c = self.caminho(x)
+                    except OSError:
+                        c = None
+                    if c is not None:
+                        saida.add(c)
+            elif isinstance(x, Mapping):
+                for v in x.values():
+                    andar(v)
+            elif isinstance(x, (list, tuple)):
+                for v in x:
+                    andar(v)
+
+        for arquivo in sorted(self.pasta.glob("*.json")) if self.pasta.is_dir() else ():
+            andar(ler_json(arquivo))
+        return saida
 
 
 class Retrato:
@@ -323,6 +370,10 @@ class Rodada:
         if self.anterior.get("v") != VERSAO:
             self.anterior = {}
         self.estado = Estado(self.cache)
+        # O prazo vale para todo pedido (não só para as séries do STJ): um portal mudo não leva o
+        # passo ao tempo-limite do fluxo (que mataria o processo antes da gravação).
+        if getattr(coletor, "prazo", None) is None:
+            coletor.prazo = self.prazo
         self.avisos_operacao: list[str] = []  # só log e Summary (com hora e motivo técnico)
         self.tpu = self._carregar_tpu()
         self.classificador = Classificador(regras, self.tpu)
@@ -396,6 +447,7 @@ class Rodada:
         """A entrada ``meta.json → fontes.<fid>`` (contrato §3)."""
         cfg = (self.regras.fontes.get(trib) or {}) if trib in ("stj", "stf") else {}
         velho = int((cfg.get("velho_dias") or {}).get(CHAVE_VELHO.get(fid, ""), 0) or 0) or (VELHO_TPU if fid == "tpu" else 7)
+        semana = CHAVE_VELHO.get(fid, "") in (cfg.get("dias_da_semana") or ())  # a validade conta de segunda a sexta
         base: dict[str, Any] = {
             "nome": NOMES_FONTES[fid], "trib": trib if trib in ("stj", "stf") else "cnj", "url": _url_da_fonte(self.regras, fid),
             "data_dados": None, "coletado_em": None, "ok": None, "aviso": None, "registros": None, "velho_dias": velho,
@@ -403,6 +455,8 @@ class Rodada:
         }
         if fid == "stj_integras":
             base["atraso_dias"] = None
+        if semana:
+            base["dias_da_semana"] = True
         if leitura is None:  # não tentada nesta execução: fica a entrada anterior
             antes = self.fonte_anterior(fid)
             if antes:
@@ -419,10 +473,39 @@ class Rodada:
         elif leitura.ok or leitura.dados is not None:
             base["coletado_em"] = self._coletado_em(fid, leitura)
         if leitura.ok and leitura.data_dados and not base["aviso"]:
-            dias = (self.hoje - date.fromisoformat(str(leitura.data_dados)[:10])).days
-            if dias > velho:
+            dado = date.fromisoformat(str(leitura.data_dados)[:10])
+            dias = (self.hoje - dado).days
+            if (dias_da_semana(dado, self.hoje) if semana else dias) > velho:
                 base["aviso"] = f"O dado mais recente desta fonte é de {_br(leitura.data_dados)} ({dias} dias)."
         return base
+
+
+def fonte_djen(pasta: Path, hoje: date, root: Path | None = None) -> dict[str, Any]:
+    """A entrada ``meta.json → fontes.djen`` a partir do ``djen.json`` que a máquina do dono
+    enviou (contrato do DJEN, §0.5). Sem arquivo (ou ilegível, de outra versão): ``ok: null`` e a
+    frase de que a coleta só roda no Brasil. Com o último dia a mais de ``validade_dias_uteis`` dias
+    de segunda a sexta: o aviso de que a camada saiu da página. Nada aqui pede nada à rede."""
+    cfg = djen_mod.carregar_config(root)
+    validade = int(cfg.get("validade_dias_uteis") or 4)
+    base: dict[str, Any] = {
+        "nome": NOME_DJEN, "trib": "cnj", "url": str(cfg.get("consulta") or djen_mod.CONSULTA), "data_dados": None, "coletado_em": None,
+        "ok": None, "aviso": SEM_DJEN, "registros": None, "velho_dias": validade, "dias_da_semana": True,
+        "atribuicao": str(cfg.get("atribuicao") or ""), "ativo": bool(cfg.get("ativo")), "tribunais": [],
+    }
+    d = ler_json(pasta / DJEN)
+    if not isinstance(d, dict) or d.get("v") != djen_mod.VERSAO_DJEN or not isinstance(d.get("tribunais"), dict):
+        return base
+    tribs = {k: t for k, t in d["tribunais"].items() if k in ("stj", "stf") and isinstance(t, dict)}
+    ultimos = [str(t["ultimo_dia"]) for t in tribs.values() if t.get("ultimo_dia")]
+    data = max(ultimos) if ultimos else None
+    base.update(data_dados=data, coletado_em=d.get("gerado_em"), ok=True, aviso=None,
+                registros=sum(int(((t.get("mes") or {}).get("itens")) or 0) for t in tribs.values()),
+                tribunais=sorted(k for k, t in tribs.items() if t.get("publica") and t.get("ultimo_dia")))
+    if data is None:
+        base["aviso"] = "A coleta ainda não trouxe publicação do STJ nem do STF."
+    elif dias_da_semana(date.fromisoformat(data[:10]), hoje) > validade:
+        base["aviso"] = f"Sem atualização desde {_br(data)}: a camada do DJe sai da página até a próxima coleta (na máquina do dono)."
+    return base
 
 
 def _url_da_fonte(regras: Regras, fid: str) -> str:
@@ -553,7 +636,13 @@ def _stj_auxiliares(r: Rodada, leitor: stj.LeitorSTJ, t: Tribunal, recusa: BaseE
 
     entradas["temas"] = tentar("stj_precedentes", precedentes, precedentes_estado).dados
 
-    maximo = SERIE_MAXIMO[r.opcoes.completo]
+    maximo = dict(SERIE_MAXIMO[r.opcoes.completo])
+    # Recuperação: a série já publicada cujo estado sumiu do cache (cache frio, o primeiro dia na main)
+    # baixa o que couber no prazo das séries, sem o teto por execução (60 execuções viram ~4).
+    for chave, fid in (("atas", "stj_atas"), ("integras", "stj_integras")):
+        if maximo[chave] is not None and r.estado.ler(fid) is None and r.fonte_anterior(fid).get("registros"):
+            maximo[chave] = None
+            r.operacao(f"{NOMES_FONTES[fid]}: sem a série no cache (cache frio); modo de recuperação, sem o teto por execução")
     janelas = r.regras.limiares.get("janelas") or {}
 
     # atas (os últimos 30 dias, acumulados no cache)
@@ -605,7 +694,8 @@ def _aviso_da_serie(r: Rodada, serie: stj.Serie, chave: str) -> tuple[str | None
         return (f"A coleta parou em {_br(r.opcoes.hoje, ano=False)} ({_motivo(serie.erro)}); os dados vão até {_br(serie.data_dados)}.", False)
     if serie.pendentes:
         ini, fim = serie.pendentes[0].data, serie.pendentes[-1].data
-        texto = (f"A série tem {len(serie.baixados)} {nome}; {len(serie.pendentes)} (de {_br(ini, ano=False)} a {_br(fim, ano=False)}) "
+        com_ano = chave == "integras" or str(ini or "")[:4] != str(fim or "")[:4]  # 12 meses: "de 16/10 a 08/10" se leria ao contrário
+        texto = (f"A série tem {len(serie.baixados)} {nome}; {len(serie.pendentes)} (de {_br(ini, ano=com_ano)} a {_br(fim, ano=com_ano)}) "
                  "ficam para as próximas coletas.")
         return texto, True
     return None, True
@@ -672,8 +762,47 @@ def _stj(r: Rodada) -> Tribunal:
         r.guardar("stj_acervo", t.leituras["stj_acervo"], caminho=_relativo(caminho, r.cache))
     t.painel, t.dossies, t.sinais = resultado.painel, resultado.dossies, resultado.sinais
     t.cobertura = {**resumo.para_meta(), "partes": resultado.cobertura.get("partes")}
+    manter_series(r, t)
     log.info("Tribunais: STJ, acervo de %s: %d processos em %.0f s", data, resumo.processos, resumo.segundos)
     return t
+
+
+SERIES_STJ = (("decisoes", "stj_integras", "documentos"), ("entradas", "stj_atas", "dias_com_ata"))
+
+
+def manter_series(r: Rodada, t: Tribunal) -> list[str]:
+    """A rede de segurança das séries do STJ (o cache frio, o portal que recusou): quando a série
+    de hoje cobre menos que a publicada (menos documentos de íntegras, menos dias com ata), os blocos
+    publicados ficam (no painel, em cada ministro e em cada dossiê) e a entrada da fonte no
+    ``meta.json`` também (o meta descreve o dado em uso). Ministro sem bloco anterior (posse
+    recente) fica com o de hoje. Devolve os blocos mantidos."""
+    antigo = ler_json(r.pasta / "stj.json")
+    if t.painel is None or not isinstance(antigo, dict) or antigo.get("v") != VERSAO:
+        return []
+    mantidos = []
+    for bloco, fid, medida in SERIES_STJ:
+        velho, novo = antigo.get(bloco), t.painel.get(bloco)
+        if not isinstance(velho, dict) or not velho.get(medida):
+            continue
+        if isinstance(novo, dict) and int(novo.get(medida) or 0) >= int(velho.get(medida) or 0):
+            continue
+        t.painel[bloco] = velho
+        antes_min = {m.get("id"): m for m in antigo.get("ministros") or [] if isinstance(m, dict)}
+        for m in t.painel.get("ministros") or []:
+            if bloco in (antes_min.get(m.get("id")) or {}):
+                m[bloco] = antes_min[m["id"]][bloco]
+        for mid, d in t.dossies.items():
+            velho_d = ler_json(r.pasta / MINISTROS / f"{mid}.json")
+            if isinstance(velho_d, dict) and bloco in velho_d:
+                d[bloco] = velho_d[bloco]
+        antes = r.fonte_anterior(fid)
+        if antes:
+            t.leituras[fid] = Leitura(None, antes.get("data_dados"), antes.get("registros"), ok=antes.get("ok"), aviso=antes.get("aviso"),
+                                      coletado_em=antes.get("coletado_em"), extra={"atraso_dias": antes.get("atraso_dias")})
+        r.operacao(f"{NOMES_FONTES[fid]}: a série de hoje cobre menos que a publicada ({(novo or {}).get(medida) if isinstance(novo, dict) else 0} "
+                   f"contra {velho.get(medida)} em {medida}); fica o bloco publicado")
+        mantidos.append(bloco)
+    return mantidos
 
 
 def _recusar(r: Rodada, t: Tribunal, fid: str, aviso: str) -> None:
@@ -688,6 +817,9 @@ def _sanidade(r: Rodada, t: Tribunal, fid: str, total: int, data: str | None) ->
     antes = r.fonte_anterior(fid)
     referencia = antes.get("registros")
     if not isinstance(referencia, int) or referencia <= 0 or antes.get("ok") is None:
+        return True
+    if fid.split("_", 1)[0] in r.opcoes.aceitar:  # o dono conferiu a mudança e mandou aceitar (workflow_dispatch)
+        r.operacao(f"{NOMES_FONTES[fid]}: {total} processos em {data} contra {referencia} de {antes.get('data_dados')}; aceito à mão (--aceitar-acervo)")
         return True
     razao = total / referencia
     menor = float(r.regras.limiares.get("recusa_arquivo_menor_que", SANIDADE[0]))
@@ -833,7 +965,14 @@ def proxima_execucao(fontes: Mapping[str, Mapping[str, Any]], agora: datetime) -
         dado = f.get("data_dados")
         esperado = None
         if dado and f.get("ok"):
-            esperado = datetime.combine(date.fromisoformat(str(dado)[:10]) + timedelta(days=dias), quando, UTC)
+            base = date.fromisoformat(str(dado)[:10])
+            if fid in DIAS_DA_SEMANA:  # o próximo dado é o do dia de semana seguinte; sai um dia depois dele
+                seguinte = base + timedelta(days=1)
+                while seguinte.weekday() >= 5:
+                    seguinte += timedelta(days=1)
+                esperado = datetime.combine(seguinte + timedelta(days=dias - 1), quando, UTC)
+            else:
+                esperado = datetime.combine(base + timedelta(days=dias), quando, UTC)
         if esperado is None or esperado <= agora:
             esperado = agora + timedelta(hours=ATRASADA_H)
         candidatos.append(esperado)
@@ -897,6 +1036,7 @@ def _conferir_tamanhos(r: Rodada, tribunais: dict[str, Tribunal], arquivos_fixos
     substituidos = {rel for arqs in por_trib.values() for rel in arqs}
     substituidos |= {f"{MINISTROS}/{c.name}" for trib in por_trib for c in (r.pasta / MINISTROS).glob(f"{trib}-*.json")}
     substituidos |= {f"{trib}.json" for trib in por_trib} | set(arquivos_fixos)
+    substituidos.add(DJEN)  # o djen.json (até 150 KB, da máquina do dono) não conta: a aba nunca depende dele
     total = _tamanho_atual(r.pasta, substituidos) + sum(len(x.encode("utf-8")) for arqs in por_trib.values() for x in arqs.values())
     total += sum(len(x.encode("utf-8")) for x in arquivos_fixos.values())
     if total > TETO_PASTA:
@@ -1094,6 +1234,9 @@ def atualizar(
         if fid == "datajud":
             fontes[fid] = dict(dj.fonte)
             continue
+        if fid == "djen":
+            fontes[fid] = fonte_djen(pasta, r.hoje, root)
+            continue
         trib = fid.split("_", 1)[0] if fid != "tpu" else "cnj"
         fontes[fid] = r.entrada_meta(fid, leituras.get(fid), trib)
     cobertura: dict[str, Any] = {}
@@ -1122,6 +1265,13 @@ def atualizar(
         "correcoes": list(r.anterior.get("correcoes") or []),
     }
 
+    # Só a proxima_execucao mudou (fonte atrasada: agora + 2 h a cada execução): fica a anterior e
+    # nada é regravado (sem commit, sem build do Pages). Com a marca no passado, o "decidir" roda a
+    # cada gatilho, e cada uma dessas execuções é barata (nenhum pedido novo, ~1,5 min).
+    if r.anterior.get("proxima_execucao") and {k: v for k, v in meta.items() if k != "proxima_execucao"} == {
+            k: v for k, v in json.loads(_json(r.anterior)).items() if k != "proxima_execucao"}:
+        meta["proxima_execucao"] = r.anterior["proxima_execucao"]
+
     arquivos: dict[str, str] = {}
     apagar: list[Path] = []
     for trib, arqs in por_trib.items():  # os dossiês primeiro, o painel depois
@@ -1148,10 +1298,13 @@ def atualizar(
             diario.write_text("".join(json.dumps(linha, ensure_ascii=False) + "\n" for linha in coletor.diario), encoding="utf-8")
         except OSError as exc:
             log.warning("Tribunais: diário da coleta não gravado (%s)", exc)
-    if not avisos and not r.avisos_operacao:
-        apagados = coletor.limpar(dias=10.0)
-        if apagados:
-            log.info("Tribunais: %d arquivo(s) velhos apagados do cache", apagados)
+    # A poda do cache roda sempre (o aviso informativo das íntegras não é falha) e nunca apaga o que
+    # um estado cita: o socorro de cada fonte, as séries e o acervo do STJ em uso.
+    citados = r.estado.citados()
+    apagados = coletor.limpar(dias=10.0, proteger=citados)
+    acervos = coletor.podar_grandes(proteger=citados)
+    if apagados or acervos:
+        log.info("Tribunais: %d arquivo(s) velhos e %d acervo(s) do STJ fora de uso apagados do cache", apagados, len(acervos))
 
     resultado.refeitos = sorted(refeitos)
     resultado.numeros = {trib: _numeros(t) for trib, t in refeitos.items()}

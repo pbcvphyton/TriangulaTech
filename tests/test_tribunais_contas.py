@@ -353,3 +353,123 @@ def test_o_que_o_presidente_assinou_vai_para_a_presidencia():
     assert painel["presidencia"] == 4 and painel["documentos"] == 6
     assert por["stj-herman-benjamin"]["documentos"] == 1  # só o de 01/09, de volta à Primeira Turma
     assert por["stj-luis-felipe-salomao"]["documentos"] == 1  # o de 20/08, antes de presidir
+
+
+# ── a revisão adversarial (23/11/2026) ───────────────────────────────────────────────────────
+
+
+def test_quem_se_repete_divide_pela_propria_base(resultado: contas.Resultado) -> None:
+    """N1: a parte de cada litigante é sobre a base de "quem se repete" (sem segredo e sem
+    precatório), a mesma do dossiê; não sobre o acervo inteiro."""
+    base = resultado.cobertura["partes"]["base"]
+    assert base == 6066 - 1 - 25  # o acervo, sem o processo em segredo e sem os 25 precatórios
+    top = {x["id"]: x for x in resultado.painel["partes"]["top"]}
+    assert top["banco-do-brasil"]["p"] == contas.fracao(2000, base)
+    assert top["banco-do-brasil"]["p"] != contas.fracao(2000, resultado.painel["universo"]["processos"])
+
+
+def _mesa_t4(antigos: dict[str, int], n: int = 1200) -> list[dict]:
+    """A Quarta Turma com ``n`` processos na mesa por gabinete e ``antigos[mid]`` deles sem decisão há mais de um ano."""
+    saida, i = [], 0
+    for mid, k in antigos.items():
+        for j in range(n):
+            i += 1
+            saida.append(proc(i, mid, dias=500 if j < k else 100))
+    return saida
+
+
+def test_mesa_antiga_sem_quem_chegou_ha_menos_de_um_ano() -> None:
+    """N4 e J4: Gambogi (convocado, na Turma desde 23/02/2026) não pode ter nada acima de um ano
+    por construção: fica fora dos candidatos e dos pares, e o achado diz quantos pares entraram."""
+    lote = _mesa_t4({"stj-raul-araujo": 360, "stj-joao-otavio-de-noronha": 120, "stj-maria-isabel-gallotti": 120,
+                     "stj-antonio-carlos-ferreira": 120, "stj-luis-carlos-gambogi": 0})
+    r = contas.montar("stj", lote, REGRAS, data_dados=DATA, hoje=HOJE)
+    [s] = [x for x in r.sinais["mesa"] if x["turma"] == "T4"]
+    assert s["ministro"] == "stj-raul-araujo" and s["n_pares"] == 3 and s["fora"] == ["stj-luis-carlos-gambogi"]
+    assert (s["pares_k"], s["pares_n"]) == (360, 3600)  # sem Gambogi: o recém-chegado não baixa a taxa dos pares
+    gambogi = next(m for m in r.painel["ministros"] if m["id"] == "stj-luis-carlos-gambogi")
+    assert gambogi["relogio"] == "2026-02-23"  # a página troca o "0 há mais de um ano" pela data em que o relógio recomeçou
+
+
+def test_distribuicao_reduzida_e_os_pares_da_mesa() -> None:
+    """J3: com 20 dias de ata ou mais, quem recebe menos que metade da mediana da Turma (o TSE) ganha
+    o selo e sai da comparação da mesa; Turma com menos de 2 pares fica sem candidato."""
+    c = contas.Contas("stj", REGRAS, data_dados=DATA, hoje=HOJE)
+    recebido = {"stj-nancy-andrighi": 1199, "stj-humberto-martins": 1174, "stj-ricardo-villas-boas-cueva": 129,
+                "stj-moura-ribeiro": 1121, "stj-daniela-teixeira": 1150,
+                "stj-sebastiao-reis-junior": 421, "stj-rogerio-schietti": 1428, "stj-carlos-pires-brandao": 1413,
+                "stj-nilsoni-de-freitas": 1443, "stj-fatima-maranhao": 0}
+    por = {mid: {"resumo": {"sorteio_30d": n}} for mid, n in recebido.items()}
+    assert c._distribuicao_reduzida({"dias_com_ata": 25}, por) == {"stj-ricardo-villas-boas-cueva", "stj-sebastiao-reis-junior"}
+    assert c._distribuicao_reduzida({"dias_com_ata": 12}, por) == set()  # poucas atas: não se sabe
+    # a mesa: Cueva com a mesa mais antiga da Terceira Turma sai dos candidatos; o candidato passa a ser outro
+    i = 0
+    for mid, k in {"stj-ricardo-villas-boas-cueva": 400, "stj-moura-ribeiro": 230, "stj-nancy-andrighi": 120,
+                   "stj-humberto-martins": 120, "stj-daniela-teixeira": 120,
+                   "stj-sebastiao-reis-junior": 300, "stj-rogerio-schietti": 300, "stj-carlos-pires-brandao": 60,
+                   "stj-nilsoni-de-freitas": 0, "stj-fatima-maranhao": 0}.items():
+        for j in range(1200):
+            i += 1
+            c.somar(proc(i, mid, dias=500 if j < k else 100))
+    comparavel = {mid: True for mid in c.grade}
+    selos = {"stj-ricardo-villas-boas-cueva": ["distribuicao_reduzida"], "stj-sebastiao-reis-junior": ["distribuicao_reduzida"]}
+    relogio = {"stj-nilsoni-de-freitas": "2026-05-18", "stj-fatima-maranhao": "2026-11-17"}
+    sinais = {s["turma"]: s for s in c._sinais_mesa(comparavel, 0.01, 0.8, 1.25, 0.02, selos=selos, relogio=relogio)}
+    assert sinais["T3"]["ministro"] == "stj-moura-ribeiro" and "stj-ricardo-villas-boas-cueva" in sinais["T3"]["fora"]
+    assert "T6" not in sinais  # Schietti contra um par só (Brandão): sem comparação
+    sem = {s["turma"]: s for s in c._sinais_mesa(comparavel, 0.01, 0.8, 1.25, 0.02)}
+    assert sem["T3"]["ministro"] == "stj-ricardo-villas-boas-cueva"  # sem o selo, o TSE parecia a mesa mais antiga
+
+
+def _stf(i: int, relator: str, area: str) -> dict:
+    p = proc(i, relator, area, classe="ARE")
+    p.update(trib="stf", id=f"stf-ARE-{i}", registro=None, orgao=None, sem_decisao_dias=None, concluso_dias=100)
+    p["datas"] = {"autuacao": None, "ano_autuacao": 2026, "distribuicao": None, "ultima_decisao": None, "andamento": "2026-08-01",
+                  "localizacao": None}
+    return p
+
+
+def test_stf_quem_concentra_uma_area_sai_dos_pares_dos_outros() -> None:
+    """J11: no STF os pares são o tribunal inteiro; as ações penais que um gabinete concentra (Moraes,
+    por prevenção) não podem marcar Penal "abaixo" em quem não as tem."""
+    from dataclasses import replace
+
+    penal = {"stf-alexandre-de-moraes": 0.60, "stf-flavio-dino": 0.24}
+    lote, i = [], 0
+    for m in REGRAS.composicao["stf"].da_grade():
+        for j in range(1500):
+            i += 1
+            lote.append(_stf(i, m.id, "penal" if j < 1500 * penal.get(m.id, 0.28) else "civil"))
+    r = contas.montar("stf", lote, REGRAS, data_dados="2026-11-22", hoje=HOJE, completar_partes=False)
+    dino = next(m for m in r.painel["ministros"] if m["id"] == "stf-flavio-dino")
+    moraes = next(m for m in r.painel["ministros"] if m["id"] == "stf-alexandre-de-moraes")
+    assert moraes["areas"]["penal"]["marca"] == 1 and dino["areas"]["penal"]["marca"] == 0
+    [x] = [x for x in r.sinais["marcas"] if x["ministro"] == "stf-flavio-dino" and x["area"] == "penal"]
+    assert x["fora"] == ["stf-alexandre-de-moraes"]
+    comp = dict(REGRAS.limiares["comparacao"], sem_destoante=[])
+    sem = contas.montar("stf", lote, replace(REGRAS, limiares={**REGRAS.limiares, "comparacao": comp}), data_dados="2026-11-22",
+                        hoje=HOJE, completar_partes=False)
+    assert next(m for m in sem.painel["ministros"] if m["id"] == "stf-flavio-dino")["areas"]["penal"]["marca"] == -1
+
+
+def test_nome_de_quem_saiu_arrumado() -> None:
+    """J21: o parêntese do convocado vem arrumado; quem está em ``saiu`` sai com o nome canônico."""
+    assert contas._nome_relator("JESUÍNO RISSATO (DESEMBARGADOR Convocado do Tjdft)") == "Jesuíno Rissato (desembargador convocado do TJDFT)"
+    assert contas._nome_relator("CARLOS CINI MARCHIONATTI (DESEMBARGADOR Convocado Tjrs)") == (
+        "Carlos Cini Marchionatti (desembargador convocado do TJRS)")
+    assert REGRAS.composicao["stj"].saida("Marco Buzzi") == ("Marco Buzzi", "em disponibilidade")
+
+
+def test_quem_chegou_dentro_da_janela_nao_ganha_distribuicao_reduzida() -> None:
+    """Quem chegou à Turma há menos de 30 dias (Fátima Maranhão, convocada em 17/11) não teve os 30 dias
+    de sorteio: não leva o selo "distribuição reduzida" nem "sem distribuição", e não entra na mediana."""
+    c = contas.Contas("stj", REGRAS, data_dados="2026-11-22", hoje=HOJE)
+    fatima = c.ministros["stj-fatima-maranhao"]
+    assert fatima.turma_desde == "2026-11-17" and c._chegou_na_janela(fatima, date(2026, 11, 22))
+    assert not c._chegou_na_janela(c.ministros["stj-rogerio-schietti"], date(2026, 11, 22))
+    recebido = {"stj-sebastiao-reis-junior": 1420, "stj-rogerio-schietti": 1428, "stj-carlos-pires-brandao": 1413,
+                "stj-nilsoni-de-freitas": 1443, "stj-fatima-maranhao": 214}  # ~43 por dia em 5 dias: o ritmo dos pares
+    por = {mid: {"resumo": {"sorteio_30d": n}} for mid, n in recebido.items()}
+    assert "stj-fatima-maranhao" not in c._distribuicao_reduzida({"dias_com_ata": 25}, por)
+    # sem a regra da janela, os 214 em 5 dias pareceriam "menos que metade" dos 1.420 dos pares
+    assert 214 < 0.5 * 1420

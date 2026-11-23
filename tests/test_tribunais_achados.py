@@ -131,3 +131,26 @@ def test_de_ponta_a_ponta_com_as_contas() -> None:
     for a in out["achados"]:
         assert set(a) == {"tipo", "trib", "peso", "selo", "titulo", "texto", "alvo", "ministro", "prova"}
         assert a["alvo"].startswith("#v=") and "&t=stj" in a["alvo"]
+
+
+def test_heranca_soma_os_dias_grandes_da_semana() -> None:
+    """N7: a herança de Fátima Maranhão veio em três dias; o título soma os dias grandes (o maior à
+    parte) e o texto diz o que veio por distribuição (sorteio ou prevenção), não "por sorteio"."""
+    fatima = _ministro("stj-fatima-maranhao", convocado={"tribunal": "TJPB", "vaga_de": None, "desde": "2026-11-17"},
+                       comparavel=False, processos=4637, entradas={"sorteio_30d": 214})
+    sinais = _sinais(heranca={"stj-fatima-maranhao": [["2026-11-17", 660], ["2026-11-18", 2791], ["2026-11-19", 1014], ["2026-11-21", 2]]})
+    [a] = achados.montar(REGRAS, {"stj": _painel("stj", [fatima])}, {"stj": sinais}, hoje=HOJE)["achados"]
+    assert a["titulo"].endswith("recebeu 4.465 processos por atribuição entre 17/11 e 19/11/2026 (2.791 só em 18/11)")
+    assert "(214 em 30 dias, sorteio ou prevenção)" in a["texto"] and "por sorteio" not in a["texto"]
+    assert a["prova"]["data"] == "2026-11-19"
+
+
+def test_mesa_antiga_diz_os_pares_que_entraram() -> None:
+    """N4: "nos outros N gabinetes que entram na comparação", com quem ficou fora dito pelo nome."""
+    sinal = {"turma": "T4", "ministro": "stj-raul-araujo", "k": 2800, "n": 10289, "p": 0.2721, "pares": 0.191, "pares_k": 4320,
+             "pares_n": 22626, "n_pares": 3, "fora": ["stj-luis-carlos-gambogi"], "p_valor": 1e-40, "passa": True}
+    painel = _painel("stj", [_ministro(m) for m in [*T4, "stj-luis-carlos-gambogi"]])
+    [a] = achados.montar(REGRAS, {"stj": painel}, {"stj": _sinais(mesa=[sinal])}, hoje=HOJE)["achados"]
+    assert "sem decisão terminativa registrada há mais de um ano" in a["titulo"]
+    assert "Nos outros três gabinetes da Quarta Turma que entram na comparação, 19,1% (4.320 de 22.626)" in a["texto"]
+    assert "Ficam fora da comparação Luís Carlos Gambogi" in a["texto"]

@@ -234,6 +234,12 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
         sem_decisao = _idade(rnd, 110 if trib == "stj" else 70, na_mesa)
         no_tribunal = _idade(rnd, 300, total)
         no_tribunal.update({"mais_180": 0, "mais_365": 0})
+        autuacao = None
+        if trib == "stf":  # a planilha do STF só dá o ano de autuação: nenhuma idade em dias, vale o ano (contas._autuacao)
+            no_tribunal = {k: None for k in no_tribunal} | {"mais_180": 0, "mais_365": 0}
+            em_2026 = int(total * rnd.uniform(0.66, 0.8))
+            autuacao = {"ano_mediano": 2026, "no_ano_dos_dados": _r4(em_2026 / total),
+                        "por_ano": [[2024, int((total - em_2026) * 0.3)], [2025, total - em_2026 - int((total - em_2026) * 0.3)], [2026, em_2026]]}
         entradas = {"sorteio_12m": int(total * 0.45), "heranca_12m": 1014 if "heranca" in m["selos"] else 0,
                     "sorteio_30d": int(total * 0.04), "heranca_30d": 1014 if "heranca" in m["selos"] else 0} if m["grade"] else None
         item = {
@@ -243,7 +249,9 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
             "comparavel": m["grade"] and not set(m["selos"]) & {"heranca", "recem_chegado"},
             "processos": total, "na_mesa": na_mesa, "onde": onde, "segredo": int(total * (0.3 if m["grupo"] == "s2" else 0.05)),
             "sobrestados": int(total * 0.01), "liminar": int(total * 0.08), "ente_publico": int(total * (0.6 if m["grupo"] in ("s1", "t1", "t2") else 0.02)),
-            "sem_decisao": sem_decisao, "no_tribunal": no_tribunal, "areas": m["areas"],
+            "sem_decisao": sem_decisao, "no_tribunal": no_tribunal, **({"autuacao": autuacao} if autuacao else {}),
+            # a convocada recém-chegada: o relógio da mesa recomeçou na chegada à Turma (contas.relogio)
+            **({"relogio": "2026-11-17"} if "recem_chegado" in m["selos"] else {}), "areas": m["areas"],
             "subareas": subareas[: lim["listas"]["subareas_painel"]], "partes": partes,
             "mais_antigos": antigos[: lim["listas"]["painel_mais_antigos"]],
             "entradas": entradas,
@@ -307,7 +315,7 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
                 "liminar": sum(r["liminar"] for r in resumo), "ente_publico": ente_n,
                 "sem_decisao_180": sum(r["sem_decisao"]["mais_180"] for r in resumo if r["grupo"] != "pr"),
                 "sem_decisao_365": sum(r["sem_decisao"]["mais_365"] for r in resumo if r["grupo"] != "pr"),
-                "pessoas_fisicas": int(total_trib * 0.43)}
+                "pessoas_fisicas": int(total_trib * 0.43), "recursos": int(total_trib * (0.88 if trib == "stj" else 0.56))}
     folhas_fila.sort(key=lambda f: (-(f["sem_decisao_dias"] or f["concluso_dias"] or 0), f["id"]))
     vistas = []
     if trib == "stf":
@@ -315,7 +323,10 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
     p = {
         "v": VERSAO, "trib": trib, "nome": NOMES[trib], "sigla": trib.upper(), "data_dados": DATA_DADOS[trib],
         "universo": universo,
-        "idade": {"sem_decisao": _idade(rnd, 112, universo["na_mesa"]), "no_tribunal": {**_idade(rnd, 301, soma_grade), "mais_180": 0, "mais_365": 0}},
+        "idade": {"sem_decisao": _idade(rnd, 112, universo["na_mesa"]), "no_tribunal": {**_idade(rnd, 301, soma_grade), "mais_180": 0, "mais_365": 0}}
+        if trib == "stj" else {"sem_decisao": _idade(rnd, 112, universo["na_mesa"]),
+                               "no_tribunal": {"mediana": None, "p25": None, "p75": None, "p90": None, "max": None, "mais_180": 0, "mais_365": 0},
+                               "autuacao": {"ano_mediano": 2026, "no_ano_dos_dados": 0.7209, "por_ano": [[2024, 1900], [2025, 2400], [2026, 11182]]}},
         "grupos": grupos, "media": media, "ministros": resumo, "fora_da_grade": fora, "areas": areas, "recortes": recortes,
         "partes": {"top": top, "pessoas_fisicas": universo["pessoas_fisicas"],
                    "ente_publico": {"n": ente_n, "p": _r4(ente_n / total_trib), "por_grupo": {g["id"]: [sum(r["ente_publico"] for r in resumo if r["grupo"] == g["id"]), g["processos"]] for g in grupos if g["id"] != "pr"}},
@@ -336,8 +347,8 @@ def painel(trib: str, *, semente: int = 7) -> tuple[dict[str, Any], dict[str, di
                      "processos": int(soma_grade * 0.85), "documentos": int(soma_grade), "monocraticas": int(soma_grade * 0.76), "acordaos": int(soma_grade * 0.24),
                      "acordaos_recurso_interno": int(soma_grade * 0.14), "presidencia": int(soma_grade * 0.19)},
         "temas": {"fonte": "stj_precedentes" if trib == "stj" else "stf_rg", "pendentes": 130 if trib == "stj" else 151,
-                  "por_tipo": {"repetitivo": 120, "iac": 10, "rg": 0} if trib == "stj" else {"repetitivo": 0, "iac": 0, "rg": 151},
-                  "relator_saiu": [["Relator Que Saiu", 2]]},
+                  "por_tipo": {"repetitivo": 120, "iac": 10, "rg": 0, "controversia": 19, "relevancia": 10} if trib == "stj" else {"repetitivo": 0, "iac": 0, "rg": 151},
+                  "relator_saiu": [["Relator Que Saiu", 2, "aposentado"], ["Relatora Em Disponibilidade", 1, "em disponibilidade"]], "sem_relator": 1},
         "valor": {"publicado": False, "texto": "Nenhuma fonte aberta do STF nem do STJ publica o valor da causa. A página não estima.",
                   "medidas": {"ente_publico": {"n": ente_n, "p": _r4(ente_n / total_trib)}, "liminar": {"n": universo["liminar"], "p": _r4(universo["liminar"] / total_trib)},
                               "recortes": {r["id"]: r["n"] for r in recortes if r["id"] in REGRAS.recortes_economicos}}},
@@ -370,7 +381,9 @@ def _dossie(trib: str, item: dict[str, Any], m: dict[str, Any], antigos: list[di
         "recortes": [{"id": "bancario", "n": int(total * 0.12), "p": 0.12, "pares": 0.14}, {"id": "dano_moral", "n": int(total * 0.04), "p": 0.04, "pares": 0.035}],
         "classes": sorted(([c, int(total * f)] for c, f in zip(_CLASSES[trib], (0.48, 0.31, 0.09, 0.05, 0.03, 0.02, 0.02), strict=True)), key=lambda x: (-x[1], x[0])),
         "onde": item["onde"],
-        "idade": {"no_tribunal": {"faixas": [[f, no_trib[f]] for f in faixas], "mediana": item["no_tribunal"]["mediana"], "p90": item["no_tribunal"]["p90"]},
+        "idade": {"no_tribunal": {"faixas": [[f, no_trib[f]] for f in faixas] if trib == "stj" else None, "mediana": item["no_tribunal"]["mediana"],
+                                  "p90": item["no_tribunal"]["p90"]},
+                  **({"autuacao": item["autuacao"]} if item.get("autuacao") else {}),
                   "sem_decisao": {"faixas": [[f, sem_dec[f]] for f in faixas], "mediana": item["sem_decisao"]["mediana"], "p90": item["sem_decisao"]["p90"],
                                   "mais_180": item["sem_decisao"]["mais_180"], "mais_365": item["sem_decisao"]["mais_365"]}},
         "mais_antigos": antigos,
@@ -435,7 +448,9 @@ def meta(paineis: dict[str, dict[str, Any]], *, estado: str = "ok") -> dict[str,
     cobertura = {
         t: {"processos": p["universo"]["processos"], "na_grade": p["universo"]["na_grade"], "segredo": p["universo"]["segredo"],
             "area_por": {"principal": int(p["universo"]["processos"] * 0.9), "classe": int(p["universo"]["processos"] * 0.1)},
-            "relatores_fora_do_mapa": [], "fora_da_grade": {f["id"]: f["n"] for f in p["fora_da_grade"]}}
+            "relatores_fora_do_mapa": [], "fora_da_grade": {f["id"]: f["n"] for f in p["fora_da_grade"]},
+            # quem se repete: sem os processos em segredo e sem os precatórios (contas.base_partes)
+            "partes": {"base": p["universo"]["processos"] - p["universo"]["segredo"] - (8000 if t == "stj" else 0)}}
         for t, p in paineis.items()
     }
     if "stf" in cobertura:
@@ -482,12 +497,53 @@ def achados(paineis: dict[str, dict[str, Any]]) -> dict[str, Any]:
     return {"v": VERSAO, "hoje": HOJE, "achados": lista}
 
 
+def djen(paineis: dict[str, dict[str, Any]], *, ultimo_dia: str = "2026-11-20") -> dict[str, Any]:
+    """Um ``djen.json`` de mentira (contrato do DJEN), com os ministros da fábrica: o STJ publica no
+    DJEN; o STF, não (``publica: false``). Um processo da mesa em cada lista, nunca em segredo."""
+    stj = paineis["stj"]
+    ministros = {}
+    for i, m in enumerate(x for x in stj["ministros"] if x["grupo"] != "pr"):
+        f = m["mais_antigos"][0]
+        bloco = {"itens": 10 + i, "processos": 8 + i, "tipos": {"decisao": 6 + i, "acordao": 3, "despacho": 1}, "areas": {"civil": 4, "penal": 4 + i}}
+        ministros[m["id"]] = {"dia": {"itens": 1, "processos": 1, "tipos": {"decisao": 1}, "areas": {"civil": 1}},
+                              "mes": {**bloco, "mesa": 3}, "partes": ["ente-federal-a"],
+                              "mesa": {"na_mesa": m["na_mesa"], "publicados": 3, "parte": round(3 / m["na_mesa"], 4),
+                                       "lista": [{"id": f["id"], "classe": f["classe"], "numero": f["numero"], "cnj": f["cnj"], "registro": f["registro"],
+                                                  "area": f["area"], "tipo": "decisao", "dia": ultimo_dia, "dias_sem_decisao": f["sem_decisao_dias"]}]}}
+    mes = {"itens": 4210, "processos": 3988, "tipos": {"decisao": 2500, "acordao": 1200, "despacho": 400, "pauta": 110}, "areas": {"civil": 1500, "penal": 1300, "tributario": 400, "sem_area": 30},
+           "mesa": 812, "partes": {"ativo": [["ente-federal-a", 120]], "passivo": [["banco-exemplo", 90]], "com_pf": 2100, "com_pj": 800, "com_ente": 900}}
+    dia = {"itens": 212, "processos": 201, "tipos": {"decisao": 150, "acordao": 50, "despacho": 12}, "areas": {"civil": 80, "penal": 70}, "mesa": 40,
+           "partes": {"ativo": [], "passivo": [], "com_pf": 100, "com_pj": 40, "com_ente": 50}}
+    vazio = {"itens": 0, "processos": 0, "tipos": {}, "areas": {}}
+    return {
+        "v": 1, "gerado_em": "2026-11-23T11:17:00Z", "hoje": HOJE, "origem": "coletado no Brasil, fora do GitHub Actions",
+        "fonte": {"nome": "DJEN", "url": "https://comunica.pje.jus.br/consulta", "api": "https://comunicaapi.pje.jus.br/api/v1/comunicacao",
+                  "atribuicao": "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)"},
+        "janela": {"de": "2026-10-24", "ate": "2026-11-22", "dias_uteis": 20},
+        "reguas": {"tipos": [{"id": "decisao", "nome": "Decisões"}], "relator": "O relator sai do gabinete que publicou, da linha \"Relator\" do texto ou do acervo",
+                   "mesa": "\"Na mesa\" é o processo no gabinete do relator no acervo do dia, casado pelo número único",
+                   "area": "A área é a do processo no acervo; sem ela, a da classe", "partes": "As partes contam só pelo grupo do litigante",
+                   "segredo": "Processo em segredo conta nos números e nunca é listado"},
+        "tribunais": {
+            "stj": {"sigla": "STJ", "publica": True, "ultimo_dia": ultimo_dia, "coletado_em": "2026-11-23T11:17:00Z",
+                    "dias": [[ultimo_dia, 212, True]], "dia": dia, "mes": mes, "ministros": ministros, "fora": {}, "orgaos": {},
+                    "acervo": {"data": "2026-11-20", "processos": 352239, "casados": 3988, "processos_casados": 3988},
+                    "cobertura": {"itens": 4210}, "avisos": []},
+            "stf": {"sigla": "STF", "publica": False, "ultimo_dia": None, "coletado_em": "2026-11-23T11:17:00Z", "dias": [], "dia": vazio, "mes": vazio,
+                    "ministros": {}, "fora": {}, "orgaos": {}, "acervo": None, "cobertura": {"itens": 0}, "avisos": []},
+        },
+        "grupos": {"ente-federal-a": "Ente Federal A", "banco-exemplo": "Banco Exemplo"}, "avisos": [],
+    }
+
+
 def _json(dado: Any) -> str:
     return json.dumps(dado, ensure_ascii=False, separators=(",", ":")) + "\n"
 
 
-def gravar(data_dir: Path, *, tribunais: tuple[str, ...] = ("stf", "stj"), estado: str = "ok", semente: int = 7) -> Path:
-    """Grava ``<data_dir>/tribunais/`` inteiro e devolve a pasta."""
+def gravar(data_dir: Path, *, tribunais: tuple[str, ...] = ("stf", "stj"), estado: str = "ok", semente: int = 7,
+           com_djen: str | None = None) -> Path:
+    """Grava ``<data_dir>/tribunais/`` inteiro e devolve a pasta. ``com_djen``: o último dia do
+    ``djen.json`` de mentira (sem ele, sem a camada do DJe)."""
     pasta = Path(data_dir) / "tribunais"
     (pasta / "ministros").mkdir(parents=True, exist_ok=True)
     paineis, dossies = {}, {}
@@ -500,4 +556,12 @@ def gravar(data_dir: Path, *, tribunais: tuple[str, ...] = ("stf", "stj"), estad
         (pasta / "ministros" / f"{mid}.json").write_text(_json(d), encoding="utf-8")
     (pasta / "meta.json").write_text(_json(meta(paineis, estado=estado)), encoding="utf-8")
     (pasta / "achados.json").write_text(_json(achados(paineis)), encoding="utf-8")
+    if com_djen and "stj" in paineis:
+        (pasta / "djen.json").write_text(_json(djen(paineis, ultimo_dia=com_djen)), encoding="utf-8")
+        m = json.loads((pasta / "meta.json").read_text(encoding="utf-8"))
+        m["fontes"]["djen"] = {"nome": "CNJ · DJe (DJEN)", "trib": "cnj", "url": "https://comunica.pje.jus.br/consulta", "data_dados": com_djen,
+                               "coletado_em": "2026-11-23T11:17:00Z", "ok": True, "aviso": None, "registros": 4210, "velho_dias": 4,
+                               "dias_da_semana": True, "atribuicao": "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)", "ativo": True,
+                               "tribunais": ["stj"]}
+        (pasta / "meta.json").write_text(_json(m), encoding="utf-8")
     return pasta

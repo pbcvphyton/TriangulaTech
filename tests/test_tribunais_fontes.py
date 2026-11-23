@@ -380,3 +380,66 @@ def test_fetch_com_assinatura_de_net(tmp_path: Path) -> None:
     c.consulta(JURIS, {"q": 1})
     assert recebidos <= aceitos and {"data", "method"} <= recebidos
 
+
+
+# ── disjuntor e prazo (revisão de 23/11/2026, OP-1) ─────────────────────────────────────────
+
+
+def test_host_mudo_fica_fora_ate_o_fim_da_execucao(tmp_path: Path) -> None:
+    """Um pedido que esgota as tentativas sem resposta põe o host fora: o pedido seguinte falha
+    na hora, sem rede. Erro com status, resposta grande demais e o DataJud (``robots: api``) não."""
+    url1, url2 = f"{STF}/a.asp", f"{STF}/b.asp"
+    fetch = FetchFalso({f"{STF}/robots.txt": b"", url1: FetchError(url1, "URLError: timed out"), url2: b"b"})
+    c = coletor(tmp_path, fetch)
+    with pytest.raises(FetchError):
+        c.texto(url1)
+    with pytest.raises(FetchError, match="não respondeu"):
+        c.texto(url2)
+    assert fetch.urls().count(url2) == 0
+    # status HTTP e "maior que" não abrem o disjuntor
+    url3, url4 = f"{STJ}/x", f"{STJ}/y"
+    fetch2 = FetchFalso({f"{STJ}/robots.txt": b"", url3: [FetchError(url3, "HTTP 500", status=500)], url4: FetchError(url4, "resposta maior que 10 bytes")})
+    c2 = coletor(tmp_path / "2", fetch2)
+    for u in (url3, url4, url3):
+        with pytest.raises(FetchError):
+            c2.texto(u)
+    assert fetch2.urls().count(url3) == 2
+    # o DataJud: a queda vale nova tentativa (o disjuntor dele é outro)
+    regras = carregar_regras()
+    dj = regras.datajud["url"]
+    fetch3 = FetchFalso({dj: [FetchError(dj, "URLError: reset"), b'{"hits": {"hits": []}}']})
+    c3 = ColetorTribunais(tmp_path / "3", regras=regras, fetch=fetch3, relogio=Relogio(), dormir=lambda s: None)
+    c3._robots["api-publica.datajud.cnj.jus.br"] = fontes.ler_robots("")
+    with pytest.raises(FetchError):
+        c3.consulta(dj, {"q": 1})
+    assert c3.consulta(dj, {"q": 1}) == {"hits": {"hits": []}}
+
+
+def test_prazo_encurta_e_corta_os_pedidos(tmp_path: Path) -> None:
+    """Perto do prazo, o tempo-limite e as tentativas encolhem; depois dele, nada é pedido
+    (``PrazoEsgotado``, que não põe o host fora). Tempo e tentativas por host vêm do config."""
+    relogio = Relogio(1000.0)
+    url = f"{STF}/a.asp"
+    fetch = FetchFalso({f"{STF}/robots.txt": b"", url: b"a"})
+    c = coletor(tmp_path, fetch, relogio)
+    c.prazo = 1060.0
+    assert c._limites(url, 180.0, 3) == (20.0, 0)  # 60 s: uma tentativa de 20 s (até 3 × de leitura)
+    c.texto(url)
+    assert fetch.pedidos[-1]["timeout"] == 20.0 and fetch.pedidos[-1]["retries"] == 0
+    relogio.t = 1061.0
+    with pytest.raises(fontes.PrazoEsgotado):
+        c.texto(f"{STF}/b.asp")
+    assert "portal.stf.jus.br" not in c._hosts_fora
+    regras = carregar_regras()
+    cfg = ColetorTribunais(tmp_path / "c", regras=regras, fetch=fetch, relogio=Relogio(), dormir=lambda s: None)
+    assert cfg._limites("https://www.stf.jus.br/arquivo/x.xlsx", 180.0, 3) == (60.0, 1)  # a planilha do STF
+
+
+def test_a_espera_do_403_nao_passa_do_prazo(tmp_path: Path) -> None:
+    relogio = Relogio(1000.0)
+    url = f"{STJ}/dataset/x"
+    c = coletor(tmp_path, FetchFalso({f"{STJ}/robots.txt": b"", url: recusa(url)}), relogio)
+    c.prazo = 1060.0  # a espera do 403 (120 s) passaria do prazo
+    with pytest.raises(fontes.PrazoEsgotado):
+        c.texto(url)
+    assert relogio.esperas == []

@@ -19,7 +19,16 @@ validade, gravação atômica, ``fetch`` injetável, contagem de pedidos e bytes
 - baixa **arquivo grande em fluxo para o disco** (o acervo do STJ tem 82 MB com gzip);
 - faz **POST** (consulta Elasticsearch da jurisprudência do STF, DataJud, SOAP do SGT) com cache
   pela URL **mais o corpo**; resposta Elasticsearch com ``_shards.failed > 0`` ou ``timed_out``
-  vira :class:`RespostaParcial` e não vai ao cache.
+  vira :class:`RespostaParcial` e não vai ao cache;
+- tem um **disjuntor por host**: um pedido que esgota as tentativas sem resposta nenhuma (tempo
+  esgotado, conexão recusada ou derrubada) põe o host fora do ar até o fim da execução, e os pedidos
+  seguintes a ele falham na hora (um portal mudo não come o prazo da coleta inteira). Os hosts de
+  API (``robots: api``, o DataJud) ficam de fora: lá a queda vale nova tentativa, com disjuntor
+  próprio (``datajud.py``);
+- respeita um **prazo** (``prazo``, instante no relógio do coletor; ``None`` = sem prazo, o padrão):
+  perto dele cada pedido encurta o tempo-limite e as tentativas, e depois dele nada é pedido
+  (:class:`PrazoEsgotado`, que não conta no disjuntor). ``timeout_s`` e ``tentativas`` por host vêm de
+  ``fontes.hosts`` do config.
 
 O User-Agent é o do projeto (``net.USER_AGENT``), que se identifica como robô e dá o endereço.
 
@@ -57,6 +66,7 @@ GRANDE_MAX_BYTES = 2_000_000_000  # acervo do STJ: 82 MB com gzip (518 MB aberto
 API_MAX_BYTES = 120_000_000
 BLOCO = 1 << 20  # 1 MB por leitura no download em fluxo
 PASTAS_DO_CACHE = ("arquivos", "api", "paginas", "robots")
+GRANDE_PODA_BYTES = 40_000_000  # acima disto, arquivo fora de uso sai do cache já (o acervo do STJ: 82 MB por dia)
 
 Baixador = Callable[..., int]  # (url, destino, *, timeout, headers, max_bytes) -> bytes gravados
 
@@ -72,6 +82,20 @@ class RecusaDoHost(FetchError):
 class RespostaParcial(FetchError):
     """Resposta Elasticsearch incompleta (``_shards.failed > 0`` ou ``timed_out``): o número
     estaria errado sem erro HTTP, então não vale."""
+
+
+class PrazoEsgotado(FetchError):
+    """O prazo desta execução acabou (o nosso, não o do servidor): nada foi pedido, ou o pedido foi
+    cortado. Não põe o host fora do ar; o que faltou fica para a próxima execução."""
+
+
+def _queda(exc: FetchError) -> bool:
+    """Falha de rede depois das tentativas (sem status HTTP): tempo esgotado, conexão recusada ou
+    derrubada. Não é queda: o nosso prazo, resposta grande demais, formato, URL recusada."""
+    if exc.status is not None or isinstance(exc, (PrazoEsgotado, RespostaParcial, CaminhoVedado, RecusaDoHost)):
+        return False
+    texto = str(exc).lower()
+    return not any(x in texto for x in ("maior que", "esquema de url", "formato"))
 
 
 def _host(url: str) -> str:
@@ -175,17 +199,26 @@ def baixar_em_fluxo(
     max_bytes: int = GRANDE_MAX_BYTES,
     tentativas: int = 3,
     dormir: Callable[[float], None] = time.sleep,
+    prazo_s: float | None = None,
 ) -> int:
     """Baixa ``url`` direto para ``destino`` (temporário na mesma pasta + ``os.replace``), em blocos
     de 1 MB, sem guardar o arquivo inteiro na memória. Confere o ``Content-Length``; corpo truncado,
     5xx e queda de conexão valem nova tentativa (1, 2, 4 s). HTTP ≥ 400 fora disso:
-    :class:`net.FetchError` com o ``status`` (o 403 é tratado por quem chama). Devolve os bytes."""
+    :class:`net.FetchError` com o ``status`` (o 403 é tratado por quem chama). ``prazo_s``: o tempo
+    total do download, tentativas incluídas (passou dele: :class:`PrazoEsgotado`). Devolve os bytes."""
     cabecalhos = {**net.DEFAULT_HEADERS, "Accept": "*/*", "Accept-Encoding": "identity", **dict(headers or {})}
     destino.parent.mkdir(parents=True, exist_ok=True)
     erro: FetchError | None = None
+    fim = time.monotonic() + prazo_s if prazo_s is not None else None
+
+    def conferir_prazo() -> None:
+        if fim is not None and time.monotonic() >= fim:
+            raise PrazoEsgotado(url, "o prazo desta execução acabou no meio do download")
+
     for tentativa in range(tentativas + 1):
         if tentativa:
             dormir(min(2 ** (tentativa - 1), 8))
+        conferir_prazo()
         fd, tmp = tempfile.mkstemp(dir=destino.parent, prefix=f".{destino.name[:40]}.", suffix=".tmp")
         try:
             total = 0
@@ -194,6 +227,7 @@ def baixar_em_fluxo(
                 with urllib.request.urlopen(req, timeout=timeout) as resp:
                     anunciado = (resp.headers.get("Content-Length") or "").strip()
                     while True:
+                        conferir_prazo()
                         bloco = resp.read(BLOCO)
                         if not bloco:
                             break
@@ -282,6 +316,11 @@ class ColetorTribunais(Coletor):
         # 403 com ela, "robots.txt" lido como nome de índice). RFC 9309, §2.3.1.3: 4xx = sem regras.
         # Os outros hosts seguem como sempre: 401/403/429 no robots.txt param o host.
         self._robots_api = {h.lower() for h, c in hosts_cfg.items() if (c or {}).get("robots") == "api"}
+        # Tempo-limite e tentativas por host (fontes.hosts: timeout_s, tentativas): a planilha do STF
+        # (5,8 MB em ~2 s) não precisa de 4 × 180 s quando o servidor está mudo.
+        self._timeout_host = {h.lower(): float(c["timeout_s"]) for h, c in hosts_cfg.items() if (c or {}).get("timeout_s")}
+        self._tentativas_host = {h.lower(): int(c["tentativas"]) for h, c in hosts_cfg.items() if (c or {}).get("tentativas") is not None}
+        self.prazo: float | None = None  # instante (no relógio do coletor) depois do qual nada é pedido
         self.proibidos = tuple(proibidos if proibidos is not None else (fontes.get("proibidos") or ()))
         self.agente = agente or net.USER_AGENT
         self._baixar = baixar
@@ -328,6 +367,8 @@ class ColetorTribunais(Coletor):
             try:
                 resp = self._com_recusa(endereco, lambda: self.fetch(endereco, timeout=30.0, retries=1, headers={"Accept": "text/plain, */*"}), robots=True)
                 texto = resp.text()
+            except PrazoEsgotado:
+                raise  # o nosso prazo: o host não fica marcado
             except RecusaDoHost as exc:
                 if host in self._robots_api:
                     texto = self._sem_regras(host, exc)
@@ -385,10 +426,33 @@ class ColetorTribunais(Coletor):
         with self._trava_hosts:
             self._proximo[host] = max(self._proximo.get(host, 0.0), self._relogio() + self.pausa_de(host))
 
+    def restante(self) -> float | None:
+        """Segundos até o prazo (``None``: sem prazo)."""
+        return None if self.prazo is None else self.prazo - self._relogio()
+
+    def _conferir_prazo(self, url: str, espera: float = 0.0) -> None:
+        restante = self.restante()
+        if restante is not None and restante - espera <= 0:
+            raise PrazoEsgotado(url, "o prazo desta execução acabou; nada mais é pedido (fica para a próxima)")
+
+    def _limites(self, url: str, timeout: float, retries: int) -> tuple[float, int]:
+        """O tempo-limite e as tentativas de um pedido: os do host (config), e perto do prazo menos
+        (cada tentativa pode ler até 3 × o tempo-limite com servidor que pinga devagar)."""
+        host = _host(url)
+        timeout = self._timeout_host.get(host, timeout)
+        retries = self._tentativas_host.get(host, retries)
+        restante = self.restante()
+        if restante is not None:
+            if restante < 3 * timeout:
+                retries = 0
+            timeout = max(5.0, min(timeout, restante / ((retries + 1) * 3)))
+        return timeout, retries
+
     def _com_recusa(self, url: str, chamada: Callable[[], Any], *, robots: bool = False) -> Any:
         host = _host(url)
         tentativa = 0
         while True:
+            self._conferir_prazo(url)
             self._esperar_host(host)
             inicio = self._relogio()
             try:
@@ -396,8 +460,13 @@ class ColetorTribunais(Coletor):
             except FetchError as exc:
                 self._terminou(host)
                 self._anotar(url, exc.status, inicio, 0, tentativa, robots)
+                if _queda(exc) and host not in self._robots_api and not robots:
+                    # O disjuntor: o host não respondeu depois das tentativas; nada mais é pedido a ele.
+                    self._hosts_fora[host] = FetchError(url, f"{host} não respondeu ({exc}); nada mais é pedido ao host nesta execução")
+                    log.warning("Tribunais: %s não respondeu; o host fica fora até o fim da execução", host)
                 espera = self._espera_da_recusa(host)
                 if exc.status == 403 and tentativa == 0 and espera is not None:
+                    self._conferir_prazo(url, espera)  # a espera do 403 não passa do prazo
                     tentativa += 1
                     log.warning("Tribunais: %s recusou o acesso (403); nova tentativa em %.0f s", host, espera)
                     self._dormir(espera)
@@ -426,6 +495,7 @@ class ColetorTribunais(Coletor):
 
     def _pedir(self, url: str, **kwargs: Any) -> net.Response:
         self._conferir(url)
+        kwargs["timeout"], kwargs["retries"] = self._limites(url, float(kwargs.get("timeout", 20.0)), int(kwargs.get("retries", 2)))
         return self._com_recusa(url, lambda: self.fetch(url, **kwargs))
 
     # ── leitura ──────────────────────────────────────────────────────────────────────────────
@@ -484,10 +554,14 @@ class ColetorTribunais(Coletor):
         baixar = self._baixar
         if baixar is None and self.fetch is net.fetch:
             baixar = baixar_em_fluxo
-        if baixar is not None:
-            self._com_recusa(url, lambda: baixar(url, destino, timeout=180.0, headers={"Accept": "*/*"}, max_bytes=max_bytes))
+        timeout, retries = self._limites(url, 180.0, 3)
+        if baixar is baixar_em_fluxo and self.prazo is not None:  # o download inteiro cabe no que resta do prazo
+            self._com_recusa(url, lambda: baixar_em_fluxo(url, destino, timeout=timeout, headers={"Accept": "*/*"}, max_bytes=max_bytes,
+                                                          tentativas=retries, prazo_s=max(1.0, self.restante() or 0.0)))
+        elif baixar is not None:
+            self._com_recusa(url, lambda: baixar(url, destino, timeout=timeout, headers={"Accept": "*/*"}, max_bytes=max_bytes))
         else:
-            resp = self._com_recusa(url, lambda: self.fetch(url, timeout=180.0, retries=3, headers={"Accept": "*/*"}, max_bytes=max_bytes))
+            resp = self._com_recusa(url, lambda: self.fetch(url, timeout=timeout, retries=retries, headers={"Accept": "*/*"}, max_bytes=max_bytes))
             self._gravar(destino, resp.content)
         log.info("Tribunais: %s baixado (%.1f MB)", url.rsplit("/", 1)[-1], destino.stat().st_size / 1e6)
         return destino
@@ -541,10 +615,11 @@ class ColetorTribunais(Coletor):
 
     # ── cache ────────────────────────────────────────────────────────────────────────────────
 
-    def limpar(self, dias: float = 10.0) -> int:
-        """Apaga do cache o que esta execução não usou e tem mais de ``dias`` dias (só chamar
-        quando não houve aviso: com fonte fora do ar, o cache fica)."""
+    def limpar(self, dias: float = 10.0, *, proteger: Iterable[Path] = ()) -> int:
+        """Apaga do cache o que esta execução não usou, nenhum estado cita (``proteger``: o socorro
+        de cada fonte, a série das atas e das íntegras) e tem mais de ``dias`` dias."""
         limite = self._relogio() - dias * 86400
+        guardar = {Path(c).resolve() for c in proteger}
         apagados = 0
         for pasta in PASTAS_DO_CACHE:
             raiz = self.cache / pasta
@@ -552,10 +627,32 @@ class ColetorTribunais(Coletor):
                 continue
             for caminho in raiz.iterdir():
                 try:
-                    if caminho in self._usados or not caminho.is_file() or caminho.stat().st_mtime >= limite:
+                    if (caminho in self._usados or not caminho.is_file() or caminho.stat().st_mtime >= limite
+                            or caminho.resolve() in guardar):
                         continue
                     caminho.unlink()
                     apagados += 1
                 except OSError:
                     continue
+        return apagados
+
+    def podar_grandes(self, minimo_bytes: int = GRANDE_PODA_BYTES, *, proteger: Iterable[Path] = ()) -> list[Path]:
+        """Apaga de ``arquivos/`` os arquivos grandes (o acervo do STJ do dia, 82 MB) que esta
+        execução não usou e nenhum estado cita, qualquer que seja a idade: o acervo em uso fica (o
+        publicado, de sexta a terça), e o recusado de hoje também (não é baixado de novo a cada hora).
+        O nome no cache não diz o que o arquivo é (o endereço é cortado em 120 letras): vale o tamanho."""
+        guardar = {Path(c).resolve() for c in proteger}
+        raiz = self.cache / "arquivos"
+        apagados: list[Path] = []
+        if not raiz.is_dir():
+            return apagados
+        for caminho in sorted(raiz.iterdir()):
+            try:
+                if (not caminho.is_file() or caminho in self._usados or caminho.resolve() in guardar
+                        or caminho.stat().st_size < minimo_bytes):
+                    continue
+                caminho.unlink()
+                apagados.append(caminho)
+            except OSError:
+                continue
         return apagados

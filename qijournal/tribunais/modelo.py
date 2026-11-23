@@ -129,10 +129,12 @@ class Datas(TypedDict):
 class Flags(TypedDict, total=False):
     """Marcas do processo. Ausente = a fonte não informa (o STJ não tem vista nem pauta aqui)."""
 
-    liminar: bool  # STJ pedidoDeLiminar == SIM; STF "**Medida liminar/Cautelar pendente" == Sim
+    # STJ pedidoDeLiminar == SIM: o processo CHEGOU ao STJ com pedido de liminar (decidido ou não; não
+    # diz nada de hoje); STF "**Medida liminar/Cautelar pendente" == Sim: liminar pendente
+    liminar: bool
     tutela: bool  # STF: tutela antecipada ou provisória pendente
     sobrestado: bool  # STJ sobrestado != N; STF "Sobrestado" == Sim
-    motivo_sobrestamento: str | None  # STJ: "T" repetitivo, "RG", "C" controvérsia, "I" IAC, "ST" sem motivo
+    motivo_sobrestamento: str | None  # STJ: "T" repetitivo, "RG", "C" controvérsia, "I" IAC, "ST" sem motivo identificado pela fonte
     vista: bool  # STF "Com pedido de vista"
     pauta: bool  # STF "Em mesa/pauta"
     sem_decisao: bool  # STF "Sem nenhuma decisão"
@@ -210,9 +212,11 @@ class Fonte(TypedDict, total=False):
     aviso: str | None  # frase para o leitor quando ok é False ou a fonte está atrasada
     registros: int | None  # quantos registros os dados em uso têm
     velho_dias: int  # passou disto desde data_dados, a página acende o alerta
+    dias_da_semana: bool  # velho_dias conta só de segunda a sexta (o acervo do STJ não sai no fim de semana)
     atribuicao: str | None  # "Fonte: STJ, Portal de Dados Abertos (CC-BY)"
     atraso_dias: int | None  # íntegras do STJ: dias entre o último arquivo e o dia da coleta
-    ativo: bool  # só no datajud
+    ativo: bool  # só no datajud e no djen
+    publicado: bool  # só no datajud: a camada do CNJ foi publicada (cnj.json)
 
 
 class Meta(TypedDict, total=False):
@@ -306,17 +310,19 @@ class ResumoMinistro(TypedDict, total=False):
     secao: str | None
     cargos: list[str]
     convocado: dict[str, Any] | None  # {tribunal, vaga_de, desde}
-    selos: list[str]  # convocado, heranca, recem_chegado, sem_distribuicao, poucos_processos
+    selos: list[str]  # convocado, heranca, recem_chegado, sem_distribuicao, distribuicao_reduzida (quem acumula o TSE...), poucos_processos
     comparavel: bool
+    relogio: str  # (opcional) a data em que o relógio da mesa recomeçou (chegada à Turma, herança): fora da comparação da mesa
     processos: int
     na_mesa: int
     onde: dict[str, int]  # contagem por Onde
     segredo: int
     sobrestados: int
-    liminar: int
-    ente_publico: int
+    liminar: int  # STJ: chegou ao STJ com pedido de liminar (decidida ou não); STF: liminar ou tutela pendente
+    ente_publico: int  # dinheiro público num dos polos (União, Fazenda Nacional, INSS, Estado/DF, Município)
     sem_decisao: Idade  # STJ: dos processos na mesa; STF: concluso_dias dos conclusos
-    no_tribunal: Idade  # dias desde a autuação (STF: anos × 365, só mediana e quartis)
+    no_tribunal: Idade  # dias desde a autuação (STF: toda None: a planilha só dá o ano)
+    autuacao: dict[str, Any]  # (só STF) {ano_mediano, no_ano_dos_dados, por_ano: [[ano, n]]}
     areas: dict[str, AreaCelula]
     subareas: list[list[Any]]  # [[id, n, p], ...] as N maiores
     partes: list[list[Any]]  # [[grupo, n], ...] os N litigantes que mais aparecem
@@ -655,7 +661,7 @@ LIMIARES_PADRAO: dict[str, Any] = {
     "recusa_arquivo_maior_que": 1.15,
     "recortes_por": "principal",
     "rampa": [0.02, 0.05, 0.10, 0.25],
-    "listas": {"painel_mais_antigos": 5, "fila_mais_antigos": 30, "dossie_mais_antigos": 15, "dossie_em_pauta": 20,
+    "listas": {"painel_mais_antigos": 3, "fila_mais_antigos": 30, "dossie_mais_antigos": 15, "dossie_em_pauta": 20,
                "partes_tribunal": 30, "partes_ministro": 10, "partes_painel_ministro": 3, "subareas_painel": 5,
                "assuntos_por_area": 10, "partes_por_area": 5},
     "janelas": {"entradas_dias": 365, "entradas_recentes_dias": 30, "decisoes_dias": 365},

@@ -126,6 +126,12 @@ def desligado(regras: Regras) -> Regras:
     return dataclasses.replace(regras, datajud={**regras.datajud, "ativo": False})
 
 
+@pytest.fixture(scope="module")
+def pessoal_regras(regras: Regras) -> Regras:
+    """Ligado **sem** publicar (``publicar: false``): o uso pessoal, só no cache."""
+    return dataclasses.replace(regras, datajud={**regras.datajud, "ativo": True, "publicar": False})
+
+
 def montar(tmp_path: Path, regras: Regras, respostas: list[Any], *, aleatorio: float = 0.5, **kw: Any) -> tuple[ClienteDataJud, FetchFalso, Relogio]:
     relogio = Relogio()
     fetch = FetchFalso(respostas, relogio)
@@ -137,14 +143,15 @@ def montar(tmp_path: Path, regras: Regras, respostas: list[Any], *, aleatorio: f
 # ── o que o config manda ─────────────────────────────────────────────────────────────────────
 
 
-def test_o_config_liga_para_uso_pessoal_sem_publicar(regras: Regras) -> None:
-    """A decisão do dono (23/11/2026): ligado, para uso pessoal; ``publicar: false`` porque o
-    repositório e o site são públicos (item 3.8 do termo). A variável liga numa execução."""
-    assert regras.datajud["ativo"] is True and regras.datajud["publicar"] is False
-    assert datajud.deve_publicar(regras, {}) is False
-    assert datajud.deve_publicar(regras, {"QIJ_DATAJUD_PUBLICAR": "1"}) is True
-    assert datajud.deve_publicar(regras, {"QIJ_DATAJUD_PUBLICAR": " sim "}) is True
-    assert datajud.deve_publicar(dataclasses.replace(regras, datajud={**regras.datajud, "publicar": True}), {"QIJ_DATAJUD_PUBLICAR": "0"}) is False
+def test_o_config_publica_por_decisao_do_dono(regras: Regras, pessoal_regras: Regras) -> None:
+    """A decisão do dono (23/11/2026, sabendo que o repositório é público): "Quero os números do
+    DataJud no site sim"; ``publicar: true``. A variável desliga ou liga numa execução."""
+    assert regras.datajud["ativo"] is True and regras.datajud["publicar"] is True
+    assert datajud.deve_publicar(regras, {}) is True
+    assert datajud.deve_publicar(regras, {"QIJ_DATAJUD_PUBLICAR": "0"}) is False
+    assert datajud.deve_publicar(pessoal_regras, {}) is False
+    assert datajud.deve_publicar(pessoal_regras, {"QIJ_DATAJUD_PUBLICAR": "1"}) is True
+    assert datajud.deve_publicar(pessoal_regras, {"QIJ_DATAJUD_PUBLICAR": " sim "}) is True
     mov = regras.datajud["movimentos"]
     assert (mov["lote"], mov["cobertura_minima"], mov["campo_incremental"]) == (1000, 0.8, "dataHoraUltimaAtualizacao")
 
@@ -826,12 +833,14 @@ def _arquivos(pasta: Path) -> dict[str, bytes]:
 
 
 @pytest.fixture(scope="module")
-def dois_modos(tmp_path_factory: pytest.TempPathFactory, regras: Regras, desligado: Regras) -> dict[str, Any]:
-    """A mesma coleta três vezes: DataJud desligado, ligado para uso pessoal (o config) e publicado
-    (``QIJ_DATAJUD_PUBLICAR=1``, a prévia)."""
+def dois_modos(tmp_path_factory: pytest.TempPathFactory, regras: Regras, desligado: Regras, pessoal_regras: Regras) -> dict[str, Any]:
+    """A mesma coleta quatro vezes: DataJud desligado, ligado para uso pessoal (``publicar: false``),
+    publicado pelo config (``publicar: true``, a decisão do dono) e publicado pela variável
+    (``QIJ_DATAJUD_PUBLICAR=1`` sobre ``publicar: false``, a prévia)."""
     raiz = Path(__file__).resolve().parents[1]
     saida = {}
-    for nome, reg, amb in (("desligado", desligado, {}), ("pessoal", regras, {}), ("publicado", regras, {"QIJ_DATAJUD_PUBLICAR": "1"})):
+    for nome, reg, amb in (("desligado", desligado, {}), ("pessoal", pessoal_regras, {}), ("publicado", regras, {}),
+                           ("previa", pessoal_regras, {"QIJ_DATAJUD_PUBLICAR": "1"})):
         tmp = tmp_path_factory.mktemp(nome)
         shutil.copytree(raiz / "data" / "tribunais" / "tpu", tmp / "data" / "tribunais" / "tpu")
         r, portal = _rodar_dados(tmp, reg, amb)
@@ -839,7 +848,7 @@ def dois_modos(tmp_path_factory: pytest.TempPathFactory, regras: Regras, desliga
     return saida
 
 
-def test_uso_pessoal_consulta_mas_nada_do_datajud_vai_a_publico(dois_modos: dict[str, Any], regras: Regras) -> None:
+def test_uso_pessoal_consulta_mas_nada_do_datajud_vai_a_publico(dois_modos: dict[str, Any], pessoal_regras: Regras) -> None:
     """Ligado sem publicar: o DataJud é consultado (frescor e os lotes da mesa) e a camada fica no
     cache; a pasta pública sai **byte a byte igual** à da coleta com o DataJud desligado, menos a
     entrada ``fontes.datajud`` do ``meta.json`` (a de uso pessoal, sem número nem data)."""
@@ -850,7 +859,7 @@ def test_uso_pessoal_consulta_mas_nada_do_datajud_vai_a_publico(dois_modos: dict
     assert set(a) == set(b) and "cnj.json" not in a
     assert [k for k in a if a[k] != b[k]] == ["meta.json"]
     ma, mb = json.loads(a["meta.json"]), json.loads(b["meta.json"])
-    assert ma["fontes"]["datajud"] == datajud.fonte_pessoal(regras) and "datajud" not in ma["cobertura"].get("stj", {})
+    assert ma["fontes"]["datajud"] == datajud.fonte_pessoal(pessoal_regras) and "datajud" not in ma["cobertura"].get("stj", {})
     ma["fontes"].pop("datajud"), mb["fontes"].pop("datajud")
     assert ma == mb
     privada = json.loads((pessoal["tmp"] / "cache" / "datajud" / "camada.json").read_text(encoding="utf-8"))
@@ -859,11 +868,12 @@ def test_uso_pessoal_consulta_mas_nada_do_datajud_vai_a_publico(dois_modos: dict
     assert "movimentos:" in pessoal["r"].datajud and "concluso" not in pessoal["r"].datajud  # o log só tem números de operação
 
 
-def test_publicado_poe_a_camada_do_cnj_na_pasta_e_na_pagina(dois_modos: dict[str, Any]) -> None:
+@pytest.mark.parametrize("modo", ["publicado", "previa"])
+def test_publicado_poe_a_camada_do_cnj_na_pasta_e_na_pagina(dois_modos: dict[str, Any], modo: str) -> None:
     from qijournal.config import load_config
     from qijournal.render import tribunais as pagina
 
-    pub = dois_modos["publicado"]
+    pub = dois_modos[modo]
     cnj = json.loads((pub["pasta"] / "cnj.json").read_text(encoding="utf-8"))
     meta = json.loads((pub["pasta"] / "meta.json").read_text(encoding="utf-8"))
     stj = json.loads((pub["pasta"] / "stj.json").read_text(encoding="utf-8"))
@@ -882,22 +892,65 @@ def test_publicado_poe_a_camada_do_cnj_na_pasta_e_na_pagina(dois_modos: dict[str
     assert html_p is not None and 'class="tb-cnj' not in html_p and '"cnj":' not in html_p and "uso pessoal" in html_p
 
 
-def test_voltar_a_nao_publicar_tira_a_camada_da_pasta(dois_modos: dict[str, Any], regras: Regras) -> None:
+def test_a_previa_e_igual_a_publicada(dois_modos: dict[str, Any]) -> None:
+    """``publicar: true`` no config e ``QIJ_DATAJUD_PUBLICAR=1`` sobre ``publicar: false`` dão a mesma pasta."""
+    assert _arquivos(dois_modos["publicado"]["pasta"]) == _arquivos(dois_modos["previa"]["pasta"])
+
+
+def test_com_publicar_tudo_do_cnj_leva_o_selo_e_a_cobertura(dois_modos: dict[str, Any]) -> None:
+    """Com ``publicar: true``: cada número do CNJ na página vem com o selo ("CNJ" no item da lista,
+    "CNJ · DataJud" nas faixas), cada faixa diz a cobertura (a parte dos candidatos com data no CNJ),
+    a tabela por ministro tem a coluna "Com data no CNJ", e o "Como ler" explica a camada."""
+    from qijournal.config import load_config
+    from qijournal.render import tribunais as pagina
+
     pub = dois_modos["publicado"]
-    _rodar_dados(pub["tmp"], regras, {})
+    html = pagina.render_tribunais_page(load_config(env={}), pub["tmp"] / "data", home_href="../", archive_href="./")
+    assert html is not None
+    itens = re.findall(r'<span class="tb-cnj">(.*?)</span></p>', html)
+    assert itens and all(x.startswith('<span class="az-selo">CNJ</span>') for x in itens)
+    faixas = re.findall(r'<div class="tb-cnj-b">(.*?)</div><p class="tb-cnj-n">', html, re.DOTALL)
+    assert faixas and all('<span class="az-selo">CNJ · DataJud</span>' in f for f in faixas)
+    assert all("data no CNJ" in x for x in re.findall(r"<small>([^<]*)</small>", " ".join(faixas)) if x and "nenhum processo" not in x)
+    bloco = re.search(r'id="tb-cnj-stj".*?</table>', html, re.DOTALL).group(0)
+    assert "Com data no CNJ" in bloco and "Sem decisão terminativa há + de" in bloco
+    metodo = re.search(r'data-vista="metodo" id="tb-v-metodo".*?</section>', html, re.DOTALL).group(0)
+    assert "O DataJud (CNJ · DataJud)" in metodo and "termo de uso, item 3.6" in metodo
+    # "O que fica de fora" com texto próprio: nada de "O valor da causa, o andamento ... não estão"
+    assert "O valor da causa e o andamento processo a processo não estão" in metodo and "O valor da causa, o andamento" not in metodo
+    assert "A data da conclusão no STJ vem do CNJ, e só onde a cobertura chega." in metodo
+    meta = json.loads((pub["pasta"] / "meta.json").read_text(encoding="utf-8"))
+    mov = meta["cobertura"]["stj"]["datajud"]["movimentos"]
+    assert mov["base"] and mov["cobertura"] is not None and meta["fontes"]["datajud"]["publicado"] is True
+
+
+def test_voltar_a_nao_publicar_tira_a_camada_da_pasta(dois_modos: dict[str, Any], pessoal_regras: Regras) -> None:
+    pub = dois_modos["publicado"]
+    _rodar_dados(pub["tmp"], pessoal_regras, {})
     assert not (pub["pasta"] / "cnj.json").exists()
-    assert json.loads((pub["pasta"] / "meta.json").read_text(encoding="utf-8"))["fontes"]["datajud"] == datajud.fonte_pessoal(regras)
+    assert json.loads((pub["pasta"] / "meta.json").read_text(encoding="utf-8"))["fontes"]["datajud"] == datajud.fonte_pessoal(pessoal_regras)
 
 
-def test_a_pasta_publica_do_repositorio_nao_tem_nada_do_datajud() -> None:
-    """A trava do item 3.8 do termo no que está no repositório (público): sem ``cnj.json``, a fonte
-    do DataJud no ``meta.json`` sem número, e a aba sem a camada do CNJ (enquanto ``datajud.publicar``
-    for ``false`` no config)."""
+def test_a_pasta_publica_do_repositorio_segue_o_config() -> None:
+    """O que está no repositório segue ``datajud.publicar``. Com ``true`` (a decisão do dono): o
+    ``cnj.json`` é do acervo do STJ em uso, a fonte diz que foi publicada, a cobertura está no
+    ``meta.json`` e a página tem o selo. Com ``false``: nada do DataJud (sem ``cnj.json``, a fonte sem
+    número, a aba sem a camada)."""
     raiz = Path(__file__).resolve().parents[1]
     regras = carregar_regras()
-    if regras.datajud.get("publicar"):
-        pytest.skip("datajud.publicar: true no config (depois de dar ciência ao CNJ)")
     pasta = raiz / "data" / "tribunais"
+    if regras.datajud.get("publicar"):
+        meta = json.loads((pasta / "meta.json").read_text(encoding="utf-8"))
+        if not (pasta / "cnj.json").exists():  # o DataJud ainda não trouxe a mesa: a fonte diz por quê
+            assert meta["fontes"]["datajud"].get("aviso")
+            return
+        cnj = json.loads((pasta / "cnj.json").read_text(encoding="utf-8"))
+        stj_painel = json.loads((pasta / "stj.json").read_text(encoding="utf-8"))
+        assert cnj["data_dados"] == stj_painel["data_dados"] and cnj["fonte"]["selo"] == "CNJ · DataJud"
+        assert meta["fontes"]["datajud"]["publicado"] is True and "movimentos" in meta["cobertura"]["stj"]["datajud"]
+        html = (raiz / "edicoes" / "tribunais.html").read_text(encoding="utf-8")
+        assert "CNJ · DataJud" in html and 'id="tb-cnj-stj"' in html
+        return
     assert not (pasta / "cnj.json").exists()
     meta = json.loads((pasta / "meta.json").read_text(encoding="utf-8"))
     fonte = meta["fontes"]["datajud"]

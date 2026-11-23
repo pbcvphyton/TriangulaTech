@@ -51,7 +51,7 @@ AREAS_NO_CARTAO = 8  # barras ordenadas no cartão do ministro; as demais somam 
 PARTES_DA_DIGITAL = 5  # a impressão digital da mesa: as 5 maiores áreas + "outras" (no máximo 6 partes: designer.md §2.2)
 MINISTROS_POR_AREA = 12  # na aba Assuntos, quantos ministros cada área mostra (os demais, somados)
 FILA_NA_PAGINA = 30  # a fila do tribunal inteiro (o painel traz até limiares.listas.fila_mais_antigos)
-ARQUIVOS = {"meta": "meta.json", "achados": "achados.json", "cnj": "cnj.json"}  # e "<trib>.json", "ministros/<id>.json"
+ARQUIVOS = {"meta": "meta.json", "achados": "achados.json", "cnj": "cnj.json", "djen": "djen.json"}  # e "<trib>.json", "ministros/<id>.json"
 NOMES = {"stj": "Superior Tribunal de Justiça", "stf": "Supremo Tribunal Federal"}
 ONDE = {
     "gabinete": "no gabinete (na mesa)",
@@ -110,12 +110,21 @@ ORDINAL = {"1": "Primeira", "2": "Segunda", "3": "Terceira", "4": "Quarta", "5":
 # ── dados ────────────────────────────────────────────────────────────────────
 
 
+class PaginaGrandeDemais(RuntimeError):
+    """A página passaria do teto (``TETO_BYTES``): não é gravada."""
+
+    def __init__(self, tamanho: int) -> None:
+        super().__init__(f"a página teria {tamanho // 1024} KB, acima do teto de {TETO_BYTES // 1024} KB")
+        self.tamanho = tamanho
+
+
 @dataclass
 class Dados:
     meta: dict[str, Any]
     paineis: dict[str, dict[str, Any]]  # "stf"/"stj" → o painel (só os que existem, na versão certa)
     achados: list[dict[str, Any]]
     cnj: dict[str, Any] | None = None  # a camada do DataJud (cnj.json): só quando publicada
+    djen: dict[str, Any] | None = None  # a camada do DJe (djen.json, da máquina do dono): só quando existe e é legível
 
 
 def _ler(caminho: Path) -> Any | None:
@@ -141,7 +150,17 @@ def carregar(data_dir: Path) -> Dados | None:
         return None
     bruto = _ler(pasta / ARQUIVOS["achados"])
     achados = bruto.get("achados") if isinstance(bruto, dict) and bruto.get("v") == VERSAO else None
-    return Dados(meta=meta, paineis=paineis, achados=[a for a in achados or [] if isinstance(a, dict)], cnj=_camada_cnj(pasta, meta, paineis))
+    return Dados(meta=meta, paineis=paineis, achados=[a for a in achados or [] if isinstance(a, dict)], cnj=_camada_cnj(pasta, meta, paineis),
+                 djen=_camada_djen(pasta))
+
+
+def _camada_djen(pasta: Path) -> dict[str, Any] | None:
+    """O ``djen.json`` (o DJe, coletado na máquina do dono, no Brasil). Ausente, ilegível ou de
+    outra versão: ``None``, e a aba sai sem a camada, sem erro (a aba nunca depende dele)."""
+    djen = _ler(pasta / ARQUIVOS["djen"])
+    if not isinstance(djen, dict) or djen.get("v") != 1 or not isinstance(djen.get("tribunais"), dict):
+        return None
+    return djen
 
 
 def _camada_cnj(pasta: Path, meta: dict[str, Any], paineis: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
@@ -274,8 +293,19 @@ def _janela(janela: Any) -> tuple[str, bool]:
     return f"entre {_data(ini.isoformat(), ano=False)} e {_data(fim.isoformat(), ano=False)}", dias <= 30
 
 
-def _plural(n: int, um: str, varios: str) -> str:
-    return f"{_num(n)} {um if n == 1 else varios}"
+def _plural(n: Any, um: str, varios: str) -> str:
+    """``1 processo``, ``2 processos``; sem número (``None``), ``— processos``."""
+    try:
+        k = int(n)
+    except (TypeError, ValueError):
+        return f"{_num(n)} {varios}"
+    return f"{_num(k)} {um if k == 1 else varios}"
+
+
+def _recursos_pauta(pa: dict[str, Any], sep: str) -> str:
+    """``1 recurso principal, 3 recursos internos`` (a pauta de um ministro ou do tribunal)."""
+    return (f"{_plural(pa.get('principal'), 'recurso principal', 'recursos principais')}{sep}"
+            f"{_plural(pa.get('interno'), 'recurso interno', 'recursos internos')}")
 
 
 def _numero_processo(folha: dict[str, Any]) -> str:
@@ -538,11 +568,22 @@ def _href_de(alvo: str, trib: str) -> str:
     return f"#tb-{campos.get('v') or 'resumo'}-{t}"
 
 
+def _grade_e_convocados(p: dict[str, Any]) -> tuple[list[dict[str, Any]], int]:
+    """Os relatores das Turmas (sem a Presidência) e quantos deles são desembargadores convocados."""
+    grade = [m for m in p.get("ministros") or [] if m.get("grupo") != "pr"]
+    return grade, sum(1 for m in grade if m.get("convocado") or "convocado" in (m.get("selos") or ()))
+
+
+def _relatores_das_turmas(p: dict[str, Any]) -> str:
+    """"relatores das Turmas" quando há convocado na grade (convocado não é ministro); senão
+    "ministros das Turmas". Vai depois de um número ou de "com os"."""
+    return "relatores das Turmas" if _grade_e_convocados(p)[1] else "ministros das Turmas"
+
+
 def _relatores_turmas(p: dict[str, Any]) -> tuple[str, str]:
     """"os 30 relatores das Turmas (27 ministros e 3 desembargadores convocados)" quando há convocado na
     grade; senão "os 10 ministros das Turmas". E o rótulo curto ("relatores nas Turmas")."""
-    grade = [m for m in p.get("ministros") or [] if m.get("grupo") != "pr"]
-    conv = sum(1 for m in grade if m.get("convocado") or "convocado" in (m.get("selos") or ()))
+    grade, conv = _grade_e_convocados(p)
     if not conv:
         return f"os {len(grade)} ministros das Turmas", "ministros nas Turmas"
     return (f"os {len(grade)} relatores das Turmas ({len(grade) - conv} ministros e {conv} "
@@ -600,15 +641,21 @@ def _fontes(trib: str, meta: dict[str, Any]) -> tuple[list[dict[str, Any]], list
             continue
         if fid == "datajud" and trib != "stj":  # o STF não está no DataJud
             continue
+        if fid == "djen" and f.get("ok") is not None and trib not in (f.get("tribunais") or ()):  # o tribunal que não publica no DJEN
+            continue
         nome = str(f.get("nome") or fid)
         data = _data(f.get("data_dados"), ano=False)
         velho = False
         try:
-            velho = (date.fromisoformat(str(hoje)) - date.fromisoformat(str(f.get("data_dados")))).days > int(f.get("velho_dias") or 9999)
+            de, ate = date.fromisoformat(str(f.get("data_dados"))[:10]), date.fromisoformat(str(hoje))
+            idade = sum(1 for i in range(1, (ate - de).days + 1) if date.fromordinal(de.toordinal() + i).weekday() < 5) if f.get("dias_da_semana") else (ate - de).days
+            velho = idade > int(f.get("velho_dias") or 9999)
         except (TypeError, ValueError):
             velho = False
         if f.get("ok") is None and f.get("publicado") is False:
             estado, forma, rotulo = "off", "○", "uso pessoal, não publicado"
+        elif f.get("ok") is None and fid == "djen":
+            estado, forma, rotulo = "off", "○", "coletado só no Brasil; ainda sem coleta"
         elif f.get("ok") is None:
             estado, forma, rotulo = "off", "○", "desligada"
         elif f.get("ok") is False:
@@ -749,7 +796,7 @@ def _digital(m: dict[str, Any], r: Reguas) -> tuple[list[dict[str, Any]], str]:
     resto = max(0.0, 1 - sum(float(areas[a].get("p") or 0) for a in ordem))
     if resto >= 0.005:
         partes.append({"area": "outros-fp", "flex": f"{resto:.4f}"})
-    aria = "; ".join(f"{r.area(a)['curto']} {_pct(areas[a].get('p'), fino=True)}" for a in sorted(ordem, key=lambda a: -(areas[a].get("n") or 0)))
+    aria = "; ".join(f"{r.area(a)['curto']} {_pct(areas[a].get('p'), fino=True, n=areas[a].get('n'))}" for a in sorted(ordem, key=lambda a: -(areas[a].get("n") or 0)))
     if resto >= 0.005:
         aria += f"; outras {_pct(resto, fino=True)}"
     return partes, aria
@@ -765,12 +812,12 @@ def _faixa_cnj(f: dict[str, Any]) -> dict[str, Any]:
     rot = "1 ano" if lim == 365 else f"{_num(lim)} dias"
     cand = int(f.get("candidatos") or 0)
     if not cand:
-        return {"rot": rot, "v": "0", "x": "nenhum processo sem decisão registrada há tanto tempo", "ok": True}
+        return {"rot": rot, "v": "0", "x": "nenhum processo sem decisão terminativa registrada há tanto tempo", "ok": True}
     if not f.get("suficiente"):
         return {"rot": rot, "v": "cobertura insuficiente", "ok": False,
-                "x": f"{_pct(f.get('cobertura') or 0)} dos {_num(cand)} sem decisão registrada há mais de {rot} têm a data no CNJ"}
+                "x": f"{_pct(f.get('cobertura') or 0, n=f.get('com_data'))} dos {_num(cand)} sem decisão terminativa registrada há mais de {rot} têm a data no CNJ"}
     return {"rot": rot, "v": _num(f.get("conclusos")), "ok": True,
-            "x": f"de {_num(cand)} sem decisão registrada há mais de {rot}; {_pct(f.get('cobertura'))} com a data no CNJ"}
+            "x": f"de {_num(cand)} sem decisão terminativa registrada há mais de {rot}; {_pct(f.get('cobertura'), n=f.get('com_data'))} com a data no CNJ"}
 
 
 def _relogio(m: dict[str, Any], ela: bool = False) -> str:
@@ -819,7 +866,7 @@ def _bloco_cnj(conta: dict[str, Any] | None, minimo: Any) -> dict[str, Any] | No
         return None
     faixas = [_faixa_cnj(f) for f in conta.get("faixas") or []]
     cob = conta.get("cobertura")
-    nota = (f"{_num(conta.get('com_data'))} de {_num(conta.get('base'))} processos públicos na mesa ({_pct(cob or 0)}) têm o estado no CNJ"
+    nota = (f"{_num(conta.get('com_data'))} de {_num(conta.get('base'))} processos públicos na mesa ({_pct(cob or 0, n=conta.get('com_data'))}) têm o estado no CNJ"
             + (f"; mediana do concluso: {_dias(conta['mediana'])}" if conta.get("mediana") is not None else "")
             + (f"; {_num(conta.get('segredo'))} em segredo de justiça ficam de fora (o índice público não os tem)" if conta.get("segredo") else "")
             + f". As faixas só saem com {_pct(float(minimo or 0.8))} ou mais dos candidatos com a data.")
@@ -827,7 +874,7 @@ def _bloco_cnj(conta: dict[str, Any] | None, minimo: Any) -> dict[str, Any] | No
 
 
 def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: dict[str, str], relatores: dict[str, str],
-            cnj: dict[str, Any] | None = None) -> dict[str, Any]:
+            cnj: dict[str, Any] | None = None, djen: dict[str, Any] | None = None) -> dict[str, Any]:
     ela = m.get("genero") == "f"
     pares_longo, pares_curto = _texto_pares(trib, r.limiares)
     pares_longo = pares_longo.replace("sem ele", "sem ela") if ela else pares_longo
@@ -858,13 +905,13 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     if maiores:
         a = maiores[0]
         cel = areas[a]
-        frase = f"{_num(total)} processos no acervo em {_data(p.get('data_dados'))}; {_pct(cel.get('p'), fino=True)} são de {r.area(a)['curto']}"
+        frase = f"{_num(total)} processos no acervo em {_data(p.get('data_dados'))}; {_pct(cel.get('p'), fino=True, n=cel.get('n'))} são de {r.area(a)['curto']}"
         if cel.get("pares") is not None and cel.get("razao") is not None:
             frase += f" ({pares_curto}: {_pct(cel.get('pares'), fino=True)})"
         frases.append(frase + ".")
     marcados = [a for a in maiores if int(areas[a].get("marca") or 0) != 0]
     if marcados:
-        textos = [f"{r.area(a)['curto']} {_pct(areas[a].get('p'), fino=True)}, {_razao(areas[a].get('razao'))} vez {pares_curto}" for a in marcados[:2]]
+        textos = [f"{r.area(a)['curto']} {_pct(areas[a].get('p'), fino=True, n=areas[a].get('n'))}, {_razao(areas[a].get('razao'))} vez {pares_curto}" for a in marcados[:2]]
         frases.append("Fora do padrão dos colegas, com teste: " + "; ".join(textos) + ".")
     sd = m.get("sem_decisao") or {}
     relogio = _relogio(m, ela)
@@ -886,7 +933,7 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     na_mesa = int(m.get("na_mesa") or 0)
     tiles = [
         {"k": "Na mesa", "dica": "mesa",
-         "v": _num(na_mesa), "u": "", "x": f"de {_num(total)} no acervo ({_pct(na_mesa / total if total else 0)})"},
+         "v": _num(na_mesa), "u": "", "x": f"de {_num(total)} no acervo ({_pct(na_mesa / total if total else 0, n=na_mesa)})"},
         {"k": "Sem decisão terminativa há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
          "dica": f"sem_decisao_{trib}",
          "v": "—" if relogio else _num(sd.get("mais_365")), "u": "",
@@ -895,7 +942,7 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     tiles.append(_tile_idade(trib, p, m.get("no_tribunal") or {}, m.get("autuacao")))
     tiles.append({"k": "Valor da causa", "dica": "valor",
                   "v": "", "u": "", "x": f"as fontes abertas não publicam. Dinheiro público num polo: {_num(m.get('ente_publico'))} "
-                                          f"({_pct((m.get('ente_publico') or 0) / total if total else 0)}); {_liminar_txt(trib)}: {_num(m.get('liminar'))}",
+                                          f"({_pct((m.get('ente_publico') or 0) / total if total else 0, n=m.get('ente_publico'))}); {_liminar_txt(trib)}: {_num(m.get('liminar'))}",
                   "sem_numero": True})
     for k in tiles:
         k.setdefault("sem_numero", False)
@@ -905,11 +952,11 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     for a in maiores[:AREAS_NO_CARTAO]:
         cel = areas[a]
         marca = int(cel.get("marca") or 0)
-        barras.append({"area": a, "nome": r.area(a)["curto"], "pct": _pct(cel.get("p"), fino=True), "n": _num(cel.get("n")),
+        barras.append({"area": a, "nome": r.area(a)["curto"], "pct": _pct(cel.get("p"), fino=True, n=cel.get("n")), "n": _num(cel.get("n")),
                        "w": f"{100 * float(cel.get('p') or 0) / escala:.1f}", "base": f"{100 * float(cel['pares']) / escala:.1f}" if cel.get("pares") is not None else "",
                        "razao": f"{_razao(cel.get('razao'))}× {pares_curto}" if cel.get("razao") is not None else "",
                        "marca": "▲" if marca > 0 else "▽" if marca < 0 else "", "marca_sr": f"bem acima {_de(pares_curto)}" if marca > 0 else f"bem abaixo {_de(pares_curto)}" if marca < 0 else "",
-                       "aria": f"{_pct(cel.get('p'), fino=True)} do acervo" + (f"; {pares_curto} {_pct(cel.get('pares'), fino=True)}" if cel.get("pares") is not None else "")})
+                       "aria": f"{_pct(cel.get('p'), fino=True, n=cel.get('n'))} do acervo" + (f"; {pares_curto} {_pct(cel.get('pares'), fino=True)}" if cel.get("pares") is not None else "")})
     outras = max(0, total - sum(int(areas[a].get("n") or 0) for a in maiores[:AREAS_NO_CARTAO]))
     digital, digital_aria = _digital(m, r)
     cnj_proc = (cnj or {}).get("processos") if trib == "stj" else None
@@ -920,24 +967,26 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
     e = m.get("entradas")
     if isinstance(e, dict):
         janela, curta = _janela((p.get("entradas") or {}).get("janela"))
+        entrou = "Entrou" if e.get("sorteio_12m") == 1 else "Entraram"
         if trib == "stj":
-            frase = (f"Entraram {_num(e.get('sorteio_12m'))} distribuídos (sorteio ou prevenção) {janela}"
+            frase = (f"{entrou} {_plural(e.get('sorteio_12m'), 'distribuído', 'distribuídos')} (sorteio ou prevenção) {janela}"
                      + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)"))
             if e.get("heranca_12m"):
                 frase += f"; {_num(e.get('heranca_12m'))} por atribuição (herança de acervo), à parte"
         else:  # a ata do STF só tem "distribuído" e "redistribuído" (impedimento, prevenção, cadeira vaga)
-            frase = (f"Entraram {_num(e.get('sorteio_12m'))} distribuídos {janela}"
+            frase = (f"{entrou} {_plural(e.get('sorteio_12m'), 'distribuído', 'distribuídos')} {janela}"
                      + ("" if curta else f" ({_num(e.get('sorteio_30d'))} nos últimos 30 dias)"))
             if e.get("heranca_12m"):
-                frase += f"; {_num(e.get('heranca_12m'))} redistribuídos, à parte"
+                frase += f"; {_plural(e.get('heranca_12m'), 'redistribuído', 'redistribuídos')}, à parte"
         fluxo.append(frase + ".")
     pa = m.get("pauta")
     if isinstance(pa, dict) and pa.get("itens"):
-        fluxo.append(f"Em pauta: {_plural(int(pa['itens']), 'item', 'itens')} ({_num(pa.get('principal'))} recursos principais, {_num(pa.get('interno'))} recursos internos).")
+        fluxo.append(f"Em pauta: {_plural(int(pa['itens']), 'item', 'itens')} ({_recursos_pauta(pa, ', ')}).")
     de = m.get("decisoes")
     if isinstance(de, dict) and de.get("processos") is not None:
         janela, _curta = _janela((p.get("decisoes") or {}).get("janela"))
-        fluxo.append(f"Decidiu {_num(de.get('processos'))} processos {janela} ({_num(de.get('monocraticas'))} decisões monocráticas, {_num(de.get('acordaos'))} acórdãos).")
+        fluxo.append(f"Decidiu {_plural(de.get('processos'), 'processo', 'processos')} {janela} ({_plural(de.get('monocraticas'), 'decisão monocrática', 'decisões monocráticas')}, "
+                     f"{_plural(de.get('acordaos'), 'acórdão', 'acórdãos')}).")
     if isinstance(m.get("temas"), int):
         fluxo.append(f"Temas sob relatoria, sem julgamento: {_num(m['temas'])}.")
     return {
@@ -946,11 +995,12 @@ def _cartao(trib: str, p: dict[str, Any], m: dict[str, Any], r: Reguas, nomes: d
         "grupo": m.get("grupo") or "", "selos": selos, "frases": frases, "tiles": tiles, "barras": barras,
         "outras": _num(outras) if outras else "", "digital": digital, "digital_aria": digital_aria,
         "pares": pares_curto, "pares_longo": pares_longo,
-        "subareas": [{"nome": r.nome_subarea(s[0]), "n": _num(s[1]), "pct": _pct(s[2], fino=True)} for s in m.get("subareas") or []],
+        "subareas": [{"nome": r.nome_subarea(s[0]), "n": _num(s[1]), "pct": _pct(s[2], fino=True, n=s[1])} for s in m.get("subareas") or []],
         "antigos": antigos, "rot_dias": "sem decisão terminativa há" if trib == "stj" else "concluso há",
         "sobrestados": _sobrestados_cartao(trib, sobrestados),
         "partes": [{"nome": nomes.get(g) or _humano(g), "n": _num(n)} for g, n in (m.get("partes") or [])],
         "fluxo": fluxo, "ela": ela, "processos": _num(total), "cnj": bloco_cnj,
+        "djen": _djen_do_ministro(trib, m["id"], djen, r) if m.get("grupo") != "pr" else None,
     }
 
 
@@ -961,13 +1011,14 @@ def _assuntos(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], tp
     areas = [a for a in p.get("areas") or [] if (a.get("n") or 0) > 0]
     areas.sort(key=lambda a: (-(a.get("n") or 0), a["id"]))
     maior = max((a.get("n") or 0 for a in areas), default=1) or 1
-    barras = [{"area": a["id"], "nome": r.area(a["id"])["curto"], "n": _num(a.get("n")), "pct": _pct(a.get("p"), fino=True),
+    barras = [{"area": a["id"], "nome": r.area(a["id"])["curto"], "n": _num(a.get("n")), "pct": _pct(a.get("p"), fino=True, n=a.get("n")),
                "w": f"{100 * (a.get('n') or 0) / maior:.1f}"} for a in areas]
     rec_maior = max((x.get("n") or 0 for x in p.get("recortes") or []), default=1) or 1
     recortes = [{"id": x["id"], "nome": (r.recortes.get(x["id"]) or {}).get("nome") or x["id"], "porque": (r.recortes.get(x["id"]) or {}).get("porque") or "",
-                 "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True), "w": f"{100 * (x.get('n') or 0) / rec_maior:.1f}"}
+                 "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True, n=x.get("n")), "w": f"{100 * (x.get('n') or 0) / rec_maior:.1f}"}
                 for x in sorted(p.get("recortes") or [], key=lambda x: (-(x.get("n") or 0), x["id"]))]
     ministros = [m for m in p.get("ministros") or [] if m.get("grupo") != "pr"]
+    quem = ("relator", "relatores") if _grade_e_convocados(p)[1] else ("ministro", "ministros")  # convocado não é ministro (J15)
     focos = []
     for a in areas:
         aid = a["id"]
@@ -975,7 +1026,7 @@ def _assuntos(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], tp
         lista = sorted(((m, (m.get("areas") or {}).get(aid) or {}) for m in ministros), key=lambda x: (-(x[1].get("n") or 0), x[0]["id"]))
         lista = [x for x in lista if (x[1].get("n") or 0) > 0]
         topo = max((c.get("n") or 0 for _, c in lista), default=1) or 1
-        mesas = [{"id": m["id"], "nome": m.get("nome"), "n": _num(c.get("n")), "pct": _pct(c.get("p"), fino=True), "w": f"{100 * (c.get('n') or 0) / topo:.1f}",
+        mesas = [{"id": m["id"], "nome": m.get("nome"), "n": _num(c.get("n")), "pct": _pct(c.get("p"), fino=True, n=c.get("n")), "w": f"{100 * (c.get('n') or 0) / topo:.1f}",
                   "marca": "▲" if (c.get("marca") or 0) > 0 else "▽" if (c.get("marca") or 0) < 0 else ""} for m, c in lista[:MINISTROS_POR_AREA]]
         resto = lista[MINISTROS_POR_AREA:]
         dentro = []
@@ -987,14 +1038,14 @@ def _assuntos(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], tp
         for codigo, n in a.get("assuntos") or []:
             assuntos.append({"nome": (tpu.nome(codigo) if tpu else None) or f"Código {codigo}", "codigo": str(codigo), "n": _num(n), "w": f"{100 * n / ass_maior:.1f}"})
         focos.append({
-            "id": aid, "nome": nome["nome"], "curto": nome["curto"], "n": _num(a.get("n")), "pct": _pct(a.get("p"), fino=True),
+            "id": aid, "nome": nome["nome"], "curto": nome["curto"], "n": _num(a.get("n")), "pct": _pct(a.get("p"), fino=True, n=a.get("n")),
             "na_grade": _num(a.get("na_grade")), "mesas": mesas,
-            "resto": f"e mais {_plural(len(resto), 'ministro', 'ministros')}, com {_num(sum(c.get('n') or 0 for _, c in resto))} processos" if resto else "",
+            "resto": f"e mais {_plural(len(resto), quem[0], quem[1])}, com {_plural(sum(c.get('n') or 0 for _, c in resto), 'processo', 'processos')}" if resto else "",
             "dentro": dentro, "assuntos": assuntos,
             "partes": [{"nome": nomes.get(g) or _humano(g), "n": _num(n)} for g, n in a.get("partes") or []],
             "toca": [{"area": t, "nome": r.area(t)["curto"], "n": _num(n)} for t, n in a.get("tambem_toca") or []],
         })
-    return {"barras": barras, "recortes": recortes, "focos": focos}
+    return {"barras": barras, "recortes": recortes, "focos": focos, "relatores": _relatores_das_turmas(p)}
 
 
 def _tipo_litigante(x: dict[str, Any], r: Reguas) -> str:
@@ -1011,7 +1062,7 @@ def _partes(trib: str, p: dict[str, Any], r: Reguas, base: Any = None) -> dict[s
     top = partes.get("top") or []
     maior = max((max(x.get("recorre") or 0, x.get("responde") or 0) for x in top), default=1) or 1
     n_grade = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr")
-    linhas = [{"nome": x.get("nome") or _humano(x.get("id") or ""), "tipo": _tipo_litigante(x, r), "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True),
+    linhas = [{"nome": x.get("nome") or _humano(x.get("id") or ""), "tipo": _tipo_litigante(x, r), "n": _num(x.get("n")), "pct": _pct(x.get("p"), fino=True, n=x.get("n")),
                "recorre": _num(x.get("recorre")), "responde": _num(x.get("responde")), "outro": _num(x.get("outro")) if x.get("outro") else "",
                "wl": f"{80 * (x.get('recorre') or 0) / maior:.1f}", "wr": f"{80 * (x.get('responde') or 0) / maior:.1f}",
                "mesas": f"em {x.get('mesas')} de {n_grade} mesas" if x.get("mesas") is not None else "",
@@ -1025,13 +1076,13 @@ def _partes(trib: str, p: dict[str, Any], r: Reguas, base: Any = None) -> dict[s
     u = p.get("universo") or {}
     return {
         "linhas": linhas, "pf": _num(partes.get("pessoas_fisicas")),
-        "ente": f"{_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))} processos) tem {DINHEIRO_PUBLICO}" if ente else "",
+        "ente": f"{_pct(ente.get('p'), fino=True, n=ente.get('n'))} do acervo ({_plural(int(ente.get('n') or 0), 'processo', 'processos')}) tem {DINHEIRO_PUBLICO}" if ente else "",
         "ente_grupos": por_grupo,
         "concentracao": (f"Os 20 litigantes que mais aparecem estão em {_pct(partes.get('concentracao_top20'))} {base_txt}."
                          if partes.get("concentracao_top20") is not None else ""),
         "minimo": int(r.limiares.get("nome_parte_tribunal") or 20),
         "base": _num(base) if base else "",
-        "recursos": _pct((u.get("recursos") or 0) / u["processos"]) if u.get("processos") and u.get("recursos") is not None else "",
+        "recursos": _pct((u.get("recursos") or 0) / u["processos"], n=u.get("recursos")) if u.get("processos") and u.get("recursos") is not None else "",
     }
 
 
@@ -1052,7 +1103,7 @@ def _fila_cnj(p: dict[str, Any], cnj: dict[str, Any]) -> dict[str, Any] | None:
             sd = m.get("sem_decisao") or {}
             faixas = [_faixa_cnj(f) for f in c.get("faixas") or []]
             linhas.append({"id": mid, "nome": m.get("nome") or mid, "sem": [_num(sd.get("mais_180")), _num(sd.get("mais_365"))],
-                           "cnj": faixas, "cob": _pct(c.get("cobertura") or 0)})
+                           "cnj": faixas, "cob": _pct(c.get("cobertura") or 0, n=c.get("com_data"))})
         if linhas:
             grupos.append({"nome": g.get("nome"), "linhas": linhas})
     u = _bloco_cnj(cnj.get("universo"), cnj.get("cobertura_minima"))
@@ -1087,7 +1138,7 @@ def _fila(trib: str, p: dict[str, Any], r: Reguas, nomes: dict[str, str], relato
             itens.append({"id": mid, "nome": m.get("nome"), "med": int(sd["mediana"]),
                           "l": f"{100 * (sd.get('p25') or 0) / escala:.1f}", "w": f"{100 * max(0, (sd.get('p75') or 0) - (sd.get('p25') or 0)) / escala:.1f}",
                           "m": f"{100 * sd['mediana'] / escala:.1f}", "p90": f"{min(100.0, 100 * (sd.get('p90') or 0) / escala):.1f}",
-                          "txt": txt + (f" ({relogio})" if relogio else ""), "curto": txt if not relogio else f"{txt}; recomeçou em {_data(m.get('relogio'))}",
+                          "txt": txt + (f" ({relogio})" if relogio else ""), "curto": txt if not relogio else f"mediana {_dias(sd['mediana'])} · relógio desde {_data(m.get('relogio'), ano=False)}",
                           "mais_365": "—" if relogio else _num(sd.get("mais_365"))})
         itens.sort(key=lambda x: (-x["med"], x["id"]))
         if itens:
@@ -1153,31 +1204,35 @@ def _fluxo(trib: str, p: dict[str, Any], meta: dict[str, Any]) -> list[dict[str,
         jan = e.get("janela") or [None, None]
         tot, u30 = e.get("total") or {}, e.get("ultimos_30d") or {}
         if trib == "stj":  # a forma "Distribuição" das atas inclui a prevenção (RISTJ, art. 71): o campo não distingue
-            texto = (f"{_num(tot.get('sorteio'))} processos distribuídos (sorteio ou prevenção) entre {_data(jan[0])} e {_data(jan[1])} "
-                     f"({_num(e.get('dias_com_ata'))} dias com ata); {_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte.")
+            texto = (f"{_plural(tot.get('sorteio'), 'processo distribuído', 'processos distribuídos')} (sorteio ou prevenção) entre {_data(jan[0])} e {_data(jan[1])} "
+                     f"({_plural(e.get('dias_com_ata'), 'dia com ata', 'dias com ata')}); {_num(tot.get('heranca'))} por atribuição (herança de acervo), contados à parte.")
             if not _janela(jan)[1]:  # com 30 dias ou menos de série, "nos últimos 30 dias" repetiria o total
-                texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} distribuídos e {_num(u30.get('heranca'))} por atribuição."
+                texto += f" Nos últimos 30 dias: {_plural(u30.get('sorteio'), 'distribuído', 'distribuídos')} e {_num(u30.get('heranca'))} por atribuição."
         else:  # o totalizador da ata do STF só tem "distribuído" e "redistribuído"
-            texto = (f"{_num(tot.get('sorteio'))} processos distribuídos e {_num(tot.get('heranca'))} redistribuídos (impedimento, prevenção "
-                     f"ou cadeira vaga; a ata não diz) entre {_data(jan[0])} e {_data(jan[1])} ({_num(e.get('dias_com_ata'))} dias com ata).")
+            texto = (f"{_plural(tot.get('sorteio'), 'processo distribuído', 'processos distribuídos')} e {_plural(tot.get('heranca'), 'redistribuído', 'redistribuídos')} "
+                     f"(impedimento, prevenção ou cadeira vaga; a ata não diz) entre {_data(jan[0])} e {_data(jan[1])} "
+                     f"({_plural(e.get('dias_com_ata'), 'dia com ata', 'dias com ata')}).")
             if not _janela(jan)[1]:
-                texto += f" Nos últimos 30 dias: {_num(u30.get('sorteio'))} distribuídos e {_num(u30.get('heranca'))} redistribuídos."
-        if tot.get("registro"):
+                texto += (f" Nos últimos 30 dias: {_plural(u30.get('sorteio'), 'distribuído', 'distribuídos')} e "
+                          f"{_plural(u30.get('heranca'), 'redistribuído', 'redistribuídos')}.")
+        if tot.get("registro") == 1:
+            texto += " Outro foi registrado à Presidência ou à Vice, que não é entrada de ministro."
+        elif tot.get("registro"):
             texto += f" Outros {_num(tot.get('registro'))} foram registrados à Presidência ou à Vice, que não são entrada de ministro."
         blocos.append({"titulo": "O que entrou", "texto": texto, "fonte": _selo_fonte(fontes.get(e.get("fonte") or ""))})
     pa = p.get("pautas")
     if isinstance(pa, dict):
         tipos = ", ".join(f"{k} {_num(v)}" for k, v in sorted((pa.get("por_tipo") or {}).items(), key=lambda kv: (-kv[1], kv[0])))
-        texto = (f"{_plural(int(pa.get('itens') or 0), 'item', 'itens')} nas sessões publicadas até agora: {_num(pa.get('principal'))} recursos principais e "
-                 f"{_num(pa.get('interno'))} recursos internos" + (f" ({tipos})" if tipos else "") + ".")
+        texto = (f"{_plural(int(pa.get('itens') or 0), 'item', 'itens')} nas sessões publicadas até agora: {_recursos_pauta(pa, ' e ')}"
+                 + (f" ({tipos})" if tipos else "") + ".")
         if pa.get("vistas") is not None:
             texto += f" Com pedido de vista: {_num(pa.get('vistas'))}; destaques: {_num(pa.get('destaques'))}."
         blocos.append({"titulo": "O que vai a julgamento", "texto": texto, "fonte": _selo_fonte(fontes.get(pa.get("fonte") or ""))})
     de = p.get("decisoes")
     if isinstance(de, dict):
         jan = de.get("janela") or [None, None]
-        texto = (f"{_num(de.get('processos'))} processos com decisão publicada entre {_data(jan[0])} e {_data(jan[1])}: {_num(de.get('monocraticas'))} decisões monocráticas "
-                 f"e {_num(de.get('acordaos'))} acórdãos"
+        texto = (f"{_plural(de.get('processos'), 'processo', 'processos')} com decisão publicada entre {_data(jan[0])} e {_data(jan[1])}: "
+                 f"{_plural(de.get('monocraticas'), 'decisão monocrática', 'decisões monocráticas')} e {_plural(de.get('acordaos'), 'acórdão', 'acórdãos')}"
                  + (f" ({_num(de.get('acordaos_recurso_interno'))} em recurso interno)" if de.get("acordaos_recurso_interno") is not None else "")
                  + f". Da Presidência: {_num(de.get('presidencia'))}.")
         if de.get("atraso_dias"):
@@ -1222,11 +1277,145 @@ def _motivo_saida(motivo: str) -> str:
     return re.sub(r"\s*\([^)]*\)", "", str(motivo or "")).split(";")[0].strip()
 
 
+TIPOS_DJEN_PLURAL = {"decisao": ("decisão", "decisões"), "acordao": ("acórdão", "acórdãos"), "despacho": ("despacho", "despachos"),
+                     "pauta": ("pauta", "pautas"), "distribuicao": ("distribuição", "distribuições"), "edital": ("edital", "editais"),
+                     "outros": ("outra", "outras")}
+
+
+def _djen_dias_da_semana(de: str, ate: str) -> int:
+    d0, d1 = date.fromisoformat(str(de)[:10]), date.fromisoformat(str(ate)[:10])
+    return sum(1 for i in range(1, (d1 - d0).days + 1) if date.fromordinal(d0.toordinal() + i).weekday() < 5)
+
+
+def _djen_do_tribunal(trib: str, d: Dados) -> dict[str, Any] | None:
+    """O que a página mostra do DJe para um tribunal: ``None`` sem a camada (ou sem o tribunal nela);
+    ``{"fresco": False, "nota"}`` com o último dia a mais de ``validade`` dias de segunda a sexta de
+    hoje (contrato do DJEN, §0.2); senão o bloco do tribunal com a fonte."""
+    t = ((d.djen or {}).get("tribunais") or {}).get(trib)
+    if not isinstance(t, dict):
+        return None
+    fonte_meta = (d.meta.get("fontes") or {}).get("djen") or {}
+    validade = int(fonte_meta.get("velho_dias") or 4)
+    hoje = str(d.meta.get("hoje") or (d.djen or {}).get("hoje") or "")
+    ultimo = t.get("ultimo_dia")
+    try:
+        fresco = bool(ultimo) and _djen_dias_da_semana(str(ultimo), hoje) <= validade
+    except ValueError:
+        fresco = False
+    if t.get("publica") is False:
+        return {"fresco": True, "publica": False, "t": t,
+                "texto": f"O {trib.upper()} não publicou nada no DJEN em {_num((d.djen or {}).get('janela', {}).get('dias_uteis'))} dias úteis: o DJe dele é outro.",
+                "fonte": NOME_DJEN}
+    if not ultimo:
+        return None
+    if not fresco:
+        return {"fresco": False, "t": t, "nota": f"DJe (DJEN) sem atualização desde {_data(ultimo)}: a camada volta quando a coleta, na máquina do dono, voltar."}
+    return {"fresco": True, "publica": True, "t": t, "ultimo": ultimo, "fonte": f"{NOME_DJEN}, coletado no Brasil, dados de {_data(ultimo)}"}
+
+
+NOME_DJEN = "CNJ · DJe (DJEN)"
+
+
+def _tipos_djen(tipos: dict[str, Any] | None) -> str:
+    itens = sorted(((k, int(v or 0)) for k, v in (tipos or {}).items() if v), key=lambda kv: (-kv[1], kv[0]))
+    return ", ".join(f"{_num(n)} {TIPOS_DJEN_PLURAL.get(k, (k, k))[0 if n == 1 else 1]}" for k, n in itens)
+
+
+def _bloco_djen(trib: str, dj: dict[str, Any] | None, d: Dados, r: Reguas) -> dict[str, str] | None:
+    """O bloco "O que saiu no DJe" do tribunal (aba A fila, "Entra e sai")."""
+    if dj is None:
+        return None
+    if not dj.get("fresco"):
+        return {"titulo": "O que saiu no DJe", "texto": dj["nota"], "fonte": NOME_DJEN}
+    if dj.get("publica") is False:
+        return {"titulo": "O que saiu no DJe", "texto": dj["texto"], "fonte": dj["fonte"]}
+    t = dj["t"]
+    dia, mes = t.get("dia") or {}, t.get("mes") or {}
+    jan = (d.djen or {}).get("janela") or {}
+    texto = (f"Em {_data(dj['ultimo'])}, o último dia coletado: {_plural(int(dia.get('itens') or 0), 'publicação', 'publicações')} de "
+             f"{_plural(int(dia.get('processos') or 0), 'processo', 'processos')}" + (f" ({_tipos_djen(dia.get('tipos'))})" if dia.get("tipos") else "") + ". "
+             f"De {_data(jan.get('de'))} a {_data(jan.get('ate'))}: {_plural(int(mes.get('itens') or 0), 'publicação', 'publicações')} de "
+             f"{_plural(int(mes.get('processos') or 0), 'processo', 'processos')}" + (f" ({_tipos_djen(mes.get('tipos'))})" if mes.get("tipos") else "") + ".")
+    areas = sorted(((a, int(n or 0)) for a, n in (mes.get("areas") or {}).items() if n and a != "sem_area"), key=lambda kv: (-kv[1], kv[0]))[:4]
+    if areas:
+        texto += " Por área, em processos: " + ", ".join(f"{r.area(a)['curto']} {_num(n)}" for a, n in areas) + "."
+    if mes.get("mesa") is not None and t.get("acervo"):
+        texto += (f" {_plural(int(mes['mesa']), 'processo que estava', 'processos que estavam')} na mesa do relator no acervo de "
+                  f"{_data((t.get('acervo') or {}).get('data'))} {'teve' if int(mes['mesa']) == 1 else 'tiveram'} publicação.")
+    return {"titulo": "O que saiu no DJe", "texto": texto, "fonte": dj["fonte"]}
+
+
+def _djen_do_ministro(trib: str, mid: str, dj: dict[str, Any] | None, r: Reguas) -> dict[str, Any] | None:
+    """O que saiu no DJe de um ministro (o cartão): as publicações dos 30 dias e quantos processos da
+    mesa dele tiveram publicação, com os que esperavam havia mais tempo (nunca em segredo)."""
+    if dj is None:
+        return None
+    if not dj.get("fresco"):
+        return {"linhas": [dj["nota"]], "lista": [], "fonte": NOME_DJEN}
+    if dj.get("publica") is False:
+        return None
+    m = (dj["t"].get("ministros") or {}).get(mid)
+    if not isinstance(m, dict):
+        return {"linhas": ["Nenhuma publicação no DJEN nos 30 dias coletados."], "lista": [], "fonte": dj["fonte"]}
+    mes = m.get("mes") or {}
+    linhas = [f"Em 30 dias, {_plural(int(mes.get('itens') or 0), 'publicação', 'publicações')} de {_plural(int(mes.get('processos') or 0), 'processo', 'processos')}"
+              + (f" ({_tipos_djen(mes.get('tipos'))})" if mes.get("tipos") else "") + "."]
+    mesa = m.get("mesa")
+    lista = []
+    if isinstance(mesa, dict) and mesa.get("na_mesa"):
+        linhas.append(f"{_num(mesa.get('publicados'))} dos {_num(mesa.get('na_mesa'))} processos na mesa tiveram publicação ({_pct(mesa.get('parte'), fino=True, n=mesa.get('publicados'))}).")
+        rot = "sem decisão terminativa registrada há" if trib == "stj" else "concluso há"
+        modelo = (r.links or {}).get(trib) or ""
+        for f in (mesa.get("lista") or [])[:3]:
+            if not isinstance(f, dict):
+                continue
+            try:
+                link = modelo.format(registro=f.get("registro") or "") if trib == "stj" and f.get("registro") else (
+                    modelo.format(classe=f.get("classe") or "", numero=f.get("numero") or "") if trib == "stf" else "")
+            except (KeyError, IndexError):
+                link = ""
+            tipo = TIPOS_DJEN_PLURAL.get(str(f.get("tipo") or ""), (str(f.get("tipo") or "publicação"), ""))[0]
+            dias = f.get("dias_sem_decisao")
+            lista.append({"rotulo": f"{f.get('classe') or ''} {_num(_int_ou(f.get('numero')))}".strip(), "link": filters.safe_url(link) or "",
+                          "area": f.get("area") or "", "area_nome": r.area(f.get("area"))["curto"] if f.get("area") else "",
+                          "texto": (f"{rot} {_dias(dias)} no acervo; " if dias is not None else "") + f"saiu no DJe em {_data(f.get('dia'), ano=False)} ({tipo})"})
+    return {"linhas": linhas, "lista": lista, "fonte": dj["fonte"]}
+
+
+def _int_ou(x: Any) -> Any:
+    try:
+        return int(str(x))
+    except (TypeError, ValueError):
+        return x
+
+
 def _selo_fonte(f: Any) -> str:
     if not isinstance(f, dict):
         return ""
     data = _data(f.get("data_dados"))
     return f"{f.get('nome')}, dados de {data}" if data else str(f.get("nome") or "")
+
+
+def _texto_metodo_djen(d: Dados) -> str:
+    """O "Como ler" da camada do DJe: de onde vem, por que roda fora do GitHub, as réguas do arquivo
+    e quando ela sai da página."""
+    fonte = (d.meta.get("fontes") or {}).get("djen") or {}
+    validade = int(fonte.get("velho_dias") or 4)
+    texto = ("Desde 29/11/2024 as decisões, os despachos, os acórdãos e a distribuição do STJ saem no DJEN, o Diário de Justiça Eletrônico "
+             "Nacional do CNJ; é a fonte do dia para o que saiu de cada gabinete (as íntegras dos dados abertos trazem o mesmo, com semanas de "
+             "atraso). A API do DJEN recusa quem está fora do Brasil: a coleta roda numa máquina do dono, no Brasil, e manda só o resumo "
+             "(nenhum texto de publicação, nenhum nome de pessoa física nem de advogado). ")
+    if d.djen is None:
+        return texto + "Ainda sem coleta: a aba sai sem a camada."
+    reguas = (d.djen.get("reguas") or {})
+    for chave in ("relator", "mesa", "area", "partes", "segredo"):
+        frase = str(reguas.get(chave) or "").strip()
+        if frase:
+            texto += frase.rstrip(".") + ". "
+    texto += (f"A camada sai da página quando o último dia coletado fica mais de {_num(validade)} dias (de segunda a sexta) para trás; o dia de "
+              "disponibilização é o do DJEN, e a publicação oficial é o dia útil seguinte. ")
+    atrib = ((d.djen.get("fonte") or {}).get("atribuicao")) or fonte.get("atribuicao")
+    return texto + (str(atrib).rstrip(".") + "." if atrib else "")
 
 
 def _texto_metodo_cnj(cnj: dict[str, Any], mesa: list[Any]) -> str:
@@ -1252,7 +1441,7 @@ def _texto_metodo_cnj(cnj: dict[str, Any], mesa: list[Any]) -> str:
                   "data do índice não respondeu): processo com distribuição ou decisão mais nova fica sem a data. ")
     texto += (f"Processos em segredo de justiça não estão no índice público ({_num(u.get('segredo'))} na mesa hoje) e os suspensos ficam fora, "
               f"como no \"sem decisão\". Cobertura de hoje: {_num(u.get('com_data'))} de {_num(u.get('base'))} processos públicos na mesa "
-              f"({_pct(u.get('cobertura') or 0)}) têm o estado no CNJ")
+              f"({_pct(u.get('cobertura') or 0, n=u.get('com_data'))}) têm o estado no CNJ")
     pend = (u.get("estados") or {}).get("p")
     if pend:
         texto += f"; {_num(pend)} ainda não foram consultados (a carga anda em fatias, a cada coleta"
@@ -1260,7 +1449,7 @@ def _texto_metodo_cnj(cnj: dict[str, Any], mesa: list[Any]) -> str:
             texto += f"; faltam cerca de {_num(fonte['execucoes_restantes'])}"
         texto += ")"
     texto += (f". As faixas de mais de {_num(mesa[0])} e de {_num(mesa[-1])} dias de cada ministro só aparecem quando {minimo} ou mais dos "
-              "candidatos (os sem decisão registrada há mais que o limite) têm a data; abaixo disso a página diz \"cobertura insuficiente\". "
+              "candidatos (os sem decisão terminativa registrada há mais que o limite) têm a data; abaixo disso a página diz \"cobertura insuficiente\". "
               f"{fonte.get('atribuicao') or 'Fonte: CNJ, DataJud (API Pública)'}; o CNJ não garante a precisão nem a atualidade dos dados (termo de uso, item 3.6).")
     return texto
 
@@ -1344,11 +1533,13 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         textos.append(("O DataJud (CNJ · DataJud)", _texto_metodo_cnj(d.cnj, mesa)))
     elif datajud:
         textos.append(("O DataJud", str(datajud.get("aviso") or "O DataJud, a base do CNJ, fica desligado: a página não usa número dele.")))
-    textos.append(("O que fica de fora", "O Diário de Justiça Eletrônico Nacional (DJEN) recusa o acesso de fora do Brasil e não é lido nesta fase. "
-                   "O valor da causa, a data exata da conclusão no STJ e o andamento processo a processo não estão nas fontes abertas lidas aqui."))
+    textos.append(("O DJe (DJEN)", _texto_metodo_djen(d)))
     if d.cnj is not None:  # com a camada do CNJ, a data da conclusão no STJ não falta mais (falta onde a cobertura não chega)
-        textos = [(t, x.replace("a data exata da conclusão no STJ, ", "").replace("a data exata da conclusão no STJ e ", ""))
-                  if t == "O que fica de fora" else (t, x) for t, x in textos]
+        textos.append(("O que fica de fora", ("O valor da causa e o andamento processo a processo não estão nas fontes abertas lidas aqui. "
+                                              "A data da conclusão no STJ vem do CNJ, e só onde a cobertura chega.")))
+    else:
+        textos.append(("O que fica de fora", ("O valor da causa, a data exata da conclusão no STJ e o andamento processo a processo não "
+                                              "estão nas fontes abertas lidas aqui.")))
     textos.append(("O que isto não diz", "Número de processos não é produtividade nem orientação de quem julga. Acervo grande pode ser herança, prevenção ou "
                    "uma Turma com mais entrada. \"Sem decisão terminativa registrada\" não quer dizer que nada aconteceu no processo: liminares, "
                    "despachos e diligências não entram no arquivo do STJ, e a fonte não diz por que um processo espera (parecer, pauta, julgamento "
@@ -1395,7 +1586,7 @@ def _metodo(d: Dados, r: Reguas, tpu: Any) -> dict[str, Any]:
         cas = cob.get("casamento")
         if isinstance(cas, dict) and cob.get("linhas_de_assunto"):
             total = cob["linhas_de_assunto"]
-            frase += (f" Das {_num(total)} linhas de assunto em texto, {_pct((cas.get('folha') or 0) / total, fino=True)} casaram com a TPU até o fim do caminho; "
+            frase += (f" Das {_num(total)} linhas de assunto em texto, {_pct((cas.get('folha') or 0) / total, fino=True, n=cas.get('folha'))} casaram com a TPU até o fim do caminho; "
                       f"{_num(cas.get('parcial'))} em parte; {_num(cas.get('raiz'))} só no ramo; {_num(cas.get('nada'))} não casaram (vale o ramo em texto).")
         fora = cob.get("relatores_fora_do_mapa") or []
         if fora:
@@ -1464,6 +1655,7 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
     pares_longo, _ = _texto_pares(trib, r.limiares)
     n_grade = sum(1 for m in p.get("ministros") or [] if m.get("grupo") != "pr")
     relatores_txt, relatores_curto = _relatores_turmas(p)
+    djen_t = _djen_do_tribunal(trib, d)
     valor = p.get("valor") or {}
     medidas = valor.get("medidas") or {}
     ente, liminar = medidas.get("ente_publico") or {}, medidas.get("liminar") or {}
@@ -1474,10 +1666,10 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
          "v": _num(u.get("na_mesa")), "u": "", "x": f"de {_num(u.get('na_grade'))} com eles; {_num(u.get('processos'))} no tribunal, em {_data(p.get('data_dados'))}"},
         {"k": "Sem decisão terminativa há + de 1 ano" if trib == "stj" else "Concluso há + de 1 ano",
          "dica": f"sem_decisao_{trib}",
-         "v": _num(u.get("sem_decisao_365")), "u": "", "x": f"{_pct((u.get('sem_decisao_365') or 0) / u['na_mesa'] if u.get('na_mesa') else 0, fino=True)} da mesa; {_num(u.get('sem_decisao_180'))} há mais de {_num((r.limiares.get('mesa_dias') or [180])[0])} dias"},
+         "v": _num(u.get("sem_decisao_365")), "u": "", "x": f"{_pct((u.get('sem_decisao_365') or 0) / u['na_mesa'] if u.get('na_mesa') else 0, fino=True, n=u.get('sem_decisao_365'))} da mesa; {_num(u.get('sem_decisao_180'))} há mais de {_num((r.limiares.get('mesa_dias') or [180])[0])} dias"},
         _tile_idade(trib, p, idade.get("no_tribunal") or {}, idade.get("autuacao")),
         {"k": "Valor da causa", "dica": "valor", "v": "", "u": "", "sem_numero": True,
-         "x": f"as fontes abertas não publicam. Dinheiro público num polo: {_pct(ente.get('p'), fino=True)} do acervo ({_num(ente.get('n'))})"},
+         "x": f"as fontes abertas não publicam. Dinheiro público num polo: {_pct(ente.get('p'), fino=True, n=ente.get('n'))} do acervo ({_num(ente.get('n'))})"},
     ]
     for k in tiles:
         k.setdefault("sem_numero", False)
@@ -1503,18 +1695,18 @@ def _tribunal(trib: str, d: Dados, r: Reguas, nomes: dict[str, str], tpu: Any, p
     return {
         **base, "tem": True, "n_ministros": len(p.get("ministros") or []), "data": _data(p.get("data_dados")), "data_curta": _data(p.get("data_dados"), ano=False),
         "leitura": _leitura(trib, p, d.achados, r), "tiles": tiles, "mapa": mapa,
-        "valor": {"texto": str(valor.get("texto") or ""), "ente": f"{_pct(ente.get('p'), fino=True)} ({_num(ente.get('n'))} processos)",
-                  "liminar": f"{_pct(liminar.get('p'), fino=True)} ({_num(liminar.get('n'))} processos)", "recortes": recortes_valor,
+        "valor": {"texto": str(valor.get("texto") or ""), "ente": f"{_pct(ente.get('p'), fino=True, n=ente.get('n'))} ({_plural(int(ente.get('n') or 0), 'processo', 'processos')})",
+                  "liminar": f"{_pct(liminar.get('p'), fino=True, n=liminar.get('n'))} ({_plural(int(liminar.get('n') or 0), 'processo', 'processos')})", "recortes": recortes_valor,
                   "liminar_rot": "Chegaram com pedido de liminar" if trib == "stj" else "Com liminar ou tutela pendente",
                   "liminar_nota": ("o arquivo do STJ diz se o processo chegou com pedido de liminar, não se ela foi decidida" if trib == "stj" else "")},
         "relatores": relatores_txt,
         "pares": pares_longo, "colunas": colunas, "nota_colunas": _nota_colunas(fora_colunas),
         "matriz": _matriz(trib, p, r, colunas), "chips": chips, "lista_mesa": lista_mesa,
-        "cartoes": [_cartao(trib, p, m, r, nomes, relatores, d.cnj) for m in p.get("ministros") or []],
+        "cartoes": [_cartao(trib, p, m, r, nomes, relatores, d.cnj, djen_t) for m in p.get("ministros") or []],
         "assuntos": _assuntos(trib, p, r, nomes, tpu),
         "partes": _partes(trib, p, r, ((((d.meta.get("cobertura") or {}).get(trib) or {}).get("partes")) or {}).get("base")),
         "fila": _fila(trib, p, r, nomes, relatores, d.cnj),
-        "fluxo": _fluxo(trib, p, d.meta),
+        "fluxo": _fluxo(trib, p, d.meta) + [b for b in (_bloco_djen(trib, djen_t, d, r),) if b],
         "colunas_grupo": {g.get("id"): sorted(a for a, (n, frac) in (g.get("areas") or {}).items() if frac < 0.01) for g in p.get("grupos") or [] if g.get("id") != "pr"},
     }
 
@@ -1622,9 +1814,11 @@ def render_tribunais_page(config: Config, data_dir: Path, *, home_href: str, arc
 def gravar_pagina(dir_saida: Path, config: Config) -> Path | None:
     """Lê ``<dir_saida>/data/tribunais/`` e grava ``<dir_saida>/edicoes/tribunais.html``.
 
-    Devolve o caminho gravado, ou ``None`` quando a marca não usa a aba, quando não há dados (ou são
-    de outra versão) ou quando a página passaria de ``TETO_BYTES`` (aí ela não é gravada: fica a
-    anterior, e o log diz o tamanho). Acende o botão cruzado do Congresso quando a aba dele existe."""
+    Devolve o caminho gravado, ou ``None`` quando a marca não usa a aba ou quando não há dados (ou
+    são de outra versão). Quando a página passaria de ``TETO_BYTES``, ela não é gravada (fica a
+    anterior) e sobe :class:`PaginaGrandeDemais`: a execução fica vermelha e nada é publicado (os
+    dados novos com a página velha sairiam incoerentes). Acende o botão cruzado do Congresso quando a
+    aba dele existe."""
     from .. import pipeline  # import tardio: o pipeline importa as páginas
 
     if not config.tribunais_ativo:
@@ -1639,5 +1833,5 @@ def gravar_pagina(dir_saida: Path, config: Config) -> Path | None:
     tamanho = len(html.encode("utf-8"))
     if tamanho > TETO_BYTES:
         log.error("Tribunais: a página teria %d KB, acima do teto de %d KB; não foi gravada (fica a anterior)", tamanho // 1024, TETO_BYTES // 1024)
-        return None
+        raise PaginaGrandeDemais(tamanho)
     return pipeline.write_atomic(dir_saida / pipeline.ARCHIVE_DIR / PAGINA, html)

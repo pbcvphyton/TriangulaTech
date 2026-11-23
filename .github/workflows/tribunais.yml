@@ -5,7 +5,7 @@
 # Roda num fluxo à parte, fora do caminho da edição: o portal de dados abertos do STJ fica atrás de
 # um limite de taxa (Cloudflare: 403 intermitente, 10 s entre pedidos pelo robots.txt) e publica o
 # acervo do dia à tarde do dia seguinte e a ata do dia por volta das 19:30 (Brasília), enquanto a
-# edição roda de manhã; o DataJud do CNJ (desligado por padrão) vive sobrecarregado. A edição
+# edição roda de manhã; o DataJud do CNJ (ligado e publicado: datajud.publicar) vive sobrecarregado. A edição
 # diária não espera os Tribunais e nunca grava em data/tribunais/ nem em edicoes/tribunais.html
 # (exclusão no "Publicar" do daily.yml): cada pasta tem um escritor só, e por isso este fluxo tem
 # fila própria, não a da edição.
@@ -47,6 +47,11 @@ on:
         description: "Ensaio: coleta e refaz a aba sem publicar nada (o resultado fica como artefato; roda mesmo com QIJ_NO_TRIBUNAIS)"
         type: boolean
         default: false
+      aceitar_acervo:
+        description: "Aceitar uma vez o acervo do dia fora da faixa da sanidade (mudança real de mais de 15%, conferida à mão; ver o README)"
+        type: choice
+        options: [nenhum, stj, stf]
+        default: nenhum
 
 # O job que publica pede o que precisa (contents, pages, issues); o "decidir" só lê.
 permissions:
@@ -66,7 +71,9 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ github.ref_name }}
-          sparse-checkout: data/tribunais/meta.json
+          sparse-checkout: |
+            data/tribunais/meta.json
+            data/tribunais/djen.json
           sparse-checkout-cone-mode: false
 
       - name: Verificar se há o que fazer
@@ -94,6 +101,22 @@ jobs:
             proxima=""
           fi
           limite=$(date -u -d '+36 hours' +%Y-%m-%dT%H:%M:%SZ)
+          # O djen.json chega da máquina do dono (no Brasil), num commit próprio: mais novo que o
+          # registrado no meta.json (fontes.djen.coletado_em), a aba é refeita (sem pedido novo às
+          # fontes que não têm novidade).
+          djen_novo=$(python3 - <<'PY' 2>/dev/null || true
+          import json
+          try:
+              djen = json.load(open("data/tribunais/djen.json", encoding="utf-8")).get("gerado_em") or ""
+          except (OSError, ValueError):
+              djen = ""
+          try:
+              meta = (json.load(open("data/tribunais/meta.json", encoding="utf-8")).get("fontes") or {}).get("djen") or {}
+          except (OSError, ValueError):
+              meta = {}
+          print("sim" if djen and djen > str(meta.get("coletado_em") or "") else "")
+          PY
+          )
           if [ "$EVENT" = "workflow_dispatch" ] && [ "$INPUT_ENSAIO" = "true" ]; then
             msg="Ensaio pedido à mão: coleta e refaz a aba sem publicar (roda mesmo com QIJ_NO_TRIBUNAIS)."
             rodar=true
@@ -102,6 +125,9 @@ jobs:
             rodar=false
           elif [ "$EVENT" = "workflow_dispatch" ]; then
             msg="Disparo manual: atualizando (as fontes sem novidade só são conferidas)."
+            rodar=true
+          elif [ "$djen_novo" = "sim" ]; then
+            msg="DJe (DJEN) novo vindo da máquina do dono; refazendo a aba ($EVENT)."
             rodar=true
           elif [ -n "$proxima" ] && [[ "$proxima" > "$limite" ]]; then
             echo "::warning::proxima_execucao ($proxima) está a mais de 36 h; conferindo as fontes assim mesmo."
@@ -134,9 +160,10 @@ jobs:
       pages: write # o pedido de build do GitHub Pages
       issues: write # o aviso ao dono quando uma fonte passa da validade
     # Dia a dia: o passo "Atualizar" tem 30 min; o resto é instalar, o cache e publicar. Carga
-    # completa: 75 min de coleta; o que não couber fica para as execuções seguintes (as atas e
-    # íntegras já baixadas ficam no cache e não são pedidas de novo).
-    timeout-minutes: ${{ inputs.completo && 95 || 45 }}
+    # completa (pedida à mão ou com o cache frio, como no primeiro dia na main): 75 min de coleta; o
+    # que não couber fica para as execuções seguintes (as atas e íntegras já baixadas ficam no cache
+    # e não são pedidas de novo). O job fica com 95 min sempre: o cache frio só se sabe no passo.
+    timeout-minutes: 95
     steps:
       - name: Baixar o repositório
         uses: actions/checkout@v5
@@ -174,7 +201,9 @@ jobs:
         # refaz a aba com o que ficou gravado e a execução fica vermelha no fim.
         id: atualizar
         continue-on-error: true
-        timeout-minutes: ${{ inputs.completo && 75 || 30 }}
+        # Cache frio (nenhuma entrada restaurada): carga completa automática. Uma execução comum
+        # baixaria só 6 atas e 4 íntegras e trocaria o painel de 12 meses por um de uma semana.
+        timeout-minutes: ${{ (inputs.completo || steps.restaurar.outputs.cache-matched-key == '') && 75 || 30 }}
         env:
           QIJ_BRAND: ${{ vars.QIJ_BRAND }}
           # No ensaio a coleta roda mesmo com a aba desligada (nada é publicado); fora dele, o
@@ -190,13 +219,22 @@ jobs:
           # ambiente, nunca interpoladas direto no script.
           INPUT_COMPLETO: ${{ inputs.completo }}
           INPUT_SO: ${{ inputs.so }}
+          INPUT_ACEITAR: ${{ inputs.aceitar_acervo }}
+          FRIO: ${{ steps.restaurar.outputs.cache-matched-key == '' }}
           TZ: America/Sao_Paulo
           PYTHONUNBUFFERED: "1"
         run: |
           args=(--dir . --cache "$RUNNER_TEMP/tribunais")
           if [ "$INPUT_COMPLETO" = "true" ]; then args+=(--completo); fi
+          if [ "$INPUT_COMPLETO" != "true" ] && [ "$FRIO" = "true" ]; then
+            echo "Cache frio (nenhuma entrada restaurada): carga completa."
+            args+=(--completo)
+          fi
           case "$INPUT_SO" in
             stj|stf) args+=(--so "$INPUT_SO") ;;
+          esac
+          case "$INPUT_ACEITAR" in
+            stj|stf) args+=(--aceitar-acervo "$INPUT_ACEITAR") ;;
           esac
           python -m qijournal tribunais atualizar "${args[@]}"
 
@@ -316,19 +354,22 @@ jobs:
           if meta is not None:
               for fid, fonte in sorted((meta.get("fontes") or {}).items()):
                   if not isinstance(fonte, dict) or fonte.get("ok") is None:
-                      continue  # fonte desligada (o DataJud, por padrão)
+                      continue  # fonte desligada (o DataJud com datajud.ativo: false; o DJEN antes da primeira coleta)
                   nome, aviso = fonte.get("nome") or fid, fonte.get("aviso") or ""
                   dados, limite = fonte.get("data_dados"), fonte.get("velho_dias")
                   if not dados:
                       problemas.append((f"{fid}:sem_dados", f"- {nome}: nenhum dado coletado até hoje. {aviso}".rstrip()))
                       continue
                   try:
-                      dias = (hoje - date.fromisoformat(str(dados)[:10])).days
+                      de = date.fromisoformat(str(dados)[:10])
+                      dias = (hoje - de).days
                   except ValueError:
                       problemas.append((f"{fid}:data", f"- {nome}: data dos dados ilegível ({dados!r})."))
                       continue
-                  if isinstance(limite, int) and dias > limite and fid not in SO_SEM_DADOS:
-                      problemas.append((f"{fid}:velho", f"- {nome}: dados de {br(str(dados))}, há {dias} dias (validade: {limite} dias). {aviso}".rstrip()))
+                  # O acervo do STJ não sai no fim de semana: a validade dele conta de segunda a sexta.
+                  idade = sum(1 for i in range(1, dias + 1) if date.fromordinal(de.toordinal() + i).weekday() < 5) if fonte.get("dias_da_semana") else dias
+                  if isinstance(limite, int) and idade > limite and fid not in SO_SEM_DADOS:
+                      problemas.append((f"{fid}:velho", f"- {nome}: dados de {br(str(dados))}, há {dias} dias (validade: {limite} dias{' de segunda a sexta' if fonte.get('dias_da_semana') else ''}). {aviso}".rstrip()))
               for trib, cob in sorted((meta.get("cobertura") or {}).items()):
                   fora = [par for par in (cob or {}).get("relatores_fora_do_mapa") or [] if isinstance(par, list) and len(par) == 2]
                   if fora:
@@ -372,7 +413,7 @@ jobs:
           number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
           body="$(cat "$alerta")
 
-          O que fazer: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md#quando-algo-dá-errado
+          O que fazer: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md#tribunais-quando-algo-dá-errado
           Execução: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           if [ -n "$number" ]; then
             ultimo=$(gh issue view "$number" --repo "$GITHUB_REPOSITORY" --json body,comments --jq '([.body] + [.comments[].body]) | last')
@@ -425,8 +466,9 @@ jobs:
 
       - name: Preparar o cache
         # O teto de cache do repositório (10 GB) é dividido com o Congresso (~1,5 GB por entrada).
-        # Fica fora: o diário (já é artefato), sobra de download e arquivo grande de outro dia (o
-        # acervo do STJ de ontem, 82 MB: cada dia tem endereço próprio). A chave é o conteúdo
+        # Fica fora: o diário (já é artefato) e sobra de download. O acervo do STJ de outro dia (82 MB)
+        # já saiu no próprio comando, pela referência: fica o que algum estado cita (o acervo em uso,
+        # de sexta a terça, e o socorro de cada fonte) e o que esta execução usou. A chave é o conteúdo
         # (caminho e tamanho de cada arquivo, menos robots.txt e páginas, relidos a cada execução):
         # sem nada novo, nenhuma entrada nova.
         id: preparar
@@ -443,7 +485,6 @@ jobs:
           fi
           rm -rf "$dir/diario"
           find "$dir" -type f -name '.*.tmp' -delete
-          find "$dir" -type f -size +40M -mtime +0 -print -delete
           resumo=$(cd "$dir" && find . -type f ! -path './robots/*' ! -path './paginas/*' -printf '%P %s\n' | LC_ALL=C sort | sha256sum | cut -c1-16)
           chave="tribunais-$(date -u +%F)-$resumo"
           echo "Cache dos Tribunais: $(du -sm "$dir" | cut -f1) MB; chave $chave (restaurada: ${RESTAURADO:-nenhuma})."
