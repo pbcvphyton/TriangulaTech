@@ -1,0 +1,154 @@
+{
+ "status": "success",
+ "message": "Sucesso",
+ "count": 7,
+ "items": [
+  {
+   "id": 9006,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "SECRETARIA JUDICIÁRIA",
+   "idOrgao": 70006,
+   "texto": "<p>DESPACHO</p><p>RELATOR : MINISTRO HERMAN BENJAMIN</p><p>IMPETRANTE : ESTADO DE SÃO PAULO</p><p>IMPETRADO : MINISTRO DE ESTADO DA FAZENDA</p><p>INTERESSADO : UNIÃO</p><p>Vista à Procuradoria (texto sintético).</p>",
+   "numero_processo": "00000060020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Intimação",
+   "nomeClasse": "MANDADO DE SEGURANÇA",
+   "codigoClasse": "1029",
+   "numeroComunicacao": 6,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000006-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9006,
+     "nome": "ESTADO DE SÃO PAULO",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9006,
+     "nome": "UNIÃO",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9006,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  },
+  {
+   "id": 9007,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "GABINETE DA MINISTRA NANCY ANDRIGHI",
+   "idOrgao": 70007,
+   "texto": "<p>DECISÃO</p><p>Publicação cancelada (texto sintético).</p>",
+   "numero_processo": "00000070020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Decisão",
+   "nomeClasse": "AGRAVO EM RECURSO ESPECIAL",
+   "codigoClasse": "11881",
+   "numeroComunicacao": 7,
+   "ativo": false,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": "Publicação em duplicidade",
+   "data_cancelamento": "2026-11-20T10:00:00",
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000007-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9007,
+     "nome": "BANCO EXEMPLO S.A.",
+     "polo": "A"
+    }
+   ],
+   "destinatarioadvogados": []
+  },
+  {
+   "id": 9005,
+   "data_disponibilizacao": "2026-11-20",
+   "siglaTribunal": "STJ",
+   "tipoComunicacao": "Intimação",
+   "nomeOrgao": "GABINETE DO MINISTRO RAUL ARAÚJO FILHO",
+   "idOrgao": 70005,
+   "texto": "<p>DESPACHO</p><p>PROCESSO EM SEGREDO DE JUSTIÇA</p><p>Intimem-se as partes (texto sintético).</p>",
+   "numero_processo": "00000050020263000000",
+   "meio": "D",
+   "link": "<link removido>",
+   "tipoDocumento": "Despacho",
+   "nomeClasse": "RECURSO ESPECIAL",
+   "codigoClasse": "1032",
+   "numeroComunicacao": 5,
+   "ativo": true,
+   "hash": "<hash removido>",
+   "status": "P",
+   "motivo_cancelamento": null,
+   "data_cancelamento": null,
+   "datadisponibilizacao": "20/11/2026",
+   "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+   "numeroprocessocommascara": "0000005-00.2026.3.00.0000",
+   "destinatarios": [
+    {
+     "comunicacao_id": 9005,
+     "nome": "A. B. C.",
+     "polo": "A"
+    },
+    {
+     "comunicacao_id": 9005,
+     "nome": "D. E. F.",
+     "polo": "P"
+    }
+   ],
+   "destinatarioadvogados": [
+    {
+     "id": 101,
+     "comunicacao_id": 9005,
+     "advogado_id": 501,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 501,
+      "nome": "ADVOGADO 1 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    },
+    {
+     "id": 102,
+     "comunicacao_id": 9005,
+     "advogado_id": 502,
+     "created_at": "2026-11-19T20:10:00",
+     "updated_at": "2026-11-19T20:10:00",
+     "advogado": {
+      "id": 502,
+      "nome": "ADVOGADO 2 (mascarado)",
+      "numero_oab": "000000",
+      "uf_oab": "SP"
+     }
+    }
+   ]
+  }
+ ]
+}

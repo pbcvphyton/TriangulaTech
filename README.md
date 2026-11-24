@@ -1047,6 +1047,361 @@ cobertura.
 
 ---
 
+## Analítico dos Tribunais (aba Tribunais, só Triangula)
+
+O botão **Tribunais** do cabeçalho abre `edicoes/tribunais.html`: **quem está com o
+quê no STJ e no STF**. Mostra o acervo de cada ministro por área do direito, o que está
+na mesa dele e há quanto tempo, os assuntos em que cada gabinete se concentra e as partes
+que se repetem. Tudo vem do que os próprios tribunais publicam em dados abertos, e
+**nenhuma IA entra nas contas**: é contagem sobre o registro de cada processo. As réguas
+ficam à vista em [`config/tribunais.yaml`](config/tribunais.yaml) (áreas, composição,
+limiares e fontes) e [`config/tribunais_partes.yaml`](config/tribunais_partes.yaml)
+(o catálogo de litigantes).
+
+No alto fica o tribunal (STF ou STJ, com o número de ministros no painel) e, logo abaixo,
+o que ver dele. Cada aba tem endereço próprio, que pode ser enviado (`tribunais.html#v=ministros&t=stj`; a mesa de um ministro, `&min=stj-raul-araujo`).
+Sem script, as abas saem todas em sequência.
+
+- **Resumo**: a leitura do dia. A manchete é o achado de maior peso, com o número e o
+  link **Ver a prova**; abaixo vêm os demais achados e o mapa do que tem em cada aba.
+- **Ministros**: a matriz **ministro × área**, com a parte do acervo de cada gabinete em
+  cada área. A linha em itálico traz a média do grupo (a Turma no STJ, o tribunal no STF).
+  ▲ e ▽ marcam onde o gabinete está **bem acima ou bem abaixo dos pares**. A marca só
+  aparece onde passa no teste (binomial exata, 99%, Holm) **e** a diferença é grande:
+  1,25 vez ou mais (ou 0,8 ou menos) e 2 pontos ou mais. Há filtro por Seção ou grupo.
+  Clicar no nome abre a **mesa** do ministro, um dossiê com:
+  - de que é o acervo, contra a Turma;
+  - o que espera há mais tempo;
+  - quem mais aparece, de que lado;
+  - o detalhe por subárea e recorte;
+  - as classes;
+  - onde está o acervo;
+  - há quanto tempo;
+  - o que está em pauta;
+  - o que entrou e o que decidiu;
+  - os temas de que é relator.
+- **Assuntos**: de que se ocupa o tribunal, área por área. Mostra as subáreas, os
+  assuntos mais frequentes da Tabela Processual Unificada do CNJ e quem cuida de cada um.
+  Inclui os **recortes** que atravessam áreas: bancário, planos de saúde, dano moral,
+  execução fiscal, recuperação judicial, drogas e improbidade.
+- **Partes**: os litigantes que mais se repetem, de que lado e em quantas mesas. No recurso,
+  "recorre" e "responde"; nas ações originárias (ADI, HC, MS, rescisória, reclamação),
+  "polo ativo" e "polo passivo". O total inclui quem é só interessado (o Ministério Público
+  no habeas corpus). Também mostra a parte do acervo com **dinheiro público num dos polos**
+  (União, Fazenda Nacional, INSS, Estado ou DF, Município; o MP, a Defensoria e as autarquias
+  não entram).
+- **A fila**: o que espera há mais tempo e na mesa de quem.
+  - No STJ, conta "sem decisão terminativa registrada há N dias": da última distribuição ou
+    da última decisão terminativa, a mais recente. O arquivo do STJ só registra a decisão
+    que encerra o processo ou o recurso; liminares e despachos não entram. Redistribuição e
+    atribuição zeram a conta: quem chegou à Turma ou herdou acervo há menos de um ano
+    aparece com "o relógio recomeçou", com a data, sem o número.
+  - No STF, conta "concluso há N dias", quando o andamento atual é a conclusão ao relator.
+  - Com a camada do CNJ (DataJud), "concluso há N dias (CNJ)" no STJ, com o selo e a
+    cobertura (ver abaixo).
+  - O que saiu no DJe (DJEN), por ministro e por área, quando a máquina do dono coletou.
+- **Como ler**: as definições, as fontes com a data de cada uma, o que a página não
+  mostra e por quê.
+
+Cada achado, cada mesa e a lista de quem se repete têm o link **Contestar este número**,
+que abre uma issue no repositório com o id do achado ou do ministro no título (nunca nome
+de parte nem número de processo).
+
+**O que a página não mostra, e por quê.**
+- **Valor da causa**: nenhuma fonte aberta dos dois tribunais publica esse campo. No lugar
+  dele, a página mostra o dinheiro público num polo, a liminar (no STJ, quantos chegaram
+  com pedido de liminar, decidida ou não; no STF, quantos têm liminar ou tutela pendente) e
+  os recortes econômicos.
+- **Nomes de pessoas físicas**: nunca aparecem. MEI e empresário individual ("Fulano - ME",
+  "12.345.678 Fulano") contam como pessoa física.
+- **Processos em segredo de justiça**: entram no acervo, nas áreas e no dinheiro público,
+  mas nunca são listados e ficam fora de "quem se repete".
+- **Advogados, autoridades e qualificadores** ("e outros", "representado por") ficam fora
+  de "quem se repete".
+
+### As contas
+
+- **Na mesa** é o processo em tramitação cujo relator está no painel e que está fisicamente
+  no gabinete:
+  - no STJ, o `localProcesso` do acervo é o gabinete do relator;
+  - no STF, a "Localização Atual" é "GABINETE MINISTRO X".
+  A Presidência, a Vice, os processos sem relator e os de quem deixou a Turma aparecem em
+  linhas próprias, fora da conta dos ministros.
+- **Uma área por processo.** A área vem do **código** do assunto principal na TPU do CNJ,
+  nunca do texto. A classe vale antes (ADI/ADC/ADO/ADPF → Constitucional; HC, RHC, APn…
+  → Penal), salvo o HC e o RHC cujo mérito é de Família ou de Saúde (prisão civil por
+  alimentos, guarda, acolhimento, internação compulsória), que ficam na área do mérito. Depois vale o nó mais específico listado na árvore e, por fim, a raiz. Quando o
+  assunto principal é só de rito, vale o primeiro assunto de mérito; sem nenhum, o processo
+  fica em "Só processual", à mostra. No STF, os assuntos vêm em texto, e o caminho é casado
+  com a árvore da TPU nível a nível (98,98% das linhas casam até a folha).
+- **Partes.**
+  - No STJ, os litigantes são agrupados pela **raiz do CNPJ**.
+  - No STF, o agrupamento é por padrões de nome do catálogo, porque a planilha cola os nomes.
+  - União, Fazenda Nacional, INSS, Estados/DF e Municípios contam como **dinheiro público**.
+  - Sindicato, associação, partido e OAB são pessoa jurídica, mesmo com um ente no nome;
+    "empresa" só para as categorias empresariais do catálogo.
+  - "Quem se repete" conta sobre a própria base: sem os processos em segredo e sem os
+    precatórios (Prc, RPV), em que o requerente é o credor. A porcentagem de cada
+    litigante é sobre essa base (`meta.json → cobertura.<trib>.partes.base`).
+- **Comparações.** No STJ, o que entra na Turma vem por sorteio ou prevenção (as atas não
+  distinguem), então um gabinete muito acima dos colegas numa área diz algo sobre o que
+  ficou: o que não foi decidido, o que veio por prevenção, o que foi herdado. Não diz nada
+  sobre escolha ou especialidade.
+  - Recém-chegados (menos de 6 meses) e acervos pequenos ficam fora do teste.
+  - No STF, em que os pares são o tribunal inteiro, o gabinete que fica bem acima numa área
+    sai da conta dos outros naquela área (as ações penais que um ministro concentra por
+    prevenção não marcam os demais "abaixo").
+  - O selo de **herança** marca quem recebeu acervo por atribuição. A atribuição aparece
+    nas atas e não soma no que o ministro recebeu por distribuição.
+  - O selo **recebe menos processos** marca quem recebe menos da metade da mediana da Turma
+    por distribuição (quem acumula o TSE, por exemplo): ele sai da comparação da mesa.
+  - A comparação da mesa (há quanto tempo) deixa de fora, dos dois lados, quem chegou à
+    Turma ou herdou acervo há menos de um ano e quem recebe menos por distribuição.
+- **Achados**: um por ministro no máximo, com peso declarado em
+  `limiares.pesos_achados`: herança, mesa antiga, fora do padrão, litigante, tema, tema
+  quente, vista e entrou. A manchete é o de maior peso.
+
+### Dados e atualização
+
+- **Fontes** (públicas, sem chave). O `robots.txt` de cada host é lido e respeitado, com o
+  ritmo que ele pede (10 s entre pedidos no STJ).
+  - **STJ**: Portal de Dados Abertos (`dadosabertos.web.stj.jus.br`, licença CC-BY), com:
+    - o acervo em tramitação, diário, um registro por processo;
+    - as atas de distribuição;
+    - as pautas;
+    - os precedentes qualificados;
+    - as íntegras das decisões do Diário da Justiça.
+
+    Os endereços de download são lidos da página HTML de cada conjunto. A API do CKAN
+    (`/api/`) é proibida pelo robots e não é usada.
+  - **STF**: a planilha do acervo (`Acervo_STF_Lista_Geral.xlsx`, diária), as atas de
+    distribuição, a pesquisa de jurisprudência e a lista de temas de repercussão geral.
+  - **CNJ**: as Tabelas Processuais Unificadas, a árvore de assuntos e classes, guardada em
+    `data/tribunais/tpu/` e baixada de novo só quando a versão muda.
+  - **CNJ, DataJud** (API Pública): ligado e **publicado**, por decisão do dono
+    (`datajud.ativo: true`, `datajud.publicar: true`). Os movimentos dos processos na mesa
+    do STJ dão o "concluso há N dias (CNJ)": a última Conclusão (código 51 da TPU), só quando
+    ela veio depois do último ato do magistrado e não é anterior à última distribuição ou
+    decisão que o acervo registra. A camada vai em `data/tribunais/cnj.json`, com o selo
+    "CNJ · DataJud" em cada número, a cobertura (quantos processos já têm o estado no CNJ) e
+    um parágrafo no "Como ler"; as faixas de 180 dias e de 1 ano de cada ministro só mostram
+    número com 80% ou mais dos candidatos com data. A carga anda em fatias (lotes de 1.000
+    números, com o serviço quase sempre sobrecarregado: 429 e 504); o estado fica no cache
+    (`<cache>/datajud/`). Decisão do dono (23/11/2026), sabendo que o repositório é público:
+    "Quero os números do DataJud no site sim. Está público apenas pra eu ter fácil acesso,
+    mas só eu uso." O termo de uso pede dar ciência ao CNJ de informação disponibilizada ao
+    público (item 3.9): isso fica com o dono. `publicar: false` volta ao uso só pessoal (a
+    camada fica no cache, em `<cache>/datajud/camada.json`, e nada do DataJud entra em
+    `data/tribunais/`); a variável `QIJ_DATAJUD_PUBLICAR` (`1` ou `0`) troca isso numa
+    execução. Carga avulsa, para encher a mesa mais depressa:
+    `python -m qijournal.tribunais.datajud --cache .cache/tribunais --fatias 6`.
+  - **CNJ, DJEN** (o DJe do STJ): coletado só na máquina do dono, no Brasil (ver abaixo),
+    e lido aqui do `data/tribunais/djen.json`.
+  - **Fora, de propósito**: a consulta processual dos dois tribunais (`processo.stj.jus.br`,
+    `portal.stf.jus.br/processos`) não é coletada; o link do processo leva até lá.
+- **Quando roda**: o fluxo **Tribunais** (`.github/workflows/tribunais.yml`) roda depois
+  de cada edição diária na `main`, e às 22:41 de Brasília como reserva. Antes, o job
+  *decidir* lê `data/tribunais/meta.json`: se nada novo é esperado das fontes
+  (`proxima_execucao`), termina em segundos.
+  - O STJ publica o acervo do dia à tarde do dia seguinte (o de sexta sai no sábado; o de
+    segunda, na terça) e a ata por volta das 19:30. A validade do acervo do STJ conta de
+    segunda a sexta (`dias_da_semana` no config).
+  - Uma atualização comum leva poucos minutos.
+  - A carga completa leva cerca de 1 hora: 12 meses de íntegras e 30 dias de atas. Ela
+    roda sozinha quando o cache do Actions está vazio (o primeiro dia na `main`, ou depois
+    de o cache expirar): sem isso, a primeira execução trocaria o painel de 12 meses por
+    um de uma semana. Mesmo assim, a série que ainda cobre menos que a publicada não a
+    substitui (fica o bloco publicado, com a fonte dele no `meta.json`). **Depois do
+    merge, rode *Actions → Tribunais → Run workflow → Carga completa*.**
+  - Toda execução tem prazo (25 min; 70 na carga completa). Um portal mudo põe o host
+    fora até o fim da execução (o disjuntor), e perto do prazo os pedidos encurtam; o que
+    faltou fica para a próxima.
+  - O que foi baixado fica num cache do Actions, perto de 600 MB com as íntegras. A poda
+    roda em toda execução e nunca apaga o que um estado cita (o acervo em uso, o socorro
+    de cada fonte, as séries).
+- **Falhas**: fonte que recusa (403 do Cloudflare), está fora do ar ou devolve dado
+  parcial nunca apaga o último dia bom. Vira aviso na página e o resto sai.
+  - Fonte que passa da validade (`velho_dias`, contada da data que a própria fonte
+    declara) abre uma **issue** para o dono.
+  - Relator desconhecido no acervo também abre issue: é sinal de que a composição em
+    `config/tribunais.yaml` precisa ser atualizada.
+  - Só erro de programa deixa a execução vermelha.
+- **Um escritor por pasta**: a edição diária nunca grava em `data/tribunais/` nem em
+  `edicoes/tribunais.html`; só o fluxo Tribunais grava, num commit próprio. A edição só
+  confere se a aba existe para acender o botão.
+- **À mão**: *Actions → **Tribunais** → Run workflow*. As opções:
+  - **Carga completa**: refaz as séries e confere a TPU;
+  - **Só um tribunal**;
+  - **Ensaio**: coleta e refaz a aba sem publicar; o resultado fica como artefato;
+  - **Aceitar o acervo**: aceita uma vez o acervo do dia fora da faixa da sanidade (mais
+    de 15% de diferença), depois de conferir que a mudança é real.
+- **No computador**:
+
+```bash
+python -m qijournal tribunais atualizar --dir . --cache .cache/tribunais   # coleta e refaz
+python -m qijournal tribunais atualizar --dir . --completo --so stj        # carga completa, só o STJ
+python -m qijournal tribunais atualizar --dir . --aceitar-acervo stj       # aceita o acervo recusado pela sanidade
+python -m qijournal tribunais pagina --dir .                               # só a página, sem rede
+QIJ_DATAJUD_PUBLICAR=0 python -m qijournal tribunais atualizar --dir .     # nesta execução, o DataJud só no cache
+```
+
+- **Onde fica** (`data/tribunais/`, gerado):
+
+| Arquivo | O quê |
+|---|---|
+| `meta.json` | por fonte: a data que a fonte declara (`data_dados`), quando foi coletada, se está ok e o aviso; no topo, `atualizado_em` e `proxima_execucao`; a cobertura de cada tribunal (quantos processos, quantos casaram com a TPU, como a área foi decidida, as partes reconhecidas) e as réguas usadas |
+| `stj.json`, `stf.json` | o painel de cada tribunal: a matriz ministro × área com as comparações, a mesa, os assuntos, as partes, a fila, as pautas e os temas |
+| `ministros/<trib>-<nome>.json` | o dossiê de cada ministro (carregado quando a mesa abre) |
+| `achados.json` | a leitura do dia, com o peso de cada achado |
+| `cnj.json` | a camada do DataJud (só com `datajud.publicar`): o estado de cada processo listado no STJ, as faixas de "concluso há mais de 180 dias e de 1 ano" por ministro e a cobertura |
+| `djen.json` | o DJe (DJEN), escrito só pela máquina do dono, no Brasil: as publicações do último dia e dos 30 dias por ministro, por Turma e por área, e os processos da mesa que saíram no DJe (contrato em `qijournal/tribunais/djen.py`) |
+| `tpu/` | a árvore de assuntos e classes da TPU do CNJ e a versão dela |
+
+- **Desligar**: `tribunais.enabled: false` em `config/site.yaml`, ou a variável
+  **`QIJ_NO_TRIBUNAIS`** = `1` (o botão some; os dados ficam).
+- **Código**: `qijournal/tribunais/`:
+  - `fontes.py`: coleta, robots, ritmo e cache;
+  - `stj.py` e `stf.py`: os leitores de cada tribunal;
+  - `tpu.py` e `areas.py`: a TPU e a classificação por área;
+  - `partes.py`: os litigantes;
+  - `contas.py`: o painel e os dossiês;
+  - `achados.py`: a leitura do dia;
+  - `datajud.py`: o DataJud (movimentos, conferência e a carga avulsa);
+  - `djen.py`: o DJEN, que só roda na máquina do dono (com `scripts/djen/`);
+  - `dados.py`: a atualização;
+  - `cli.py`: os comandos;
+  - `modelo.py`: os tipos e a leitura do config.
+
+  A página fica em `qijournal/render/tribunais.py`, com os modelos `tribunais*.j2`.
+
+### DJe (DJEN) na máquina do dono
+
+Desde 29/11/2024, as decisões, os despachos, as ementas de acórdão, as intimações e a distribuição do STJ
+são publicados no **DJEN**, o Diário de Justiça Eletrônico Nacional do CNJ (Res. CNJ 455/2022 e
+Res. STJ/GP 19/2024). O DJe próprio do STJ ficou só com os atos administrativos. É a fonte do dia
+para saber **o que saiu de cada gabinete**. As íntegras dos dados abertos trazem o mesmo conteúdo,
+mas com semanas de atraso.
+
+A API pública de consulta do DJEN (`comunicaapi.pje.jus.br`) **recusa quem está fora do Brasil**
+(403 geográfico), e os executores do GitHub Actions estão fora. Por isso a coleta roda **numa máquina
+do dono, no Brasil**, por uma tarefa agendada, e envia só `data/tribunais/djen.json`, num commit
+próprio. Nada contorna a recusa: não há proxy, VPN, navegador nem troca de origem. O pedido sai com o
+User-Agent do projeto, depois da leitura do `robots.txt`, com 2 s entre pedidos. **A edição e a aba
+nunca dependem disso**: sem `djen.json` novo, a aba sai sem a camada do DJe.
+
+O STF tem DJe próprio (o STF Digital) e, até onde se sabe, não publica no DJEN. A sonda confere. O
+"o que saiu" do STF vem da pesquisa de jurisprudência, que já é coletada no Actions.
+
+**O que sai** (`data/tribunais/djen.json`, cerca de 100 KB; contrato em `qijournal/tribunais/djen.py`):
+
+- as publicações do último dia e dos 30 dias, por ministro, por Turma ou Seção e pela Presidência;
+- por tipo: decisão, acórdão, despacho, pauta, distribuição e edital;
+- por área: a do processo no acervo, ou a da classe;
+- **os processos que estavam na mesa do relator e tiveram publicação**, casados pelo número único com o
+  acervo do dia, com os que estavam parados há mais tempo;
+- as partes por grupo de litigante (União, INSS, Estados, bancos...).
+
+Algumas coisas nunca saem:
+
+- **Pessoa física e MEI** ficam sem nome, só na contagem.
+- **Advogado** nunca aparece, nem o nome nem a OAB.
+- **Processo em segredo** conta nos números e não é listado.
+- **O texto das publicações** é lido para achar o relator e o tipo e depois descartado: não fica nem no
+  cache.
+
+**Ver se funciona agora (do celular ou do computador, no Brasil, sem instalar nada).** Abra estes dois
+endereços. Troque a data por um dia útil recente.
+
+- STJ: <https://comunicaapi.pje.jus.br/api/v1/comunicacao?pagina=1&itensPorPagina=5&siglaTribunal=STJ&dataDisponibilizacaoInicio=2026-11-20&dataDisponibilizacaoFim=2026-11-20>
+- STF: <https://comunicaapi.pje.jus.br/api/v1/comunicacao?pagina=1&itensPorPagina=5&siglaTribunal=STF&dataDisponibilizacaoInicio=2026-11-20&dataDisponibilizacaoFim=2026-11-20>
+
+Na resposta (um texto JSON), confira cinco pontos:
+
+1. **Abriu um JSON?** Ele começa com `{"status":"success"`. Se aparecer *"configured to block access from
+   your country"*, a rede não está saindo pelo Brasil.
+2. **`"count"`**: quantas publicações o tribunal teve no dia. No STJ, espera-se de milhares a dezenas de
+   milhares. Com `0`, o tribunal não publicou nesse dia. Se o STF der `0` em vários dias, ele não usa o DJEN.
+3. **`"siglaTribunal"`** de cada item tem de ser `"STJ"` (ou `"STF"`). Se vier `"TJSP"`, `"TRT2"`..., o
+   filtro foi ignorado. Avise: a coleta para sozinha nesse caso.
+4. **`"tipoDocumento"`** e **`"nomeOrgao"`**: que tipos aparecem (Decisão, Acórdão, Despacho...) e como o órgão
+   vem escrito (por exemplo, "GABINETE DO MINISTRO ..." ou "TERCEIRA TURMA").
+5. **`"texto"`**: se tem a linha "RELATOR: MINISTRO ...".
+
+**Instalar (uma vez).** Precisa de Python 3.11 ou mais novo e do git.
+
+```bash
+# 1. Um clone só para o robô, com permissão de envio. O melhor é uma chave de implantação
+#    (Settings → Deploy keys → Add deploy key → "Allow write access"), que vale só para este repositório.
+git clone git@github.com:pbcvphyton/TriangulaTech.git ~/triangula-djen
+cd ~/triangula-djen
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# 2. A sonda: poucos pedidos. Diz se a API responde, se o STJ e o STF publicam, quantos itens houve
+#    no último dia útil e que tipos de documento vieram. Grava uma amostra mascarada.
+scripts/djen/rodar_djen.sh --sondar
+
+# 3. A tarefa agendada: às 8h17 e às 20h47. No macOS usa o launchd (com o Mac dormindo, roda ao
+#    acordar); no Linux, o systemd do usuário (Persistent=true roda o que se perdeu) ou o cron.
+scripts/djen/instalar.sh
+```
+
+No Windows (PowerShell, sem administrador):
+
+```powershell
+git clone git@github.com:pbcvphyton/TriangulaTech.git $HOME\triangula-djen
+cd $HOME\triangula-djen
+py -3 -m venv .venv; .venv\Scripts\pip install -r requirements.txt
+powershell -ExecutionPolicy Bypass -File scripts\djen\rodar_djen.ps1 -Sondar
+powershell -ExecutionPolicy Bypass -File scripts\djen\instalar_windows.ps1
+```
+
+**Como funciona a tarefa** (`scripts/djen/rodar_djen.sh` e `rodar_djen.ps1`):
+
+1. Põe o clone igual à `main`. Se o clone tiver alteração local, recusa rodar, porque é um clone só
+   do robô.
+2. Roda `python -m qijournal tribunais djen`.
+3. Faz commit **só** de `data/tribunais/djen.json`.
+4. Envia. Se o envio for recusado porque os robôs do GitHub publicaram no meio, reaplica o commit
+   sobre o remoto e tenta de novo, até 5 vezes.
+5. Sem nada novo, não faz pedido nenhum à API e não faz commit.
+
+Uma execução por vez. O log de cada dia fica em `~/.cache/triangula-djen/logs/` (no Windows,
+`%LOCALAPPDATA%\triangula-djen\logs\`) e é guardado por 30 dias.
+
+**Volume e ritmo.**
+
+- Por execução, entram até 5 dias novos, com 100 publicações por página e 2 s entre pedidos. A janela de
+  30 dias enche em uma semana; `--completo` enche de uma vez.
+- Um dia do STJ deve dar dezenas de páginas, poucos minutos.
+- Para casar com o acervo, a máquina baixa uma vez por dia o arquivo aberto do acervo do STJ (82 MB,
+  10 s de pausa no portal, CC-BY) e a planilha do STF. Isso leva cerca de 30 s de leitura, e só o
+  retrato compacto fica guardado.
+
+**À mão:**
+
+```bash
+python -m qijournal tribunais djen --sondar --cache ~/.cache/triangula-djen     # só a sonda
+python -m qijournal tribunais djen --dir . --cache ~/.cache/triangula-djen      # coleta e grava o djen.json
+python -m qijournal tribunais djen --dir . --completo --so stj                  # a janela inteira, só o STJ
+python -m qijournal tribunais djen --dir . --sem-acervo                         # sem a mesa (não baixa o acervo)
+```
+
+**Desligar**: rode `scripts/djen/instalar.sh --remover` ou `instalar_windows.ps1 -Remover`, ou ponha
+`djen.ativo: false` em `config/tribunais.yaml`. A aba segue sem a camada.
+
+**Por que não um executor próprio do GitHub Actions (self-hosted) na máquina do dono.** O repositório é
+público. Um *pull request* vindo de fork pode trazer um fluxo próprio com `runs-on: [self-hosted, brasil]`
+e rodar código na máquina do dono. As proteções existem, mas cada uma deixa uma brecha:
+
+- *Settings → Actions → General → Fork pull request workflows*: "Require approval for all outside
+  collaborators". Basta um clique de aprovação por engano.
+- Fluxo do DJEN só com `schedule` e `workflow_dispatch`. Isso não impede que um PR traga outro fluxo.
+- Executor num usuário sem privilégios, de preferência efêmero (`--ephemeral`) e numa máquina virtual.
+
+O GitHub recomenda não usar executor próprio em repositório público. A tarefa agendada roda só o que
+está na `main`, a mesma confiança de quem clona e usa o projeto.
+
+
 ## Receber por e-mail
 
 O e-mail segue o modelo do e-mail do **TSA Tech**: a faixa do cabeçalho (o logo
@@ -1292,6 +1647,9 @@ Cada peça passa por um lint antes de sair e, reprovada, cai para um substituto;
 | `QIJ_BRAND` | variável | marca (`tech` ou `pbcv`) |
 | `QIJ_NO_TERMOMETRO` | variável | `1` desliga o Termômetro de Viés e a aba Analítico Político |
 | `QIJ_NO_CONGRESSO` | variável | `1` desliga a aba Congresso e as fichas nas matérias |
+| `QIJ_NO_TRIBUNAIS` | variável | `1` desliga a aba Tribunais (STF e STJ) |
+| `DATAJUD_API_KEY` | variável (opcional) | chave do DataJud do CNJ (o padrão é a chave pública, em `config/tribunais.yaml`; esta a troca quando o CNJ a mudar) |
+| `QIJ_DATAJUD_PUBLICAR` | variável de ambiente (opcional) | `1` publica a camada do CNJ (`cnj.json`) numa execução, `0` a deixa só no cache; sem ela vale `datajud.publicar` do config (hoje `true`) |
 | `QIJ_NO_LEITURA` | variável | `1` desliga a leitura diária dos projetos de lei por IA (`congresso ler`, no fluxo *Leitura dos projetos*) |
 | `QIJ_MODEL` | variável | modelo do Claude |
 | `QIJ_GEMINI_MODEL`, `QIJ_GEMINI_LITE_MODEL`, `QIJ_AIML_MODEL`, `QIJ_SENSENOVA_MODEL`, `QIJ_MISTRAL_MODEL`, `QIJ_KIMI_MODEL` | variáveis | modelo de cada editor (padrões na tabela de editores acima) |
@@ -1341,6 +1699,34 @@ publicado normalmente.
   atividade por 60 dias (o commit diário da edição evita isso). Reative em
   *Actions → Edição diária → Enable workflow*.
 
+### Tribunais: quando algo dá errado
+
+A issue "Tribunais: dados parados ou fonte recusada" aponta para cá. A aba continua no ar
+com o último dado bom de cada fonte e diz de quando ele é.
+
+- **Fonte recusada (403) ou fora do ar:** nada é contornado. O portal do STJ recusa por
+  taxa às vezes (Cloudflare) e libera em minutos; a execução seguinte tenta de novo. Se a
+  recusa durar dias, veja o diário da coleta (artefato `tribunais-diario-…`: host, status
+  e tempo de cada pedido).
+- **Acervo recusado pela sanidade** ("trouxe N processos, X% dos M"): o total do dia saiu
+  da faixa de 85% a 115% do último dia bom. Confira no portal do tribunal se a mudança é
+  real; se for, *Run workflow* com **Aceitar o acervo** = `stj` ou `stf` (uma vez). Se o
+  arquivo veio quebrado, não faça nada: o dia seguinte resolve.
+- **Relator fora da composição:** um ministro novo, um convocado ou uma troca de Turma.
+  Atualize `composicao` em `config/tribunais.yaml` (o PDF da composição do tribunal diz
+  quem é quem). Até lá, os processos dele contam como resíduo.
+- **Cache frio ou carga completa:** a execução com o cache vazio já faz a carga completa
+  sozinha (até 75 min). Se ela não couber, as seguintes completam; a série que cobre menos
+  que a publicada não a substitui.
+- **Página acima do teto (1,5 MB):** a execução fica vermelha e nada é publicado (os dados
+  novos com a página velha sairiam incoerentes). Reduza as listas em `limiares.listas` do
+  config e rode de novo.
+- **DataJud sem resposta:** é o normal dele (429 e 504). A camada do CNJ usa os movimentos
+  já guardados e a cobertura diz quanto falta.
+- **DJe (DJEN) sem atualização:** a tarefa da máquina do dono parou (máquina desligada,
+  chave de implantação, rede fora do Brasil). Veja o log em
+  `~/.cache/triangula-djen/logs/`. A camada some da aba depois de 4 dias úteis sem coleta.
+
 ---
 
 ## Estrutura de pastas
@@ -1370,6 +1756,12 @@ qijournal/                código do jornal
                           relevancia.py (o que espera × o que passa),
                           jornal.py (os nomes no banco do jornal), ficha.py (o
                           dossiê), dados.py (a atualização) e cli.py (comandos)
+  tribunais/              Analítico dos Tribunais (STF e STJ): fontes.py (coleta,
+                          robots e cache), stj.py e stf.py (leitores), tpu.py e
+                          areas.py (TPU e áreas), partes.py, contas.py,
+                          achados.py, datajud.py (o DataJud do CNJ), djen.py (o
+                          DJEN, só na máquina do dono), dados.py (a atualização)
+                          e cli.py
   deliver/smtp.py         envio do e-mail por SMTP
   instagram/              Instagram: formatos/ (um módulo por post do dia),
                           estatistica.py, selecao.py e redacao.py (contas, escolha
@@ -1383,9 +1775,14 @@ config/saida_modelo.schema.json, lexico.yaml, atores.yaml  termômetro (formato 
                           saída da IA, dicionário e âncoras de campo)
 config/congresso.yaml     as réguas do Analítico do Congresso (polos, governos,
                           limiares, faixas do campo e macrotemas)
+config/tribunais.yaml     as réguas do Analítico dos Tribunais (áreas, composição
+                          dos tribunais, limiares, fontes, DataJud);
+                          tribunais_partes.yaml, o catálogo de litigantes
 assets/                   logos e ícones das marcas; fonts/ (fontes das imagens do
                           Instagram); instagram/ (foto de perfil e capas de destaque)
 docs/instagram.md         guia do Instagram
+scripts/djen/             a tarefa agendada do DJEN na máquina do dono, no Brasil
+                          (rodar_djen.sh/.ps1, instalar.sh, instalar_windows.ps1)
 index.html                edição do dia (gerado automaticamente)
 edicoes/                  arquivo de edições, todas as notícias de cada dia,
                           e-mail e latest.json (gerado)
@@ -1393,11 +1790,14 @@ data/                     cada edição em JSON; em data/termometro/, as anális
                           do termômetro de cada dia, guardadas para sempre; em
                           data/busca/, o que cada edição publicou, para a Pesquisa
                           analítica; em data/congresso/, a base de votos, as
-                          fichas e os painéis do Congresso (gerado)
+                          fichas e os painéis do Congresso; em data/tribunais/,
+                          os painéis e dossiês dos Tribunais, a camada do CNJ
+                          (cnj.json) e o DJe (djen.json, da máquina do dono)
 tests/                    testes automáticos
 .github/workflows/        daily.yml (edição diária), congresso.yml (Congresso, à
                           mão), instagram.yml (posts do Instagram) e ci.yml (testes)
                           e leitura.yml (leitura dos projetos de lei, depois da edição)
+                          e tribunais.yml (aba Tribunais, depois da edição)
 ```
 
 `index.html`, `edicoes/` e `data/` são escritos pelo robô — não edite à mão.

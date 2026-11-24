@@ -1,6 +1,8 @@
 # Edição diária do jornal PBCV Tech: coleta, edita (IA ou automática), publica no
 # GitHub Pages (commit em index.html, edicoes/ e data/) e, depois que o Pages
 # publicou, envia o e-mail por SMTP quando os segredos estiverem configurados.
+# A aba Tribunais (data/tribunais/ e edicoes/tribunais.html) não é gravada aqui: é do
+# fluxo Tribunais (tribunais.yml), que dispara quando esta execução termina.
 name: Edição diária
 
 on:
@@ -132,6 +134,8 @@ jobs:
         env:
           QIJ_BRAND: ${{ vars.QIJ_BRAND }}
           QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          # Só para o botão "Tribunais" no cabeçalho da aba Congresso (some com a aba desligada).
+          QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
           TZ: America/Sao_Paulo
           PYTHONUNBUFFERED: "1"
         run: python -m qijournal congresso atualizar --dir . --cache "$RUNNER_TEMP/congresso"
@@ -149,6 +153,8 @@ jobs:
           QIJ_BRAND: ${{ vars.QIJ_BRAND }}
           QIJ_NO_TERMOMETRO: ${{ vars.QIJ_NO_TERMOMETRO }}
           QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          # O botão "Tribunais" no cabeçalho só aparece com a aba ligada e já publicada.
+          QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
           QIJ_MODEL: ${{ vars.QIJ_MODEL }}
           QIJ_GEMINI_MODEL: ${{ vars.QIJ_GEMINI_MODEL }}
           QIJ_GEMINI_LITE_MODEL: ${{ vars.QIJ_GEMINI_LITE_MODEL }}
@@ -175,7 +181,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           stage() {
-            git add "$@" -- index.html edicoes data
+            # data/tribunais/ e edicoes/tribunais.html têm um escritor só, o fluxo Tribunais, que
+            # roda na fila dele. Sem esta exclusão, o commit refeito sobre o remoto (abaixo) levaria
+            # a cópia do início desta execução e desfaria o que os Tribunais publicaram no meio dela.
+            git add "$@" -- index.html edicoes data \
+              ':(exclude)data/tribunais' ':(exclude)edicoes/tribunais.html'
           }
           stage --all
           if git diff --cached --quiet; then
@@ -242,7 +252,7 @@ jobs:
           fi
           # Espera o GitHub Pages publicar este commit (até ~3 min); se demorar, envia assim mesmo.
           sha=$(git rev-parse HEAD)
-          for i in $(seq 1 18); do
+          for _ in $(seq 1 18); do
             status=$(curl -fsS -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
               "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds/latest" \
               | python -c 'import json, sys; d = json.load(sys.stdin); print(d.get("status") if d.get("commit") == sys.argv[1] else "")' "$sha" || true)

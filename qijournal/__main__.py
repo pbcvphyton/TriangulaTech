@@ -12,6 +12,8 @@ Comandos:
 - ``congresso atualizar``: baixa os dados da Câmara e do Senado, refaz as contas e a aba Congresso.
 - ``congresso pagina``: só refaz a aba Congresso a partir de ``data/congresso/``.
 - ``congresso ler``: a leitura diária dos projetos de lei novos, com a cadeia de IAs do jornal.
+- ``tribunais atualizar``: baixa os dados abertos do STF e do STJ, refaz as contas e a aba Tribunais.
+- ``tribunais pagina``: só refaz a aba Tribunais a partir de ``data/tribunais/``.
 
 Códigos de saída: 0 = sucesso; 1 = erro; 2 = dados insuficientes (a edição
 não foi publicada e a anterior continua no ar) ou argumentos inválidos.
@@ -37,6 +39,7 @@ from qijournal.congresso import cli as congresso_cli
 from qijournal.deliver.smtp import EmailDeliveryError
 from qijournal.instagram import cli as instagram_cli
 from qijournal.net import Fetcher
+from qijournal.tribunais import cli as tribunais_cli
 
 # Nome fixo: executado com ``-m``, ``__name__`` seria "__main__".
 log = logging.getLogger("qijournal")
@@ -255,6 +258,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     instagram_cli.add_parser(commands, common, _iso_datetime)
     congresso_cli.add_parser(commands, common, _iso_datetime)
+    tribunais_cli.add_parser(commands, common, _iso_datetime)
     return parser
 
 

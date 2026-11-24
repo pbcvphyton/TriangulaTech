@@ -1,0 +1,484 @@
+{#- Aba "Tribunais": que ministro do STF e do STJ está com o quê. No desenho do Congresso: a barra
+    fixa (o tribunal e as abas), a leitura (os achados, cada um com a prova), a matriz ministro ×
+    área com a mesa de cada um, os assuntos, as partes, a fila e o "Como ler". Sem script, os dois
+    tribunais saem em sequência, cada um com todas as abas, e uma mesa compacta por ministro em
+    <details>; com script (tribunais.js.j2), um tribunal e uma aba por vez, o estado no endereço,
+    o dossiê de cada ministro lido de data/tribunais/ministros/ e a folha de cada processo listado.
+    Nenhum nome de área nem limiar mora aqui: tudo vem da view (render/tribunais.py), que lê as
+    réguas do meta.json.
+    Variáveis: t (dict de tribunais_view), brand, home_href, archive_href, base_url, repo_url, analitico.
+    Estilos: analitico.css.j2 (az-…), congresso.css.j2 e congresso_papel.css.j2 (cg-…, reaproveitados
+    sem cópia), tribunais_areas.css.j2 (a cor de cada área) e tribunais.css.j2 (tb-…). -#}
+{% extends "layout.html.j2" %}
+{% import "macros.html.j2" as m %}
+
+{% block title %}{{ brand.name }} — Tribunais{% endblock %}
+{% block description %}Que ministro do STF e do STJ está com o quê: o acervo de cada um, de que área, há quanto tempo e quem aparece, pelos dados abertos dos próprios tribunais.{% endblock %}
+{% block meta %}
+<link rel="canonical" href="{{ base_url }}edicoes/tribunais.html">
+{% endblock %}
+{% block home_link %}{{ home_href }}{% endblock %}
+{% block dateline %}Tribunais{% if t.atualizado %}&nbsp;· <span class="nw">atualizado em {{ t.atualizado }}</span>{% endif %}{% endblock %}
+
+{% block tools %}
+{{ m.ferramentas(brand, archive_href, analitico=(archive_href ~ "analitico.html") if analitico else "", analitico_titulo="Analítico Político: como a imprensa cobre a política", atual="tribunais") }}
+{% endblock %}
+
+{% block styles %}
+{% include "analitico.css.j2" %}
+{% include "congresso.css.j2" %}
+{% include "congresso_papel.css.j2" %}
+{% include "tribunais_areas.css.j2" %}
+{% include "tribunais.css.j2" %}
+{% endblock %}
+
+{#- O nome de uma área: quadradinho na cor e o nome escrito (a cor nunca vai sozinha). -#}
+{% macro area(id, nome) -%}
+<span class="tb-ar tb-a-{{ id }}"><i aria-hidden="true"></i>{{ nome }}</span>
+{%- endmacro %}
+
+{#- "1 processo", "2 processos": o número já vem formatado (_num), por isso a comparação com "1". -#}
+{% macro pl(n, um="processo", varios="processos") -%}
+{{ n }} {{ um if n|string == "1" else varios }}
+{%- endmacro %}
+
+{#- Um número com o rótulo e a dica (cg-tiles). Valor da causa: sem número, a frase. -#}
+{% macro tile(k) -%}
+<div class="cg-tile{% if k.sem_numero %} tb-sem{% endif %}"><p class="cg-tile-k">{{ k.k }}{% if k.dica %} <button class="cg-i" type="button" aria-label="O que é: {{ k.k }}" data-dica="{{ k.dica }}">i</button>{% endif %}</p>
+{%- if k.sem_numero %}<p class="cg-tile-v tb-sem-v">não publicado</p>{% else %}<p class="cg-tile-v">{{ k.v }}{% if k.u %} <small>{{ k.u }}</small>{% endif %}</p>{% endif %}<p class="cg-tile-x">{{ k.x }}</p></div>
+{%- endmacro %}
+
+{#- Um processo numa lista: os dias, o número (sem script, a página oficial; com script, a folha),
+    a área e as partes por tipo (nunca nome de pessoa física). de: de onde a folha sai (o painel do
+    tribunal ou o dossiê do ministro). -#}
+{% macro processo(x, trib, de, rot) -%}
+<li><p class="tb-fi-d">{{ x.dias }}<small>dias</small></p><p class="tb-fi-p">{% if x.link %}<a href="{{ x.link }}" data-pr="{{ x.id }}" data-de="{{ de }}" target="_blank" rel="noopener noreferrer">{{ x.rotulo }}</a>{% else %}<b>{{ x.rotulo }}</b>{% endif %}{{ area(x.area, x.area_nome) }}</p><p class="tb-fi-x">{% if x.relator %}<b>{{ x.relator }}</b> · {% endif %}{{ x.texto }}{% if x.cnj %} <span class="tb-cnj"><span class="az-selo">CNJ</span> {{ x.cnj }}</span>{% endif %}</p></li>
+{%- endmacro %}
+
+{#- A camada do CNJ (DataJud) de um ministro ou do tribunal: as faixas de concluso, com a cobertura;
+    só existe quando o cnj.json foi publicado. -#}
+{% macro faixas_cnj(b, selo) -%}
+<div class="tb-cnj-b"><p class="tb-cnj-k"><span class="az-selo">{{ selo }}</span> há quanto tempo concluso ao relator</p><div class="tb-cnj-l">{% for f in b.faixas %}<p class="tb-cnj-f{% if not f.ok %} tb-cnj-ins{% endif %}"><span>Conclusos há + de {{ f.rot }}</span><b>{{ f.v }}</b><small>{{ f.x }}</small></p>{% endfor %}</div><p class="tb-cnj-n">{{ b.nota }}</p></div>
+{%- endmacro %}
+
+{#- "Contestar este número": uma issue no repositório, com o título que diz o quê (o id do achado, do
+    ministro ou da lista; nunca nome de parte nem número de processo: o repositório é público). Sem
+    repo_url, nada. -#}
+{% macro contestar(ref) -%}
+{% if repo_url %}<a class="tb-ct-l" href="{{ repo_url }}/issues/new?title={{ ('Tribunais: ' ~ ref)|urlencode }}" target="_blank" rel="noopener noreferrer">Contestar este número</a>{% endif %}
+{%- endmacro %}
+
+{#- As fontes de hoje: o estado escrito e a forma (● completa, ◐ com aviso, ■ falhou, ○ desligada). -#}
+{% macro fontes(tr) -%}
+<p class="tb-fn" aria-label="As fontes de hoje">{% for f in tr.fontes %}<span class="tb-fn-{{ f.estado }}" title="{{ f.aviso or f.nome }}"><i aria-hidden="true">{{ f.forma }}</i>{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener noreferrer">{{ f.nome }}</a>{% else %}{{ f.nome }}{% endif %}: {{ f.rotulo }}</span>{% endfor %}</p>
+{%- endmacro %}
+
+{#- A mesa de um ministro: o cartão compacto (painel), completado pelo dossiê com script. -#}
+{% macro cartao(c, tr) -%}
+<article class="tb-cd" aria-labelledby="tb-cd-t-{{ c.id }}">
+  <header class="tb-cd-h">
+    <div class="tb-cd-f" aria-hidden="true">{{ c.iniciais }}</div>
+    <div class="tb-cd-hx">
+      <p class="tb-cd-k">{{ c.kicker }}</p>
+      <h5 class="tb-cd-t" id="tb-cd-t-{{ c.id }}">{{ c.nome }}</h5>
+      <p class="tb-cd-s">{{ c.sub }}</p>
+      {% if c.selos %}<p class="tb-cd-sl">{% for s in c.selos %}<span class="cg-chip">{{ s }}</span>{% endfor %}</p>{% endif %}
+    </div>
+    <p class="tb-cd-nv" data-com-script hidden><button class="cg-me-b" type="button" data-passo="-1" aria-label="Ministro anterior">&lsaquo;</button><button class="cg-me-b" type="button" data-passo="1" aria-label="Próximo ministro">&rsaquo;</button></p>
+  </header>
+  {% if c.frases %}<ul class="cg-d-fr">{% for f in c.frases %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+  <div class="cg-tiles">{% for k in c.tiles %}{{ tile(k) }}{% endfor %}</div>
+  {% if c.cnj %}{{ faixas_cnj(c.cnj, "CNJ · DataJud") }}{% endif %}
+  <section class="tb-cd-sec">
+    <h6 class="tb-cd-h6">Do que é o acervo <span>a parte de cada área; o traço é {{ c.pares }}</span></h6>
+    <div class="tb-cd-fp"><span class="tb-fp" role="img" aria-label="As maiores áreas: {{ c.digital_aria }}">{% for x in c.digital %}<i class="tb-a-{{ x.area }}" style="flex:{{ x.flex }}"></i>{% endfor %}</span></div>
+    <ul class="tb-cp">
+      {% for b in c.barras %}
+      <li><span class="tb-cp-n">{{ area(b.area, b.nome) }}</span><span class="tb-cp-b" role="img" aria-label="{{ b.nome }}: {{ b.aria }}"><i style="width:{{ b.w }}%"></i>{% if b.base %}<b style="left:{{ b.base }}%"></b>{% endif %}</span><span class="tb-cp-v">{% if b.marca %}<em class="tb-mk">{{ b.marca }}<span class="sr-only"> {{ b.marca_sr }}</span></em> {% endif %}{{ b.pct }} · {{ b.n }}<small>{{ b.razao }}</small></span></li>
+      {% endfor %}
+    </ul>
+    <p class="tb-cp-k"><span><i class="k1" aria-hidden="true"></i>parte do acervo</span><span><i class="k2" aria-hidden="true"></i>{{ c.pares }}</span><span>▲ ▽ fora do padrão, com teste</span>{% if c.outras %}<span>outras áreas: {{ pl(c.outras) }}</span>{% endif %}</p>
+    {% if c.subareas %}<p class="tb-cl"><span class="cg-lg-k">No detalhe</span>{% for s in c.subareas %}<span class="cg-chip">{{ s.nome }} <b>{{ s.pct }}</b></span>{% endfor %}</p>{% endif %}
+  </section>
+  <div class="tb-cd-2c">
+    <section class="tb-cd-sec" data-sec="antigos">
+      <h6 class="tb-cd-h6">O que espera há mais tempo <span>na mesa, {{ c.rot_dias }}; do mais antigo</span></h6>
+      {% if c.antigos %}<ol class="tb-fi">{% for x in c.antigos %}{{ processo(x, tr.id, c.id, c.rot_dias) }}{% endfor %}</ol>
+      {% else %}<p class="az-dek">Nenhum processo público na mesa nesta lista (os processos em segredo de justiça contam nos números e nunca aparecem aqui).</p>{% endif %}
+      {% if c.sobrestados %}<p class="az-dek">{{ c.sobrestados }}</p>{% endif %}
+    </section>
+    <section class="tb-cd-sec" data-sec="partes">
+      <h6 class="tb-cd-h6">Quem mais aparece <span>pessoas jurídicas e entes públicos, em processos distintos</span></h6>
+      {% if c.partes %}<ol class="tb-pl">{% for x in c.partes %}<li><span>{{ x.nome }}</span><b>{{ x.n }}</b></li>{% endfor %}</ol>
+      {% else %}<p class="az-dek">Nenhum litigante com processos bastantes para ter o nome aqui.</p>{% endif %}
+      {% if c.fluxo %}<h6 class="tb-cd-h6 tb-cd-h6b">Entra e sai <span>atas, pautas e decisões publicadas</span></h6><ul class="tb-fx">{% for f in c.fluxo %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+      {% if c.djen %}<h6 class="tb-cd-h6 tb-cd-h6b">O que saiu no DJe <span><span class="az-selo">DJe</span> {{ c.djen.fonte }}</span></h6><ul class="tb-fx tb-dj">{% for f in c.djen.linhas %}<li>{{ f }}</li>{% endfor %}{% for x in c.djen.lista %}<li>{% if x.link %}<a href="{{ x.link }}" target="_blank" rel="noopener noreferrer">{{ x.rotulo }}</a>{% else %}<b>{{ x.rotulo }}</b>{% endif %}{% if x.area %} {{ area(x.area, x.area_nome) }}{% endif %} {{ x.texto }}</li>{% endfor %}</ul>{% endif %}
+    </section>
+  </div>
+  <div class="tb-dz" data-dossie="{{ c.id }}" hidden><p class="tb-dz-st" aria-live="polite"></p></div>
+  <p class="cg-d-n">{{ tr.nome }}, dados de {{ tr.data }}. Como cada número é contado está em “Como ler”. {{ contestar(c.id) }}</p>
+</article>
+{%- endmacro %}
+
+{% block content %}
+<section class="an az cg tb" id="tribunais" aria-labelledby="tb-h" data-padrao="{{ t.padrao }}">
+  <div class="arch-top">
+    <h2 class="kicker" id="tb-h">Tribunais</h2>
+    <a class="arch-home" href="{{ home_href }}">&larr; Edição mais recente</a>
+  </div>
+  {#- A barra fixa: o tribunal (só com script; sem ele, os dois saem em sequência) e as abas. -#}
+  <div class="cg-barra" id="tbBarra">
+    <div class="cg-casas" id="tbTribs" role="group" aria-label="Tribunal" hidden>
+      {% for tr in t.tribunais %}
+      <button class="cg-casa-b" type="button" data-trib="{{ tr.id }}" aria-pressed="{{ 'true' if tr.padrao else 'false' }}" title="{{ tr.nome }}">{{ tr.sigla }} <span>{{ tr.n_ministros }}</span></button>
+      {% endfor %}
+      <span class="cg-casas-n">Escolha o tribunal e, abaixo, o que quer ver dele.</span>
+    </div>
+    <nav class="cg-vistas" id="tbNav" aria-label="O que ver">
+      <ul>
+        <li><a href="#tb-v-resumo" data-vista="resumo">Resumo</a></li>
+        <li><a href="#tb-v-ministros" data-vista="ministros">Ministros</a></li>
+        <li><a href="#tb-v-assuntos" data-vista="assuntos">Assuntos</a></li>
+        <li><a href="#tb-v-partes" data-vista="partes">Partes</a></li>
+        <li><a href="#tb-v-fila" data-vista="fila">A fila</a></li>
+        <li><a href="#tb-v-metodo" data-vista="metodo">Como ler</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  {#- ── Resumo ── -#}
+  <div class="cg-vista" data-vista="resumo" id="tb-v-resumo">
+  {% for tr in t.tribunais %}
+  <div class="tb-t" data-tribunal="{{ tr.id }}" id="tb-resumo-{{ tr.id }}">
+    <h3 class="cg-ct tb-ct">{{ tr.nome }}{% if tr.tem %} <span>acervo de {{ tr.data }}</span>{% endif %}</h3>
+    {% if not tr.tem %}
+    <p class="tb-av tb-av-erro"><span class="az-selo">Sem dados</span><span>{{ tr.vazio }}</span></p>
+    {{ fontes(tr) }}
+    {% else %}{% set l = tr.leitura %}
+    <div class="az-lead">
+      <div class="az-box">
+        <p class="az-chapeu">A leitura</p>
+        <h4 class="az-manchete">{{ l.manchete }}</h4>
+        <p class="az-prova"><span class="az-selo">{{ l.principal.selo }}</span><span>{{ l.principal.texto }} <a href="{{ l.principal.href }}" data-alvo="{{ l.principal.alvo }}">Ver a prova<span aria-hidden="true"> &darr;</span></a>{% if l.principal.fonte %} <small>{{ l.principal.fonte }}</small>{% endif %} {{ contestar(l.principal.ref) }}</span></p>
+        <p class="az-fina">{{ l.fina }}</p>
+        {% if l.achados %}
+        <div class="az-mais">
+          <h5 class="az-lbl">Mais achados <span class="az-lbl-n">{{ l.achados|length }}</span></h5>
+          <ol class="az-achados">
+            {% for a in l.achados %}
+            <li class="az-a"><div class="az-a-tx">
+              <p class="az-a-k"><span class="az-selo">{{ a.selo }}</span></p>
+              <h6 class="az-a-t"><a class="hit" href="{{ a.href }}" data-alvo="{{ a.alvo }}">{{ a.titulo }}</a></h6>
+              <p class="az-a-x">{{ a.texto }}{% if a.fonte %} <small>{{ a.fonte }}</small>{% endif %} {{ contestar(a.ref) }}</p>
+            </div></li>
+            {% endfor %}
+          </ol>
+        </div>
+        {% endif %}
+      </div>
+      <aside class="az-rail" aria-labelledby="tb-mapa-h-{{ tr.id }}">
+        <h5 class="az-lbl" id="tb-mapa-h-{{ tr.id }}">O que tem em cada aba <span class="az-lbl-n">para ir direto ao ponto</span></h5>
+        <ol class="cg-mapa">
+          {% for x in tr.mapa %}
+          <li><a class="hit" href="#tb-{{ x.vista }}-{{ tr.id }}" data-alvo="#v={{ x.vista }}&amp;t={{ tr.id }}">{{ x.nome }}</a><p>{{ x.texto }} <b>{{ x.n }}</b> {{ x.n_txt }}.</p></li>
+          {% endfor %}
+        </ol>
+      </aside>
+    </div>
+    <div class="cg-tiles tb-k">{% for k in tr.tiles %}{{ tile(k) }}{% endfor %}</div>
+    {{ fontes(tr) }}
+    {% for a in tr.avisos %}<p class="tb-av {{ a.classe }}"><span class="az-selo">{{ a.selo }}</span><span><b>{{ a.nome }}.</b> {{ a.texto }}</span></p>{% endfor %}
+    <div class="az-blk tb-vl" id="tb-valor-{{ tr.id }}">
+      <h4 class="az-h">Quanto vale <span>o que se mede no lugar do valor da causa</span></h4>
+      <p class="tb-vl-0"><b>Valor da causa: as fontes abertas não publicam.</b> {{ tr.valor.texto }}</p>
+      <ul class="tb-vl-l">
+        <li><span>Com dinheiro público num dos polos <small>União, Fazenda Nacional, INSS, Estado ou DF, Município</small></span><b>{{ tr.valor.ente }}</b></li>
+        <li><span>{{ tr.valor.liminar_rot }}{% if tr.valor.liminar_nota %} <small>{{ tr.valor.liminar_nota }}</small>{% endif %}</span><b>{{ tr.valor.liminar }}</b></li>
+        {% for x in tr.valor.recortes %}<li><span>{{ x.nome }}</span><b>{{ pl(x.n) }}</b></li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+  </div>
+
+  {#- ── Ministros: a matriz e a mesa ── -#}
+  <section class="az-sec cg-vista" data-vista="ministros" id="tb-v-ministros" aria-labelledby="tb-min-h">
+    <header class="az-lh">
+      <p class="az-ln">Ministros</p>
+      <h3 class="az-lt" id="tb-min-h">Quem está com o quê: o acervo de cada ministro, por área</h3>
+      <p class="az-ld">Cada linha é um gabinete; cada número, a parte do acervo dele que é daquela área. A comparação que vale é com os pares, e só com teste: a linha em itálico, a média do grupo, é contexto.</p>
+    </header>
+    {% for tr in t.tribunais %}
+    <div class="tb-t" data-tribunal="{{ tr.id }}" id="tb-ministros-{{ tr.id }}">
+      <h4 class="cg-ct">{{ tr.nome }}{% if tr.tem %} <span>acervo de {{ tr.data }}; ▲/▽ contra {{ tr.pares }}</span>{% endif %}</h4>
+      {% if not tr.tem %}<p class="tb-av tb-av-erro"><span class="az-selo">Sem dados</span><span>{{ tr.vazio }}</span></p>{% else %}{% set mx = tr.matriz %}
+      <div class="az-blk">
+        <h5 class="az-h">De que é cada acervo <span>a parte de cada área, em %; clique no nome para abrir a mesa</span></h5>
+        <div class="tb-sec" role="group" aria-label="Ver um grupo" data-com-script hidden><span class="cg-lg-k">Ver</span>{% for g in tr.chips %}<button class="cg-lg-b" type="button" data-o="{{ g.id }}" aria-pressed="{{ 'false' if g.id else 'true' }}">{{ g.nome }} <b>{{ g.n }}</b></button>{% endfor %}</div>
+        <p class="tb-mx-cap" aria-hidden="true">{{ mx.caption }}</p>
+        <div class="tb-mx-wrap">
+          <table class="tb-mx" id="tb-mx-{{ tr.id }}" style="--tb-cols-w:{{ mx.largura }}px">
+            <caption>{{ mx.caption }}</caption>
+            <thead><tr><th scope="col" class="tb-mx-v">Ministro</th><th scope="col" class="tb-mx-n">Acervo</th>{% for c in tr.colunas %}<th scope="col" class="tb-a-{{ c.id }}" data-a="{{ c.id }}" data-w="{{ c.w }}" style="width:{{ c.w }}px" title="{{ c.nome }}"><a href="#tb-area-{{ tr.id }}-{{ c.id }}" data-alvo="#v=assuntos&amp;t={{ tr.id }}&amp;area={{ c.id }}">{{ c.curto }}</a><small>{{ c.n_txt }}</small></th>{% endfor %}</tr></thead>
+            {% if mx.linha_tribunal %}{% set lt = mx.linha_tribunal %}
+            <tbody data-grupo="">
+              <tr class="tb-mx-m tb-mx-t"><th scope="row">{{ lt.rotulo }}</th><td class="tb-n" title="{{ lt.titulo }}">{{ lt.processos }}</td>{% for c in lt.celulas %}<td data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}</td>{% endfor %}</tr>
+            </tbody>
+            {% endif %}
+            {% for g in mx.grupos %}
+            <tbody data-grupo="{{ g.id }}">
+              <tr class="tb-mx-g"><th scope="rowgroup" colspan="{{ mx.colspan }}">{{ g.nome }} <span>{{ g.desc }}</span></th></tr>
+              {% if g.media %}<tr class="tb-mx-m"><th scope="row">{{ g.media.rotulo }}</th><td class="tb-n" title="{{ g.media.titulo }}">{{ g.media.processos }}</td>{% for c in g.media.celulas %}<td data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}</td>{% endfor %}</tr>{% endif %}
+              {% for l in g.linhas %}
+              <tr data-min="{{ l.id }}"><th scope="row"><a href="#tb-mesa-{{ l.id }}" data-min="{{ l.id }}" title="{{ l.nome }}{% if l.selos %} · {{ l.selos }}{% endif %}">{{ l.nome }}</a><small>{{ l.curta }}{% if l.conv %} conv.{% endif %}</small></th><td class="tb-n" title="{{ pl(l.processos) }}; {{ l.na_mesa }} na mesa">{{ l.processos }}</td>{% for c in l.celulas %}<td class="{{ c.classe }}" data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}{% if c.sr %}<span class="sr-only">{{ c.sr }}</span>{% endif %}</td>{% endfor %}</tr>
+              {% endfor %}
+            </tbody>
+            {% endfor %}
+            {% if mx.fora %}
+            <tbody data-grupo="fora">
+              <tr class="tb-mx-g"><th scope="rowgroup" colspan="{{ mx.colspan }}">Fora da conta dos ministros <span>quem não é relator de Turma: cada linha com a parte de cada área</span></th></tr>
+              {% for f in mx.fora %}
+              <tr class="tb-mx-f"><th scope="row" title="{{ f.nota }}">{{ f.rotulo }}</th><td class="tb-n">{{ f.processos }}</td>{% for c in f.celulas %}<td class="{{ c.classe }}" data-a="{{ c.a }}" title="{{ c.titulo }}">{{ c.v }}</td>{% endfor %}</tr>
+              {% endfor %}
+            </tbody>
+            {% endif %}
+          </table>
+        </div>
+        <p class="tb-mx-leg" aria-hidden="true">{% for f in mx.legenda %}<span><i class="{{ f.classe }}"></i>{{ f.rotulo }}</span>{% endfor %}<span><b>▲</b> bem acima {{ mx.pares_de }}</span><span><b>▽</b> bem abaixo</span><span><i class="tb-mx-lm"></i>a média do grupo (Acervo: por gabinete)</span><span><b>·</b> nenhum processo</span></p>
+        <p class="az-dek">O número pequeno sob a área é quantos processos o tribunal tem nela. A marca aparece só onde {{ t.regua_marca }}, contra {{ tr.pares }}.{% if tr.nota_colunas %} {{ tr.nota_colunas }}{% endif %} Quem não é relator de Turma (a Presidência, a triagem, quem saiu) fica fora das médias, em linhas à parte.</p>
+      </div>
+      <div class="az-blk" id="tb-mesas-{{ tr.id }}">
+        <h5 class="az-h">A mesa de cada ministro <span>o que está com cada um, há quanto tempo e quem aparece</span></h5>
+        <div class="tb-me">
+          <nav class="tb-me-l" aria-label="Ministros do {{ tr.sigla }}" data-com-script hidden>
+            {% for g in tr.lista_mesa %}
+            <p class="tb-me-gk">{{ g.nome }}</p>
+            <ul class="tb-me-ls">
+              {% for x in g.itens %}<li><button class="tb-me-b" type="button" data-min="{{ x.id }}"><span class="tb-me-n">{{ x.nome }}</span><span class="tb-me-c">{{ x.processos }}</span><span class="tb-fp" role="img" aria-label="{{ x.aria }}">{% for p in x.digital %}<i class="tb-a-{{ p.area }}" style="flex:{{ p.flex }}"></i>{% endfor %}</span></button></li>{% endfor %}
+            </ul>
+            {% endfor %}
+          </nav>
+          <div class="tb-me-cs">
+            {% for c in tr.cartoes %}
+            <details class="tb-mesa" id="tb-mesa-{{ c.id }}" data-min="{{ c.id }}">
+              <summary><span class="tb-me-n">{{ c.nome }}</span><span class="tb-me-c">{{ pl(c.processos) }}</span><span class="tb-fp" aria-hidden="true">{% for p in c.digital %}<i class="tb-a-{{ p.area }}" style="flex:{{ p.flex }}"></i>{% endfor %}</span></summary>
+              {{ cartao(c, tr) }}
+            </details>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ── Assuntos ── -#}
+  <section class="az-sec cg-vista" data-vista="assuntos" id="tb-v-assuntos" aria-labelledby="tb-as-h">
+    <header class="az-lh">
+      <p class="az-ln">Assuntos</p>
+      <h3 class="az-lt" id="tb-as-h">De que se ocupa cada tribunal, e quem cuida de cada assunto</h3>
+      <p class="az-ld">As áreas juntam os assuntos da Tabela Processual Unificada do CNJ (a lista de cada uma está no Como ler). Um processo conta numa área só; os outros assuntos dele aparecem em “também toca”.</p>
+    </header>
+    {% for tr in t.tribunais %}
+    <div class="tb-t" data-tribunal="{{ tr.id }}" id="tb-assuntos-{{ tr.id }}">
+      <h4 class="cg-ct">{{ tr.nome }}{% if tr.tem %} <span>acervo de {{ tr.data }}</span>{% endif %}</h4>
+      {% if not tr.tem %}<p class="tb-av tb-av-erro"><span class="az-selo">Sem dados</span><span>{{ tr.vazio }}</span></p>{% else %}{% set a = tr.assuntos %}
+      <div class="az-2c tb-as-2c">
+        <div class="az-blk">
+          <h5 class="az-h">O tribunal por área <span>processos em tramitação; clique para ver a área</span></h5>
+          <ol class="tb-br">{% for b in a.barras %}<li><a class="tb-br-n" href="#tb-area-{{ tr.id }}-{{ b.area }}" data-alvo="#v=assuntos&amp;t={{ tr.id }}&amp;area={{ b.area }}">{{ area(b.area, b.nome) }}</a><span class="tb-br-b" aria-hidden="true"><i style="width:{{ b.w }}%"></i></span><span class="tb-br-v">{{ b.n }}<small>{{ b.pct }}</small></span></li>{% endfor %}</ol>
+        </div>
+        <div class="az-blk">
+          <h5 class="az-h">Os recortes <span>atravessam as áreas e não mudam a conta delas</span></h5>
+          <ol class="tb-br">{% for b in a.recortes %}<li><span class="tb-br-n" title="{{ b.porque }}">{{ b.nome }}</span><span class="tb-br-b" aria-hidden="true"><i style="width:{{ b.w }}%"></i></span><span class="tb-br-v">{{ b.n }}<small>{{ b.pct }}</small></span></li>{% endfor %}</ol>
+        </div>
+      </div>
+      <div class="tb-sec tb-sec-a" role="group" aria-label="Ver uma área" data-com-script hidden><span class="cg-lg-k">Área</span>{% for b in a.barras %}<button class="cg-lg-b tb-a-{{ b.area }}" type="button" data-area="{{ b.area }}" aria-pressed="false"><i aria-hidden="true"></i>{{ b.nome }} <b>{{ b.n }}</b></button>{% endfor %}</div>
+      {% for f in a.focos %}
+      <div class="az-blk tb-foco" id="tb-area-{{ tr.id }}-{{ f.id }}" data-area="{{ f.id }}">
+        <h5 class="az-h">{{ area(f.id, f.nome) }} <span>{{ pl(f.n) }}, {{ f.pct }} do acervo; {{ f.na_grade }} com os {{ a.relatores }}</span></h5>
+        <div class="tb-foco-g">
+          <div>
+            <h6 class="az-h5">Em que mesas está <span>processos da área no acervo de cada um; a parte no acervo dele</span></h6>
+            {% if f.mesas %}<ol class="tb-br tb-br-m">{% for x in f.mesas %}<li><a class="tb-br-n" href="#tb-mesa-{{ x.id }}" data-min="{{ x.id }}">{{ x.nome }}</a><span class="tb-br-b" aria-hidden="true"><i style="width:{{ x.w }}%"></i></span><span class="tb-br-v">{{ x.n }}<small>{% if x.marca %}<em class="tb-mk">{{ x.marca }}</em> {% endif %}{{ x.pct }}</small></span></li>{% endfor %}</ol>{% if f.resto %}<p class="az-dek">{{ f.resto }}.</p>{% endif %}
+            {% else %}<p class="az-dek">Nenhum processo da área com os {{ a.relatores }}.</p>{% endif %}
+          </div>
+          <div>
+            <h6 class="az-h5">O que tem dentro <span>subáreas e os assuntos mais frequentes</span></h6>
+            {% if f.dentro %}<ol class="tb-br">{% for x in f.dentro %}<li><span class="tb-br-n">{{ x.nome }}</span><span class="tb-br-b" aria-hidden="true"><i style="width:{{ x.w }}%"></i></span><span class="tb-br-v">{{ x.n }}</span></li>{% endfor %}</ol>{% endif %}
+            {% if f.assuntos %}<ol class="tb-br tb-br-c">{% for x in f.assuntos %}<li><span class="tb-br-n">{{ x.nome }} <small>TPU {{ x.codigo }}</small></span><span class="tb-br-b" aria-hidden="true"><i style="width:{{ x.w }}%"></i></span><span class="tb-br-v">{{ x.n }}</span></li>{% endfor %}</ol>{% endif %}
+            {% if not f.dentro and not f.assuntos %}<p class="az-dek">Sem detalhe para esta área.</p>{% endif %}
+          </div>
+          <div>
+            <h6 class="az-h5">Quem aparece <span>pessoas jurídicas e entes públicos</span></h6>
+            {% if f.partes %}<ol class="tb-pl">{% for x in f.partes %}<li><span>{{ x.nome }}</span><b>{{ x.n }}</b></li>{% endfor %}</ol>{% else %}<p class="az-dek">Nenhum litigante com processos bastantes para ter o nome.</p>{% endif %}
+            {% if f.toca %}<h6 class="az-h5">Também toca <span>outros assuntos dos mesmos processos (não somam)</span></h6><p class="tb-cl">{% for x in f.toca %}<span class="cg-chip">{{ area(x.area, x.nome) }} <b>{{ x.n }}</b></span>{% endfor %}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ── Partes ── -#}
+  <section class="az-sec cg-vista" data-vista="partes" id="tb-v-partes" aria-labelledby="tb-pa-h">
+    <header class="az-lh">
+      <p class="az-ln">Partes</p>
+      <h3 class="az-lt" id="tb-pa-h">Quem mais aparece nos processos, e de que lado</h3>
+      <p class="az-ld">Pessoas jurídicas (empresas, bancos, partidos, entidades) e entes públicos, agrupados, em processos distintos. No recurso, “recorre” é quem perdeu embaixo; “responde”, o outro lado. Nas ações originárias (ADI, HC, mandado de segurança, rescisória, reclamação) não há recurso: as listas dizem polo ativo e polo passivo. Pessoas físicas não entram na lista: só somadas.</p>
+    </header>
+    {% for tr in t.tribunais %}
+    <div class="tb-t" data-tribunal="{{ tr.id }}" id="tb-partes-{{ tr.id }}">
+      <h4 class="cg-ct">{{ tr.nome }}{% if tr.tem %} <span>acervo de {{ tr.data }}</span>{% endif %}</h4>
+      {% if not tr.tem %}<p class="tb-av tb-av-erro"><span class="az-selo">Sem dados</span><span>{{ tr.vazio }}</span></p>{% else %}{% set pa = tr.partes %}
+      <div class="az-blk">
+        <h5 class="az-h">Os que mais aparecem <span>à esquerda, no polo ativo (quem recorre ou pede); à direita, no passivo (quem responde); o total inclui quem é só interessado</span></h5>
+        {% if pa.recursos %}<p class="az-dek">No {{ tr.sigla }}, {{ pa.recursos }} do acervo são recursos; o resto são ações que começam no próprio tribunal.</p>{% endif %}
+        {% if pa.linhas %}
+        <ul class="tb-bf">
+          <li class="tb-bf-h" aria-hidden="true"><span></span><span>polo ativo</span><span>polo passivo</span></li>
+          {% for x in pa.linhas %}
+          <li><span class="tb-bf-n">{{ x.nome }}<small>{{ x.n }} · {{ x.pct }}{% if x.outro %} · interessado em {{ x.outro }}{% endif %}{% if x.mesas %} · {{ x.mesas }}{% endif %}</small>{% if x.area %}<small class="tb-bf-a">{{ area(x.area, x.area_nome) }}</small>{% endif %}</span><span class="tb-bf-l"><b>{{ x.recorre }}</b><i style="width:{{ x.wl }}%"></i></span><span class="tb-bf-r"><i style="width:{{ x.wr }}%"></i><b>{{ x.responde }}</b></span><span class="sr-only">{{ x.nome }}: {{ x.tipo }}, {{ pl(x.n) }}; no polo ativo em {{ x.recorre }}, no passivo em {{ x.responde }}{% if x.outro %}, interessado em {{ x.outro }}{% endif %}.</span></li>
+          {% endfor %}
+        </ul>
+        {% else %}<p class="az-dek">A fonte não trouxe litigantes com processos bastantes para ter o nome.</p>{% endif %}
+        <p class="tb-pf">Pessoas físicas: {{ pl(pa.pf) }}, somadas, sem nome. Um litigante só ganha nome com {{ pa.minimo }} processos ou mais no tribunal. A porcentagem é sobre {% if pa.base %}os {{ pa.base }} processos desta conta{% else %}os processos desta conta{% endif %}: os em segredo de justiça e os precatórios ficam fora dela. {{ contestar('quem se repete ' ~ tr.id) }}</p>
+      </div>
+      <div class="az-blk">
+        <h5 class="az-h">Dinheiro público no recurso <span>a União, a Fazenda Nacional, o INSS, um Estado ou o DF, ou um Município num dos polos</span></h5>
+        {% if pa.ente %}<p class="tb-fx-p">{{ pa.ente }}.</p>{% endif %}
+        {% if pa.ente_grupos %}<ul class="tb-fx">{% for x in pa.ente_grupos %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}
+        {% if pa.concentracao %}<p class="az-dek">{{ pa.concentracao }}</p>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ── A fila ── -#}
+  <section class="az-sec cg-vista" data-vista="fila" id="tb-v-fila" aria-labelledby="tb-fi-h">
+    <header class="az-lh">
+      <p class="az-ln">A fila</p>
+      <h3 class="az-lt" id="tb-fi-h">O que espera há mais tempo, e na mesa de quem</h3>
+      <p class="az-ld">Na mesa é o processo no gabinete do relator. Os suspensos (à espera de um tema repetitivo, de repercussão geral ou por um motivo que a fonte não identifica) ficam à parte, fora da conta da idade.</p>
+    </header>
+    {% for tr in t.tribunais %}
+    <div class="tb-t" data-tribunal="{{ tr.id }}" id="tb-fila-{{ tr.id }}">
+      <h4 class="cg-ct">{{ tr.nome }}{% if tr.tem %} <span>acervo de {{ tr.data }}</span>{% endif %}</h4>
+      {% if not tr.tem %}<p class="tb-av tb-av-erro"><span class="az-selo">Sem dados</span><span>{{ tr.vazio }}</span></p>{% else %}{% set fi = tr.fila %}
+      <div class="az-blk">
+        <h5 class="az-h">Idade de cada mesa <span>{{ fi.rot }}: metade dos processos entre as pontas da barra; o traço é a mediana, o ponto, onde ficam 90%</span></h5>
+        {% for g in fi.linhas %}
+        <p class="az-h5">{{ g.grupo }}</p>
+        <ul class="tb-id">
+          {% for x in g.itens %}<li><a class="tb-id-n" href="#tb-mesa-{{ x.id }}" data-min="{{ x.id }}">{{ x.nome }}</a><span class="tb-id-b" role="img" aria-label="{{ x.txt }}"><i style="left:{{ x.l }}%;width:{{ x.w }}%"></i><b style="left:{{ x.m }}%"></b><em style="left:{{ x.p90 }}%"></em></span><span class="tb-id-v" title="{{ x.txt }}">{{ x.curto }}</span></li>{% endfor %}
+        </ul>
+        {% endfor %}
+        <p class="tb-id-x" aria-hidden="true">{% for e in fi.eixo %}<span style="left:{{ e.l }}%">{{ e.t }}</span>{% endfor %}</p>
+      </div>
+      <div class="az-blk" id="tb-antigos-{{ tr.id }}">
+        <h5 class="az-h">Os mais antigos na mesa <span>{{ fi.rot }}, do mais antigo; nunca processo em segredo de justiça</span></h5>
+        {% if fi.antigos %}<ol class="tb-fi tb-fi-2c">{% for x in fi.antigos %}{{ processo(x, tr.id, tr.id, fi.rot) }}{% endfor %}</ol>{% else %}<p class="az-dek">A lista está vazia nesta atualização.</p>{% endif %}
+      </div>
+      {% if fi.cnj %}{% set fc = fi.cnj %}
+      <div class="az-blk" id="tb-cnj-{{ tr.id }}">
+        <h5 class="az-h">Há quanto tempo concluso <span>a data da conclusão vem do DataJud (CNJ), acervo de {{ fc.acervo }}{% if fc.indice %}, {{ fc.indice }}{% endif %}</span></h5>
+        {{ faixas_cnj(fc.tribunal, fc.selo) }}
+        <div class="an-tbl-wrap"><table class="an-tbl tb-tbl tb-cnj-t"><caption class="sr-only">Por relator das Turmas (ministros e desembargadores convocados): sem decisão terminativa registrada (STJ) e concluso (CNJ) há mais de {{ fi.mesa_dias[0] }} dias e de {{ fi.mesa_dias[-1] }} dias</caption>
+          <thead><tr><th scope="col">Relator</th><th scope="col">Sem decisão terminativa há + de {{ fi.mesa_dias[0] }} dias <small>STJ</small></th><th scope="col">Concluso há + de {{ fi.mesa_dias[0] }} dias <small>CNJ</small></th><th scope="col">Sem decisão terminativa há + de 1 ano <small>STJ</small></th><th scope="col">Concluso há + de 1 ano <small>CNJ</small></th><th scope="col">Com data no CNJ</th></tr></thead>
+          {% for g in fc.grupos %}<tbody><tr class="tb-cnj-g"><th scope="rowgroup" colspan="6">{{ g.nome }}</th></tr>{% for l in g.linhas %}<tr><th scope="row"><a href="#tb-mesa-{{ l.id }}" data-min="{{ l.id }}">{{ l.nome }}</a></th><td>{{ l.sem[0] }}</td><td{% if not l.cnj[0].ok %} class="tb-cnj-ins"{% endif %}>{{ l.cnj[0].v }}</td><td>{{ l.sem[1] }}</td><td{% if not l.cnj[-1].ok %} class="tb-cnj-ins"{% endif %}>{{ l.cnj[-1].v }}</td><td>{{ l.cob }}</td></tr>{% endfor %}</tbody>{% endfor %}
+        </table></div>
+      </div>
+      {% endif %}
+      <div class="az-2c">
+        <div class="az-blk">
+          <h5 class="az-h">Por grupo <span>na mesa e há quanto tempo</span></h5>
+          <div class="an-tbl-wrap"><table class="an-tbl tb-tbl"><caption class="sr-only">Na mesa, por grupo, e quantos há mais de {{ fi.mesa_dias[0] }} e de {{ fi.mesa_dias[-1] }} dias</caption>
+            <thead><tr><th scope="col">Grupo</th><th scope="col">Na mesa</th><th scope="col">+ de {{ fi.mesa_dias[0] }} dias</th><th scope="col">+ de {{ fi.mesa_dias[-1] }} dias</th></tr></thead>
+            <tbody>{% for g in fi.por_grupo %}<tr><th scope="row">{{ g.nome }}</th><td>{{ g.na_mesa }}</td><td>{{ g.mais_180 }}</td><td>{{ g.mais_365 }}</td></tr>{% endfor %}</tbody>
+          </table></div>
+          {% if fi.sobrestados %}<p class="az-dek">{{ fi.sobrestados }}</p>{% endif %}
+        </div>
+        <div class="az-blk">
+          <h5 class="az-h">Entra e sai <span>o que entrou, o que vai a julgamento, o que foi decidido</span></h5>
+          {% if tr.fluxo %}
+          <dl class="tb-dl">{% for b in tr.fluxo %}<div><dt>{{ b.titulo }}</dt><dd>{{ b.texto }}{% if b.fonte %} <small>{{ b.fonte }}</small>{% endif %}</dd></div>{% endfor %}</dl>
+          {% else %}<p class="az-dek">As atas, as pautas e as decisões deste tribunal não vieram nesta atualização.</p>{% endif %}
+        </div>
+      </div>
+      {% if fi.vistas %}
+      <div class="az-blk">
+        <h5 class="az-h">Os pedidos de vista {% if fi.vistas_com_quem %}<span>com quem está o processo, de quem é a relatoria</span>{% else %}<span>com pedido de vista (a planilha não diz de quem); de quem é a relatoria</span>{% endif %}</h5>
+        <ol class="tb-fi">{% for x in fi.vistas %}<li><p class="tb-fi-d">{% if x.sessao %}{{ x.sessao }}<small>sessão</small>{% else %}—<small></small>{% endif %}</p><p class="tb-fi-p">{% if x.link %}<a href="{{ x.link }}" data-pr="{{ x.id }}" data-de="{{ tr.id }}" target="_blank" rel="noopener noreferrer">{{ x.rotulo }}</a>{% else %}<b>{{ x.rotulo }}</b>{% endif %}{{ area(x.area, x.area_nome) }}</p><p class="tb-fi-x">{% if x.vista %}{{ x.vista }}{% if x.relator %}; {% endif %}{% endif %}{% if x.relator %}relatoria de {{ x.relator }}{% endif %}{% if x.texto %} · {{ x.texto }}{% endif %}</p></li>{% endfor %}</ol>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  {#- ── Como ler ── -#}
+  <section class="az-sec az-met cg-vista" data-vista="metodo" id="tb-v-metodo" aria-labelledby="tb-metodo-h">
+    <header class="az-lh">
+      <p class="az-ln">Método</p>
+      <h3 class="az-lt" id="tb-metodo-h">Como ler</h3>
+    </header>
+    {% set me = t.metodo %}
+    {% if me.avisos %}<div class="tb-av tb-av-parcial"><span class="az-selo">Avisos de hoje</span><ul>{% for a in me.avisos %}<li>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+    <dl class="az-dl">
+      {% for titulo, texto in me.textos %}
+      <div><dt>{{ titulo }}</dt><dd>{{ texto }}</dd></div>
+      {% endfor %}
+    </dl>
+    <div class="az-blk" id="tb-areas-def">
+      <h4 class="az-h">O que entra em cada área <span>pelo código da Tabela Processual Unificada do CNJ, na ordem da legenda</span></h4>
+      <div class="an-tbl-wrap">
+        <table class="an-tbl tb-tdef">
+          <thead><tr><th scope="col">Área</th><th scope="col">Regra</th></tr></thead>
+          <tbody>{% for a in me.tabela %}<tr><th scope="row">{{ area(a.id, a.nome) }}</th><td>{{ a.regra }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="az-blk" id="tb-fontes-def">
+      <h4 class="az-h">De onde vem cada número <span>a data é a que a própria fonte declara</span></h4>
+      <div class="an-tbl-wrap">
+        <table class="an-tbl tb-tdef">
+          <thead><tr><th scope="col">Fonte</th><th scope="col">Dados de</th><th scope="col">Última coleta</th><th scope="col">Registros</th><th scope="col">Atribuição</th></tr></thead>
+          <tbody>{% for f in me.fontes %}<tr><th scope="row">{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener noreferrer">{{ f.nome }}</a>{% else %}{{ f.nome }}{% endif %}</th><td>{{ f.data }}</td><td>{{ f.estado }}</td><td>{{ f.registros }}</td><td>{{ f.atribuicao }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      {% for c in me.cobertura %}<p class="az-dek">{{ c }}</p>{% endfor %}
+    </div>
+    {% if me.correcoes %}
+    <div class="az-blk">
+      <h4 class="az-h">Correções <span>o que foi contestado e corrigido</span></h4>
+      <ul class="tb-fx">{% for c in me.correcoes %}<li><b>{{ c.data }}</b> {{ c.texto }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}
+
+{% block footer %}
+<footer class="ft">
+  <p><strong>{{ brand.name }}</strong> · Tribunais · fontes: Portal de Dados Abertos do STJ (CC-BY) e portal do STF · TPU do CNJ</p>
+  <p class="ft-links"><a href="{{ home_href }}">Edição mais recente</a> · <a href="{{ archive_href }}">Edições anteriores</a>{% if repo_url %} · <a href="{{ repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
+</footer>
+{% endblock %}
+
+{% block after %}
+<div class="cg-mo" id="tbFolha" role="dialog" aria-modal="true" aria-labelledby="tbFolhaT" hidden>
+  <article class="cg-ml cg" tabindex="-1">
+    <button class="mc cg-mc" type="button" aria-label="Fechar a folha">&times;</button>
+    <div id="tbFolhaIn"><h2 id="tbFolhaT" class="sr-only">Folha do processo</h2></div>
+  </article>
+</div>
+<script type="application/json" id="tbManifesto">{{ t.manifesto|safe }}</script>
+<script>
+{% include "tribunais.js.j2" %}
+</script>
+{% endblock %}

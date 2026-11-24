@@ -75,9 +75,12 @@ def _resumo_do_actions(resultado: dados.Resultado, config: Config) -> None:
 
 
 def renderizar(config: Config, out_dir: Path) -> Path | None:
-    """Grava ``edicoes/congresso.html`` a partir de ``data/congresso/`` (``None`` sem dados)."""
+    """Grava ``edicoes/congresso.html`` a partir de ``data/congresso/`` (``None`` sem dados). O botão
+    "Tribunais" do cabeçalho acende quando a aba dos Tribunais existe (``edicoes/tribunais.html``)."""
     from qijournal.render import congresso as pagina  # import tardio: a renderização carrega os modelos
+    from qijournal.render import tribunais as pagina_tribunais
 
+    pagina_tribunais.marcar_publicada(config, Path(out_dir))
     html = pagina.render_congresso_page(config, Path(out_dir) / pipeline.DATA_DIR, home_href="../", archive_href="./")
     if html is None:
         return None

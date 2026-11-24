@@ -1,0 +1,359 @@
+{#- Aba Tribunais (só esta página inclui este arquivo). Por baixo: analitico.css.j2 (az-…),
+    congresso.css.j2 (cg-barra, cg-casa-b, cg-vistas, cg-tiles, cg-chip, cg-i/cg-dica, cg-mo, a rampa
+    cg-j0…j4, cg-sm) e congresso_papel.css.j2 (a folha cg-fo, o carimbo cg-cb, cg-lg-b): reaproveitados,
+    não copiados. As cores das áreas estão em tribunais_areas.css.j2. Aqui mora só o que é novo (tb-…).
+    A cor diz uma coisa só: a área (com o nome escrito ao lado) ou a quantidade (a rampa azul, com o
+    número escrito); estado de fonte e de processo vai em palavra + forma, nunca só em cor. -#}
+
+/* Um tribunal por vez (com script: a raiz ganha data-ver); sem script, os dois em sequência */
+.tb[data-ver="stf"] .tb-t[data-tribunal="stj"],.tb[data-ver="stj"] .tb-t[data-tribunal="stf"]{display:none}
+.tb-t+.tb-t{margin-top:44px}
+.tb[data-ver] .tb-t+.tb-t{margin-top:0}
+.tb-ct span{display:inline;margin-left:8px}
+
+/* O rótulo de uma área: quadradinho na cor, nome em cor de texto */
+.tb-ar{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.tb-ar>i{flex:none;width:9px;height:9px;border-radius:2px;background:var(--tb-a,var(--tb-a-resto))}
+.tb-a-sem_assunto>i,.tb-ar.tb-a-sem_assunto>i{box-shadow:inset 0 0 0 1px var(--muted)}
+.tb-mk{font-style:normal;font-family:var(--mn);font-size:11px;color:var(--ink)}
+.az-h>.tb-ar{font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.az-h>.tb-ar>i{width:11px;height:11px}
+.tb-fo-g .cg-fo-d dd small{display:block}
+
+/* Avisos de estado: fonte fora do ar (borda vermelha do "não"), parcial ou atrasada (laranja) */
+.tb-av{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;max-width:980px;margin-top:14px;padding:9px 12px;border-left:3px solid var(--muted);border-radius:0 6px 6px 0;background:var(--soft);font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--body)}
+.tb-av b{color:var(--ink)}
+.tb-av .az-selo{color:var(--ink)}
+.tb-av ul{flex-basis:100%;margin:2px 0 0 18px}
+.tb-av-erro{border-left-color:var(--cg-no)}
+.tb-av-parcial{border-left-color:var(--qc)}
+
+/* As fontes de hoje: uma linha, o estado escrito e a forma (● completa, ◐ com aviso, ■ falhou, ○ desligada) */
+.tb-fn{display:flex;flex-wrap:wrap;gap:6px 18px;max-width:1180px;margin-top:12px;font-family:var(--mn);font-size:10.5px;line-height:1.5;color:var(--muted)}
+.tb-fn span{display:inline-block}
+.tb-fn i{font-style:normal;font-size:11px;margin-right:5px}
+.tb-fn a{color:var(--muted);text-decoration:underline;text-decoration-color:var(--rule)}
+.tb-fn a:hover{color:var(--link)}
+.tb-fn-ok i{color:var(--cg-ok)}
+.tb-fn-parc i{color:var(--qc)}
+.tb-fn-erro i{color:var(--cg-no)}
+.tb-fn-erro{color:var(--ink)}
+
+/* Os números do tribunal: cg-tiles com o número solto; o valor da causa sem número (a frase) */
+.tb-k{margin-top:22px}
+.tb-k .cg-tile-v{font-size:28px}
+.tb-sem-v{font-family:var(--ss)!important;font-size:17px!important;font-weight:700!important;color:var(--muted)!important}
+.tb-vl{max-width:980px}
+.tb-vl-0{margin-top:8px;font-family:var(--ss);font-size:13px;line-height:1.55;color:var(--body)}
+.tb-vl-0 b{color:var(--ink)}
+.tb-vl-l{list-style:none;margin-top:6px}
+.tb-vl-l li{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--body)}
+.tb-vl-l b{font-family:var(--mn);font-size:12.5px;font-weight:600;color:var(--ink);text-align:right}
+
+/* ── A matriz ministro × área (tb-mx, derivada de az-mx) ──
+   A célula é a parte do acervo do ministro naquela área (a rampa azul do Congresso, o número sempre
+   escrito); ▲/▽ só onde o JSON marca (passou do teste e do piso de efeito). A cor da área mora só na
+   faixa de 4 px do alto da coluna; o nome vai escrito. */
+.tb-mx-wrap{position:relative;max-width:1320px;margin-top:14px;overflow-x:auto;scrollbar-width:thin}
+/* largura mínima = as colunas de área (--tb-cols-w, calculada no Python e refeita pelo script quando um grupo esconde colunas) + o nome (176) + o acervo (64) + o espaçamento */
+.tb-mx{width:100%;min-width:calc(var(--tb-cols-w, 880px) + 248px);border-collapse:separate;border-spacing:2px;table-layout:fixed;font-family:var(--mn);font-size:12px;font-variant-numeric:tabular-nums;color:var(--ink)}
+/* A legenda da tabela fica fora da moldura que rola (no celular a tabela é mais larga que a tela e a
+   legenda, dentro dela, saía cortada): o texto visível é o parágrafo; o <caption> fica para o leitor de tela. */
+.tb-mx-cap{max-width:1320px;margin:14px 0 6px;font-family:var(--ss);font-size:12px;font-weight:600;line-height:1.45;color:var(--muted)}
+.tb-mx-cap + .tb-mx-wrap{margin-top:0}
+.tb-mx caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tb-mx thead th{position:relative;padding:10px 2px 6px;vertical-align:bottom;font-family:var(--ss);font-size:10.5px;font-weight:700;line-height:1.2;white-space:normal;overflow-wrap:normal;hyphens:manual;text-align:center;color:var(--ink)}
+.tb-mx thead th[data-a]::before{content:"";position:absolute;left:2px;right:2px;top:0;height:4px;border-radius:2px;background:var(--tb-a)}
+.tb-mx thead th small{display:block;margin-top:2px;font-family:var(--mn);font-size:9.5px;font-weight:400;color:var(--faint)}
+.tb-mx thead th a{color:inherit}
+.tb-mx thead th a:hover{color:var(--link);text-decoration:underline}
+.tb-mx .tb-mx-v{position:sticky;left:0;z-index:2;width:176px;padding:0 10px 0 0;background:var(--paper);font-family:var(--ss);font-size:10px;letter-spacing:.9px;text-transform:uppercase;text-align:left;color:var(--muted)}
+.tb-mx .tb-mx-n{width:64px;font-family:var(--ss);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.tb-mx tbody th{position:sticky;left:0;z-index:2;padding:0 10px 0 0;background:var(--paper);font-family:var(--ss);font-size:12.5px;font-weight:700;text-align:left;white-space:normal;line-height:1.15;overflow-wrap:break-word}  /* nome inteiro, sem reticências: quebra a linha */
+.tb-mx tbody th a{color:var(--ink)}
+.tb-mx tbody th a:focus-visible{outline-offset:-2px}  /* o contorno fica dentro da célula fixa, que cobre o que passa da borda */
+.tb-mx tbody th a:hover{color:var(--link)}
+.tb-mx tbody th small{margin-left:5px;font-family:var(--mn);font-size:9.5px;font-weight:400;color:var(--faint)}
+.tb-mx td{position:relative;height:28px;border-radius:3px;text-align:center;font-weight:500;color:var(--cg-jon)}
+.tb-mx td.cg-j3,.tb-mx td.cg-j4{color:var(--cg-jon2)}
+:root[data-theme="dark"] .tb-mx td.cg-j3{color:var(--cg-jon)}
+.tb-mx td.tb-n{font-weight:600;color:var(--ink);text-align:right;padding-right:6px}
+.tb-mx td.tb-0{background:transparent;color:var(--faint)}
+.tb-mx td.tb-up::after,.tb-mx td.tb-dn::after{position:absolute;top:1px;right:3px;font-size:9px;line-height:1;color:inherit;opacity:.9}
+.tb-mx td.tb-up::after{content:"▲"}
+.tb-mx td.tb-dn::after{content:"▽"}
+.tb-mx tr.tb-mx-g th{position:sticky;left:0;padding:16px 0 5px;border-bottom:1px solid var(--rule);background:var(--paper);font-size:10.5px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--head);overflow:visible;white-space:normal}
+.tb-mx tr.tb-mx-g th span{margin-left:8px;font-size:11.5px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted)}
+.tb-mx tr.tb-mx-m th{font-weight:400;font-style:italic;color:var(--muted);white-space:normal;line-height:1.2}
+.tb-mx tr.tb-mx-m td{background:transparent;box-shadow:inset 0 0 0 1px var(--rule);color:var(--muted);font-style:italic}
+.tb-mx tr.tb-mx-f th{font-weight:500;color:var(--body);white-space:normal;line-height:1.2}
+.tb-mx tbody tr:not(.tb-mx-g):hover th a{color:var(--link)}
+.tb-mx td[title]:hover{outline:2px solid var(--link);outline-offset:-2px}
+.tb-mx tr[aria-current="true"] th{box-shadow:inset 3px 0 0 var(--qc);padding-left:8px}
+.tb-mx [hidden]{display:none}
+.tb-mx-leg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;margin-top:10px;font-family:var(--ss);font-size:11px;color:var(--muted)}
+.tb-mx-leg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.tb-mx-leg i{width:11px;height:11px;border-radius:2px}
+.tb-mx-leg b{font-family:var(--mn);font-size:9px;color:var(--ink)}
+.tb-mx-leg .tb-mx-lm{width:14px;height:11px;box-shadow:inset 0 0 0 1px var(--rule)}
+.tb-sec{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+.tb-sec[hidden]{display:none}
+
+/* ── A mesa: a lista dos ministros (à esquerda, só com script) e o cartão em foco ──
+   Sem script, cada mesa é um <details> fechado (o resumo: nome, acervo e a impressão digital). */
+.tb-me{margin-top:16px}
+.tb-js .tb-me{display:grid;grid-template-columns:minmax(0,272px) minmax(0,1fr);gap:0 28px}
+.tb-me-l{position:sticky;top:112px;align-self:start;max-height:calc(100vh - 130px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding-right:6px;border-right:1px solid var(--rl)}
+.tb-me-l[hidden]{display:none}
+.tb-me-gk{position:sticky;top:0;z-index:1;padding:10px 0 5px;background:var(--paper);font-family:var(--ss);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--head);border-bottom:1px solid var(--rule)}
+.tb-me-ls{list-style:none}
+.tb-me-b{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;width:100%;padding:7px 8px 8px 10px;border:0;border-bottom:1px solid var(--rl);background:none;text-align:left;cursor:pointer;font-family:var(--ss)}
+.tb-me-b:hover{background:var(--hover)}
+.tb-me-b[aria-current="true"]{background:var(--soft);box-shadow:inset 3px 0 0 var(--qc)}
+.tb-me-n{font-family:var(--ss);font-size:13px;font-weight:600;line-height:1.25;color:var(--ink);white-space:normal;overflow-wrap:break-word}  /* nome inteiro: é a resposta a "na mesa de quem" */
+.tb-me-b .tb-me-c{font-family:var(--mn);font-size:11px;color:var(--muted);text-align:right}
+.tb-me-b .tb-fp{grid-column:1/-1;height:4px;margin-top:3px}
+.tb-me-cs{min-width:0}
+.tb-mx thead th.tb-mx-af{box-shadow:inset 0 -2px 0 var(--qc)}
+.tb-mx td.tb-mx-af{box-shadow:inset 0 0 0 2px var(--qc)}
+.tb-mesa{border-top:1px solid var(--rl)}
+.tb-mesa:last-child{border-bottom:1px solid var(--rl)}
+.tb-mesa>summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:baseline;padding:9px 4px;cursor:pointer;list-style:none}
+.tb-mesa>summary::-webkit-details-marker{display:none}
+.tb-mesa>summary::before{content:"+";position:absolute;left:2px;top:9px;font-family:var(--mn);color:var(--muted)}
+.tb-mesa[open]>summary::before{content:"−"}
+.tb-mesa>summary{position:relative;padding-left:18px}
+.tb-mesa>summary .tb-me-c{font-family:var(--mn);font-size:11px;color:var(--muted)}
+.tb-mesa>summary .tb-fp{grid-column:1/-1;height:4px}
+.tb-mesa>summary:hover .tb-me-n{color:var(--link)}
+.tb-mesa[open]>.tb-cd{margin:4px 0 18px}
+/* com script: só a mesa em foco, aberta, sem o resumo */
+.tb-js .tb-mesa{border:0}
+.tb-js .tb-mesa>summary{display:none}
+.tb-js .tb-mesa[open]>.tb-cd{margin:0}
+/* A impressão digital da mesa: barra 100% fina, até 6 partes (as 5 maiores + "outras"), 2 px de papel
+   entre as partes, na ordem da legenda; sem texto (os números estão ao lado ou no aria-label) */
+.tb-fp{display:flex;gap:2px;height:10px}
+.tb-fp i{display:block;min-width:3px;border-radius:2px;background:var(--tb-a,var(--tb-a-resto))}
+
+/* O cartão (a mesa de um ministro) */
+.tb-cd{min-width:0;padding:22px 26px 24px;border:1px solid var(--az-fr)}
+.tb-cd-h{display:flex;gap:18px;align-items:flex-start}
+.tb-cd-hx{flex:1 1 auto;min-width:0}
+.tb-cd-f{flex:none;display:flex;align-items:center;justify-content:center;width:72px;height:92px;border-radius:4px;background:var(--hl);font-family:var(--sf);font-size:24px;font-weight:700;color:var(--head)}
+.tb-cd-k{font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--link)}
+.tb-cd-t{margin-top:5px;font-family:var(--sf);font-size:clamp(26px,calc(14px + 1.3vw),38px);font-weight:700;line-height:1.1;color:var(--head)}
+.tb-cd-s{margin-top:6px;font-family:var(--ss);font-size:13px;color:var(--muted)}
+.tb-cd-sl{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:8px}
+.tb-cd-sl .cg-chip{font-size:11.5px;border-color:var(--qc)}
+.tb-cd-nv{display:flex;flex:none;gap:6px}
+.tb-cd-nv[hidden]{display:none}
+.tb-cd .cg-tiles{margin-top:18px}
+.tb-cd-sec{margin-top:26px}
+.tb-cd-h6{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-family:var(--sf);font-size:17px;font-weight:700;color:var(--ink)}
+.tb-cd-h6 span{font-family:var(--ss);font-size:12px;font-weight:400;color:var(--muted)}
+.tb-cd-h6b{margin-top:22px}
+.tb-cd-2c{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0 36px}
+.tb-cd-fp{margin-top:12px}
+.tb-cd-fp .tb-fp{height:12px}
+/* Do que é o acervo: a barra do ministro + o traço dos pares (um bullet chart de uma cor só) */
+.tb-cp{list-style:none;margin-top:8px}
+.tb-cp li{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 132px;align-items:center;gap:4px 12px;padding:5px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tb-cp-b{position:relative;display:block;height:9px;border-radius:2px;background:var(--cg-trk)}
+.tb-cp-b i{display:block;height:100%;min-width:2px;border-radius:0 2px 2px 0;background:var(--qi)}
+:root[data-theme="dark"] .tb-cp-b i{background:var(--link)}
+.tb-cp-b b{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ink);box-shadow:0 0 0 1.5px var(--paper)}
+.tb-cp-v{font-family:var(--mn);font-size:12px;text-align:right;white-space:nowrap}
+.tb-cp-v small{display:block;font-size:10px;color:var(--muted)}
+.tb-cp-k{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:8px;font-family:var(--ss);font-size:11px;color:var(--muted)}
+.tb-cp-k span{display:inline-flex;align-items:center;gap:6px}
+.tb-cp-k .k1{width:14px;height:9px;border-radius:2px;background:var(--qi)}
+:root[data-theme="dark"] .tb-cp-k .k1{background:var(--link)}
+.tb-cp-k .k2{width:2px;height:13px;background:var(--ink)}
+.tb-cl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px}
+.tb-cl abbr{text-decoration:none;cursor:help}
+.tb-cd .cg-sm{height:84px}
+.tb-dz[hidden]{display:none}
+.tb-dz-st{margin-top:18px;font-family:var(--ss);font-size:12.5px;color:var(--muted)}
+.tb-dz-st:empty{display:none}
+.tb-cd.tb-carregando .tb-dz{opacity:.5}
+/* O que espera há mais tempo */
+.tb-fi{list-style:none;margin-top:6px}
+.tb-fi li{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:baseline;gap:2px 14px;padding:9px 0;border-bottom:1px solid var(--rl)}
+.tb-fi-d{grid-row:1/3;font-family:var(--mn);font-size:17px;font-weight:600;line-height:1.15;color:var(--ink)}
+.tb-fi-d small{display:block;font-size:10px;font-weight:400;color:var(--muted)}
+.tb-fi-p{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;font-family:var(--ss);font-size:13px;color:var(--ink)}
+.tb-fi-p a,.tb-fi-p b{font-family:var(--mn);font-weight:600;color:var(--link)}
+.tb-fi-p b{color:var(--ink)}
+.tb-fi-p a:hover{text-decoration:underline}
+.tb-fi-x{grid-column:2;font-family:var(--ss);font-size:12px;line-height:1.45;color:var(--muted)}
+.tb-fi-x b{color:var(--ink);font-weight:600}
+.tb-fi-2c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 36px;max-width:1180px}
+/* Listas curtas: litigantes, frases do fluxo */
+.tb-pl{list-style:none;margin-top:6px}
+.tb-pl li{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--body)}
+.tb-pl b{font-family:var(--mn);font-weight:600;color:var(--ink)}
+.tb-fx{list-style:none;margin-top:6px}
+.tb-fx li{position:relative;padding:5px 0 5px 14px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--body)}
+.tb-fx li::before{content:"";position:absolute;left:0;top:.95em;width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.tb-fx-p{margin-top:8px;font-family:var(--sf);font-size:15.5px;line-height:1.5;color:var(--ink)}
+.tb-dl{margin-top:6px}
+.tb-dl>div{padding:8px 0;border-bottom:1px solid var(--rl)}
+.tb-dl dt{font-family:var(--ss);font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink)}
+.tb-dl dd{margin-top:3px;font-family:var(--ss);font-size:12.5px;line-height:1.55;color:var(--body)}
+.tb-dl dd small{display:block;margin-top:2px}
+/* Quem mais aparece: recorre à esquerda, responde à direita, uma cor só (a posição diz o lado) */
+.tb-bf{list-style:none;max-width:1100px;margin-top:8px}
+.tb-bf-h,.tb-bf li{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);align-items:center}
+.tb-bf-h{padding-bottom:5px;font-family:var(--ss);font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.tb-bf-h span:nth-child(2){padding-right:8px;text-align:right}
+.tb-bf-h span:nth-child(3){padding-left:8px}
+.tb-bf li{padding:6px 0;border-top:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tb-bf-n{padding-right:10px;min-width:0}
+.tb-bf-n small{display:block;font-family:var(--mn);font-size:10px;color:var(--faint)}
+.tb-bf-n .tb-bf-a{font-family:var(--ss);font-size:10.5px;color:var(--muted)}
+.tb-bf-l,.tb-bf-r{display:flex;align-items:center;gap:6px;min-height:16px}
+.tb-bf-l{justify-content:flex-end;padding-right:1px;border-right:1px solid var(--ink)}
+.tb-bf-r{padding-left:1px}
+.tb-bf-l i,.tb-bf-r i{display:block;height:9px;min-width:2px;background:var(--qi)}
+:root[data-theme="dark"] .tb-bf-l i,:root[data-theme="dark"] .tb-bf-r i{background:var(--link)}
+.tb-bf-l i{border-radius:2px 0 0 2px}
+.tb-bf-r i{border-radius:0 2px 2px 0}
+.tb-bf-l b,.tb-bf-r b{font-family:var(--mn);font-size:11px;font-weight:600}
+.tb-pf{margin-top:8px;font-family:var(--ss);font-size:12px;color:var(--muted)}
+
+/* Barras ordenadas de uma cor só (o tribunal por área, os recortes, as mesas de uma área) */
+.tb-br{list-style:none;max-width:720px;margin-top:8px}
+.tb-br li{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 92px;align-items:center;gap:4px 12px;padding:5px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px;color:var(--ink)}
+.tb-br-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+a.tb-br-n:hover{color:var(--link)}
+.tb-br-n small{font-family:var(--mn);font-size:9.5px;color:var(--faint)}
+.tb-br-b{display:block;height:9px;border-radius:2px;background:var(--cg-trk)}
+.tb-br-b i{display:block;height:100%;min-width:2px;border-radius:0 2px 2px 0;background:var(--qi)}
+:root[data-theme="dark"] .tb-br-b i{background:var(--link)}
+.tb-br-v{font-family:var(--mn);font-size:12px;font-weight:600;text-align:right;white-space:nowrap}
+.tb-br-v small{margin-left:6px;font-size:10px;font-weight:400;color:var(--muted)}
+.tb-br-c .tb-br-n{white-space:normal}
+.tb-foco-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 32px}
+.tb-foco-g .tb-br li{grid-template-columns:minmax(0,1fr) minmax(0,.8fr) 96px}
+.tb-foco-g .tb-br-n{white-space:normal}  /* o nome do ministro e da subárea quebra a linha: nunca corta com reticências */
+.tb-js .tb-foco{display:none}
+.tb-js .tb-foco.on{display:block}
+
+/* Idade de cada mesa: do 1º ao 3º quartil, o traço na mediana, o ponto no p90 */
+.tb-id{list-style:none;max-width:1100px}
+.tb-id li{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 280px;align-items:center;gap:4px 14px;padding:4px 0;border-bottom:1px solid var(--rl);font-family:var(--ss);font-size:12.5px}
+.tb-id-n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--ink)}
+.tb-id-n:hover{color:var(--link)}
+.tb-id-b{position:relative;display:block;height:14px;background:linear-gradient(var(--rl),var(--rl)) 0 50%/100% 1px no-repeat}
+.tb-id-b i{position:absolute;top:2px;bottom:2px;min-width:2px;border-radius:2px;background:var(--cg-j2)}
+.tb-id-b b{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink)}
+.tb-id-b em{position:absolute;top:4px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--paper);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.tb-id-v{min-width:0;font-family:var(--mn);font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}  /* o texto inteiro está no aria-label da barra */
+/* O eixo tem a largura do trilho das barras: 1100 − 190 − 280 − 2 × 14 = 602 px (o nome à esquerda, o texto à direita). */
+.tb-id-x{position:relative;max-width:calc(1100px - 498px);height:16px;margin:4px 294px 0 204px;padding:0;font-family:var(--mn);font-size:9.5px;color:var(--faint)}
+.tb-id-x span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tb-tbl td{font-family:var(--mn);text-align:right}
+.tb-tdef td{font-family:var(--ss);font-size:12px;line-height:1.5}
+.tb-tdef th{white-space:normal}
+
+/* A folha do processo (por cima): a folha do Congresso (cg-fo), a faixa na cor da área */
+.tb-fo-g{margin-top:8px}
+.tb-fo-pt{margin-top:14px;font-family:var(--ss);font-size:12.5px;line-height:1.5}
+.tb-fo-pt>div{display:grid;grid-template-columns:102px minmax(0,1fr);gap:0 10px;padding:4px 0;border-top:1px dotted var(--cg-fo-fio)}
+.tb-fo-pt dt{padding-top:2px;font-size:9.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--cg-fo-tinta2)}
+.tb-fo-pt dd{color:var(--cg-fo-tinta)}
+.tb-fo-as{margin-top:5px;font-family:var(--ss);font-size:12.5px;line-height:1.5;color:var(--cg-fo-tinta)}
+.tb-mc{list-style:none;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);margin-top:30px}
+.tb-mc li{position:relative;padding:18px 8px 0 0;font-family:var(--ss);font-size:12px;line-height:1.35;color:var(--ink)}
+.tb-mc li::before{content:"";position:absolute;left:0;right:0;top:5px;height:2px;background:var(--rule)}
+.tb-mc li::after{content:"";position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;background:var(--paper);box-shadow:inset 0 0 0 2px var(--ink)}
+.tb-mc li.ok::after{background:var(--ink)}
+.tb-mc li.agora::after{background:var(--qc);box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--qc)}
+.tb-mc li:last-child::before{right:auto;width:0}
+.tb-mc b{display:block;font-weight:700}
+.tb-mc time{display:block;font-family:var(--mn);font-size:10.5px;color:var(--muted)}
+/* Os dias entre o marco anterior e este ficam sobre o trecho que chega a este: o meio do item anterior
+   (os li têm a mesma largura, sem gap; o ponto tem 12 px). */
+.tb-mc em{position:absolute;top:-16px;left:calc(-50% + 6px);font-family:var(--mn);font-size:10px;font-style:normal;color:var(--muted);white-space:nowrap;transform:translateX(-50%)}
+.tb-mc li:first-child em{display:none}
+
+/* A camada do CNJ (DataJud): só com o cnj.json publicado. Selo "CNJ" (az-selo) e texto em cor neutra;
+   a faixa sem cobertura bastante sai em palavras ("cobertura insuficiente"), nunca com número. */
+.tb-cnj{display:inline-flex;align-items:baseline;gap:5px;margin-left:2px;color:var(--body)}
+.tb-cnj .az-selo{font-size:8.5px;padding:0 4px;color:var(--ink)}
+.tb-cnj-b{max-width:980px;margin:14px 0 4px;padding:10px 12px;border-left:3px solid var(--rule);border-radius:0 6px 6px 0;background:var(--soft)}
+.tb-cnj-k{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-family:var(--ss);font-size:11.5px;color:var(--muted)}
+.tb-cnj-k .az-selo{color:var(--ink)}
+.tb-cnj-l{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 24px;margin-top:8px}
+.tb-cnj-f span{display:block;font-family:var(--ss);font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.tb-cnj-f b{display:block;margin-top:2px;font-family:var(--mn);font-size:20px;font-weight:600;line-height:1.2;color:var(--ink)}
+.tb-cnj-f small{display:block;margin-top:2px;font-family:var(--ss);font-size:11.5px;line-height:1.4;color:var(--muted)}
+.tb-cnj-ins b{font-family:var(--ss);font-size:14px;font-weight:600;color:var(--muted)}
+.tb-cnj-n{margin-top:4px;font-family:var(--ss);font-size:11.5px;line-height:1.45;color:var(--muted)}
+.tb-cnj-t td{font-family:var(--mn)}
+.tb-cnj-t td.tb-cnj-ins{font-family:var(--ss);font-size:11.5px;color:var(--muted)}
+.tb-cnj-t th small{display:block;font-weight:400;color:var(--muted)}
+.tb-cnj-t tr.tb-cnj-g th{padding-top:12px;font-family:var(--ss);font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+
+/* "Contestar este número": uma issue no repositório */
+.tb-ct-l{font-family:var(--ss);font-size:11px;font-weight:400;color:var(--muted);text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.tb-ct-l:hover{color:var(--link)}
+/* O mapa das abas: o foco aparece no item (o .hit do site tira o contorno do link) */
+.tb .cg-mapa li:has(.hit:focus-visible){outline:2px solid var(--link);outline-offset:3px}
+
+@media (max-width:1023px){
+  .tb-js .tb-me{grid-template-columns:minmax(0,1fr)}
+  /* nomes inteiros: é a resposta a "na mesa de quem" (quebram a linha na miniatura, sem reticências) */
+  .tb-me-l .tb-me-n{white-space:normal}
+  .tb-id-n{white-space:normal}
+  .tb-mx tbody th{white-space:normal;line-height:1.15}
+  .tb-me-l{position:static;max-height:none;overflow:visible;border-right:0;padding:0}
+  /* no tablet e no celular, a lista vira a fila de miniaturas da mesa do Congresso */
+  .tb-me-l .tb-me-ls{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:thin}
+  .tb-me-l .tb-me-ls li{flex:0 0 156px}
+  .tb-me-l .tb-me-b{height:100%;border:1px solid var(--rule);border-radius:4px}
+  .tb-me-gk{position:static;margin-top:6px;border-bottom:0}
+  .tb-cd-2c{grid-template-columns:minmax(0,1fr)}
+  .tb-foco-g{grid-template-columns:minmax(0,1fr)}
+  .tb-fi-2c{grid-template-columns:minmax(0,1fr)}
+  .tb-id li{grid-template-columns:minmax(0,150px) minmax(0,1fr)}
+  .tb-id-v{grid-column:1/-1}
+  .tb-id-x{display:none}
+}
+@media (max-width:760px){
+  /* a calha da página cai para 16 px aqui (styles.css.j2, .an); a barra fixa acompanha (no Congresso a regra é de 720 px e sobram 14 px de rolagem lateral entre 721 e 760) */
+  .tb .cg-barra{margin-left:-16px;margin-right:-16px;padding:0 16px}
+  .tb-cd{padding:16px 14px 18px;margin:0 -2px}
+  .tb-cd-h{gap:12px;flex-wrap:wrap}
+  .tb-cd-hx{flex:1 1 0}
+  .tb-cd-nv{margin-left:auto}
+  .tb-cd-f{width:56px;height:72px;font-size:19px}
+  .tb-cp li{grid-template-columns:minmax(0,1fr) 104px}
+  .tb-cp-b{grid-column:1/-1;grid-row:2}
+  .tb-br li{grid-template-columns:minmax(0,1fr) 84px}
+  .tb-br-b{grid-column:1/-1;grid-row:2}
+  .tb-foco-g .tb-br li{grid-template-columns:minmax(0,1fr) auto}
+  .tb-bf-h,.tb-bf li{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .tb-bf-n{grid-column:1/-1;padding:0 0 3px}
+  .tb-bf-h span:first-child{display:none}
+  .tb-fi li{grid-template-columns:74px minmax(0,1fr)}
+  .tb-fi-d{font-size:15px}
+  .tb-id li{grid-template-columns:minmax(0,110px) minmax(0,1fr)}
+  .tb-mc{grid-auto-flow:row;grid-auto-columns:auto;margin-top:12px}
+  .tb-mc li{padding:0 0 12px 22px}
+  .tb-mc li::before{left:5px;right:auto;top:12px;bottom:0;width:2px;height:auto}
+  .tb-mc em{position:static;transform:none;display:block}
+  .tb-mx{min-width:calc(var(--tb-cols-w, 880px) + 190px)}
+  .tb-mx .tb-mx-v,.tb-mx tbody th{width:118px}
+  .tb-vl-l li{flex-direction:column;gap:0}
+  .tb-vl-l b{text-align:left}
+}
+@media (max-width:480px){
+  /* o quadro das iniciais é enfeite (aria-hidden): sai, e as setas descem para a linha de baixo */
+  .tb-cd-f{display:none}
+  .tb-cd-nv{order:3;width:100%;justify-content:flex-end}
+}
+@media (prefers-reduced-motion:reduce){
+  .tb-cd.tb-carregando .tb-dz{opacity:1}
+}

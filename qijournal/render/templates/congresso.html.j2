@@ -16,11 +16,7 @@
 {% block dateline %}Congresso{% if c.atualizado %}&nbsp;· <span class="nw">atualizado em {{ c.atualizado }}</span>{% endif %}{% endblock %}
 
 {% block tools %}
-    <a class="tool" href="{{ archive_href }}" title="Edições anteriores"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Edições</span></a>
-    {% if analitico %}
-    <a class="tool tool-an" href="{{ archive_href }}analitico.html" title="Analítico Político: como a imprensa cobre a política" aria-label="Analítico Político"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M6 16v-5M11 16V7M16 16v-8M21 16V4"/></svg><span>Analítico</span></a>
-    {% endif %}
-    {{ m.search_tool(archive_href) }}
+{{ m.ferramentas(brand, archive_href, analitico=(archive_href ~ "analitico.html") if analitico else "", analitico_titulo="Analítico Político: como a imprensa cobre a política", atual="congresso") }}
 {% endblock %}
 
 {% block styles %}

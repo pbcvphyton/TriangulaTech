@@ -1,0 +1,13 @@
+# DJEN na máquina do dono (Linux): às 8h17 e às 20h47 (hora local), com até 10 min de folga.
+# Persistent=true: com a máquina desligada na hora, roda assim que ela liga.
+[Unit]
+Description=Triangula: DJEN duas vezes por dia
+
+[Timer]
+OnCalendar=*-*-* 08:17:00
+OnCalendar=*-*-* 20:47:00
+RandomizedDelaySec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

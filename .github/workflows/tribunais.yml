@@ -1,0 +1,513 @@
+# Analítico dos Tribunais (aba Tribunais, edicoes/tribunais.html): baixa o que o STJ e o STF
+# publicam em dados abertos, refaz as contas e a aba (python -m qijournal tribunais atualizar) e
+# publica só data/tribunais/ e edicoes/tribunais.html, num commit próprio.
+#
+# Roda num fluxo à parte, fora do caminho da edição: o portal de dados abertos do STJ fica atrás de
+# um limite de taxa (Cloudflare: 403 intermitente, 10 s entre pedidos pelo robots.txt) e publica o
+# acervo do dia à tarde do dia seguinte e a ata do dia por volta das 19:30 (Brasília), enquanto a
+# edição roda de manhã; o DataJud do CNJ (ligado e publicado: datajud.publicar) vive sobrecarregado. A edição
+# diária não espera os Tribunais e nunca grava em data/tribunais/ nem em edicoes/tribunais.html
+# (exclusão no "Publicar" do daily.yml): cada pasta tem um escritor só, e por isso este fluxo tem
+# fila própria, não a da edição.
+#
+# O meta.json guarda, por fonte, a data que a fonte declara (data_dados), quando a coleta trouxe
+# os dados em uso e, no topo, proxima_execucao: antes dela nada novo é esperado, e a execução
+# termina em segundos (job "decidir"). Fonte que recusa, está fora do ar ou devolve resultado
+# parcial nunca sobrescreve o último dia bom: o comando grava fonte a fonte, avisa e sai 0; só erro
+# de programa sai diferente de 0 (a execução fica vermelha). Fonte que passa da validade
+# (velho_dias, no config) abre uma issue para o dono.
+# Réguas, fontes e prazos em config/tribunais.yaml. Desligar: variável QIJ_NO_TRIBUNAIS=1.
+name: Tribunais
+
+on:
+  workflow_run:
+    # Depois de cada execução da edição diária na main (a de hora em hora também): é o gatilho
+    # mais confiável deste repositório (os agendamentos do GitHub chegam com horas de atraso). O
+    # job "decidir" termina em segundos quando nada novo é esperado das fontes.
+    workflows: ["Edição diária"]
+    types: [completed]
+    branches: [main]
+  schedule:
+    # Reserva, uma vez por dia (22:41 em Brasília), para os Tribunais andarem mesmo num dia sem
+    # edição: a ata do dia (19:30) e o acervo da véspera (à tarde) já saíram. Também passa pelo
+    # "decidir".
+    - cron: "41 1 * * *"
+  workflow_dispatch:
+    inputs:
+      completo:
+        description: "Carga completa: refaz as séries (atas dos últimos 30 dias, íntegras disponíveis) e rebaixa a TPU do CNJ se a versão mudou"
+        type: boolean
+        default: false
+      so:
+        description: "Só um tribunal (ambos: STJ, depois STF)"
+        type: choice
+        options: [ambos, stj, stf]
+        default: ambos
+      ensaio:
+        description: "Ensaio: coleta e refaz a aba sem publicar nada (o resultado fica como artefato; roda mesmo com QIJ_NO_TRIBUNAIS)"
+        type: boolean
+        default: false
+      aceitar_acervo:
+        description: "Aceitar uma vez o acervo do dia fora da faixa da sanidade (mudança real de mais de 15%, conferida à mão; ver o README)"
+        type: choice
+        options: [nenhum, stj, stf]
+        default: nenhum
+
+# O job que publica pede o que precisa (contents, pages, issues); o "decidir" só lê.
+permissions:
+  contents: read
+
+jobs:
+  decidir:
+    # Sem fila e sem instalar nada: lê só data/tribunais/meta.json. Uma execução que não tem o que
+    # fazer não ocupa a fila do job "tribunais" (que só guarda uma execução à espera).
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      rodar: ${{ steps.decidir.outputs.rodar }}
+    steps:
+      - name: Baixar o registro das fontes
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: |
+            data/tribunais/meta.json
+            data/tribunais/djen.json
+          sparse-checkout-cone-mode: false
+
+      - name: Verificar se há o que fazer
+        id: decidir
+        env:
+          EVENT: ${{ github.event_name }}
+          QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
+          # Entrada do disparo manual (vazia nos outros eventos): passada por variável de
+          # ambiente, nunca interpolada direto no script.
+          INPUT_ENSAIO: ${{ inputs.ensaio }}
+        run: |
+          # Uma variável do repositório vale como "sim" do jeito que o Python a lê.
+          ativa() {
+            case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')" in
+              1|true|yes|sim|on) return 0 ;;
+            esac
+            return 1
+          }
+          agora=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          # proxima_execucao: gravada pelo Python a partir do calendário de cada fonte (instante UTC
+          # no mesmo formato de "agora": a comparação de texto vale como de data). Marca ilegível ou
+          # a mais de 36 h (erro no cálculo) não segura a coleta: confere assim mesmo.
+          proxima=$(python3 -c 'import json; print(json.load(open("data/tribunais/meta.json", encoding="utf-8")).get("proxima_execucao") or "")' 2>/dev/null || true)
+          if ! [[ "$proxima" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]]; then
+            proxima=""
+          fi
+          limite=$(date -u -d '+36 hours' +%Y-%m-%dT%H:%M:%SZ)
+          # O djen.json chega da máquina do dono (no Brasil), num commit próprio: mais novo que o
+          # registrado no meta.json (fontes.djen.coletado_em), a aba é refeita (sem pedido novo às
+          # fontes que não têm novidade).
+          djen_novo=$(python3 - <<'PY' 2>/dev/null || true
+          import json
+          try:
+              djen = json.load(open("data/tribunais/djen.json", encoding="utf-8")).get("gerado_em") or ""
+          except (OSError, ValueError):
+              djen = ""
+          try:
+              meta = (json.load(open("data/tribunais/meta.json", encoding="utf-8")).get("fontes") or {}).get("djen") or {}
+          except (OSError, ValueError):
+              meta = {}
+          print("sim" if djen and djen > str(meta.get("coletado_em") or "") else "")
+          PY
+          )
+          if [ "$EVENT" = "workflow_dispatch" ] && [ "$INPUT_ENSAIO" = "true" ]; then
+            msg="Ensaio pedido à mão: coleta e refaz a aba sem publicar (roda mesmo com QIJ_NO_TRIBUNAIS)."
+            rodar=true
+          elif ativa "$QIJ_NO_TRIBUNAIS"; then
+            msg="Tribunais desligados (QIJ_NO_TRIBUNAIS); nada a fazer."
+            rodar=false
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            msg="Disparo manual: atualizando (as fontes sem novidade só são conferidas)."
+            rodar=true
+          elif [ "$djen_novo" = "sim" ]; then
+            msg="DJe (DJEN) novo vindo da máquina do dono; refazendo a aba ($EVENT)."
+            rodar=true
+          elif [ -n "$proxima" ] && [[ "$proxima" > "$limite" ]]; then
+            echo "::warning::proxima_execucao ($proxima) está a mais de 36 h; conferindo as fontes assim mesmo."
+            msg="Marca de próxima execução longe demais ($proxima); conferindo as fontes ($EVENT)."
+            rodar=true
+          elif [ -n "$proxima" ] && [[ "$agora" < "$proxima" ]]; then
+            msg="Nada novo esperado nas fontes antes de $proxima (UTC); nada a fazer nesta execução ($EVENT)."
+            rodar=false
+          else
+            msg="Última marca: ${proxima:-nenhuma}; conferindo as fontes ($EVENT)."
+            rodar=true
+          fi
+          echo "$msg"
+          echo "$msg" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+          echo "rodar=$rodar" >> "$GITHUB_OUTPUT"
+
+  tribunais:
+    needs: decidir
+    if: needs.decidir.outputs.rodar == 'true'
+    # Fila própria, no job (e não no workflow), como a da leitura dos projetos: uma execução por
+    # vez, e as puladas pelo "if" não tomam o lugar de uma que espera. Não é a fila da edição
+    # (daily-edition-<ref>): uma carga longa aqui não atrasa a edição, e a edição à espera não
+    # cancela esta. Os dois fluxos escrevem em pastas diferentes (ver o "Publicar" do daily.yml).
+    concurrency:
+      group: tribunais-${{ github.ref }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # o commit de data/tribunais/ e da aba
+      pages: write # o pedido de build do GitHub Pages
+      issues: write # o aviso ao dono quando uma fonte passa da validade
+    # Dia a dia: o passo "Atualizar" tem 30 min; o resto é instalar, o cache e publicar. Carga
+    # completa (pedida à mão ou com o cache frio, como no primeiro dia na main): 75 min de coleta; o
+    # que não couber fica para as execuções seguintes (as atas e íntegras já baixadas ficam no cache
+    # e não são pedidas de novo). O job fica com 95 min sempre: o cache frio só se sabe no passo.
+    timeout-minutes: 95
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v5
+        with:
+          # Ponta da branch no início do job (não o SHA do evento): uma execução que esperou na
+          # fila parte do que a anterior publicou.
+          ref: ${{ github.ref_name }}
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Restaurar o cache dos Tribunais
+        # Fora do git: robots.txt de cada host, páginas dos conjuntos, as atas e íntegras do STJ já
+        # baixadas (cada arquivo diário tem endereço próprio e não muda: não é pedido de novo ao
+        # portal, que limita a taxa), a planilha do STF e o acervo do STJ do dia. Parte da entrada
+        # mais recente; a chave de cada entrada é o próprio conteúdo (ver "Preparar o cache").
+        id: restaurar
+        continue-on-error: true
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ runner.temp }}/tribunais
+          key: tribunais-${{ github.run_id }}
+          restore-keys: tribunais-
+
+      - name: Atualizar os Tribunais
+        # Fonte que recusa (403 do Cloudflare duas vezes), está fora do ar ou devolve resultado
+        # parcial vira aviso no Summary e no meta.json e o último dia bom fica; o comando sai 0. Só
+        # erro de programa (ou o tempo-limite deste passo) sai diferente de 0: o passo seguinte
+        # refaz a aba com o que ficou gravado e a execução fica vermelha no fim.
+        id: atualizar
+        continue-on-error: true
+        # Cache frio (nenhuma entrada restaurada): carga completa automática. Uma execução comum
+        # baixaria só 6 atas e 4 íntegras e trocaria o painel de 12 meses por um de uma semana.
+        timeout-minutes: ${{ (inputs.completo || steps.restaurar.outputs.cache-matched-key == '') && 75 || 30 }}
+        env:
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          # No ensaio a coleta roda mesmo com a aba desligada (nada é publicado); fora dele, o
+          # "decidir" já parou a execução desligada.
+          QIJ_NO_TRIBUNAIS: ${{ !inputs.ensaio && vars.QIJ_NO_TRIBUNAIS || '' }}
+          # O botão "Congresso" no cabeçalho da aba só aparece com o Congresso ligado.
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          # A chave pública do DataJud (a que o CNJ publica na wiki) está em config/tribunais.yaml;
+          # esta variável a troca sem mexer no código quando o CNJ a mudar. O DataJud só é consultado
+          # com datajud.ativo: true no config.
+          DATAJUD_API_KEY: ${{ vars.DATAJUD_API_KEY }}
+          # Entradas do disparo manual (vazias nos outros eventos): passadas por variável de
+          # ambiente, nunca interpoladas direto no script.
+          INPUT_COMPLETO: ${{ inputs.completo }}
+          INPUT_SO: ${{ inputs.so }}
+          INPUT_ACEITAR: ${{ inputs.aceitar_acervo }}
+          FRIO: ${{ steps.restaurar.outputs.cache-matched-key == '' }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: |
+          args=(--dir . --cache "$RUNNER_TEMP/tribunais")
+          if [ "$INPUT_COMPLETO" = "true" ]; then args+=(--completo); fi
+          if [ "$INPUT_COMPLETO" != "true" ] && [ "$FRIO" = "true" ]; then
+            echo "Cache frio (nenhuma entrada restaurada): carga completa."
+            args+=(--completo)
+          fi
+          case "$INPUT_SO" in
+            stj|stf) args+=(--so "$INPUT_SO") ;;
+          esac
+          case "$INPUT_ACEITAR" in
+            stj|stf) args+=(--aceitar-acervo "$INPUT_ACEITAR") ;;
+          esac
+          python -m qijournal tribunais atualizar "${args[@]}"
+
+      - name: Refazer a aba com o que ficou gravado
+        # Só quando a atualização não terminou: a aba é refeita, sem rede, a partir do que está em
+        # data/tribunais/, para a página e os dados publicados serem do mesmo momento.
+        id: pagina
+        if: ${{ !cancelled() && steps.atualizar.outcome != 'success' }}
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_TRIBUNAIS: ${{ !inputs.ensaio && vars.QIJ_NO_TRIBUNAIS || '' }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: python -m qijournal tribunais pagina --dir .
+
+      - name: Publicar (commit e push)
+        # Só a pasta dos Tribunais (com as remoções: o dossiê de quem saiu da composição) e a aba
+        # (nunca apagada: edições publicadas apontam para ela). Push recusado (a edição ou outro
+        # fluxo publicou no meio): o commit é reaplicado sobre o remoto, como o da leitura dos
+        # projetos, e o que os outros enviaram fica como está.
+        id: publish
+        if: ${{ !cancelled() && !inputs.ensaio && (steps.atualizar.outcome == 'success' || steps.pagina.outcome == 'success') }}
+        env:
+          TZ: America/Sao_Paulo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ ! -d data/tribunais ]; then
+            echo "Sem a pasta data/tribunais; nada a publicar."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Sobra de uma gravação interrompida (arquivo temporário): não vai ao repositório.
+          find data/tribunais -name '.*.tmp' -type f -delete
+          caminhos=(data/tribunais)
+          if [ -f edicoes/tribunais.html ]; then caminhos+=(edicoes/tribunais.html); fi
+          git add --all -- "${caminhos[@]}"
+          if git diff --cached --quiet; then
+            echo "Nenhuma mudança para publicar."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git commit --quiet -m "⚖️ Tribunais em $(date +%d/%m/%Y)"
+          for attempt in 1 2 3; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "changed=true" >> "$GITHUB_OUTPUT"
+              echo "Publicado: ${GITHUB_SERVER_URL:-}/${GITHUB_REPOSITORY:-}/commit/$(git rev-parse HEAD)" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then break; fi
+            echo "::notice::Push recusado (tentativa ${attempt}/3); reaplicando o commit dos Tribunais sobre o remoto."
+            sleep $((attempt * 5))
+            # O remoto andou: o commit (que só toca data/tribunais/ e a aba) é reaplicado sobre ele.
+            # Se outro mexeu nos mesmos arquivos, não há como juntar sem desfazer o que foi enviado:
+            # nada é publicado, e a próxima execução refaz tudo a partir do remoto.
+            git fetch --quiet origin "${GITHUB_REF_NAME}"
+            if ! git rebase --quiet --autostash FETCH_HEAD; then
+              git rebase --abort || true
+              echo "::warning::data/tribunais/ ou a aba mudaram no repositório durante a coleta; esta execução não publicou (a próxima refaz a partir do repositório)."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          echo "::error::Não foi possível enviar os dados dos Tribunais após 3 tentativas."
+          exit 1
+
+      - name: Pedir build do GitHub Pages
+        if: steps.publish.outputs.changed == 'true'
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages/builds"
+
+      - name: Conferir a validade das fontes
+        # Como os passos de coleta não deixam a execução vermelha quando uma fonte falha, quem
+        # avisa é isto: lê data/tribunais/meta.json e escreve o alerta quando uma fonte ligada passou
+        # da validade (velho_dias, contado da data que a própria fonte declara) ou nunca trouxe
+        # dados, ou quando o acervo trouxe relator que a composição do config não conhece. A
+        # primeira linha do alerta é a assinatura do problema (sem datas): o mesmo problema não
+        # gera um comentário por execução.
+        id: validade
+        if: ${{ !cancelled() && !inputs.ensaio }}
+        continue-on-error: true
+        env:
+          TZ: America/Sao_Paulo
+        run: |
+          python3 - "$(date +%F)" "$RUNNER_TEMP/tribunais-alerta.txt" <<'PY'
+          import json
+          import os
+          import sys
+          from datetime import date
+
+          hoje, saida = date.fromisoformat(sys.argv[1]), sys.argv[2]
+
+
+          def br(d):
+              return f"{d[8:10]}/{d[5:7]}/{d[:4]}"
+
+
+          # A data da TPU é a da versão que o CNJ publicou (sai a cada poucos meses): versão velha não
+          # é dado parado. Ela só alerta quando nunca foi lida.
+          SO_SEM_DADOS = {"tpu"}
+          problemas = []  # (assinatura, linha)
+          try:
+              with open("data/tribunais/meta.json", encoding="utf-8") as f:
+                  meta = json.load(f)
+          except (OSError, ValueError) as exc:
+              meta = None
+              problemas.append(("meta", f"- data/tribunais/meta.json ausente ou ilegível ({type(exc).__name__}): a coleta não gravou nada."))
+          if meta is not None:
+              for fid, fonte in sorted((meta.get("fontes") or {}).items()):
+                  if not isinstance(fonte, dict) or fonte.get("ok") is None:
+                      continue  # fonte desligada (o DataJud com datajud.ativo: false; o DJEN antes da primeira coleta)
+                  nome, aviso = fonte.get("nome") or fid, fonte.get("aviso") or ""
+                  dados, limite = fonte.get("data_dados"), fonte.get("velho_dias")
+                  if not dados:
+                      problemas.append((f"{fid}:sem_dados", f"- {nome}: nenhum dado coletado até hoje. {aviso}".rstrip()))
+                      continue
+                  try:
+                      de = date.fromisoformat(str(dados)[:10])
+                      dias = (hoje - de).days
+                  except ValueError:
+                      problemas.append((f"{fid}:data", f"- {nome}: data dos dados ilegível ({dados!r})."))
+                      continue
+                  # O acervo do STJ não sai no fim de semana: a validade dele conta de segunda a sexta.
+                  idade = sum(1 for i in range(1, dias + 1) if date.fromordinal(de.toordinal() + i).weekday() < 5) if fonte.get("dias_da_semana") else dias
+                  if isinstance(limite, int) and idade > limite and fid not in SO_SEM_DADOS:
+                      problemas.append((f"{fid}:velho", f"- {nome}: dados de {br(str(dados))}, há {dias} dias (validade: {limite} dias{' de segunda a sexta' if fonte.get('dias_da_semana') else ''}). {aviso}".rstrip()))
+              for trib, cob in sorted((meta.get("cobertura") or {}).items()):
+                  fora = [par for par in (cob or {}).get("relatores_fora_do_mapa") or [] if isinstance(par, list) and len(par) == 2]
+                  if fora:
+                      nomes = ", ".join(f"{n} ({q} processos)" for n, q in fora)
+                      problemas.append((f"{trib}:relatores:" + "|".join(sorted(str(n) for n, _ in fora)),
+                                        f"- {trib.upper()}: relator fora da composição de config/tribunais.yaml (composicao.{trib}): {nomes}. Os processos dele contam como resíduo até a composição ser atualizada."))
+          resumo = os.environ.get("GITHUB_STEP_SUMMARY")
+          if problemas:
+              texto = "\n".join([
+                  "<!-- tribunais-alerta: " + ";".join(a for a, _ in problemas) + " -->",
+                  f"Tribunais, conferência de {hoje.strftime('%d/%m/%Y')}: {len(problemas)} problema(s).",
+                  "",
+                  *[linha for _, linha in problemas],
+                  "",
+                  "A aba continua no ar com o último dado bom de cada fonte e diz de quando ele é.",
+              ])
+              with open(saida, "w", encoding="utf-8") as f:
+                  f.write(texto + "\n")
+              print(texto)
+          else:
+              texto = "Todas as fontes ligadas dos Tribunais estão dentro da validade."
+              print(texto)
+          if resumo:
+              with open(resumo, "a", encoding="utf-8") as f:
+                  f.write("\n### Validade das fontes\n\n" + texto.split(" -->\n", 1)[-1] + "\n")
+          PY
+
+      - name: Avisar o dono (issue)
+        # O GitHub manda e-mail ao dono a cada issue e comentário. O mesmo problema (a mesma
+        # assinatura) não é comentado de novo a cada execução. (hashFiles não enxerga o
+        # RUNNER_TEMP: a conferência fica no script.)
+        if: ${{ !cancelled() && !inputs.ensaio && steps.validade.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          alerta="$RUNNER_TEMP/tribunais-alerta.txt"
+          [ -s "$alerta" ] || exit 0
+          title="Tribunais: dados parados ou fonte recusada"
+          assinatura=$(head -n 1 "$alerta")
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          body="$(cat "$alerta")
+
+          O que fazer: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/README.md#tribunais-quando-algo-dá-errado
+          Execução: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [ -n "$number" ]; then
+            ultimo=$(gh issue view "$number" --repo "$GITHUB_REPOSITORY" --json body,comments --jq '([.body] + [.comments[].body]) | last')
+            if [ "$(printf '%s\n' "$ultimo" | head -n 1)" = "$assinatura" ]; then
+              echo "A issue #$number já registra este problema; nada a comentar."
+              exit 0
+            fi
+            gh issue comment "$number" --repo "$GITHUB_REPOSITORY" --body "$body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body" --assignee "$GITHUB_REPOSITORY_OWNER" \
+              || gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body "$body"
+          fi
+
+      - name: Fechar o aviso resolvido
+        if: ${{ !cancelled() && !inputs.ensaio && steps.validade.outcome == 'success' && steps.atualizar.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          [ -s "$RUNNER_TEMP/tribunais-alerta.txt" ] && exit 0
+          title="Tribunais: dados parados ou fonte recusada"
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue close "$number" --repo "$GITHUB_REPOSITORY" --comment "Resolvido: as fontes ligadas dos Tribunais voltaram a ficar dentro da validade."
+          fi
+
+      - name: Guardar o ensaio
+        if: ${{ !cancelled() && inputs.ensaio }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: tribunais-ensaio-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            data/tribunais/
+            edicoes/tribunais.html
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Guardar o diário da coleta
+        # Uma linha por pedido (host, caminho, status, segundos, bytes, tentativa), gravada pelo
+        # comando em <cache>/diario/: é o que mostra, semana a semana, quanto cada fonte recusa.
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: tribunais-diario-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/tribunais/diario/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Preparar o cache
+        # O teto de cache do repositório (10 GB) é dividido com o Congresso (~1,5 GB por entrada).
+        # Fica fora: o diário (já é artefato) e sobra de download. O acervo do STJ de outro dia (82 MB)
+        # já saiu no próprio comando, pela referência: fica o que algum estado cita (o acervo em uso,
+        # de sexta a terça, e o socorro de cada fonte) e o que esta execução usou. A chave é o conteúdo
+        # (caminho e tamanho de cada arquivo, menos robots.txt e páginas, relidos a cada execução):
+        # sem nada novo, nenhuma entrada nova.
+        id: preparar
+        if: always()
+        continue-on-error: true
+        env:
+          RESTAURADO: ${{ steps.restaurar.outputs.cache-matched-key }}
+        run: |
+          dir="$RUNNER_TEMP/tribunais"
+          if [ ! -d "$dir" ]; then
+            echo "Nada no cache dos Tribunais."
+            echo "guardar=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          rm -rf "$dir/diario"
+          find "$dir" -type f -name '.*.tmp' -delete
+          resumo=$(cd "$dir" && find . -type f ! -path './robots/*' ! -path './paginas/*' -printf '%P %s\n' | LC_ALL=C sort | sha256sum | cut -c1-16)
+          chave="tribunais-$(date -u +%F)-$resumo"
+          echo "Cache dos Tribunais: $(du -sm "$dir" | cut -f1) MB; chave $chave (restaurada: ${RESTAURADO:-nenhuma})."
+          echo "chave=$chave" >> "$GITHUB_OUTPUT"
+          if [ -n "$RESTAURADO" ] && [ "${RESTAURADO##*-}" = "$resumo" ]; then
+            echo "Nada novo no cache: a entrada restaurada continua valendo."
+            echo "guardar=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "guardar=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Guardar o cache
+        if: always() && steps.preparar.outputs.guardar == 'true'
+        continue-on-error: true
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ runner.temp }}/tribunais
+          key: ${{ steps.preparar.outputs.chave }}
+
+      - name: Resultado
+        # Fonte fora do ar não deixa a execução vermelha (quem avisa é a issue); erro de programa,
+        # sim: o comando só sai diferente de 0 nesse caso (ou quando o passo estoura o tempo).
+        if: ${{ !cancelled() && steps.atualizar.outcome != 'success' }}
+        run: |
+          echo "::error::A atualização dos Tribunais não terminou (erro de programa ou tempo-limite); veja o passo \"Atualizar os Tribunais\". O que estava gravado em data/tribunais/ foi mantido e a aba, refeita a partir dele."
+          exit 1

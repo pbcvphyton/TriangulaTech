@@ -81,3 +81,62 @@ def test_complete_body_is_returned() -> None:
         assert response.content == b"<rss>ok</rss>" and server.requests == 1
     finally:
         server.close()
+
+
+class EchoServer:
+    """Servidor HTTP que devolve o método, o caminho, o Content-Type e o corpo recebidos (em JSON)."""
+
+    def __init__(self) -> None:
+        import http.server
+        import json
+
+        dono = self
+
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def _responder(self) -> None:
+                tamanho = int(self.headers.get("Content-Length") or 0)
+                corpo = self.rfile.read(tamanho) if tamanho else b""
+                dono.pedidos.append((self.command, self.path, corpo))
+                saida = json.dumps(
+                    {"metodo": self.command, "caminho": self.path, "tipo": self.headers.get("Content-Type"),
+                     "corpo": corpo.decode("utf-8")}
+                ).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(saida)))
+                self.end_headers()
+                self.wfile.write(saida)
+
+            do_GET = do_POST = _responder
+
+            def log_message(self, *args: object) -> None:  # silencioso nos testes
+                pass
+
+        self.pedidos: list[tuple[str, str, bytes]] = []
+        self.httpd = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+        self.port = self.httpd.server_address[1]
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        self.thread.start()
+
+    def close(self) -> None:
+        self.httpd.shutdown()
+        self.httpd.server_close()
+
+    @property
+    def url(self) -> str:
+        return f"http://127.0.0.1:{self.port}/api/search"
+
+
+def test_post_manda_o_corpo_e_o_get_continua_get() -> None:
+    server = EchoServer()
+    try:
+        corpo = b'{"query":{"match_all":{}},"size":0}'
+        resp = net.fetch(server.url, data=corpo, headers={"Content-Type": "application/json"}, retries=0)
+        assert resp.json() == {"metodo": "POST", "caminho": "/api/search", "tipo": "application/json",
+                               "corpo": corpo.decode()}
+        assert net.fetch(server.url, retries=0).json()["metodo"] == "GET"  # sem data: o GET de sempre
+        forcado = net.fetch(server.url, data=b"x=1", method="POST", retries=0).json()
+        assert forcado["metodo"] == "POST" and forcado["corpo"] == "x=1"
+        assert [p[0] for p in server.pedidos] == ["POST", "GET", "POST"]
+    finally:
+        server.close()

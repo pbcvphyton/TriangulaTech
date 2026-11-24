@@ -1,0 +1,52 @@
+# STJ BLOQUEIOS GERAIS PARA TODOS OS ROBÔS Rev 20250501
+ 
+User-agent: *              # Aplica as regras a todos os bots (Googlebot, Bingbot, etc.) bloqueando acesso em:
+Disallow: /
+Disallow: /processo/        
+Disallow: /processo/pesquisa/  
+Disallow: /SCON/           
+Disallow: /repetitivos      
+Disallow: /processo/dj/edital/  
+Disallow: /portal_stj/teste/    
+Disallow: /grucobranca/    
+ 
+# BLOQUEIO TOTAL PARA CRAWLERS DE SEO E BOTS AGRESSIVOS
+ 
+User-agent: AhrefsBot      # Bot da ferramenta Ahrefs (SEO e backlinks)
+Disallow: /
+ 
+User-agent: SemrushBot     # Bot da Semrush (SEO/marketing digital)
+Disallow: /
+ 
+User-agent: MJ12bot        # Bot da Majestic SEO
+Disallow: /
+ 
+User-agent: DotBot         # Bot da Moz (SEO)
+Disallow: /
+ 
+User-agent: BLEXBot        # Crawler de big data (frequentemente agressivo)
+Disallow: /
+ 
+User-agent: YandexBot      # Bot do buscador russo Yandex
+Disallow: /
+ 
+User-agent: BaiduSpider    # Bot do buscador chinês Baidu
+Disallow: /
+ 
+User-agent: PetalBot       # Bot da Huawei
+Disallow: /
+ 
+User-agent: Sogou Spider   # Bot de outro buscador chinês
+Disallow: /
+ 
+User-agent: SEOkicks-Robot # Crawler de backlinks
+Disallow: /
+ 
+User-agent: DataForSeoBot  # Bot comercial de SEO
+Disallow: /
+ 
+User-agent: spbot          # Bot da SimilarWeb (coleta dados de tráfego)
+Disallow: /
+ 
+User-agent: Exabot         # Crawler francês (pouco usado, mas ativo)
+Disallow: /

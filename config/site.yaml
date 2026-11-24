@@ -3,7 +3,7 @@
 #
 # Várias chaves podem ser sobrescritas por variáveis de ambiente
 # (útil no GitHub Actions): QIJ_BRAND, QIJ_BASE_URL, QIJ_MODEL, QIJ_EFFORT, QIJ_NO_TERMOMETRO=1,
-# QIJ_NO_LLM=1, EMAIL_TO (lista separada por vírgulas).
+# QIJ_NO_LLM=1, QIJ_NO_TRIBUNAIS=1, EMAIL_TO (lista separada por vírgulas).
 
 site:
   base_url: "https://pbcvphyton.github.io/TriangulaTech/"
@@ -269,6 +269,16 @@ congresso:
   projetos_desde: 2011        # proposições da Câmara acompanhadas a partir deste ano
   noticias_dias: 60           # edições do jornal lidas atrás dos nomes dos parlamentares
   fichas_por_materia: 4       # parlamentares citados mostrados em cada matéria
+
+# Analítico dos Tribunais (qijournal/tribunais): a aba "Tribunais" (edicoes/tribunais.html), que
+# mostra que ministro do STF e do STJ está com o quê, há quanto tempo, de que área e quem se repete.
+# Os dados vêm dos dados abertos dos próprios tribunais (STJ: Portal de Dados Abertos, CC-BY; STF:
+# acervo, atas, jurisprudência e repercussão geral), num fluxo próprio (.github/workflows/tribunais.yml,
+# `python -m qijournal tribunais atualizar`), e ficam em data/tribunais/. As réguas (áreas, composição,
+# limiares, fontes) estão em config/tribunais.yaml. Desligar sem mexer no código: QIJ_NO_TRIBUNAIS=1.
+tribunais:
+  enabled: true
+  marcas: [tech]
 
 # Instagram (qijournal/instagram, workflow instagram.yml): imagens e legendas
 # geradas da edição do dia e publicadas pela API oficial. Horários em Brasília;

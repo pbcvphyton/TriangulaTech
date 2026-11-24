@@ -1,0 +1,73 @@
+{
+ "meta": {
+  "fonte": "Estrutura copiada de amostra real capturada por terceiros (projeto juscraper, licenca MIT, tests/comunica_cnj/samples/listar_comunicacoes/single_page.json, commit 871d1413 de 17/11/2026) - NAO capturada por nos: a API comunicaapi.pje.jus.br responde 403 (CloudFront geo-block) fora do Brasil.",
+  "endpoint": "GET https://comunicaapi.pje.jus.br/api/v1/comunicacao?pagina=1&itensPorPagina=100&texto=...&numeroProcesso=<20 digitos>&dataDisponibilizacaoInicio=AAAA-MM-DD&dataDisponibilizacaoFim=AAAA-MM-DD (outros filtros possiveis nao confirmados: siglaTribunal, nomeAdvogado, numeroOab, ufOab, nomeParte)",
+  "envelope": {
+   "status": "success",
+   "message": "Sucesso",
+   "count": "int total",
+   "items": "lista"
+  },
+  "anonimizado": true,
+  "mascarado_aqui": "número do processo trocado (o segmento do tribunal ficou); nomes já vinham anonimizados"
+ },
+ "exemplo_item": {
+  "id": 87016305,
+  "data_disponibilizacao": "2024-06-03",
+  "siglaTribunal": "TJRO",
+  "tipoComunicacao": "Intimação",
+  "nomeOrgao": "Cacoal - 3ª Vara Cível",
+  "idOrgao": 882,
+  "texto": "[texto HTML integral da publicacao; truncado/anonimizado nesta amostra]",
+  "numero_processo": "00000010020238220007",
+  "meio": "D",
+  "link": "https://<sistema-do-tribunal>/...documento...",
+  "tipoDocumento": "Sentença",
+  "nomeClasse": "PROCEDIMENTO COMUM CíVEL",
+  "codigoClasse": "7",
+  "numeroComunicacao": 130,
+  "ativo": true,
+  "hash": "<hash>",
+  "status": "P",
+  "motivo_cancelamento": null,
+  "data_cancelamento": null,
+  "datadisponibilizacao": "03/06/2024",
+  "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+  "numeroprocessocommascara": "0000001-00.2023.8.22.0007",
+  "destinatarios": [
+   {
+    "comunicacao_id": 87016305,
+    "nome": "PARTE 1 (anonimizado)",
+    "polo": "A"
+   }
+  ],
+  "destinatarioadvogados": [
+   {
+    "id": 149290221,
+    "comunicacao_id": 87016305,
+    "advogado_id": 253288,
+    "created_at": "2024-05-31T08:56:49",
+    "updated_at": "2024-05-31T08:56:49",
+    "advogado": {
+     "id": 253288,
+     "nome": "ADVOGADO 1 (anonimizado)",
+     "numero_oab": "000000",
+     "uf_oab": "MT"
+    }
+   },
+   {
+    "id": 149290222,
+    "comunicacao_id": 87016305,
+    "advogado_id": 1054747,
+    "created_at": "2024-05-31T08:56:49",
+    "updated_at": "2024-05-31T08:56:49",
+    "advogado": {
+     "id": 1054747,
+     "nome": "ADVOGADO 2 (anonimizado)",
+     "numero_oab": "000000",
+     "uf_oab": "RO"
+    }
+   }
+  ]
+ }
+}

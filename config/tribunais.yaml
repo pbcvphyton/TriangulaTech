@@ -1,0 +1,695 @@
+# Analítico dos Tribunais (aba "Tribunais", edicoes/tribunais.html): as réguas das contas.
+#
+# Tudo o que está aqui é escolha editorial ou registro oficial copiado à mão, e vai escrito no
+# "Como ler" da página (o meta.json leva uma cópia das réguas usadas em cada atualização).
+# Lido por qijournal/tribunais/modelo.py (carregar_regras); chave desconhecida é ignorada,
+# chave obrigatória ausente derruba a leitura com o caminho do erro.
+#
+# Seções: areas (macroáreas, cores e regras), subareas, recortes, composicao (quem é quem no STJ
+# e no STF), limiares (as réguas das contas), fontes (endereços e ritmo), datajud (ligado e publicado).
+
+versao: 1
+
+# ── Macroáreas ───────────────────────────────────────────────────────────────────────────────
+# Uma área por processo; as áreas somam 100% do acervo. A ordem desta lista é a ordem da legenda,
+# das colunas da matriz ministro × área e das partes da "impressão digital" de cada gabinete.
+#
+# Como um processo cai numa área (o analista jurídico decide; a régua usa sempre o CÓDIGO da
+# Tabela Processual Unificada do CNJ, nunca o texto do ramo, que vem fora do padrão nas fontes):
+#   1. a CLASSE vale antes do assunto (classes: HC, RHC... → penal; ADI, ADC... → constitucional),
+#      salvo quando ela cede ao mérito (cede_ao_merito): o HC e o RHC cujo assunto de mérito é de
+#      Família ou de Saúde (prisão civil por alimentos, guarda, acolhimento institucional,
+#      internação compulsória: CPC, art. 528, §3º) ficam na área do assunto, não em Penal;
+#   2. depois o NÓ MAIS ESPECÍFICO listado na árvore do assunto principal (nos: Família 5626 vence
+#      a raiz Civil 899; Infância, Seção Cível 9964, vence a raiz da Criança e do Adolescente 9633);
+#   3. depois a RAIZ da árvore (raizes);
+#   4. assunto principal só processual (raiz 8826): vale o primeiro assunto de mérito da lista, na
+#      ordem do tribunal; sem nenhum, a área é "Só processual", à mostra;
+#   5. sem código válido: "Sem assunto". Código fora de toda regra: "Outros".
+# Códigos com o prefixo 9 na lista do STJ ("910288") valem pelo código sem o 9 quando o código
+# inteiro não existe na TPU. No STF os assuntos vêm em texto: o caminho é casado com a árvore da
+# TPU pelo nome (ver tpu.py); sem casamento, vale o ramo do direito (a raiz) pelo nome.
+#
+# Cores: a paleta do designer (designer.md §3), as 13 cores dos temas do Congresso atribuídas por
+# sentido, mais uma para Previdência (o designer juntava Trabalho e Previdência; o brief as separa).
+# A 14ª cor (#874e87 / #a84d95, ameixa) foi escolhida por busca com o validador da skill dataviz
+# (scratchpad/fundacao/cor14.mjs), entre Trabalho e Ambiental:
+#   claro — CVD pior vizinha ΔE 11,7 (consumidor↔processual, protan; a nova: 13,7 com Trabalho),
+#           visão normal pior vizinha 16,6 (administrativo↔tributário; a nova: 19,9), croma ≥ 0,10,
+#           marca ≥ 3:1 contra #ffffff, #f8f9fb e #fffdf8 (a nova: 6,05 · 5,75 · 5,95), texto #fff 6,05:1;
+#   escuro — CVD pior vizinha 11,2 (a nova com Trabalho, protan), normal 16,2, marca ≥ 3:1 contra
+#           #111827, #131c2d e #262522 (a nova: 3,51 · 3,38 · 3,04), texto #fff 5,05:1.
+# Só vizinhas foram testadas: a cor nunca vai sozinha (o nome da área vai sempre escrito).
+# "cor": [claro, escuro]; "texto": a cor do texto sobre a área (a mesma nos dois modos).
+areas:
+  - id: constitucional
+    nome: "Constitucional (controle concentrado)"
+    nome_curto: "Constitucional"
+    cor: ["#901557", "#b25874"]
+    texto: "#fff"
+    classes: [ADI, ADC, ADO, ADPF]   # só pela classe: o assunto da ação aparece como "sobre:"
+  - id: tributario
+    nome: "Tributário"
+    nome_curto: "Tributário"
+    cor: ["#a28a30", "#a3933f"]
+    texto: "#0b0f17"
+    raizes: [14]
+  - id: administrativo
+    nome: "Administrativo e servidores"
+    nome_curto: "Administrativo"
+    cor: ["#009896", "#08aaa8"]
+    texto: "#0b0f17"
+    raizes: [9985, 12775]            # Administrativo e outras matérias de direito público; Direito à Educação
+    nos: [6197, 6192, 6202]          # Estrangeiro, Nacionalidade, Direitos humanos (sob Internacional)
+  - id: saude
+    nome: "Saúde"
+    nome_curto: "Saúde"
+    cor: ["#bd022f", "#d92141"]
+    texto: "#fff"
+    raizes: [12480]                  # Suplementar 12482 = planos; Pública 12481 = SUS
+  - id: trabalho
+    nome: "Trabalho"
+    nome_curto: "Trabalho"
+    cor: ["#176aea", "#0d77d6"]
+    texto: "#fff"
+    raizes: [864]                    # no STJ, só conflito de competência; no STF, o ARE vindo do TST
+  - id: previdenciario
+    nome: "Previdência e assistência"
+    nome_curto: "Previdência"
+    cor: ["#874e87", "#a84d95"]
+    texto: "#fff"
+    raizes: [195, 12734]
+  - id: ambiental
+    nome: "Ambiental"
+    nome_curto: "Ambiental"
+    cor: ["#298d41", "#40a763"]
+    texto: "#0b0f17"
+    raizes: [10110]                  # o crime ambiental (3618) fica em Penal
+  - id: eleitoral
+    nome: "Eleitoral"
+    nome_curto: "Eleitoral"
+    cor: ["#2397de", "#459ad8"]
+    texto: "#0b0f17"
+    raizes: [11428, 10739]
+  - id: civil
+    nome: "Civil (contratos, bens, responsabilidade)"
+    nome_curto: "Civil"
+    cor: ["#de6a0b", "#d77b04"]
+    texto: "#0b0f17"
+    raizes: [899, 7724, 1146, 6191]  # Civil, Registros Públicos, Marítimo, Internacional (menos os nós listados em outras áreas)
+  - id: familia
+    nome: "Família e sucessões"
+    nome_curto: "Família"
+    cor: ["#ad67b8", "#b865b7"]
+    texto: "#0b0f17"
+    nos: [5626, 7673, 9964, 6216, 6214]  # Família, Sucessões, Infância (Seção Cível), alimentos e divórcio internacionais
+  - id: empresarial
+    nome: "Empresarial e falência"
+    nome_curto: "Empresarial"
+    cor: ["#864c0a", "#a95a03"]
+    texto: "#fff"
+    nos: [9616, 9981]                # Empresas (recuperação judicial e falência, sociedades, mercado de capitais); Pessoas Jurídicas
+  - id: processual
+    nome: "Só processual"
+    nome_curto: "Só processual"
+    cor: ["#7956d3", "#895bbb"]
+    texto: "#fff"
+    raizes: [8826]
+    residual: true                   # só quando nenhum assunto da lista é de mérito
+  - id: consumidor
+    nome: "Consumidor"
+    nome_curto: "Consumidor"
+    cor: ["#e64d9d", "#de658e"]
+    texto: "#0b0f17"
+    raizes: [1156]
+  - id: penal
+    nome: "Penal e processo penal"
+    nome_curto: "Penal"
+    cor: ["#4743a8", "#6162f4"]
+    texto: "#fff"
+    raizes: [287, 1209, 11068, 11049, 9633]  # Penal, Processual Penal, militares, Criança e Adolescente
+    nos: [9634, 10688]               # Ato infracional, Medidas socioeducativas
+    classes: [HC, RHC, APn, AP, Inq, RvCr, RvC]  # STJ: APn e RvCr; STF: AP e RvC
+    # O HC e o RHC da Segunda Seção são quase todos de prisão civil do devedor de alimentos, guarda,
+    # acolhimento ou internação compulsória (STJ, 20/11/2026: 216 nas Turmas 3 e 4, 169 de alimentos):
+    # com o mérito em Família ou Saúde, a área é a do mérito.
+    cede_ao_merito: {classes: [HC, RHC], areas: [familia, saude]}
+  - id: outros
+    nome: "Outros"
+    nome_curto: "Outros"
+    cor: ["#7b8494", "#8d95a3"]
+    texto: "#0b0f17"
+    raizes: [12467]                  # Questões de alta complexidade (Covid, Brumadinho...); e todo código fora das regras
+    residual: true
+  - id: sem_assunto
+    nome: "Sem assunto"
+    nome_curto: "Sem assunto"
+    cor: null                        # hachura em --muted (designer.md §3)
+    texto: null
+    residual: true                   # a fonte não informou código válido
+
+# ── Subáreas ("no detalhe") ──────────────────────────────────────────────────────────────────
+# Dentro da área do processo, o nó listado mais específico da árvore do assunto principal. O que
+# não casar fica em "<área>.outros" ("Outros de <área>"). Lista curada do analista (§3.3), com as
+# contagens do STJ em 20/11/2026 no comentário.
+subareas:
+  penal:
+    - {id: penal.drogas, nome: "Drogas", codigos: [3607]}                                   # 21.210
+    - {id: penal.patrimonio, nome: "Patrimônio", codigos: [3415]}                           # 13.571
+    - {id: penal.vida, nome: "Vida", codigos: [3369]}                                       # 9.785
+    - {id: penal.dignidade_sexual, nome: "Dignidade sexual", codigos: [3463]}               # 8.412
+    - {id: penal.execucao, nome: "Execução penal", codigos: [7942]}                         # 7.115
+    - {id: penal.prisao, nome: "Prisão e liberdade", codigos: [4355, 10632, 7929, 10904, 7928]}  # ~2.380
+    - {id: penal.violencia_domestica, nome: "Violência doméstica", codigos: [10949, 14226]}  # ~1.100
+    - {id: penal.armas, nome: "Armas", codigos: [3633]}                                     # 1.796
+    - {id: penal.orcrim_lavagem, nome: "Organização criminosa e lavagem", codigos: [12333, 3628]}  # ~2.980
+    - {id: penal.administracao, nome: "Crimes contra a administração", codigos: [5872, 3547, 5874]}  # ~2.730
+  civil:
+    - {id: civil.bancario, nome: "Bancário e crédito", codigos: [9607, 4960, 9582, 7717]}  # 22.505
+    - {id: civil.contratos, nome: "Contratos e obrigações", codigos: [7681]}                # 47.712 (sem os nós de Bancário)
+    - {id: civil.responsabilidade, nome: "Responsabilidade civil", codigos: [10431]}        # 15.438
+    - {id: civil.posse_propriedade, nome: "Posse, propriedade e condomínio", codigos: [10432]}  # 16.754
+    - {id: civil.atos_negocios, nome: "Atos e negócios jurídicos", codigos: [7947]}         # 3.790
+  administrativo:
+    - {id: administrativo.servidores, nome: "Servidores civis", codigos: [10219]}           # 23.687
+    - {id: administrativo.militares, nome: "Militares", codigos: [10324]}                   # 5.191
+    - {id: administrativo.improbidade, nome: "Improbidade", codigos: [10011]}               # 4.090
+    - {id: administrativo.responsabilidade_estado, nome: "Responsabilidade do Estado", codigos: [9991]}  # 3.635
+    - {id: administrativo.contratos_licitacoes, nome: "Contratos e licitações", codigos: [10421, 10385]}  # 2.814
+    - {id: administrativo.concurso, nome: "Concurso público", codigos: [10370]}             # 1.879
+    - {id: administrativo.desapropriacao, nome: "Desapropriação e intervenção", codigos: [10120]}  # 1.951
+    - {id: administrativo.multas, nome: "Multas e infrações", codigos: [10022]}             # 2.072
+    - {id: administrativo.divida_ativa, nome: "Dívida ativa não tributária", codigos: [10394]}  # 1.868
+  tributario:
+    - {id: tributario.icms, nome: "ICMS", codigos: [5946]}                                  # 4.057
+    - {id: tributario.imposto_renda, nome: "Imposto de renda", codigos: [5933, 5917]}       # 2.906
+    - {id: tributario.contribuicoes, nome: "PIS, Cofins e contribuições", codigos: [6031]}  # 6.101
+    - {id: tributario.iss, nome: "ISS", codigos: [5951]}                                    # 1.443
+    - {id: tributario.iptu, nome: "IPTU", codigos: [5952]}                                  # 1.574
+    - {id: tributario.execucao_fiscal, nome: "Execução fiscal", codigos: [6017]}            # 5.090
+    - {id: tributario.credito, nome: "Crédito tributário", codigos: [5986]}                 # 2.175
+  consumidor:
+    - {id: consumidor.contratos, nome: "Contratos de consumo", codigos: [7771]}             # 14.862
+    - {id: consumidor.responsabilidade, nome: "Responsabilidade do fornecedor", codigos: [6220]}  # 9.377
+    - {id: consumidor.superendividamento, nome: "Superendividamento", codigos: [15048]}     # 475
+  familia:
+    - {id: familia.casamento, nome: "Casamento e divórcio", codigos: [5808]}                # 3.757
+    - {id: familia.alimentos, nome: "Alimentos", codigos: [5779]}                           # 2.815
+    - {id: familia.uniao_estavel, nome: "União estável", codigos: [7656]}                   # 1.826
+    - {id: familia.parentesco, nome: "Filiação e parentesco", codigos: [10577]}             # 1.231
+    - {id: familia.inventario, nome: "Inventário e partilha", codigos: [7687]}              # 2.113
+  saude:
+    - {id: saude.planos, nome: "Planos de saúde", codigos: [12482]}                         # 9.176
+    - {id: saude.sus, nome: "SUS e medicamentos", codigos: [12481]}                         # 2.210
+  empresarial:
+    - {id: empresarial.recuperacao_falencia, nome: "Recuperação judicial e falência", codigos: [4993]}  # 4.862
+    - {id: empresarial.sociedades, nome: "Sociedades", codigos: [5724, 9617]}               # 3.601
+  previdenciario:
+    - {id: previdenciario.beneficios, nome: "Benefícios", codigos: [6094]}                  # 6.205
+    - {id: previdenciario.revisoes, nome: "Revisões", codigos: [6119]}                      # 809
+
+# ── Recortes transversais ────────────────────────────────────────────────────────────────────
+# Não mudam a área: cada um tem a sua conta. Um processo entra no recorte quando o assunto que
+# decidiu a área (o principal; ou o primeiro de mérito da lista, quando o principal é só processual)
+# está sob um dos códigos: é a conta do analista (Bancário e crédito, 30.982 no STJ em 20/11/2026).
+# Com limiares.recortes_por: todos, vale qualquer assunto do processo (Bancário: 33.483).
+recortes:
+  - {id: bancario, nome: "Bancário e crédito", codigos: [9607, 4960, 9582, 7717, 7752, 7772, 15048],
+     porque: "os bancos são os litigantes privados que mais se repetem; atravessa Civil e Consumidor"}
+  - {id: planos_saude, nome: "Planos de saúde", codigos: [12482, 7775], porque: "assunto de interesse público; Segunda Seção"}
+  - {id: dano_moral, nome: "Dano moral", codigos: [10433, 7779, 9992], porque: "atravessa Civil, Consumidor e Administrativo"}
+  - {id: execucao_fiscal, nome: "Execução fiscal", codigos: [6017, 10394], porque: "dinheiro público direto"}
+  - {id: recuperacao_falencia, nome: "Recuperação judicial e falência", codigos: [4993], porque: "economia"}
+  - {id: drogas, nome: "Drogas", codigos: [3607], porque: "a maior subárea penal"}
+  - {id: improbidade, nome: "Improbidade", codigos: [10011], porque: "interesse político"}
+# Os recortes econômicos da vista "Quanto vale" (as fontes abertas não publicam valor da causa).
+recortes_economicos: [execucao_fiscal, recuperacao_falencia, bancario, planos_saude]
+
+# ── Composição ───────────────────────────────────────────────────────────────────────────────
+# Quem é quem. STJ: o PDF oficial "Composição – 18/11/2026" (Assessoria para Assuntos Funcionais de
+# Magistrados). STF: páginas "Composição Atual" (18/10/2025) e "Turmas" (06/08/2026) do portal,
+# conferidas com o totalizador das atas de 19 e 20/11/2026 e com a lista da pesquisa de
+# jurisprudência. Um teste quebra quando o acervo do dia traz relator fora deste mapa.
+#
+# Campos: id (<tribunal>-<slug>, endereço do dossiê), nome (como a página mostra), nome_completo,
+# genero (f/m: "a ministra", "o ministro"), turma e secao (STJ: T1..T6, S1..S3; STF: T1, T2),
+# corte_especial (STJ), cargos (presidente, vice_presidente, corregedor_cnj, presidente_turma,
+# presidente_secao, decano, tse_corregedor, tse_efetivo: quem acumula o TSE recebe menos processos
+# por distribuição; o selo "distribuicao_reduzida" sai das atas e tira o gabinete da comparação da
+# mesa), grade (false: fora da matriz e das médias — Presidência, Vice e
+# Corregedoria não recebem distribuição comum), posse (no tribunal), turma_desde (ingresso no
+# colegiado atual; menos de 6 meses = "não comparável"), convocado ({tribunal, vaga_de}: o
+# desembargador convocado), gabinete (o texto oficial do local "na mesa"), aliases (como o nome
+# aparece em cada fonte; a comparação ignora acento, caixa, "MIN.", "GABINETE DO MINISTRO" e o
+# parêntese "(Desembargador Convocado do TJMG)"), codigo_ata (STF: cod_ministro das atas).
+composicao:
+  stj:
+    data: "2026-11-18"
+    fonte: "https://www.stj.jus.br/sites/portalp/SiteAssets/Paginas/Institucional/Composicao/Composicao-do-STJ.pdf"
+    grupos:   # a matriz agrupa por Seção: no STJ, a Seção decide o ramo
+      - {id: s1, nome: "Primeira Seção", descricao: "direito público", turmas: [T1, T2]}
+      - {id: s2, nome: "Segunda Seção", descricao: "direito privado", turmas: [T3, T4]}
+      - {id: s3, nome: "Terceira Seção", descricao: "direito penal", turmas: [T5, T6]}
+      - {id: pr, nome: "Sem Turma", descricao: "Presidência, Vice-Presidência e Corregedoria: fora das médias", turmas: []}
+    orgaos: {T1: "Primeira Turma", T2: "Segunda Turma", T3: "Terceira Turma", T4: "Quarta Turma", T5: "Quinta Turma", T6: "Sexta Turma",
+             S1: "Primeira Seção", S2: "Segunda Seção", S3: "Terceira Seção", CE: "Corte Especial"}
+    ministros:
+      # Primeira Seção (presidente: Gurgel de Faria, 15/1/2026 a 14/1/2028)
+      - {id: stj-herman-benjamin, nome: "Herman Benjamin", nome_completo: "Antonio Herman de Vasconcellos e Benjamin", genero: m,
+         turma: T1, secao: S1, corte_especial: true, posse: "2006-09-06", turma_desde: "2026-08-25",
+         gabinete: "GABINETE DO MINISTRO HERMAN BENJAMIN", aliases: ["HERMAN BENJAMIN"]}
+      - {id: stj-sergio-kukina, nome: "Sérgio Kukina", nome_completo: "Sergio Luiz Kukina", genero: m,
+         turma: T1, secao: S1, cargos: [presidente_turma], posse: "2013-02-06", turma_desde: "2013-02-07",
+         gabinete: "GABINETE DO MINISTRO SÉRGIO LUIZ KUKINA", aliases: ["SÉRGIO KUKINA", "Sergio Kukina"]}
+      - {id: stj-regina-helena-costa, nome: "Regina Helena Costa", nome_completo: "Regina Helena Costa", genero: f,
+         turma: T1, secao: S1, posse: "2013-08-28", turma_desde: "2014-08-29",
+         gabinete: "GABINETE DA MINISTRA REGINA HELENA COSTA", aliases: ["REGINA HELENA COSTA"]}
+      - {id: stj-gurgel-de-faria, nome: "Gurgel de Faria", nome_completo: "Luiz Alberto Gurgel de Faria", genero: m,
+         turma: T1, secao: S1, cargos: [presidente_secao], posse: "2014-09-09", turma_desde: "2016-03-01",
+         gabinete: "GABINETE DO MINISTRO GURGEL DE FARIA", aliases: ["GURGEL DE FARIA"]}
+      - {id: stj-paulo-sergio-domingues, nome: "Paulo Sérgio Domingues", nome_completo: "Paulo Sérgio Domingues", genero: m,
+         turma: T1, secao: S1, posse: "2022-12-06", turma_desde: "2022-12-07",
+         gabinete: "GABINETE DO MINISTRO PAULO SERGIO DOMINGUES", aliases: ["PAULO SÉRGIO DOMINGUES"]}
+      - {id: stj-francisco-falcao, nome: "Francisco Falcão", nome_completo: "Francisco Cândido de Melo Falcão Neto", genero: m,
+         turma: T2, secao: S1, corte_especial: true, posse: "1999-06-30", turma_desde: "2016-09-02",
+         gabinete: "GABINETE DO MINISTRO FRANCISCO FALCÃO", aliases: ["FRANCISCO FALCÃO"]}
+      - {id: stj-maria-thereza-de-assis-moura, nome: "Maria Thereza de Assis Moura", nome_completo: "Maria Thereza Rocha de Assis Moura", genero: f,
+         turma: T2, secao: S1, corte_especial: true, posse: "2006-08-09", turma_desde: "2024-08-23",
+         gabinete: "GABINETE DA MINISTRA MARIA THEREZA DE ASSIS MOURA", aliases: ["MARIA THEREZA DE ASSIS MOURA"]}
+      - {id: stj-marco-aurelio-bellizze, nome: "Marco Aurélio Bellizze", nome_completo: "Marco Aurélio Bellizze Oliveira", genero: m,
+         turma: T2, secao: S1, corte_especial: true, posse: "2011-09-05", turma_desde: "2024-11-22",
+         gabinete: "GABINETE DO MINISTRO MARCO AURÉLIO BELLIZZE", aliases: ["MARCO AURÉLIO BELLIZZE"]}
+      - {id: stj-teodoro-silva-santos, nome: "Teodoro Silva Santos", nome_completo: "Teodoro Silva Santos", genero: m,
+         turma: T2, secao: S1, cargos: [presidente_turma], posse: "2023-11-22", turma_desde: "2024-03-15",
+         gabinete: "GABINETE DO MINISTRO TEODORO SILVA SANTOS", aliases: ["TEODORO SILVA SANTOS"]}
+      - {id: stj-afranio-vilela, nome: "Afrânio Vilela", nome_completo: "José Afrânio Vilela", genero: m,
+         turma: T2, secao: S1, posse: "2023-11-22", turma_desde: "2023-11-23",
+         gabinete: "GABINETE DO MINISTRO AFRÂNIO VILELA", aliases: ["AFRÂNIO VILELA"]}
+      # Segunda Seção (presidente: Moura Ribeiro, 25/8/2026 a 24/8/2028)
+      - {id: stj-nancy-andrighi, nome: "Nancy Andrighi", nome_completo: "Fátima Nancy Andrighi", genero: f,
+         turma: T3, secao: S2, corte_especial: true, posse: "1999-10-27", turma_desde: "2016-08-25",
+         gabinete: "GABINETE DA MINISTRA NANCY ANDRIGHI", aliases: ["NANCY ANDRIGHI"]}
+      - {id: stj-humberto-martins, nome: "Humberto Martins", nome_completo: "Humberto Eustáquio Soares Martins", genero: m,
+         turma: T3, secao: S2, corte_especial: true, posse: "2006-06-14", turma_desde: "2023-06-01",
+         gabinete: "GABINETE DO MINISTRO HUMBERTO EUSTÁQUIO SOARES MARTINS", aliases: ["HUMBERTO MARTINS"]}
+      # Corregedor-Geral Eleitoral, efetivo no TSE (2025/27), pelo PDF de 18/11/2026: recebe cerca de 1/10
+      # do que os pares recebem por distribuição (atas de 24/10 a 22/11: 129 contra 1.121 a 1.199).
+      - {id: stj-ricardo-villas-boas-cueva, nome: "Ricardo Villas Bôas Cueva", nome_completo: "Ricardo Villas Bôas Cueva", genero: m,
+         turma: T3, secao: S2, corte_especial: true, cargos: [tse_corregedor], posse: "2011-06-13", turma_desde: "2011-06-14",
+         gabinete: "GABINETE DO MINISTRO RICARDO VILLAS BÔAS CUEVA", aliases: ["RICARDO VILLAS BÔAS CUEVA", "Villas Bôas Cueva"]}
+      - {id: stj-moura-ribeiro, nome: "Moura Ribeiro", nome_completo: "Paulo Dias de Moura Ribeiro", genero: m,
+         turma: T3, secao: S2, cargos: [presidente_secao], posse: "2013-08-28", turma_desde: "2014-08-29",
+         gabinete: "GABINETE DO MINISTRO MOURA RIBEIRO", aliases: ["MOURA RIBEIRO"]}
+      - {id: stj-daniela-teixeira, nome: "Daniela Teixeira", nome_completo: "Daniela Rodrigues Teixeira", genero: f,
+         turma: T3, secao: S2, cargos: [presidente_turma], posse: "2023-11-22", turma_desde: "2025-03-01",
+         gabinete: "GABINETE DA MINISTRA DANIELA TEIXEIRA", aliases: ["DANIELA TEIXEIRA"]}
+      - {id: stj-joao-otavio-de-noronha, nome: "João Otávio de Noronha", nome_completo: "João Otávio de Noronha", genero: m,
+         turma: T4, secao: S2, corte_especial: true, posse: "2002-12-03", turma_desde: "2022-09-29",
+         gabinete: "GABINETE DO MINISTRO JOÃO OTÁVIO DE NORONHA", aliases: ["JOÃO OTÁVIO DE NORONHA"]}
+      - {id: stj-raul-araujo, nome: "Raul Araújo", nome_completo: "Raul Araújo Filho", genero: m,
+         turma: T4, secao: S2, corte_especial: true, posse: "2010-05-12", turma_desde: "2018-09-26",
+         gabinete: "GABINETE DO MINISTRO RAUL ARAÚJO FILHO", aliases: ["RAUL ARAÚJO"]}
+      - {id: stj-maria-isabel-gallotti, nome: "Maria Isabel Gallotti", nome_completo: "Maria Isabel Diniz Gallotti Rodrigues", genero: f,
+         turma: T4, secao: S2, corte_especial: true, cargos: [presidente_turma], posse: "2010-08-10", turma_desde: "2010-08-11",
+         gabinete: "GABINETE DA MINISTRA MARIA ISABEL GALLOTTI", aliases: ["MARIA ISABEL GALLOTTI"]}
+      - {id: stj-antonio-carlos-ferreira, nome: "Antonio Carlos Ferreira", nome_completo: "Antonio Carlos Ferreira", genero: m,
+         turma: T4, secao: S2, corte_especial: true, posse: "2011-06-13", turma_desde: "2011-06-11",
+         gabinete: "GABINETE DO MINISTRO ANTONIO CARLOS FERREIRA", aliases: ["ANTONIO CARLOS FERREIRA"]}
+      - {id: stj-luis-carlos-gambogi, nome: "Luís Carlos Gambogi", nome_completo: "Luís Carlos Balbino Gambogi", genero: m,
+         turma: T4, secao: S2, turma_desde: "2026-02-23", convocado: {tribunal: TJMG, vaga_de: "Marco Buzzi"},
+         gabinete: "GABINETE DO DESEMBARGADOR CONVOCADO DO TJMG LUÍS CARLOS GAMBOGI",
+         aliases: ["Luís Carlos Gambogi (Desembargador Convocado do TJMG)", "LUÍS CARLOS GAMBOGI (DESEMBARGADOR CONVOCADO DO TJMG)"]}
+      # Terceira Seção (presidente: Joel Ilan Paciornik, 24/4/2026 a 23/4/2028)
+      - {id: stj-reynaldo-soares-da-fonseca, nome: "Reynaldo Soares da Fonseca", nome_completo: "Reynaldo Soares da Fonseca", genero: m,
+         turma: T5, secao: S3, cargos: [presidente_turma], posse: "2015-05-26", turma_desde: "2015-05-27",
+         gabinete: "GABINETE DO MINISTRO REYNALDO SOARES DA FONSECA", aliases: ["REYNALDO SOARES DA FONSECA"]}
+      - {id: stj-ribeiro-dantas, nome: "Ribeiro Dantas", nome_completo: "Marcelo Navarro Ribeiro Dantas", genero: m,
+         turma: T5, secao: S3, posse: "2015-09-30", turma_desde: "2015-10-01",
+         gabinete: "GABINETE DO MINISTRO RIBEIRO DANTAS", aliases: ["RIBEIRO DANTAS"]}
+      - {id: stj-joel-ilan-paciornik, nome: "Joel Ilan Paciornik", nome_completo: "Joel Ilan Paciornik", genero: m,
+         turma: T5, secao: S3, cargos: [presidente_secao], posse: "2016-04-06", turma_desde: "2016-04-07",
+         gabinete: "GABINETE DO MINISTRO JOEL ILAN PACIORNIK", aliases: ["JOEL ILAN PACIORNIK"]}
+      - {id: stj-messod-azulay-neto, nome: "Messod Azulay Neto", nome_completo: "Messod Azulay Neto", genero: m,
+         turma: T5, secao: S3, posse: "2022-12-06", turma_desde: "2022-12-07",
+         gabinete: "GABINETE DO MINISTRO MESSOD AZULAY NETO", aliases: ["MESSOD AZULAY NETO"]}
+      - {id: stj-maria-marluce-caldas, nome: "Maria Marluce Caldas", nome_completo: "Maria Marluce Caldas Bezerra", genero: f,
+         turma: T5, secao: S3, posse: "2025-09-04", turma_desde: "2025-09-05",
+         gabinete: "GABINETE DA MINISTRA MARIA MARLUCE CALDAS", aliases: ["MARIA MARLUCE CALDAS"]}
+      # Efetivo no TSE (2026/28), pelo PDF de 18/11/2026: recebe menos por distribuição (atas de 24/10 a
+      # 22/11: 421 contra 1.413 a 1.443 dos pares).
+      - {id: stj-sebastiao-reis-junior, nome: "Sebastião Reis Júnior", nome_completo: "Sebastião Alves dos Reis Júnior", genero: m,
+         turma: T6, secao: S3, corte_especial: true, cargos: [tse_efetivo], posse: "2011-06-13", turma_desde: "2011-06-14",
+         gabinete: "GABINETE DO MINISTRO SEBASTIÃO REIS JUNIOR", aliases: ["SEBASTIÃO REIS JÚNIOR"]}
+      - {id: stj-rogerio-schietti, nome: "Rogerio Schietti", nome_completo: "Rogerio Schietti Machado Cruz", genero: m,
+         turma: T6, secao: S3, posse: "2013-08-28", turma_desde: "2013-08-29",
+         gabinete: "GABINETE DO MINISTRO ROGERIO SCHIETTI", aliases: ["ROGERIO SCHIETTI", "Rogerio Schietti Cruz"]}
+      - {id: stj-carlos-pires-brandao, nome: "Carlos Pires Brandão", nome_completo: "Carlos Augusto Pires Brandão", genero: m,
+         turma: T6, secao: S3, cargos: [presidente_turma], posse: "2025-09-04", turma_desde: "2025-09-05",
+         gabinete: "GABINETE DO MINISTRO CARLOS PIRES BRANDÃO", aliases: ["CARLOS PIRES BRANDÃO"]}
+      - {id: stj-nilsoni-de-freitas, nome: "Nilsoni de Freitas", nome_completo: "Nilsoni de Freitas Custódio", genero: f,
+         turma: T6, secao: S3, turma_desde: "2026-05-18", convocado: {tribunal: TJDFT, vaga_de: null},
+         gabinete: "GABINETE DA DESEMBARGADORA CONVOCADA DO TJDFT NILSONI DE FREITAS",
+         aliases: ["Nilsoni de Freitas (Desembargadora Convocada do TJDFT)", "NILSONI DE FREITAS (DESEMBARGADORA CONVOCADA DO TJDFT)"]}
+      - {id: stj-fatima-maranhao, nome: "Fátima Maranhão", nome_completo: "Fátima Maranhão", genero: f,
+         turma: T6, secao: S3, turma_desde: "2026-11-17", convocado: {tribunal: TJPB, vaga_de: null},
+         gabinete: "GABINETE DA DESEMBARGADORA CONVOCADA DO TJPB FÁTIMA MARANHÃO",
+         aliases: ["Fátima Maranhão (Desembargadora convocada do TJPB)", "FÁTIMA MARANHÃO (DESEMBARGADORA CONVOCADA DO TJPB)"]}
+      # O PDF de 18/11/2026 marca a Sexta Turma com "Vaga do Min. Antonio Palheiro" sem dizer de qual das
+      # duas convocadas; o acervo de Og Fernandes (que deixou o tribunal) foi redistribuído e, pelas atas,
+      # 4.467 processos foram atribuídos a Fátima Maranhão entre 17 e 21/11 (660 em 17/11, 2.791 em 18/11,
+      # 1.014 em 19/11 e 2 em 21/11). Por isso vaga_de: null nas duas.
+      # Sem Turma: cargos de direção (acervo residual; fora da matriz e das médias)
+      - {id: stj-luis-felipe-salomao, nome: "Luis Felipe Salomão", nome_completo: "Luis Felipe Salomão", genero: m,
+         corte_especial: true, cargos: [presidente], grade: false, posse: "2008-06-17",
+         gabinete: "GABINETE DO MINISTRO LUIS FELIPE SALOMÃO", aliases: ["LUIS FELIPE SALOMÃO"]}
+      - {id: stj-mauro-campbell-marques, nome: "Mauro Campbell Marques", nome_completo: "Mauro Luiz Campbell Marques", genero: m,
+         corte_especial: true, cargos: [vice_presidente], grade: false, posse: "2008-06-17",
+         gabinete: "GABINETE DO MINISTRO MAURO CAMPBELL MARQUES", aliases: ["MAURO CAMPBELL MARQUES"]}
+      - {id: stj-benedito-goncalves, nome: "Benedito Gonçalves", nome_completo: "Benedito Gonçalves", genero: m,
+         corte_especial: true, cargos: [corregedor_cnj], grade: false, posse: "2008-09-17",
+         gabinete: "GABINETE DO MINISTRO BENEDITO GONÇALVES", aliases: ["BENEDITO GONÇALVES"]}
+    # Relatores do arquivo que não são ministros da grade: cada linha vira uma linha própria da página.
+    # "relatores" casa o nome inteiro (sem acento e sem caixa); "prefixos", o começo.
+    fora_da_grade:
+      - {id: presidencia, rotulo: "Presidência", relatores: ["Presidente do STJ"],
+         nota: "Triagem de admissibilidade antes da distribuição (ARP), homologação de decisão estrangeira, cartas rogatórias, suspensões de liminar, precatórios e RPV; parte já decidida, no cartório ou remetida ao STF."}
+      - {id: vice, rotulo: "Vice-Presidência", relatores: ["Vice-Presidente do STJ"],
+         nota: "A admissibilidade do recurso extraordinário ao STF; inclui os sobrestados à espera da repercussão geral."}
+      - {id: sem_relator, rotulo: "Ainda sem relator", relatores: ["Não Informado"],
+         nota: "Na maior parte, na Coordenadoria de Triagem: ainda não foram distribuídos."}
+      - {id: presidentes_orgao, rotulo: "Presidentes de Seção e de Turma", relatores: ["Presidente da Primeira Seção", "Presidente da Segunda Seção", "Presidente da Terceira Seção", "Presidente da Quarta Turma"],
+         nota: "Execuções de mandado de segurança e de ação rescisória (ExeMS, EmbExeMS, ExeAR), que ficam com o órgão, não com um gabinete."}
+      - {id: cogepac, rotulo: "Precedentes (Cogepac)", prefixos: ["Presidente da Comissão Gestora de Precedentes", "Comissão Gestora de Precedentes"],
+         nota: "A Comissão Gestora de Precedentes, Jurisprudência e Ações Coletivas."}
+      - {id: residuos, rotulo: "Resíduos de quem deixou a Turma", relatores: [],
+         nota: "Processos ainda em nome de quem saiu do colegiado ou do tribunal, em geral à espera de redistribuição."}
+      - {id: sem_relator_arquivo, rotulo: "Sem relator no arquivo", relatores: [""],
+         nota: "Registros sem relator, local ou assunto no arquivo do dia."}
+    # Quem saiu (resíduos): o nome vai para a linha "residuos", nunca para um cartão.
+    saiu:
+      - {nome: "Og Fernandes", motivo: "deixou o tribunal; acervo da Corte Especial atribuído a Bellizze em 17 e 18/11"}
+      - {nome: "Antonio Saldanha Palheiro", motivo: "aposentado"}
+      - {nome: "Marco Buzzi", motivo: "em disponibilidade"}   # PDF de 18/11/2026: membro do Plenário, sem Turma
+      - {nome: "Jorge Mussi", motivo: "aposentado"}
+      - {nome: "Assusete Magalhães", motivo: "aposentada"}
+      - {nome: "Massami Uyeda", motivo: "aposentado"}
+      - {nome: "Barros Monteiro", motivo: "aposentado"}
+      - {nome: "Otávio de Almeida Toledo", motivo: "convocação encerrada", aliases: ["Otávio de Almeida Toledo (Desembargador Convocado do TJSP)"]}
+      - {nome: "Jesuíno Rissato", motivo: "convocação encerrada", aliases: ["Jesuíno Rissato (Desembargador Convocado do TJDFT)"]}
+      - {nome: "Carlos Cini Marchionatti", motivo: "convocação encerrada", aliases: ["Carlos Cini Marchionatti (Desembargador Convocado TJRS)"]}
+    # Quem presidiu o STJ e quando (datas de publicação no DJ): o que a pessoa assinou como
+    # Presidente vai para a linha da Presidência, nunca para o cartão dela. Herman Benjamin presidiu
+    # até 24/08/2026 e voltou à Primeira Turma em 25/08; nas íntegras de 12 meses, 150 mil decisões
+    # dele são da Presidência (conferido em 23/11/2026: as últimas em 21/08, as de Salomão como
+    # Presidente a partir de 28/08).
+    presidencias:
+      - {id: stj-herman-benjamin, de: "2024-08-22", ate: "2026-08-24"}
+      - {id: stj-luis-felipe-salomao, de: "2026-08-25"}
+  stf:
+    data: "2026-08-06"
+    fonte: "https://portal.stf.jus.br/textos/verTexto.asp?servico=sobreStfComposicaoTurma&pagina=principal"
+    cadeiras: 11                     # 10 em exercício e 1 vaga (a página não diz o motivo)
+    grupos:   # "média do tribunal sem a Presidência" é a linha de comparação da matriz do STF
+      - {id: t1, nome: "Primeira Turma", descricao: "4 ministros", turmas: [T1]}
+      - {id: t2, nome: "Segunda Turma", descricao: "5 ministros", turmas: [T2]}
+      - {id: pr, nome: "Presidência", descricao: "o Presidente não integra Turma: fora das médias", turmas: []}
+    orgaos: {T1: "Primeira Turma", T2: "Segunda Turma", PL: "Tribunal Pleno"}
+    # posse: registro público do STF (não estava nas amostras desta coleta; conferir antes de publicar).
+    ministros:
+      - {id: stf-flavio-dino, nome: "Flávio Dino", nome_completo: "Flávio Dino de Castro e Costa", genero: m, turma: T1,
+         cargos: [presidente_turma], posse: "2024-02-22", codigo_ata: 54,
+         gabinete: "GABINETE MINISTRO FLÁVIO DINO", aliases: ["MIN. FLÁVIO DINO", "FLÁVIO DINO"]}
+      - {id: stf-carmen-lucia, nome: "Cármen Lúcia", nome_completo: "Cármen Lúcia Antunes Rocha", genero: f, turma: T1,
+         posse: "2006-06-21", codigo_ata: 42,
+         gabinete: "GABINETE MINISTRA CÁRMEN LÚCIA", aliases: ["MIN. CÁRMEN LÚCIA", "CÁRMEN LÚCIA"]}
+      - {id: stf-alexandre-de-moraes, nome: "Alexandre de Moraes", nome_completo: "Alexandre de Moraes", genero: m, turma: T1,
+         cargos: [vice_presidente], posse: "2017-03-22", codigo_ata: 50,
+         gabinete: "GABINETE MINISTRO ALEXANDRE DE MORAES", aliases: ["MIN. ALEXANDRE DE MORAES", "ALEXANDRE DE MORAES"]}
+      - {id: stf-cristiano-zanin, nome: "Cristiano Zanin", nome_completo: "Cristiano Zanin Martins", genero: m, turma: T1,
+         posse: "2023-08-03", codigo_ata: 53,
+         gabinete: "GABINETE MINISTRO CRISTIANO ZANIN", aliases: ["MIN. CRISTIANO ZANIN", "CRISTIANO ZANIN"]}
+      - {id: stf-luiz-fux, nome: "Luiz Fux", nome_completo: "Luiz Fux", genero: m, turma: T2,
+         cargos: [presidente_turma], posse: "2011-03-03", codigo_ata: 45,
+         gabinete: "GABINETE MINISTRO LUIZ FUX", aliases: ["MIN. LUIZ FUX", "LUIZ FUX"]}
+      - {id: stf-gilmar-mendes, nome: "Gilmar Mendes", nome_completo: "Gilmar Ferreira Mendes", genero: m, turma: T2,
+         cargos: [decano], posse: "2002-06-20", codigo_ata: 36,
+         gabinete: "GABINETE MINISTRO GILMAR MENDES", aliases: ["MIN. GILMAR MENDES", "GILMAR MENDES"]}
+      - {id: stf-dias-toffoli, nome: "Dias Toffoli", nome_completo: "José Antonio Dias Toffoli", genero: m, turma: T2,
+         posse: "2009-10-23", codigo_ata: 44,
+         gabinete: "GABINETE MINISTRO DIAS TOFFOLI", aliases: ["MIN. DIAS TOFFOLI", "DIAS TOFFOLI"]}
+      - {id: stf-nunes-marques, nome: "Nunes Marques", nome_completo: "Kassio Nunes Marques", genero: m, turma: T2,
+         posse: "2020-11-05", codigo_ata: 51,
+         gabinete: "GABINETE MINISTRO NUNES MARQUES", aliases: ["MIN. NUNES MARQUES", "NUNES MARQUES"]}
+      - {id: stf-andre-mendonca, nome: "André Mendonça", nome_completo: "André Luiz de Almeida Mendonça", genero: m, turma: T2,
+         posse: "2021-12-16", codigo_ata: 52,
+         gabinete: "GABINETE MINISTRO ANDRÉ MENDONÇA", aliases: ["MIN. ANDRÉ MENDONÇA", "ANDRÉ MENDONÇA"]}
+      - {id: stf-edson-fachin, nome: "Edson Fachin", nome_completo: "Luiz Edson Fachin", genero: m,
+         cargos: [presidente], grade: false, posse: "2015-06-16", codigo_ata: 49,
+         gabinete: "GABINETE MINISTRO EDSON FACHIN", aliases: ["MIN. EDSON FACHIN", "EDSON FACHIN"]}
+    fora_da_grade:
+      - {id: presidencia, rotulo: "Presidência", relatores: ["MINISTRO PRESIDENTE", "MINISTRA PRESIDENTE", "PRESIDENTE"],
+         nota: "O Presidente não recebe distribuição comum e decide antes da distribuição os recursos inadmissíveis; o que ele decide como Presidente conta aqui, nunca no cartão do ministro."}
+      - {id: vice, rotulo: "Vice-Presidência", relatores: ["VICE-PRESIDENTE"], nota: "O que está com a Vice-Presidência como tal."}
+      - {id: residuos, rotulo: "Relatores que deixaram o tribunal", relatores: [],
+         nota: "Na maior parte, o acervo da cadeira vaga de Luís Roberto Barroso, à espera do novo ministro; o resto, processos antigos ainda em nome de relatores aposentados."}
+      - {id: sem_relator, rotulo: "Sem relator", relatores: [""], nota: "Processos ainda não distribuídos, na planilha sem relator."}
+    saiu:
+      - {nome: "Luís Roberto Barroso", motivo: "aposentado em 2025 (cadeira vaga)"}
+      - {nome: "Rosa Weber", motivo: "aposentada"}
+      - {nome: "Ricardo Lewandowski", motivo: "aposentado"}
+      - {nome: "Marco Aurélio", motivo: "aposentado"}
+      # Ainda relatores na planilha do acervo de 22/11/2026 (de 1 a 3 processos cada) ou em temas antigos de RG:
+      - {nome: "Teori Zavascki", motivo: "falecido em 2017"}
+      - {nome: "Celso de Mello", motivo: "aposentado"}
+      - {nome: "Joaquim Barbosa", motivo: "aposentado"}
+      - {nome: "Ayres Britto", motivo: "aposentado"}
+      - {nome: "Ellen Gracie", motivo: "aposentada"}
+      - {nome: "Cezar Peluso", motivo: "aposentado"}
+      - {nome: "Menezes Direito", motivo: "falecido em 2009"}
+      - {nome: "Sepúlveda Pertence", motivo: "aposentado (relator de acórdão na pesquisa de jurisprudência de 12 meses)"}
+
+# ── Limiares (as réguas das contas) ──────────────────────────────────────────────────────────
+limiares:
+  mesa_dias: [180, 365]          # "sem decisão registrada há mais de" (o 365 é o "há mais de 1 ano"); escolha editorial
+  idade_faixas_meses: [6, 12, 24, 36, 60]   # "Há quanto tempo": até 6 meses, 6–12, 1–2 anos, 2–3, 3–5, mais de 5
+  comparacao:                    # "Em que ele está mais": só com os pares e só com teste
+    confianca: 0.99              # binomial exata bicaudal + Holm sobre todas as comparações do tribunal
+    razao: [0.80, 1.25]          # piso de efeito: marca só fora desta faixa...
+    pontos: 2                    # ...e com 2 pontos percentuais ou mais de diferença
+    minimo_area: 30              # processos da área no ministro ou nos pares para testar
+    minimo_acervo: 1000          # acervo mínimo do ministro para entrar no teste ("poucos processos para comparar")
+    pares: {stj: turma, stf: tribunal}   # STJ: a mesma Turma, sem ele; STF: o tribunal sem ele e sem a Presidência
+    # Onde os pares são o tribunal inteiro (STF), o gabinete que fica bem acima numa área (▲) sai da
+    # conta dos outros naquela área: as ações e execuções penais que Alexandre de Moraes concentra por
+    # prevenção marcavam Penal "abaixo" em quem não as tem (Flávio Dino: 0,7 vez com ele, 0,8 sem ele).
+    sem_destoante: [stf]
+  nao_comparavel_meses: 6        # herança recente, chegada à Turma ou convocação há menos que isto: selo, sem marca
+  heranca_parte: 0.30            # "acervo herdado": atribuições de 30% ou mais do acervo nos últimos 6 meses
+  distribuicao_reduzida: 0.5     # com 20 dias de ata ou mais: o gabinete que recebeu por distribuição em 30 dias menos que
+                                 # isto × a mediana da Turma (STJ) ou do grupo (STF) ganha o selo "recebe menos processos"
+                                 # e sai da comparação da mesa (quem acumula o TSE, por exemplo)
+  classes_recurso:               # "recorre" e "responde" só nos recursos; nas ações originárias (ADI, HC, MS, AR, Rcl...), "polo ativo" e "polo passivo"
+    stj: [REsp, AREsp, RHC, RMS, EREsp, EAREsp, RO, Ag, EAg]
+    stf: [RE, ARE, RHC, RMS, AI, RO]
+  nome_parte_tribunal: 20        # processos para um litigante (PJ ou ente) aparecer com nome na lista do tribunal
+  nome_parte_ministro: 5         # ... no cartão do ministro
+  achado_heranca: 300            # atribuições a um relator num dia para virar achado
+  tema_quente_vezes: 2           # entrada de 30 dias de uma subárea × a mediana mensal dos 12 meses anteriores
+  tema_quente_minimo: 50
+  litigante_semana_vezes: 3      # entrada de 7 dias de um litigante × a média semanal das 12 semanas anteriores
+  litigante_semana_minimo: 100
+  vista_dias: 90                 # STF: vista vencida (RISTF, art. 134, com a ER 58/2022; conferir) — fase 2
+  recusa_arquivo_menor_que: 0.85 # acervo do dia com total fora de [menor_que, maior_que] × o do último dia bom é
+  recusa_arquivo_maior_que: 1.15 # recusado: fica o painel daquele dia (dados.py; a faixa é a da integração)
+  recortes_por: principal        # principal (o assunto que decidiu a área) ou todos (qualquer assunto do processo)
+  rampa: [0.02, 0.05, 0.10, 0.25]  # faixas da cor da célula da matriz: <2%, 2–4, 5–9, 10–24, 25% ou mais (designer)
+  listas:                        # quantos itens cada lista leva (os tetos de tamanho dos JSON dependem disto)
+    painel_mais_antigos: 3       # por ministro, no painel (a mesa compacta sem script); a lista inteira fica no dossiê.
+                                 # Era 5: com 3, o stj.json e a página abrem folga para a camada do DJe (23/11/2026)
+    fila_mais_antigos: 30        # o tribunal inteiro, na aba "A fila"
+    dossie_mais_antigos: 15      # no dossiê do ministro
+    dossie_em_pauta: 20
+    partes_tribunal: 30
+    partes_ministro: 10
+    partes_painel_ministro: 3
+    subareas_painel: 5
+    assuntos_por_area: 10
+    partes_por_area: 5
+  janelas:
+    entradas_dias: 365           # "o que entrou": 12 meses...
+    entradas_recentes_dias: 30   # ...e 30 dias
+    decisoes_dias: 365           # "o que decidiu": 12 meses até o último arquivo publicado
+  pesos_achados:                 # peso = base do tipo × log10(1 + n); a manchete é o de maior peso
+    heranca: 5
+    mesa_antiga: 4
+    fora_do_padrao: 3
+    litigante: 3
+    tema: 3
+    tema_quente: 2
+    vista: 2
+    entrou: 1
+
+# ── Fontes (endereços e ritmo) ───────────────────────────────────────────────────────────────
+# User-Agent: o do projeto (qijournal.net.USER_AGENT), que se identifica como robô e dá o endereço.
+# Toda requisição passa pelo robots.txt do host (lido uma vez por dia; caminho vedado = o pedido não
+# sai) e pela pausa mínima do host. 403 (o WAF Cloudflare do STJ recusa às vezes, por taxa): uma
+# nova tentativa depois de recusa_espera_s; se repetir, a fonte vira aviso e fica o último dia bom.
+fontes:
+  robots_validade_h: 24
+  pausa_s: 1.0                   # padrão para host não listado
+  recusa_espera_s: 120
+  hosts:
+    dadosabertos.web.stj.jus.br: {pausa_s: 10}       # Crawl-Delay: 10 no robots.txt (lido em 23/11/2026)
+    www.stf.jus.br: {pausa_s: 1, timeout_s: 60, tentativas: 1}   # a planilha (5,8 MB) vem em ~2 s; servidor mudo custava 4 × 180 s
+    portal.stf.jus.br: {pausa_s: 1}
+    jurisprudencia.stf.jus.br: {pausa_s: 1}
+    www.cnj.jus.br: {pausa_s: 1}
+    # O DataJud é um Elasticsearch puro: não tem robots.txt (o /robots.txt responde 401 sem a chave e 403
+    # com ela, "robots.txt" lido como nome de índice; conferido em 23/11/2026). robots: api = 4xx no
+    # robots.txt vale "sem regras" (RFC 9309, §2.3.1.3); as regras do host são as do termo de uso.
+    api-publica.datajud.cnj.jus.br: {pausa_s: 0.5, recusa_espera_s: null, robots: api}   # 3.13 do termo: até 120/min; 403 ali é chave, não taxa
+  # Nunca, nem que o robots.txt permita (prefixos de URL): a trava do coletor recusa antes de pedir.
+  # O link para o leitor humano abrir o processo no tribunal é permitido (links_oficiais).
+  proibidos:
+    - "https://processo.stj.jus.br/"
+    - "https://portal.stf.jus.br/processos"
+    - "https://dadosabertos.web.stj.jus.br/api/"
+  stj:
+    portal: "https://dadosabertos.web.stj.jus.br"
+    pagina_conjunto: "https://dadosabertos.web.stj.jus.br/dataset/{slug}"   # links: /dataset/<uuid>/resource/<uuid>/download/<arquivo>
+    conjuntos:
+      acervo: acervo-em-tramitacao                 # processos_tramitando_AAAAMMDD.json.gz (~82 MB; só o último dia fica publicado)
+      atas: atas-de-distribuicao                   # ataAAAAMMDD.json (um por dia, ~22:30 UTC)
+      pautas: pautas-futuras                       # pautas_futuras_AAAAMMDD.json.gz
+      precedentes: precedentes-qualificados        # Temas.csv, Processos.csv
+      integras: integras-de-decisoes-terminativas-e-acordaos-do-diario-da-justica   # metadadosAAAAMMDD.json (~38 dias de atraso em 22/11)
+    validade_h: {acervo: 20, atas: 20, pautas: 20, precedentes: 20, integras: 20, pagina: 6}
+    # O acervo do STJ não sai de sábado nem de domingo (o arquivo de sexta sai no sábado; o de segunda,
+    # na terça à tarde): a validade dele conta de segunda a sexta (dias_da_semana). 2 dias da semana sem
+    # arquivo novo = parado; na terça de manhã, com o de sexta, ainda está em dia. Feriado conta (o STJ
+    # publicou o de 20/11, feriado).
+    velho_dias: {acervo: 2, atas: 4, pautas: 4, precedentes: 8, integras: 45}
+    dias_da_semana: [acervo]
+    atribuicao: "Fonte: STJ, Portal de Dados Abertos (CC-BY)"
+    licenca: "CC-BY"
+  stf:
+    acervo: "https://www.stf.jus.br/arquivo/cms/publicacaoBOInternet/anexo/acervo/Acervo_STF_Lista_Geral.xlsx"
+    atas_recupera: "https://portal.stf.jus.br/atadistribuicao/recuperaata.asp?dia={dia}&mes={mes}&ano={ano}"
+    atas_lista: "https://portal.stf.jus.br/atadistribuicao/listaratas.asp?data={data}&num={num}&sessao={sessao}"
+    jurisprudencia: "https://jurisprudencia.stf.jus.br/api/search/search"   # POST, consulta Elasticsearch; exigir _shards.failed == 0
+    rg_temas: "https://portal.stf.jus.br/jurisprudenciaRepercussao/todostemas.asp"
+    rg_exportar: "https://portal.stf.jus.br/jurisprudenciaRepercussao/exportarDados.asp"
+    pauta: "https://portal.stf.jus.br/pauta/services/calendario-service.asp"
+    validade_h: {acervo: 20, atas: 20, jurisprudencia: 20, rg: 160, pauta: 20}
+    velho_dias: {acervo: 3, atas: 4, jurisprudencia: 10, rg: 10, pauta: 4}   # jurisprudência: a última data de julgamento indexada anda 4 a 6 dias atrás (18/11 em 23/11/2026)
+    atribuicao: "Fonte: STF (portal, pesquisa de jurisprudência e acervo em www.stf.jus.br)"
+  tpu:
+    versao_soap: "https://www.cnj.jus.br/sgt/sgt_ws.php"   # getDataUltimaVersao (depreciado: o CNJ anuncia sgt.cloud.cnj.jus.br)
+    dump: "https://www.cnj.jus.br/sgt/enviarArquivo.php?url={versao}_dump_dados_oracle_postgres.sql&nome=dump_dados_oracle_postgres.sql"
+    versoes: "https://www.cnj.jus.br/sgt/versoes.php"
+  # Endereço para o leitor humano abrir o processo no tribunal (não é coletado).
+  links_oficiais:
+    stj: "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo={registro}"
+    stf: "https://portal.stf.jus.br/processos/listarProcessos.asp?classe={classe}&numeroProcesso={numero}"
+
+# ── DataJud (CNJ, API Pública) ───────────────────────────────────────────────────────────────
+# LIGADO E PUBLICADO PARA USO PESSOAL (decisões do dono, 23/11/2026: "não vou distribuir
+# informação; é para uso pessoal" e, sabendo que o repositório é público, "quero os números do
+# DataJud no site sim; está público apenas pra eu ter fácil acesso, mas só eu uso"). O Termo de Uso
+# da API (v1.2, lido em scratchpad/amostras/termos/datajud_termos_v1.2.txt):
+#   3.3  "fornecida exclusivamente para fins legais, não comerciais e autorizados";
+#   3.8  "não modificar, distribuir, vender ou explorar comercialmente a API ou qualquer informação
+#        derivada dela" — o repositório e o site são públicos: o dono decidiu publicar assim mesmo,
+#        para o uso dele (publicar: true abaixo);
+#   3.9  "dar ciência ao CNJ de qualquer informação [...] disponibilizado ao público em geral" —
+#        dar essa ciência fica com o dono;
+#   3.13 "não realizar mais de 120 requisições por minuto" — o teto do cliente (por_minuto).
+# O serviço vive sobrecarregado (22 e 23/11/2026: 16 de 102 e 1 de 22 tentativas completas; em
+# 23/11 de manhã, 0 de 25: 429 e 504). Nada dele está no caminho crítico: falha vira aviso.
+# O que se pede: o frescor do índice, a conferência (ativos por gabinete × acervo do STJ) e os
+# movimentos dos processos na mesa (o "concluso há N dias" do STJ; ver movimentos abaixo).
+datajud:
+  ativo: true
+  # publicar: true = a camada do CNJ (cnj.json: "concluso há N dias", com o selo "CNJ · DataJud", a
+  # cobertura e o "Como ler") vai aos painéis e à página. Decisão do dono em 23/11/2026, sabendo que o
+  # repositório é público: "Quero os números do DataJud no site sim. Está público apenas pra eu ter
+  # fácil acesso, mas só eu uso." O uso é pessoal; dar ciência ao CNJ (item 3.9 do termo de uso)
+  # fica com o dono. false = o DataJud é consultado, o resultado fica só no cache (fora do git) e nada
+  # derivado dele entra em data/tribunais/ nem na página (a fonte sai "ligada para uso pessoal; não
+  # publicada", sem número). A variável QIJ_DATAJUD_PUBLICAR=1 liga numa execução, =0 desliga.
+  publicar: true
+  url: "https://api-publica.datajud.cnj.jus.br/api_publica_stj/_search"   # o STF não está no DataJud (404 index_not_found)
+  chave: "cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw=="    # pública (wiki do CNJ); a variável DATAJUD_API_KEY a substitui
+  chave_wiki: "https://datajud-wiki.cnj.jus.br/api-publica/acesso/"
+  por_minuto: 120                # 3.13 (um pedido por vez: o tempo de cada um, de 1 a 60 s, já segura o ritmo)
+  timeout_s: 90                  # acima dos 60 s do balanceador do CNJ: o 504 chega, não é cortado aqui
+  tentativas: 3                  # frescor e conferência (agregações sobre o índice inteiro); os lotes têm as deles (movimentos)
+  espera_s: [5, 15]              # × aleatório entre 1 − variacao e 1 + variacao; em 23/11 seis tentativas do frescor gastaram 5 min do prazo sem resposta
+  variacao: 0.2
+  disjuntor: 3                   # consultas seguidas sem resposta completa: DataJud parado nesta execução
+  prazo_s: 900                   # teto do DataJud por execução; dados.py corta ao que sobra do passo (30 min) menos 5 min
+  velho_dias: 15                 # o CNJ carrega o índice em lotes irregulares
+  # Os movimentos dos processos na mesa do STJ: a data da última Conclusão (TPU 51, conferida na
+  # tabela de movimentos do SGT: 14 Serventuário › 48 › 51, sem filhos; o tipo vai no complemento
+  # tipo_de_conclusao), do último ato do magistrado (raiz 1 da TPU: decisão 3, julgamento 193,
+  # despacho 11009), da última decisão ou julgamento e do último movimento. Régua da página:
+  # "concluso há N dias (CNJ)" = a última conclusão veio depois do último ato do magistrado E não é
+  # anterior à última distribuição ou decisão que o acervo do STJ registra (contas.camada_cnj).
+  movimentos:
+    ativo: true
+    lote: 1000                   # números CNJ por consulta (terms em numeroProcesso.keyword, _source filtrado); 23/11: 500 → 1 MB em 53 s; 1.000 parcial → 0,6–1,1 MB em 55–61 s
+    pagina: 1000                 # documentos por página do incremental (search_after)
+    tentativas: 4                # por lote
+    espera_s: [5, 15, 30]
+    folga_s: 100                 # não começa lote novo com menos que isto de prazo
+    incremental_fracao: 0.5      # parte do prazo do incremental enquanto a carga inicial não termina
+    campo_incremental: dataHoraUltimaAtualizacao
+    margem_h: 24                 # o incremental olha este tanto antes da marca (carga do índice fora de ordem)
+    reconsultar_ausentes_dias: 7 # número que não estava no índice é pedido de novo depois disto
+    cobertura_minima: 0.80       # faixa "conclusos há mais de 180/365 dias" do ministro só com 80% ou mais dos candidatos com data no CNJ
+
+# ── DJEN: Diário de Justiça Eletrônico Nacional (CNJ) ────────────────────────────────────────
+# Lido por qijournal/tribunais/djen.py ("python -m qijournal tribunais djen", na máquina do dono) e,
+# do lado do GitHub, por dados.py e pela página, que só leem o data/tribunais/djen.json (validade_dias
+# abaixo). Desde 29/11/2024 os atos judiciais do STJ saem no DJEN
+# (Res. STJ/GP 19/2024; a página "Publicações Oficiais do STJ" aponta para
+# comunica.pje.jus.br/consulta?siglaTribunal=STJ&meio=D). O STF tem DJe próprio (Res. STF 700/2020 e
+# 725/2021) e, até onde se sabe, não publica no DJEN: a sonda confere e, sem publicação em
+# sem_publicacao_dias dias úteis seguidos, o djen.json diz "publica: false".
+# A API recusa (403 geográfico, CloudFront) quem está fora do Brasil: roda numa máquina do dono, no
+# Brasil, pela tarefa agendada de scripts/djen/ (nunca no GitHub Actions, nunca por proxy ou VPN).
+# A edição e a aba nunca dependem disto: sem djen.json novo, a aba sai sem a camada.
+djen:
+  ativo: true
+  api: "https://comunicaapi.pje.jus.br/api/v1/comunicacao"
+  consulta: "https://comunica.pje.jus.br/consulta"   # para o leitor (não é coletada)
+  tribunais: [stj, stf]
+  itens_por_pagina: 100          # o máximo que a API aceita
+  pausa_s: 2                     # entre um pedido e o seguinte; o Crawl-delay do robots.txt vence se for maior
+  max_paginas_dia: 150           # 15 mil publicações por tribunal e dia (o STJ publica ~3 mil decisões e acórdãos por dia útil)
+  janela_dias: 30                # dias corridos até ontem
+  dias_por_execucao: 5           # dias novos por execução (a janela enche em uma semana; --completo tira o teto)
+  incluir_hoje: false            # o dia de hoje ainda recebe publicações: só entra fechado, no dia seguinte
+  prazo_s: 2400                  # teto de uma execução (com o acervo refeito)
+  guardar_dias: 40               # o cache da máquina guarda os dias por isto
+  sem_publicacao_dias: 3         # dias úteis fechados sem nada: "o tribunal não publica no DJEN"
+  validade_dias_uteis: 4         # a aba mostra a camada com o último dia a até 4 dias (de segunda a sexta) de hoje; depois, só a nota
+  origem: "coletado no Brasil, fora do GitHub Actions"   # vai no djen.json (público): sem cidade, sem nome
+  atribuicao: "Fonte: CNJ, Diário de Justiça Eletrônico Nacional (DJEN)"
+  # O casamento com o acervo (a "mesa"): o retrato que o fluxo dos Tribunais deixa no cache; sem ele,
+  # o retrato é refeito uma vez por dia na máquina (o arquivo aberto do STJ, 82 MB, e a planilha do
+  # STF, pelo mesmo coletor: robots.txt e 10 s entre pedidos ao portal do STJ).
+  acervo: {baixar: true, retrato_validade_h: 30}
+  listas: {mesa_por_ministro: 5, partes: 10, partes_ministro: 3, orgaos: 40, tipos_brutos: 30}
+  sonda: {itens: 100, tentativas_dias: 3, amostra: 12}
+  # O tipo de cada publicação: o primeiro grupo cujo padrão (texto sem acento, maiúsculo) aparece no
+  # tipoDocumento; tipoDocumento genérico ("Intimação"): as três primeiras linhas do texto. Edital
+  # também pelo tipoComunicacao. O resto é "outros" (e a contagem crua fica em cobertura.tipos_brutos,
+  # para afinar esta lista depois da primeira coleta no Brasil).
+  tipos:
+    - {id: pauta, nome: "Pautas de julgamento", padroes: ["PAUTA", "SESSAO DE JULGAMENTO", "SESSAO VIRTUAL"]}
+    - {id: distribuicao, nome: "Distribuição", padroes: ["DISTRIBUICAO"]}
+    - {id: acordao, nome: "Acórdãos", padroes: ["ACORDAO", "EMENTA"]}
+    - {id: decisao, nome: "Decisões", padroes: ["DECISAO", "SENTENCA", "MONOCRATICA"]}
+    - {id: despacho, nome: "Despachos", padroes: ["DESPACHO", "ATO ORDINATORIO"]}
+    - {id: edital, nome: "Editais", padroes: ["EDITAL"]}

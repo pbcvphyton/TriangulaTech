@@ -127,8 +127,15 @@ def fetch(
     retries: int = 2,
     headers: dict[str, str] | None = None,
     max_bytes: int = 8_000_000,
+    data: bytes | None = None,
+    method: str | None = None,
 ) -> Response:
-    """GET com retentativas exponenciais (1s, 2s, ...) para erros transitórios.
+    """GET (ou POST, com ``data``) com retentativas exponenciais (1s, 2s, ...) para erros
+    transitórios.
+
+    ``data`` vai como corpo da requisição (o ``urllib`` faz dela um POST); ``method``
+    força o verbo (``"POST"``, ``"HEAD"``...). Sem os dois, é o GET de sempre. O tipo do
+    corpo vai em ``headers`` (``{"Content-Type": "application/json"}``).
 
     Um corpo menor que o ``Content-Length`` anunciado (conexão caiu no meio),
     gzip/deflate truncado ou leitura além de ``3 × timeout`` contam como erro
@@ -144,7 +151,7 @@ def fetch(
             time.sleep(min(2 ** (attempt - 1), 8))
         start = time.monotonic()
         try:
-            req = urllib.request.Request(url, headers=req_headers)
+            req = urllib.request.Request(url, data=data, headers=req_headers, method=method)
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 raw = _read_body(resp, max_bytes, start + timeout * TOTAL_DEADLINE_FACTOR)
                 if len(raw) > max_bytes:
