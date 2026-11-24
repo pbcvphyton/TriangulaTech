@@ -338,6 +338,17 @@ class TribunaisConfig:
 
 
 @dataclass
+class AgendaConfig:
+    """Agenda da semana (``qijournal/agenda``): o bloco da home e a página ``edicoes/agenda.html``,
+    com o que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso. A edição só lê os
+    arquivos de coleta (``data/congresso/agenda.json`` e ``data/tribunais/agenda.json``). A régua,
+    os tetos e o dicionário de situações ficam em ``config/agenda.yaml``."""
+
+    enabled: bool = True
+    marcas: list[str] = field(default_factory=lambda: ["tech"])
+
+
+@dataclass
 class InstagramSlot:
     """Horário-alvo de uma publicação diária (BRT) e até quando ela ainda pode sair."""
 
@@ -446,6 +457,7 @@ class Config:
     instagram: InstagramConfig = field(default_factory=InstagramConfig)
     congresso: CongressoConfig = field(default_factory=CongressoConfig)
     tribunais: TribunaisConfig = field(default_factory=TribunaisConfig)
+    agenda: AgendaConfig = field(default_factory=AgendaConfig)
 
     def section(self, section_id: str) -> SectionConfig:
         for s in self.sections:
@@ -471,6 +483,11 @@ class Config:
     def tribunais_ativo(self) -> bool:
         """Aba Tribunais (e o botão no cabeçalho) ligada para a marca ativa."""
         return self.tribunais.enabled and self.brand.key in self.tribunais.marcas
+
+    @property
+    def agenda_ativo(self) -> bool:
+        """Agenda da semana (bloco da home e página completa) ligada para a marca ativa."""
+        return self.agenda.enabled and self.brand.key in self.agenda.marcas
 
 
 def _truthy(value: str | None) -> bool:
@@ -576,6 +593,10 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
     if _truthy(env.get("QIJ_NO_TRIBUNAIS")):
         tribunais.enabled = False
 
+    agenda = AgendaConfig(**_known(AgendaConfig, site_raw.get("agenda")))
+    if _truthy(env.get("QIJ_NO_AGENDA")):
+        agenda.enabled = False
+
     instagram_raw = dict(site_raw.get("instagram") or {})
     slots = _instagram_slots(instagram_raw.pop("slots", None))
     eleicao = EleicaoConfig(**_known(EleicaoConfig, instagram_raw.pop("eleicao", None)))
@@ -597,4 +618,5 @@ def load_config(root: Path | None = None, env: Mapping[str, str] | None = None) 
         instagram=instagram,
         congresso=congresso,
         tribunais=tribunais,
+        agenda=agenda,
     )

@@ -1,0 +1,213 @@
+# Agenda da semana (bloco da home e edicoes/agenda.html): as escolhas com que a pauta oficial
+# do STF, do STJ, da Câmara, do Senado e do Congresso é lida.
+#
+# Tudo o que está aqui é escolha editorial, igual para todos os itens (matéria do governo e da
+# oposição, tribunal e Congresso), e vai escrito no "Como ler" da página completa. Nada aqui é
+# escolhido por IA, e nenhum texto da agenda é escrito por IA.
+# Lido por qijournal/agenda/regras.py (carregar). Chave desconhecida é ignorada; valor inválido
+# cai no padrão do código com um aviso; sem este arquivo a agenda usa os padrões (a edição nunca
+# cai por causa dele). O vocabulário (foro, alcance, estágio...) é o de qijournal/agenda/contrato.py.
+#
+# Seções: regua (os pesos), cortes, tetos, comissoes_que_decidem, frescor, situacoes (o
+# dicionário da home), palavras_de_area, nomes_aprovados, apelidos (ligação com a mídia) e
+# feeds_oficiais (o que não conta como imprensa).
+
+versao: 1
+
+# ── A régua ──────────────────────────────────────────────────────────────────────────────────
+# Só entra o que tem data e decide: sessão deliberativa de Plenário, julgamento, comissão que
+# decide e prazo constitucional que vence. Cada item recebe uma nota de 0 a 85, soma de três
+# partes: FORO (até 30), ALCANCE (até 30) e ESTÁGIO (até 25). A nota mede sinais institucionais
+# (onde se decide, quanta gente a decisão alcança, em que ponto está); não diz se a decisão é
+# boa e não prevê resultado. A MÍDIA NÃO PONTUA: a cobertura não escolhe o que entra.
+# Conferência nos dados de 23 a 27/11/2026: tema de repercussão geral que volta de pedido de
+# vista no Plenário do STF, 30 + 30 + 20 = 80; ação direta contra norma federal com destaque,
+# 30 + 30 + 15 = 75; medida provisória com prazo na semana, 15 + 30 + 25 = 70; projeto de lei no
+# Plenário do Senado com pauta confirmada, 30 + 18 + 15 = 63; PEC na CCJ do Senado, 15 + 30 + 10 = 55.
+regua:
+  foro:                          # onde se decide (até 30)
+    plenario: 30                 # Plenário da Câmara, do Senado, do Congresso ou do STF
+    corte_especial: 25           # Corte Especial do STJ
+    secao: 20                    # Seção do STJ
+    comissao_decide: 15          # comissão que decide (ver comissoes_que_decidem)
+    prazo: 15                    # prazo constitucional que vence
+    turma: 10                    # Turma do STF ou do STJ
+    comissao: 5                  # outra comissão
+  alcance:                       # quanta gente a decisão alcança (até 30)
+    repercussao_geral: 30        # o que o STF decidir vale para todos os casos iguais
+    repetitivo: 30               # o mesmo no STJ (recurso repetitivo)
+    controle_federal: 30         # ação direta contra norma federal
+    pec: 30                      # proposta de emenda à Constituição
+    plp: 30                      # projeto de lei complementar
+    mpv: 30                      # medida provisória
+    veto: 30
+    orcamento: 30                # leis orçamentárias
+    indicacao: 30                # indicação de autoridade
+    pl: 18                       # projeto de lei
+    controle_estadual: 15        # ação contra norma estadual ou municipal
+    acao_originaria: 15
+    embargos_de_divergencia: 15
+    afetacao: 15                 # proposta de afetação ou de relevância
+    pdl: 9                       # decreto legislativo
+    individual: 5                # caso individual, sem tema
+    outro: 0                     # tipo sem linha na régua (projeto de resolução, requerimento de mérito)
+  estagio:                       # em que ponto está (até 25); vale o maior entre os estágios do item
+    em_votacao: 25               # a sessão está em andamento e a deliberação do item começou
+    prazo_vence: 25              # o prazo vence na janela
+    retorno_de_vista: 20         # volta ao julgamento depois de pedido de vista
+    referendo_de_cautelar: 15    # o colegiado confirma ou derruba a decisão provisória
+    destaque: 15                 # saiu do julgamento virtual a pedido de um ministro
+    urgencia: 15                 # regime de urgência
+    pauta_confirmada: 15         # a própria Casa informa que a pauta está confirmada
+    pautado: 10                  # consta da pauta, sem confirmação
+    pauta_nao_publicada: 0       # a sessão existe e a pauta ainda não saiu
+
+# Nota mínima da linha (a linha vale a nota do seu melhor item). Piso por instituição: STF, STJ,
+# Câmara, Senado e Congresso aparecem sempre na home com o melhor item da janela, mesmo abaixo
+# do corte. A nota de relevância que o Congresso já calcula só desempata.
+cortes:
+  home: 60
+  pagina: 40                     # página completa (edicoes/agenda.html)
+
+# ── Tetos ────────────────────────────────────────────────────────────────────────────────────
+# Semana fraca mostra menos linhas: não se completa cota. O que passa do teto vira "mais N" e
+# fica inteiro na página completa.
+tetos:
+  home:
+    linhas: 8                    # linhas de pauta na janela (o dia da edição e os 4 dias úteis seguintes)
+    itens_por_linha: 2           # itens nomeados em cada linha; o resto vira "mais N"
+    nome_ate: 90                 # caracteres do nome de um item (corte no fim de uma palavra)
+    resultados: 2                # "Já decidido esta semana": os dias que já passaram
+    fila_nomeados: 2             # itens nomeados da fila do Plenário da Câmara
+    altura_px: 520               # altura do bloco no computador (conferida na medição, não no gerador)
+    celular:
+      linhas_hoje_amanha: 4      # HOJE e AMANHÃ abrem com até 4 linhas no total
+      itens_por_linha: 1         # um item nomeado; o resto vira "mais N"
+      nome_ate: 60
+      linhas_de_texto: 3         # cada linha de pauta ocupa no máximo 3 linhas de texto
+      altura_px: 600
+  pagina:
+    linhas: 60
+    bytes: 250000                # tamanho de edicoes/agenda.html
+  arquivos:                      # tamanho dos arquivos de coleta
+    congresso_bytes: 150000      # data/congresso/agenda.json
+    tribunais_bytes: 60000       # data/tribunais/agenda.json (a pasta tem teto de 3 MB)
+
+# Comissões que decidem, por Casa (sigla oficial). As demais comissões valem "comissao" na régua.
+comissoes_que_decidem:
+  camara: [CCJC, CFT]            # Constituição e Justiça; Finanças e Tributação
+  senado: [CCJ, CAE]             # Constituição e Justiça; Assuntos Econômicos
+  congresso: [CMO]               # Comissão Mista de Orçamento
+
+# ── Frescor ──────────────────────────────────────────────────────────────────────────────────
+# Cada arquivo de coleta traz, por fonte, o dia do dado (data_dados). A conta é em dias úteis
+# (segunda a sexta) porque o STJ não publica no fim de semana: dado de sexta lido na segunda tem
+# 1 dia útil e aparece normal.
+frescor:
+  aviso_dias_uteis: 2            # a partir de 2 dias úteis sem dado novo: "dados de DD/MM, pode ter mudado"
+  some_dias: 4                   # acima de 4 dias corridos os itens da fonte somem e fica uma frase com o link
+                                 # oficial; quando a fonte traz o seu limite (velho_dias de data/tribunais/meta.json),
+                                 # vale o da fonte
+
+# ── Dicionário de situações (só a home) ──────────────────────────────────────────────────────
+# Escrito por gente, uma vez. A home troca o termo do registro pela frase daqui; o termo oficial
+# fica na página completa. Sem entrada, a home mostra o termo oficial. Regras de redação: verbo
+# "pautado" ou "consta da pauta"; nada de previsão ("vai votar", "será julgado"), de chance ou de
+# adjetivo; sem travessão. {detalhe} é o que o registro traz (o ministro que pediu vista ou
+# destaque); "com_detalhe" só é usado quando o registro traz o detalhe. {data} é DD/MM.
+situacoes:
+  retorno_de_vista:
+    texto: "volta ao julgamento depois de um pedido de vista"
+    com_detalhe: "volta ao julgamento depois do pedido de vista de {detalhe}"
+  destaque:
+    texto: "pautado no Plenário depois de sair do julgamento virtual a pedido de um ministro"
+    com_detalhe: "pautado no Plenário depois de sair do julgamento virtual a pedido de {detalhe}"
+  referendo_de_cautelar:
+    texto: "o Plenário confirma ou derruba a decisão provisória"
+  urgencia:
+    texto: "pautado com urgência"
+  prazo_mpv:                     # prazo de medida provisória (no lugar de "Congresso, prazo")
+    texto: "Medida provisória perde a validade"
+  prazo_veto:                    # veto com o prazo de análise vencido (Constituição, art. 66, § 6º)
+    texto: "Veto passa à frente das outras votações do Congresso"
+  aprovado_ressalvados_destaques:
+    texto: "texto principal aprovado; faltam os trechos votados em separado"
+  retirado_de_pauta:
+    texto: "saiu da pauta"
+  nao_apreciado:
+    texto: "não chegou a ser votado"
+  prejudicado:
+    texto: "não foi a voto porque outra decisão já resolveu o assunto"
+  pedido_de_vista:
+    texto: "votação adiada por pedido de mais tempo para analisar"
+  pauta_camara_nao_publicada:    # a Câmara só registra a sessão do Plenário na véspera ou no dia
+    texto: "pauta do Plenário ainda não publicada pela Câmara"
+  fila:                          # o que sobrou da última sessão do Plenário da Câmara (não tem data marcada)
+    texto: "ficaram sem votação na última sessão do Plenário"
+  dia_vazio:
+    texto: "nada de peso pautado"
+  resultado_tribunal:            # os tribunais não publicam o resultado em dado aberto
+    texto: "resultado no andamento oficial"
+  como_pautado:                  # sessão mantida do arquivo anterior
+    texto: "como pautado em {data}"
+
+# ── Palavra de área ──────────────────────────────────────────────────────────────────────────
+# Uma palavra no começo do item, só quando a fonte traz classificação oficial: o tema da
+# proposição (ids de config/congresso.yaml → temas) ou a área do processo (ids de
+# config/tribunais.yaml → areas). Área sem palavra aqui não ganha palavra: "constitucional"
+# (é o tipo da ação, não o assunto), "processual", "outros" e "sem_assunto" ficam de fora.
+palavras_de_area:
+  # Congresso
+  economia: "Economia"
+  trabalho: "Trabalho"
+  saude: "Saúde"
+  educacao: "Educação"
+  seguranca: "Segurança"
+  direitos: "Direitos humanos"
+  ambiente: "Meio ambiente"
+  agro: "Agro"
+  cidades: "Cidades"
+  politica: "Política"
+  exterior: "Relações exteriores"
+  tecnologia: "Tecnologia"
+  # Tribunais
+  tributario: "Tributos"
+  administrativo: "Setor público"
+  previdenciario: "Previdência"
+  ambiental: "Meio ambiente"
+  eleitoral: "Eleições"
+  civil: "Contratos e bens"
+  familia: "Família"
+  empresarial: "Empresas"
+  consumidor: "Consumidor"
+  penal: "Penal"
+
+# ── Nomes aprovados por pessoa ───────────────────────────────────────────────────────────────
+# O nome do item sai, nesta ordem: (1) do nome curto que a própria fonte publica; (2) desta
+# tabela; (3) do título do tema; (4) da ementa cortada por regra. Use esta tabela só para os
+# poucos itens que a regra nomeia mal. É o dono quem aprova cada linha; nada entra sozinho.
+# O nome descreve o assunto, sem adjetivo e sem previsão. Exemplo (comentado: não vale):
+#   "PL 5807/2025": "Falsificação de alimentos, bebidas e suplementos"
+nomes_aprovados: {}
+
+# ── Apelidos para a ligação com a mídia ──────────────────────────────────────────────────────
+# A agenda só liga um item a uma matéria pelo identificador (sigla, número e ano; classe e
+# número do processo; "Tema N" com o tribunal no mesmo texto) ou por um apelido desta tabela.
+# Apelido tem 2 palavras ou mais e validade (de/até, inclusive): fora dela não liga. O primeiro
+# termo é o que aparece entre parênteses ao lado do número: "PLP 299/2026 (pacote fiscal)".
+# Sigla solta, nome de ministro, nome de parte e palavras da ementa nunca ligam. Esta tabela é
+# só da agenda: os apelidos de config/congresso.yaml valem para a aba Congresso e não são lidos aqui.
+apelidos:
+  # SUGESTÃO A SER CONFIRMADA PELO DONO: nas edições de novembro de 2026 os veículos chamam o
+  # PLP 299/2026 de "pacote fiscal" e "pacote de ajuste fiscal" e quase nunca citam o número.
+  - item: "PLP 299/2026"
+    termos: ["pacote fiscal", "pacote de ajuste fiscal"]
+    de: "2026-11-01"
+    ate: "2026-12-31"
+
+# ── Feeds que não contam como imprensa ───────────────────────────────────────────────────────
+# Ids de config/sources.yaml dos canais dos próprios tribunais e das próprias Casas. Uma notícia
+# do STJ sobre um julgamento do STJ é comunicação do órgão, não cobertura: é contada à parte e
+# não entra em "na mídia: N veículos". A Agência Brasil é agência pública de notícias e conta
+# como veículo.
+feeds_oficiais: [stf, stj, tst, tse, cnj, tjdft, tjmg, trf6, camara, senado]

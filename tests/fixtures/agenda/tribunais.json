@@ -1,0 +1,1556 @@
+{
+ "versao": 1,
+ "lado": "tribunais",
+ "gerado_em": "2026-11-23T21:14:22Z",
+ "hoje": "2026-11-23",
+ "janela": {
+  "de": "2026-11-23",
+  "ate": "2026-12-06"
+ },
+ "fontes": {
+  "stf_pauta": {
+   "instituicao": "stf",
+   "nome": "STF: pauta das sessões",
+   "url": "https://portal.stf.jus.br/pauta/",
+   "ok": true,
+   "data_dados": "2026-11-23",
+   "coletado_em": "2026-11-23T11:54:49Z",
+   "aviso": null,
+   "velho_dias": 4
+  },
+  "stj_pautas": {
+   "instituicao": "stj",
+   "nome": "STJ: pautas de julgamento",
+   "url": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "ok": true,
+   "data_dados": "2026-11-23",
+   "coletado_em": "2026-11-23T21:14:22Z",
+   "aviso": null,
+   "velho_dias": 4
+  },
+  "stj_precedentes": {
+   "instituicao": "stj",
+   "nome": "STJ: precedentes qualificados",
+   "url": "https://dadosabertos.web.stj.jus.br/dataset/precedentes-qualificados",
+   "ok": true,
+   "data_dados": "2026-11-19",
+   "coletado_em": "2026-11-23T11:54:49Z",
+   "aviso": null,
+   "velho_dias": 8
+  }
+ },
+ "sessoes": [
+  {
+   "id": "stj-t1-2026-11-24",
+   "instituicao": "stj",
+   "orgao": "Primeira Turma",
+   "orgao_sigla": "T1",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-24",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 15,
+    "recurso_interno": 185,
+    "sem_tema": 1
+   }
+  },
+  {
+   "id": "stj-t4-2026-11-24",
+   "instituicao": "stj",
+   "orgao": "Quarta Turma",
+   "orgao_sigla": "T4",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-24",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 82,
+    "recurso_interno": 203,
+    "sem_tema": 129,
+    "outros": 1
+   }
+  },
+  {
+   "id": "stj-t3-2026-11-24",
+   "instituicao": "stj",
+   "orgao": "Terceira Turma",
+   "orgao_sigla": "T3",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-24",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 77,
+    "recurso_interno": 248,
+    "sem_tema": 64
+   }
+  },
+  {
+   "id": "stf-plenario-2026-11-25",
+   "instituicao": "stf",
+   "orgao": "Plenário",
+   "orgao_sigla": "PLEN",
+   "foro": "plenario",
+   "tipo": "julgamento",
+   "data": "2026-11-25",
+   "hora": "14:00",
+   "situacao": "agendada",
+   "modalidade": "presencial",
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://portal.stf.jus.br/pauta/",
+   "itens": [
+    {
+     "identificador": "ADI 6002",
+     "tipo": "ADI",
+     "alcance": "controle_federal",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "destaque",
+     "estagio_detalhe": "Flávio Dino",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Cristiano Zanin",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=6002",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Congresso Nacional"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ARE 1502069",
+     "tipo": "ARE",
+     "alcance": "repercussao_geral",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1324,
+      "titulo": "Revisão de salário-base de professor municipal, com base no valor de atualização do piso nacional da educação fixado em Portaria do Ministério da Educação – MEC.",
+      "tipo": "repercussao_geral"
+     },
+     "area": "administrativo",
+     "estagio": "retorno_de_vista",
+     "estagio_detalhe": "Gilmar Mendes",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Dias Toffoli",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 2,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ARE&numeroProcesso=1502069",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Município de Riolandia"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "RE 1326541",
+     "tipo": "RE",
+     "alcance": "repercussao_geral",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1218,
+      "titulo": "Adoção do piso nacional estipulado pela Lei federal 11.738/2008 como base para o vencimento inicial da carreira do magistério da Educação Básica estadual, com reflexos nos demais níveis, faixas e classes da carreira escalonada.",
+      "tipo": "repercussao_geral"
+     },
+     "area": "administrativo",
+     "estagio": "retorno_de_vista",
+     "estagio_detalhe": "Gilmar Mendes",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Cristiano Zanin",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 3,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=RE&numeroProcesso=1326541",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Estado de São Paulo"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7717",
+     "tipo": "ADI",
+     "alcance": "controle_federal",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "retorno_de_vista",
+     "estagio_detalhe": "Alexandre de Moraes",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Nunes Marques",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 4,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7717",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Estado de Mato Grosso do Sul"
+      },
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Congresso Nacional"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 6528",
+     "tipo": "ADI",
+     "alcance": "controle_federal",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "destaque",
+     "estagio_detalhe": "Flávio Dino",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Cristiano Zanin",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 5,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=6528",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "pj",
+       "nome": "PSB"
+      },
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Congresso Nacional"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7493",
+     "tipo": "ADI",
+     "alcance": "controle_estadual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "destaque",
+     "estagio_detalhe": "Edson Fachin",
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Dias Toffoli",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 6,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7493",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Assembleia Legislativa de Mato Grosso"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7643",
+     "tipo": "ADI",
+     "alcance": "controle_estadual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Alexandre de Moraes",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 7,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7643",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Assembleia Legislativa da Paraíba"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7807",
+     "tipo": "ADI",
+     "alcance": "controle_estadual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "referendo_de_cautelar",
+     "estagio_detalhe": null,
+     "outros_estagios": [
+      "destaque"
+     ],
+     "resultado": null,
+     "relator": {
+      "nome": "Dias Toffoli",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 8,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7807",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Estado de Mato Grosso"
+      },
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Assembleia Legislativa de Mato Grosso"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7869",
+     "tipo": "ADI",
+     "alcance": "controle_estadual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "referendo_de_cautelar",
+     "estagio_detalhe": null,
+     "outros_estagios": [
+      "destaque"
+     ],
+     "resultado": null,
+     "relator": {
+      "nome": "Alexandre de Moraes",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 9,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7869",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Assembleia Legislativa da Paraíba"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "ADI 7906",
+     "tipo": "ADI",
+     "alcance": "controle_estadual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": "constitucional",
+     "estagio": "referendo_de_cautelar",
+     "estagio_detalhe": null,
+     "outros_estagios": [
+      "destaque"
+     ],
+     "resultado": null,
+     "relator": {
+      "nome": "Dias Toffoli",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 10,
+     "link": "https://portal.stf.jus.br/processos/listarProcessos.asp?classe=ADI&numeroProcesso=7906",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Assembleia Legislativa de Rondônia"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {}
+  },
+  {
+   "id": "stj-ce-2026-11-25",
+   "instituicao": "stj",
+   "orgao": "Corte Especial",
+   "orgao_sigla": "CE",
+   "foro": "corte_especial",
+   "tipo": "julgamento",
+   "data": "2026-11-25",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "AREsp 3296604",
+     "tipo": "AREsp",
+     "alcance": "afetacao",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "João Otávio de Noronha",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202602205797",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "pj",
+       "nome": "Banco BMG"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {
+    "segredo": 50,
+    "recurso_interno": 60,
+    "vice_presidencia": 215
+   }
+  },
+  {
+   "id": "stf-plenario-2026-11-26",
+   "instituicao": "stf",
+   "orgao": "Plenário",
+   "orgao_sigla": "PLEN",
+   "foro": "plenario",
+   "tipo": "julgamento",
+   "data": "2026-11-26",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": "presencial",
+   "pauta": "nao_publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://portal.stf.jus.br/pauta/",
+   "itens": [],
+   "fora": {}
+  },
+  {
+   "id": "stj-t5-2026-11-26",
+   "instituicao": "stj",
+   "orgao": "Quinta Turma",
+   "orgao_sigla": "T5",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-26",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 33,
+    "recurso_interno": 180,
+    "outros": 2
+   }
+  },
+  {
+   "id": "stj-t2-2026-11-26",
+   "instituicao": "stj",
+   "orgao": "Segunda Turma",
+   "orgao_sigla": "T2",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-26",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 10,
+    "recurso_interno": 198,
+    "sem_tema": 40
+   }
+  },
+  {
+   "id": "stj-t6-2026-11-26",
+   "instituicao": "stj",
+   "orgao": "Sexta Turma",
+   "orgao_sigla": "T6",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-11-26",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 90,
+    "recurso_interno": 258,
+    "sem_tema": 76,
+    "outros": 1
+   }
+  },
+  {
+   "id": "stj-t1-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Primeira Turma",
+   "orgao_sigla": "T1",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 8,
+    "recurso_interno": 126,
+    "sem_tema": 2
+   }
+  },
+  {
+   "id": "stj-t4-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Quarta Turma",
+   "orgao_sigla": "T4",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 7,
+    "recurso_interno": 1,
+    "sem_tema": 1
+   }
+  },
+  {
+   "id": "stj-t5-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Quinta Turma",
+   "orgao_sigla": "T5",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "sem_tema": 1
+   }
+  },
+  {
+   "id": "stj-t2-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Segunda Turma",
+   "orgao_sigla": "T2",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "sem_tema": 2
+   }
+  },
+  {
+   "id": "stj-t6-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Sexta Turma",
+   "orgao_sigla": "T6",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 3,
+    "sem_tema": 1
+   }
+  },
+  {
+   "id": "stj-t3-2026-12-01",
+   "instituicao": "stj",
+   "orgao": "Terceira Turma",
+   "orgao_sigla": "T3",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-01",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 101,
+    "recurso_interno": 181,
+    "sem_tema": 64
+   }
+  },
+  {
+   "id": "stj-ce-2026-12-02",
+   "instituicao": "stj",
+   "orgao": "Corte Especial",
+   "orgao_sigla": "CE",
+   "foro": "corte_especial",
+   "tipo": "julgamento",
+   "data": "2026-12-02",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "APn 1131",
+     "tipo": "APn",
+     "alcance": "acao_originaria",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Antonio Carlos Ferreira",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202502771756",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Ministério Público Federal"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "EAREsp 2616058",
+     "tipo": "EAREsp",
+     "alcance": "embargos_de_divergencia",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "João Otávio de Noronha",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 2,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202401361665",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "Inq 1635",
+     "tipo": "Inq",
+     "alcance": "acao_originaria",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Antonio Carlos Ferreira",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 3,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202200598967",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Ministério Público Federal"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2034211",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1254,
+      "titulo": "Definir se ocorre ou não a prescrição para a habilitação de herdeiros ou sucessores da parte falecida no curso da ação.",
+      "tipo": "repetitivo"
+     },
+     "area": "administrativo",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Humberto Martins",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 4,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202203340439",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Departamento Nacional de Obras Contra as Secas"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "União"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2034214",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1254,
+      "titulo": "Definir se ocorre ou não a prescrição para a habilitação de herdeiros ou sucessores da parte falecida no curso da ação.",
+      "tipo": "repetitivo"
+     },
+     "area": "administrativo",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Humberto Martins",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 5,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202203340464",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Departamento Nacional de Obras Contra as Secas"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "União"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2235680",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1448,
+      "titulo": "Definir parâmetros de aferição de razoabilidade e de proporcionalidade na fixação e no montante acumulado de multa cominatória (astreintes), considerando-se o valor diário inicial e a obrigação principal buscada na ação, frente à prestação imposta.",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Raul Araújo",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 6,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202503745930",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "pj",
+       "nome": "Aymoré Financiamentos"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "União"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2258899",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1448,
+      "titulo": "Definir parâmetros de aferição de razoabilidade e de proporcionalidade na fixação e no montante acumulado de multa cominatória (astreintes), considerando-se o valor diário inicial e a obrigação principal buscada na ação, frente à prestação imposta.",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Raul Araújo",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 7,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202600524503",
+     "partes": [
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "União"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {
+    "segredo": 22,
+    "recurso_interno": 22,
+    "vice_presidencia": 102
+   }
+  },
+  {
+   "id": "stj-s2-2026-12-02",
+   "instituicao": "stj",
+   "orgao": "Segunda Seção",
+   "orgao_sigla": "S2",
+   "foro": "secao",
+   "tipo": "julgamento",
+   "data": "2026-12-02",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "REsp 2284957",
+     "tipo": "REsp",
+     "alcance": "afetacao",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Comissão Gestora de Precedentes | 2ª Seção - integrante 1",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202602916421",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "pj",
+       "nome": "Banco do Nordeste"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {}
+  },
+  {
+   "id": "stj-s3-2026-12-02",
+   "instituicao": "stj",
+   "orgao": "Terceira Seção",
+   "orgao_sigla": "S3",
+   "foro": "secao",
+   "tipo": "julgamento",
+   "data": "2026-12-02",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 1
+   }
+  },
+  {
+   "id": "stj-s1-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Primeira Seção",
+   "orgao_sigla": "S1",
+   "foro": "secao",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "EAREsp 2716614",
+     "tipo": "EAREsp",
+     "alcance": "embargos_de_divergencia",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Maria Thereza de Assis Moura",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202402964300",
+     "partes": [
+      {
+       "polo": "ativo",
+       "tipo": "ente",
+       "nome": "Ministério Público Federal"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Estado de Goiás"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {
+    "segredo": 1
+   }
+  },
+  {
+   "id": "stj-t5-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Quinta Turma",
+   "orgao_sigla": "T5",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 31,
+    "recurso_interno": 96,
+    "sem_tema": 2
+   }
+  },
+  {
+   "id": "stj-s2-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Segunda Seção",
+   "orgao_sigla": "S2",
+   "foro": "secao",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "CC 223090",
+     "tipo": "CC",
+     "alcance": "acao_originaria",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Maria Isabel Gallotti",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202603088957",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2026255",
+     "tipo": "REsp",
+     "alcance": "individual",
+     "apelido": null,
+     "ementa": null,
+     "tema": null,
+     "area": null,
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Luís Carlos Gambogi",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 2,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202202885714",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2226097",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1404,
+      "titulo": "Definir se: (i) é lícita a disponibilização ou comercialização a terceiros de dados pessoais não sensíveis, por gestor de banco de dados de entidades de proteção ao crédito, sem prévia comunicação ou consentimento do cadastrado; (ii) há configuração de dano moral in re ipsa na…",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Raul Araújo",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 3,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202502873671",
+     "partes": [
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Agencia Nacional de Protecao de Dados - Anpd"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2226946",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1404,
+      "titulo": "Definir se: (i) é lícita a disponibilização ou comercialização a terceiros de dados pessoais não sensíveis, por gestor de banco de dados de entidades de proteção ao crédito, sem prévia comunicação ou consentimento do cadastrado; (ii) há configuração de dano moral in re ipsa na…",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Raul Araújo",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 4,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202502953369",
+     "partes": [
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Agencia Nacional de Protecao de Dados - Anpd"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2258565",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1466,
+      "titulo": "Definir se, nos contratos de compra e venda de imóveis submetidos a regime de patrimônio de afetação e firmados após a vigência da Lei nº 13.786/2018 (Lei do Distrato), a rescisão por inadimplemento do comprador autoriza o vendedor a reter até 50% (cinquenta por cento) das…",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Ricardo Villas Bôas Cueva",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 5,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202600497587",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2258822",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1466,
+      "titulo": "Definir se, nos contratos de compra e venda de imóveis submetidos a regime de patrimônio de afetação e firmados após a vigência da Lei nº 13.786/2018 (Lei do Distrato), a rescisão por inadimplemento do comprador autoriza o vendedor a reter até 50% (cinquenta por cento) das…",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Ricardo Villas Bôas Cueva",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 6,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202600498257",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    },
+    {
+     "identificador": "REsp 2259135",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1466,
+      "titulo": "Definir se, nos contratos de compra e venda de imóveis submetidos a regime de patrimônio de afetação e firmados após a vigência da Lei nº 13.786/2018 (Lei do Distrato), a rescisão por inadimplemento do comprador autoriza o vendedor a reter até 50% (cinquenta por cento) das…",
+      "tipo": "repetitivo"
+     },
+     "area": "civil",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Ricardo Villas Bôas Cueva",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 7,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202600544380",
+     "partes": [],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {
+    "segredo": 1
+   }
+  },
+  {
+   "id": "stj-t2-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Segunda Turma",
+   "orgao_sigla": "T2",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 19,
+    "recurso_interno": 221,
+    "sem_tema": 71
+   }
+  },
+  {
+   "id": "stj-t6-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Sexta Turma",
+   "orgao_sigla": "T6",
+   "foro": "turma",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [],
+   "fora": {
+    "segredo": 59,
+    "recurso_interno": 135,
+    "sem_tema": 31,
+    "outros": 1
+   }
+  },
+  {
+   "id": "stj-s3-2026-12-03",
+   "instituicao": "stj",
+   "orgao": "Terceira Seção",
+   "orgao_sigla": "S3",
+   "foro": "secao",
+   "tipo": "julgamento",
+   "data": "2026-12-03",
+   "hora": null,
+   "situacao": "agendada",
+   "modalidade": null,
+   "pauta": "publicada",
+   "pauta_confirmada": null,
+   "como_pautado_em": null,
+   "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+   "itens": [
+    {
+     "identificador": "REsp 2076432",
+     "tipo": "REsp",
+     "alcance": "repetitivo",
+     "apelido": null,
+     "ementa": null,
+     "tema": {
+      "numero": 1256,
+      "titulo": "Definição da natureza do crime previsto no art. 14 da Lei 10.826/2003 como de mera conduta e de perigo abstrato.",
+      "tipo": "repetitivo"
+     },
+     "area": "penal",
+     "estagio": "pautado",
+     "estagio_detalhe": null,
+     "outros_estagios": [],
+     "resultado": null,
+     "relator": {
+      "nome": "Messod Azulay Neto",
+      "partido": null,
+      "uf": null
+     },
+     "ordem": 1,
+     "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202301633325",
+     "partes": [
+      {
+       "polo": "passivo",
+       "tipo": "ente",
+       "nome": "Ministério Público do DF e Territórios"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Defensoria Pública da União"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Ministério Público do Rio Grande do Sul"
+      },
+      {
+       "polo": "outro",
+       "tipo": "ente",
+       "nome": "Ministério Público de São Paulo"
+      }
+     ],
+     "ficha": null,
+     "relevancia": null,
+     "segredo": false
+    }
+   ],
+   "fora": {}
+  }
+ ],
+ "estado": {
+  "stf": {
+   "recesso": null,
+   "pauta_publicada_ate": "2026-11-25",
+   "fila": [],
+   "fila_de": null,
+   "sessao_conjunta_convocada": null,
+   "proximo": null,
+   "virtuais": [
+    {
+     "de": "2026-11-13",
+     "ate": "2026-11-23",
+     "plenario": 132,
+     "turma1": 218,
+     "turma2": 277
+    },
+    {
+     "de": "2026-11-20",
+     "ate": "2026-11-30",
+     "plenario": 179,
+     "turma1": 209,
+     "turma2": 274
+    },
+    {
+     "de": "2026-11-27",
+     "ate": "2026-12-04",
+     "plenario": 165,
+     "turma1": 187,
+     "turma2": 194
+    }
+   ],
+   "contagens": {}
+  },
+  "stj": {
+   "recesso": null,
+   "pauta_publicada_ate": "2026-12-17",
+   "fila": [],
+   "fila_de": null,
+   "sessao_conjunta_convocada": null,
+   "proximo": {
+    "id": "stj-s2-2026-12-09",
+    "instituicao": "stj",
+    "orgao": "Segunda Seção",
+    "orgao_sigla": "S2",
+    "foro": "secao",
+    "tipo": "julgamento",
+    "data": "2026-12-09",
+    "hora": null,
+    "situacao": "agendada",
+    "modalidade": null,
+    "pauta": "publicada",
+    "pauta_confirmada": null,
+    "como_pautado_em": null,
+    "link": "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras",
+    "itens": [
+     {
+      "identificador": "REsp 2272537",
+      "tipo": "REsp",
+      "alcance": "repetitivo",
+      "apelido": null,
+      "ementa": null,
+      "tema": {
+       "numero": 1443,
+       "titulo": "Definir se a cláusula de destinação residencial prevista em convenção de condomínio é suficiente para impedir a locação de unidades autônomas por curto período, por meio de plataformas digitais, independentemente de proibição expressa.",
+       "tipo": "repetitivo"
+      },
+      "area": "civil",
+      "estagio": "pautado",
+      "estagio_detalhe": null,
+      "outros_estagios": [],
+      "resultado": null,
+      "relator": {
+       "nome": "Raul Araújo",
+       "partido": null,
+       "uf": null
+      },
+      "ordem": 1,
+      "link": "https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo=202500817086",
+      "partes": [],
+      "ficha": null,
+      "relevancia": null,
+      "segredo": false
+     }
+    ],
+    "fora": {}
+   },
+   "virtuais": [],
+   "contagens": {
+    "itens": 3549,
+    "sessoes": 22
+   }
+  }
+ }
+}

@@ -144,6 +144,20 @@ def test_site_yaml_liga_a_aba_e_qij_no_tribunais_desliga() -> None:
     assert not load_config(env={"QIJ_BRAND": "pbcv"}).tribunais_ativo  # só a marca tech
 
 
+def test_site_yaml_liga_a_agenda_e_qij_no_agenda_desliga() -> None:
+    """A Agenda da semana segue o mesmo molde da aba: ligada no site.yaml para a marca tech,
+    desligada por QIJ_NO_AGENDA, e cada chave desliga só o que é dela."""
+    from qijournal.config import load_config
+
+    ligada = load_config(env={})
+    assert ligada.agenda.enabled and ligada.agenda.marcas == ["tech"]
+    assert ligada.agenda_ativo
+    desligada = load_config(env={"QIJ_NO_AGENDA": "1"})
+    assert not desligada.agenda_ativo and desligada.tribunais_ativo  # a aba Tribunais continua
+    assert load_config(env={"QIJ_NO_TRIBUNAIS": "1"}).agenda_ativo  # e a agenda não depende da aba
+    assert not load_config(env={"QIJ_BRAND": "pbcv"}).agenda_ativo  # só a marca tech
+
+
 # ── a composição ─────────────────────────────────────────────────────────────────────────────
 
 
