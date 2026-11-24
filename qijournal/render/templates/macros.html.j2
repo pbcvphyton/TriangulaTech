@@ -1,7 +1,8 @@
 {#- Blocos reutilizados na página da edição. "s" é sempre uma StoryView (textos já limpos). -#}
 
-{% macro figure(s, cls) -%}
-<figure class="{{ cls }}" data-img><img src="{{ s.image }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"></figure>
+{#- lazy=False na foto da manchete, que já está na primeira tela. -#}
+{% macro figure(s, cls, lazy=True) -%}
+<figure class="{{ cls }}" data-img><img src="{{ s.image }}" alt=""{% if lazy %} loading="lazy"{% endif %} decoding="async" referrerpolicy="no-referrer"></figure>
 {%- endmacro %}
 
 {% macro lang(s) -%}{% if s.lang %} lang="{{ s.lang }}"{% endif %}{%- endmacro %}
@@ -37,7 +38,8 @@
 {#- Os botões do cabeçalho em dois grupos (designer.md §5): as abas especiais (Analítico ·
     Congresso · Tribunais) e as ferramentas (Edições · Buscar; o Escuro vem do layout, logo
     depois). A ordem do HTML é a ordem na tela, então o Tab segue o que se vê. O CSS põe os dois
-    grupos em duas linhas no celular e de 1024 a 1599 px, e numa linha no resto.
+    grupos em duas linhas no celular e de 1024 a 1599 px, e numa linha no resto; na página da
+    edição, o celular leva uma fileira só (as abas com o nome escrito, as ferramentas com o ícone).
     brand: BrandView (os macros não veem o contexto da página); base: caminho da pasta das
     edições; analitico: endereço do Analítico ("" sem ele); atual: "analitico", "congresso" ou
     "tribunais" na própria aba (o botão dela leva aria-current); edicoes/buscar: False na página
@@ -63,9 +65,22 @@
 <button class="srch-all" type="submit" title="Buscar em todas as edições (Pesquisa analítica)"><span class="sr-only">Buscar em </span>Todas as edições<span aria-hidden="true"> &rarr;</span></button>
 {%- endmacro %}
 
-{% macro meta(s) -%}
-{% if s.source_names or s.age %}
-<p class="meta">{% if s.source_names %}<span>{{ s.source_names }}</span>{% endif %}{% if s.age %}<time datetime="{{ s.published }}" data-age>{{ s.age }}</time>{% endif %}</p>
+{#- Linha de serviço de uma chamada (itens: lista de ServicoView, montada em web.py): os
+    trechos separados por " · ". A idade ("há 3 h") é recalculada no navegador; a marca de
+    divergência leva ao item de "Onde os veículos divergiram". -#}
+{% macro servico(itens) -%}
+{% if itens %}
+<p class="sv">
+  {%- for i in itens -%}
+  {%- if not loop.first %}<span class="sv-s"> · </span>{% endif -%}
+  {%- if i.tipo == "idade" %}<time datetime="{{ i.quando }}" data-age>{{ i.texto }}</time>
+  {%- elif i.tipo == "hora" %}<time datetime="{{ i.quando }}">{{ i.texto }}</time>
+  {%- elif i.tipo == "diverge" %}<a class="sv-dv" href="{{ i.href }}">{{ i.texto }}</a>
+  {%- elif i.href %}<a href="{{ i.href }}">{{ i.texto }}</a>
+  {%- else %}<span>{{ i.texto }}</span>
+  {%- endif -%}
+  {%- endfor -%}
+</p>
 {% endif %}
 {%- endmacro %}
 
@@ -77,14 +92,6 @@
   {%- if c.pct_a %}<span class="cov-a" style="width:{{ c.pct_a }}%"></span>{% endif -%}
   {%- if c.pct_n %}<span class="cov-n" style="width:{{ c.pct_n }}%"></span>{% endif -%}
   {%- if c.pct_b %}<span class="cov-b" style="width:{{ c.pct_b }}%"></span>{% endif -%}
-</div>
-{%- endmacro %}
-
-{#- Selo do card: barra fina e o lado para onde a cobertura pendeu. -#}
-{% macro badge(c) -%}
-<div class="cov mini lean-{{ c.lean }}" lang="pt-BR">
-  {{ bar(c) }}
-  <p class="cov-lean">{{ c.lean_label }}</p>
 </div>
 {%- endmacro %}
 
@@ -121,19 +128,18 @@
 </div>
 {%- endmacro %}
 
+{#- Cartão de "Todas as matérias, por editoria": só a editoria, o título e a linha fina; a
+    marca de divergência só quando o assunto teve veículos dos dois lados. Foto, lista de
+    veículos, hora e barra da cobertura ficam na janela da matéria. -#}
 {% macro card(s) -%}
 <article class="cl" style="--sc:{{ s.color }}">
   <p class="cat">{{ s.section_title }}</p>
-  {% if s.image %}
-  {{ figure(s, "ci") }}
-  {% endif %}
   <h3{{ lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
   {% if s.dek %}
   <p class="dk"{{ lang(s) }}>{{ s.dek }}</p>
   {% endif %}
-  {{ meta(s) }}
-  {% if s.coverage %}
-  {{ badge(s.coverage) }}
+  {% if s.marca %}
+  <p class="sv"><span class="sv-dv">{{ s.marca }}</span></p>
   {% endif %}
 </article>
 {%- endmacro %}

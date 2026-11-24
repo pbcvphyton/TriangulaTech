@@ -94,6 +94,113 @@ arquivo guarda as edições dos últimos 400 dias (`archive_keep_days` em
 
 ---
 
+## A home: três andares, cada um com teto
+
+A home (`index.html`) é a primeira página de um jornal, não o jornal inteiro: uma
+manchete, uma lista numerada e um resumo de como a mídia cobriu o dia. O que é
+detalhe fica a um clique, na janela de cada matéria e na cópia arquivada da edição.
+É uma capa só no código, que se rearruma pela largura da tela (não há uma versão
+para computador e outra para celular). De cima para baixo:
+
+1. **Cabeçalho.** Marca, data e hora da edição e os botões (Analítico, Congresso,
+   Tribunais, Edições, Buscar, Escuro). No celular (até 640 px), o logo e uma
+   fileira só de botões: as abas com o nome escrito, as ferramentas com o ícone
+   (o nome segue para o leitor de tela); o lema desce para o rodapé.
+2. **Linha de indicadores.** As cotações, sem rolagem automática e sem botão de
+   pausa; quem quer ver as demais arrasta para o lado. O clima da primeira cidade
+   configurada é o último item da linha (some no celular).
+3. **Manchete.** Editoria, título (abre a janela de leitura), linha fina, a foto,
+   quando há (ao lado do texto; no celular, uma miniatura), e uma linha de
+   serviço: quantos veículos, há quanto tempo e, se o assunto teve veículos dos
+   dois lados, a marca de divergência. Nenhum parágrafo do corpo. O título nunca
+   é cortado: a letra é que diminui com o comprimento (a classe sai de `web.py`).
+4. **Em 1 minuto.** Uma lista numerada com 5 chamadas: as 3 secundárias e os 2
+   primeiros destaques (se faltar, as próximas matérias na ordem das seções).
+   Cada matéria aparece uma única vez neste andar (manchete e 5 chamadas). A
+   linha fina de cada chamada, em uma linha, só aparece em tela larga.
+5. **Agenda da semana** (reservado: o bloco entra neste ponto do modelo).
+6. **Como a mídia cobriu.** Uma linha de abertura, só para a marca com
+   termômetro e quando ele rodou no dia ("Viés político das notícias de hoje:
+   equilibrado. Ver a análise", sem número; só cresce quando algum texto sai da
+   faixa de equilíbrio, e aí lista até 3), e duas colunas:
+   - **Onde os veículos divergiram:** até 3 assuntos com veículos dos dois lados
+     e 3 veículos ou mais, cada um com o título e os dois lados em palavras, com
+     a conta ("3 veículos: critica a falta de ambição. 1 veículo destoou: destaca
+     os limites do consenso. 11 sem lado."). Só se chama divergência quando o
+     lado menor tem 2 veículos ou mais; com 1, ele "destoou". Sem nenhum assunto
+     assim, uma frase diz que os veículos relataram tudo de forma semelhante.
+   - **Mais recentes até HHhMM** (a hora da edição, porque a lista não se
+     atualiza): 5 notícias no computador e 3 no celular, com hora, veículo e
+     título, e o link para todas as notícias do dia.
+
+   Edição em modo automático não tem cobertura comparada: o bloco fica só com
+   "Mais recentes". Marca sem termômetro não tem a linha do viés.
+7. **Todas as N matérias, por editoria.** O único bloco recolhido da home: uma
+   linha quando fechado. Aberto, traz a busca do dia, as abas (a primeira é
+   "Todas") e os cartões, só com editoria, título e linha fina. O atalho `/` e o
+   link "Todas as N matérias" abrem o bloco.
+8. **Rodapé.** A linha de método ("Compilada de N notícias de M veículos. Como
+   foi feita"), as edições anteriores, o Instagram, o código-fonte, o estado das
+   fontes (recolhido) e o lema.
+
+**Onde mora o detalhe.** A cópia arquivada de cada edição
+(`edicoes/AAAA-MM-DD.html`) é a mesma página com três gavetas fechadas depois do
+bloco das matérias, com o conteúdo completo por dentro: `#cobertura` (a cobertura
+comparada, assunto por assunto e veículo por veículo), `#termometro` (os painéis
+do termômetro e cada texto analisado) e `#racional` (como a edição foi feita). A
+home não carrega as gavetas: os links "Ver os N assuntos comparados", "Ver a
+análise" e "Como foi feita" apontam para a cópia do dia. Quem chega com uma dessas
+âncoras no endereço (da home, do Analítico, da Pesquisa ou de um e-mail antigo)
+encontra a gaveta aberta; as âncoras das matérias (`#s-<id>`) abrem a janela de
+leitura, como sempre.
+
+**O que saiu da home e para onde foi.** O editorial do dia (continua na descrição
+da página, no e-mail e no Instagram), o corpo da manchete, as listas de veículos e
+as barras da cobertura (janela da matéria), o resumo em prosa (e-mail e
+Instagram), "Mais para ler" e "Destaques" (dois deles em "Em 1 minuto", os demais
+no bloco das matérias), o Radar (5 itens em "Mais recentes"; o resto em "Todas as
+notícias do dia"), a navegação de editorias, a faixa do clima, a barra de
+progresso de leitura e o botão de voltar ao topo (continuam nas outras páginas), o
+racional, a cobertura completa e os painéis do termômetro (gavetas da cópia
+arquivada). O JSON da edição não mudou: e-mail e Instagram saem iguais.
+
+**Tetos.** São constantes de `qijournal/render/web.py` (`TETO_CHAMADAS` = 5,
+`TETO_DIVERGENCIAS` = 3, `TETO_RECENTES` = 5, `RECENTES_NO_CELULAR` = 3) e de
+`qijournal/render/termometro.py` (`VIES_FORA_MAX` = 3): o gerador corta por eles,
+então a publicação diária nunca é barrada. `tests/test_home_orcamento.py` trava o
+que dá para contar sem navegador, com três edições reais reduzidas (uma delas
+automática): itens por bloco, até 1.000 palavras visíveis com tudo fechado, até 12
+controles e 70 links à vista, `index.html` de até 450 KB, nenhum termo de bastidor
+("blocos por editoria", "parte 1 de 2", "chamadas à IA") e nenhuma animação além
+da janela da matéria abrindo. Nada se move sozinho na página da edição.
+
+**Desenho.** Os blocos da home usam um sistema só, em `styles.css.j2`: uma régua
+(`--fio`), cinco tamanhos de letra (`--f-man`, `--f-tit`, `--f-txt`, `--f-min`,
+`--f-rot`), dois pesos (400 e 700) e o laranja só na marca de divergência. Um
+bloco novo segue o mesmo molde: `<section class="bl">`, o título em
+`<h2 class="rot">` e o link do pé em `<p class="mais">`.
+
+**Medição** (edição de 23/11/2026, em 24/11/2026, com o Chromium; página com tudo
+fechado, os três botões das abas no cabeçalho e uma foto de teste na manchete,
+porque o ambiente de medição não carrega as fotos dos veículos):
+
+| | Antes | Agora | Meta sem a agenda |
+|---|---|---|---|
+| Computador, 1440 × 900 | 5.630 px | 1.550 px | até 1.700 px |
+| Celular, 390 × 844 | 12.683 px | 2.377 px | até 2.700 px |
+| Topo do título da manchete no celular | 900 px | 188 px | até 240 px |
+| Cabeçalho no celular (com as três abas) | 203 px | 116 px | até 120 px |
+| Palavras visíveis | 3.289 | 612 | até 1.000 |
+| Controles visíveis | 55 | 3 | até 12 |
+| `index.html` | 858 KB | 281 KB | até 450 KB |
+
+A manchete e as 5 chamadas cabem inteiras na primeira tela do computador (terminam
+a 784 px do topo). Sem a foto da manchete, a página fica mais curta (1.420 px no
+computador). A altura em pixels não entra nos testes automáticos: é medida à mão a
+cada mudança do modelo, e os números novos entram nesta tabela.
+
+---
+
 ## Ativar a edição por IA
 
 Os editores por IA ficam numa **cadeia**, na ordem de `llm.providers` em
@@ -173,13 +280,17 @@ Para cada assunto coberto por dois ou mais veículos, a IA devolve:
 
 No site, um **medidor** mostra cada veículo como um trecho da barra (lado A à
 esquerda, neutros no meio, lado B à direita): a barra cresce para o lado com
-mais veículos, com o rótulo "Pende para: …". Ele aparece no card de cada
-matéria, na janela da matéria (com a conclusão e a **análise por veículo**) e na
-seção **Cobertura comparada**. No e-mail, cada matéria ganha a barra e a
+mais veículos, com o rótulo "Pende para: …". Ele aparece na janela da matéria
+(com a conclusão e a **análise por veículo**) e na gaveta **Cobertura
+comparada** da cópia arquivada da edição. Na home ficam só a marca de divergência
+na chamada ("veículos divergem" ou "1 veículo destoou", quando o assunto teve
+veículos dos dois lados) e o bloco **Onde os veículos divergiram**, com até 3
+assuntos e os dois lados em palavras. No e-mail, cada matéria ganha a barra e a
 conclusão. A análise usa só o que os veículos publicaram; quando o trecho não
 permite dizer, o veículo fica como neutro.
 
-A seção **Cobertura comparada** reúne todos os assuntos do dia vistos por dois ou
+A gaveta **Cobertura comparada** (`edicoes/AAAA-MM-DD.html#cobertura`) reúne todos
+os assuntos do dia vistos por dois ou
 mais veículos — as matérias da edição com análise e os demais assuntos — em
 **abas por editoria**, no mesmo desenho das abas das matérias (Brasil · Economia,
 Mercados & Finanças, Política, Esporte…, e "Todas"): cada assunto entra na aba da
@@ -193,8 +304,8 @@ veículos ("3 div."). Em cada aba:
 - **Relataram de forma semelhante**: o resto, em lista curta (clicar abre a
   conclusão e a análise por veículo).
 
-Os atalhos do topo da edição levam à Cobertura comparada, ao Termômetro do dia, ao
-Racional da edição e a todas as notícias do dia.
+A home leva a ela pelo link "Ver os N assuntos comparados"; o Analítico e a
+Pesquisa continuam apontando para a mesma âncora.
 
 ### Termômetro de Viés Editorial e Analítico Político (só Triangula)
 
@@ -202,7 +313,11 @@ Depois da edição, os textos compilados nas matérias do dia passam pelo
 **Termômetro de Viés Editorial, versão 1.1** — a especificação em
 `termometro-referencia-v1.3`, que é o pilar desta parte. Ele é **estritamente
 adicional**: a análise da cobertura acima continua igual, e o termômetro aparece
-**depois** dela, no fim da edição, e na aba **Analítico Político** (botão
+em três lugares: na home, numa linha em palavras ("Viés político das notícias de
+hoje: equilibrado", sem número; ver [A home](#a-home-três-andares-cada-um-com-teto));
+na gaveta **Termômetro do dia** da cópia arquivada de cada edição
+(`edicoes/AAAA-MM-DD.html#termometro`), com o painel completo; e na aba
+**Analítico Político** (botão
 *Analítico* no cabeçalho, ao lado de *Edições* e *Buscar*). A marca PBCV
 Advogados não tem nada disso (`termometro.marcas` em `config/site.yaml`).
 
@@ -240,7 +355,7 @@ Como cada texto é analisado:
    (com as palavras de fala direta e quem tem a última palavra) e quantos pontos de
    T cada critério somou. Análises anteriores a nov/2026 não têm esses detalhes.
 
-No fim da edição, o **Termômetro do dia** é um painel com:
+Na cópia arquivada da edição, a gaveta **Termômetro do dia** é um painel com:
 
 - **placar**: o T médio das notícias, o rótulo e o intervalo de 95%, ao lado da
   escala de −100 a +100 com as sete faixas (a do dia em destaque), o intervalo, o
@@ -530,16 +645,20 @@ Embaixo da caixa de busca, os **nomes em destaque** da Política (os do placar d
 Analítico) viram atalhos para o analítico de cada um (com a editoria e o período do
 placar).
 
-### Racional da edição e lista completa do dia
+### Como a edição foi feita (racional) e lista completa do dia
 
-- **Racional da edição:** uma faixa no topo da capa e uma seção própria dizem
-  como a edição foi compilada — quantas notícias e veículos, os blocos por
-  editoria (notícias lidas, matérias redigidas e assuntos comparados em cada
-  um), quantos assuntos sobraram depois de unir as repetidas e qual IA fez o
-  trabalho. Cada matéria mostra de quantas notícias e veículos foi compilada e
-  em que bloco.
+- **Como a edição foi feita:** na home, o racional é uma linha do rodapé
+  ("Compilada de 1.146 notícias de 42 veículos. Como foi feita"), sem contadores
+  de produção. O link leva à gaveta **Como a edição foi feita** da cópia
+  arquivada (`edicoes/AAAA-MM-DD.html#racional`), que diz como a edição foi
+  compilada: quantas notícias e veículos, os blocos por editoria (notícias lidas,
+  matérias redigidas e assuntos comparados em cada um) e quantos assuntos
+  sobraram depois de unir as repetidas. O rodapé diz se a edição foi gerada por
+  IA (e por qual) ou no modo automático. Na janela de cada matéria, a lista de
+  fontes mostra de quantas notícias e veículos ela foi compilada e em que bloco.
 - **Nenhuma notícia é descartada:** a página *Todas as notícias do dia*
-  (`edicoes/AAAA-MM-DD-todas.html`, com link na capa e no e-mail) lista todas as
+  (`edicoes/AAAA-MM-DD-todas.html`, com link na capa, em "Mais recentes", e no
+  e-mail) lista todas as
   notícias coletadas, por editoria e por assunto (as repetidas ficam juntas),
   com link para o original. Só ficam de fora da coleta publieditoriais,
   resultados de loteria, horóscopo e vídeos sem texto (`exclude_url_patterns` e
@@ -1563,7 +1682,7 @@ As fontes ficam em [`config/sources.yaml`](config/sources.yaml), uma por linha:
 - **Remover:** apague a linha ou use `enabled: false`.
 
 Seções, palavras-chave, cotações do ticker, cidades do clima (hoje só São Paulo;
-Montevidéu saiu em nov/2026: a faixa de clima mostra só as cidades configuradas,
+Montevidéu saiu em nov/2026: o clima da linha de indicadores mostra só a primeira cidade configurada,
 também nas edições refeitas) e limites da edição
 (quantidade de matérias, mínimos, idade máxima das notícias) ficam em
 [`config/site.yaml`](config/site.yaml), com comentários explicando cada item.
@@ -1590,13 +1709,15 @@ carregada na página) e o ícone é o triângulo laranja sobre o marinho. A chav
 marca continua `tech` (o termômetro depende dela). Desde out/2026 o jornal usa
 a estrutura visual do TSA Tech: página na largura toda da tela (margens em
 `--gut`, que crescem nas telas largas), cabeçalho em bloco marinho `#273351`
-(`colors.masthead`, com data e hora à esquerda do logo no computador), barra de
-editorias e primeira página no desenho de jornal no computador (editorial,
-manchete com a foto ao lado, "Mais para ler" e trilho com o Radar); no celular
-e no tablet valem os blocos de sempre. A paleta vem do quadro do Sinal: marinho `#1B2745` (ticker, rodapé, títulos), ardósia `#394A7A` (links e
-réguas), laranja de sinal `#FF5A1F` (destaques; só decoração no fundo branco) e
-altas/quedas do ticker em `#7FC8FF`/`#FF5C9A`, com os cinzas azulados do layout
-original.
+(`colors.masthead`, com data e hora à esquerda do logo no computador) e, desde
+nov/2026, a home em três andares (ver
+[A home](#a-home-três-andares-cada-um-com-teto)): uma capa só, que se rearruma
+pela largura, com a manchete ao lado de "Em 1 minuto" a partir de 1280 px. A
+paleta vem do quadro do Sinal: marinho `#1B2745` (linha de indicadores, rodapé,
+títulos), ardósia `#394A7A` (links e numerais), laranja de sinal `#FF5A1F` (o
+triângulo do logo e a marca de divergência; só decoração no fundo branco) e
+altas/quedas das cotações em `#7FC8FF`/`#FF5C9A`, com os cinzas azulados do
+layout original.
 
 - `assets/triangula-marca-cabecalho.svg` — logo do cabeçalho, com o letreiro em
   `currentColor` (branco sobre o bloco, nos dois modos) e o triângulo laranja

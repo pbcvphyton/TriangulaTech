@@ -1,5 +1,6 @@
-"""Views do Termômetro de Viés Editorial: o painel do dia (fim da edição) e as
-peças reaproveitadas pela aba "Analítico Político" (:mod:`qijournal.render.analitico`).
+"""Views do Termômetro de Viés Editorial: o painel do dia (gaveta da cópia arquivada
+da edição), a linha do viés da home e as peças reaproveitadas pela aba "Analítico
+Político" (:mod:`qijournal.render.analitico`).
 
 Tudo aqui sai pronto para o template: textos limpos, números já formatados em
 pt-BR (sinal de menos tipográfico) e posições em % na escala de −100 (esquerda)
@@ -16,6 +17,11 @@ a distribuição por rótulo, os sinais por critério, o checklist da qualidade 
 apuração, os recortes por veículo e por editoria e a lista de cada texto analisado
 (com filtros, ordem e o detalhe de cada um: sinais com a citação, enquadramento,
 fontes, checklist e teste de inversão).
+
+O painel mora numa gaveta da cópia arquivada da edição (``edicoes/AAAA-MM-DD.html``,
+âncora ``#termometro``). A home leva só a linha do viés (:func:`vies_do_dia`): o
+rótulo da média do dia em palavras e, quando existem, até ``VIES_FORA_MAX`` notícias
+fora da faixa de equilíbrio.
 """
 
 from __future__ import annotations
@@ -93,6 +99,7 @@ ESTADO = {"ok": "Com T", "inconclusivo": "Inconclusivo", "nao_se_aplica": "Sem d
 DOMINIOS = (25, 50, 100)
 RECORTE_MAX = 10  # veículos visíveis no recorte do dia (os demais abrem num "ver todos")
 LISTA_VISIVEL = 12  # textos visíveis antes do "mostrar todos" (com o script; sem ele, todos)
+VIES_FORA_MAX = 3  # notícias fora da faixa de equilíbrio listadas na linha do viés da home
 MENOS = "−"
 
 
@@ -630,7 +637,7 @@ class OpcaoView:
 
 @dataclass
 class TermometroDiaView:
-    """Painel "Termômetro do dia", no fim da edição."""
+    """Painel "Termômetro do dia", na gaveta ``#termometro`` da cópia arquivada da edição."""
 
     vazio: bool
     motivo: str
@@ -897,6 +904,50 @@ def termometro_dia_view(registro: Mapping[str, Any] | None) -> TermometroDiaView
         com_sinais=sum(1 for v in views if v.sinais),
         inclinados=sum(1 for v in views if v.estado == "ok" and v.classe not in ("eq", "na")),
         opiniao=sum(1 for v in views if v.opiniao),
+    )
+
+
+@dataclass
+class TextoForaView:
+    """Uma notícia fora da faixa de equilíbrio, na linha do viés da home."""
+
+    veiculo: str
+    titulo: str
+    rotulo: str  # "leve à esquerda", "direita moderada", "misto"
+    url: str | None
+
+
+@dataclass
+class ViesDoDiaView:
+    """A linha do viés na home: "Viés político das notícias de hoje: equilibrado."
+
+    Sem "T" e sem número. ``fora`` só tem itens no dia em que alguma notícia sai da
+    faixa de equilíbrio; é só então que a linha cresce."""
+
+    rotulo: str  # o rótulo da média do dia, em minúsculas
+    fora: list[TextoForaView] = field(default_factory=list)
+    fora_total: int = 0  # quantas notícias saíram da faixa (a lista traz até VIES_FORA_MAX)
+
+
+def vies_do_dia(painel: TermometroDiaView | None) -> ViesDoDiaView | None:
+    """Resumo do termômetro para a home, tirado do painel do dia (nada é recalculado).
+
+    ``None`` sem painel, sem análise no dia ou sem média (nenhuma notícia com T): a
+    home então não mostra a linha. Opinião fica de fora, como na média do dia; as
+    notícias vêm das mais inclinadas para as menos (a ordem do painel)."""
+    if painel is None or painel.vazio or painel.gauge is None:
+        return None
+    fora = [
+        a for a in painel.analises
+        if a.estado == "ok" and not a.opiniao and a.classe not in ("eq", "na")
+    ]
+    return ViesDoDiaView(
+        rotulo=painel.gauge.rotulo.lower(),
+        fora=[
+            TextoForaView(veiculo=a.veiculo, titulo=a.titulo, rotulo=a.rotulo.lower(), url=a.url)
+            for a in fora[:VIES_FORA_MAX]
+        ],
+        fora_total=len(fora),
     )
 
 

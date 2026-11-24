@@ -315,12 +315,25 @@ def test_rationale_and_full_list_are_rendered(config, monkeypatch):
     edition = run(config, monkeypatch, Router(aimlapi=FakeMistral(model=GPT)), "AIMLAPI_KEY")
     total = len(sample_bundle().articles)
     page = render_edition_page(edition, config, home_href="./", archive_href="edicoes/")
-    assert '<p class="rat-strip">' in page and 'id="racional"' in page
-    assert "blocos por editoria" in page and "Nenhuma notícia foi descartada" in page
+    # a home leva só a linha de método do rodapé, que aponta para a gaveta da cópia arquivada;
+    # nenhum termo de bastidor na capa
+    rodape = page[page.index('<footer class="ft">') : page.index("</footer>")]
+    assert f"<p>Compilada de {total} notícias de " in rodape
+    assert f'<a href="edicoes/{edition.date}.html#racional">Como foi feita</a>' in rodape
+    capa = page[page.index("<main") : page.index("</footer>")]
+    assert 'id="racional"' not in page and "rat-strip" not in page
+    assert "blocos por editoria" not in capa and "Nenhuma notícia foi descartada" not in capa
     assert f'href="{config.site.base_url}edicoes/{edition.date}-todas.html"' in page  # a lista fica em página própria
     assert 'class="todas"' not in page
-    assert "Compilada de" in page and "· bloco " in page  # de onde saiu cada matéria
-    assert "Interpretação do foco de" in page  # analítico por veículo
+    assert "Compilada de" in page and "· bloco " in page  # de onde saiu cada matéria (na janela dela)
+    assert "Interpretação do foco de" in page  # analítico por veículo (na janela da matéria)
+    # o racional completo fica na gaveta "Como a edição foi feita" da cópia arquivada
+    copia = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
+    gaveta = copia[copia.index('<details class="gav" id="racional">') :]
+    gaveta = gaveta[: gaveta.index("</details>")]
+    assert "Como a edição foi feita" in gaveta and "blocos por editoria" in gaveta
+    assert "Nenhuma notícia foi descartada" in gaveta and '<ol class="rat-blocks">' in gaveta
+    assert '<a href="#racional">Como foi feita</a>' in copia
 
     everything = render_index_page(edition, config, home_href="../", edition_href=f"{edition.date}.html")
     assert f"Todas as notícias do dia <span>{total}</span>" in everything

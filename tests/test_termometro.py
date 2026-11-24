@@ -404,10 +404,14 @@ def test_publish_grava_o_dia_e_a_aba_analitica(tmp_path, config):
     assert [a["id"] for a in dia["analises"]] == ["a", "b"]
     pagina = paths["analitico"].read_text(encoding="utf-8")
     assert "Analítico Político" in pagina and "Texto a" in pagina
+    # a capa leva só a linha do viés, que aponta para a gaveta da cópia arquivada, e o botão do Analítico
     capa = (tmp_path / "index.html").read_text(encoding="utf-8")
-    assert 'id="termometro"' in capa and 'href="edicoes/analitico.html"' in capa
+    assert 'id="termometro"' not in capa and 'href="edicoes/analitico.html"' in capa
+    assert f'Viés político das notícias de hoje: <b>leve à esquerda</b>. <a href="edicoes/{DATA}.html#termometro">Ver a análise</a>' in capa
+    # o painel completo é conferido na cópia arquivada, dentro da gaveta fechada
     arquivada = (tmp_path / "edicoes" / f"{DATA}.html").read_text(encoding="utf-8")
-    assert 'href="./analitico.html"' in arquivada
+    assert '<details class="gav" id="termometro">' in arquivada and 'href="./analitico.html"' in arquivada
+    assert '<a href="#termometro">Ver a análise</a>' in arquivada
 
 
 def test_reexecucao_sem_analise_nao_apaga_o_dia(tmp_path, config):
@@ -434,13 +438,14 @@ def test_marca_sem_termometro_nao_ganha_nada(tmp_path):
 def test_bloco_do_dia_e_seguro_e_bem_formado(config):
     maliciosa = _analise("x", DATA, T=-40, veiculo="<script>alert(1)</script>", titulo="**Título** <b>forte</b>")
     edition = _edicao_com_termometro([maliciosa, _analise("y", DATA, T=12), _analise("z", DATA, T=None)])
-    html = render_edition_page(edition, config, home_href="./", archive_href="edicoes/")
+    # o painel completo mora na gaveta da cópia arquivada
+    html = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
     estrutura = parse(html)
     assert estrutura.errors == [] and estrutura.stack == []
     assert all(n == 1 for n in estrutura.ids.values())
     assert "<script>alert" not in html and "**" not in html and "*" not in visible_text(html)
     assert html.count("<script") == 2  # só os scripts da página
-    assert "Termômetro do dia" in html
+    assert '<summary><h2 class="gav-t" id="term-h">Termômetro do dia: o viés de cada texto analisado</h2></summary>' in html
     bloco = html[html.index('<section class="term"') : html.index('<footer class="ft">')]
     # placar, indicadores, painéis e uma linha por texto (com os dados dos filtros escapados)
     assert 'class="tm-placar"' in bloco and '<p class="tm-n">−14</p>' in bloco  # (−40 + 12) / 2
@@ -448,14 +453,48 @@ def test_bloco_do_dia_e_seguro_e_bem_formado(config):
     assert bloco.count('<li class="tr" ') == 3 and 'id="tmFil"' in bloco and 'id="term-metodo"' in bloco
     assert 'data-v="&lt;script&gt;alert(1)&lt;/script&gt;"' in bloco
     assert '<option value="&lt;script&gt;alert(1)&lt;/script&gt;">' in bloco
+    # a home: só a linha do viés, com os dois textos fora da faixa (escapados), sem o painel
+    capa = render_edition_page(edition, config, home_href="./", archive_href="edicoes/")
+    estrutura = parse(capa)
+    assert estrutura.errors == [] and all(n == 1 for n in estrutura.ids.values())
+    assert "<script>alert" not in capa and "**" not in capa and "*" not in visible_text(capa)
+    assert 'class="tm-placar"' not in capa and 'id="tmFil"' not in capa and 'id="term-metodo"' not in capa
+    linha = capa[capa.index('<p class="md-vies">') : capa.index("</ul>", capa.index('<ul class="md-fora"'))]
+    assert "Viés político das notícias de hoje: <b>leve à esquerda</b>." in linha
+    assert "<li><b>&lt;script&gt;alert(1)&lt;/script&gt;</b>, esquerda moderada: " in linha and "Título &lt;b&gt;forte&lt;/b&gt;" in linha
+    assert "<li><b>Folha</b>, leve à direita: " in linha
+
+
+def test_resumo_do_vies_para_a_home():
+    from qijournal.render.termometro import VIES_FORA_MAX, vies_do_dia
+
+    # dia normal: só o rótulo, em minúsculas, sem lista
+    calmo = vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, [_analise("a", DATA, T=-4), _analise("b", DATA, T=6)])))
+    assert (calmo.rotulo, calmo.fora, calmo.fora_total) == ("equilibrado", [], 0)
+    # textos fora da faixa: até VIES_FORA_MAX, dos mais inclinados para os menos; opinião e textos sem T ficam de fora
+    analises = [_analise(f"t{i}", DATA, T=T) for i, T in enumerate([12, -45, 30, -18, 3])]
+    analises += [_analise("op", DATA, T=80, selo="Opinião"), _analise("sem", DATA, T=None)]
+    vies = vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, analises)))
+    assert vies.fora_total == 4 and len(vies.fora) == VIES_FORA_MAX == 3
+    assert [(t.titulo, t.rotulo) for t in vies.fora] == [
+        ("Texto t1", "esquerda moderada"), ("Texto t2", "direita moderada"), ("Texto t3", "leve à esquerda"),
+    ]
+    assert vies.fora[0].url == "https://x.com/t1" and vies.fora[0].veiculo == "Folha"
+    # sem painel, sem análise ou sem média (nenhuma notícia com T): a home não mostra a linha
+    assert vies_do_dia(None) is None
+    assert vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, [], motivo="sem IA"))) is None
+    assert vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, [_analise("z", DATA, T=None)]))) is None
 
 
 def test_bloco_do_dia_sem_analise_mostra_o_motivo(config):
     edition = _edicao_com_termometro([], motivo="nenhuma IA disponível nesta execução")
     view = termometro_dia_view(edition.termometro)
     assert view.vazio and view.motivo == "nenhuma IA disponível nesta execução"
-    html = render_edition_page(edition, config, home_href="./", archive_href="edicoes/")
+    html = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
     assert "Sem análise nesta edição: nenhuma IA disponível nesta execução." in html
+    # na home, sem análise não há linha do viés nem link para a gaveta
+    capa = render_edition_page(edition, config, home_href="./", archive_href="edicoes/")
+    assert "Viés político" not in capa and "#termometro" not in capa and "Sem análise nesta edição" not in capa
 
 
 def test_media_do_dia_vem_da_agregacao_e_separa_opiniao():
@@ -762,7 +801,8 @@ def test_painel_do_dia_com_o_detalhe_das_analises(config):
     assert ("Valor moral", "cuidado e igualdade") in a.enquadramento
     assert a.contribuicoes[0].lado == "esq" and a.contribuicoes[0].width == 100.0
     assert [c.valor for c in a.checklist][:2] == ["nao", "sim"] and a.inversao and a.fontes and a.fala
-    html = render_edition_page(_edicao_registro([ref, *outras]), config, home_href="./", archive_href="edicoes/")
+    # o detalhe de cada texto fica na gaveta do termômetro, na cópia arquivada da edição
+    html = render_edition_page(_edicao_registro([ref, *outras]), config, home_href="../", archive_href="./", is_archive=True)
     estrutura = parse(html)
     assert estrutura.errors == [] and estrutura.stack == [] and all(n == 1 for n in estrutura.ids.values())
     assert html.count('<li class="tev-') == len(ref["evidencias"]) and "Ver os outros 10 sinais" in html
