@@ -41,6 +41,10 @@ from qijournal.net import FetchError, Response
 HOJE = "2026-11-13"
 CAMARA = "https://dadosabertos.camara.leg.br"
 SENADO = "https://legis.senado.leg.br/dadosabertos"
+# Trechos de URL das listas de quem está em exercício (para simular a fonte fora do ar com
+# ``FetchFalso.fora_do_ar``; o "?" separa a lista dos recursos de cada deputado).
+LISTA_DE_DEPUTADOS = "deputados?"
+LISTA_DE_SENADORES = "senador/lista/atual"
 
 DEPUTADOS = [
     (1, "Ana Lima", "PT", "SP"),

@@ -98,7 +98,11 @@ def cmd_atualizar(args: argparse.Namespace, config: Config) -> int:
         projetos_desde=config.congresso.projetos_desde,
         noticias_dias=config.congresso.noticias_dias,
     )
-    resultado = dados.atualizar(config.root, out_dir / pipeline.DATA_DIR, Path(args.cache), opcoes)
+    try:
+        resultado = dados.atualizar(config.root, out_dir / pipeline.DATA_DIR, Path(args.cache), opcoes)
+    except dados.SemExercicio as exc:  # sem a lista de hoje e sem o último dia bom: o que está publicado fica como está
+        log.error("Congresso: %s", exc)
+        return EXIT_ERROR
     caminho = renderizar(config, out_dir)
     if caminho is not None:
         log.info("Aba Congresso gravada em %s", caminho)

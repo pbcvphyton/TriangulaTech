@@ -75,6 +75,13 @@ def em_aberto(intervalos: list[tuple[str, str]] | None) -> bool:
     return bool(intervalos) and intervalos[-1][1] == ABERTO
 
 
+def abertos(intervalos: Mapping[int, list[tuple[str, str]]]) -> set[int]:
+    """Quem tem o período em aberto: estava em exercício no último dia em que a lista da
+    Câmara veio. Com a lista fora do ar, :func:`atualizar` não abre nem fecha o período de
+    quem já tem registro: o que está gravado é o retrato do último dia bom."""
+    return {pid for pid, lista in intervalos.items() if em_aberto(lista)}
+
+
 def fechados(intervalos: Mapping[int, list[tuple[str, str]]], hoje: str) -> Intervalos:
     """Os intervalos com o fim em aberto trocado por ``hoje`` (para comparar datas)."""
     return {pid: [(inicio, fim or hoje) for inicio, fim in lista] for pid, lista in intervalos.items()}
@@ -133,7 +140,8 @@ def presidencia(coletor: Coletor, legislaturas: Iterable[int], *, validade_h: fl
 
 
 def em_exercicio_hoje(coletor: Coletor) -> set[int] | None:
-    """Os ids dos deputados em exercício agora (``None`` se a lista não vier)."""
+    """Os ids dos deputados em exercício agora. ``None`` se a lista não vier ou vier vazia:
+    quem chama não fecha o período de ninguém por causa de uma fonte fora do ar."""
     try:
         lista = fontes.camara_api(coletor, "deputados", ordem="ASC", ordenarPor="nome")
     except Exception as exc:  # noqa: BLE001

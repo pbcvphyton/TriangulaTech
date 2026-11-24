@@ -15,7 +15,9 @@
 Tudo é montado em memória e só então gravado, arquivo a arquivo, de forma atômica.
 Um arquivo só é reescrito quando o conteúdo muda (o commit diário leva só a
 diferença). Uma fonte fora do ar não derruba a atualização: o que não veio fica
-como estava e a falta vira aviso.
+como estava e a falta vira aviso. Isso vale também para a lista de quem está em
+exercício: sem ela, fica em exercício quem estava no último dia bom (a Casa nunca é
+gravada com zero em exercício por causa de uma fonte fora do ar).
 """
 
 from __future__ import annotations
@@ -179,8 +181,82 @@ def atualizar_base(
 # ── cadastros ────────────────────────────────────────────────────────────────
 
 
-def _cadastros_camara(coletor: Coletor, perfis: Mapping[int, Perfil], legislatura: int, avisos: list[str]) -> dict[int, Cadastro]:
-    """Quem está em exercício hoje (API) e quem votou nesta legislatura e não está mais."""
+class SemExercicio(RuntimeError):
+    """A lista de quem está em exercício numa Casa não veio e não há registro do último dia
+    bom para manter: a atualização para antes de gravar (a Casa nunca é publicada com zero
+    em exercício por causa de uma fonte fora do ar)."""
+
+
+def _exercicio_gravado(pasta: Path | None, casa: str) -> dict[int, Cadastro]:
+    """Quem estava em exercício na Casa na última atualização gravada, com o cadastro daquele
+    dia: as linhas de ``resumo.json`` e, para o que o resumo não guarda (a página, a condição
+    do mandato, o bloco), a ficha de cada um. ``{}`` sem o arquivo ou sem ninguém em exercício."""
+    if pasta is None:
+        return {}
+    resumo = ler_json(Path(pasta) / RESUMO)
+    linhas = resumo.get("pessoas") if isinstance(resumo, dict) else None
+    padrao_foto, padrao_pagina = (ficha.FOTO_CAMARA, ficha.PAGINA_CAMARA) if casa == "cd" else (ficha.FOTO_SENADO, ficha.PAGINA_SENADO)
+    gravados: dict[int, Cadastro] = {}
+    for linha in linhas if isinstance(linhas, list) else []:
+        if not isinstance(linha, dict) or not linha.get("ex"):
+            continue
+        chave = str(linha.get("k") or "")
+        pid = fontes.inteiro(chave.partition("-")[2])
+        if not chave.startswith(f"{casa}-") or pid is None:
+            continue
+        antiga = ler_json(Path(pasta) / FICHAS / f"{chave}.json")
+        origem = antiga if isinstance(antiga, dict) and antiga.get("exercicio") else linha
+        extra = origem.get("extra")
+        gravados[pid] = Cadastro(
+            id=pid,
+            casa=casa,
+            nome=str(origem.get("nome") or linha.get("nome") or "").strip(),
+            partido=str(origem.get("partido") or ""),
+            uf=str(origem.get("uf") or ""),
+            exercicio=True,
+            foto=str(origem.get("foto") or padrao_foto.format(id=pid)),
+            pagina=str(origem.get("pagina") or padrao_pagina.format(id=pid)),
+            condicao=str(origem.get("condicao") or ""),
+            extra=dict(extra) if isinstance(extra, dict) else {},
+        )
+    return gravados
+
+
+def _sem_a_lista(
+    casa: str,
+    quem: str,
+    exc: Exception,
+    mantidos: Mapping[int, Cadastro],
+    perfis: Mapping[int, Perfil],
+    legislatura: int,
+    avisos: list[str],
+) -> None:
+    """A lista de quem está em exercício não veio: registra o aviso com o que foi mantido do
+    último dia bom. Sem nada para manter numa Casa que tem gente, levanta :class:`SemExercicio`."""
+    nome = _nome_casa(casa)
+    if not mantidos and any(legislatura in p.legislaturas for p in perfis.values()):
+        raise SemExercicio(
+            f"{nome}: lista dos {quem} em exercício indisponível ({exc}) e sem registro do último dia bom; "
+            "nada foi gravado, para a Casa não sair com zero em exercício"
+        )
+    avisos.append(f"{nome}: lista dos {quem} em exercício indisponível ({exc}); vale o exercício do último dia bom ({len(mantidos)} em exercício)")
+    log.warning("Congresso: %s sem a lista de hoje; mantidos %d em exercício do último dia bom", nome, len(mantidos))
+
+
+def _cadastros_camara(
+    coletor: Coletor,
+    perfis: Mapping[int, Perfil],
+    legislatura: int,
+    avisos: list[str],
+    *,
+    pasta: Path | None = None,
+    intervalos: Mapping[int, list[tuple[str, str]]] | None = None,
+) -> dict[int, Cadastro]:
+    """Quem está em exercício hoje (API) e quem votou nesta legislatura e não está mais.
+
+    Com a lista fora do ar (ou vazia), ninguém vira "fora do exercício" por isso: fica em
+    exercício quem estava na última atualização gravada em ``pasta`` e, se ela não tiver
+    ninguém, quem tem o período em aberto em ``intervalos`` (``base/cd-exercicio.json``)."""
     cadastros: dict[int, Cadastro] = {}
     try:
         for d in fontes.camara_api(coletor, "deputados", ordem="ASC", ordenarPor="nome"):
@@ -197,8 +273,26 @@ def _cadastros_camara(coletor: Coletor, perfis: Mapping[int, Perfil], legislatur
                 foto=ficha.FOTO_CAMARA.format(id=pid),
                 pagina=ficha.PAGINA_CAMARA.format(id=pid),
             )
-    except Exception as exc:  # noqa: BLE001
-        avisos.append(f"Câmara: lista dos deputados em exercício indisponível ({exc})")
+        if not cadastros:
+            raise ValueError("a lista veio vazia")
+    except Exception as exc:  # noqa: BLE001 — a fonte fora do ar não tira ninguém do exercício
+        cadastros = _exercicio_gravado(pasta, "cd")
+        if not cadastros:  # sem resumo que sirva: os períodos em aberto são o retrato do último dia bom
+            for pid in sorted(exercicio.abertos(intervalos or {})):
+                p = perfis.get(pid)
+                if p is None:
+                    continue
+                cadastros[pid] = Cadastro(
+                    id=pid,
+                    casa="cd",
+                    nome=p.nome,
+                    partido=p.partido,
+                    uf=p.uf,
+                    exercicio=True,
+                    foto=ficha.FOTO_CAMARA.format(id=pid),
+                    pagina=ficha.PAGINA_CAMARA.format(id=pid),
+                )
+        _sem_a_lista("cd", "deputados", exc, cadastros, perfis, legislatura, avisos)
     for pid, p in perfis.items():
         if pid in cadastros or legislatura not in p.legislaturas:
             continue
@@ -215,7 +309,11 @@ def _cadastros_camara(coletor: Coletor, perfis: Mapping[int, Perfil], legislatur
     return cadastros
 
 
-def _cadastros_senado(coletor: Coletor, perfis: Mapping[int, Perfil], legislatura: int, avisos: list[str]) -> dict[int, Cadastro]:
+def _cadastros_senado(
+    coletor: Coletor, perfis: Mapping[int, Perfil], legislatura: int, avisos: list[str], *, pasta: Path | None = None
+) -> dict[int, Cadastro]:
+    """Os senadores em exercício hoje (API) e quem votou nesta legislatura e não está mais. Com
+    a lista fora do ar (ou vazia), fica em exercício quem estava na última atualização gravada."""
     cadastros: dict[int, Cadastro] = {}
     try:
         bruto = fontes.senado_api(coletor, "senador/lista/atual")
@@ -242,8 +340,11 @@ def _cadastros_senado(coletor: Coletor, perfis: Mapping[int, Perfil], legislatur
                 condicao=str(mandato.get("DescricaoParticipacao") or "").strip(),
                 extra=extra,
             )
-    except Exception as exc:  # noqa: BLE001
-        avisos.append(f"Senado: lista dos senadores em exercício indisponível ({exc})")
+        if not cadastros:
+            raise ValueError("a lista veio vazia")
+    except Exception as exc:  # noqa: BLE001 — a fonte fora do ar não tira ninguém do exercício
+        cadastros = _exercicio_gravado(pasta, "sf")
+        _sem_a_lista("sf", "senadores", exc, cadastros, perfis, legislatura, avisos)
     for pid, p in perfis.items():
         if pid in cadastros or legislatura not in p.legislaturas:
             continue
@@ -1248,8 +1349,8 @@ def atualizar(
         "sf": perfil.calcular(votos["sf"], regras),
     }
     cadastros = {
-        "cd": _cadastros_camara(coletor, perfis["cd"], legislatura.numero, avisos),
-        "sf": _cadastros_senado(coletor, perfis["sf"], legislatura.numero, avisos),
+        "cd": _cadastros_camara(coletor, perfis["cd"], legislatura.numero, avisos, pasta=pasta, intervalos=intervalos),
+        "sf": _cadastros_senado(coletor, perfis["sf"], legislatura.numero, avisos, pasta=pasta),
     }
 
     # Projetos, relatorias e filas.
