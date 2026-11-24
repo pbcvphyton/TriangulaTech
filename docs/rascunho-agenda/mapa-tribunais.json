@@ -1,0 +1,239 @@
+{
+ "chave": "tribunais",
+ "resumo": "1. STF: a pauta vem de portal.stf.jus.br/pauta/services/calendario-service.asp (calendário do mês e uma consulta por dia de sessão presencial). Na prática cobre só o Plenário presencial: o publicado é uma sessão (25/11, 10 itens, 3 vistas, 6 destaques). Do Plenário Virtual a fonte só dá a contagem por colegiado, e nem ela é publicada. Nenhuma sessão de Turma aparece.\n2. A fonte do STF traz o resumo do que se discute (resumoTema) e o incidente (cadeia, ex.: \"Referendo na medida cautelar\"), mas o leitor descarta os dois. O destaque por processo e a hora da sessão também não chegam a data/tribunais.\n3. Os 10 itens de 25/11 são reconstruíveis pelos dossiês. Dois são repercussão geral (Temas 1218 e 1324, piso do magistério), ambos com vista de Gilmar Mendes.\n4. STJ: o conjunto pautas-futuras tem 15 campos por item, sem assunto, sem tema, sem tipo de sessão (virtual ou presencial) e sem hora. Dos 8.545 itens, só 595 (7%) sobrevivem nos dossiês, por um corte de 20 por ministro. A agenda do STJ não sai do que está publicado hoje.\n5. Semana de 24 a 26/11 no STJ: 2.219 itens, 1.853 petições (recursos internos), 357 em segredo, nenhum recurso repetitivo. O cruzamento pauta × precedentes por numeroRegistro funciona (testei com os arquivos reais): 14 recursos de temas afetados estão pautados entre 02 e 16/12.\n6. Uma régua sem IA (órgão, principal × interno, classe, tema afetado, proposta de relevância, relator Vice-Presidência) reduziu 6.884 itens listáveis a 1 destaque nesta semana e 23 nas três seguintes.\n7. Frescor: o STJ publica o arquivo do dia por volta de 14h20 de Brasília, mas o conjunto já ficou até 20 dias sem arquivo. A pauta do STF tem cache de 20 h. Não há dado de resultado em nenhuma fonte.\n8. Caminho: módulo puro qijournal/tribunais/agenda.py e data/tribunais/agenda.json, gravado pelo fluxo Tribunais; a home só lê e mostra a data do dado.\nNão verificado: o portal do STF devolve 403 daqui, então os campos da fonte vêm da fixture real do repositório, não de consulta ao vivo.",
+ "fatos": [
+  {
+   "afirmacao": "STF: a pauta vem de um único serviço JSON, com duas consultas: o calendário do mês e a sessão presencial de cada dia. Só são consultados os dias que o calendário lista em diasPresenciais, de hoje a hoje+14.",
+   "evidencia": "config/tribunais.yaml:582; qijournal/tribunais/stf.py:1445-1483 (calendarios na linha 1459, filtro por diasPresenciais em 1465, sessao-presencial em 1468-1471)"
+  },
+  {
+   "afirmacao": "STF: cada item coletado guarda data, orgao, sessao (id), classe, numero, id, relator_id, relator_fora, vista e vista_id, destaque e destaque_id, repercussao_geral (booleano).",
+   "evidencia": "qijournal/tribunais/stf.py:1394-1425"
+  },
+  {
+   "afirmacao": "STF: a fonte traz, e o leitor descarta, por processo: cadeia (o incidente), resumoTema (o resumo do que se discute), materiaRelevante, assuncaoCompetencia, situacaoProcessoSessao, idInformacaoPautaProcesso. Por sessão: hora de dataInicio, numero/ano, tipo, observacao e listas.",
+   "evidencia": "tests/fixtures/tribunais/stf/pauta_sessao-presencial_2026-11-25.json (resposta real; sessão id 87282, '25/11/2026 14:00', nº 35/2026, tipo 'O'; resumos cortados em 60 caracteres na fixture) comparado a stf.py:1410-1424"
+  },
+  {
+   "afirmacao": "STF: o que chega a data/tribunais é um bloco de contagens (sessoes, itens, principal, interno, vistas, destaques). Publicado hoje: uma sessão, 25/11, Plenário, 10 itens, 3 vistas, 6 destaques.",
+   "evidencia": "qijournal/tribunais/contas.py:382-428; data/tribunais/stf.json → pautas = {\"sessoes\": [[\"2026-11-25\",\"PL\",10]], \"itens\": 10, \"vistas\": 3, \"destaques\": 6}"
+  },
+  {
+   "afirmacao": "STF: os itens individuais só existem nos dossiês dos ministros (em_pauta), com teto de 20 por relator, só para relator da grade e só se o processo está no acervo. Quem pediu vista sai em stf.json → fila.vistas. Quem pediu destaque não é gravado em lugar nenhum.",
+   "evidencia": "contas.py:945-959 (teto e filtros na linha 950) e 1123-1134; config/tribunais.yaml:511; stf.json → fila.vistas tem 3 entradas com sessao 2026-11-25"
+  },
+  {
+   "afirmacao": "STF: o resultado bruto da coleta (itens com vista, destaque e as sessões virtuais) fica só no cache do Actions, fora do git.",
+   "evidencia": "qijournal/tribunais/dados.py:24-26, 430-433, 891-899"
+  },
+  {
+   "afirmacao": "STF, Plenário Virtual: a fonte só dá contagem por colegiado e janela. O leitor lê essas contagens, mas o bloco publicado não as inclui e a página não as mostra.",
+   "evidencia": "stf.py:1428-1442 e 1481; contas.py:417-427 (sem a chave virtuais); busca por 'virtua' em contas.py, achados.py, render/tribunais.py e nos modelos tribunais.*.j2 sem resultado"
+  },
+  {
+   "afirmacao": "STF, ordem de grandeza desta semana: 10 processos no Plenário presencial contra 662 em sessão virtual em curso (20 a 30/11: Plenário 179, 1ª Turma 209, 2ª Turma 274) e 546 na que abre na sexta (27/11 a 04/12: 165, 187, 194).",
+   "evidencia": "tests/fixtures/tribunais/stf/pauta_calendarios_2026-11.json (calendário real de novembro de 2026, inteiro)"
+  },
+  {
+   "afirmacao": "STF, Turmas: o código reconhece 1ª e 2ª Turma, mas os dias consultados vêm de diasPresenciais, que em novembro de 2026 só tem quartas e quintas (4, 5, 11, 12, 18, 19, 25, 26). Nenhuma terça é consultada e nenhuma sessão de Turma aparece. Inferência minha: a coleta cobre só o Plenário presencial; falta confirmar ao vivo.",
+   "evidencia": "stf.py:1383-1391 e 1465; pauta_calendarios_2026-11.json; stf.json → pautas.sessoes só tem 'PL'"
+  },
+  {
+   "afirmacao": "STF: dia de sessão sem processo publicado some da lista, porque sessoes é contado a partir dos itens. O calendário marca 26/11 como presencial e o publicado só traz 25/11, sem aviso.",
+   "evidencia": "stf.py:1476-1479; data/tribunais/meta.json → fontes.stf_pauta ok true, aviso null, registros 10"
+  },
+  {
+   "afirmacao": "Os 10 itens do Plenário de 25/11/2026, 14h (parte 1 de 2). ADI 6002: rel. Cristiano Zanin, destaque de Flávio Dino, controle de constitucionalidade, OAB Conselho Federal × Congresso Nacional, autuada em 2018. ARE 1502069: rel. Dias Toffoli, vista de Gilmar Mendes, repercussão geral, piso salarial, Município de Riolândia × pessoa física, 2024. RE 1326541: rel. Cristiano Zanin, vista de Gilmar Mendes, repercussão geral, piso salarial, Estado de São Paulo × pessoa física, 2021. ADI 7717: rel. Nunes Marques, vista de Alexandre de Moraes, Estado de Mato Grosso do Sul e outros × Congresso Nacional, 2024. ADI 6528: rel. Cristiano Zanin, destaque de Flávio Dino, PSB × Congresso Nacional, 2020.",
+   "evidencia": "data/tribunais/ministros/stf-cristiano-zanin.json, stf-dias-toffoli.json, stf-nunes-marques.json (em_pauta: classe, número, assunto, partes, ano) + a fixture da sessão (vista, destaque). Vista e destaque por item vêm da fixture; o publicado confirma as 3 vistas e a contagem 3/6"
+  },
+  {
+   "afirmacao": "Os 10 itens do Plenário de 25/11/2026 (parte 2 de 2). ADI 7493: rel. Dias Toffoli, destaque de Edson Fachin, orçamento, contra a Assembleia de Mato Grosso, 2023. ADI 7643: rel. Alexandre de Moraes, sem vista nem destaque, processo legislativo, contra a Assembleia da Paraíba, 2024. ADI 7807: referendo de medida cautelar, rel. Dias Toffoli, destaque de Fachin, Estado de Mato Grosso × Assembleia de Mato Grosso, 2025. ADI 7869: referendo de medida cautelar, rel. Alexandre de Moraes, destaque de Fachin, contra a Assembleia da Paraíba, 2025. ADI 7906: referendo de medida cautelar, rel. Dias Toffoli, destaque de Fachin, orçamento, contra a Assembleia de Rondônia, 2025.",
+   "evidencia": "data/tribunais/ministros/stf-dias-toffoli.json e stf-alexandre-de-moraes.json (em_pauta) + campo cadeia da fixture ('REFERENDO NA MEDIDA CAUTELAR NA AÇÃO DIRETA DE INCONSTITUCIONALIDADE')"
+  },
+  {
+   "afirmacao": "O cruzamento pauta do STF × repercussão geral funciona com o que já está publicado, pelo link do tema. RE 1326541 é o Tema 1218 (piso nacional da Lei 11.738/2008 como base do vencimento inicial do magistério estadual). ARE 1502069 é o Tema 1324 (revisão do salário-base de professor municipal pela atualização do piso por portaria do MEC).",
+   "evidencia": "data/tribunais/ministros/stf-cristiano-zanin.json e stf-dias-toffoli.json → temas[].link (…numeroProcesso=1326541&classeProcesso=RE&numeroTema=1218; …numeroProcesso=1502069&classeProcesso=ARE&numeroTema=1324); stf.py:1251, 1341"
+  },
+  {
+   "afirmacao": "STJ: o conjunto pautas-futuras traz 15 campos por item: numeroUnico, numeroRegistro, dataSessão, dataPublicacaoPauta, orgaoJulgador, siglaClasse, numeroNaClasse, codigoClasseCNJ, processo, numeroPeticao, tipoPeticao, siglaPeticao, Relator, segredoDeJustica e partes (descTipoParte, nomeParte, numeroCNPJ, advogados). Não há assunto, tema, tipo de sessão, hora, nem vista.",
+   "evidencia": "dicionário oficial baixado (dicionario-pautas.csv) e contagem de chaves no arquivo real de 23/11/2026: 8.545 itens, as 15 chaves em todos; o dicionário escreve segredoJustica, o arquivo traz segredoDeJustica (stj.py:986 aceita os dois)"
+  },
+  {
+   "afirmacao": "STJ: o leitor guarda sessao, publicada, orgao, id, classe, numero, cnj, registro, tipo, peticao, numero_peticao, interno, relator, relator_id, fora, segredo e partes (sem nome de pessoa física e sem advogados). Recurso interno é AgInt, AgRg ou EDcl.",
+   "evidencia": "qijournal/tribunais/stj.py:940-990 e 98"
+  },
+  {
+   "afirmacao": "STJ: do que é lido, só contagens vão ao painel. Os itens vão aos dossiês com teto de 20 por ministro, na ordem sessão, órgão e id, sem os relatados pela Vice-Presidência e pela Presidência (1.209 dos 8.545). Publicados: 595 itens (7%); da semana, 556 de 2.219, e 29 dos 366 principais.",
+   "evidencia": "contas.py:382-428 e 945-959; contagem em data/tribunais/ministros/stj-*.json; arquivo real de 23/11 lido por stj.ler_pautas (relator fora da grade: vice 1.062, presidencia 147)"
+  },
+  {
+   "afirmacao": "STJ, semana de 24 a 26/11: Primeira Turma 201 itens (1 principal), Terceira 389 (83), Quarta 415 (154) em 24/11; Corte Especial 326 (nenhum principal, 248 relatados pela Vice-Presidência ou Presidência) em 25/11; Segunda Turma 248 (41), Quinta 215 (0), Sexta 425 (87) em 26/11. Total 2.219, 357 em segredo. Nenhuma Seção tem sessão na semana.",
+   "evidencia": "data/tribunais/stj.json → pautas.sessoes; arquivo real pautas_futuras_20261123.json.gz; resumo em amostra_pauta_stj_campos.json"
+  },
+  {
+   "afirmacao": "STJ: o cruzamento pauta × precedentes qualificados funciona pelo numeroRegistro contra o Processos.csv. No arquivo de 23/11, 16 processos pautados estão ligados a precedente, 14 deles recursos principais de tema repetitivo pendente. Nenhum é desta semana: começam em 02/12.",
+   "evidencia": "saída do script cruzar.py sobre pautas_futuras_20261123.json.gz, temas.csv e processos.csv baixados do portal em 24/11/2026"
+  },
+  {
+   "afirmacao": "STJ, temas repetitivos já pautados: Corte Especial em 02/12, Temas 1254 (prescrição da habilitação de herdeiros) e 1448 (parâmetros das astreintes). Segunda Seção em 03/12, Temas 1404 (venda de dados pessoais por birôs de crédito, em julgamento) e 1466 (Lei do Distrato com patrimônio de afetação); Terceira Seção, Tema 1256 (porte de arma como perigo abstrato). Em 09/12, Temas 1443 (locação curta por plataforma em condomínio) e 1407 (arma de fogo no roubo). Corte Especial em 16/12, Temas 1343 (aviso de glúten na embalagem) e 1396 (tentativa extrajudicial prévia nas ações de consumo).",
+   "evidencia": "amostra_agenda_stj_prototipo.json (título e situação de cada tema vêm do Temas.csv real)"
+  },
+  {
+   "afirmacao": "STJ: o cruzamento não é possível com o que está publicado nem com o que o leitor guarda hoje. O montar_temas calcula os registros de cada tema e guarda só a contagem e o id do paradigma; o dossiê publica só numero, tipo, titulo, situacao, desde e link.",
+   "evidencia": "stj.py:1149-1156; contas.py:550-551"
+  },
+  {
+   "afirmacao": "STJ × repercussão geral do STF: a ligação é fraca. O campo numeroRepercussaoGeralSTF só vale quando descricaoRepercussaoGeral está preenchido (362 de 2.416 linhas); 629 linhas trazem números acima de 1.600 e 25 negativos, que não são temas. O leitor grava esses valores em rg_stf sem conferir. O Processos.csv tem o processo no STF em 192 linhas.",
+   "evidencia": "temas.csv real (exemplos: 7667823, 2097249, -1015715227); stj.py:1115-1118; processos.csv coluna processoSTF"
+  },
+  {
+   "afirmacao": "Ter ente público ou litigante do catálogo não separa nada no STJ: aparece em 223 dos 326 itens da Corte Especial e em 185 dos 201 da Primeira Turma (o Ministério Público está em quase todo processo penal). Serve como etiqueta, não como ordem.",
+   "evidencia": "saída do script prototipo.py (stj.ler_pautas com partes.tipificar e config/tribunais_partes.yaml) sobre o arquivo real"
+  },
+  {
+   "afirmacao": "Uma régua sem IA separa o ruído: tema afetado pendente em recurso principal, proposta de relevância ou questão de ordem, órgão (Corte Especial, depois Seção), recurso principal, classe de divergência ou originária, e desconto para relator Vice-Presidência ou Presidência. Dos 6.884 itens listáveis, 28 passam do corte: 1 nesta semana (proposta de relevância no AREsp 3296604, Corte Especial, rel. João Otávio de Noronha, Banco BMG agravante) e 23 nas três semanas seguintes.",
+   "evidencia": "saída do script prototipo2.py: faixas de nota (-20: 120, 0: 5.362, 20: 1.374, 40: 4, 60: 10, 140: 14)"
+  },
+  {
+   "afirmacao": "STJ: o conjunto não diz se a sessão é virtual ou presencial. Indício no dado: lotes de centenas de itens publicados de 21 a 29 dias antes, e lotes pequenos, quase só de recursos principais, no mesmo dia e órgão (Corte Especial de 02/12: 145 itens publicados em 05/11 e 8 em 13/11, com ações penais e repetitivos). Leio os lotes grandes como sessão virtual e os pequenos como pauta presencial; é inferência, não campo da fonte. Na semana de 24 a 26/11 só há lotes grandes.",
+   "evidencia": "saída do script analisar2.py e do agrupamento por (sessão, órgão, dataPublicacaoPauta) no arquivo real"
+  },
+  {
+   "afirmacao": "Sinais que não existem em nenhuma fonte coletada: valor da causa; ementa ou objeto do processo no STJ (só o assunto da TPU, pelo acervo, e a questão submetida, nos temas); tipo de sessão e hora no STJ; resultado do julgamento; data do pedido de vista; pedido de vista no STJ.",
+   "evidencia": "README.md:1111; dicionario-pautas.csv; achados.py:281 ('A pauta não traz a data do pedido de vista'); modelo.py:130; meta.json → stj_integras atraso_dias 39"
+  },
+  {
+   "afirmacao": "Frescor do STJ: o arquivo de 23/11 foi publicado às 17:21 UTC (14h21 de Brasília) e coletado às 21:14 UTC. O conjunto promete atualização diária, mas a página lista 68 arquivos em 132 dias, com buracos de 20 dias (24/10 a 13/11), 13 dias (09 a 22/09) e 12 dias (09 a 21/10).",
+   "evidencia": "página do conjunto baixada em 24/11 ('Última Atualização novembro 23, 2026, 17:21 (UTC)'); meta.json → fontes.stj_pautas; lista de arquivos em pagina_pautas.html"
+  },
+  {
+   "afirmacao": "Frescor do STF: a resposta fica 20 h no cache, e a data do dado é a do dia da execução, não uma data declarada pela fonte. A coleta em uso é de 23/11 às 11:54 UTC (08h54 de Brasília).",
+   "evidencia": "config/tribunais.yaml:583; dados.py:894; meta.json → fontes.stf_pauta"
+  },
+  {
+   "afirmacao": "O fluxo Tribunais roda depois de cada edição e às 22:41 de Brasília, mas o job que decide se roda só olha o acervo dos dois tribunais e as atas do STJ; a pauta não entra nesse calendário. Com o painel de um tribunal recusado, as fontes acessórias, pauta incluída, ficam como estavam.",
+   "evidencia": ".github/workflows/tribunais.yml:22-36; dados.py:115 e 1221-1229"
+  },
+  {
+   "afirmacao": "Na aba Tribunais a pauta aparece só como uma frase em 'A fila' ('8.545 itens nas sessões publicadas até agora: 1.370 recursos principais e 7.175 recursos internos'), uma linha no cartão do ministro, a lista 'Em pauta' do dossiê e a lista de pedidos de vista. A lista de sessões por dia está no JSON e não é mostrada. Não há agenda por dia.",
+   "evidencia": "qijournal/render/tribunais.py:1223-1230 e 982-984; qijournal/render/templates/tribunais.js.j2:406-416; tribunais.html.j2:413-416; busca por 'sessoes' em qijournal/render sem resultado; edicoes/tribunais.html"
+  },
+  {
+   "afirmacao": "Há folga de tamanho para um arquivo novo: data/tribunais tem 2.568.524 bytes de um teto de 3.000.000, e cada JSON pode ter até 300.000.",
+   "evidencia": "du -sb data/tribunais; dados.py:79-80 e 1018-1047"
+  },
+  {
+   "afirmacao": "A página do conjunto pautas-futuras declara 'Nenhuma Licença Fornecida'; a de precedentes declara Creative Commons Atribuição. O config trata todo o portal do STJ como CC-BY.",
+   "evidencia": "pagina_pautas.html e pagina_precedentes.html baixadas em 24/11; config/tribunais.yaml:573-574"
+  },
+  {
+   "afirmacao": "O README não lista a pauta entre as fontes do STF.",
+   "evidencia": "README.md:1177-1178"
+  }
+ ],
+ "arquivos_chave": [
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/stf.py",
+   "papel": "Leitor do STF. A pauta está em 1381-1483: ler_sessao_presencial (campos por item), ler_calendario (dias presenciais e contagens virtuais), coletar_pauta (janela de 14 dias)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/stj.py",
+   "papel": "Leitor do STJ. ler_pautas em 940-990, baixar_pautas em 1339-1346, montar_temas em 1088-1166 (onde a ligação registro → tema se perde)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/contas.py",
+   "papel": "Contas do painel. _pautas (382-428) reduz a pauta a contagens; 945-959 monta em_pauta por ministro com o processo do acervo; 1123-1134 liga vista a sessão. É onde item de pauta e processo do acervo se encontram."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/dados.py",
+   "papel": "A atualização: coleta das pautas (605-621 STJ, 891-899 STF), estado no cache, tetos de tamanho, gravação dos arquivos (1275-1291). A constante AGENDA (linha 115) já existe e é o calendário das fontes."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/achados.py",
+   "papel": "Precedente de módulo puro que transforma sinais em frases com peso; modelo para o módulo da agenda."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/tribunais/modelo.py",
+   "papel": "Tipos dos arquivos de data/tribunais e leitura do config; LIMIARES_PADRAO (640-668) é onde entram padrões novos."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/config/tribunais.yaml",
+   "papel": "Réguas: fontes e ritmo (537-593), validade e velho_dias das pautas, listas (506-517), pesos (522-530)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/config/tribunais_partes.yaml",
+   "papel": "Catálogo de litigantes e categorias (ente público, banco, plano de saúde, partido), usado para etiquetar as partes."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/render/tribunais.py",
+   "papel": "Página da aba. A pauta entra em 1223-1230 (frase de 'A fila') e 982-984 (cartão do ministro)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/render/templates/tribunais.html.j2",
+   "papel": "Modelo da aba: navegação das vistas (137-144) e lista de pedidos de vista (413-416)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/qijournal/render/web.py",
+   "papel": "Home e edições. Hoje só sabe se a aba Tribunais existe (263, 401); é onde um bloco de agenda leria agenda.json."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/.github/workflows/tribunais.yml",
+   "papel": "Fluxo próprio dos Tribunais: gatilhos, job decidir, publicação só de data/tribunais e da aba."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/data/tribunais/stf.json",
+   "papel": "Painel do STF: pautas (contagens) e fila.vistas (quem pediu vista, com a sessão)."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/data/tribunais/stj.json",
+   "papel": "Painel do STJ: pautas.sessoes com as 44 combinações de data e órgão até 17/12."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/data/tribunais/ministros/",
+   "papel": "Dossiês: em_pauta (até 20 por ministro), em_vista, temas pendentes com link."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/data/tribunais/meta.json",
+   "papel": "Por fonte: data do dado, hora da coleta, ok, aviso, velho_dias."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/tests/fixtures/tribunais/stf/pauta_sessao-presencial_2026-11-25.json",
+   "papel": "Resposta real da pauta do Plenário de 25/11, com os campos que o leitor descarta."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/tests/fixtures/tribunais/stf/pauta_calendarios_2026-11.json",
+   "papel": "Calendário real de novembro de 2026: dias presenciais e contagens das sessões virtuais."
+  },
+  {
+   "caminho": "/home/user/TriangulaTech/tests/fixtures/tribunais/stj/pautas_futuras_20261122_amostra.json.gz",
+   "papel": "Amostra de 16 itens da pauta do STJ; nenhum ligado aos temas das fixtures."
+  }
+ ],
+ "como_estender": "LER SEM COLETAR DE NOVO (o que dá hoje)\n- STF: a agenda da semana sai dos arquivos publicados. stf.json → pautas.sessoes dá data e órgão; os itens vêm de ministros/stf-*.json → em_pauta (classe, número, área, assunto, partes por grupo, ano, link); a vista por item vem de stf.json → fila.vistas onde sessao não é nula; o tema de repercussão geral vem de temas[].link. Faltam destaque por item, incidente (referendo de cautelar), resumo, hora e ordem.\n- STJ: dos arquivos publicados só sai a tabela de sessões por dia e órgão. Os itens publicados são 7% do total, escolhidos por ordem de id. A agenda do STJ precisa ser montada na execução do fluxo Tribunais, com todos os itens em memória.\n\nONDE ENTRA\n- Módulo novo qijournal/tribunais/agenda.py, puro e sem rede, no molde de achados.py: uma função montar que recebe os itens de pauta já cruzados com o acervo, os temas, as regras, o catálogo e a data.\n- contas.py: no laço de 945-959, devolver também a lista de itens cruzados sem o teto de 20 e com os relatados pela Presidência e pela Vice marcados (campo novo em Resultado, como sinais). Item em segredo só conta.\n- stj.py: montar_temas passa a devolver os registros de cada tema (uso interno, não publicado), ou uma função auxiliar registro → tema. Guardar rg_stf só quando descricaoRepercussaoGeral vier preenchido.\n- stf.py: ler_sessao_presencial passa a guardar cadeia, resumoTema (com corte de tamanho), materiaRelevante, situacaoProcessoSessao, hora, número e tipo da sessão e a ordem. coletar_pauta passa a listar sessão presencial sem itens. O bloco publicado ganha as contagens virtuais.\n- dados.py: gravar data/tribunais/agenda.json junto de achados.json (1286), com o teto de 300 KB; manter a parte do tribunal não refeito, como _achados faz (985-1005). O nome AGENDA já está em uso na linha 115; usar outro. Desacoplar a pauta do painel recusado (1221-1229).\n- config/tribunais.yaml: pesos, classes e tetos em limiares.agenda, com padrão em modelo.LIMIARES_PADRAO, como pesos_achados. Tipos do arquivo em modelo.py, seção 2.\n- Página: uma vista nova na navegação da aba (tribunais.html.j2:137-144) e, na home, um bloco em render/web.py e edition.html.j2 que só lê agenda.json, ligado a brand.tribunais.\n- Fluxo: nada muda em tribunais.yml; o passo de publicar já leva a pasta inteira. A edição diária continua sem gravar em data/tribunais.\n- README: linha nova na tabela 'Onde fica' (1248-1258) e a pauta do STF na lista de fontes (1177).\n\nFORMATO SUGERIDO DE agenda.json\n- v, hoje, janela; por fonte, data do dado e hora da coleta.\n- stf: sessões (data, hora, órgão, número, itens), contagens virtuais por janela e itens com classe, número, incidente, relator, vista, destaque, repercussão geral e tema, área, assunto, partes por grupo, ano, resumo, link.\n- stj: sessões (data, órgão, itens, principais, internos, segredo, lotes por data de publicação) e os destaques com nota e motivos (tema, tipo, órgão), mais os temas das semanas seguintes.\n- Janela de pelo menos 14 dias, para a home filtrar a semana e mostrar a seguinte.\n\nTESTES E FIXTURES\n- tests/test_tribunais_agenda.py para a função pura.\n- Ampliar test_tribunais_stf.py (614-648) para os campos novos e para a sessão sem itens; test_tribunais_stj.py:364 e test_tribunais_contas.py:276 e 298 para a ligação com tema; test_tribunais_dados.py para o arquivo gravado, o teto e a regra de mesmos dados, mesmos bytes; test_render_web.py e test_tribunais_tela.py para o bloco e a vista.\n- Fixtures: a da sessão do STF já traz cadeia e resumoTema; falta uma resposta real de dia sem itens. No STJ, uma amostra nova com lote presencial da Corte Especial, item de tema afetado, proposta de relevância, agravo da Vice-Presidência e item em segredo, mais as linhas correspondentes em temas.csv e processos.csv (a amostra atual não liga a nenhum tema). Mascarar pessoa física, advogado e OAB e registrar a origem no docstring, como as demais. tests/fixtures/tribunais/fabrica.py passa a gerar um agenda.json inventado.",
+ "riscos": [
+  "Chamar de 'agenda do STF' só o Plenário presencial engana: nesta semana são 10 processos contra 662 em sessão virtual em curso, dos quais o projeto só tem a contagem. A home precisa dizer isso.",
+  "Não sei se o serviço do STF lista os processos das sessões virtuais nem as sessões presenciais das Turmas. O portal devolve 403 daqui; a sondagem tem de ser feita no Actions, em modo ensaio.",
+  "No STJ, 'pautado na semana' são 2.219 itens, quase todos de lista. Sem a régua, o bloco vira o mesmo excesso de que o dono reclama. Nesta semana a régua dá um destaque só; a home deve dizer 'sem repetitivo nesta semana' e mostrar os de 02/12 em diante.",
+  "A leitura virtual × presencial no STJ é inferência pelo tamanho e pela data de publicação do lote. Publicar como fato exige confirmação.",
+  "O conjunto de pautas do STJ já ficou 20 dias sem arquivo. Com dado velho, a semana mostrada pode estar errada; a home precisa esconder ou avisar depois do prazo (velho_dias das pautas: 4).",
+  "A pauta muda no dia (retirada, adiamento, vista) e não há dado de resultado. Sessão passada não pode aparecer como julgada. Os valores de situacaoProcessoSessao são desconhecidos (só 'N' na amostra).",
+  "Privacidade: o resumoTema do STF pode trazer nome de pessoa física, e o projeto nunca publica nome de pessoa. Precisa de filtro ou de limite às ações de controle concentrado e aos temas de repercussão geral.",
+  "Nome de empresa: hoje só aparece com 20 processos ou mais no tribunal. A agenda quer nomear partes de um caso só (Airbnb, Boa Vista). É decisão editorial do dono.",
+  "A edição roda de manhã e o fluxo Tribunais roda depois dela: a home mostra a pauta da execução da noite anterior. Se o fluxo falhar, a agenda envelhece sem a edição perceber.",
+  "data/tribunais está a 430 KB do teto da pasta. Um agenda.json grande derruba os painéis do dia (dados.py:1041-1045).",
+  "rg_stf do STJ carrega números que não são temas; usá-lo para ligar ao STF sem a conferência produz ligação falsa.",
+  "A página do conjunto pautas-futuras não declara licença, e o config assume CC-BY para todo o portal.",
+  "O arquivo bruto da pauta que baixei tem nomes de pessoas e de advogados. Está só no rascunho e não deve ir para o repositório sem máscara."
+ ],
+ "amostras": [
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/amostra_stf_plenario_2026-11-25.json — os 10 itens do Plenário de 25/11 reconstruídos (fixture real + dossiês + temas). Exemplo: RE 1326541, rel. Cristiano Zanin, vista de Gilmar Mendes, Tema 1218, Estado de São Paulo no polo ativo.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/amostra_pauta_stj_campos.json — campos do conjunto, contagem por sessão e órgão e 3 itens crus com pessoa física e advogados mascarados (AREsp 3296604, REsp 2226097, REsp 2034211).",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/amostra_agenda_stj_prototipo.json — resultado da régua sem IA: 1 destaque na semana e 23 nas seguintes, com nota, motivos, partes de catálogo e tema. Exemplo: REsp 2272537, Segunda Seção, 09/12, rel. Raul Araújo, Tema 1443, Airbnb como interessada.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/baixado/dicionario-pautas.csv — dicionário oficial do conjunto pautas-futuras.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/baixado/pautas_futuras_20261123.json.gz — arquivo real de 23/11 (8.545 itens), bruto, com nomes; só para análise.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/baixado/temas.csv e /tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/baixado/processos.csv — precedentes qualificados reais usados no cruzamento.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/baixado/pagina_pautas.html — página do conjunto, com a lista dos 68 arquivos, a hora da última atualização e a licença.",
+  "/tmp/claude-0/-home-user-TriangulaTech/853edc40-6c97-5a3a-9141-a5a7681881a4/scratchpad/trabalho/tribunais/scripts/ — scripts de leitura usados (cruzar.py, prototipo2.py, analisar2.py, amostras.py). Rodam os leitores do projeto sem gravar nada no repositório.",
+  "Pedidos feitos ao portal do STJ: 7 (robots.txt, duas páginas de conjunto, o dicionário, o arquivo de pautas, temas.csv e processos.csv), com 11 s entre os pedidos de cada lote; o intervalo entre o robots.txt e a primeira página não foi cronometrado. Agente de usuário genérico, sem dado do projeto. Nenhum arquivo do repositório foi alterado (git status vazio)."
+ ]
+}
