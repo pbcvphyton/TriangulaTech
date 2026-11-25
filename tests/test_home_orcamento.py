@@ -290,6 +290,8 @@ def test_edicao_automatica_mostra_so_mais_recentes(config):
     assert not re.search(r"</h[234]>\s*(</div>|</section>|</details>)", corpo(home))
     tela = visivel(home)
     assert len(tela.palavras) <= PALAVRAS_MAX and tela.controles <= CONTROLES_MAX
+    # 16/11 tem um único texto analisado: a home não afirma o viés "das notícias de hoje"
+    assert "md-vies" not in midia and "Viés político" not in home
     # sem termômetro na edição, a linha do viés também some e o bloco fica só com a lista
     edicao.termometro = None
     midia = trecho(render_edition_page(edicao, config, home_href="./", archive_href="edicoes/"), '<section class="bl md"', "</section>")

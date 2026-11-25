@@ -100,6 +100,7 @@ DOMINIOS = (25, 50, 100)
 RECORTE_MAX = 10  # veículos visíveis no recorte do dia (os demais abrem num "ver todos")
 LISTA_VISIVEL = 12  # textos visíveis antes do "mostrar todos" (com o script; sem ele, todos)
 VIES_FORA_MAX = 3  # notícias fora da faixa de equilíbrio listadas na linha do viés da home
+VIES_MIN_NOTICIAS = 10  # com menos notícias analisadas, a home não afirma o viés "das notícias de hoje"
 MENOS = "−"
 
 
@@ -933,9 +934,15 @@ def vies_do_dia(painel: TermometroDiaView | None) -> ViesDoDiaView | None:
     """Resumo do termômetro para a home, tirado do painel do dia (nada é recalculado).
 
     ``None`` sem painel, sem análise no dia ou sem média (nenhuma notícia com T): a
-    home então não mostra a linha. Opinião fica de fora, como na média do dia; as
-    notícias vêm das mais inclinadas para as menos (a ordem do painel)."""
+    home então não mostra a linha. Também ``None`` quando o dia tem menos de
+    ``VIES_MIN_NOTICIAS`` notícias analisadas (edição automática, falhas da análise): a
+    frase fala das "notícias de hoje" e uma ou duas não bastam para sustentá-la. Opinião
+    fica de fora, como na média do dia; as notícias vêm das mais inclinadas para as menos
+    (a ordem do painel)."""
     if painel is None or painel.vazio or painel.gauge is None:
+        return None
+    medidas = sum(1 for a in painel.analises if a.estado == "ok" and not a.opiniao and a.classe != "na")
+    if medidas < VIES_MIN_NOTICIAS:
         return None
     fora = [
         a for a in painel.analises

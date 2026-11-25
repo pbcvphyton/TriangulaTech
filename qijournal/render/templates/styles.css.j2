@@ -986,9 +986,11 @@ body.modal-open .btt{visibility:hidden}
   .man.curto{--f-man:46px}
   .man.longo{--f-man:36px}
   .man .cat{margin-bottom:10px}
-  .man-c{flex:1 1 auto;grid-template-columns:minmax(0,4fr) minmax(0,8fr);column-gap:28px;align-items:stretch;margin-top:16px}
+  .man-c{flex:1 1 auto;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:28px;align-items:stretch;margin-top:16px}
+  .man-x{height:100%}
+  .man .sv{margin-top:auto;padding-top:12px}
   .man-f{position:relative;width:100%;height:100%;min-height:250px;aspect-ratio:auto;margin:0}
-  .man-f img{position:absolute;inset:0}
+  .man-f img{position:absolute;inset:0;object-position:50% 30%}
   /* Sem foto (a matéria não tem ou ela não carregou): a manchete ocupa a largura toda e
      "Em 1 minuto" vira uma fileira de chamadas abaixo dela, sem buraco na página */
   .capa.solo,.capa:has(.man.noimg),.capa:has(.man-f.img-fail){grid-template-columns:minmax(0,1fr)}
@@ -1115,6 +1117,7 @@ body.modal-open .btt{visibility:hidden}
   .ed .mt-abas .tool span{display:inline}
   .ed .mt-abas~.mt-fer .tool span,.ed .mt-abas~#dmBtn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .ed .mast{padding:41px 16px 7px}
+  .ed .mast h1.logo svg,.ed .mast h1.logo.mono svg{max-height:48px}
   .ed .mast-sub{display:none}
   .ed .mast-date{margin-top:5px}
 }
