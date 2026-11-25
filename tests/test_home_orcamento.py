@@ -276,6 +276,8 @@ def test_copia_arquivada_leva_as_gavetas_do_que_a_edicao_tem(caso, config):
     assert re.findall(rf'href="edicoes/{dia}\.html#\w+"', home)
     assert f"{dia}.html#" not in copia.split("</head>")[1]  # na cópia, âncoras da própria página
     for ancora in esperadas[1:]:
+        if ancora == "termometro" and not (view.midia and view.midia.vies):
+            continue  # poucas notícias analisadas: sem linha do viés, a gaveta fica só como gaveta
         assert f'href="#{ancora}"' in copia
 
 

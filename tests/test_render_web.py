@@ -35,6 +35,15 @@ from tests.fixtures.render.helpers import (
 )
 
 
+@pytest.fixture(scope="module", autouse=True)
+def _vies_com_amostra_pequena():
+    """As edições inventadas destes testes têm poucas análises: a amostra mínima da linha
+    do viés cai para 1 aqui (a regra é conferida em tests/test_termometro.py)."""
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setattr("qijournal.render.termometro.VIES_MIN_NOTICIAS", 1)
+        yield
+
+
 @pytest.fixture(scope="module")
 def config():
     return default_config()

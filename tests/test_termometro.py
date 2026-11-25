@@ -151,6 +151,13 @@ def config():
     return load_config(env={})
 
 
+@pytest.fixture(autouse=True)
+def _vies_com_amostra_pequena(monkeypatch):
+    """Os dias inventados destes testes têm duas ou três análises: a amostra mínima da
+    linha do viés (``VIES_MIN_NOTICIAS``) cai para 1 aqui e é conferida no teste próprio."""
+    monkeypatch.setattr("qijournal.render.termometro.VIES_MIN_NOTICIAS", 1)
+
+
 # ── schema e validação ───────────────────────────────────────────────────────
 
 
@@ -465,7 +472,7 @@ def test_bloco_do_dia_e_seguro_e_bem_formado(config):
     assert "<li><b>Folha</b>, leve à direita: " in linha
 
 
-def test_resumo_do_vies_para_a_home():
+def test_resumo_do_vies_para_a_home(monkeypatch):
     from qijournal.render.termometro import VIES_FORA_MAX, vies_do_dia
 
     # dia normal: só o rótulo, em minúsculas, sem lista
@@ -480,6 +487,12 @@ def test_resumo_do_vies_para_a_home():
         ("Texto t1", "esquerda moderada"), ("Texto t2", "direita moderada"), ("Texto t3", "leve à esquerda"),
     ]
     assert vies.fora[0].url == "https://x.com/t1" and vies.fora[0].veiculo == "Folha"
+    # amostra mínima: com poucas notícias analisadas a home não afirma o viés do dia
+    monkeypatch.setattr("qijournal.render.termometro.VIES_MIN_NOTICIAS", 10)
+    poucas = [_analise(f"p{i}", DATA, T=2) for i in range(9)]
+    assert vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, poucas))) is None
+    bastam = poucas + [_analise("p9", DATA, T=2), _analise("op2", DATA, T=70, selo="Opinião")]
+    assert vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, bastam))).rotulo == "equilibrado"
     # sem painel, sem análise ou sem média (nenhuma notícia com T): a home não mostra a linha
     assert vies_do_dia(None) is None
     assert vies_do_dia(termometro_dia_view(analise.registro_do_dia(DATA, [], motivo="sem IA"))) is None
