@@ -37,6 +37,7 @@ from typing import Any
 
 from qijournal.congresso import regras
 from qijournal.net import FetchError, Response
+from tests.fixtures.congresso import agenda as respostas_reais
 
 HOJE = "2026-11-13"
 CAMARA = "https://dadosabertos.camara.leg.br"
@@ -445,3 +446,120 @@ class FetchFalso:
         if caminho not in self.mapa or any(trecho in url for trecho in self.fora_do_ar):
             raise FetchError(url, "HTTP 404", status=404)
         return Response(url=url, status=200, content=self.mapa[caminho], headers={"content-type": "application/json"})
+
+
+# ── a agenda do Congresso (qijournal/congresso/agenda.py) ────────────────────
+#
+# As respostas são reais e recortadas (a origem de cada uma está no docstring de
+# tests/fixtures/congresso/agenda/__init__.py). Três cenários, cada um com o seu "hoje":
+#
+# - AGENDA_HOJE (terça, 24/11/2026): a janela vai de 23/11 a 06/12 e vira o mês. A sessão de 23/11
+#   do Plenário da Câmara está encerrada e a de 24/11 foi convocada no próprio dia.
+# - AGENDA_SEMANA_ANTERIOR (quinta, 19/11/2026): Senado com duas sessões deliberativas encerradas
+#   (o resultado oficial) e a CCJC da Câmara com uma reunião encerrada e uma cancelada.
+# - AGENDA_SESSAO_CONJUNTA (terça, 10/11/2026): a sessão conjunta do Congresso de 12/11.
+
+AGENDA_HOJE = "2026-11-24"
+AGENDA_SEMANA_ANTERIOR = "2026-11-19"
+AGENDA_SESSAO_CONJUNTA = "2026-11-10"
+_V2, _DA = "/api/v2", "/dadosabertos"
+
+
+def respostas_da_agenda() -> dict[str, bytes]:
+    """URL (sem o esquema e o host) → corpo, para a rodada de :data:`AGENDA_HOJE`."""
+    r = respostas_reais.bruto
+    eventos = f"{_V2}/eventos?dataInicio=2026-11-23&dataFim=2026-12-06"
+    return {
+        f"{eventos}&itens=100": r("cd-eventos-20261123.json"),
+        f"{eventos}&pagina=2&itens=100": r("cd-eventos-20261123-p2.json"),
+        **{f"{_V2}/eventos/{evento}/pauta": r(f"cd-evento-{evento}-pauta.json") for evento in (83419, 85464, 83357, 83412, 83359, 83437)},
+        f"{_DA}/plenario/agenda/mes/20261123": r("sf-plenario-agenda-mes-20261123.json"),
+        f"{_DA}/plenario/agenda/mes/20261201": r("sf-plenario-agenda-mes-20261201.json"),
+        f"{_DA}/plenario/agenda/cn/20261123/20261206": r("sf-plenario-agenda-cn-vazia.json"),
+        f"{_DA}/comissao/agenda/20261123/20261206": r("sf-comissao-agenda-20261123.json"),
+        f"{_DA}/processo/prazo?sigla=MPV&dataReferencia={AGENDA_HOJE}": r("sf-processo-prazo-mpv.json"),
+        f"{_DA}/processo?sigla=MPV&tramitando=S": r("sf-processo-mpv-tramitando.json"),
+        f"{_DA}/materia/vetos/aposrcn": r("sf-materia-vetos-aposrcn.json"),
+    }
+
+
+def respostas_da_semana_anterior() -> dict[str, bytes]:
+    """A rodada de :data:`AGENDA_SEMANA_ANTERIOR` (janela de 16 a 29/11): a agenda e o resultado do
+    Plenário do Senado e as reuniões da CCJC da Câmara (a pauta da reunião 83324 não foi
+    guardada: o pedido falha, como uma pauta fora do ar)."""
+    r = respostas_reais.bruto
+    return {
+        f"{_V2}/eventos?dataInicio=2026-11-16&dataFim=2026-11-29&itens=100": r("cd-eventos-ccjc-20261116.json"),
+        f"{_V2}/eventos/83282/pauta": r("cd-evento-83282-pauta.json"),
+        f"{_V2}/orgaos/180/eventos?dataInicio=2026-11-02&dataFim=2026-11-15&itens=100": json.dumps({"dados": [], "links": []}).encode("utf-8"),
+        f"{_DA}/plenario/agenda/mes/20261116": r("sf-plenario-agenda-mes-20261116.json"),
+        f"{_DA}/plenario/resultado/mes/20261116": r("sf-plenario-resultado-mes-20261116.json"),
+        f"{_DA}/plenario/agenda/cn/20261116/20261129": r("sf-plenario-agenda-cn-vazia.json"),
+    }
+
+
+def respostas_da_sessao_conjunta() -> dict[str, bytes]:
+    """A rodada de :data:`AGENDA_SESSAO_CONJUNTA` (janela de 09 a 22/11): só a agenda do Congresso."""
+    return {f"{_DA}/plenario/agenda/cn/20261109/20261122": respostas_reais.bruto("sf-plenario-agenda-cn-20261109.json")}
+
+
+def apoio_da_agenda() -> dict[str, Any]:
+    """O que a coleta lê de ``data/congresso/`` para enriquecer os itens, em miniatura (entradas
+    recortadas das fichas reais de 23/11/2026): ``{nome do arquivo: conteúdo}``.
+
+    - ``PL 7103/2014`` casa na Câmara pelo título e pelo id (606005);
+    - ``PL 479/2015`` tem o mesmo título e OUTRO id: não casa (o id é conferido);
+    - ``PLP 299/2026`` só tem ficha no Senado, com o apelido oficial e o tema: vale para o item
+      da Câmara porque a numeração é única desde 2019;
+    - ``PL 6461/2019`` casa no Senado (174061) e traz o apelido oficial;
+    - ``PL 5894/2025`` casa no Senado e o apelido da ficha é o da tabela de ``config/congresso.yaml``
+      (apelido de imprensa): não é tomado por oficial."""
+    return {
+        "materias-cd.json": {"v": 1, "casa": "cd", "materias": {
+            "PL 7103/2014": {"id": 606005, "tm": ["saude"], "rel": {"q": "espera", "n": 12}},
+            "PL 479/2015": {"id": 1, "tm": ["educacao"], "rel": {"q": "espera", "n": 40}},
+        }},
+        "materias-sf.json": {"v": 1, "casa": "sf", "materias": {
+            "PLP 299/2026": {"id": 176328, "ap": "Ajuste fiscal", "tm": ["economia"], "rel": {"q": "passou", "n": 27}},
+            "PL 6461/2019": {"id": 174061, "ap": "Estatuto do Aprendiz", "tm": ["trabalho"], "rel": {"q": "espera", "n": 62}},
+            "PL 5894/2025": {"id": 175950, "ap": "Plano da Cultura", "rel": {"q": "espera", "n": 62}},
+        }},
+        "resumo.json": {"v": 1, "pessoas": [
+            {"k": "cd-204486", "nome": "Mauro Benevides Filho", "partido": "UNIÃO", "uf": "CE", "ex": 1},
+            {"k": "sf-5008", "nome": "Humberto Costa", "partido": "PT", "uf": "PE", "ex": 1},
+        ]},
+    }  # fmt: skip
+
+
+class Relogio:
+    """Relógio de teste: só anda quando alguém o adianta (um pedido de rede lento, uma pausa)."""
+
+    def __init__(self) -> None:
+        self.agora = 1000.0
+
+    def __call__(self) -> float:
+        return self.agora
+
+    def dormir(self, segundos: float) -> None:
+        self.agora += max(0.0, segundos)
+
+
+class FetchDaAgenda(FetchFalso):
+    """``fetch`` de teste da agenda: além do que o :class:`FetchFalso` faz, cada pedido gasta
+    ``segundos`` do :class:`Relogio` (fonte lenta) e o que está em ``fora_do_ar`` falha com o
+    ``status`` dado (504 é passageiro: vale nova tentativa; 404 não). Guarda também o prazo e as
+    tentativas que cada pedido recebeu."""
+
+    def __init__(self, mapa: dict[str, bytes], *, relogio: Relogio | None = None, segundos: float = 0.0, status: int = 504) -> None:
+        super().__init__(mapa)
+        self.relogio, self.segundos, self.status = relogio, segundos, status
+        self.opcoes: list[dict[str, Any]] = []
+
+    def __call__(self, url: str, **opcoes: Any) -> Response:
+        self.opcoes.append(opcoes)
+        if self.relogio is not None:
+            self.relogio.dormir(self.segundos)
+        if any(trecho in url for trecho in self.fora_do_ar):
+            self.pedidos.append(url)
+            raise FetchError(url, f"HTTP {self.status}", status=self.status)
+        return super().__call__(url, **opcoes)
