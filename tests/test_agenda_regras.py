@@ -138,7 +138,7 @@ def test_o_dicionario_cobre_o_que_precisa_de_traducao(do_arquivo: Regras) -> Non
     assert do_arquivo.situacao("retorno_de_vista", "Gilmar Mendes") == "volta ao julgamento depois do pedido de vista de Gilmar Mendes"
     assert do_arquivo.situacao("retorno_de_vista") == "volta ao julgamento depois de um pedido de vista"
     assert do_arquivo.situacao("destaque", "Edson Fachin").endswith("a pedido de Edson Fachin")
-    assert do_arquivo.situacao("aprovado_ressalvados_destaques") == "texto principal aprovado; faltam os trechos votados em separado"
+    assert do_arquivo.situacao("aprovado_ressalvados_destaques") == "texto principal aprovado; os trechos destacados são votados em separado"
     assert do_arquivo.situacao("referendo_de_cautelar", "qualquer") == "o Plenário confirma ou derruba a decisão provisória"
     assert do_arquivo.situacao("prazo_mpv") == "Medida provisória perde a validade"
     assert do_arquivo.situacao("dia_vazio") == "nada de peso pautado"

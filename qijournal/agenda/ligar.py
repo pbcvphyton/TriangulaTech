@@ -115,20 +115,26 @@ def _nomes(valores: Iterable[Any]) -> tuple[str, ...]:
 
 
 def textos_da_edicao(edition: Any) -> list[Texto]:
-    """Os textos da edição do dia: cada matéria (com as fontes dela), cada assunto comparado
-    (com os veículos comparados) e cada notícia da lista completa (com o veículo; a notícia de um
-    assunto que virou matéria leva o id da matéria)."""
+    """Os textos da edição do dia. Só credita um veículo o texto que é dele: o título de cada
+    notícia da lista completa e o enquadramento de cada veículo num assunto comparado. A matéria
+    escrita pela própria edição e a síntese do assunto comparado ligam a matéria (para "na
+    agenda" e para o link), mas não creditam as fontes: um veículo citado como fonte de uma
+    matéria que fala do projeto não citou o projeto por isso (revisão de 24/11/2026: 8 dos 15
+    veículos contados para o PLP 299/2026 entravam só assim). A notícia de um assunto que virou
+    matéria leva o id da matéria."""
     textos: list[Texto] = []
     dia = str(getattr(edition, "date", "") or "")
     comparadas = list(getattr(edition, "compared", None) or [])
     for story in getattr(edition, "stories", None) or []:
         corpo = " \n".join([story.headline or "", story.dek or "", *(story.body or []), story.why_it_matters or ""])
-        textos.append(Texto(corpo, _nomes(s.name for s in story.sources or []), materia=story.id, data=dia))
+        textos.append(Texto(corpo, (), materia=story.id, data=dia))
         if story.coverage is not None:
             comparadas.append(story.coverage)
     for cobertura in comparadas:
-        partes = [cobertura.topic, cobertura.conclusion, cobertura.side_a, cobertura.side_b, *(o.framing for o in cobertura.outlets)]
-        textos.append(Texto(" \n".join(p or "" for p in partes), _nomes(o.name for o in cobertura.outlets), data=dia))
+        partes = [cobertura.topic, cobertura.conclusion, cobertura.side_a, cobertura.side_b]
+        textos.append(Texto(" \n".join(p or "" for p in partes), (), data=dia))
+        for o in cobertura.outlets:
+            textos.append(Texto(o.framing or "", _nomes([o.name]), data=dia))
     for assunto in getattr(edition, "index", None) or []:
         for noticia in assunto.items:
             textos.append(Texto(noticia.title or "", _nomes([noticia.source]), materia=assunto.story_id or "", data=dia))
@@ -139,9 +145,10 @@ def textos_da_edicao(edition: Any) -> list[Texto]:
 
 
 def textos_da_busca(dados: Any) -> list[Texto]:
-    """Os textos de um arquivo de ``data/busca`` (uma edição anterior): matérias, assuntos
-    comparados e notícias, cada um com os seus veículos. Formato inesperado devolve o que der
-    para ler (uma linha fora do formato é pulada)."""
+    """Os textos de um arquivo de ``data/busca`` (uma edição anterior), com a mesma regra de
+    ``textos_da_edicao``: só o título da notícia e o enquadramento de cada veículo creditam o
+    veículo; a matéria e a síntese do assunto comparado não creditam ninguém. Formato
+    inesperado devolve o que der para ler (uma linha fora do formato é pulada)."""
     if not isinstance(dados, Mapping):
         return []
     dia = str(dados.get("data") or "")
@@ -158,13 +165,13 @@ def textos_da_busca(dados: Any) -> list[Texto]:
     for materia in lista("materias"):
         if isinstance(materia, Mapping):
             corpo = " \n".join(str(materia.get(k) or "") for k in ("t", "l", "c", "p"))
-            fontes = materia.get("f") if isinstance(materia.get("f"), list) else []
-            textos.append(Texto(corpo, _nomes(nome(i) for i in fontes), data=dia))
+            textos.append(Texto(corpo, (), data=dia))
     for comparada in lista("comparadas"):
         if isinstance(comparada, Mapping):
             focos = [f for f in comparada.get("f") or [] if isinstance(f, list) and len(f) >= 3] if isinstance(comparada.get("f"), list) else []
-            corpo = " \n".join([*(str(comparada.get(k) or "") for k in ("t", "c", "a", "b")), *(str(f[2] or "") for f in focos)])
-            textos.append(Texto(corpo, _nomes(nome(f[0]) for f in focos), data=dia))
+            textos.append(Texto(" \n".join(str(comparada.get(k) or "") for k in ("t", "c", "a", "b")), (), data=dia))
+            for f in focos:
+                textos.append(Texto(str(f[2] or ""), _nomes([nome(f[0])]), data=dia))
     for noticia in lista("noticias"):
         if isinstance(noticia, list) and len(noticia) >= 4:
             textos.append(Texto(str(noticia[3] or ""), _nomes([nome(noticia[2])]), data=dia))

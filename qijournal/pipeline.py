@@ -668,9 +668,9 @@ def publish(
         log.warning("Agenda da semana: a página completa não foi renderizada (%s: %s); a edição sai sem ela", type(exc).__name__, exc)
     if agenda_page is not None:
         paths["agenda"] = agenda_path
-    # O pé do bloco da home leva o link "Agenda completa". Só quando a página completa falhou
-    # sem nunca ter existido é que a edição sai sem esse link (não há para onde ele levar).
-    extras: dict[str, Any] = {"agenda_pagina": False} if agenda_falhou and not agenda_path.is_file() else {}
+    # O pé do bloco da home leva o link "Agenda completa". Quando a página completa falhou, a
+    # edição sai sem esse link: a página que estiver lá é de outro dia, com outra conferência.
+    extras: dict[str, Any] = {"agenda_pagina": False} if agenda_falhou else {}
     home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/", **extras)
     archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True, **extras)
     archive_index = render_archive_index(entries, config, home_href="../")

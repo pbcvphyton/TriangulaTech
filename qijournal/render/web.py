@@ -1337,13 +1337,28 @@ def render_edition_page(
     if view.termometro is not None:  # a aba fica em edicoes/, ao lado das edições anteriores
         view.termometro.analitico_href = filters.safe_href(f"{archive.rstrip('/')}/{ANALITICO_PAGINA}") or ""
     template = filters.environment().get_template("edition.html.j2")
-    html = template.render(
-        v=view,
-        brand=view.brand,
-        home_href=filters.safe_href(home_href) or "./",
-        archive_href=archive,
-        agenda_script=view.agenda is not None,  # page.js.j2: HOJE, AMANHÃ e os dias passados
-    )
+
+    def desenhar(v: EditionView) -> str:
+        return template.render(
+            v=v,
+            brand=v.brand,
+            home_href=filters.safe_href(home_href) or "./",
+            archive_href=archive,
+            agenda_script=v.agenda is not None,  # page.js.j2: HOJE, AMANHÃ e os dias passados
+        )
+
+    try:
+        html = desenhar(view)
+    except Exception as exc:
+        if getattr(edition, "agenda", None) is None:
+            raise
+        # A agenda é adicional: se o bloco (ou a marca "na agenda" de uma chamada) não puder
+        # ser desenhado, a página sai sem nada dela, como numa edição sem retrato.
+        log.warning("Agenda da semana: o bloco não foi desenhado (%s: %s); a página sai sem ele", type(exc).__name__, exc)
+        view = build_view(replace(edition, agenda=None), config, archive=is_archive, copia_href=copia, agenda_pagina=False)
+        if view.termometro is not None:
+            view.termometro.analitico_href = filters.safe_href(f"{archive.rstrip('/')}/{ANALITICO_PAGINA}") or ""
+        html = desenhar(view)
     log.info(
         "Página da edição %s renderizada: %d matérias, %d seções, %.0f KB",
         edition.date,

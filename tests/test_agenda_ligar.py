@@ -189,8 +189,10 @@ def test_textos_da_edicao_do_dia():
     textos = ligar.textos_da_edicao(edicao)
     assert [t.materia for t in textos if t.materia] == ["plp", "materia-2", "plp"]
     ligacoes = ligar.ligar(ALVOS, textos, REGRAS, DIA, veiculos_oficiais=("STJ",))
-    assert ligacoes["PLP 299/2026"] == ligar.Ligacao(veiculos=("O Globo", "Valor Econômico"), materias=("plp",))
-    assert ligacoes["RE 1326541"].veiculos == ("Conjur", "JOTA") and ligacoes["RE 1326541"].materias == ()
+    # a matéria da edição liga a matéria, mas não credita as fontes dela; O Globo citou no título
+    assert ligacoes["PLP 299/2026"] == ligar.Ligacao(veiculos=("O Globo",), materias=("plp",))
+    # no assunto comparado, só o veículo cujo enquadramento cita o item (a síntese não credita ninguém)
+    assert ligacoes["RE 1326541"].veiculos == ("Conjur",) and ligacoes["RE 1326541"].materias == ()
     assert ligacoes["MPV 1381/2026"].veiculos == ("Poder360",)
     assert "REsp 2034211" not in ligacoes  # só o canal do próprio STJ citou: não é imprensa e não há matéria
 
@@ -200,14 +202,14 @@ def test_textos_de_um_arquivo_de_busca():
         "data": "2026-11-23",
         "veiculos": ["Valor Econômico", "Folha de S.Paulo", "STF"],
         "materias": [{"id": "m", "s": 0, "t": "Câmara vota o PLP 299/2026", "l": "", "c": "Texto.", "p": "", "f": [0, 1]}],
-        "comparadas": [{"t": "Supremo e o Tema 1218", "c": "", "a": "", "b": "", "f": [[1, "a", "foco", "x"], [2, "b", "foco", "y"]]}],
+        "comparadas": [{"t": "Supremo e o Tema 1218", "c": "", "a": "", "b": "", "f": [[1, "a", "Destaca o RE 1326541", "x"], [0, "b", "foco", "y"]]}],
         "noticias": [[0, -1, 1, "MP 1.381/26 perde a validade", "x", 10], [0, -1, 9, "PL 6461/2019 no Senado", "y", None], "lixo", [1]],
     }
     textos = ligar.textos_da_busca(dados)
-    assert len(textos) == 4 and all(t.materia == "" and t.data == "2026-11-23" for t in textos)
+    assert len(textos) == 6 and all(t.materia == "" and t.data == "2026-11-23" for t in textos)
     ligacoes = ligar.ligar(ALVOS, textos, REGRAS, DIA, veiculos_oficiais=("STF",))
-    assert ligacoes["PLP 299/2026"].veiculos == ("Folha de S.Paulo", "Valor Econômico")
-    assert ligacoes["RE 1326541"].veiculos == ("Folha de S.Paulo",)
+    assert "PLP 299/2026" not in ligacoes  # só a matéria da edição citou: as fontes dela não contam
+    assert ligacoes["RE 1326541"].veiculos == ("Folha de S.Paulo",)  # o enquadramento da Folha cita o RE
     assert ligacoes["MPV 1381/2026"].veiculos == ("Folha de S.Paulo",)
     assert "PL 6461/2019" not in ligacoes  # veículo fora da tabela: o texto não tem a quem ser atribuído
 

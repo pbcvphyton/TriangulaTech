@@ -131,7 +131,7 @@ def test_cada_linha_traz_instituicao_e_orgao_por_extenso_e_o_assunto_antes_do_nu
     assert bloco.index("Estatuto do Aprendiz") < bloco.index(">PL 6461/2019<")
     assert re.search(r'<a href="https://[^"]+" target="_blank" rel="noopener noreferrer">PL 6461/2019<', bloco)
     assert "Medida provisória perde a validade" in texto and "nada de peso pautado" in texto
-    assert "Já decidido esta semana" in texto and "texto principal aprovado; faltam os trechos votados em separado" in texto
+    assert "Já decidido esta semana" in texto and "texto principal aprovado; os trechos destacados são votados em separado" in texto
     # nenhuma cor nem ícone por instituição: o bloco não leva estilo embutido nem imagem
     assert "style=" not in bloco and "<svg" not in bloco and "<img" not in bloco
 
@@ -377,8 +377,31 @@ def test_excecao_no_renderizador_da_agenda_nao_derruba_o_publish(
     assert "agenda.html" not in home  # e sem link para a página que não existe
     assert 'href="edicoes/agenda.html"' in (tmp_path / "ok" / "index.html").read_text(encoding="utf-8")
 
-    # A página que já existia fica como estava quando a renderização falha.
+    # A página que já existia fica como estava quando a renderização falha, mas a home do dia
+    # não aponta para ela: é de outro dia, com outra data de conferência.
     paths = _publicar(copy.deepcopy(edicao), tmp_path / "ok")
     assert "agenda" not in paths
     assert (tmp_path / "ok" / "edicoes" / "agenda.html").read_bytes() == referencia["agenda"].read_bytes()
-    assert 'href="edicoes/agenda.html"' in (tmp_path / "ok" / "index.html").read_text(encoding="utf-8")
+    assert "agenda.html" not in (tmp_path / "ok" / "index.html").read_text(encoding="utf-8")
+
+
+def test_erro_ao_desenhar_o_bloco_da_agenda_nao_derruba_a_pagina(monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture):
+    """Um defeito no desenho do bloco (o modelo é estrito) não derruba a home: ela sai sem a
+    agenda e sem as marcas "na agenda", como numa edição sem retrato."""
+    from qijournal.render import web
+
+    edicao = make_edition()
+    edicao.agenda = _cheio().para_dict()
+    original = web.build_view
+
+    def view_quebrada(edition: Any, *args: Any, **kwargs: Any) -> Any:
+        v = original(edition, *args, **kwargs)
+        if v.agenda is not None:
+            v.agenda = object()  # o modelo vai pedir campos que este objeto não tem
+        return v
+
+    monkeypatch.setattr(web, "build_view", view_quebrada)
+    with caplog.at_level("WARNING"):
+        home = web.render_edition_page(edicao, make_config(), home_href="./", archive_href="edicoes/")
+    assert "o bloco não foi desenhado" in caplog.text
+    assert parse(home).errors == [] and 'id="agenda"' not in home and "na agenda:" not in home

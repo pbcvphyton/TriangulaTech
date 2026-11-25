@@ -131,7 +131,7 @@ situacoes:
   prazo_veto:                    # veto com o prazo de análise vencido (Constituição, art. 66, § 6º)
     texto: "Veto passa à frente das outras votações do Congresso"
   aprovado_ressalvados_destaques:
-    texto: "texto principal aprovado; faltam os trechos votados em separado"
+    texto: "texto principal aprovado; os trechos destacados são votados em separado"
   retirado_de_pauta:
     texto: "saiu da pauta"
   nao_apreciado:

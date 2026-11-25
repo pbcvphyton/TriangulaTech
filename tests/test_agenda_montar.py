@@ -69,7 +69,8 @@ def test_home_por_dia_com_a_hora_e_a_nota_no_empate():
         ("sáb 28", ["congresso-prazo-mpv-1382-2026"]),  # prazo que vence no sábado não some
         ("seg 30", []),
     ]
-    assert [d.vazio for d in r.dias] == ["", "", "nada de peso pautado", "", "", "nada de peso pautado"]
+    # qui 26: há sessão do Plenário do STF com a pauta ainda não publicada; não é "nada"
+    assert [d.vazio for d in r.dias] == ["", "", "STF · Plenário: pauta ainda não publicada", "", "", "nada de peso pautado"]
     assert [d.principal for d in r.dias] == [True, True, False, False, False, False]
     assert r.dias[1].rotulo_longo == "quarta-feira, 25 de novembro"
 
@@ -185,8 +186,8 @@ def test_sem_item_nomeado_na_janela_a_frase_traz_o_proximo_evento_com_o_assunto(
     frase = next(f for f in r.frases if f.instituicao == "STJ")
     assert frase.tipo == "proximo"
     assert frase.texto == (
-        "STJ: nada de alcance geral pautado até 30/11; em 02/12, Corte Especial, "
-        "Definir se ocorre ou não a prescrição para a habilitação de herdeiros ou sucessores…"
+        "STJ: nenhum julgamento de tese para todo o país pautado até 30/11. Próximo: Corte Especial, 02/12: "
+        "definir se ocorre ou não a prescrição para a habilitação de herdeiros ou sucessores…"
     )
     assert frase.itens[0].identificador == "REsp 2034211" and frase.link.startswith("https://")
 
@@ -194,8 +195,8 @@ def test_sem_item_nomeado_na_janela_a_frase_traz_o_proximo_evento_com_o_assunto(
 def test_proximo_evento_pode_ser_um_prazo_e_pode_nao_haver():
     domingo = montar.montar(_com_dados_de(fx.congresso(), "2026-11-27"), _com_dados_de(fx.tribunais(), "2026-11-27"), "2026-11-29", REGRAS)
     frases = {f.instituicao: f.texto for f in domingo.frases if f.tipo == "proximo"}
-    assert frases["Congresso"].startswith("Congresso: nada de peso pautado até 04/12; em 07/12, Medida provisória perde a validade: Crédito extraordinário")
-    assert frases["STF"] == "STF: nada de alcance geral pautado até 04/12."
+    assert frases["Congresso"].startswith("Congresso: nada de peso pautado até 04/12. Próximo: 07/12, medida provisória perde a validade: crédito extraordinário")
+    assert frases["STF"] == "STF: nenhum julgamento de tese para todo o país pautado até 04/12."
     assert frases["Senado"] == "Senado: nada de peso pautado até 04/12."
     assert "Câmara" not in frases  # a frase da pauta não publicada já diz o que há
 
@@ -357,16 +358,20 @@ def test_dia_passado_com_resultado_oficial_so_a_palavra():
     item = linha.itens[0]
     assert item.identificador_tela == "PLP 299/2026 (pacote fiscal)"  # o apelido aprovado, entre parênteses
     assert item.nome == "Ajuste fiscal"
-    assert item.situacao == "texto principal aprovado; faltam os trechos votados em separado"
+    assert item.situacao == "texto principal aprovado; os trechos destacados são votados em separado"
     assert item.resultado == "aprovado, ressalvados os destaques"
     # Nenhum placar: o "127 a 347" do requerimento de adiamento nunca sai como resultado.
     for texto in _textos(r.para_dict()):
         assert "127 a 347" not in texto and "347" not in texto and not re.search(r"(?i)\b(?:sim|não|placar)\s*:\s*\d", texto), texto
 
 
-def test_palavra_aprovado_com_frase_de_destaques_e_lida_pela_frase():
+def test_palavra_do_resultado_e_a_do_coletor_sem_reclassificar_pela_frase():
+    # "ressalvados os destaques" fica na frase oficial mesmo depois que os destaques são votados
+    # (em 23/11 o PLP 299/2026 já tinha ido à sanção): só o coletor sabe se a matéria seguiu.
     resultado = contrato.Resultado(palavra="aprovado", texto=fx.RESULTADO_PLP_299)
-    assert montar.palavra_do_resultado(resultado) == "aprovado_ressalvados_destaques"
+    assert montar.palavra_do_resultado(resultado) == "aprovado"
+    pendente = contrato.Resultado(palavra="aprovado_ressalvados_destaques", texto=fx.RESULTADO_PLP_299)
+    assert montar.palavra_do_resultado(pendente) == "aprovado_ressalvados_destaques"
     assert montar.palavra_do_resultado(contrato.Resultado(palavra="aprovado", texto="Aprovado o Projeto.")) == "aprovado"
     assert montar.palavra_do_resultado(contrato.Resultado(palavra="rejeitado", texto=None)) == "rejeitado"
 
@@ -397,7 +402,7 @@ def test_tribunais_no_dia_passado_apontam_o_andamento_oficial():
     todos = [l for d in sexta.pagina.decidido for l in d.linhas]
     assert len(todos) > 2 and {l.data for l in todos} <= {"2026-11-23", "2026-11-24", "2026-11-25", "2026-11-26"}
     palavras = {i.situacao for l in todos for i in l.itens}
-    assert "resultado no andamento oficial" in palavras and "texto principal aprovado; faltam os trechos votados em separado" in palavras
+    assert "resultado no andamento oficial" in palavras and "texto principal aprovado; os trechos destacados são votados em separado" in palavras
 
 
 def test_na_segunda_feira_nao_ha_dia_passado():
@@ -622,7 +627,9 @@ def test_do_dia_le_os_arquivos_e_liga_com_a_edicao_e_com_a_busca(tmp_path: Path)
     r = montar.do_dia(_edicao(), dados, make_config())
     assert r is not None and r.lados == ("congresso", "tribunais")
     item = next(i for l in r.linhas for i in l.itens if i.identificador == "RE 1326541")
-    assert item.midia_texto == "na mídia: 2 veículos" and item.materia == "piso"  # Valor (a matéria) e O Globo; o canal do STF não conta
+    # só O Globo, que citou no título; a matéria da edição liga a matéria, mas não credita as
+    # fontes dela; o canal do STF não conta como imprensa
+    assert item.midia_texto == "na mídia: 1 veículo" and item.materia == "piso"
     assert r.rotulo_da_materia("piso") == "na agenda: qua 25"
 
 

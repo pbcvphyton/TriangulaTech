@@ -59,7 +59,10 @@ MESES = ("janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "a
 SITUACOES_SEM_DECISAO = ("cancelada", "adiada")  # a sessão não acontece: fica fora da home
 RESULTADOS_QUE_DECIDEM = ("aprovado", "aprovado_ressalvados_destaques", "rejeitado")
 ROTULO_DO_LINK = "fonte oficial"
-SEM_ALCANCE_GERAL = "nada de alcance geral pautado"  # a frase do piso dos tribunais
+# A frase do piso dos tribunais. Diz o que a régua mede (julgamento que fixa tese para todo o
+# país: repercussão geral, repetitivo), não "nada de alcance geral": uma proposta de afetação
+# pautada sem nome de tema não é julgamento de tese, mas também não é "nada".
+SEM_ALCANCE_GERAL = "nenhum julgamento de tese para todo o país pautado"
 SEM_RESULTADO = "sem resultado no registro oficial"
 # Como as contagens das fontes se chamam na página completa (as demais saem com o nome simples).
 ROTULO_DA_CONTAGEM = {
@@ -234,11 +237,13 @@ def _chave_do_prazo(item: contrato.ItemAgenda) -> str:
 
 
 def palavra_do_resultado(resultado: contrato.Resultado) -> str:
-    """A palavra do resultado, conferida com a frase oficial: "aprovado" cuja frase diz
-    "ressalvados os destaques" é o texto principal aprovado, com trechos ainda por votar."""
-    frase = (resultado.texto or "").lower()
-    if resultado.palavra == "aprovado" and "ressalvad" in frase and "destaque" in frase:
-        return "aprovado_ressalvados_destaques"
+    """A palavra do resultado, como o coletor gravou.
+
+    Não se reclassifica pela frase: "Aprovado ..., ressalvados os destaques" é a fórmula da
+    votação do texto principal e continua no registro depois que os destaques são votados. Só
+    o coletor sabe se a matéria já seguiu (à sanção, ao Senado) e por isso só ele marca
+    ``aprovado_ressalvados_destaques``. Em 23/11/2026 a reclassificação aqui mostrou o PLP
+    299/2026 com trechos "por votar" quando ele já tinha ido à sanção."""
     return resultado.palavra
 
 
@@ -414,13 +419,28 @@ def _dias(linhas: Iterable[LinhaTela], datas: Iterable[str], ctx: _Contexto, *, 
             rotulo=rotulo_do_dia(dia),
             rotulo_longo=rotulo_longo(dia),
             linhas=tuple(por_dia[dia]),
-            vazio=ctx.regras.situacao("dia_vazio") if com_vazios and not por_dia[dia] else "",
+            vazio=_vazio_do_dia(dia, ctx) if com_vazios and not por_dia[dia] else "",
             principal=not passado and dia in principais,
             passado=passado,
         )
         for dia in sorted(por_dia)
         if por_dia[dia] or com_vazios
     )
+
+
+def _vazio_do_dia(dia: str, ctx: _Contexto) -> str:
+    """O texto de um dia da janela sem linha na home. Se há sessão que decide nesse dia com a
+    pauta ainda não publicada (o Plenário do STF publica a pauta da quinta só na véspera), diz
+    isso, em vez de "nada de peso pautado", que daria a entender que não há nada."""
+    pendentes = [l for l in ctx.linhas if l.sessao.data == dia and l.faixa == "janela" and _sem_pauta_ainda(l)]
+    if not pendentes:
+        return ctx.regras.situacao("dia_vazio")
+    nomes = list(dict.fromkeys(
+        f"{contrato.NOME_INSTITUICAO.get(l.sessao.instituicao, l.sessao.instituicao)} · {_tela(l.sessao.orgao)}" if l.sessao.orgao
+        else contrato.NOME_INSTITUICAO.get(l.sessao.instituicao, l.sessao.instituicao)
+        for l in pendentes
+    ))
+    return f"{' e '.join(nomes)}: pauta ainda não publicada"
 
 
 # ── frases ───────────────────────────────────────────────────────────────────────────────────
@@ -497,10 +517,11 @@ def _frase_do_proximo(instituicao: str, ctx: _Contexto) -> Frase:
     linha, (nota, item) = min(depois, key=lambda x: (x[0].sessao.data, -x[1][0].total, x[0].sessao.hora or "99:99", x[0].id))
     tela = _item_tela(linha, nota, item, ctx, na_linha_de_prazo=linha.sessao.foro == "prazo")
     quando = f"em {dia_mes(linha.sessao.data)}"
+    nome = tela.nome[:1].lower() + tela.nome[1:] if tela.nome[:2] != tela.nome[:2].upper() else tela.nome  # no meio da frase, sem maiúscula (sigla fica)
     if linha.sessao.foro == "prazo":
-        texto = f"{base}; {quando}, {_situacao_da_linha(linha, ctx)}: {tela.nome}"
+        texto = f"{base}. Próximo: {dia_mes(linha.sessao.data)}, {_situacao_da_linha(linha, ctx).lower()}: {nome}"
     else:
-        texto = f"{base}; {quando}, {_tela(linha.sessao.orgao)}, {tela.nome}"
+        texto = f"{base}. Próximo: {_tela(linha.sessao.orgao)}, {dia_mes(linha.sessao.data)}: {nome}"
     return Frase(tipo="proximo", instituicao=nome_inst, texto=_ponto(texto), itens=(tela,), link=linha.sessao.link, link_rotulo=ROTULO_DO_LINK)
 
 
