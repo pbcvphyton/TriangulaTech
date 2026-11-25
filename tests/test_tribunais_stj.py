@@ -19,7 +19,14 @@ o MEI mascarado guarda 11 zeros no fim do nome e um CNPJ de exemplo, para o test
   ``processos.csv``: 14 precedentes (pendentes, julgados, cancelados, relevância, IAC, PUIL);
 - ``metadados20261015_amostra.json``: 42 documentos das íntegras (sem ``descricaoMonocratica``);
 - ``pagina_*.html``: recortes das páginas reais dos conjuntos (o esqueleto do CKAN com alguns
-  itens, inclusive os republicados e os nomes fora do padrão).
+  itens, inclusive os republicados e os nomes fora do padrão);
+- ``pautas_futuras_20261124_agenda.json.gz``, ``temas_agenda.csv`` e ``processos_agenda.csv``
+  (baixados em 24/11/2026, para a agenda da semana): 17 itens do arquivo de pautas de 24/11
+  (Corte Especial com proposta de relevância, agravos da Vice-Presidência, recursos de temas
+  afetados, um processo em segredo) e as linhas dos precedentes ligados a eles (Temas 1254, 1404,
+  1443 e 1448 e as controvérsias já vinculadas). Além das pessoas físicas e dos advogados, as
+  empresas fora do catálogo de litigantes também foram mascaradas, e os processos em segredo
+  perderam o número. Origem item a item em ``tests/test_tribunais_agenda.py``.
 """
 
 from __future__ import annotations
@@ -412,6 +419,41 @@ def test_precedentes_temas_com_relator_e_situacao(regras, classificador):
     assert por[3582]["estado"] == "encerrado" and por[2637]["tipo"] == "puil"
     assert all(t["titulo"] is None or len(t["titulo"]) <= stj.TITULO_MAX for t in temas)
     assert sum(t["pendente"] for t in temas) == 9
+
+
+def test_temas_devolvem_os_registros_para_ligar_pauta_e_repetitivo(regras, classificador):
+    """``montar_temas`` devolve o número de registro de cada processo do tema (antes só a contagem):
+    é por ele que um recurso pautado se liga ao tema afetado."""
+    temas = stj.montar_temas(stj.ler_temas(PASTA / "temas.csv"), stj.ler_processos_precedentes(PASTA / "processos.csv"),
+                             regras, classificador)
+    assert all(isinstance(t["registros"], list) and t["registros"] == sorted(set(t["registros"])) for t in temas)
+    assert all(r.isdigit() for t in temas for r in t["registros"])
+    por = {t["seq"]: t for t in temas}
+    assert por[4781]["registros"] == ["202600859606"]  # o REsp 2267903, paradigma do tema de relevância
+    assert len(por[3481]["registros"]) == por[3481]["processos"] == 3
+    volta = stj.temas_por_registro(temas)
+    assert all(t["pendente"] and t["tipo"] in ("repetitivo", "iac") for lista in volta.values() for t in lista)
+    assert set(volta) == {r for t in temas if t["pendente"] and t["tipo"] in ("repetitivo", "iac") for r in t["registros"]}
+    assert "202600859606" not in volta and "202600859606" in stj.temas_por_registro(temas, tipos=("relevancia",))
+    julgados = stj.temas_por_registro(temas, so_pendentes=False)
+    assert len(julgados) > len(volta) and stj.temas_por_registro(None) == {} and stj.temas_por_registro([{"tipo": "repetitivo"}]) == {}
+
+
+def test_amostra_da_agenda_liga_o_registro_da_pauta_ao_tema(regras, classificador):
+    pauta = stj.ler_pautas(PASTA / "pautas_futuras_20261124_agenda.json.gz", regras, classificador)
+    assert len(pauta) == 17 and sum(i["segredo"] for i in pauta) == 2 and sum(i["fora"] == "vice" for i in pauta) == 3
+    assert {(i["sessao"], i["orgao"]) for i in pauta} == {
+        ("2026-11-24", "T1"), ("2026-11-24", "T4"), ("2026-11-25", "CE"), ("2026-12-02", "CE"), ("2026-12-03", "S2"), ("2026-12-09", "S2")}
+    temas = stj.montar_temas(stj.ler_temas(PASTA / "temas_agenda.csv"), stj.ler_processos_precedentes(PASTA / "processos_agenda.csv"),
+                             regras, classificador)
+    assert sorted((t["tipo"], t["numero"], t["pendente"]) for t in temas) == [
+        ("controversia", 372, False), ("controversia", 757, False), ("controversia", 772, False), ("controversia", 821, False),
+        ("repetitivo", 1254, True), ("repetitivo", 1404, True), ("repetitivo", 1443, True), ("repetitivo", 1448, True)]
+    volta = stj.temas_por_registro(temas)
+    ligados = {i["id"]: [t["numero"] for t in volta.get(i["registro"], [])] for i in pauta if i["registro"] in volta}
+    assert ligados == {"stj-REsp-2034211": [1254], "stj-REsp-2235680": [1448], "stj-REsp-2226097": [1404], "stj-REsp-2272537": [1443]}
+    texto = json.dumps(pauta, ensure_ascii=False)
+    assert "PESSOA FÍSICA" not in texto and "ADVOGADO" not in texto  # a leitura nunca guarda nome de gente nem advogado
 
 
 def test_precedentes_data_do_conteudo_separa_a_copia_parada():

@@ -1,6 +1,6 @@
 """Uma aba Tribunais de mentira, no formato do contrato (``data/tribunais/``: ``meta.json``,
-``achados.json``, ``stj.json``, ``stf.json`` e ``ministros/<id>.json``), para os testes da página
-e as fotos de tela.
+``achados.json``, ``agenda.json``, ``stj.json``, ``stf.json`` e ``ministros/<id>.json``), para os
+testes da página e as fotos de tela.
 
 Tudo aqui é INVENTADO: os nomes dos ministros ("Ana Exemplar", "Bento Modelo"), das partes ("Banco
 Exemplo S.A.") e todos os números. As réguas são as de verdade (``config/tribunais.yaml``: as 16
@@ -12,6 +12,13 @@ dele; a linha "média" de um grupo é a soma dos ministros da grade do grupo; o 
 grupos e as linhas fora da grade; ``pares`` é a parte da área nos colegas da mesma Turma sem ele
 (STJ) ou no tribunal sem ele e sem a Presidência (STF). A marca (▲/▽) segue o piso de efeito do
 config (razão fora de [0,80; 1,25], 2 pontos ou mais, 30 processos ou mais) sem o teste de acaso.
+
+``agenda()`` é a agenda da semana inventada (``agenda.json``), no formato único de
+``qijournal/agenda/contrato.py``: o Plenário presencial do STF com hora e três processos
+inventados (um de repercussão geral que volta de vista, uma ação direta em destaque e um
+referendo de cautelar), um dia de sessão ainda sem pauta, as contagens das sessões virtuais e,
+no STJ, sessões com o que ficou só em contagem, um recurso repetitivo, uma proposta de
+relevância e o próximo repetitivo depois da janela.
 
 Uso: ``gravar(tmp_path / "data")`` grava a pasta inteira e devolve o caminho de
 ``data/tribunais``; ``gravar(..., estado="fora_do_ar")`` simula a fonte do STJ que falhou (fica o
@@ -27,6 +34,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
+from qijournal.agenda import contrato
 from qijournal.tribunais import VERSAO, modelo
 from qijournal.tribunais.tpu import TPU
 
@@ -536,6 +544,78 @@ def djen(paineis: dict[str, dict[str, Any]], *, ultimo_dia: str = "2026-11-20") 
     }
 
 
+def agenda() -> dict[str, Any]:
+    """Um ``agenda.json`` de mentira (o lado dos Tribunais), válido pelo contrato da agenda
+    (``qijournal/agenda/contrato.py``) e coletado no ``HOJE`` da fábrica. Tudo inventado: os
+    ministros são os da fábrica, as partes são as de ``_PARTES`` e os números de processo não
+    existem; só os endereços seguem os padrões oficiais."""
+    c = contrato
+    stf_nomes = [m["nome"] for m in _ministros("stf", random.Random(7))]
+    stj_nomes = [m["nome"] for m in _ministros("stj", random.Random(7))]
+    pauta_stf, pauta_stj = "https://portal.stf.jus.br/pauta/", "https://dadosabertos.web.stj.jus.br/dataset/pautas-futuras"
+
+    def processo_stf(classe: str, numero: int) -> str:
+        return f"https://portal.stf.jus.br/processos/listarProcessos.asp?classe={classe}&numeroProcesso={numero}"
+
+    def processo_stj(registro: str) -> str:
+        return f"https://processo.stj.jus.br/processo/pesquisa/?tipoPesquisa=tipoPesquisaNumeroRegistro&termo={registro}"
+
+    def stj_sessao(orgao: str, nome: str, foro: str, dia: str, itens: tuple[Any, ...] = (), **fora: int) -> Any:
+        return c.SessaoAgenda(id=c.id_de_sessao(c.STJ, orgao, dia), instituicao=c.STJ, orgao=nome, orgao_sigla=orgao, foro=foro, tipo="julgamento",
+                              data=dia, situacao="agendada", link=pauta_stj, itens=itens, fora=fora)
+
+    plenario = c.SessaoAgenda(
+        id="stf-plenario-2026-11-25", instituicao=c.STF, orgao="Plenário", orgao_sigla="PLEN", foro="plenario", tipo="julgamento", data="2026-11-25",
+        hora="14:00", situacao="agendada", modalidade="presencial", link=pauta_stf,
+        itens=(
+            c.ItemAgenda(identificador="RE 9900001", tipo="RE", alcance="repercussao_geral", estagio="retorno_de_vista", estagio_detalhe=stf_nomes[1],
+                         link=processo_stf("RE", 9900001), area="administrativo", relator=c.Relator(nome=stf_nomes[0]), ordem=1,
+                         tema=c.Tema(numero=9001, titulo="Tema de exemplo número 1, sobre uma questão inventada de alcance geral.", tipo="repercussao_geral"),
+                         partes=(c.Parte(polo="ativo", tipo="ente", nome="Estado C"),)),
+            c.ItemAgenda(identificador="ADI 99002", tipo="ADI", alcance="controle_federal", estagio="destaque", estagio_detalhe=stf_nomes[2],
+                         link=processo_stf("ADI", 99002), area="constitucional", relator=c.Relator(nome=stf_nomes[3]), ordem=2,
+                         ementa="1. Trata-se de ação direta de inconstitucionalidade inventada, contra uma lei federal de exemplo.",
+                         partes=(c.Parte(polo="passivo", tipo="ente", nome="Ente Público Federal A"),)),
+            c.ItemAgenda(identificador="ADI 99003", tipo="ADI", alcance="controle_estadual", estagio="referendo_de_cautelar", outros_estagios=("destaque",),
+                         link=processo_stf("ADI", 99003), area="constitucional", relator=c.Relator(nome=stf_nomes[4]), ordem=3),
+        ))
+    sem_pauta = c.SessaoAgenda(id="stf-plenario-2026-11-26", instituicao=c.STF, orgao="Plenário", orgao_sigla="PLEN", foro="plenario", tipo="julgamento",
+                               data="2026-11-26", situacao="agendada", modalidade="presencial", pauta="nao_publicada", link=pauta_stf)
+    proposta = c.ItemAgenda(identificador="AREsp 9900004", tipo="AREsp", alcance="afetacao", estagio="pautado", link=processo_stj("202699000041"),
+                            relator=c.Relator(nome=stj_nomes[0]), partes=(c.Parte(polo="ativo", tipo="pj", nome="Banco Exemplo S.A."),))
+    repetitivo = c.ItemAgenda(identificador="REsp 9900005", tipo="REsp", alcance="repetitivo", estagio="pautado", link=processo_stj("202699000052"),
+                              area="consumidor", relator=c.Relator(nome=stj_nomes[11]),
+                              tema=c.Tema(numero=9101, titulo="Definir se a questão inventada de exemplo número 1 admite a solução de exemplo.", tipo="repetitivo"),
+                              partes=(c.Parte(polo="passivo", tipo="pj", nome="Operadora de Saúde E"),))
+    depois = c.ItemAgenda(identificador="REsp 9900006", tipo="REsp", alcance="repetitivo", estagio="pautado", link=processo_stj("202699000063"),
+                          area="civil", relator=c.Relator(nome=stj_nomes[12]),
+                          tema=c.Tema(numero=9102, titulo="Definir se a questão inventada de exemplo número 2 admite a solução de exemplo.", tipo="repetitivo"))
+    sessoes = (
+        stj_sessao("T1", "Primeira Turma", "turma", "2026-11-24", segredo=15, recurso_interno=185, sem_tema=1),
+        plenario,
+        stj_sessao("CE", "Corte Especial", "corte_especial", "2026-11-25", (proposta,), segredo=50, recurso_interno=60, vice_presidencia=215),
+        sem_pauta,
+        stj_sessao("S2", "Segunda Seção", "secao", "2026-12-02", (repetitivo,), segredo=1),
+    )
+    fontes = (
+        c.FonteAgenda(chave="stf_pauta", instituicao=c.STF, nome="STF: pauta das sessões", url=pauta_stf, ok=True, data_dados=HOJE,
+                      coletado_em="2026-11-23T09:47:20Z", velho_dias=4),
+        c.FonteAgenda(chave="stj_pautas", instituicao=c.STJ, nome="STJ: pautas de julgamento", url=pauta_stj, ok=True, data_dados="2026-11-22",
+                      coletado_em="2026-11-23T09:43:30Z", velho_dias=4),
+        c.FonteAgenda(chave="stj_precedentes", instituicao=c.STJ, nome="STJ: precedentes qualificados",
+                      url="https://dadosabertos.web.stj.jus.br/dataset/precedentes-qualificados", ok=True, data_dados="2026-11-20",
+                      coletado_em="2026-11-23T09:43:50Z", velho_dias=8),
+    )
+    estado = (
+        c.EstadoInstituicao(instituicao=c.STF, pauta_publicada_ate="2026-11-25", contagens={"sessoes": 2, "itens": 3},
+                            virtuais=(c.JulgamentoVirtual(de="2026-11-20", ate="2026-11-30", plenario=179, turma1=209, turma2=274),
+                                      c.JulgamentoVirtual(de="2026-11-27", ate="2026-12-04", plenario=165, turma1=187, turma2=194))),
+        c.EstadoInstituicao(instituicao=c.STJ, pauta_publicada_ate="2026-12-17", contagens={"sessoes": 3, "itens": 529, "repetitivos": 1, "propostas": 1},
+                            proximo=stj_sessao("S2", "Segunda Seção", "secao", "2026-12-09", (depois,))),
+    )
+    return c.Agenda(lado=c.LADO_TRIBUNAIS, gerado_em="2026-11-23T09:47:20Z", hoje=HOJE, fontes=fontes, sessoes=sessoes, estado=estado).para_dict()
+
+
 def _json(dado: Any) -> str:
     return json.dumps(dado, ensure_ascii=False, separators=(",", ":")) + "\n"
 
@@ -556,6 +636,8 @@ def gravar(data_dir: Path, *, tribunais: tuple[str, ...] = ("stf", "stj"), estad
         (pasta / "ministros" / f"{mid}.json").write_text(_json(d), encoding="utf-8")
     (pasta / "meta.json").write_text(_json(meta(paineis, estado=estado)), encoding="utf-8")
     (pasta / "achados.json").write_text(_json(achados(paineis)), encoding="utf-8")
+    if set(tribunais) == {"stf", "stj"}:  # a agenda inventada traz os dois tribunais
+        (pasta / "agenda.json").write_text(_json(agenda()), encoding="utf-8")
     if com_djen and "stj" in paineis:
         (pasta / "djen.json").write_text(_json(djen(paineis, ultimo_dia=com_djen)), encoding="utf-8")
         m = json.loads((pasta / "meta.json").read_text(encoding="utf-8"))

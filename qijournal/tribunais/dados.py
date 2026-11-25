@@ -24,6 +24,12 @@ Regras da casa (as mesmas do Congresso, mais estritas onde o dado é mais frági
 - **Fora do git, no cache**: os arquivos baixados (o coletor), o estado da última coleta boa de cada
   fonte (``estado/``), o retrato compacto do acervo de hoje e da véspera (``retratos/``, para a
   comparação dia a dia) e o diário de cada pedido (``diario/``, artefato do fluxo).
+- **A agenda da semana** (``agenda.json``, no formato de ``qijournal/agenda/contrato.py``) sai das
+  pautas lidas nesta execução, ao lado dos achados, e **não depende do painel**: com o acervo
+  recusado, a pauta é lida do mesmo jeito. Ela mantém a parte do tribunal que não foi refeito e as
+  sessões já passadas da semana (as fontes só publicam pautas futuras), tem teto próprio (60 KB)
+  e nunca impede os painéis: qualquer falha dela vira aviso de operação e fica o arquivo anterior;
+  se a pasta chegar ao teto, quem não é gravada é ela.
 - **Séries acumuladas**: as atas de distribuição dos últimos 30 dias e as íntegras dos 12 meses até
   o último arquivo publicado ficam no cache (cada arquivo tem endereço próprio e não muda); uma
   execução comum baixa só as mais novas (``SERIE_MAXIMO``), ``completo`` baixa o que faltar até o
@@ -53,10 +59,13 @@ from typing import Any
 from xml.etree.ElementTree import ParseError
 
 from .. import net
+from ..agenda import contrato as contrato_agenda
+from ..agenda import regras as regras_agenda
 from ..congresso.dados import _gravar, _json
 from ..net import FetchError
 from . import PASTA, VERSAO, contas, datajud, modelo, stf, stj
 from . import achados as achados_mod
+from . import agenda as pauta_mod
 from . import djen as djen_mod
 from . import tpu as tpu_mod
 from .areas import Classificador
@@ -69,6 +78,10 @@ log = logging.getLogger(__name__)
 
 META = "meta.json"
 ACHADOS = "achados.json"
+# A agenda da semana (STF e STJ), no formato de qijournal/agenda/contrato.py. O nome AGENDA, mais
+# abaixo, já é o calendário das fontes: este é PAUTA_SEMANAL.
+PAUTA_SEMANAL = contrato_agenda.ARQUIVO  # data/tribunais/agenda.json
+FONTES_DA_PAUTA = {"stf": ("stf_pauta",), "stj": ("stj_pautas", "stj_precedentes")}  # as fontes que a agenda declara, por tribunal
 CNJ = "cnj.json"  # a camada do DataJud: só existe com datajud.publicar (ou QIJ_DATAJUD_PUBLICAR=1)
 DJEN = "djen.json"  # a camada do DJe (DJEN): escrita só pela máquina do dono, no Brasil (djen.py); aqui só é lida
 NOME_DJEN = "CNJ · DJe (DJEN)"
@@ -174,6 +187,10 @@ class Tribunal:
     cobertura: dict[str, Any] | None = None
     sinais: dict[str, Any] | None = None
     retrato: Path | None = None
+    # O que a agenda da semana usa, guardado à parte porque NÃO depende do painel (um painel recusado
+    # troca ``leituras``): ``leituras`` (as da pauta e dos temas), ``pautas`` e ``temas`` (o que as
+    # contas também recebem) e ``acervo`` (contas.cruzamento_da_pauta, quando houve contas).
+    semana: dict[str, Any] = field(default_factory=dict)
 
 
 # ── utilidades ───────────────────────────────────────────────────────────────
@@ -583,9 +600,13 @@ def _nome_integra(caminho: Path, data: str | None) -> str:
     return caminho.name
 
 
-def _stj_auxiliares(r: Rodada, leitor: stj.LeitorSTJ, t: Tribunal, recusa: BaseException | None = None) -> dict[str, Any]:
+def _stj_auxiliares(r: Rodada, leitor: stj.LeitorSTJ, t: Tribunal, recusa: BaseException | None = None, *,
+                    so_a_pauta: bool = False) -> dict[str, Any]:
     """Pautas, precedentes, atas e íntegras do STJ (cada uma com o seu fallback). Depois de uma
-    recusa do portal (403 duas vezes), nada mais é pedido a ele: vale a última coleta boa."""
+    recusa do portal (403 duas vezes), nada mais é pedido a ele: vale a última coleta boa.
+
+    As pautas e os precedentes ficam também em ``t.semana`` (a agenda da semana, que não depende do
+    painel). ``so_a_pauta``: só essas duas fontes (o acervo falhou sem socorro e não haverá contas)."""
     entradas: dict[str, Any] = {"atas": None, "pautas": None, "decisoes": None, "temas": None}
     recusado: list[BaseException] = [recusa] if recusa is not None else []
 
@@ -635,6 +656,9 @@ def _stj_auxiliares(r: Rodada, leitor: stj.LeitorSTJ, t: Tribunal, recusa: BaseE
         return stj.montar_temas(stj.ler_temas(temas), stj.ler_processos_precedentes(processos), r.regras, r.classificador, leitor=leitor)
 
     entradas["temas"] = tentar("stj_precedentes", precedentes, precedentes_estado).dados
+    t.semana.update(leituras={fid: t.leituras[fid] for fid in FONTES_DA_PAUTA["stj"]}, pautas=entradas["pautas"], temas=entradas["temas"])
+    if so_a_pauta:
+        return entradas
 
     maximo = dict(SERIE_MAXIMO[r.opcoes.completo])
     # Recuperação: a série já publicada cujo estado sumiu do cache (cache frio, o primeiro dia na main)
@@ -723,6 +747,9 @@ def _stj(r: Rodada) -> Tribunal:
         aviso = f"A coleta falhou em {_br(r.opcoes.hoje, ano=False)} ({motivo})"
         if caminho is None:
             antes = r.fonte_anterior("stj_acervo")
+            # A agenda da semana não depende do painel: a pauta e os precedentes são lidos assim mesmo
+            # (depois de uma recusa do portal, só do que a última coleta boa deixou no cache).
+            _stj_auxiliares(r, leitor, t, exc if isinstance(exc, RecusaDoHost) else None, so_a_pauta=True)
             t.leituras["stj_acervo"] = Leitura(None, antes.get("data_dados"), antes.get("registros"), ok=False,
                                                coletado_em=antes.get("coletado_em"), aviso=aviso + "; fica o painel da última coleta boa.")
             return t
@@ -743,6 +770,7 @@ def _stj(r: Rodada) -> Tribunal:
         processos = stj.ler_acervo(caminho, r.regras, r.classificador, data_dados=data, resumo=resumo, leitor=leitor)
         resultado = contas.montar("stj", retrato.passar(processos), r.regras, data_dados=data, hoje=r.hoje, catalogo=r.catalogo,
                                   atas=entradas["atas"], pautas=entradas["pautas"], decisoes=entradas["decisoes"], temas=entradas["temas"])
+        t.semana["acervo"] = resultado.pauta
         ok = True
     except stj.FormatoInesperado as exc:
         motivo = r.falha("stj_acervo", exc)
@@ -835,7 +863,10 @@ def _sanidade(r: Rodada, t: Tribunal, fid: str, total: int, data: str | None) ->
 # ── STF ──────────────────────────────────────────────────────────────────────
 
 
-def _stf_auxiliares(r: Rodada, t: Tribunal) -> dict[str, Any]:
+def _stf_auxiliares(r: Rodada, t: Tribunal, *, so_a_pauta: bool = False) -> dict[str, Any]:
+    """Atas, jurisprudência, repercussão geral e pauta do STF (cada uma com o seu fallback). A
+    pauta e os temas ficam também em ``t.semana`` (a agenda da semana, que não depende do painel).
+    ``so_a_pauta``: só essas duas fontes (o acervo foi recusado e não haverá contas)."""
     entradas: dict[str, Any] = {"atas": None, "pautas": None, "decisoes": None, "temas": None}
     recusado: set[str] = set()  # hosts que recusaram (403 duas vezes)
 
@@ -865,7 +896,8 @@ def _stf_auxiliares(r: Rodada, t: Tribunal) -> dict[str, Any]:
         r.guardar("stf_atas", leitura, dados=saida)
         return leitura
 
-    entradas["atas"] = tentar("stf_atas", "portal.stf.jus.br", atas).dados
+    if not so_a_pauta:
+        entradas["atas"] = tentar("stf_atas", "portal.stf.jus.br", atas).dados
 
     def decisoes() -> Leitura:
         saida = stf.coletar_decisoes(r.coletor, r.regras, hoje=r.hoje)
@@ -874,7 +906,8 @@ def _stf_auxiliares(r: Rodada, t: Tribunal) -> dict[str, Any]:
         r.guardar("stf_jurisprudencia", leitura, dados=saida)
         return leitura
 
-    entradas["decisoes"] = tentar("stf_jurisprudencia", "jurisprudencia.stf.jus.br", decisoes).dados
+    if not so_a_pauta:
+        entradas["decisoes"] = tentar("stf_jurisprudencia", "jurisprudencia.stf.jus.br", decisoes).dados
 
     def rg() -> Leitura:
         antes = r.coletor.requisicoes
@@ -897,6 +930,8 @@ def _stf_auxiliares(r: Rodada, t: Tribunal) -> dict[str, Any]:
         return leitura
 
     entradas["pautas"] = tentar("stf_pauta", "portal.stf.jus.br", pauta).dados
+    t.semana.update(leituras={fid: t.leituras[fid] for fid in FONTES_DA_PAUTA["stf"]}, pautas=entradas["pautas"],
+                    temas=(entradas["temas"] or {}).get("temas") if isinstance(entradas["temas"], Mapping) else None)
     return entradas
 
 
@@ -918,15 +953,18 @@ def _stf(r: Rodada) -> Tribunal:
             caminho = None
         if caminho is None:
             _recusar(r, t, "stf_acervo", aviso + "; fica o painel da última coleta boa.")
+            _stf_auxiliares(r, t, so_a_pauta=True)  # a agenda da semana não depende do painel
             return t
         try:
             acervo = stf.ler_acervo(caminho, r.regras, tpu=r.tpu, classificador=r.classificador)
         except ERROS_DE_FONTE:
             _recusar(r, t, "stf_acervo", aviso + "; fica o painel da última coleta boa.")
+            _stf_auxiliares(r, t, so_a_pauta=True)
             return t
         t.leituras["stf_acervo"] = Leitura(None, acervo.data_dados, len(acervo.processos), ok=False, coletado_em=guardado.get("coletado_em"),
                                            aviso=aviso + f"; as contas usam a planilha de {_br(acervo.data_dados)}.")
     if not _sanidade(r, t, "stf_acervo", len(acervo.processos), acervo.data_dados):
+        _stf_auxiliares(r, t, so_a_pauta=True)  # a agenda da semana não depende do painel
         return t
     if t.leituras["stf_acervo"].ok:
         caminho = _no_cache(r.coletor, url)
@@ -938,6 +976,7 @@ def _stf(r: Rodada) -> Tribunal:
         resultado = contas.montar("stf", retrato.passar(acervo.processos), r.regras, data_dados=acervo.data_dados, hoje=r.hoje,
                                   catalogo=r.catalogo, atas=entradas["atas"], pautas=entradas["pautas"], decisoes=entradas["decisoes"],
                                   temas=entradas["temas"])
+        t.semana["acervo"] = resultado.pauta
         ok = True
     finally:
         t.retrato = retrato.fechar(ok)
@@ -1037,6 +1076,7 @@ def _conferir_tamanhos(r: Rodada, tribunais: dict[str, Tribunal], arquivos_fixos
     substituidos |= {f"{MINISTROS}/{c.name}" for trib in por_trib for c in (r.pasta / MINISTROS).glob(f"{trib}-*.json")}
     substituidos |= {f"{trib}.json" for trib in por_trib} | set(arquivos_fixos)
     substituidos.add(DJEN)  # o djen.json (até 150 KB, da máquina do dono) não conta: a aba nunca depende dele
+    substituidos.add(PAUTA_SEMANAL)  # a agenda da semana não conta contra os painéis: no aperto, quem cai é ela (_cabe_a_pauta)
     total = _tamanho_atual(r.pasta, substituidos) + sum(len(x.encode("utf-8")) for arqs in por_trib.values() for x in arqs.values())
     total += sum(len(x.encode("utf-8")) for x in arquivos_fixos.values())
     if total > TETO_PASTA:
@@ -1045,6 +1085,69 @@ def _conferir_tamanhos(r: Rodada, tribunais: dict[str, Tribunal], arquivos_fixos
             _recusar(r, tribunais[trib], f"{trib}_acervo", f"Os números de {_br(r.opcoes.hoje, ano=False)} passaram do tamanho máximo publicado; fica o painel da última coleta boa.")
             del por_trib[trib]
     return por_trib
+
+
+# ── a agenda da semana (agenda.json) ─────────────────────────────────────────
+
+
+def _entrada_da_semana(r: Rodada, t: Tribunal) -> pauta_mod.Entrada:
+    """O que um tribunal traz para a agenda da semana: as fontes da pauta (como iriam ao
+    ``meta.json``, com o ``velho_dias`` de cada uma) e, quando a pauta foi lida nesta execução, a
+    pauta, os temas e o cruzamento com o acervo. Pauta que falhou (mesmo com socorro do cache) não
+    refaz o tribunal: a parte dele fica como estava no arquivo anterior."""
+    leituras = t.semana.get("leituras") or {}
+    fontes = []
+    for fid in FONTES_DA_PAUTA[t.trib]:
+        leitura = leituras.get(fid)
+        entrada = r.entrada_meta(fid, leitura, t.trib)
+        if leitura is None:  # nem tentada: a entrada do meta é a anterior, não a desta execução
+            entrada = {**entrada, "ok": False, "aviso": "A pauta não foi lida nesta execução; ficam os dados do último dia bom."}
+        fontes.append(pauta_mod.fonte(fid, t.trib, entrada, coletado_em=r.instante))
+    principal = leituras.get(FONTES_DA_PAUTA[t.trib][0])
+    pauta = t.semana.get("pautas") if principal is not None and principal.ok is True else None
+    if t.trib == "stj" and isinstance(pauta, Mapping):
+        pauta = pauta.get("itens")
+    return pauta_mod.Entrada(fontes=tuple(fontes), pauta=pauta, temas=t.semana.get("temas"), acervo=t.semana.get("acervo"))
+
+
+def _pauta_semanal(r: Rodada, tribunais: Mapping[str, Tribunal], root: Path | None = None) -> str | None:
+    """O texto novo de ``agenda.json`` (já validado pelo contrato e dentro do teto dele), ou
+    ``None`` quando fica o arquivo que está lá: nada mudou além dos relógios (mesmos dados, mesmos
+    bytes), nenhum tribunal veio, a agenda saiu fora do contrato ou acima do teto. O tribunal que
+    não foi refeito e as sessões já passadas da semana vêm do arquivo anterior (``agenda.juntar``).
+    Nunca levanta exceção: a agenda não pode impedir os painéis."""
+    try:
+        entradas = {trib: _entrada_da_semana(r, t) for trib, t in tribunais.items()}
+        novo = pauta_mod.montar(r.regras, hoje=r.opcoes.hoje, gerado_em=r.instante, catalogo=r.catalogo,
+                                stf=entradas.get("stf"), stj=entradas.get("stj"))
+        if novo is None:
+            return None
+        anterior = contrato_agenda.ler(r.pasta / PAUTA_SEMANAL, lado=contrato_agenda.LADO_TRIBUNAIS)
+        junto = pauta_mod.juntar(novo, anterior, r.opcoes.hoje)
+        if contrato_agenda.conteudo_igual(junto, anterior):
+            return None
+        teto = regras_agenda.carregar(root).tetos.arquivos.tribunais_bytes
+        saida, cortes = pauta_mod.texto(junto, teto)
+        if cortes:
+            r.operacao(f"Agenda da semana: para caber em {teto // 1000} KB, saíram {' e '.join(cortes)}")
+        return saida
+    except Exception as exc:  # noqa: BLE001 — a agenda é acessória: vira aviso de operação e fica o arquivo anterior
+        if not isinstance(exc, (contrato_agenda.ErroDeContrato, pauta_mod.AcimaDoTeto)):
+            log.error("Tribunais: agenda da semana: erro inesperado", exc_info=exc)
+        r.operacao(f"Agenda da semana não gravada ({type(exc).__name__}: {exc}); fica o arquivo anterior")
+        return None
+
+
+def _cabe_a_pauta(r: Rodada, arquivos: Mapping[str, str], apagar: Iterable[Path], extra: int) -> bool:
+    """A agenda da semana cabe na pasta junto com o que vai ser gravado? Os painéis já passaram
+    pelo teto sem ela (``_conferir_tamanhos``): no aperto, quem não é gravada é a agenda."""
+    fora = {*arquivos, PAUTA_SEMANAL, DJEN, META} | {_relativo(c, r.pasta) for c in apagar}
+    total = _tamanho_atual(r.pasta, fora) + sum(len(x.encode("utf-8")) for x in arquivos.values()) + extra
+    if total <= TETO_PASTA:
+        return True
+    r.operacao(f"data/tribunais/ teria {total // 1000} KB com a agenda da semana, mais que os {TETO_PASTA // 1000} KB da pasta; "
+               "a agenda de hoje não foi gravada")
+    return False
 
 
 def _trocar(pasta: Path, arquivos: Mapping[str, str], apagar: Iterable[Path]) -> tuple[int, int]:
@@ -1284,7 +1387,13 @@ def atualizar(
     else:
         apagar.append(pasta / CNJ)  # sem publicar, a camada do CNJ sai da pasta pública
     arquivos[ACHADOS] = _json(achados)
-    arquivos[META] = _json(meta)
+    # A agenda da semana, ao lado dos achados: por último (os painéis e o meta já estão decididos) e
+    # sem poder impedi-los. O meta.json continua sendo o último arquivo a trocar de lugar.
+    meta_texto = _json(meta)
+    semanal = _pauta_semanal(r, tribunais, root)
+    if semanal is not None and _cabe_a_pauta(r, arquivos, apagar, len(meta_texto.encode("utf-8")) + len(semanal.encode("utf-8"))):
+        arquivos[PAUTA_SEMANAL] = semanal
+    arquivos[META] = meta_texto
     for rel in (ACHADOS, META):
         if len(arquivos[rel].encode("utf-8")) > TETO_JSON:  # não deve acontecer (~15 KB e ~10 KB): avisa e grava
             r.operacao(f"{rel} com {len(arquivos[rel].encode('utf-8')) // 1000} KB, acima do teto de {TETO_JSON // 1000} KB")
