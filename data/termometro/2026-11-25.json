@@ -1,0 +1,6269 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-25",
+ "analises": [
+  {
+   "id": "a4a2e5d6e041",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/pela-1a-vez-ararinha-azul-nasce-em-zoologico-brasileiro.shtml",
+   "titulo": "Pela 1ª vez, ararinha-azul nasce em zoológico brasileiro",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "ararinha-azul-nasce-pela-primeira-vez-em-zoologi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata do nascimento histórico de uma ararinha-azul em zoológico, com menção institucional a órgãos governamentais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 77,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 412,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Espécie de ararinha-azul extinta na natureza tenta se recuperar em cativeiro.",
+    "causa": "Esforços de conservação e centros especializados.",
+    "vitima": "Ararinha-azul ameaçada de extinção.",
+    "culpado": "Nenhum.",
+    "solucao": "Programa de reprodução e conservação em zoológico.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre um evento científico e ambiental, sem viés político.",
+   "atores": [
+    {
+     "nome": "Governo de São Paulo",
+     "campo": "centro"
+    },
+    {
+     "nome": "Ministério do Meio Ambiente e Mudança do Clima (MMA)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "nota do Governo de São Paulo",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "bióloga Fernanda Guida, chefe do setor de aves do zoológico",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "5c5df48e7d33",
+   "url": "https://ge.globo.com/futebol/times/corinthians/noticia/2026/11/24/juiza-pede-esclarecimentos-ao-mp-em-processo-de-intervencao-judicial-no-corinthians.ghtml",
+   "titulo": "Juíza pede esclarecimentos ao MP em processo de intervenção judicial no Corinthians",
+   "veiculo": "ge",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Envolve uma disputa judicial de grande repercussão sobre intervenção no Corinthians e ação do Ministério Público."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 78,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 928,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise financeira e de governança no Corinthians motiva pedido de intervenção pelo MP.",
+    "causa": "Irregularidades e estagnação em sucessivas administrações.",
+    "vitima": "Corinthians e seus torcedores.",
+    "culpado": "Administrações anteriores e atuais do clube.",
+    "solucao": "Esclarecimentos judiciais e possível intervenção temporária.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta detalhadamente os argumentos de ambas as partes (MP e clube) sem tomar partido na contula jurídica.",
+   "atores": [
+    {
+     "nome": "Juíza Tamara Hochgreb Matos",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Ministério Público de São Paulo (MP-SP)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Corinthians (Diretoria)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "juíza Tamara Hochgreb Matos",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    },
+    {
+     "rotulo": "Corinthians",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 91,
+     "ultima": true
+    },
+    {
+     "rotulo": "promotores Luiz Ambra Neto e Silvio Antônio Marques",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 90,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 10,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3baf63cd6a25",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/24/governo-trump-suspende-operacoes-militares-conjuntas-com-equador-diz-jornal.ghtml",
+   "titulo": "EUA suspendem operações conjuntas com o Equador e abrem investigação para apurar morte, diz jornal",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de relações internacionais, cooperação militar entre EUA e Equador e denúncias de violações de direitos humanos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 50,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 469,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Suspensão de operações militares conjuntas após denúncias de abusos.",
+    "causa": "Ação letal com questionamentos sobre direitos humanos.",
+    "vitima": "Vítimas de operação e direitos humanos violados.",
+    "culpado": "Forças equatorianas (em investigação).",
+    "solucao": "Investigação e interrupção temporária da cooperação.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "A abordagem é jornalística padrão, relatando a decisão dos EUA e trazendo o contexto político de Noboa.",
+   "atores": [
+    {
+     "nome": "Governo dos EUA (Donald Trump)",
+     "campo": "direita"
+    },
+    {
+     "nome": "Daniel Noboa (Presidente do Equador)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "The New York Times",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 8,
+     "ultima": true
+    },
+    {
+     "rotulo": "três pessoas ouvidas pelo jornal",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Departamento de Defesa norte-americano",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "88355dd47996",
+   "url": "https://www.bloomberglinea.com.br/negocios/petrobras-diversifica-investimentos-com-etanol-de-milho-e-ve-brent-estavel-no-longo-prazo/",
+   "titulo": "Petrobras diversifica investimentos com etanol de milho e vê Brent estável no longo prazo",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda a diversificação de investimentos da Petrobras e declarações da presidente da estatal sobre transição energética."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 243 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 63,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 243,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de diversificação de portfólio na transição energética.",
+    "causa": "Mudanças estratégicas de longo prazo na matriz energética.",
+    "vitima": "Nenhum.",
+    "culpado": "Nenhum.",
+    "solucao": "Investimento em etanol de milho com disciplina financeira.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata declarações corporativas sem juízo de valor ou viés político partidário.",
+   "atores": [
+    {
+     "nome": "Magda Chambriard (Presidente da Petrobras)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 73,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e5b4215d0af4",
+   "url": "https://umsoplaneta.globo.com/financas/noticia/2026/11/24/tupancireta-tera-r3-milhoes-para-recuperar-prejuizos.ghtml",
+   "titulo": "Tupanciretã terá R$3 milhões para recuperar prejuízos",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de repasse de recursos federais para município afetado por temporal e ações de socorro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 316,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Destruição causada por temporal em Tupanciretã.",
+    "causa": "Fenômeno climático severo com fortes ventos e chuvas.",
+    "vitima": "Moradores de Tupanciretã.",
+    "culpado": "Nenhum.",
+    "solucao": "Aporte de recursos federais e auxílio humanitário e de saúde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto descreve uma ação administrativa padrão de socorro a desastres naturais, sem juízo político.",
+   "atores": [
+    {
+     "nome": "Governo Federal (Ministério da Integração / Lula)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Prefeitura de Tupanciretã (Gustavo Herter Terra)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gustavo Herter Terra, prefeito de Tupanciretã",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "744c9644248b",
+   "url": "https://www.infomoney.com.br/onde-investir/fii-hgre11-compra-salas-comerciais-locadas-a-wework-na-vila-olimpia-por-r-735-mi/",
+   "titulo": "FII HGRE11 compra salas comerciais locadas à WeWork na Vila Olímpia por R$ 73,5 mi",
+   "veiculo": "InfoMoney",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata uma transação imobiliária corporativa sem embates políticos ou ideológicos."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 251,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Nenhum problema político apontado.",
+    "causa": "N/A",
+    "vitima": "N/A",
+    "culpado": "N/A",
+    "solucao": "N/A",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre o mercado imobiliário e não possui viés político.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "dc34bb9beaba",
+   "url": "https://neofeed.com.br/startups/kaszek-capta-us-650-milhoes-de-olho-nas-oportunidades-abertas-pela-ia-na-america-latina/",
+   "titulo": "Kaszek capta US$ 650 milhões de olho nas oportunidades abertas pela IA na América Latina",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "kaszek-capta-us-650-milhoes-para-fundo-de-estagi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de captação de recursos por gestora de venture capital, com foco em mercado e tecnologia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 699,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade na indústria de venture capital para captar recursos.",
+    "causa": "Cenário econômico desafiador.",
+    "vitima": "Startups em busca de financiamento.",
+    "culpado": "Nenhum.",
+    "solucao": "Captação focada em IA e empresas perenes.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata uma captação corporativa de forma estritamente descritiva e factual.",
+   "atores": [
+    {
+     "nome": "Kaszek",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Santiago Fossatti, sócio da Kaszek",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 127,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ef8120162618",
+   "url": "https://www.seudinheiro.com/2026/economia/cop31-termina-sem-acordo-politico-amplo-e-xp-ve-mudanca-no-foco-dos-investidores-esg-cbcb/",
+   "titulo": "COP31 termina sem acordo político amplo, e XP vê mudança no foco dos investidores em ESG",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "cop31-termina-sem-acordo-politico-e-direciona-fo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Aborda o resultado da COP31 e análises de mercado sobre transição energética e investimentos ESG, além de listar chamadas secundárias de cunho político."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 79,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 939,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ausência de acordo político amplo na COP31 sobre combustíveis fósseis e financiamento.",
+    "causa": "Divisões geopolíticas e pressões fiscais entre os países.",
+    "vitima": "Metas multilaterais de descarbonização em curto prazo.",
+    "culpado": "Negociadores internacionais e governos sem consenso.",
+    "solucao": "Foco na execução de projetos concretos e infraestrutura climática pelo setor privado.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A análise reproduz a visão de relatório corporativo de investimentos sem tomar partido ideológico em disputas partidárias.",
+   "atores": [
+    {
+     "nome": "XP Investimentos",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Marcella Ungaretti, head de Pesquisa ESG da XP, e Luiza Aguiar, analista da casa",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 78,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "bbd8039ad5a5",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/extinta-na-natureza-ararinha-azul-nasce-no-zoologico-de-sao-paulo",
+   "titulo": "Extinta na natureza, ararinha-azul nasce no zoológico de São Paulo",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "ararinha-azul-nasce-pela-primeira-vez-em-zoologi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata do nascimento de uma ararinha-azul em zoológico e de esforços de conservação ambiental."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 349,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Espécie de ararinha-azul extinta na natureza e altamente ameaçada.",
+    "causa": "Declínio populacional histórico e perda de habitat.",
+    "vitima": "A espécie de ararinha-azul.",
+    "culpado": "Nenhum.",
+    "solucao": "Reprodução assistida e manejo genético em cativeiro.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto tem caráter estritamente científico e conservacionista, sem conflito político.",
+   "atores": [
+    {
+     "nome": "Zoológico de São Paulo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "bióloga Fernanda Guida, chefe do setor de aves do zoológico",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 60,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "06d2e8ec0b1c",
+   "url": "https://www.cnnbrasil.com.br/internacional/governo-trump-suspende-operacoes-conjuntas-com-o-equador-diz-jornal/",
+   "titulo": "Governo Trump suspende operações conjuntas com o Equador, diz jornal",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "Trata de decisão geopolítica do governo dos EUA de suspender operações militares com o Equador devido a preocupações com direitos humanos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 249 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 249,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investigação sobre possíveis violações de direitos humanos em operação militar no Equador.",
+    "causa": "Ação letal de forças equatorianas resultando na morte de membro de facção criminosa.",
+    "vitima": "Pessoas afetadas por possíveis violações de direitos humanos.",
+    "culpado": "Forças equatorianas (sob investigação).",
+    "solucao": "Suspensão temporária de operações militares conjuntas pelos EUA.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O relato expõe de maneira factual as posições dos governos envolvidos sem expressar juízo de valor próprio da redação.",
+   "atores": [
+    {
+     "nome": "Governo Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo do Equador",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "uma autoridade e três pessoas a par do assunto / New York Times",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "presidente do Equador, Daniel Noboa",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": false
+    },
+    {
+     "rotulo": "chefe do Pentágono, Pete Hegseth",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 33
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f0735e8b6219",
+   "url": "https://www.moneytimes.com.br/fundo-imobiliario-compra-67-salas-comerciais-alugadas-a-wework-por-r-735-milhoes-ifix-amplia-perdas-em-novembro-igdl/",
+   "titulo": "Fundo imobiliário compra salas comerciais alugadas à WeWork por R$ 73,5 milhões; IFIX amplia perdas em novembro",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Texto informativo sobre transação imobiliária de fundo de investimento e oscilação de índice de mercado (IFIX), sem conteúdo político-ideológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 366,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Nenhum",
+    "causa": "Nenhum",
+    "vitima": "Nenhum",
+    "culpado": "Nenhum",
+    "solucao": "Nenhum",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente descritivo e baseado em dados de mercado financeiro, não havendo viés político aplicável.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "81033113a68b",
+   "url": "https://www.poder360.com.br/poder-seguranca-publica/abin-mapeia-avanco-de-pcc-cv-e-tcp-e-identifica-31-faccoes-no-pais/",
+   "titulo": "Abin mapeia avanço de PCC, CV e TCP e identifica 31 facções no país",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "abin-mapeia-31-organizacoes-criminosas-e-aponta",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "seguranca"
+    ],
+    "justificativa": "Aborda estudo de segurança pública sobre facções criminosas e o avanço territorial do crime organizado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 307,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Avanço e expansão de organizações criminosas e facções pelo país",
+    "causa": "Articulação de grandes facções e diversificação de receitas com milícias",
+    "vitima": "Sociedade e segurança pública",
+    "culpado": "Facções criminosas (PCC, CV, TCP)",
+    "solucao": "Mapeamento e monitoramento estatal",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto baseia-se em dados de um estudo oficial de segurança pública de forma neutra e descritiva.",
+   "atores": [
+    {
+     "nome": "Abin",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Abin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a180a39cfe0b",
+   "url": "https://www.gazetaesportiva.com/times/corinthians/justica-pedido-intervencao-judicial-corinthians/",
+   "titulo": "Justiça não concede pedido de intervenção no Corinthians e pede esclarecimentos ao MP",
+   "veiculo": "Gazeta Esportiva",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão judicial envolvendo pedido de intervenção do Ministério Público em um clube de futebol de massa e suas implicações institucionais e eleitorais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 531,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise financeira e administrativa em clube de futebol com pedido de intervenção",
+    "causa": "Irregularidades financeiras e dívidas apontadas pelo Ministério Público",
+    "vitima": "Patrimônio do clube e torcedores",
+    "culpado": "Gestões do clube apontadas pelo MP",
+    "solucao": "Decisão judicial pendente após esclarecimentos",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata os argumentos tanto do Ministério Público quanto do clube de maneira equilibrada e sem juízo de valor da redação.",
+   "atores": [
+    {
+     "nome": "Ministério Público de São Paulo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Corinthians (Gestão Osmar Stabile)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Corinthians",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 47,
+     "ultima": true
+    },
+    {
+     "rotulo": "promotores Luiz Ambra Neto e Silvio Antônio Marques",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "34ddb9f5ffd3",
+   "url": "https://www.camara.leg.br/noticias/1322507-comissao-aprova-projeto-que-autoriza-parlamentares-a-exercer-advocacia-com-restricoes",
+   "titulo": "Comissão aprova projeto que autoriza parlamentares a exercer advocacia com restrições",
+   "veiculo": "Agência Câmara",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Reporta a aprovação na CCJ da Câmara de projeto de lei que altera regras para o exercício da advocacia por parlamentares, gerando debate sobre conflito de interesses."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 585,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Restrições atuais da OAB ao exercício da advocacia por parlamentares",
+    "causa": "Potencial conflito entre atividade privada e mandatos públicos",
+    "vitima": "Sociedade e moralidade administrativa (segundo críticos)",
+    "culpado": "Restrições excessivas ao exercício profissional (segundo defensores)",
+    "solucao": "Aprovação de projeto que restringe o impedimento apenas ao ente federativo pagador",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto relata a tramitação legislativa ouvindo de forma equilibrada parlamentares de oposição e da base/direita, mantendo tom estritamente informativo.",
+   "atores": [
+    {
+     "nome": "Hildo Rocha (MDB-MA) e Baleia Rossi (MDB-SP)",
+     "campo": "centro"
+    },
+    {
+     "nome": "Helder Salomão (PT-ES)",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Bia Kicis (PL-DF)",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Hildo Rocha (MDB-MA)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 62,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Helder Salomão (PT-ES)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 85,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputada Bia Kicis (PL-DF)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 82,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 85,
+    "direita": 82
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A Comissão de Constituição e Justiça e de Cidadania (CCJ) da Câmara dos Deputados aprovou, nesta terça-feira (24), por 32 votos a 7",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta o resultado da votação e abre espaço simétrico para argumentos contrários (PT) e favoráveis (PL/relator).",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "7760357c3762",
+   "url": "https://maquinadoesporte.com.br/futebol/justica-rejeita-pedido-de-intervencao-no-corinthians-feito-pelo-ministerio-publico/",
+   "titulo": "Justiça rejeita pedido de intervenção no Corinthians feito pelo Ministério Público",
+   "veiculo": "Máquina do Esporte",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Aborda a decisão judicial que rejeitou o pedido de intervenção no Corinthians feito pelo Ministério Público, detalhando os argumentos de ambas as partes."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 562,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise financeira e investigações sobre irregularidades no Corinthians",
+    "causa": "Dívidas elevadas e contratos sob suspeita",
+    "vitima": "Saúde financeira do clube",
+    "culpado": "Gestões investigadas",
+    "solucao": "Recuperação judicial e medidas cautelares adotadas pelo clube",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A estrutura da notícia relata fatos judiciais de interesse público sem demonstrar viés editorial em favor de nenhuma das partes envolvidas.",
+   "atores": [
+    {
+     "nome": "Ministério Público de São Paulo",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Corinthians",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Corinthians",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 52,
+     "ultima": true
+    },
+    {
+     "rotulo": "promotores Luiz Ambra Neto e Silvio Antônio Marques",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A 1ª Vara Cível do Foro Regional do Tatuapé, em São Paulo (SP), recusou o pedido de intervenção judicial no Corinthians",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A matéria expõe tanto os fundamentos do Ministério Público para o pedido quanto as justificativas apresentadas pela defesa do clube e a decisão da Justiça.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2359e4b3a1fa",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/24/abin-mapeia-31-organizaes-criminosas-no-brasil-pcc-foca-exterior-e-cv-avana-no-norte-e-nordeste.ghtml",
+   "titulo": "Abin mapeia 31 organizações criminosas no Brasil; PCC foca no exterior e CV avança no Norte e Nordeste",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "abin-mapeia-31-organizacoes-criminosas-e-aponta",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda um estudo oficial da Abin e do Fórum Brasileiro de Segurança Pública sobre o mapeamento de 31 organizações criminosas no país."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 648,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A atuação disseminada e complexa de 31 organizações criminosas no Brasil.",
+    "causa": "Expansão de facções por meio de rotas logísticas e alianças locais.",
+    "vitima": "Sociedade e estados afetados pela criminalidade.",
+    "culpado": "Organizações criminosas (PCC, CV, TCP e milícias).",
+    "solucao": "Monitoramento e inteligência estatal para mapear e compreender o crime organizado.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se o estudo tratasse de organizações de outro perfil, a estrutura da notícia baseada em dados institucionais seria idêntica.",
+   "atores": [
+    {
+     "nome": "Abin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "PCC",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Comando Vermelho",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Abin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Um levantamento elaborado pela Agência Brasileira de Inteligência (Abin) em parceria com o Fórum Brasileiro de Segurança Pública apontou a atuação de 31 organizações criminosas com presença relevante no Brasil.",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados com fonte oficial e metodologia declarada.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "242573bacaf1",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/julgamento-na-italia-sobre-extradicao-de-zambelli-tem-novo-adiamento.shtml",
+   "titulo": "Julgamento na Itália sobre extradição de Zambelli tem novo adiamento",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "O texto relata o andamento do processo de extradição de uma ex-deputada federal na justiça italiana, envolvendo decisões do STF."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 617,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Atrasos sucessivos na conclusão do processo de extradição na Itália.",
+    "causa": "Greve de advogados criminalistas e questionamentos jurídicos da defesa sobre garantias prisionais.",
+    "vitima": "Nenhuma informada diretamente.",
+    "culpado": "Nenhum apontado diretamente (questão processual).",
+    "solucao": "Realização de nova audiência pela justiça italiana.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O tom e a estrutura descritiva do texto seriam mantidos caso o processo envolvesse uma figura pública de qualquer outra matiz político.",
+   "atores": [
+    {
+     "nome": "Carla Zambelli",
+     "campo": "direita"
+    },
+    {
+     "nome": "STF",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "cinco anos e três meses de prisão em regime inicial semiaberto",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Citação objetiva da pena imposta pelo STF com base em decisões oficiais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a22001ab3803",
+   "url": "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/24/associacao-de-vitimas-do-ninho-considera-condenacao-insuficiente-e-critica-falta-de-punicao-a-dirigentes-do-flamengo.ghtml",
+   "titulo": "Associação de vítimas do Ninho considera condenação insuficiente e critica falta de punição a dirigentes do Flamengo",
+   "veiculo": "ge",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de desdobramentos judiciais de tragédia com repercussão pública e cobrança de responsabilização de dirigentes."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1138,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insatisfação de familiares com a limitação das punições judiciais apenas a engenheiros, sem responsabilização de dirigentes do clube.",
+    "causa": "Falhas estruturais e de segurança no alojamento associadas à falta de responsabilização da diretoria à época.",
+    "vitima": "Jovens atletas mortos no incêndio e seus familiares.",
+    "culpado": "Responsáveis pela segurança do alojamento e direção do clube (segundo os familiares).",
+    "solucao": "Recursos às instâncias superiores pelo Ministério Público e investigação rigorosa.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A abordagem humanizada e de cobrança por justiça seria aplicada a qualquer caso similar de cobrança de familiares de vítimas contra instituições.",
+   "atores": [
+    {
+     "nome": "AFAVINU",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Flamengo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "AFAVINU",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 78,
+     "ultima": true
+    },
+    {
+     "rotulo": "Andreia de Oliveira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A associação das vítimas do incêndio no Ninho do Urubu aponta que a condenação de engenheiros é insuficiente sem a responsabilização de dirigentes do Flamengo.",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A voz principal da matéria é dada aos familiares das vítimas, detalhando suas reivindicações sem que haja o contraponto direto de dirigentes citados na mesma edição.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "ressalva": "O texto apresenta o histórico dos processos e a posição do Ministério Público."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "059150c40211",
+   "url": "https://umsoplaneta.globo.com/financas/negocios/noticia/2026/11/24/mulheres-indigenas-da-amazonia-trocam-experiencias-de-bioeconomia.ghtml",
+   "titulo": "Mulheres indígenas da Amazônia trocam experiências de bioeconomia",
+   "veiculo": "Um Só Planeta",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "costumes",
+     "geral"
+    ],
+    "justificativa": "Aborda encontro de mulheres indígenas da Amazônia com foco em bioeconomia, manejo sustentável e articulação política."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 516,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impactos das mudanças climáticas sobre os recursos tradicionais e isolamento de comunidades indígenas.",
+    "causa": "Mudanças climáticas afetando espécies locais como o tucum e falta de visibilidade econômica.",
+    "vitima": "Mulheres indígenas e comunidades da Amazônia.",
+    "culpado": "Mudanças climáticas e pressões sobre os territórios.",
+    "solucao": "Fortalecimento da bioeconomia, redes de colaboração e manejo sustentável.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O foco em relatos pessoais de superação e dificuldades seria adotado para qualquer grupo em eventos de intercâmbio cultural e econômico.",
+   "atores": [
+    {
+     "nome": "Mulheres indígenas da Amazônia",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Conservação Internacional (CI)",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Angela Jaboti Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 106,
+     "ultima": false
+    },
+    {
+     "rotulo": "Jeny Jazmín Juagibioy",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Bruna Pratesi",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 138,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "5db44a75a1f5",
+   "url": "https://g1.globo.com/politica/noticia/2026/11/24/pcc-cv-estudo-abin-forum-brasileiro-seguranca-publica.ghtml",
+   "titulo": "PCC foca em rotas do tráfico a partir do Sudeste e CV aposta no controle do território no Norte e no Nordeste, mostra estudo inédito da Abin",
+   "veiculo": "g1",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "abin-mapeia-31-organizacoes-criminosas-e-aponta",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Análise detalhada de relatório oficial sobre a atuação e capilaridade de facções criminosas no país."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 1265,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Domínio e capilaridade de facções criminosas em unidades da federação.",
+    "causa": "Diferentes estratégias de expansão e controle territorial adotadas por grandes grupos criminosos.",
+    "vitima": "População das regiões afetadas pela criminalidade.",
+    "culpado": "Organizações criminosas.",
+    "solucao": "Mapeamento estratégico e inteligência de segurança pública.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A estrutura de divulgação de dados técnicos de segurança seria mantida inalterada independentemente do governo ou órgão emissor.",
+   "atores": [
+    {
+     "nome": "Abin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "PCC",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Comando Vermelho",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Abin / Fórum Brasileiro de Segurança Pública",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "c2e76c6edfe8",
+   "url": "https://www.infomoney.com.br/business/itau-entra-no-mcmv-e-avanca-sobre-mercado-dominado-pela-caixa/",
+   "titulo": "Itaú entra no MCMV e avança sobre mercado dominado pela Caixa",
+   "veiculo": "InfoMoney",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata a entrada do Itaú Unibanco no programa Minha Casa, Minha Vida e a expansão de sua carteira de crédito imobiliário, sem embates ideológicos diretos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 389,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concorrência no mercado de financiamento imobiliário e expansão de crédito",
+    "causa": "Estratégia de diversificação e estrutura de captação dos bancos privados",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Entrada de bancos privados no Minha Casa, Minha Vida",
+    "motor_moral": "eficiencia"
+   },
+   "teste_inversao": "O texto relata uma movimentação corporativa puramente factual e econômica, logo seria redigido exatamente da mesma forma independentemente da instituição financeira envolvida.",
+   "atores": [
+    {
+     "nome": "Itaú Unibanco",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Itaú",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Milton Maluhy Filho",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 17,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "504f30c6750f",
+   "url": "https://www.seudinheiro.com/2026/empresas/a-petrobras-petr4-nao-quer-depender-da-bonanca-do-petroleo-para-investir-o-recado-da-ceo-da-estatal-ao-mercado-bdap/",
+   "titulo": "Petrobras (PETR4) não quer depender da bonança do petróleo para investir — e CEO manda recado ao mercado",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de diretrizes estratégicas e investimentos da estatal Petrobras e a reação do mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1122,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Equilíbrio entre investimentos elevados da Petrobras e a rentabilidade em cenários adversos",
+    "causa": "Volatilidade dos preços do petróleo e estratégia de diversificação para o etanol",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Adotar premissas conservadoras de preço e rigor na alocação de capital",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "A matéria relata os anúncios da estatal e a reação de queda nas ações de forma estritamente descritiva e baseada em fatos de mercado.",
+   "atores": [
+    {
+     "nome": "Magda Chambriard",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Mercado financeiro / Analistas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 71,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "75999466a748",
+   "url": "https://climainfo.org.br/2026/11/24/inglaterra-registra-recorde-de-mortes-por-causa-do-calor-em-2026/",
+   "titulo": "Inglaterra registra recorde de mortes por causa do calor em 2026",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Aborda o recorde de mortes por calor na Inglaterra e a discussão sobre adaptação às mudanças climáticas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 612,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento expressivo de mortes decorrentes de ondas de calor extremo",
+    "causa": "Mudanças climáticas e aquecimento global",
+    "vitima": "População idosa e vulnerável na Inglaterra",
+    "culpado": "Nenhum citado diretamente",
+    "solucao": "Adaptação de longo prazo e redução de emissões",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto baseia-se em relatórios estatísticos oficiais de saúde pública e seria redigido da mesma forma sem viés político.",
+   "atores": [
+    {
+     "nome": "Agência de Segurança da Saúde do Reino Unido (UKHSA)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ross Thompson",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 102,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "a5e50ff4bfc3",
+   "url": "https://agenciabrasil.ebc.com.br/meio-ambiente/noticia/2026-11/tupancireta-tera-r-3-milhoes-para-recuperar-prejuizos",
+   "titulo": "Tupanciretã terá R$ 3 milhões para recuperar prejuízos",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de repasse de recursos federais para auxílio a município atingido por desastre natural."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 320,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Prejuízos e destruição causados por temporal em município gaúcho",
+    "causa": "Fenômeno climático extremo (temporal com fortes ventos)",
+    "vitima": "População de Tupanciretã",
+    "culpado": "Nenhum",
+    "solucao": "Repasse de recursos federais para atendimento emergencial e Defesa Civil",
+    "motor_moral": "solidariedade"
+   },
+   "teste_inversao": "A notícia cobre uma ação administrativa padrão de repasse de verbas federais para calamidades, sem juízos de valor ideológicos.",
+   "atores": [
+    {
+     "nome": "Ministério da Integração e do Desenvolvimento Regional",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Prefeitura de Tupanciretã",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gustavo Herter Terra",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8bf135e294f0",
+   "url": "https://www.bloomberglinea.com.br/negocios/justica-derruba-liminar-que-suspendia-novas-regras-do-pat-para-associadas-da-abbt/",
+   "titulo": "Justiça derruba liminar que suspendia novas regras do PAT para associadas da ABBT",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "trf-1-derruba-liminar-e-restabelece-novas-regras",
+   "origem": "materia",
+   "data_publicacao": "2026-11-25",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Relata decisão judicial sobre regras do Programa de Alimentação do Trabalhador (PAT) e impacto fiscal envolvendo o governo federal e grandes empresas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 520,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disputa jurídica sobre a validade de novas regras de tarifas e prazos no PAT",
+    "causa": "Divergência regulatória entre o poder regulamentar do Executivo e os interesses das operadoras de benefícios",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Decisão judicial restabelecendo as exigências normativas e o teto de taxas",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve com neutralidade os argumentos de ambas as partes e o teor da decisão judicial proferida, mantendo o mesmo tom para qualquer caso semelhante.",
+   "atores": [
+    {
+     "nome": "Associação Brasileira das Empresas de Benefícios ao Trabalhador (ABBT)",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "União Federal / Poder Executivo",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Alexandre Jorge Fontes Laranjeira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "b2614d556a86",
+   "url": "https://neofeed.com.br/wealth-management/assessoria-de-investimentos-do-safra-entra-na-gestao-de-fortunas-com-carteira-de-r-300-milhoes/",
+   "titulo": "Assessoria de investimentos do Safra entra na gestão de fortunas com carteira de R$ 300 milhões",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "kaszek-capta-us-650-milhoes-para-fundo-de-estagi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda a expansão de um escritório de investimentos para a gestão de fortunas, tratando de mercado financeiro e negócios."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 706,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Investidores de alta renda desassistidos nas plataformas atuais.",
+    "causa": "Falta de atendimento especializado e integrado para fortunas intermediárias.",
+    "vitima": "Investidores com patrimônio entre R$ 5 milhões e R$ 50 milhões.",
+    "culpado": "Plataformas atuais do mercado B2C e B2B.",
+    "solucao": "Lançamento da KAT Wealth com acesso internacional e estruturação própria.",
+    "motor_moral": "eficiencia"
+   },
+   "teste_inversao": "O texto descreve um movimento corporativo padrão do setor financeiro sem juízos de valor ideológicos. Seria redigido da mesma forma para qualquer outra empresa.",
+   "atores": [
+    {
+     "nome": "KAT Wealth / KAT Investimentos",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ewerson Padovan, CEO da KAT",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 85,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ronaldo Guimarães",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 60,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 145
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "896fc9f6fa52",
+   "url": "https://www.cnnbrasil.com.br/nacional/sudeste/sp/hope-nasce-a-nova-ararinha-azul-do-zoologico-de-sao-paulo/",
+   "titulo": "Hope: nasce a nova ararinha-azul do Zoológico de São Paulo",
+   "veiculo": "CNN Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "ararinha-azul-nasce-pela-primeira-vez-em-zoologi",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "costumes"
+    ],
+    "justificativa": "Trata-se de uma notícia sobre o nascimento de um animal silvestre ameaçado de extinção em um zoológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 390,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Espécie de ararinha-azul extinta na natureza.",
+    "causa": "Desaparecimento histórico e degradação ambiental.",
+    "vitima": "A espécie de ararinha-azul.",
+    "culpado": "Nenhum apontado diretamente no texto.",
+    "solucao": "Reprodução assistida e centros de conservação.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Texto estritamente informativo sobre conservação animal, neutro em termos político-partidários.",
+   "atores": [
+    {
+     "nome": "Zoológico de São Paulo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "2b7eb650555f",
+   "url": "https://www.moneytimes.com.br/petrobras-nao-e-mais-apenas-uma-petroleira-a-declaracao-da-ceo-da-estatal-que-virou-o-jogo-para-as-acoes-na-bolsa-hoje-bdap/",
+   "titulo": "“Petrobras não é mais apenas uma petroleira”: a declaração da CEO da estatal que virou o jogo para as ações na bolsa hoje",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Envolve estratégia de estatal (Petrobras), debate sobre papel do Estado, investimentos e impacto no mercado financeiro."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1265,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda das ações da Petrobras após anúncio de novos investimentos em etanol e transição energética.",
+    "causa": "Temor do mercado quanto à disciplina de capital e retorno aos acionistas.",
+    "vitima": "Acionistas e investidores da bolsa.",
+    "culpado": "Estratégia de diversificação da estatal para alguns analistas.",
+    "solucao": "Disciplina de capital e foco em resiliência com cenários de preços baixos.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto expõe tanto os argumentos da CEO quanto a reação e as dúvidas do mercado de forma equilibrada.",
+   "atores": [
+    {
+     "nome": "Magda Chambriard / Petrobras",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Analistas de mercado",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard, CEO da Petrobras",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 187,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 187,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "811bf6ff88f6",
+   "url": "https://www.poder360.com.br/poder-economia/argentina-entra-em-recessao-tecnica-com-queda-no-pib-em-setembro/",
+   "titulo": "Argentina entra em recessão técnica com queda no PIB em setembro",
+   "veiculo": "Poder360",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "economia-da-argentina-entra-em-recessao-tecnica",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda dados macroeconômicos da Argentina e a repercussão política para o governo de Javier Milei."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 262 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 262,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Recessão econômica na Argentina e queda da atividade em setembro.",
+    "causa": "Retração em setores específicos como pesca, intermediação financeira e indústria manufatureira.",
+    "vitima": "População e economia argentina.",
+    "culpado": "Conjuntura econômica e setorial.",
+    "solucao": "Aguardar dados consolidados e considerar o peso da economia informal.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto apresenta os dados oficiais de queda e abre espaço para a contenda institucional do governo por meio de seu porta-voz.",
+   "atores": [
+    {
+     "nome": "Governo Javier Milei",
+     "campo": "direita"
+    },
+    {
+     "nome": "Indec",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Adrián Ravier, porta-voz presidencial",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 28,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 28
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "be92b7243da9",
+   "url": "https://www.gazetaesportiva.com/times/flamengo/dois-reus-condenados-a-8-anos-de-prisao-pela-morte-de-10-promessas-do-flamengo-em-incendio/",
+   "titulo": "Justiça condena dois réus a oito anos de prisão pela morte de jovens no CT do Flamengo",
+   "veiculo": "Gazeta Esportiva",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "Trata de decisão judicial sobre homicídios e responsabilidade penal de engenheiros no CT do Flamengo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 283 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 283,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incêndio letal no centro de treinamento do Flamengo.",
+    "causa": "Falha em aparelho de ar-condicionado e inadequação estrutural do projeto.",
+    "vitima": "Jovens atletas das categorias de base mortos e feridos.",
+    "culpado": "Engenheiros responsáveis pelo projeto e construção.",
+    "solucao": "Condenação judicial dos responsáveis.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Notícia factual com base em decisão judicial e comunicado oficial, aplicável a qualquer cobertura de caso criminal ou cível.",
+   "atores": [
+    {
+     "nome": "Justiça do Rio de Janeiro",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Engenheiros réus",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "comunicado do sistema de Justiça do Rio",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 54,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "d8ff07590fee",
+   "url": "https://valor.globo.com/empresas/noticia/2026/11/24/justica-derruba-decisao-que-suspendia-parte-das-novas-regras-para-vale-refeicao-e-vale-alimentacao.ghtml",
+   "titulo": "Justiça derruba decisão que suspendia parte das novas regras para vale-refeição e vale-alimentação",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "trf-1-derruba-liminar-e-restabelece-novas-regras",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda disputa judicial sobre decreto governamental relativo a regras econômicas do PAT."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 411,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Controvérsia jurídica sobre a liminar que suspendia regras do Programa de Alimentação do Trabalhador.",
+    "causa": "Recurso da Advocacia-Geral da União contra decisão da Justiça Federal do DF.",
+    "vitima": "Trabalhadores e estabelecimentos comerciais.",
+    "culpado": "Empresas associadas à ABBT que buscavam desarticular o PAT.",
+    "solucao": "Derrubada da liminar pelo TRF-1, restabelecendo as regras do decreto.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve uma decisão judicial de forma estritamente factual e descritiva. Se os atores fossem invertidos, a estrutura narrativa permaneceria a mesma.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Empresas da ABBT",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Governo",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "desembargador federal Alexandre Jorge Fontes Laranjeira",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Laranjeiras considerou que, se a suspensão fosse mantida, as associadas poderiam desarticular o PAT.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro de atribuição para relatar o entendimento do magistrado.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Governo Lula",
+     "desfavorece": "Empresas da ABBT"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "b3381e340199",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/imigrante-deportado-por-engano-que-virou-simbolo-de-resistencia-nos-eua-deixara-o-pais-voluntariamente.shtml",
+   "titulo": "Imigrante deportado por engano que virou símbolo de resistência nos EUA deixará o país voluntariamente",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Trata de políticas de imigração dos EUA, disputas judiciais e ações do governo Donald Trump."
+   },
+   "estado": "ok",
+   "T": -11,
+   "rotulo": "Leve à esquerda",
+   "confianca": "baixa",
+   "motivos_confianca": [
+    "2 critérios concordantes em 1 famílias"
+   ],
+   "resumo": "Leve à esquerda (confiança baixa). Principais sinais: verbos de atribuição (E2) e carga avaliativa (E1).",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1144,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -10.59,
+    "divergente": false
+   },
+   "por_eixo": {
+    "instituicoes": -10.59
+   },
+   "criterios": {
+    "VERBOS": -5.88,
+    "ADJETIVOS": -4.71
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Deportação indevida e perseguição judicial de imigrante por parte do governo americano.",
+    "causa": "Política agressiva de deportações em massa e uso abusivo do poder governamental.",
+    "vitima": "Kilmar Abrego Garcia",
+    "culpado": "Governo Trump e Departamento de Justiça",
+    "solucao": "Partida voluntária para a Espanha após vitórias judiciais e impasses.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o foco fosse a defesa da soberania das fronteiras e o combate ao crime, o texto destacaria mais as acusações e a gravidade dos delitos imputados pelo governo.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Kilmar Abrego Garcia",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "advogados",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 33,
+     "ultima": false
+    },
+    {
+     "rotulo": "J. Harvie Wilkinson III",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 29
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "uma tortuosa saga de 20 meses",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -4.71,
+     "explicacao": "Uso de qualificação carregada na voz da redação para descrever o processo enfrentado pelo imigrante.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Kilmar Abrego Garcia",
+     "desfavorece": "Donald Trump"
+    },
+    {
+     "id": "E2",
+     "criterio": "VERBOS",
+     "citacao": "o presidente e integrantes de seu gabinete frequentemente atacaram Abrego Garcia",
+     "paragrafo": "P13",
+     "direcao": "esquerda",
+     "contribuicao": -5.88,
+     "explicacao": "Atribuição de comportamento agressivo ao governo na voz da redação.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Kilmar Abrego Garcia",
+     "desfavorece": "Donald Trump"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "568c884645a9",
+   "url": "https://g1.globo.com/tecnologia/noticia/2026/11/24/chinesa-huawei-e-condenada-nos-eua.ghtml",
+   "titulo": "Chinesa Huawei é condenada nos EUA por negócios no Irã e roubo de segredos comerciais; entenda",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "justica-dos-eua-condena-huawei-por-fraude-sancoe",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda condenação criminal de empresa multinacional chinesa nos EUA por fraude e roubo de segredos comerciais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 772,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crimes corporativos, fraude e roubo de segredos comerciais por parte de empresa estrangeira.",
+    "causa": "Práticas comerciais ilegais e violação de sanções internacionais.",
+    "vitima": "Bancos e empresas de tecnologia americanas.",
+    "culpado": "Huawei",
+    "solucao": "Condenação em júri federal e responsabilização judicial.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um processo judicial com ampla exposição dos argumentos da acusação e da defesa. A estrutura é simétrica e baseada em fatos do julgamento.",
+   "atores": [
+    {
+     "nome": "Autoridades dos EUA",
+     "campo": "centro"
+    },
+    {
+     "nome": "Huawei",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Huawei",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": false
+    },
+    {
+     "rotulo": "Meredith Arfa",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 25,
+     "ultima": false
+    },
+    {
+     "rotulo": "Brian Heberlig",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A acusação convocou mais de 60 testemunhas, enquanto a defesa apresentou 15.",
+     "paragrafo": "P7",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação equilibrada do volume de evidências e testemunhas de ambas as partes.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Autoridades dos EUA",
+     "desfavorece": "Huawei"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "17da3853cfb6",
+   "url": "https://ge.globo.com/futebol/times/flamengo/noticia/2026/11/24/justica-condena-engenheiros-a-oito-anos-de-prisao-pelo-incendio-do-ninho-do-urubu.ghtml",
+   "titulo": "Justiça condena engenheiros a oito anos de prisão pelo incêndio do Ninho do Urubu",
+   "veiculo": "ge",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de condenação judicial de engenheiros por tragédia com grande repercussão pública (incêndio no Ninho do Urubu)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 714,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tragédia com mortes decorrente de falhas estruturais e materiais inadequados em alojamento.",
+    "causa": "Negligência e falhas técnicas em atribuições de engenharia e materiais inflamáveis.",
+    "vitima": "Adolescentes vítimas do incêndio no Ninho do Urubu",
+    "culpado": "Engenheiros responsáveis pelas estruturas",
+    "solucao": "Condenação em segunda instância a pena de prisão em regime semiaberto.",
+    "motor_moral": "justica"
+   },
+   "teste_inversao": "O texto relata a decisão judicial e traz a manifestação da defesa e do Ministério Público de forma imparcial. A inversão não alteraria a forma de apuração.",
+   "atores": [
+    {
+     "nome": "Ministério Público do Rio de Janeiro (MPRJ)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Engenheiros condenados",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Bruno Rodrigues",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 63,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "a relatora do processo, desembargadora Suimei Meira Cavalieri, considerou que os dois falharam em suas atribuições técnicas",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Emprego de verbo neutro para relatar a fundamentação da decisão judicial.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Engenheiros condenados"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "fb69d09bcb79",
+   "url": "https://agenciabrasil.ebc.com.br/geral/noticia/2026-11/mulheres-indigenas-da-amazonia-trocam-experiencias-de-bioeconomia",
+   "titulo": "Mulheres indígenas da Amazônia trocam experiências de bioeconomia",
+   "veiculo": "Agência Brasil",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "costumes"
+    ],
+    "justificativa": "Aborda evento sobre bioeconomia, manejo sustentável e protagonismo de mulheres indígenas da Amazônia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 530,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Impacto das mudanças climáticas na disponibilidade de materiais tradicionais para artesanato indígena.",
+    "causa": "Aquecimento global e alterações climáticas que afetam espécies vegetais.",
+    "vitima": "Mulheres indígenas artesãs",
+    "culpado": "Mudanças climáticas",
+    "solucao": "Encontro de intercâmbio de experiências, bioeconomia e fortalecimento de redes de cooperação.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto foca em pautas socioambientais e valorização cultural. Se o tema fosse outro, a ênfase humanizada poderia ser direcionada a atores de outra matiz.",
+   "atores": [
+    {
+     "nome": "Mulheres indígenas da Amazônia",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Angela Jaboti Brasil",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 106,
+     "ultima": false
+    },
+    {
+     "rotulo": "Jeny Jazmín Juagibioy",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": false
+    },
+    {
+     "rotulo": "Bruna Pratesi",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 138,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "993a45b80558",
+   "url": "https://climainfo.org.br/2026/11/24/governador-eleito-do-para-tem-multas-por-desmatamento-e-vice-foi-autuada-por-garimpo/",
+   "titulo": "Governador eleito do Pará tem multas por desmatamento, e vice foi autuada por garimpo",
+   "veiculo": "ClimaInfo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda histórico de infrações ambientais de governadores eleitos."
+   },
+   "estado": "ok",
+   "T": -5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 65,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 598,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.23,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ADJETIVOS": -5.23
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Políticos eleitos com histórico de infrações ambientais na Amazônia",
+    "causa": "Desrespeito à legislação ambiental e avanço de práticas ilegais",
+    "vitima": "Meio ambiente e sociedade",
+    "culpado": "Governantes eleitos com multas ambientais",
+    "solucao": "Responsabilização e cumprimento da lei",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se os políticos citados fossem de esquerda, a menção a familiares presos ou associados seria feita com a mesma ênfase? Provavelmente sim, mas o tom avaliativo difere.",
+   "atores": [
+    {
+     "nome": "Dr. Daniel",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ellayne D'Almeida",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "instituto",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "atual presidiário",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -5.23,
+     "explicacao": "Uso de qualificador depreciativo na voz da redação para se referir a Jair Bolsonaro.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "instituicoes",
+     "desfavorece": "Dr. Daniel"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "812d742c472b",
+   "url": "https://www.bloomberglinea.com.br/tech/justica-da-72-horas-para-99food-informar-como-deixou-de-barrar-a-keeta-em-restaurantes/",
+   "titulo": "Justiça dá 72 horas para 99Food informar como deixou de barrar a Keeta em restaurantes",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-25",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Disputa judicial antitruste entre plataformas de entrega (99Food e Keeta)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 526,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Práticas anticompetitivas de exclusividade em aplicativos de entrega",
+    "causa": "Cláusulas contratuais de banimento de concorrentes",
+    "vitima": "Empresa concorrente e restaurantes",
+    "culpado": "Plataforma dominante",
+    "solucao": "Decisão judicial determinando cumprimento imediato",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto relata fatos processuais de forma neutra e equilibrada entre as partes.",
+   "atores": [
+    {
+     "nome": "99Food",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Keeta",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "juiz Fábio Henrique Prado de Toledo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "90d4f003efe5",
+   "url": "https://www.cnnbrasil.com.br/politica/em-carta-pt-diz-que-urnas-valem-mais-que-poder-economico-e-ignora-fiscal/",
+   "titulo": "Em carta, PT diz que urnas valem mais que poder econômico e ignora fiscal",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Cobertura de manifesto político do Partido dos Trabalhadores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 790,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desafios econômicos e institucionais do país",
+    "causa": "Interesses econômicos e avanço da extrema direita",
+    "vitima": "Trabalhadores e população vulnerável",
+    "culpado": "Poder econômico e plataformas digitais",
+    "solucao": "Democracia e diálogo social",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto reproduz extensamente os pontos da carta do partido sem juízos de valor excessivos na voz da redação.",
+   "atores": [
+    {
+     "nome": "PT",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "PT",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 509,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 509,
+    "direita": 0
+   },
+   "falas": 16,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "10d0bbee5eeb",
+   "url": "https://www.moneytimes.com.br/ibovespa-fecha-no-vermelho-apos-presidente-da-petrobras-nao-garantir-dividendos-extraordinarios-davs/",
+   "titulo": "Ibovespa fecha no vermelho após presidente da Petrobras não garantir dividendos extraordinários",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Análise do fechamento do mercado financeiro influenciado por política fiscal e estatal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 839,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desequilíbrio fiscal e volatilidade nos mercados financeiros",
+    "causa": "Gastos públicos elevados e incertezas sobre dividendos estatais",
+    "vitima": "Investidores e economia nacional",
+    "culpado": "Gestão fiscal e declarações de dirigentes",
+    "solucao": "Ajuste fiscal e controle de despesas",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Relatório padrão de mercado financeiro, tratando atores econômicos e governamentais com critérios técnicos.",
+   "atores": [
+    {
+     "nome": "Magda Chambriard",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rafael Dadoorian",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 30,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "f41f92383f1c",
+   "url": "https://www.poder360.com.br/poder-brasil/cni-protocola-nova-acao-no-stf-contra-a-regulamentacao-do-fim-da-6-x-1/",
+   "titulo": "CNI protocola nova ação no STF contra a regulamentação do fim da 6 X 1",
+   "veiculo": "Poder360",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "cni-aciona-o-stf-contra-decreto-e-portaria-do-go",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Ação judicial da indústria contra regulamentação trabalhista do governo."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 293 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 293,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Insegurança jurídica e invasão de competência legislativa",
+    "causa": "Regulamentação por decreto e portaria de temas trabalhistas",
+    "vitima": "Setor produtivo",
+    "culpado": "Poder Executivo",
+    "solucao": "Anulações de atos normativos pelo STF",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve de maneira neutra e factual a ação protocolada e as decisões do STF.",
+   "atores": [
+    {
+     "nome": "CNI",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "CNI",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e44804bdc2ba",
+   "url": "https://neofeed.com.br/negocios/a-braskem-ganhou-folego-no-acordo-com-credores-mas-falta-definir-a-que-preco-eles-podem-virar-socios/",
+   "titulo": "A Braskem ganhou fôlego no acordo com credores. Mas falta definir a que preço eles podem virar sócios",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de acordo financeiro de recuperação extrajudicial de uma grande empresa (Braskem) com credores, sem forte conflito político-partidário explícito."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 635,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise financeira e endividamento da Braskem.",
+    "causa": "Dívidas acumuladas e necessidade de reestruturação.",
+    "vitima": "Credores e acionistas sob risco de diluição.",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Acordo de recuperação extrajudicial com conversão de dívida em ações e novos prazos.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata fatos objetivos sobre termos financeiros e negociações de uma empresa privada e seus credores, sem viés ideológico detectável.",
+   "atores": [
+    {
+     "nome": "Braskem",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Comitê de credores da Braskem",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "comitê diretor do grupo de credores",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c8c8a8b0274e",
+   "url": "https://www.seudinheiro.com/2026/empresas/petrobras-petr4-vai-conseguir-manter-os-dividendos-plano-de-negocios-conta-com-petroleo-nas-alturas-e-gera-apreensao-bdap/",
+   "titulo": "Petrobras (PETR4) vai conseguir manter os dividendos? Plano de Negócios conta com petróleo nas alturas e gera apreensão",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda o plano de negócios de uma empresa estatal (Petrobras) e as avaliações de analistas de mercado sobre dividendos, investimentos e gestão."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1163,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possível pressão sobre a geração de caixa e dividendos da Petrobras devido ao novo plano de investimentos.",
+    "causa": "Aumento dos gastos de capital (capex) e novas aquisições.",
+    "vitima": "Acionistas da estatal.",
+    "culpado": "Gestão da Petrobras / diretoria.",
+    "solucao": "Disciplina na alocação de capital e foco na eficiência.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta análises de diferentes bancos de investimento sobre o plano financeiro de uma empresa, mantendo tom informativo e técnico.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Itaú BBA",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "BTG Pactual",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Citi",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Itaú BBA e Citi",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "BTG Pactual",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "69be39a2e5d3",
+   "url": "https://valor.globo.com/empresas/noticia/2026/11/24/nao-estamos-prometendo-dividendo-extraordinario-estamos-aventando-a-possibilidade-diz-petrobras.ghtml",
+   "titulo": "Não estamos prometendo dividendo extraordinário, estamos aventando a possibilidade, diz Petrobras",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-eleva-investimentos-para-us-122-bilhoe",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Reporta declarações da presidente da Petrobras sobre a política de dividendos e o plano de negócios da empresa."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 295 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 295,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Expectativas do mercado financeiro em relação aos dividendos extraordinários da Petrobras.",
+    "causa": "Cautela da diretoria da estatal em não prometer distribuições extras sem respaldo no caixa.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Manter alavancagem de olho no caixa e na dívida.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata com precisão declarações oficiais dos executivos da empresa, com equilibrio e citação direta.",
+   "atores": [
+    {
+     "nome": "Magda Chambriard",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Fernando Melgarejo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Magda Chambriard",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Fernando Melgarejo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "87bc1ddc6942",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/inglaterra-registra-recorde-de-mortes-relacionadas-ao-calor-no-verao-deste-ano.shtml",
+   "titulo": "Inglaterra registra recorde de mortes relacionadas ao calor no verão deste ano",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Aborda o recorde de mortes por calor na Inglaterra e o debate sobre mudanças climáticas e políticas públicas de adaptação."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 708,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Elevado número de mortes causadas por ondas de calor extremo na Inglaterra.",
+    "causa": "Mudanças climáticas causadas pela ação humana e falta de adaptação estrutural.",
+    "vitima": "População idosa e vulnerável exposta ao calor.",
+    "culpado": "Falta de ação política e infraestrutura inadequada.",
+    "solucao": "Adaptação de moradias, infraestrutura e serviços de saúde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A cobertura de eventos extremos e dados de órgãos oficiais e ativistas segue o padrão jornalístico padrão de reporte de desastres e saúde pública.",
+   "atores": [
+    {
+     "nome": "Agência de Segurança da Saúde do Reino Unido (UKHSA)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Greenpeace UK",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ross Thompson",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 65,
+     "ultima": false
+    },
+    {
+     "rotulo": "Maja Darlington",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 29,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "134fda983a36",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/24/expectativa-de-vida-em-cuba-cai-pela-primeira-vez-em-quase-80-anos-alerta-oms.ghtml",
+   "titulo": "Expectativa de vida em Cuba cai pela 1ª vez em quase 80 anos, alerta OMS",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata da queda na expectativa de vida e problemas no sistema de saúde em Cuba, relacionando-os à crise econômica e ao embargo/bloqueio energético dos EUA."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 341,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Queda na expectativa de vida e aumento da mortalidade infantil em Cuba.",
+    "causa": "Grave crise econômica e bloqueio energético imposto pelos Estados Unidos.",
+    "vitima": "População cubana.",
+    "culpado": "Crise estrutural e sanções externas dos EUA.",
+    "solucao": "Superação da crise energética e melhoria no sistema de saúde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata dados divulgados pela OMS sobre a situação sanitária e social em Cuba com base em declarações oficiais da organização.",
+   "atores": [
+    {
+     "nome": "Governo de Cuba",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Organização Mundial da Saúde (OMS)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Estados Unidos",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Tedros Adhanom / Ghebreyesus",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 64,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7cb9312b1b3b",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/metodologia-da-abin-mostra-diferencas-entre-organizacoes-criminosas",
+   "titulo": "Metodologia da Abin mostra diferenças entre organizações criminosas",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "abin-mapeia-31-organizacoes-criminosas-e-aponta",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda estudo da Abin sobre organizações criminosas e sua relação com políticas públicas e propostas do governo federal como a PEC da Segurança Pública."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 737,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A atuação difusa e complexa de organizações criminosas pelo país.",
+    "causa": "Falta de diferenciação estrutural e estratégica entre os grupos criminosos.",
+    "vitima": "A sociedade e as instituições públicas de segurança.",
+    "culpado": "Organizações criminosas como PCC, CV e TCP.",
+    "solucao": "Adotar metodologia científica de inteligência para embasar políticas públicas de combate ao crime.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto descreve um estudo técnico e metodológico de um órgão de Estado sem tomar partido político, mantendo-se descritivo.",
+   "atores": [
+    {
+     "nome": "Abin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Abin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 12,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A aplicação da metodologia resultou na identificação de 31 organizações criminosas relevantes atuando nacionalmente e de 75 células estaduais.",
+     "paragrafo": "P23",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados quantitativos detalhados com base em estudo técnico.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "8056beb5b1a9",
+   "url": "https://www.cnnbrasil.com.br/economia/money/negocios/justica-da-72-horas-a-99food-para-comprovar-fim-de-clausulas-de-banimento/",
+   "titulo": "Justiça dá 72 horas para 99Food comprovar fim de cláusulas de banimento",
+   "veiculo": "CNN Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão judicial envolvendo litígio concorrencial entre empresas de entrega de refeições (99Food e Keeta)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 356,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Práticas anticompetitivas e manutenção de cláusulas de exclusividade por empresa de entrega.",
+    "causa": "Alteração contratual para burlar decisão judicial anterior.",
+    "vitima": "Empresa concorrente (Keeta) e restaurantes parceiros.",
+    "culpado": "99Food",
+    "solucao": "Cumprimento de ordem judicial sob pena de multa.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto relata um processo judicial de forma padrão, dando espaço para os argumentos e registrando a ausência de resposta da parte notificada.",
+   "atores": [
+    {
+     "nome": "TJSP",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "99Food",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Keeta",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "desembargador Rômolo Russo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": true
+    },
+    {
+     "rotulo": "Keeta",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "99Food",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Procurada, a 99Food não se manifestou.",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "A empresa citada teve a oportunidade de resposta registrada pela reportagem.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "desfavorece": "99Food"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ff2b87a5b78c",
+   "url": "https://www.poder360.com.br/poder-justica/camara-convoca-ministro-para-explicar-troca-de-delegados-da-pf/",
+   "titulo": "Câmara convoca ministro para explicar troca de delegados da PF",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "seguranca"
+    ],
+    "justificativa": "Aborda convocação de ministro de Estado pelo Congresso Nacional em meio a disputas envolvendo a Polícia Federal e o Supremo Tribunal Federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 504,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Conflito institucional sobre mudanças na Polícia Federal e relatórios envolvendo ministros de tribunais superiores.",
+    "causa": "Troca de delegados em cargos de chefia e divergências sobre o escopo de relatórios de investigação.",
+    "vitima": "O parlamento e a transparência nas investigações.",
+    "culpado": "Ministério da Justiça e cúpula da Polícia Federal.",
+    "solucao": "Convocação do ministro da Justiça para prestar esclarecimentos formais no Congresso.",
+    "motor_moral": "instituicoes"
+   },
+   "teste_inversao": "A notícia expõe os argumentos tanto da oposição na Câmara quanto da Polícia Federal e do governo, mantendo o equilíbrio de versões.",
+   "atores": [
+    {
+     "nome": "Comissão de Segurança Pública da Câmara",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Wellington César Lima e Silva",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Delegado Paulo Bilynskyj",
+     "campo": "direita"
+    },
+    {
+     "nome": "Supremo Tribunal Federal (STF)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Delegado Paulo Bilynskyj (PL-SP)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Polícia Federal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "diretor-geral da PF, Andrei Rodrigues",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A PF afirmou que as dispensas decorreram de uma reestruturação administrativa e não alteraram as equipes responsáveis pelas investigações.",
+     "paragrafo": "P11",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta a versão da Polícia Federal e da cúpula policial para contrapor as críticas dos parlamentares.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "0768030b0371",
+   "url": "https://www.seudinheiro.com/2026/economia/apos-saida-relampago-jensen-huang-retorna-a-nvidia-outro-ceo-porem-saiu-e-voltou-ao-comando-ainda-mais-rapido-mlem/",
+   "titulo": "Após saída relâmpago, Jensen Huang retorna à Nvidia; outro CEO, porém, saiu e voltou ao comando ainda mais rápido",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "jensen-huang-retorna-a-lideranca-da-nvidia-apos",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Texto sobre o retorno de executivos ao comando de grandes empresas de tecnologia, com notas curtas sobre economia ao final."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 781,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Afastamentos repentinos e retornos rápidos de principais executivos de empresas de tecnologia.",
+    "causa": "Controvérsias e disputas internas de governança corporativa.",
+    "vitima": "A estabilidade de mercado e a confiança acionária de curto prazo.",
+    "culpado": "Nenhum atribuído formalmente além de conflitos corporativos.",
+    "solucao": "Reintegração dos executivos após pressões de mercado e conselhos.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto aborda um tema corporativo global de forma factual e comparativa, aplicável a qualquer veículo de negócios.",
+   "atores": [
+    {
+     "nome": "Jensen Huang",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Sam Altman",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Jensen Huang",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": false
+    },
+    {
+     "rotulo": "OpenAI",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 50,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Durante o pregão de ontem, as ações da Nvidia chegaram a valorizar mais de 30% na Nasdaq.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de dados de mercado para ilustrar a repercussão financeira do retorno do executivo.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9ef9cd64641c",
+   "url": "https://neofeed.com.br/negocios/plano-de-us-122-bilhoes-da-petrobras-agrada-menos-que-o-dividendo-extra/",
+   "titulo": "Plano de US$ 122 bilhões da Petrobras agrada menos que o dividendo extra",
+   "veiculo": "NeoFeed",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-eleva-investimentos-para-us-122-bilhoe",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Analisa o plano estratégico da estatal Petrobras e a repercussão entre analistas de mercado e bancos de investimento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 661,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Pressão sobre o fluxo de caixa e o pagamento de dividendos da Petrobras devido ao aumento de investimentos.",
+    "causa": "Aumento expressivo no capex de curto prazo e novos desembolsos planejados pela estatal.",
+    "vitima": "Acionistas e investidores focados em dividendos de curto prazo.",
+    "culpado": "A gestão de investimentos da Petrobras.",
+    "solucao": "Ajuste na velocidade de expansão dos investimentos da companhia.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "O texto relata a avaliação de analistas financeiros de mercado sobre um plano corporativo, mantendo tom técnico e especializado.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Itaú BBA",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "XP",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "analistas Monique Greco, Eric de Mello, Eduardo Mendes e Ignacio Sabelle, do Itaú BBA",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 68,
+     "ultima": false
+    },
+    {
+     "rotulo": "XP",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 68,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A Petrobras anunciou na noite da segunda-feira, 23 de novembro, a projeção de um investimento de US$ 122 bilhões em seu novo plano estratégico para 2027-2031.",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação detalhada de valores financeiros e projeções com base em relatórios de mercado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "43f394d35efa",
+   "url": "https://climainfo.org.br/2026/11/24/analises-sobre-o-plano-de-negocios-2027-2031-da-petrobras/",
+   "titulo": "Análises sobre o Plano de Negócios 2027-2031 da Petrobras",
+   "veiculo": "ClimaInfo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "petrobras-eleva-investimentos-para-us-122-bilhoe",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "O texto apresenta críticas de organizações ambientalistas ao Plano de Negócios da Petrobras, discutindo transição energética, investimentos em combustíveis fósseis e prioridades econômicas do governo."
+   },
+   "estado": "ok",
+   "T": -8,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 47,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 361,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -7.84,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -7.84
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Aumento de investimentos em combustíveis fósseis pela Petrobras em detrimento da transição energética.",
+    "causa": "Foco na lucratividade de curto prazo e exploração de novas fronteiras de petróleo.",
+    "vitima": "A sociedade brasileira e o futuro climático global.",
+    "culpado": "A gestão da Petrobras e o desalinhamento com metas ambientais.",
+    "solucao": "Redirecionar orçamentos para energias renováveis e alinhar a empresa aos compromissos climáticos.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o texto fosse construído sob a ótica econômica da empresa, traria defensores da segurança energética e executivos da Petrobras argumentando sobre a necessidade de receitas do petróleo para financiar a transição.",
+   "atores": [
+    {
+     "nome": "Petrobras",
+     "campo": "centro"
+    },
+    {
+     "nome": "Governo Federal",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Observatório do Clima",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Suely Araújo, coordenadora de Políticas Públicas do Observatório do Clima",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 62,
+     "ultima": false
+    },
+    {
+     "rotulo": "João Cerqueira, diretor da 350.org Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 83,
+     "ultima": false
+    },
+    {
+     "rotulo": "Mariana Andrade, coordenadora da Campanha de Oceanos do Greenpeace Brasil",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 64,
+     "ultima": false
+    },
+    {
+     "rotulo": "Carolina Marçal, coordenadora de projetos do ClimaInfo",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 110,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 319,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Suely Araújo, coordenadora de Políticas Públicas do Observatório do Clima",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -7.84,
+     "explicacao": "Todas as fontes ouvidas pertencem ao mesmo campo ideológico (ambientalista crítico da Petrobras), sem contraponto da empresa ou do governo.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "desfavorece": "Petrobras",
+     "ressalva": "Trata-se de um artigo de opinião ou análise especializada compilada pelo portal temático."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "053f47be3baf",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/24/arrecadacao-federal-de-tributos-e-a-maior-da-historia-para-outubro.ghtml",
+   "titulo": "Arrecadação federal de tributos é a maior da história para outubro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "arrecadacao-federal-atinge-r-294-bilhoes-em-outu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Trata de dados oficiais da arrecadação federal, mencionando ações econômicas e normativas do governo em relação às apostas online."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 367,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crescimento do mercado de apostas e endividamento dos usuários.",
+    "causa": "Expansão desregulada anterior de plataformas de apostas online.",
+    "vitima": "Usuários endividados.",
+    "culpado": "Casas de apostas.",
+    "solucao": "Edição de medida provisória para proibir apostas e bloqueio de sites.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto tem caráter estritamente informativo e técnico, mantendo neutralidade descritiva sobre os dados fiscais.",
+   "atores": [
+    {
+     "nome": "Governo Federal (Lula)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Receita Federal",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Receita Federal",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A arrecadação federal de impostos alcançou R$ 293,975 bilhões em outubro de 2026 e registrou alta real de 7,28%",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os dados numéricos são apresentados com fontes institucionais claras (Receita Federal), períodos de comparação e correções inflacionárias.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ad419fb50366",
+   "url": "https://www1.folha.uol.com.br/ambiente/2026/11/governador-eleito-do-para-tem-multas-por-desmatamento-e-vice-foi-autuada-por-garimpo.shtml",
+   "titulo": "Governador eleito do Pará tem multas por desmatamento, e vice foi autuada por garimpo",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Natureza & Meio Ambiente",
+   "secao": "natureza",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda multas e autuações ambientais contra o governador eleito do Pará e sua vice, envolvendo debates sobre fiscalização e produção rural."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1002,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Infrações ambientais cometidas por autoridades eleitas na Amazônia.",
+    "causa": "Desmatamento ilegal e abertura de garimpos sem autorização.",
+    "vitima": "Florestas da Amazônia e ecossistemas protegidos.",
+    "culpado": "Dr. Daniel e Ellayne D'Almeida.",
+    "solucao": "Aplicação de multas, embargos e contestação jurídica.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A estrutura de apuração e denúncia baseada em registros públicos de órgãos de controle seria aplicada a qualquer político independentemente de seu espectro.",
+   "atores": [
+    {
+     "nome": "Dr. Daniel",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ellayne D'Almeida",
+     "campo": "direita"
+    },
+    {
+     "nome": "Ibama",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Dr. Daniel",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 112,
+     "ultima": false
+    },
+    {
+     "rotulo": "assessoria da vice",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 48,
+     "ultima": true
+    },
+    {
+     "rotulo": "Ibama",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 160
+   },
+   "falas": 9,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O Ibama multou Daniel Barbosa Santos em R$ 1,4 milhão em 2024 pela destruição de 279 hectares",
+     "paragrafo": "P6",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Os dados de multas e áreas desmatadas vêm acompanhados de fontes oficiais (Ibama, Inpe) e o espaço de defesa foi integralmente garantido ('Outro lado').",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral",
+     "desfavorece": "Dr. Daniel"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ed5a5f1e3456",
+   "url": "https://g1.globo.com/tecnologia/noticia/2026/11/24/australia-google-meta.ghtml",
+   "titulo": "Austrália quer multar big techs em até 5% do faturamento global por conteúdos nocivos",
+   "veiculo": "g1",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Discute projeto de lei na Austrália prevendo pesadas multas a big techs por conteúdos nocivos, gerando debate regulatório."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 419,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Circulação de conteúdos nocivos e funcionalidades viciantes em plataformas digitais.",
+    "causa": "Falta de responsabilização das big techs sobre o impacto de seus serviços.",
+    "vitima": "Crianças, pais e usuários da internet.",
+    "culpado": "Grandes empresas de tecnologia.",
+    "solucao": "Aprovação de projeto de lei com multas severas e dever de cuidado digital.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um fato legislativo internacional com distribuição equilibrada de argumentos entre Estado e setor privado.",
+   "atores": [
+    {
+     "nome": "Governo da Austrália",
+     "campo": "centro"
+    },
+    {
+     "nome": "Empresas de tecnologia (Google, Meta)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Anika Wells, ministra das Comunicações da Austrália",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Anthony Albanese, primeiro-ministro",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A principal crítica é que a proposta abre espaço para que autoridades do governo definam o que será considerado conteúdo nocivo.",
+     "paragrafo": "P14",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto relata a posição do governo proponente e traz as críticas e contrapontos das empresas de tecnologia de forma balanceada.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "568f59cea86c",
+   "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-11/projeto-de-regulacao-das-big-techs-sera-votado-na-proxima-semana",
+   "titulo": "Projeto de regulação das big techs será votado na próxima semana",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Cobre a tramitação do projeto de lei de regulação dos mercados digitais (PL das Big Techs) no Brasil, confrontando posições do governo, relator, sociedade civil e empresas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 90,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 962,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Concentração de poder econômico e monopólio de grandes plataformas digitais.",
+    "causa": "Falta de regulação específica para mercados digitais e ecossistemas fechados.",
+    "vitima": "Pequenos empresários, consumidores e concorrentes.",
+    "culpado": "Grandes plataformas de tecnologia.",
+    "solucao": "Aprovação do PL dos Mercados Digitais e fortalecimento do Cade.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A abordagem relata a disputa em torno do projeto legislativo dando voz proporcional aos proponentes e aos opositores.",
+   "atores": [
+    {
+     "nome": "Governo Federal e Relator (Aliel Machado)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Grandes plataformas digitais (Big Techs)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Aliel Machado (PV-PR)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 139,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sala de Articulação contra a Desinformação (SAD) e diversas organizações",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 114,
+     "ultima": false
+    },
+    {
+     "rotulo": "Conselho Digital",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 10,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 253,
+    "direita": 10
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "20d54263971f",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/fusao-com-tesla-pode-facilitar-entrada-da-spacex-no-sp-500-diz-jpmorgan/",
+   "titulo": "Fusão com Tesla pode facilitar entrada da SpaceX no S&P 500, diz JPMorgan",
+   "veiculo": "CNN Brasil",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda uma possível fusão empresarial entre SpaceX e Tesla e seus reflexos no mercado financeiro e índices de ações."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 352,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Possíveis impactos regulatórios e de mercado para a entrada da SpaceX no S&P 500.",
+    "causa": "Possível fusão entre Tesla e SpaceX.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Fusão societária e dispensa de requisitos históricos pelo comitê da S&P.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata análises de mercado de forma estritamente técnica, sem juízos de valor ideológicos. A inversão de atores não alteraria a estrutura da notícia.",
+   "atores": [
+    {
+     "nome": "JPMorgan",
+     "campo": "centro"
+    },
+    {
+     "nome": "SpaceX / Tesla (Elon Musk)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "analistas do JPMorgan",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "df14b65d934e",
+   "url": "https://www.moneytimes.com.br/potencia-fiscal-governo-prepara-pec-turbinada-com-revisao-de-pisos-veja-o-que-esta-na-mesa/",
+   "titulo": "Potência fiscal: Governo prepara PEC ‘turbinada’ com revisão de pisos; veja o que está na mesa",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de proposta de Emenda à Constituição (PEC) do governo federal voltada ao ajuste fiscal, envolvendo negociações com o Congresso e repercussão no mercado."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 523,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Rigidez orçamentária e necessidade de reforçar a sustentabilidade das contas públicas.",
+    "causa": "Elevadas despesas obrigatórias e pisos constitucionais.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Aprovação de nova PEC com revisão de despesas e flexibilização de pisos.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto descreve medidas administrativas e legislativas de ajuste fiscal. Caso outro governo estivesse no poder, a cobertura de propostas econômicas seguiria o mesmo padrão descritivo.",
+   "atores": [
+    {
+     "nome": "Governo Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Mercado financeiro",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Congresso Nacional",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Bruno Moretti, secretário-executivo do Ministério do Planejamento",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 2,
+     "ultima": true
+    },
+    {
+     "rotulo": "líderes ouvidos pelo Estadão/Broadcast",
+     "campo": "centro",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 2,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "o governo Luiz Inácio Lula da Silva prepara uma nova ofensiva para reforçar o ajuste",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de ação neutro/afirmativo para descrever a iniciativa do governo sem carregar juízo de valor.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f19ff1fd2ee3",
+   "url": "https://valor.globo.com/empresas/noticia/2026/11/24/huawei-condenada-nos-eua-por-fraude-bancria-violaes-de-sanes-e-roubo-de-segredos-comerciais.ghtml",
+   "titulo": "Huawei é condenada nos EUA por fraude bancária, violações de sanções e roubo de segredos comerciais",
+   "veiculo": "Valor Econômico",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "justica-dos-eua-condena-huawei-por-fraude-sancoe",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Envolve processo criminal contra uma grande empresa multinacional chinesa (Huawei) nos EUA por fraude, sanções e segurança nacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 895,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fraude bancária, violação de sanções internacionais e roubo de segredos comerciais.",
+    "causa": "Conduta corporativa ilegal da Huawei e riscos à segurança nacional dos EUA.",
+    "vitima": "Empresas e bancos americanos com segredos roubados ou enganados.",
+    "culpado": "Huawei.",
+    "solucao": "Condenação judicial, aplicação de penalidades e recursos legais.",
+    "motor_moral": "lei_e_ordem"
+   },
+   "teste_inversao": "O texto relata um veredicto de júri em tribunal federal com amplo registro das declarações de ambas as partes (acusação e defesa). A abordagem de cobertura processual não mudaria.",
+   "atores": [
+    {
+     "nome": "Governo dos EUA / Justiça americana",
+     "campo": "centro"
+    },
+    {
+     "nome": "Huawei",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo da China",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Meredith Arfa, promotora",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": false
+    },
+    {
+     "rotulo": "Brian Heberlig, advogado da Huawei",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": true
+    },
+    {
+     "rotulo": "Joseph Nocella, procurador dos EUA",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 36,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Brian Heberlig, advogado da Huawei, afirmou que a empresa ficou decepcionada com as condenações",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O veículo abre amplo espaço para a defesa da empresa apresentar seus argumentos e destacar absolvições parciais.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "4599e250efc8",
+   "url": "https://www1.folha.uol.com.br/tec/2026/11/australia-ameaca-multar-google-e-meta-em-ate-5-da-receita-global-por-conteudo-nocivo.shtml",
+   "titulo": "Austrália ameaça multar Google e Meta em até 5% da receita global por conteúdo nocivo",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de nova legislação da Austrália impondo pesadas multas e responsabilidades a grandes empresas de tecnologia."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 628,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Conteúdos nocivos e viciantes em plataformas de internet.",
+    "causa": "Falta de regulação rígida e de responsabilização das empresas de tecnologia.",
+    "vitima": "Crianças, pais e usuários expostos a abusos e conteúdos nocivos.",
+    "culpado": "Plataformas de tecnologia de propriedade estrangeira.",
+    "solucao": "Aprovação de lei com multas severas e direito de processar as plataformas.",
+    "motor_moral": "protecao_infantil"
+   },
+   "teste_inversao": "A notícia cobre uma iniciativa regulatória de um governo estrangeiro contra grandes empresas de tecnologia, detalhando os argumentos de ambas as partes. O padrão de apuração é neutro e impessoal.",
+   "atores": [
+    {
+     "nome": "Governo da Austrália (Partido Trabalhista)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Os Verdes",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Big Techs (Google, Meta, etc.)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Anika Wells, ministra das Comunicações",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 18,
+     "ultima": false
+    },
+    {
+     "rotulo": "Anthony Albanese, primeiro-ministro",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 73,
+    "direita": 0
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Porta-vozes de Google, Meta e Snapchat não quiseram responder.",
+     "paragrafo": "P15",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O veículo registra a tentativa de ouvir o outro lado (as empresas de tecnologia), apontando que optaram por não comentar.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "142646126184",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/24/economia-da-argentina-encolhe-e-entra-em-recessao-tecnica-apontam-dados-preliminares.ghtml",
+   "titulo": "Economia da Argentina encolhe e entra em recessão técnica, apontam dados preliminares",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "economia-da-argentina-entra-em-recessao-tecnica",
+   "origem": "materia",
+   "data_publicacao": "2026-11-24",
+   "analisado_em": "2026-11-25",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda dados econômicos da Argentina e a discussão política e técnica sobre a entrada do país em recessão técnica sob a gestão de Javier Milei."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 496,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Retração da atividade econômica e estagnação na Argentina.",
+    "causa": "Conjuntura macroeconômica e dinâmica setorial desfavorável.",
+    "vitima": "População argentina afetada pela contração econômica.",
+    "culpado": "Não especificado.",
+    "solucao": "Aguardar divulgação oficial consolidada do PIB e avaliar dados setoriais.",
+    "motor_moral": "responsabilidade_economica"
+   },
+   "teste_inversao": "O texto reporta indicadores macroeconômicos e traz tanto a avaliação de especialistas independentes quanto a ponderação oficial do governo. A estrutura da reportagem é equilibrada e aplicável a qualquer governo.",
+   "atores": [
+    {
+     "nome": "Governo de Javier Milei",
+     "campo": "direita"
+    },
+    {
+     "nome": "Economistas / Analistas independentes",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Federico Glustein, economista, professor da Universidade de Buenos Aires",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 22,
+     "ultima": false
+    },
+    {
+     "rotulo": "Adrián Ravier, porta-voz presidencial",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 27,
+     "ultima": false
+    },
+    {
+     "rotulo": "Lisandro Mondino, economista, secretário acadêmico da Universidade de Quilmes",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 27
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "A atividade econômica da Argentina recuou 1,2% em setembro em relação ao mesmo mês do ano passado, segundo dados divulgados nesta terça-feira (24) pelo Instituto Nacional de Estatística e Censos (Indec).",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados estatísticos oficiais acompanhados da fonte primária (Indec) e do contraponto oficial do governo.",
+     "intensidade": 1,
+     "certeza": 0.95,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-25T04:19:27+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 120,
+   "textos_curtos": 24,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 91796,
+    "saida": 43828
+   },
+   "analises": [
+    "a4a2e5d6e041",
+    "5c5df48e7d33",
+    "3baf63cd6a25",
+    "88355dd47996",
+    "e5b4215d0af4",
+    "744c9644248b",
+    "dc34bb9beaba",
+    "ef8120162618",
+    "bbd8039ad5a5",
+    "06d2e8ec0b1c",
+    "f0735e8b6219",
+    "81033113a68b",
+    "a180a39cfe0b",
+    "34ddb9f5ffd3",
+    "7760357c3762",
+    "2359e4b3a1fa",
+    "242573bacaf1",
+    "a22001ab3803",
+    "059150c40211",
+    "5db44a75a1f5",
+    "c2e76c6edfe8",
+    "504f30c6750f",
+    "75999466a748",
+    "a5e50ff4bfc3",
+    "8bf135e294f0",
+    "b2614d556a86",
+    "896fc9f6fa52",
+    "2b7eb650555f",
+    "811bf6ff88f6",
+    "be92b7243da9",
+    "d8ff07590fee",
+    "b3381e340199",
+    "568c884645a9",
+    "17da3853cfb6",
+    "fb69d09bcb79",
+    "993a45b80558",
+    "812d742c472b",
+    "90d4f003efe5",
+    "10d0bbee5eeb",
+    "f41f92383f1c",
+    "e44804bdc2ba",
+    "c8c8a8b0274e",
+    "69be39a2e5d3",
+    "87bc1ddc6942",
+    "134fda983a36",
+    "7cb9312b1b3b",
+    "8056beb5b1a9",
+    "ff2b87a5b78c",
+    "0768030b0371",
+    "9ef9cd64641c",
+    "43f394d35efa",
+    "053f47be3baf",
+    "ad419fb50366",
+    "ed5a5f1e3456",
+    "568f59cea86c",
+    "20d54263971f",
+    "df14b65d934e",
+    "f19ff1fd2ee3",
+    "4599e250efc8",
+    "142646126184"
+   ]
+  }
+ ]
+}
