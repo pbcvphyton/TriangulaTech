@@ -52,16 +52,15 @@
   .so-cel{display:inline}
   .ag-dia,.ag-dec{padding:7px 0}
   .ag-r .ag-dia{padding:5px 0}
-  .ag-fr li{display:block;white-space:nowrap;text-overflow:ellipsis}
   /* coluna larga em corrida: cabeça, item, situação e "mais N" num parágrafo só */
   .ag-p .ag-c,.ag-p .ag-x,.ag-p .ag-x>*,.ag-p .ag-t{display:inline}
   .ag-p .ag-c,.ag-p .ag-t,.ag-p .ag-m{font-size:inherit;line-height:inherit}
   .ag-p .ag-c::after,.ag-p .ag-x>*+*::before,.ag-p .ag-t::before{content:" · ";font-weight:400;color:var(--muted)}
   .ag .ag-x>.ag-i.larga{display:none}
   .ag-p .ag-l{margin-top:3px}
-  /* linha aberta: até 3 linhas de texto; linha fechada: uma linha só, com reticências */
-  .ag-l.ab{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-  .ag-l:not(.ab){white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* cada linha em até 3 linhas de texto (numa linha só, o nome da medida provisória ou do
+     projeto sumia nas reticências e a linha não dizia do que se tratava) */
+  .ag-l{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 }
 @media (min-width:1024px){
   .ag-cols{grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:56px}
