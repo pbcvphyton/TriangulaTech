@@ -26,12 +26,17 @@ Origem de cada arquivo (todos baixados na fase de descoberta, 22–23/11/2026):
   ``tests/test_tribunais_datajud.py``.
 - ``stj/``: amostras do Portal de Dados Abertos do STJ (acervo, atas, pautas, precedentes, íntegras e
   as páginas dos conjuntos), feitas por ``montar_fixtures.py`` do agente do STJ; origem em
-  ``tests/test_tribunais_stj.py``.
+  ``tests/test_tribunais_stj.py``. Para a agenda da semana: ``stj/pautas_futuras_20261124_agenda.json.gz``
+  (17 itens reais do arquivo de pautas de 24/11/2026), ``stj/temas_agenda.csv`` e
+  ``stj/processos_agenda.csv`` (as linhas reais dos precedentes ligados a eles), baixados em
+  24/11/2026; pessoa física, advogado, número de OAB e empresa fora do catálogo de litigantes
+  **mascarados**, e os processos em segredo sem o número. Origem em ``tests/test_tribunais_agenda.py``.
 - ``stf/``: amostras do STF (planilha do acervo, atas, jurisprudência, repercussão geral e pauta);
   origem de cada arquivo em ``stf/__init__.py``.
 - ``contas/``: os casos difíceis do analista para partes, contas e achados (``contas/__init__.py``).
-- ``fabrica.py``: dados sintéticos no formato do contrato (painéis, dossiês, ``meta.json``) para a
-  página e para o passo "Aba Tribunais de exemplo (offline)" do ``ci.yml``.
+- ``fabrica.py``: dados sintéticos no formato do contrato (painéis, dossiês, ``meta.json`` e a
+  agenda da semana inventada, ``agenda.json``) para a página e para o passo "Aba Tribunais de
+  exemplo (offline)" do ``ci.yml``.
 
 Os testes de ``dados.py`` e da linha de comando (``test_tribunais_dados.py``, ``test_tribunais_cli.py``)
 montam um portal falso com estas mesmas amostras; nenhum arquivo novo.

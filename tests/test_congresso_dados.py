@@ -675,6 +675,111 @@ def test_fonte_fora_do_ar_mantem_o_que_ja_existe(publicado: tuple[Path, fabrica.
     assert resultado.pessoas == {"cd": 11, "sf": 4}  # as contas saem da base que já existia
 
 
+# ── a lista de quem está em exercício fora do ar (o caso "Câmara 0" de 23/11/2026) ──
+
+
+def _em_exercicio(data_dir: Path, casa: str) -> set[str]:
+    return {p["k"] for p in _ler(data_dir, "resumo.json")["pessoas"] if p["k"].startswith(f"{casa}-") and p["ex"]}
+
+
+def _sem_as_listas() -> fabrica.FetchFalso:
+    fora = fabrica.FetchFalso()
+    fora.fora_do_ar |= {fabrica.LISTA_DE_DEPUTADOS, fabrica.LISTA_DE_SENADORES}
+    return fora
+
+
+def test_lista_de_deputados_fora_do_ar_mantem_o_exercicio_do_ultimo_dia_bom(
+    publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path, r: regras.Regras
+):
+    data_dir, _fetch, _resultado = publicado
+    antes = {casa: _em_exercicio(data_dir, casa) for casa in ("cd", "sf")}
+    ficha_antes = (data_dir / "congresso" / "fichas" / "sf-101.json").read_text(encoding="utf-8")
+    assert (len(antes["cd"]), len(antes["sf"])) == (11, 4)
+    fora = _sem_as_listas()
+    resultado = dados.atualizar(tmp_path, data_dir, tmp_path / "cache2", dados.Opcoes(hoje=HOJE, projetos_desde=2026), fetch=fora, regras=r)
+    assert any(fabrica.LISTA_DE_DEPUTADOS in u for u in fora.pedidos)  # a lista foi pedida e falhou
+    assert {casa: _em_exercicio(data_dir, casa) for casa in ("cd", "sf")} == antes  # ninguém saiu do exercício
+    assert (_ler(data_dir, "casa-cd.json")["em_exercicio"], _ler(data_dir, "casa-sf.json")["em_exercicio"]) == (11, 4)
+    meta = _ler(data_dir, "meta.json")
+    assert {casa: meta["casas"][casa]["em_exercicio"] for casa in ("cd", "sf")} == {"cd": 11, "sf": 4}
+    avisos = [a for a in meta["avisos"] if "em exercício indisponível" in a]
+    assert len(avisos) == 2 and all("vale o exercício do último dia bom" in a for a in avisos)
+    assert any(a.startswith("Câmara: lista dos deputados") and "(11 em exercício)" in a for a in avisos)
+    assert any(a.startswith("Senado: lista dos senadores") and "(4 em exercício)" in a for a in avisos)
+    assert resultado.avisos == meta["avisos"]
+    # O cadastro do último dia bom fica inteiro (a condição do mandato só vem na lista do Senado).
+    assert (data_dir / "congresso" / "fichas" / "sf-101.json").read_text(encoding="utf-8") == ficha_antes
+    assert _ler(data_dir, "fichas/sf-101.json")["condicao"] == "Titular"
+
+
+def test_lista_vazia_vale_como_fonte_fora_do_ar(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path, r: regras.Regras):
+    data_dir, _fetch, _resultado = publicado
+    vazia = fabrica.FetchFalso()
+    vazia.mapa[f"/api/v2/{fabrica.LISTA_DE_DEPUTADOS}ordem=ASC&ordenarPor=nome&itens=100"] = json.dumps({"dados": [], "links": []}).encode("utf-8")
+    resultado = dados.atualizar(tmp_path, data_dir, tmp_path / "cache2", dados.Opcoes(hoje=HOJE, projetos_desde=2026), fetch=vazia, regras=r)
+    assert len(_em_exercicio(data_dir, "cd")) == 11
+    assert any("a lista veio vazia" in a and "último dia bom" in a for a in resultado.avisos)
+
+
+def test_o_comando_sai_0_com_a_lista_fora_do_ar(
+    publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path, r: regras.Regras, config: Config, monkeypatch: pytest.MonkeyPatch
+):
+    import argparse
+    import functools
+    from datetime import datetime
+
+    from qijournal.congresso import cli
+
+    data_dir, _fetch, _resultado = publicado
+    monkeypatch.setattr(cli.dados, "atualizar", functools.partial(dados.atualizar, fetch=_sem_as_listas(), regras=r))
+    args = argparse.Namespace(dir=str(tmp_path), cache=str(tmp_path / "cache2"), completo=False, now=datetime.fromisoformat(f"{HOJE}T15:00:00"))
+    assert cli.cmd_atualizar(args, dataclasses.replace(config, congresso=dataclasses.replace(config.congresso, projetos_desde=2026))) == cli.EXIT_OK
+    assert len(_em_exercicio(data_dir, "cd")) == 11 and (tmp_path / "edicoes" / "congresso.html").is_file()
+
+
+def test_resumo_gravado_com_zero_e_curado_pelos_periodos_em_aberto(
+    publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path, r: regras.Regras
+):
+    """O estado publicado em 23/11/2026: o resumo já saiu com zero deputados em exercício, mas
+    ``base/cd-exercicio.json`` guarda os períodos em aberto do último dia em que a lista veio."""
+    data_dir, _fetch, _resultado = publicado
+    antes = _em_exercicio(data_dir, "cd")
+    caminho = data_dir / "congresso" / "resumo.json"
+    resumo = json.loads(caminho.read_text(encoding="utf-8"))
+    for pessoa in resumo["pessoas"]:
+        if pessoa["k"].startswith("cd-"):
+            pessoa["ex"] = 0
+    caminho.write_text(json.dumps(resumo), encoding="utf-8")
+    resultado = dados.atualizar(tmp_path, data_dir, tmp_path / "cache2", dados.Opcoes(hoje=HOJE, projetos_desde=2026), fetch=_sem_as_listas(), regras=r)
+    assert _em_exercicio(data_dir, "cd") == antes and _ler(data_dir, "casa-cd.json")["em_exercicio"] == 11
+    assert any("Câmara: lista dos deputados em exercício indisponível" in a and "(11 em exercício)" in a for a in resultado.avisos)
+
+
+def test_sem_a_lista_e_sem_ultimo_dia_bom_nada_e_gravado(tmp_path: Path, r: regras.Regras):
+    """Primeira execução com a lista fora do ar: não há o que manter, e a Casa não sai com zero."""
+    fora = fabrica.FetchFalso()
+    fora.fora_do_ar |= {fabrica.LISTA_DE_SENADORES}
+    with pytest.raises(dados.SemExercicio, match="Senado: lista dos senadores em exercício indisponível"):
+        dados.atualizar(tmp_path, tmp_path / "data", tmp_path / "cache", dados.Opcoes(hoje=HOJE, projetos_desde=2026), fetch=fora, regras=r)
+    pasta = tmp_path / "data" / "congresso"
+    assert not (pasta / "resumo.json").exists() and not (pasta / "casa-sf.json").exists() and not (pasta / "meta.json").exists()
+
+
+def test_o_cadastro_do_ultimo_dia_bom_sai_do_resumo_e_das_fichas(publicado: tuple[Path, fabrica.FetchFalso, dados.Resultado], tmp_path: Path):
+    data_dir, _fetch, _resultado = publicado
+    pasta = data_dir / "congresso"
+    senado = dados._exercicio_gravado(pasta, "sf")
+    assert sorted(senado) == [101, 102, 103, 104] and all(c.exercicio and c.casa == "sf" for c in senado.values())
+    assert (senado[101].nome, senado[101].partido, senado[101].uf, senado[101].condicao) == ("Rita Alves", "PT", "BA", "Titular")
+    assert len(dados._exercicio_gravado(pasta, "cd")) == 11
+    # Pasta vazia, arquivo ilegível ou formato inesperado: ninguém (e nenhum erro).
+    assert dados._exercicio_gravado(tmp_path / "nada", "cd") == {} and dados._exercicio_gravado(None, "cd") == {}
+    (tmp_path / "resumo.json").write_text("[1, 2", encoding="utf-8")
+    assert dados._exercicio_gravado(tmp_path, "cd") == {}
+    (tmp_path / "resumo.json").write_text('{"pessoas": [3, {"k": "cd-x", "ex": 1}, {"k": "sf-7", "ex": 1, "nome": "Z"}]}', encoding="utf-8")
+    assert dados._exercicio_gravado(tmp_path, "cd") == {} and list(dados._exercicio_gravado(tmp_path, "sf")) == [7]
+
+
 # ── a aba e as fichas nas matérias ───────────────────────────────────────────
 
 

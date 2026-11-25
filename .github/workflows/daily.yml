@@ -89,7 +89,8 @@ jobs:
     # estourar o limite, a seguinte da cadeia assume. Se nenhuma conseguir a
     # tempo, a edição sai em modo automático. Depois, o termômetro de viés
     # (termometro.deadline_seconds: 12 min; até 60 textos) analisa os textos compilados.
-    # Antes de tudo, os dados do Congresso (até 15 min; passo acessório).
+    # Antes de tudo, a agenda do Congresso (até 5 min) e os dados do Congresso (até 15 min),
+    # dois passos acessórios.
     timeout-minutes: 85
     steps:
       - name: Baixar o repositório
@@ -125,6 +126,23 @@ jobs:
           key: congresso-${{ steps.cg.outputs.dia }}
           restore-keys: congresso-
 
+      - name: Agenda do Congresso
+        # O que está pautado na Câmara, no Senado e no Congresso (data/congresso/agenda.json),
+        # para a Agenda da semana. Vem antes do passo pesado: se ele estourar o prazo, a agenda
+        # já foi. É acessório: o comando tem prazo de rede próprio (150 s), sai com 0 mesmo com
+        # fonte fora do ar e, nesse caso, mantém o que o arquivo já tinha. O arquivo entra no
+        # mesmo commit da edição (um escritor só).
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          QIJ_BRAND: ${{ vars.QIJ_BRAND }}
+          QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
+          QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
+          QIJ_NO_AGENDA: ${{ vars.QIJ_NO_AGENDA }}
+          TZ: America/Sao_Paulo
+          PYTHONUNBUFFERED: "1"
+        run: python -m qijournal congresso agenda --dir . --cache "$RUNNER_TEMP/congresso"
+
       - name: Atualizar o Congresso
         # Dados abertos da Câmara e do Senado (aba Congresso e fichas nas matérias). É
         # acessório: se uma fonte estiver fora do ar ou demorar, a edição sai com o que já
@@ -155,6 +173,8 @@ jobs:
           QIJ_NO_CONGRESSO: ${{ vars.QIJ_NO_CONGRESSO }}
           # O botão "Tribunais" no cabeçalho só aparece com a aba ligada e já publicada.
           QIJ_NO_TRIBUNAIS: ${{ vars.QIJ_NO_TRIBUNAIS }}
+          # A Agenda da semana (o bloco da home e edicoes/agenda.html) some com QIJ_NO_AGENDA=1.
+          QIJ_NO_AGENDA: ${{ vars.QIJ_NO_AGENDA }}
           QIJ_MODEL: ${{ vars.QIJ_MODEL }}
           QIJ_GEMINI_MODEL: ${{ vars.QIJ_GEMINI_MODEL }}
           QIJ_GEMINI_LITE_MODEL: ${{ vars.QIJ_GEMINI_LITE_MODEL }}

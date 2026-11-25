@@ -583,6 +583,25 @@ class Resultado:
     dossies: dict[str, dict[str, Any]]
     cobertura: dict[str, Any]
     sinais: dict[str, Any]
+    # O cruzamento da pauta com o acervo, sem o teto por ministro (para a agenda da semana; fica em
+    # memória, nunca vai a arquivo): ver cruzamento_da_pauta.
+    pauta: dict[str, Any] = field(default_factory=dict)
+
+
+def cruzamento_da_pauta(na_pauta: Mapping[str, Mapping[str, Any]], em_segredo: Iterable[str]) -> dict[str, Any]:
+    """O que o acervo sabe de cada processo pautado, pela chave da pauta (STJ: o número de
+    registro; STF: o id do processo): ``{"processos": {chave: {area, partes, pessoa_fisica}},
+    "segredo": [chaves]}``. ``partes`` traz só ente público e pessoa jurídica com polo e grupo
+    (``{polo, tipo, grupo, nome}``); pessoa física, autoridade e qualificador não entram, e
+    ``pessoa_fisica`` só diz se o processo tem parte que é, ou pode ser, pessoa física. Processo em
+    segredo no acervo fica só em ``segredo``."""
+    processos: dict[str, dict[str, Any]] = {}
+    for chave, p in na_pauta.items():
+        partes = [{"polo": x.get("polo"), "tipo": x.get("tipo"), "grupo": x.get("grupo"), "nome": x.get("nome")}
+                  for x in p.get("partes") or () if x.get("tipo") in ("ente", "pj") and x.get("polo") and x.get("grupo")]
+        gente = any(x.get("tipo") in ("pf", "desconhecido") and x.get("polo") for x in p.get("partes") or ())
+        processos[str(chave)] = {"area": p.get("area"), "partes": partes, "pessoa_fisica": gente}
+    return {"processos": processos, "segredo": sorted(str(c) for c in em_segredo)}
 
 
 # ── a passada pelo acervo ────────────────────────────────────────────────────────────────────
@@ -1191,7 +1210,8 @@ class Contas:
             "temas_recentes": temas_recentes(temas, self.hoje) if trib == "stj" and temas is not None else [],
             "pauta_janela": ((pautas or {}).get("janela") if trib == "stf" and isinstance(pautas, Mapping) else None),
         }
-        return Resultado(painel=painel, dossies=dossies, cobertura=cobertura, sinais=sinais)
+        return Resultado(painel=painel, dossies=dossies, cobertura=cobertura, sinais=sinais,
+                         pauta=cruzamento_da_pauta(self.na_pauta, self.pauta_segredo))
 
     def _chegou_na_janela(self, m: Any, ref: date) -> bool:
         """Chegou à Turma, foi convocado ou tomou posse há menos de ``janelas.entradas_recentes_dias``

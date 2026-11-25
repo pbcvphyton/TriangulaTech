@@ -621,6 +621,61 @@ def test_sessao_presencial(regras: Regras) -> None:
     assert adi["destaque_id"] == "stf-flavio-dino" and adi["vista"] is None
 
 
+def test_sessao_presencial_guarda_o_que_a_agenda_precisa(regras: Regras) -> None:
+    """Incidente, resumo oficial, destaque por processo, hora, número da sessão e ordem na pauta:
+    o que a leitura descartava (a amostra real traz o resumo cortado em 60 caracteres)."""
+    itens = stf.ler_sessao_presencial(json.loads(fx_stf.ler("pauta_sessao-presencial_2026-11-25.json")), regras)
+    assert [i["ordem"] for i in itens] == list(range(1, 11))
+    assert {(i["sessao"], i["hora"], i["sessao_numero"], i["sessao_ano"]) for i in itens} == {("87282", "14:00", 35, 2026)}
+    por_id = {i["id"]: i for i in itens}
+    assert por_id["stf-ADI-7807"]["incidente"] == "REFERENDO NA MEDIDA CAUTELAR NA AÇÃO DIRETA DE INCONSTITUCIONALIDADE"
+    assert por_id["stf-ADI-6002"]["incidente"] is None
+    assert (por_id["stf-ADI-7807"]["destaque"], por_id["stf-ADI-7807"]["destaque_id"]) == ("MIN. EDSON FACHIN", "stf-edson-fachin")
+    assert sum(1 for i in itens if i["destaque"]) == 6 and sum(1 for i in itens if i["vista"]) == 3
+    # o resumo oficial: nas ações de controle concentrado e nos recursos com repercussão geral
+    assert por_id["stf-ADI-6002"]["resumo"] == "1. Trata-se de Ação Direta de Inconstitucionalidade, com ped…"
+    assert por_id["stf-RE-1326541"]["resumo"] == "1. Trata-se de Recurso Extraordinário interposto contra acór…"
+    assert all(i["resumo"] for i in itens)
+
+
+def test_resumo_so_em_controle_concentrado_e_repercussao_geral_com_corte(regras: Regras) -> None:
+    def resposta(classe: str, rg: str | None, texto: str) -> dict[str, Any]:
+        return {"data": "25/11/2026", "colegiados": [{"codigo": "TP", "descricao": "Plenário", "sessoes": [{
+            "id": "1", "dataInicio": "25/11/2026 14:00", "numero": "35", "ano": "2026",
+            "incidentes": [{"classe": classe, "numero": "123", "relator": "MIN. LUIZ FUX", "repercussaoGeral": rg, "resumoTema": texto}]}]}]}
+
+    texto = "1. Trata-se de processo de exemplo   em que o autor, FULANO DE TAL, pede uma coisa. " * 40
+    assert stf.ler_sessao_presencial(resposta("HC", None, texto), regras)[0]["resumo"] is None  # pode trazer nome de pessoa
+    assert stf.ler_sessao_presencial(resposta("RE-AgR", "N", texto), regras)[0]["resumo"] is None
+    longo = stf.ler_sessao_presencial(resposta("ADPF", None, texto), regras)[0]["resumo"]
+    assert longo is not None and len(longo) <= stf.RESUMO_MAX and longo.endswith("…") and "  " not in longo
+    assert not longo[:-1].endswith((" ", ",")) and texto.replace("   ", " ").startswith(longo[:-1])  # corta no fim de uma palavra
+    assert stf.ler_sessao_presencial(resposta("RE", "S", "Resumo curto."), regras)[0]["resumo"] == "Resumo curto."
+    assert stf.cortar_no_fim_de_palavra("  ", 10) is None and stf.cortar_no_fim_de_palavra(None, 10) is None
+
+
+def test_sessao_presencial_tolera_campo_ausente(regras: Regras) -> None:
+    """A fonte muda: campo que falta vira None e nada levanta."""
+    minimo = {"colegiados": [{"descricao": "Plenário", "sessoes": [{"incidentes": [{"classe": "ADI", "numero": "7000"}, "lixo"]}]}, "lixo"]}
+    (item,) = stf.ler_sessao_presencial(minimo, regras)
+    assert (item["id"], item["orgao"], item["ordem"], item["data"]) == ("stf-ADI-7000", "PL", 1, None)
+    assert all(item[c] is None for c in ("sessao", "hora", "sessao_numero", "sessao_ano", "incidente", "resumo", "vista", "vista_id",
+                                         "destaque", "destaque_id"))
+    assert item["repercussao_geral"] is False
+    for vazio in ({}, {"colegiados": None}, {"colegiados": [{"sessoes": "x"}]}, {"colegiados": [{"sessoes": [{"incidentes": None}]}]}):
+        assert stf.ler_sessao_presencial(vazio, regras) == []
+    assert stf.ler_sessoes_do_dia({}) == [] and stf.ler_sessoes_do_dia({"colegiados": [{"codigo": "1T", "sessoes": [{}]}]}) == [
+        {"data": None, "orgao": "T1", "sessao": None, "hora": None, "numero": None, "ano": None, "tipo": None, "itens": 0}]
+    assert stf.hora_da_sessao("25/11/2026 14:00") == "14:00" and stf.hora_da_sessao("25/11/2026 9h30") == "09:30"
+    assert stf.hora_da_sessao("25/11/2026") is None and stf.hora_da_sessao(None) is None  # a hora nunca é inventada
+
+
+def test_sessoes_do_dia(regras: Regras) -> None:
+    dia = json.loads(fx_stf.ler("pauta_sessao-presencial_2026-11-25.json"))
+    assert stf.ler_sessoes_do_dia(dia) == [
+        {"data": "2026-11-25", "orgao": "PL", "sessao": "87282", "hora": "14:00", "numero": 35, "ano": 2026, "tipo": "O", "itens": 10}]
+
+
 def test_calendario(regras: Regras) -> None:
     cal = stf.ler_calendario(json.loads(fx_stf.ler("pauta_calendarios_2026-11.json")), 11, 2026)
     assert cal["presenciais"][:2] == ["2026-11-04", "2026-11-05"] and len(cal["presenciais"]) == 8
@@ -646,6 +701,36 @@ def test_coletar_pauta(regras: Regras) -> None:
     assert pauta["sessoes"] == [["2026-11-25", "PL", 10]] and len(pauta["itens"]) == 10
     assert len(pauta["avisos"]) == 2  # o calendário de dezembro e a sessão de 26/11 falharam: avisos, não erro
     assert c.pedidos[0].endswith("calendario-service.asp?dados=calendarios&mes=11&ano=2026")
+    # todo dia que o calendário marca é listado; o de 26/11 não foi lido nesta coleta (a consulta falhou)
+    assert [(d["data"], d["lida"], len(d["sessoes"])) for d in pauta["dias"]] == [("2026-11-25", True, 1), ("2026-11-26", False, 0)]
+    assert pauta["dias"][0]["sessoes"][0]["hora"] == "14:00" and pauta["calendarios"] == {"lidos": 1, "falhas": 1}
+    # as contagens das sessões virtuais (a fonte só dá a contagem por colegiado)
+    assert {"inicio": "2026-11-20", "fim": "2026-11-30", "PL": 179, "T1": 209, "T2": 274} in pauta["virtuais"]
+
+
+def test_coletar_pauta_lista_o_dia_de_sessao_sem_processos(regras: Regras) -> None:
+    """O calendário marca 26/11 como dia de sessão presencial e a fonte ainda não lista processos:
+    o dia entra em ``dias`` (lido, sem sessões), em vez de sumir. A resposta do dia vazio e o
+    calendário de dezembro são hipóteses do teste (não há resposta real guardada)."""
+    class Falso:
+        def json(self, url: str, *, validade_h: float) -> Any:
+            if "calendarios&mes=11" in url:
+                return json.loads(fx_stf.ler("pauta_calendarios_2026-11.json"))
+            if "calendarios&mes=12" in url:
+                return {"diasPresenciais": [2, "x", 99], "julgamentosVirtuais": None}
+            if "sessao-presencial&data=25/11/2026" in url:
+                return json.loads(fx_stf.ler("pauta_sessao-presencial_2026-11-25.json"))
+            if "sessao-presencial&data=26/11/2026" in url:
+                return {"data": "26/11/2026", "tipo": "PRESENCIAL", "colegiados": []}
+            if "sessao-presencial&data=02/12/2026" in url:
+                return ["resposta fora do formato"]
+            raise FetchError(url, "HTTP 500", status=500)
+
+    pauta = stf.coletar_pauta(Falso(), regras, hoje=date(2026, 11, 23), dias=14)
+    assert [(d["data"], d["lida"], d["sessoes"] != []) for d in pauta["dias"]] == [
+        ("2026-11-25", True, True), ("2026-11-26", True, False), ("2026-12-02", False, False)]
+    assert pauta["calendarios"] == {"lidos": 2, "falhas": 0} and len(pauta["avisos"]) == 1 and "02/12/2026" in pauta["avisos"][0]
+    assert pauta["sessoes"] == [["2026-11-25", "PL", 10]]  # o bloco do painel não muda: conta só o que tem processo
 
 
 def test_planilha_sem_data_avisa(regras: Regras, tpu: TPU) -> None:

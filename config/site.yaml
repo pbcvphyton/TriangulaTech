@@ -3,7 +3,7 @@
 #
 # Várias chaves podem ser sobrescritas por variáveis de ambiente
 # (útil no GitHub Actions): QIJ_BRAND, QIJ_BASE_URL, QIJ_MODEL, QIJ_EFFORT, QIJ_NO_TERMOMETRO=1,
-# QIJ_NO_LLM=1, QIJ_NO_TRIBUNAIS=1, EMAIL_TO (lista separada por vírgulas).
+# QIJ_NO_LLM=1, QIJ_NO_TRIBUNAIS=1, QIJ_NO_AGENDA=1, EMAIL_TO (lista separada por vírgulas).
 
 site:
   base_url: "https://pbcvphyton.github.io/TriangulaTech/"
@@ -277,6 +277,15 @@ congresso:
 # `python -m qijournal tribunais atualizar`), e ficam em data/tribunais/. As réguas (áreas, composição,
 # limiares, fontes) estão em config/tribunais.yaml. Desligar sem mexer no código: QIJ_NO_TRIBUNAIS=1.
 tribunais:
+  enabled: true
+  marcas: [tech]
+
+# Agenda da semana (qijournal/agenda): o bloco "Agenda da semana" da home e a página completa
+# (edicoes/agenda.html), com o que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso.
+# A edição só lê dois arquivos de coleta, no mesmo formato: data/congresso/agenda.json (escrito pela
+# edição diária) e data/tribunais/agenda.json (escrito pelo fluxo Tribunais). A régua, os cortes, os
+# tetos e o dicionário de situações estão em config/agenda.yaml. Desligar sem mexer no código: QIJ_NO_AGENDA=1.
+agenda:
   enabled: true
   marcas: [tech]
 

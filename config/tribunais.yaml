@@ -528,6 +528,22 @@ limiares:
     tema_quente: 2
     vista: 2
     entrou: 1
+  # A agenda da semana (qijournal/tribunais/agenda.py → data/tribunais/agenda.json, no formato de
+  # qijournal/agenda/contrato.py). Aqui ficam só as listas que dizem O QUE é cada item da pauta; a
+  # régua (pesos, cortes, tetos) é a de config/agenda.yaml, igual para o Congresso e os Tribunais.
+  agenda:
+    resumo_max: 1500             # STF: caracteres do resumo oficial guardados (corte no fim de uma palavra)
+    classes_controle: [ADI, ADC, ADO, ADPF]   # controle concentrado: com a repercussão geral, as únicas que levam o
+                                 # resumo oficial (nos outros processos o texto pode trazer nome de pessoa)
+    # Grupos de config/tribunais_partes.yaml que, no polo passivo de uma ação de controle
+    # concentrado, dizem que a norma é federal (sem nenhum deles, vale norma estadual).
+    passivo_federal: [congresso-nacional, senado-federal, camara-dos-deputados, uniao]
+    classes_originarias:         # ação originária (o caso começa no próprio tribunal)
+      stf: [ACO, AO, AP, Inq, MS, MI, Rcl, Ext, IF, AR, RvC, SL, SS, STP, STA, Pet, PPE, HD]
+      stj: [APn, Inq, MS, MI, HD, AR, RvCr, CC, Rcl, HDE, SEC, SE, IF, SLS, SS, ExSusp, PUIL, IAC, IDC, QC, Sd, AIA]
+    classes_divergencia: [EREsp, EAREsp, EAg, EDv]   # embargos de divergência (a classe no STJ; o incidente no STF)
+    propostas: [ProAfR, ProRQF]  # STJ: proposta de afetação (repetitivo) e proposta de relevância da questão federal
+    tipos_de_tema: [repetitivo, iac]   # STJ: os precedentes que ligam um recurso pautado a um tema afetado
 
 # ── Fontes (endereços e ritmo) ───────────────────────────────────────────────────────────────
 # User-Agent: o do projeto (qijournal.net.USER_AGENT), que se identifica como robô e dá o endereço.

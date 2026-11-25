@@ -1096,12 +1096,14 @@ def montar_temas(
     """Um item por precedente (temas repetitivos, controvérsias, IAC, PUIL, SIRDR, relevância):
     ``{trib, seq, tipo, numero, situacao, estado, pendente, orgao, desde, julgado_em, publicado_em,
     titulo, relator, relator_id, fora, relatores, processos, leading, suspensos_origem, assuntos,
-    area, rg_stf, link}``.
+    area, rg_stf, link, registros}``.
 
     O ``Temas.csv`` repete o tema numa linha por tema de repercussão geral ligado: as linhas viram
     um item. O relator é o do processo-paradigma (``leadingCase`` S) no ``Processos.csv``; sem
     paradigma com relator, o mais frequente entre os processos do tema; sem nenhum, quem propôs a
-    afetação. Ordem: tipo, número."""
+    afetação. ``registros`` são os números de registro (só dígitos, em ordem) dos processos ligados
+    ao tema no ``Processos.csv``: é por eles que a pauta se liga ao tema (:func:`temas_por_registro`);
+    ficam em memória e nunca vão a arquivo publicado. Ordem: tipo, número."""
     leitor = leitor or LeitorSTJ(regras, classificador)
     por_seq: dict[str, list[Mapping[str, str]]] = defaultdict(list)
     for linha in processos:
@@ -1155,6 +1157,7 @@ def montar_temas(
             "relatores": [[n, q] for n, q in sorted(todos.items(), key=lambda kv: (-kv[1], kv[0]))],
             "processos": len(registros), "leading": leading,
             "suspensos_origem": sum(int(_digitos(x.get("quantidadeProcessosSuspensoNaOrigem")) or 0) for x in linhas),
+            "registros": sorted({_digitos(x.get("numeroRegistro")) for x in linhas} - {""}),
         })
     ordem = {"repetitivo": 0, "iac": 1, "controversia": 2, "relevancia": 3, "puil": 4, "sirdr": 5, "outro": 6}
     saida = list(juntos.values())
@@ -1162,8 +1165,29 @@ def montar_temas(
     # Chaves na ordem do docstring (o update acrescentou relator e afins no fim).
     campos = ("trib", "seq", "tipo", "numero", "situacao", "estado", "pendente", "orgao", "desde", "julgado_em",
               "publicado_em", "titulo", "relator", "relator_id", "fora", "relatores", "processos", "leading",
-              "suspensos_origem", "assuntos", "area", "rg_stf", "link")
+              "suspensos_origem", "assuntos", "area", "rg_stf", "link", "registros")
     return [{c: t.get(c) for c in campos} for t in saida]
+
+
+TIPOS_DE_TEMA_AFETADO = ("repetitivo", "iac")  # o que liga um processo pautado a um precedente qualificado
+
+
+def temas_por_registro(temas: Iterable[Mapping[str, Any]] | None, *, tipos: Iterable[str] = TIPOS_DE_TEMA_AFETADO,
+                       so_pendentes: bool = True) -> dict[str, list[Mapping[str, Any]]]:
+    """O caminho de volta de :func:`montar_temas`: número de registro (só dígitos) → os temas a que
+    o processo está ligado, na ordem da lista (tipo, número). Por padrão só os temas pendentes
+    (afetados e ainda sem julgamento) dos tipos repetitivo e IAC: é o que diz que um recurso
+    pautado é o caso de um tema afetado."""
+    aceitos = frozenset(tipos)
+    saida: dict[str, list[Mapping[str, Any]]] = {}
+    for tema in temas or ():
+        if tema.get("tipo") not in aceitos or (so_pendentes and not tema.get("pendente")):
+            continue
+        for registro in tema.get("registros") or ():
+            chave = _digitos(registro)
+            if chave:
+                saida.setdefault(chave, []).append(tema)
+    return saida
 
 
 def _id_de_processo(texto: str | None) -> str | None:

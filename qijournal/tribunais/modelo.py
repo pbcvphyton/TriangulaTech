@@ -11,6 +11,10 @@ Três partes:
    :class:`Dossie`, :class:`MiniFolha`): o que ``dados.py`` grava em ``data/tribunais/`` e a
    página lê. O contrato completo, campo a campo e com exemplos, está em
    ``scratchpad/plano/contrato.md`` (a cópia de trabalho desta fase); aqui ficam os tipos.
+   A exceção é ``agenda.json`` (a agenda da semana): o formato dele é o de
+   ``qijournal/agenda/contrato.py``, o mesmo de ``data/congresso/agenda.json``; aqui ficam só os
+   tipos do que os leitores entregam à agenda (:class:`ItemDaPautaSTF`, :class:`SessaoDoDiaSTF`,
+   :class:`DiaDaPautaSTF`).
 3. **As réguas** (:class:`Regras`, :func:`carregar_regras`): áreas, subáreas, recortes,
    composição dos dois tribunais, limiares, fontes e DataJud, lidos de
    ``config/tribunais.yaml``. Erro de configuração derruba a leitura com o caminho da chave.
@@ -247,6 +251,53 @@ class Achados(TypedDict):
     v: int
     hoje: str
     achados: list[Achado]
+
+
+class ItemDaPautaSTF(TypedDict, total=False):
+    """Um processo da pauta presencial do STF, como ``stf.ler_sessao_presencial`` o entrega (em
+    memória e no cache; nunca publicado assim). Campo que a fonte não traz vem ``None``."""
+
+    data: str | None  # o dia da sessão
+    orgao: str | None  # "PL", "T1" ou "T2"
+    sessao: str | None  # o id da sessão na fonte
+    hora: str | None  # "14:00", da sessão (só quando a fonte informa)
+    sessao_numero: int | None
+    sessao_ano: int | None
+    ordem: int  # a posição do processo na pauta da sessão, a partir de 1
+    classe: str
+    numero: str
+    id: str  # "stf-ADI-6002"
+    incidente: str | None  # a cadeia que a fonte informa ("REFERENDO NA MEDIDA CAUTELAR NA AÇÃO DIRETA DE INCONSTITUCIONALIDADE")
+    resumo: str | None  # o resumo oficial, cortado; só em controle concentrado e repercussão geral
+    relator_id: str | None
+    relator_fora: str | None
+    vista: str | None  # o ministro do pedido de vista, como a fonte escreve
+    vista_id: str | None
+    destaque: str | None  # o ministro do destaque, por processo
+    destaque_id: str | None
+    repercussao_geral: bool
+
+
+class SessaoDoDiaSTF(TypedDict):
+    """Uma sessão presencial que a resposta de um dia traz (``stf.ler_sessoes_do_dia``)."""
+
+    data: str | None
+    orgao: str | None
+    sessao: str | None
+    hora: str | None
+    numero: int | None
+    ano: int | None
+    tipo: str | None
+    itens: int  # quantos processos a sessão lista
+
+
+class DiaDaPautaSTF(TypedDict):
+    """Um dia que o calendário do STF marca como de sessão presencial (``stf.coletar_pauta`` →
+    ``dias``): entra na lista mesmo sem processos. ``lida`` falso: a consulta do dia falhou."""
+
+    data: str
+    lida: bool
+    sessoes: list[SessaoDoDiaSTF]
 
 
 class ParteFolha(TypedDict):
@@ -667,6 +718,21 @@ LIMIARES_PADRAO: dict[str, Any] = {
     "janelas": {"entradas_dias": 365, "entradas_recentes_dias": 30, "decisoes_dias": 365},
     "pesos_achados": {"heranca": 5, "mesa_antiga": 4, "fora_do_padrao": 3, "litigante": 3, "tema": 3, "tema_quente": 2,
                       "vista": 2, "entrou": 1},
+    # A agenda da semana (agenda.py → data/tribunais/agenda.json, no formato de qijournal/agenda/contrato.py).
+    "agenda": {
+        "resumo_max": 1500,  # caracteres do resumo oficial do STF guardados (corte no fim de uma palavra)
+        "classes_controle": ["ADI", "ADC", "ADO", "ADPF"],  # controle concentrado (STF): as únicas, com a repercussão geral, que levam o resumo
+        # Grupos do catálogo de litigantes que, no polo passivo de uma ação de controle concentrado, dizem que a norma é federal.
+        "passivo_federal": ["congresso-nacional", "senado-federal", "camara-dos-deputados", "uniao"],
+        "classes_originarias": {
+            "stf": ["ACO", "AO", "AP", "Inq", "MS", "MI", "Rcl", "Ext", "IF", "AR", "RvC", "SL", "SS", "STP", "STA", "Pet", "PPE", "HD"],
+            "stj": ["APn", "Inq", "MS", "MI", "HD", "AR", "RvCr", "CC", "Rcl", "HDE", "SEC", "SE", "IF", "SLS", "SS", "ExSusp", "PUIL",
+                    "IAC", "IDC", "QC", "Sd", "AIA"],
+        },
+        "classes_divergencia": ["EREsp", "EAREsp", "EAg", "EDv"],  # embargos de divergência (a classe ou o incidente)
+        "propostas": ["ProAfR", "ProRQF"],  # petições do STJ que são proposta de afetação ou de relevância
+        "tipos_de_tema": ["repetitivo", "iac"],  # precedentes do STJ que ligam um recurso pautado a um tema afetado
+    },
 }
 
 

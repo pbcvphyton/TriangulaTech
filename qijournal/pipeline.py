@@ -12,6 +12,7 @@ Layout publicado (raiz do GitHub Pages)::
     edicoes/pesquisa.html      Pesquisa analítica: busca em todas as edições
     edicoes/congresso.html     aba "Congresso" (gravada por ``congresso atualizar``, antes da edição)
     edicoes/tribunais.html     aba "Tribunais" (gravada por ``tribunais atualizar``, no fluxo próprio)
+    edicoes/agenda.html        agenda da semana completa (marca com agenda, quando a edição traz o retrato)
     data/congresso/            base de votos, fichas e painéis do Congresso (``qijournal.congresso``)
     data/AAAA-MM-DD.json       edição em JSON (``Edition.to_dict``)
     data/busca/AAAA-MM-DD.json  o que a edição publicou, compacto, para a Pesquisa analítica
@@ -42,6 +43,7 @@ from typing import Any, Callable, Mapping, TypeVar
 from zoneinfo import ZoneInfo
 
 from qijournal import net, text
+from qijournal.agenda import montar as agenda_montar
 from qijournal.collect.enrich import PageInfo, enrich
 from qijournal.collect.feeds import collect_feeds, dedupe_articles, sanitize_articles
 from qijournal.collect.market import collect_market
@@ -54,6 +56,7 @@ from qijournal.models import Article, Bundle, Edition
 from qijournal.net import Fetcher
 from qijournal.render import congresso as congresso_pagina
 from qijournal.render import lados, midia, pesquisa
+from qijournal.render import agenda as agenda_pagina
 from qijournal.render import tribunais as tribunais_pagina
 from qijournal.render.analitico import ANALITICO_PAGINA, render_analitico_page
 from qijournal.render.email import render_email
@@ -543,6 +546,11 @@ def publish(
     mesmo dia sobrescreve a edição do dia. Edições (HTML + JSON) mais antigas
     que ``site.archive_keep_days`` dias são removidas (0 = guardar todas). A
     capa (``index.html``) é o último arquivo gravado.
+
+    A página ``edicoes/agenda.html`` (a agenda da semana completa) é adicional:
+    só entra quando a edição traz o retrato da agenda, e é renderizada e gravada
+    dentro de ``try/except`` próprio. Se falhar, não é gravada (fica a anterior,
+    se houver), sai um aviso no registro e a edição é publicada igual.
     """
     out_dir = Path(out_dir)
     archive_dir = out_dir / ARCHIVE_DIR
@@ -648,8 +656,23 @@ def publish(
             destaques=destaques,
             enquadramento=_enquadramento(edition, data_dir, kept_days, inicio_nomes, config),
         )
-    home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/")
-    archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True)
+    # Agenda da semana: a página completa sai do retrato gravado na edição. Sem retrato a
+    # página não é tocada; com ele, é sempre regravada (inclusive no estado "sem pauta válida").
+    agenda_path = archive_dir / agenda_pagina.PAGINA
+    agenda_page: str | None = None
+    agenda_falhou = False
+    try:
+        agenda_page = agenda_pagina.render_agenda_page(edition, config, home_href="../", archive_href="./")
+    except Exception as exc:  # noqa: BLE001 — a agenda é adicional: nunca derruba a edição
+        agenda_falhou = True
+        log.warning("Agenda da semana: a página completa não foi renderizada (%s: %s); a edição sai sem ela", type(exc).__name__, exc)
+    if agenda_page is not None:
+        paths["agenda"] = agenda_path
+    # O pé do bloco da home leva o link "Agenda completa". Quando a página completa falhou, a
+    # edição sai sem esse link: a página que estiver lá é de outro dia, com outra conferência.
+    extras: dict[str, Any] = {"agenda_pagina": False} if agenda_falhou else {}
+    home_page = render_edition_page(edition, config, home_href="./", archive_href=f"{ARCHIVE_DIR}/", **extras)
+    archived_page = render_edition_page(edition, config, home_href="../", archive_href="./", is_archive=True, **extras)
     archive_index = render_archive_index(entries, config, home_href="../")
     all_news_page = (
         render_index_page(edition, config, home_href="../", edition_href=f"{edition.date}.html")
@@ -683,6 +706,12 @@ def publish(
     if analitico_page is not None:
         write_atomic(paths["analitico"], analitico_page)
     write_atomic(paths["pesquisa"], search_page)
+    if agenda_page is not None:
+        try:
+            write_atomic(paths["agenda"], agenda_page)
+        except OSError as exc:  # a página é adicional: falha de escrita não derruba a edição
+            log.warning("Agenda da semana: a página completa não foi gravada (%s)", exc)
+            del paths["agenda"]
     write_atomic(paths["archive"], archive_index)
     _write_json(paths["latest"], manifest)
     write_atomic(paths["index"], home_page)
@@ -725,6 +754,32 @@ def anexar_tribunais(config: Config, out_dir: Path) -> None:
     except Exception as exc:  # noqa: BLE001 — nunca derruba a edição
         log.warning("Tribunais: não foi possível conferir a aba (%s) — cabeçalho sem o botão", exc)
         config.tribunais.publicado = False
+
+
+def anexar_agenda(edition: Edition, config: Config, out_dir: Path) -> None:
+    """Põe na edição o retrato da Agenda da semana (``Edition.agenda``): a pauta do STF, do STJ,
+    da Câmara, do Senado e do Congresso para o dia da edição e os 4 dias úteis seguintes, já com
+    os textos de tela (``qijournal.agenda.montar``).
+
+    A edição só lê arquivos: ``data/congresso/agenda.json``, ``data/tribunais/agenda.json``,
+    ``data/tribunais/meta.json`` e ``data/busca``. O bloco é adicional: com a agenda desligada
+    (``config.agenda_ativo``), sem nenhum dos dois arquivos de coleta ou com qualquer erro, a
+    edição sai sem ele, igual a antes."""
+    edition.agenda = None
+    if not config.agenda_ativo:
+        return
+    try:
+        retrato = agenda_montar.do_dia(edition, Path(out_dir) / DATA_DIR, config)
+        if retrato is None:
+            return
+        edition.agenda = retrato.para_dict()
+        log.info(
+            "Agenda: %d linha(s) na home, %d frase(s), %d matéria(s) ligada(s) (lados: %s)",
+            len(retrato.linhas), len(retrato.frases), len(retrato.materias), ", ".join(retrato.lados) or "nenhum",
+        )
+    except Exception as exc:  # noqa: BLE001 — nunca derruba a edição
+        log.warning("Agenda: retrato indisponível (%s) — edição sem o bloco", exc)
+        edition.agenda = None
 
 
 # ── E-mail ───────────────────────────────────────────────────────────────────
@@ -1025,6 +1080,7 @@ def run(
             log.warning("Páginas enriquecidas não salvas (%s): %s", pages_path, exc)
     anexar_congresso(edition, config, out_dir)
     anexar_tribunais(config, out_dir)
+    anexar_agenda(edition, config, out_dir)
     subject, email_html, email_text = render_email(edition, config)
     previous = previous_manifest(out_dir)
     already_sent = previous.get("date") == edition.date and previous.get("email_sent") is True

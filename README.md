@@ -94,6 +94,137 @@ arquivo guarda as edições dos últimos 400 dias (`archive_keep_days` em
 
 ---
 
+## A home: três andares, cada um com teto
+
+A home (`index.html`) é a primeira página de um jornal, não o jornal inteiro: uma
+manchete, uma lista numerada e um resumo de como a mídia cobriu o dia. O que é
+detalhe fica a um clique, na janela de cada matéria e na cópia arquivada da edição.
+É uma capa só no código, que se rearruma pela largura da tela (não há uma versão
+para computador e outra para celular). De cima para baixo:
+
+1. **Cabeçalho.** Marca, data e hora da edição e os botões (Analítico, Congresso,
+   Tribunais, Edições, Buscar, Escuro). No celular (até 640 px), o logo e uma
+   fileira só de botões: as abas com o nome escrito, as ferramentas com o ícone
+   (o nome segue para o leitor de tela); o lema desce para o rodapé.
+2. **Linha de indicadores.** As cotações, sem rolagem automática e sem botão de
+   pausa; quem quer ver as demais arrasta para o lado. O clima da primeira cidade
+   configurada é o último item da linha (some no celular).
+3. **Manchete.** Editoria, título (abre a janela de leitura), linha fina, a foto,
+   quando há (ao lado do texto; no celular, uma miniatura), e uma linha de
+   serviço: quantos veículos, há quanto tempo e, se o assunto teve veículos dos
+   dois lados, a marca de divergência. Nenhum parágrafo do corpo. O título nunca
+   é cortado: a letra é que diminui com o comprimento (a classe sai de `web.py`).
+4. **Em 1 minuto.** Uma lista numerada com 5 chamadas: as 3 secundárias e os 2
+   primeiros destaques (se faltar, as próximas matérias na ordem das seções).
+   Cada matéria aparece uma única vez neste andar (manchete e 5 chamadas). A
+   linha fina de cada chamada, em uma linha, só aparece em tela larga.
+5. **Agenda da semana** (só a marca com agenda, e só quando a edição traz a pauta): o
+   que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso, por dia. No
+   computador, duas colunas: hoje e amanhã (larga) e o resto da semana, com o que já
+   foi decidido (estreita). No celular, as linhas de hoje e amanhã abrem com um item e
+   até 3 linhas de texto; os outros dias ficam em uma linha cada. Em cada linha, a
+   instituição e o órgão por extenso, o assunto antes do número, o número como link
+   oficial e a situação em português claro. Um pé de uma linha leva à agenda completa.
+   Detalhes em [Agenda da semana](#agenda-da-semana-bloco-da-home-e-página-completa-só-triangula).
+6. **Como a mídia cobriu.** Uma linha de abertura, só para a marca com
+   termômetro e quando ele rodou no dia ("Viés político das notícias de hoje:
+   equilibrado. Ver a análise", sem número; só cresce quando algum texto sai da
+   faixa de equilíbrio, e aí lista até 3), e duas colunas:
+   - **Onde os veículos divergiram:** até 3 assuntos com veículos dos dois lados
+     e 3 veículos ou mais, cada um com o título e os dois lados em palavras, com
+     a conta ("3 veículos: critica a falta de ambição. 1 veículo destoou: destaca
+     os limites do consenso. 11 sem lado."). Só se chama divergência quando o
+     lado menor tem 2 veículos ou mais; com 1, ele "destoou". Sem nenhum assunto
+     assim, uma frase diz que os veículos relataram tudo de forma semelhante.
+   - **Mais recentes até HHhMM** (a hora da edição, porque a lista não se
+     atualiza): 5 notícias no computador e 3 no celular, com hora, veículo e
+     título, e o link para todas as notícias do dia.
+
+   Edição em modo automático não tem cobertura comparada: o bloco fica só com
+   "Mais recentes". Marca sem termômetro não tem a linha do viés.
+7. **Todas as N matérias, por editoria.** O único bloco recolhido da home: uma
+   linha quando fechado. Aberto, traz a busca do dia, as abas (a primeira é
+   "Todas") e os cartões, só com editoria, título e linha fina. O atalho `/` e o
+   link "Todas as N matérias" abrem o bloco.
+8. **Rodapé.** A linha de método ("Compilada de N notícias de M veículos. Como
+   foi feita"), as edições anteriores, o Instagram, o código-fonte, o estado das
+   fontes (recolhido) e o lema.
+
+**Onde mora o detalhe.** A cópia arquivada de cada edição
+(`edicoes/AAAA-MM-DD.html`) é a mesma página com três gavetas fechadas depois do
+bloco das matérias, com o conteúdo completo por dentro: `#cobertura` (a cobertura
+comparada, assunto por assunto e veículo por veículo), `#termometro` (os painéis
+do termômetro e cada texto analisado) e `#racional` (como a edição foi feita). A
+home não carrega as gavetas: os links "Ver os N assuntos comparados", "Ver a
+análise" e "Como foi feita" apontam para a cópia do dia. Quem chega com uma dessas
+âncoras no endereço (da home, do Analítico, da Pesquisa ou de um e-mail antigo)
+encontra a gaveta aberta; as âncoras das matérias (`#s-<id>`) abrem a janela de
+leitura, como sempre.
+
+**O que saiu da home e para onde foi.** O editorial do dia (continua na descrição
+da página, no e-mail e no Instagram), o corpo da manchete, as listas de veículos e
+as barras da cobertura (janela da matéria), o resumo em prosa (e-mail e
+Instagram), "Mais para ler" e "Destaques" (dois deles em "Em 1 minuto", os demais
+no bloco das matérias), o Radar (5 itens em "Mais recentes"; o resto em "Todas as
+notícias do dia"), a navegação de editorias, a faixa do clima, a barra de
+progresso de leitura e o botão de voltar ao topo (continuam nas outras páginas), o
+racional, a cobertura completa e os painéis do termômetro (gavetas da cópia
+arquivada). O JSON da edição não mudou: e-mail e Instagram saem iguais.
+
+**Tetos.** São constantes de `qijournal/render/web.py` (`TETO_CHAMADAS` = 5,
+`TETO_DIVERGENCIAS` = 3, `TETO_RECENTES` = 5, `RECENTES_NO_CELULAR` = 3) e de
+`qijournal/render/termometro.py` (`VIES_FORA_MAX` = 3): o gerador corta por eles,
+então a publicação diária nunca é barrada. `tests/test_home_orcamento.py` trava o
+que dá para contar sem navegador, com três edições reais reduzidas (uma delas
+automática): itens por bloco, até 1.000 palavras visíveis com tudo fechado, até 12
+controles e 70 links à vista, `index.html` de até 450 KB, nenhum termo de bastidor
+("blocos por editoria", "parte 1 de 2", "chamadas à IA") e nenhuma animação além
+da janela da matéria abrindo. Nada se move sozinho na página da edição.
+
+**Desenho.** Os blocos da home usam um sistema só, em `styles.css.j2`: uma régua
+(`--fio`), cinco tamanhos de letra (`--f-man`, `--f-tit`, `--f-txt`, `--f-min`,
+`--f-rot`), dois pesos (400 e 700) e o laranja só na marca de divergência. Um
+bloco novo segue o mesmo molde: `<section class="bl">`, o título em
+`<h2 class="rot">` e o link do pé em `<p class="mais">`.
+
+**Medição** (edição de 23/11/2026, em 24/11/2026, com o Chromium; página com tudo
+fechado, os três botões das abas no cabeçalho e uma foto de teste na manchete,
+porque o ambiente de medição não carrega as fotos dos veículos):
+
+| | Antes | Agora | Meta sem a agenda |
+|---|---|---|---|
+| Computador, 1440 × 900 | 5.630 px | 1.550 px | até 1.700 px |
+| Celular, 390 × 844 | 12.683 px | 2.377 px | até 2.700 px |
+| Topo do título da manchete no celular | 900 px | 188 px | até 240 px |
+| Cabeçalho no celular (com as três abas) | 203 px | 116 px | até 120 px |
+| Palavras visíveis | 3.289 | 612 | até 1.000 |
+| Controles visíveis | 55 | 3 | até 12 |
+| `index.html` | 858 KB | 281 KB | até 450 KB |
+
+Com o bloco da agenda (edição de 24/11/2026 com a pauta coletada no mesmo dia, medida em
+25/11/2026 com o relógio do navegador fixado em 24/11, sem a foto de teste):
+
+| | Com a agenda | Meta |
+|---|---|---|
+| Bloco da agenda no computador, 1440 × 900 | 494 px | até 520 px |
+| Bloco da agenda no celular, 390 × 844 | 709 px | até 600 px (não atingida) |
+| Home inteira no computador | 2.019 px | até 2.250 px |
+| Home inteira no celular | 2.803 px | até 3.400 px |
+| Palavras visíveis (computador / celular) | 860 / 709 | até 1.000 |
+| `index.html` | 271 KB | até 450 KB |
+| `edicoes/agenda.html` | 214 KB | até 250 KB |
+
+No celular o bloco passa da meta porque a semana medida tem seis dias na janela (um prazo
+de medida provisória cai no sábado) e porque o item de maior peso (STF) ocupa as três
+linhas de texto. Sem a agenda na edição, a home sai byte a byte como antes.
+
+A manchete e as 5 chamadas cabem inteiras na primeira tela do computador (terminam
+a 784 px do topo). Sem a foto da manchete, a página fica mais curta (1.420 px no
+computador). A altura em pixels não entra nos testes automáticos: é medida à mão a
+cada mudança do modelo, e os números novos entram nesta tabela.
+
+---
+
 ## Ativar a edição por IA
 
 Os editores por IA ficam numa **cadeia**, na ordem de `llm.providers` em
@@ -173,13 +304,17 @@ Para cada assunto coberto por dois ou mais veículos, a IA devolve:
 
 No site, um **medidor** mostra cada veículo como um trecho da barra (lado A à
 esquerda, neutros no meio, lado B à direita): a barra cresce para o lado com
-mais veículos, com o rótulo "Pende para: …". Ele aparece no card de cada
-matéria, na janela da matéria (com a conclusão e a **análise por veículo**) e na
-seção **Cobertura comparada**. No e-mail, cada matéria ganha a barra e a
+mais veículos, com o rótulo "Pende para: …". Ele aparece na janela da matéria
+(com a conclusão e a **análise por veículo**) e na gaveta **Cobertura
+comparada** da cópia arquivada da edição. Na home ficam só a marca de divergência
+na chamada ("veículos divergem" ou "1 veículo destoou", quando o assunto teve
+veículos dos dois lados) e o bloco **Onde os veículos divergiram**, com até 3
+assuntos e os dois lados em palavras. No e-mail, cada matéria ganha a barra e a
 conclusão. A análise usa só o que os veículos publicaram; quando o trecho não
 permite dizer, o veículo fica como neutro.
 
-A seção **Cobertura comparada** reúne todos os assuntos do dia vistos por dois ou
+A gaveta **Cobertura comparada** (`edicoes/AAAA-MM-DD.html#cobertura`) reúne todos
+os assuntos do dia vistos por dois ou
 mais veículos — as matérias da edição com análise e os demais assuntos — em
 **abas por editoria**, no mesmo desenho das abas das matérias (Brasil · Economia,
 Mercados & Finanças, Política, Esporte…, e "Todas"): cada assunto entra na aba da
@@ -193,8 +328,8 @@ veículos ("3 div."). Em cada aba:
 - **Relataram de forma semelhante**: o resto, em lista curta (clicar abre a
   conclusão e a análise por veículo).
 
-Os atalhos do topo da edição levam à Cobertura comparada, ao Termômetro do dia, ao
-Racional da edição e a todas as notícias do dia.
+A home leva a ela pelo link "Ver os N assuntos comparados"; o Analítico e a
+Pesquisa continuam apontando para a mesma âncora.
 
 ### Termômetro de Viés Editorial e Analítico Político (só Triangula)
 
@@ -202,7 +337,11 @@ Depois da edição, os textos compilados nas matérias do dia passam pelo
 **Termômetro de Viés Editorial, versão 1.1** — a especificação em
 `termometro-referencia-v1.3`, que é o pilar desta parte. Ele é **estritamente
 adicional**: a análise da cobertura acima continua igual, e o termômetro aparece
-**depois** dela, no fim da edição, e na aba **Analítico Político** (botão
+em três lugares: na home, numa linha em palavras ("Viés político das notícias de
+hoje: equilibrado", sem número; ver [A home](#a-home-três-andares-cada-um-com-teto));
+na gaveta **Termômetro do dia** da cópia arquivada de cada edição
+(`edicoes/AAAA-MM-DD.html#termometro`), com o painel completo; e na aba
+**Analítico Político** (botão
 *Analítico* no cabeçalho, ao lado de *Edições* e *Buscar*). A marca PBCV
 Advogados não tem nada disso (`termometro.marcas` em `config/site.yaml`).
 
@@ -240,7 +379,7 @@ Como cada texto é analisado:
    (com as palavras de fala direta e quem tem a última palavra) e quantos pontos de
    T cada critério somou. Análises anteriores a nov/2026 não têm esses detalhes.
 
-No fim da edição, o **Termômetro do dia** é um painel com:
+Na cópia arquivada da edição, a gaveta **Termômetro do dia** é um painel com:
 
 - **placar**: o T médio das notícias, o rótulo e o intervalo de 95%, ao lado da
   escala de −100 a +100 com as sete faixas (a do dia em destaque), o intervalo, o
@@ -530,16 +669,20 @@ Embaixo da caixa de busca, os **nomes em destaque** da Política (os do placar d
 Analítico) viram atalhos para o analítico de cada um (com a editoria e o período do
 placar).
 
-### Racional da edição e lista completa do dia
+### Como a edição foi feita (racional) e lista completa do dia
 
-- **Racional da edição:** uma faixa no topo da capa e uma seção própria dizem
-  como a edição foi compilada — quantas notícias e veículos, os blocos por
-  editoria (notícias lidas, matérias redigidas e assuntos comparados em cada
-  um), quantos assuntos sobraram depois de unir as repetidas e qual IA fez o
-  trabalho. Cada matéria mostra de quantas notícias e veículos foi compilada e
-  em que bloco.
+- **Como a edição foi feita:** na home, o racional é uma linha do rodapé
+  ("Compilada de 1.146 notícias de 42 veículos. Como foi feita"), sem contadores
+  de produção. O link leva à gaveta **Como a edição foi feita** da cópia
+  arquivada (`edicoes/AAAA-MM-DD.html#racional`), que diz como a edição foi
+  compilada: quantas notícias e veículos, os blocos por editoria (notícias lidas,
+  matérias redigidas e assuntos comparados em cada um) e quantos assuntos
+  sobraram depois de unir as repetidas. O rodapé diz se a edição foi gerada por
+  IA (e por qual) ou no modo automático. Na janela de cada matéria, a lista de
+  fontes mostra de quantas notícias e veículos ela foi compilada e em que bloco.
 - **Nenhuma notícia é descartada:** a página *Todas as notícias do dia*
-  (`edicoes/AAAA-MM-DD-todas.html`, com link na capa e no e-mail) lista todas as
+  (`edicoes/AAAA-MM-DD-todas.html`, com link na capa, em "Mais recentes", e no
+  e-mail) lista todas as
   notícias coletadas, por editoria e por assunto (as repetidas ficam juntas),
   com link para o original. Só ficam de fora da coleta publieditoriais,
   resultados de loteria, horóscopo e vídeos sem texto (`exclude_url_patterns` e
@@ -1402,6 +1545,147 @@ O GitHub recomenda não usar executor próprio em repositório público. A taref
 está na `main`, a mesma confiança de quem clona e usa o projeto.
 
 
+## Agenda da semana (bloco da home e página completa, só Triangula)
+
+O bloco **Agenda da semana** da home e a página `edicoes/agenda.html` dizem **o que está
+pautado no STF, no STJ, na Câmara, no Senado e no Congresso**: sessões de votação,
+julgamentos, comissões que decidem e prazos da Constituição que vencem. Tudo vem das pautas
+oficiais, e **nenhuma IA escolhe nem escreve nada**: a seleção é uma régua pública, igual
+para todos os itens, e os textos saem das fontes e de um dicionário fixo, escrito por gente.
+As escolhas ficam à vista em [`config/agenda.yaml`](config/agenda.yaml).
+
+**Pautado não é votado nem julgado.** A agenda diz o que consta da pauta; não prevê
+resultado, não usa adjetivo e não diz que algo "vai" acontecer. A pauta pode mudar até a
+hora da sessão, e o pé do bloco diz de quando é o dado ("Conferido em 24/11. A pauta pode
+mudar.").
+
+### O que aparece
+
+- **Na home**, por dia, nunca por instituição. A janela é o dia da edição e os 4 dias úteis
+  seguintes (edição de sábado ou domingo começa na segunda). Até 8 linhas; cada linha é uma
+  sessão, um julgamento, uma reunião de comissão ou um prazo, com até 2 itens nomeados e o
+  resto em "mais N". Os dias da semana que já passaram vão para a faixa "Já decidido esta
+  semana" (até 2 resultados). Até 2 frases completam o quadro: a instituição que não tem
+  nada na janela (com o próximo evento), a pauta do Plenário da Câmara que ainda não saiu,
+  a fonte que está sem dado novo.
+- **Em cada item**: uma palavra de área, quando a fonte classifica; o assunto, sempre antes
+  do número; o número como link para a página oficial; a situação em português claro
+  ("volta ao julgamento depois do pedido de vista de…", "pautado com urgência"); e
+  "na mídia: N veículos" só quando alguma matéria cita o item pelo número ou por um apelido
+  aprovado (abre a matéria da edição ou a Pesquisa). Item sem citação fica calado: a home
+  não publica frase de ausência de cobertura.
+- **HOJE e AMANHÃ** são marcados no navegador de quem lê, pela data de Brasília; os dias que
+  já passaram ficam em cinza. Sem script, aparecem só as datas. O laranja é só do HOJE.
+- **Nas chamadas**: a manchete e as chamadas de "Em 1 minuto" cuja matéria cita um item
+  pautado na janela ganham "na agenda: qua 25" na linha de serviço, com link para o bloco.
+- **Na página completa** (`edicoes/agenda.html`, sem botão no cabeçalho; chega-se por
+  "Agenda completa", no pé do bloco): a janela por dia com todos os itens de nota 40 ou
+  mais, cada um com o termo oficial da situação, a relatoria com partido e UF, o resultado
+  em palavra (quando já houve), a menção direta na imprensa e **por que está aqui** (a conta
+  da nota); "Já decidido esta semana"; "No radar" (o que tem data depois da janela e a fila
+  do Plenário da Câmara); "O que ficou de fora", em números; e "Como ler" (a régua e os
+  pesos, as fontes com a data dos dados e o que cada fonte permite dizer).
+
+### De onde vem cada dado, e os limites
+
+A edição só lê dois arquivos de coleta, no mesmo formato (o contrato de
+`qijournal/agenda/contrato.py`, com campo `versao`). Arquivo ausente, ilegível, em formato
+inesperado ou de outra versão vale como fonte ausente: a edição sai sem aquele lado, ou sem
+o bloco, e nunca cai por causa da agenda.
+
+| Arquivo | Quem escreve | O que traz |
+|---|---|---|
+| `data/congresso/agenda.json` | `congresso agenda`, um passo próprio da edição diária (até 5 min, antes da atualização do Congresso) | Câmara: eventos e pautas (`/api/v2/eventos` e `/eventos/{id}/pauta`); Senado: agenda do Plenário e das comissões; Congresso: sessões conjuntas, a CMO e os prazos de medida provisória |
+| `data/tribunais/agenda.json` | o fluxo Tribunais (`tribunais atualizar`) | STF: o Plenário presencial; STJ: Corte Especial e Seções |
+
+- **Câmara.** Entram o Plenário e as comissões que decidem (CCJC e CFT). A Câmara só
+  registra a sessão do Plenário na véspera ou no dia: até lá a agenda diz "pauta do
+  Plenário ainda não publicada pela Câmara" e mostra a fila da última sessão, rotulada como
+  fila. O resultado é só a palavra, e só quando o registro traz, sem ambiguidade,
+  "Aprovado" ou "Rejeitado" do próprio item. Nenhum placar.
+- **Senado.** Plenário e as comissões que decidem (CCJ e CAE); o resultado é o oficial do
+  Plenário, só a palavra.
+- **Congresso.** Sessões conjuntas, a CMO e os prazos de medida provisória (consulta oficial
+  de prazos; nada é calculado à mão; medidas anteriores a 2002 ficam de fora).
+- **STF.** Só o Plenário presencial. Do Plenário Virtual e das Turmas a fonte só informa a
+  contagem de processos, que aparece na página completa.
+- **STJ.** Corte Especial e Seções. A fonte não informa a hora nem o assunto, e a agenda não
+  afirma nenhum dos dois; recursos internos em lista e processos em segredo de justiça ficam
+  só na contagem. Pessoa física e advogado nunca aparecem; empresa, só a do catálogo de
+  litigantes.
+- **Tribunais não publicam resultado em dado aberto**: a linha de um dia já passado aponta o
+  andamento oficial. O arquivo dos tribunais acumula a semana corrente (a sessão passada é
+  mantida "como pautado em DD/MM") e é podado na virada da semana.
+- **Fonte fora do ar** mantém as sessões daquela instituição do arquivo anterior, com a data
+  delas; nunca grava zero. A partir de 2 dias úteis sem dado novo, o pé do bloco passa a
+  dizer a data por fonte; acima do limite (4 dias corridos, ou o que a própria fonte
+  informa em `data/tribunais/meta.json`), os itens daquela fonte somem e fica uma frase com
+  o link oficial. Sem nenhuma fonte válida, o bloco diz "Sem pauta válida desde DD/MM".
+- Dia útil é segunda a sexta, sem calendário de feriados.
+
+### A régua
+
+Só entra o que tem data e decide. Cada item recebe uma **nota de 0 a 85**, soma de três
+partes: **foro** (onde se decide, até 30), **alcance** (quanta gente a decisão alcança, até
+30) e **estágio** (em que ponto está, até 25). Os pesos de cada caso estão em
+`config/agenda.yaml` e saem escritos no "Como ler" da página completa. **A mídia não
+pontua**: a cobertura não escolhe o que entra. Entram na home os itens de nota 60 ou mais;
+na página completa, os de nota 40 ou mais. STF, STJ, Câmara, Senado e Congresso aparecem
+sempre na home com o melhor item de cada um, mesmo abaixo de 60. Exemplos conferidos nos
+dados de 23 a 27/11/2026: tema de repercussão geral que volta de pedido de vista no
+Plenário do STF, 30 + 30 + 20 = 80; medida provisória com prazo na semana, 15 + 30 + 25 =
+70; projeto de lei no Plenário do Senado com pauta confirmada, 30 + 18 + 15 = 63.
+
+O nome de cada item também segue regra fixa, sem IA: o nome curto oficial, quando a fonte
+publica; depois o nome aprovado por pessoa; depois o título do tema; depois a ementa, a
+partir do que ela muda ("Altera a Lei X, para Y" vira "Y"), cortada no fim de uma palavra
+(até 90 caracteres no computador e 60 no celular). Sem texto aproveitável, o item não é
+nomeado na home e entra em "mais N".
+
+### Ligar e desligar
+
+- Em `config/site.yaml`: `agenda: {enabled: true, marcas: [tech]}`. Só a marca da lista
+  mostra a agenda.
+- Sem mexer no código: a variável `QIJ_NO_AGENDA=1` desliga a coleta do Congresso, o bloco
+  da home e a página completa. A edição sai como saía antes.
+- A página `edicoes/agenda.html` é gravada pela edição diária, dentro de proteção própria:
+  se a renderização falhar, ela não é gravada, sai um aviso no log e a edição é publicada
+  igual. Depois que existe, é regravada a cada edição que traz a agenda.
+
+### Aprovar nomes e apelidos (`config/agenda.yaml`)
+
+- **`nomes_aprovados`**: o nome que a tela mostra para um item, quando o nome tirado da
+  fonte não serve. Uma linha por item: `"PL 6461/2019": "Estatuto do Aprendiz"`. Vale para
+  todas as telas e passa na frente do título do tema e da ementa.
+- **`apelidos`**: como a imprensa chama um item, para ligar a matéria à pauta quando o
+  veículo não cita o número. Cada apelido tem o item, os termos (2 palavras ou mais cada) e
+  a validade (`de` e `ate`); fora da validade não liga. O primeiro termo aparece entre
+  parênteses ao lado do número: "PLP 299/2026 (pacote fiscal)". Sigla solta, nome de
+  ministro, nome de parte e palavras da ementa nunca ligam. Esta tabela é só da agenda: os
+  apelidos de `config/congresso.yaml` não são lidos aqui.
+- **`situacoes`**: o dicionário que troca o termo do registro pela frase da home ("retorno
+  de vista" vira "volta ao julgamento depois do pedido de vista de…"). Frase com previsão,
+  adjetivo ou travessão é recusada na leitura do arquivo, com aviso.
+- Valor inválido cai no padrão do código, com aviso; sem o arquivo, a agenda usa os padrões.
+
+### Pendências
+
+- O apelido "pacote fiscal" do PLP 299/2026 em `config/agenda.yaml` é sugestão e espera a
+  confirmação do dono (vale de 01/11 a 31/12/2026).
+- Fora desta entrega: placar das votações, atualização da agenda ao longo do dia, agenda no
+  e-mail, sugestão automática de apelidos, linha da agenda nas abas Congresso e Tribunais e
+  revisão da editoria Jurídico.
+- A página completa mostra o nome do item (até 90 caracteres), não a ementa oficial
+  inteira: o retrato gravado na edição não a carrega.
+- As fontes da Câmara e do Senado informam como endereço oficial a URL da API; as frases
+  com o link "fonte oficial" levam para lá, não para uma página de leitura.
+- O coletor da Câmara grava a palavra "aprovado" quando o registro diz "Aprovado…,
+  ressalvados os destaques"; a tela corrige pela frase oficial, e o coletor deve passar a
+  gravar a palavra certa.
+- No celular, o bloco mede 709 px na semana usada na medição; a meta é 600 px.
+
+---
+
 ## Receber por e-mail
 
 O e-mail segue o modelo do e-mail do **TSA Tech**: a faixa do cabeçalho (o logo
@@ -1531,6 +1815,7 @@ Todos os comandos (`python -m qijournal <comando> --help` mostra os detalhes):
 | `send-email [--dir DIR] [--force-email]` | envia por SMTP o e-mail da última edição gerada (uma vez por edição, salvo `--force-email`) |
 | `check-sources` | testa cada fonte e mostra quais estão respondendo |
 | `congresso atualizar [--dir DIR] [--cache DIR] [--completo] [--now ISO]` | baixa os dados da Câmara e do Senado, refaz as contas, `data/congresso/` e a aba Congresso (o que baixa fica em `.cache/congresso`, fora do git) |
+| `congresso agenda [--dir DIR] [--cache DIR] [--now ISO]` | coleta o que está pautado na Câmara, no Senado e no Congresso e grava `data/congresso/agenda.json`, para a Agenda da semana (sai sempre com código 0; fonte fora do ar mantém o dado anterior) |
 | `congresso pagina [--dir DIR]` | só refaz a aba Congresso a partir de `data/congresso/`, sem internet |
 | `congresso ler [--dir DIR] [--cache DIR] [--max N] [--now ISO]` | a leitura diária dos projetos de lei: a cadeia de IAs lê as proposições novas e relê as que mudam a conta, e grava em `data/congresso/leitura/` (sem chave de IA, não lê nada; `--max 0` só diz o que leria); no GitHub, roda no fluxo *Leitura dos projetos*, depois da edição |
 
@@ -1563,7 +1848,7 @@ As fontes ficam em [`config/sources.yaml`](config/sources.yaml), uma por linha:
 - **Remover:** apague a linha ou use `enabled: false`.
 
 Seções, palavras-chave, cotações do ticker, cidades do clima (hoje só São Paulo;
-Montevidéu saiu em nov/2026: a faixa de clima mostra só as cidades configuradas,
+Montevidéu saiu em nov/2026: o clima da linha de indicadores mostra só a primeira cidade configurada,
 também nas edições refeitas) e limites da edição
 (quantidade de matérias, mínimos, idade máxima das notícias) ficam em
 [`config/site.yaml`](config/site.yaml), com comentários explicando cada item.
@@ -1590,13 +1875,15 @@ carregada na página) e o ícone é o triângulo laranja sobre o marinho. A chav
 marca continua `tech` (o termômetro depende dela). Desde out/2026 o jornal usa
 a estrutura visual do TSA Tech: página na largura toda da tela (margens em
 `--gut`, que crescem nas telas largas), cabeçalho em bloco marinho `#273351`
-(`colors.masthead`, com data e hora à esquerda do logo no computador), barra de
-editorias e primeira página no desenho de jornal no computador (editorial,
-manchete com a foto ao lado, "Mais para ler" e trilho com o Radar); no celular
-e no tablet valem os blocos de sempre. A paleta vem do quadro do Sinal: marinho `#1B2745` (ticker, rodapé, títulos), ardósia `#394A7A` (links e
-réguas), laranja de sinal `#FF5A1F` (destaques; só decoração no fundo branco) e
-altas/quedas do ticker em `#7FC8FF`/`#FF5C9A`, com os cinzas azulados do layout
-original.
+(`colors.masthead`, com data e hora à esquerda do logo no computador) e, desde
+nov/2026, a home em três andares (ver
+[A home](#a-home-três-andares-cada-um-com-teto)): uma capa só, que se rearruma
+pela largura, com a manchete ao lado de "Em 1 minuto" a partir de 1280 px. A
+paleta vem do quadro do Sinal: marinho `#1B2745` (linha de indicadores, rodapé,
+títulos), ardósia `#394A7A` (links e numerais), laranja de sinal `#FF5A1F` (o
+triângulo do logo e a marca de divergência; só decoração no fundo branco) e
+altas/quedas das cotações em `#7FC8FF`/`#FF5C9A`, com os cinzas azulados do
+layout original.
 
 - `assets/triangula-marca-cabecalho.svg` — logo do cabeçalho, com o letreiro em
   `currentColor` (branco sobre o bloco, nos dois modos) e o triângulo laranja
@@ -1648,6 +1935,7 @@ Cada peça passa por um lint antes de sair e, reprovada, cai para um substituto;
 | `QIJ_NO_TERMOMETRO` | variável | `1` desliga o Termômetro de Viés e a aba Analítico Político |
 | `QIJ_NO_CONGRESSO` | variável | `1` desliga a aba Congresso e as fichas nas matérias |
 | `QIJ_NO_TRIBUNAIS` | variável | `1` desliga a aba Tribunais (STF e STJ) |
+| `QIJ_NO_AGENDA` | variável | `1` desliga a Agenda da semana (a coleta do Congresso, o bloco da home e `edicoes/agenda.html`) |
 | `DATAJUD_API_KEY` | variável (opcional) | chave do DataJud do CNJ (o padrão é a chave pública, em `config/tribunais.yaml`; esta a troca quando o CNJ a mudar) |
 | `QIJ_DATAJUD_PUBLICAR` | variável de ambiente (opcional) | `1` publica a camada do CNJ (`cnj.json`) numa execução, `0` a deixa só no cache; sem ela vale `datajud.publicar` do config (hoje `true`) |
 | `QIJ_NO_LEITURA` | variável | `1` desliga a leitura diária dos projetos de lei por IA (`congresso ler`, no fluxo *Leitura dos projetos*) |
@@ -1698,6 +1986,38 @@ publicado normalmente.
 - **O agendamento parou:** o GitHub desativa agendamentos de repositórios sem
   atividade por 60 dias (o commit diário da edição evita isso). Reative em
   *Actions → Edição diária → Enable workflow*.
+
+### Agenda da semana: quando algo dá errado
+
+A agenda é adicional: nenhum erro dela derruba a edição. O que pode acontecer:
+
+- **O bloco sumiu da home:** a edição não recebeu a pauta. Confira se `data/congresso/agenda.json`
+  e `data/tribunais/agenda.json` existem e são do formato atual (`contrato.validar`, em
+  `qijournal/agenda/contrato.py`), se `QIJ_NO_AGENDA` não está ligada e se a marca está em
+  `agenda.marcas` de `config/site.yaml`. Quando um arquivo é recusado, o log de *Gerar a
+  edição* traz o caminho dele e "a fonte fica ausente".
+- **Falta um lado ("STF e STJ: pauta indisponível nesta edição."):** o arquivo daquele lado
+  não existe ou não vale. O dos tribunais vem do fluxo *Tribunais*; o do Congresso, do passo
+  *Agenda do Congresso* da edição diária.
+- **"Sem pauta válida desde DD/MM":** as duas coletas estão paradas há mais dias que o
+  limite de `frescor` em `config/agenda.yaml`. Veja por que os passos de coleta não rodam.
+- **Uma fonte fora do ar:** a coleta mantém as sessões daquela instituição do arquivo
+  anterior, com a data delas, e a execução segue verde. O resumo do passo *Agenda do
+  Congresso* mostra a situação de cada fonte.
+- **Um nome ruim ou uma ligação errada com a mídia:** corrija em `config/agenda.yaml`
+  (`nomes_aprovados`, `apelidos`). Valor inválido no arquivo cai no padrão, com aviso no log.
+- **`edicoes/agenda.html` não foi atualizada:** o log traz "Agenda da semana: a página
+  completa não foi renderizada". A edição saiu igual e a página anterior ficou no lugar;
+  se ela nunca existiu, o pé do bloco sai sem o link "Agenda completa".
+
+### Congresso: "Câmara 0" (corrigido)
+
+Em 23/11/2026 a aba Congresso chegou a mostrar a Câmara com zero deputados em exercício:
+a lista de quem está em exercício falhou na fonte e a atualização marcou todos como fora
+do exercício. Agora, com a lista fora do ar, a atualização mantém quem estava em exercício
+no último dia bom (o `resumo.json` e as fichas; na Câmara, sem resumo aproveitável, os
+períodos em aberto de `base/cd-exercicio.json`). Sem nenhum registro anterior, o comando
+`congresso atualizar` termina com código 1 e não grava nada: nunca grava zero.
 
 ### Tribunais: quando algo dá errado
 
@@ -1756,6 +2076,13 @@ qijournal/                código do jornal
                           relevancia.py (o que espera × o que passa),
                           jornal.py (os nomes no banco do jornal), ficha.py (o
                           dossiê), dados.py (a atualização) e cli.py (comandos)
+  agenda/                 Agenda da semana: contrato.py (o formato dos dois
+                          arquivos de coleta), regras.py (lê config/agenda.yaml),
+                          regua.py (a nota), nomes.py (o nome de cada item),
+                          ligar.py (a ligação com a mídia), montar.py e retrato.py
+                          (o retrato que a edição grava e a tela mostra); a coleta
+                          fica em congresso/agenda.py e tribunais/agenda.py, e a
+                          tela em render/agenda.py
   tribunais/              Analítico dos Tribunais (STF e STJ): fontes.py (coleta,
                           robots e cache), stj.py e stf.py (leitores), tpu.py e
                           areas.py (TPU e áreas), partes.py, contas.py,
@@ -1775,6 +2102,9 @@ config/saida_modelo.schema.json, lexico.yaml, atores.yaml  termômetro (formato 
                           saída da IA, dicionário e âncoras de campo)
 config/congresso.yaml     as réguas do Analítico do Congresso (polos, governos,
                           limiares, faixas do campo e macrotemas)
+config/agenda.yaml        as escolhas da Agenda da semana (régua, cortes, tetos,
+                          comissões que decidem, frescor, dicionário de situações,
+                          palavras de área, nomes aprovados e apelidos)
 config/tribunais.yaml     as réguas do Analítico dos Tribunais (áreas, composição
                           dos tribunais, limiares, fontes, DataJud);
                           tribunais_partes.yaml, o catálogo de litigantes
@@ -1785,14 +2115,17 @@ scripts/djen/             a tarefa agendada do DJEN na máquina do dono, no Bras
                           (rodar_djen.sh/.ps1, instalar.sh, instalar_windows.ps1)
 index.html                edição do dia (gerado automaticamente)
 edicoes/                  arquivo de edições, todas as notícias de cada dia,
-                          e-mail e latest.json (gerado)
+                          e-mail e latest.json (gerado); agenda.html, a agenda
+                          da semana completa
 data/                     cada edição em JSON; em data/termometro/, as análises
                           do termômetro de cada dia, guardadas para sempre; em
                           data/busca/, o que cada edição publicou, para a Pesquisa
                           analítica; em data/congresso/, a base de votos, as
-                          fichas e os painéis do Congresso; em data/tribunais/,
+                          fichas e os painéis do Congresso (e agenda.json, o que
+                          está pautado, para a Agenda da semana); em data/tribunais/,
                           os painéis e dossiês dos Tribunais, a camada do CNJ
-                          (cnj.json) e o DJe (djen.json, da máquina do dono)
+                          (cnj.json), o DJe (djen.json, da máquina do dono) e a
+                          pauta da semana (agenda.json)
 tests/                    testes automáticos
 .github/workflows/        daily.yml (edição diária), congresso.yml (Congresso, à
                           mão), instagram.yml (posts do Instagram) e ci.yml (testes)

@@ -295,6 +295,43 @@ def test_pautas_decisoes_temas_do_stj(k: Classificador) -> None:
     assert all(len(x) == 3 and x[0] != "Relator não informado" for x in te["relator_saiu"])  # [nome, n, motivo]
 
 
+def test_cruzamento_da_pauta_com_o_acervo_sem_teto_e_sem_gente(k: Classificador) -> None:
+    """``Resultado.pauta``: o que o acervo sabe de cada processo pautado, pela chave da pauta (o
+    registro, no STJ), sem o teto de 20 por ministro; partes só ente e pessoa jurídica com grupo;
+    processo em segredo só na lista de segredo. É o que liga a pauta à agenda da semana."""
+    processos = [proc(i, T4[0], "consumidor" if i % 2 else "civil", partes_=(BB, PF) if i % 2 else (INSS,)) for i in range(1, 31)]
+    processos.append(proc(31, T4[0], "familia", segredo=True, partes_=(BB,)))
+    processos.append(proc(32, T4[1]))  # fora da pauta
+    itens = [{"sessao": "2026-12-02", "orgao": "S2", "id": p["id"], "classe": p["classe"], "numero": p["numero"], "registro": p["registro"],
+              "tipo": "principal", "interno": False, "relator_id": p["relator_id"], "fora": None, "segredo": False, "partes": []}
+             for p in processos[:31]]
+    r = contas.montar("stj", processos, REGRAS, data_dados=DATA, hoje=HOJE, pautas={"data_dados": "2026-11-22", "itens": itens})
+    assert len(r.dossies[T4[0]]["em_pauta"]) == 20  # o dossiê continua com o teto
+    cruzamento = r.pauta
+    assert len(cruzamento["processos"]) == 30 and cruzamento["segredo"] == ["202600000031"]  # sem teto; o segredo à parte
+    assert "202600000031" not in cruzamento["processos"] and "202600000032" not in cruzamento["processos"]
+    impar, par = cruzamento["processos"]["202600000001"], cruzamento["processos"]["202600000002"]
+    assert (impar["area"], impar["pessoa_fisica"], par["area"], par["pessoa_fisica"]) == ("consumidor", True, "civil", False)
+    assert impar["partes"] == [{"polo": "ativo", "tipo": "pj", "grupo": "banco-do-brasil", "nome": "BANCO DO BRASIL SA"}]
+    assert par["partes"] == [{"polo": "passivo", "tipo": "ente", "grupo": "inss", "nome": "INSTITUTO NACIONAL DO SEGURO SOCIAL"}]
+    assert contas.cruzamento_da_pauta({}, ()) == {"processos": {}, "segredo": []}
+    sem_pauta = contas.montar("stj", processos, REGRAS, data_dados=DATA, hoje=HOJE)
+    assert sem_pauta.pauta == {"processos": {}, "segredo": []}
+
+
+def test_cruzamento_da_pauta_do_stf_pelo_id_do_processo() -> None:
+    acervo = stf.ler_acervo(FX / "stf/acervo_amostra.xlsx", REGRAS)
+    aberto = next(p for p in acervo.processos if not p["segredo"])
+    fechado = next(p for p in acervo.processos if p["segredo"])
+    itens = [{"data": "2026-11-25", "orgao": "PL", "id": p["id"], "classe": p["classe"], "numero": p["numero"], "relator_id": p["relator_id"]}
+             for p in (aberto, fechado)]
+    r = contas.montar("stf", acervo.processos, REGRAS, data_dados=acervo.data_dados, hoje=HOJE, pautas={"janela": ["2026-11-23", "2026-12-07"], "itens": itens})
+    assert list(r.pauta["processos"]) == [aberto["id"]] and r.pauta["segredo"] == [fechado["id"]]
+    assert r.pauta["processos"][aberto["id"]]["area"] == aberto["area"]
+    assert all(x["tipo"] in ("ente", "pj") and x["grupo"] and x["polo"] for x in r.pauta["processos"][aberto["id"]]["partes"])
+    assert "PESSOA FÍSICA" not in _json(r.pauta)
+
+
 def test_stf_planilha_atas_jurisprudencia_rg_pauta() -> None:
     regras = REGRAS
     acervo = stf.ler_acervo(FX / "stf/acervo_amostra.xlsx", regras)

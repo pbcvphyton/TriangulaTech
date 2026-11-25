@@ -411,6 +411,11 @@ class Edition:
     # ({"hoje", "materias": {id da matéria: [fichas curtas]}}); None quando nenhuma matéria
     # cita parlamentar, sem os dados do Congresso e em edições antigas.
     congresso: dict[str, Any] | None = None
+    # Agenda da semana (qijournal.agenda.retrato.Retrato.para_dict): o retrato do dia com a pauta
+    # do STF, do STJ, da Câmara, do Senado e do Congresso, já com os textos de tela; None sem os
+    # arquivos de coleta, com a agenda desligada e em edições antigas. Leia com
+    # qijournal.agenda.retrato.ler_retrato (tolerante: formato inesperado vale como ausente).
+    agenda: dict[str, Any] | None = None
 
     def story(self, story_id: str) -> Story:
         for s in self.stories:
@@ -444,6 +449,9 @@ class Edition:
         # Só quando há fichas: sem o Congresso, o JSON da edição fica como antes, byte a byte.
         if self.congresso is not None:
             dados["congresso"] = copy.deepcopy(self.congresso)
+        # Idem para a agenda: só quando existe (o JSON das edições antigas não muda).
+        if self.agenda is not None:
+            dados["agenda"] = copy.deepcopy(self.agenda)
         return dados
 
     @classmethod
@@ -470,4 +478,5 @@ class Edition:
             index=[IndexTopic.from_dict(t) for t in data.get("index") or [] if isinstance(t, dict)],
             termometro=copy.deepcopy(data["termometro"]) if isinstance(data.get("termometro"), dict) else None,
             congresso=copy.deepcopy(data["congresso"]) if isinstance(data.get("congresso"), dict) else None,
+            agenda=copy.deepcopy(data["agenda"]) if isinstance(data.get("agenda"), dict) else None,
         )

@@ -1381,6 +1381,11 @@ def coletar_rg(coletor: Any, regras: Regras, *, validade_h: float | None = None)
 # ── 6. a pauta (sessões presenciais) ────────────────────────────────────────────────────────
 
 ORGAO_DO_COLEGIADO = {"PLENARIO": "PL", "PRIMEIRA TURMA": "T1", "SEGUNDA TURMA": "T2", "1ª TURMA": "T1", "2ª TURMA": "T2"}
+# O resumo oficial do processo (``resumoTema``) só é guardado nas ações de controle concentrado e
+# nos recursos com repercussão geral: nos demais, o texto pode trazer nome de pessoa.
+CLASSES_CONTROLE = ("ADI", "ADC", "ADO", "ADPF")
+RESUMO_MAX = 1500  # caracteres do resumo guardados (limiares.agenda.resumo_max no config vence)
+_HORA = re.compile(r"\b([01]?\d|2[0-3])[:h]([0-5]\d)\b")
 
 
 def _orgao(colegiado: Mapping[str, Any]) -> str | None:
@@ -1391,38 +1396,115 @@ def _orgao(colegiado: Mapping[str, Any]) -> str | None:
     return {"TP": "PL", "1T": "T1", "2T": "T2", "PT": "T1", "ST": "T2"}.get(normalizar(colegiado.get("codigo")))
 
 
+def hora_da_sessao(texto: Any) -> str | None:
+    """``"25/11/2026 14:00"`` → ``"14:00"``; sem hora no texto, ``None`` (a hora nunca é inventada)."""
+    m = _HORA.search(str(texto or ""))
+    return f"{int(m.group(1)):02d}:{m.group(2)}" if m else None
+
+
+def cortar_no_fim_de_palavra(texto: Any, maximo: int) -> str | None:
+    """O texto limpo, cortado no fim de uma palavra com reticências quando passa de ``maximo``."""
+    limpo = _limpo(str(texto)) if texto is not None else ""
+    if not limpo:
+        return None
+    if len(limpo) <= maximo:
+        return limpo
+    corte = limpo[: max(1, maximo - 1)].rsplit(" ", 1)[0]
+    return corte.rstrip(" ,;:.") + "…"
+
+
+def _resumo_max(regras: Regras) -> int:
+    try:
+        return max(60, int((regras.limiares.get("agenda") or {}).get("resumo_max") or RESUMO_MAX))
+    except (TypeError, ValueError):
+        return RESUMO_MAX
+
+
+def _classes_controle(regras: Regras) -> frozenset[str]:
+    classes = (regras.limiares.get("agenda") or {}).get("classes_controle") or CLASSES_CONTROLE
+    return frozenset(str(c) for c in classes)
+
+
+def _lista(valor: Any) -> list[Any]:
+    """Uma lista de objetos, ou vazia quando o campo falta ou vem em outra forma."""
+    return [x for x in valor if isinstance(x, Mapping)] if isinstance(valor, (list, tuple)) else []
+
+
+def _sessoes_do_dia(dados: Mapping[str, Any]) -> Iterator[tuple[str | None, Mapping[str, Any]]]:
+    """Cada sessão da resposta com o órgão do colegiado (``PL``, ``T1``, ``T2``)."""
+    for colegiado in _lista(dados.get("colegiados")):
+        orgao = _orgao(colegiado)
+        for sessao in _lista(colegiado.get("sessoes")):
+            yield orgao, sessao
+
+
 def ler_sessao_presencial(dados: Mapping[str, Any], regras: Regras) -> list[dict[str, Any]]:
     """``calendario-service.asp?dados=sessao-presencial&data=…`` → um item por processo pautado:
-    ``{data, orgao, sessao, classe, numero, id, relator_id, relator_fora, vista_id, vista,
-    destaque_id, destaque, repercussao_geral}``. Vista e destaque pelo nome do ministro."""
+    ``{data, orgao, sessao, hora, sessao_numero, sessao_ano, ordem, classe, numero, id, incidente,
+    resumo, relator_id, relator_fora, vista_id, vista, destaque_id, destaque, repercussao_geral}``.
+
+    Vista e destaque pelo nome do ministro, por processo. ``hora``, ``sessao_numero`` e
+    ``sessao_ano`` são os da sessão; ``ordem`` é a posição do processo na pauta da sessão (a
+    partir de 1); ``incidente`` é a cadeia que a fonte informa ("REFERENDO NA MEDIDA CAUTELAR NA
+    AÇÃO DIRETA DE INCONSTITUCIONALIDADE"). ``resumo`` é o resumo oficial (``resumoTema``), cortado
+    no fim de uma palavra, e só nas ações de controle concentrado e nos recursos com repercussão
+    geral: nos demais fica ``None`` (o texto pode trazer nome de pessoa). Campo ausente na resposta
+    vira ``None``; nada aqui levanta por campo que falta."""
     composicao = regras.composicao[TRIB]
+    controle, maximo = _classes_controle(regras), _resumo_max(regras)
     itens = []
-    for colegiado in dados.get("colegiados") or ():
-        orgao = _orgao(colegiado)
-        for sessao in colegiado.get("sessoes") or ():
-            dia = data_br(sessao.get("dataInicio")) or data_br(dados.get("data"))
-            for inc in sessao.get("incidentes") or ():
-                classe = _limpo(inc.get("classe"))
-                numero = _so_digitos(inc.get("numero"))
-                relator_id, relator_fora = destino_do_relator(inc.get("relator"), composicao)
-                vista = _limpo(inc.get("ministroVista")) or None
-                destaque = _limpo(inc.get("destaque")) or None
-                itens.append({
-                    "data": dia,
-                    "orgao": orgao,
-                    "sessao": _limpo(sessao.get("id")) or None,
-                    "classe": classe,
-                    "numero": numero,
-                    "id": f"{TRIB}-{classe}-{numero}",
-                    "relator_id": relator_id,
-                    "relator_fora": relator_fora,
-                    "vista": vista,
-                    "vista_id": destino_do_relator(vista, composicao)[0] if vista else None,
-                    "destaque": destaque,
-                    "destaque_id": destino_do_relator(destaque, composicao)[0] if destaque else None,
-                    "repercussao_geral": normalizar(inc.get("repercussaoGeral")) == "S",
-                })
+    for orgao, sessao in _sessoes_do_dia(dados):
+        dia = data_br(sessao.get("dataInicio")) or data_br(dados.get("data"))
+        hora = hora_da_sessao(sessao.get("dataInicio"))
+        for ordem, inc in enumerate(_lista(sessao.get("incidentes")), start=1):
+            classe = _limpo(inc.get("classe"))
+            numero = _so_digitos(inc.get("numero"))
+            relator_id, relator_fora = destino_do_relator(inc.get("relator"), composicao)
+            vista = _limpo(inc.get("ministroVista")) or None
+            destaque = _limpo(inc.get("destaque")) or None
+            repercussao = normalizar(inc.get("repercussaoGeral")) == "S"
+            com_resumo = repercussao or classe.split("-", 1)[0] in controle
+            itens.append({
+                "data": dia,
+                "orgao": orgao,
+                "sessao": _limpo(sessao.get("id")) or None,
+                "hora": hora,
+                "sessao_numero": _inteiro(sessao.get("numero")),
+                "sessao_ano": _inteiro(sessao.get("ano")),
+                "ordem": ordem,
+                "classe": classe,
+                "numero": numero,
+                "id": f"{TRIB}-{classe}-{numero}",
+                "incidente": _limpo(inc.get("cadeia")) or None,
+                "resumo": cortar_no_fim_de_palavra(inc.get("resumoTema"), maximo) if com_resumo else None,
+                "relator_id": relator_id,
+                "relator_fora": relator_fora,
+                "vista": vista,
+                "vista_id": destino_do_relator(vista, composicao)[0] if vista else None,
+                "destaque": destaque,
+                "destaque_id": destino_do_relator(destaque, composicao)[0] if destaque else None,
+                "repercussao_geral": repercussao,
+            })
     return itens
+
+
+def ler_sessoes_do_dia(dados: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """As sessões presenciais que a resposta de um dia traz, com ou sem processos:
+    ``{data, orgao, sessao, hora, numero, ano, tipo, itens}`` (``itens``: quantos processos a
+    sessão lista). Dia sem sessão na resposta → lista vazia."""
+    saida = []
+    for orgao, sessao in _sessoes_do_dia(dados):
+        saida.append({
+            "data": data_br(sessao.get("dataInicio")) or data_br(dados.get("data")),
+            "orgao": orgao,
+            "sessao": _limpo(sessao.get("id")) or None,
+            "hora": hora_da_sessao(sessao.get("dataInicio")),
+            "numero": _inteiro(sessao.get("numero")),
+            "ano": _inteiro(sessao.get("ano")),
+            "tipo": _limpo(sessao.get("tipo")) or None,
+            "itens": len(_lista(sessao.get("incidentes"))),
+        })
+    return saida
 
 
 def ler_calendario(dados: Mapping[str, Any], mes: int, ano: int) -> dict[str, Any]:
@@ -1437,7 +1519,7 @@ def ler_calendario(dados: Mapping[str, Any], mes: int, ano: int) -> dict[str, An
     virtuais = [{"inicio": data_br(v.get("dataInicial")), "fim": data_br(v.get("dataFinal")),
                  "PL": _inteiro(v.get("qtdProcessosPlenario")) or 0, "T1": _inteiro(v.get("qtdPrimeiraTurma")) or 0,
                  "T2": _inteiro(v.get("qtdSegundaTurma")) or 0}
-                for v in dados.get("julgamentosVirtuais") or ()]
+                for v in _lista(dados.get("julgamentosVirtuais"))]
     virtuais.sort(key=lambda v: (v["inicio"] or "", v["fim"] or ""))
     return {"presenciais": sorted(presenciais), "virtuais": virtuais}
 
@@ -1445,7 +1527,14 @@ def ler_calendario(dados: Mapping[str, Any], mes: int, ano: int) -> dict[str, An
 def coletar_pauta(coletor: Any, regras: Regras, *, hoje: date, dias: int = 14) -> dict[str, Any]:
     """As sessões presenciais de ``hoje`` a ``hoje + dias`` (o calendário do mês e do seguinte,
     e uma consulta por dia de sessão) → ``{janela, sessoes: [[data, orgao, itens]], itens,
-    virtuais, avisos}``."""
+    virtuais, avisos, dias, calendarios}``.
+
+    ``dias`` lista TODO dia que o calendário marca como de sessão presencial na janela, com ou sem
+    processos: ``{data, lida, sessoes}``, com ``lida`` falso quando a consulta do dia falhou (a
+    pauta daquele dia não foi lida nesta coleta) e ``sessoes`` como :func:`ler_sessoes_do_dia`
+    devolve (vazia quando a fonte ainda não publicou a pauta do dia). ``calendarios`` diz quantos
+    meses foram lidos e quantos falharam (com falha, os dias daquele mês são desconhecidos).
+    ``virtuais`` traz as contagens das sessões virtuais por colegiado, como o calendário informa."""
     cfg = regras.fontes.get("stf") or {}
     base = cfg["pauta"]
     validade = float((cfg.get("validade_h") or {}).get("pauta", 20))
@@ -1454,25 +1543,33 @@ def coletar_pauta(coletor: Any, regras: Regras, *, hoje: date, dias: int = 14) -
     presenciais: list[str] = []
     virtuais: list[dict[str, Any]] = []
     avisos: list[str] = []
+    lidos = 0
     for ano, mes in meses:
         try:
             cal = ler_calendario(coletor.json(f"{base}?dados=calendarios&mes={mes}&ano={ano}", validade_h=validade), mes, ano)
         except (RecusaDoHost, CaminhoVedado):
             raise
-        except (FetchError, ValueError) as exc:
+        except (FetchError, ValueError, AttributeError, TypeError) as exc:
             avisos.append(f"STF, calendário da pauta de {mes:02d}/{ano}: {exc}")
             continue
+        lidos += 1
         presenciais += [d for d in cal["presenciais"] if hoje.isoformat() <= d <= fim.isoformat()]
         virtuais += [v for v in cal["virtuais"] if v not in virtuais]
     itens: list[dict[str, Any]] = []
+    por_dia: list[dict[str, Any]] = []
     for dia in sorted(set(presenciais)):
         data = date.fromisoformat(dia).strftime("%d/%m/%Y")
         try:
-            itens += ler_sessao_presencial(coletor.json(f"{base}?dados=sessao-presencial&data={data}", validade_h=validade), regras)
+            resposta = coletor.json(f"{base}?dados=sessao-presencial&data={data}", validade_h=validade)
+            if not isinstance(resposta, Mapping):
+                raise ValueError("a resposta da pauta do dia não é um objeto")
+            itens += ler_sessao_presencial(resposta, regras)
+            por_dia.append({"data": dia, "lida": True, "sessoes": ler_sessoes_do_dia(resposta)})
         except (RecusaDoHost, CaminhoVedado):
             raise
-        except (FetchError, ValueError) as exc:
+        except (FetchError, ValueError, AttributeError, TypeError) as exc:
             avisos.append(f"STF, pauta de {data}: {exc}")
+            por_dia.append({"data": dia, "lida": False, "sessoes": []})
     sessoes = Counter((i["data"], i["orgao"]) for i in itens)
     return {
         "janela": [hoje.isoformat(), fim.isoformat()],
@@ -1480,15 +1577,18 @@ def coletar_pauta(coletor: Any, regras: Regras, *, hoje: date, dias: int = 14) -
         "itens": itens,
         "virtuais": sorted(virtuais, key=lambda v: (v["inicio"] or "", v["fim"] or "")),
         "avisos": avisos,
+        "dias": por_dia,
+        "calendarios": {"lidos": lidos, "falhas": len(meses) - lidos},
     }
 
 
 __all__ = [
     "Acervo", "ErroDeFormato", "Planilha", "coletar_acervo", "coletar_atas", "coletar_decisoes", "coletar_pauta",
-    "coletar_rg", "coluna_da_referencia", "consulta_decisoes", "corrigir_acentos", "data_br", "descolar",
-    "destino_do_relator", "flags_do_registro", "ler_acervo", "ler_ata", "ler_calendario", "ler_decisoes",
-    "ler_exportacao", "ler_feitos_presidencia", "ler_indice_atas", "ler_planilha", "ler_sessao_presencial",
-    "ler_todos_temas", "linhas_xlsx", "merito_pendente", "nomes_conhecidos", "onde_stf", "pendentes_por_relator",
+    "coletar_rg", "coluna_da_referencia", "consulta_decisoes", "corrigir_acentos", "cortar_no_fim_de_palavra", "data_br",
+    "descolar", "destino_do_relator", "flags_do_registro", "hora_da_sessao", "ler_acervo", "ler_ata", "ler_calendario",
+    "ler_decisoes", "ler_exportacao", "ler_feitos_presidencia", "ler_indice_atas", "ler_planilha", "ler_sessao_presencial",
+    "ler_sessoes_do_dia", "ler_todos_temas", "linhas_xlsx", "merito_pendente", "nomes_conhecidos", "onde_stf",
+    "pendentes_por_relator",
     "processo_do_registro", "representacao_institucional", "representantes", "separar_polo", "serial_excel",
     "temas_rg", "uf_do_nome",
 ]

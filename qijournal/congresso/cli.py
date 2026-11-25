@@ -1,9 +1,14 @@
-"""Comandos ``python -m qijournal congresso atualizar|pagina|ler|leitura``.
+"""Comandos ``python -m qijournal congresso atualizar|agenda|pagina|ler|leitura``.
 
 - ``atualizar``: baixa o que mudou nas duas Casas, refaz as contas, grava
   ``data/congresso/`` e a aba ``edicoes/congresso.html``. Roda todo dia antes da
   edição (``daily.yml``); se uma fonte estiver fora do ar, o que já existe fica
   como está.
+- ``agenda``: coleta o que está pautado na Câmara, no Senado e no Congresso (da segunda-feira
+  da semana corrente até 13 dias depois) e grava ``data/congresso/agenda.json``, no formato de
+  :mod:`qijournal.agenda.contrato`. Roda todo dia num passo próprio, antes do ``atualizar``
+  (``daily.yml``), com prazo de rede curto. Fonte fora do ar mantém o que o arquivo já tinha; o
+  comando devolve 0 com qualquer falha de fonte e não depende da legislatura configurada.
 - ``pagina``: só refaz a aba a partir de ``data/congresso/`` (sem rede).
 - ``ler``: a leitura diária dos projetos de lei novos, com a cadeia de IAs do jornal: lê as
   proposições que ainda não têm leitura e relê as que mudam a conta, em lotes cegos com
@@ -19,7 +24,9 @@
   ainda não leu.
 
 Códigos de saída: 0 sucesso (mesmo com avisos); 1 erro. ``ler`` só devolve 1 por configuração
-quebrada: sem IA, com a IA fora do ar ou com qualquer outro erro, avisa e devolve 0.
+quebrada: sem IA, com a IA fora do ar ou com qualquer outro erro, avisa e devolve 0. ``agenda``
+devolve sempre 0: desligada, com fonte fora do ar, com saída inválida (que não é gravada) ou com
+erro inesperado, o arquivo anterior fica como está e a edição segue.
 """
 
 from __future__ import annotations
@@ -33,7 +40,7 @@ from pathlib import Path
 from qijournal import pipeline
 from qijournal.config import Config
 
-from . import dados
+from . import agenda, dados
 from . import leitura, ler, regras as regras_mod
 from .fontes import Coletor
 
@@ -98,11 +105,62 @@ def cmd_atualizar(args: argparse.Namespace, config: Config) -> int:
         projetos_desde=config.congresso.projetos_desde,
         noticias_dias=config.congresso.noticias_dias,
     )
-    resultado = dados.atualizar(config.root, out_dir / pipeline.DATA_DIR, Path(args.cache), opcoes)
+    try:
+        resultado = dados.atualizar(config.root, out_dir / pipeline.DATA_DIR, Path(args.cache), opcoes)
+    except dados.SemExercicio as exc:  # sem a lista de hoje e sem o último dia bom: o que está publicado fica como está
+        log.error("Congresso: %s", exc)
+        return EXIT_ERROR
     caminho = renderizar(config, out_dir)
     if caminho is not None:
         log.info("Aba Congresso gravada em %s", caminho)
     _resumo_do_actions(resultado, config)
+    return EXIT_OK
+
+
+def _resumo_da_agenda(rodada: agenda.Rodada | None, motivo: str = "") -> None:
+    """A rodada da agenda no resumo do GitHub Actions."""
+    caminho = (os.environ.get("GITHUB_STEP_SUMMARY") or "").strip()
+    if not caminho:
+        return
+    linhas = ["### 🗓️ Agenda do Congresso", ""]
+    if rodada is None:
+        linhas.append(motivo)
+    else:
+        por_casa = ", ".join(f"{nome} {rodada.sessoes.get(chave, 0)}" for chave, nome in (("camara", "Câmara"), ("senado", "Senado"), ("congresso", "Congresso")))
+        linhas += [
+            "| | |",
+            "|---|---|",
+            f"| Sessões, reuniões e prazos na janela | {por_casa} |",
+            f"| Itens guardados | {sum(rodada.itens.values())} |",
+            f"| Pedidos de rede | {rodada.pedidos} em {rodada.segundos:.0f} s{' (prazo esgotado: coleta parcial)' if rodada.prazo_esgotado else ''} |",
+            f"| Arquivo | {'gravado' if rodada.gravado else 'sem mudança'} ({rodada.bytes} bytes) |",
+            "",
+            "| Fonte | Situação |",
+            "|---|---|",
+            *[f"| {f.nome} | {'ok' if f.ok else 'falhou'}{f': {f.aviso}' if f.aviso else ''} |" for f in rodada.fontes],
+        ]
+        if not rodada.valido:
+            linhas += ["", f"Saída fora do contrato, nada foi gravado: {rodada.erro}"]
+    try:
+        with open(caminho, "a", encoding="utf-8") as handle:
+            handle.write("\n".join(linhas) + "\n\n")
+    except OSError as exc:
+        log.warning("Não foi possível escrever o resumo do GitHub Actions: %s", exc)
+
+
+def cmd_agenda(args: argparse.Namespace, config: Config) -> int:
+    """A coleta da agenda do Congresso (:mod:`qijournal.congresso.agenda`). Devolve sempre 0."""
+    if not config.agenda_ativo:
+        log.info("Agenda da semana desligada para a marca %s (ou por QIJ_NO_AGENDA); nada a coletar", config.brand.key)
+        return EXIT_OK
+    agora = pipeline.as_utc(args.now) if getattr(args, "now", None) else datetime.now(timezone.utc)
+    try:
+        rodada = agenda.atualizar(config.root, Path(args.dir) / pipeline.DATA_DIR, Path(args.cache), hoje=_hoje(args, config), agora=agora)
+    except Exception as exc:  # noqa: BLE001 — acessório: a agenda que falha não derruba a edição
+        log.exception("Agenda do Congresso: erro inesperado; o arquivo anterior fica como está")
+        _resumo_da_agenda(None, f"Erro inesperado: {exc}")
+        return EXIT_OK
+    _resumo_da_agenda(rodada)
     return EXIT_OK
 
 
@@ -199,6 +257,12 @@ def add_parser(commands: argparse._SubParsersAction, common: argparse.ArgumentPa
     )
     atualizar.add_argument("--now", type=iso_datetime, metavar="ISO", help="data/hora de referência (sem fuso = UTC)")
     atualizar.set_defaults(handler=cmd_atualizar)
+
+    pautado = sub.add_parser("agenda", parents=[common], help="coleta o que está pautado na Câmara, no Senado e no Congresso (data/congresso/agenda.json)")
+    pautado.add_argument("--dir", default=".", metavar="DIR", help="pasta publicada (padrão: .)")
+    pautado.add_argument("--cache", default=CACHE_PADRAO, metavar="DIR", help=f"pasta do que foi baixado (padrão: {CACHE_PADRAO})")
+    pautado.add_argument("--now", type=iso_datetime, metavar="ISO", help="data/hora de referência (sem fuso = UTC)")
+    pautado.set_defaults(handler=cmd_agenda)
 
     pagina = sub.add_parser("pagina", parents=[common], help="só refaz a aba a partir de data/congresso/ (sem rede)")
     pagina.add_argument("--dir", default=".", metavar="DIR", help="pasta publicada (padrão: .)")

@@ -1,4 +1,19 @@
-{#- Página da edição. Variáveis: v (EditionView), brand, home_href, archive_href. -#}
+{#- Página da edição: a home (index.html) e a cópia arquivada (edicoes/AAAA-MM-DD.html).
+    Variáveis: v (EditionView), brand, home_href, archive_href.
+
+    Uma capa só, que se rearruma pela largura, em três andares com teto (os tetos são
+    constantes de web.py):
+      1. linha de indicadores (cotações paradas; o clima é o último item);
+      2. manchete, sem corpo: editoria, título, linha fina, foto e a linha de serviço;
+      3. "Em 1 minuto": a lista numerada das chamadas (cada matéria uma vez neste andar);
+      4. "Agenda da semana" (só com o retrato da agenda na edição): o que está pautado, por dia;
+      5. "Como a mídia cobriu": a linha do viés, "Onde os veículos divergiram" e
+         "Mais recentes";
+      6. "Todas as N matérias, por editoria": o único bloco recolhido da home;
+      7. só na cópia arquivada (v.arquivada): as gavetas #cobertura, #termometro e
+         #racional, fechadas, com o detalhe completo; na home, os links de detalhe
+         apontam para a cópia do dia (v.copia_href);
+      8. rodapé com a linha de método e o lema; depois, as janelas das matérias. -#}
 {% extends "layout.html.j2" %}
 {% import "macros.html.j2" as m %}
 {% import "termometro.html.j2" as tm %}
@@ -21,6 +36,17 @@
 {% endif %}
 {% endblock %}
 
+{#- A página da edição não leva a barra de progresso de leitura nem o botão de voltar ao
+    topo (ficam nas outras páginas); a classe "ed" liga o cabeçalho de uma fileira no celular. -#}
+{% block body_attrs %} class="ed"{% endblock %}
+{% block styles %}
+{% if v.agenda %}
+{% include "agenda.css.j2" %}
+{% endif %}
+{% endblock %}
+{% block progresso %}{% endblock %}
+{% block topo %}{% endblock %}
+
 {% block home_link %}{{ home_href }}{% endblock %}
 {% block dateline %}{{ v.date_label }}{% if v.time_label %}&nbsp;· <span class="nw">{{ v.time_label }} {{ v.tz_label }}</span>{% endif %}{% endblock %}
 {#- Computador: data e hora da edição à esquerda do logo (como o cabeçalho de um
@@ -32,293 +58,202 @@
 {% endblock %}
 
 {% block content %}
-{% if v.quotes %}
+{% if v.quotes or v.clima %}
 <section class="tk" aria-label="Cotações e indicadores">
-  <div class="tk-rail">
+  {% if v.quotes %}
+  <div class="tk-rail" tabindex="0" role="group" aria-label="Cotações: arraste para o lado para ver todas">
     <ul class="tk-track">
       {% for q in v.quotes %}
       <li class="tk-i"{% if q.note %} title="{{ q.note }}"{% endif %}>{{ q.label }} <b>{{ q.display }}</b>{% if q.change %} <span class="{{ q.css }}">{{ q.change }}</span>{% endif %}</li>
       {% endfor %}
     </ul>
   </div>
-  <button class="tk-pause" type="button" aria-label="Pausar rolagem das cotações" hidden>&#10074;&#10074;</button>
-</section>
-{% endif %}
-
-{% if v.weather %}
-<section class="wx" aria-label="Clima">
-  {% for w in v.weather %}
-  <p>{% if w.now_emoji %}<span role="img" aria-label="{{ w.now_desc }}" title="{{ w.now_desc }}">{{ w.now_emoji }}</span>{% endif %}<strong>{{ w.city }}</strong>{{ w.now_temp }} <span aria-hidden="true">↓</span><span class="sr-only">mínima </span>{{ w.today_min }} <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>{{ w.today_max }}<span class="sep" aria-hidden="true">|</span>Amanhã {% if w.tomorrow_emoji %}<span role="img" aria-label="{{ w.tomorrow_desc }}" title="{{ w.tomorrow_desc }}">{{ w.tomorrow_emoji }}</span> {% endif %}<span aria-hidden="true">↓</span><span class="sr-only">mínima </span>{{ w.tomorrow_min }} <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>{{ w.tomorrow_max }}</p>
-  {% endfor %}
-</section>
-{% endif %}
-
-{#- Primeira página no computador (a partir de 1024 px), no desenho de jornal:
-    barra de editorias com régua dupla; coluna principal (editorial, manchete com a
-    foto à direita e a chamada relacionada, "Mais para ler" e "Em 1 minuto") e trilho
-    à direita (chamadas com foto e o Radar). No celular e no tablet estes blocos
-    ficam ocultos e valem os de baixo (op-bar, brief, hero, dst), que no computador
-    se ocultam. -#}
-{% if v.sections %}
-<nav class="sec-nav" aria-label="Editorias">
-  <div class="sn-in">
-  <ul class="sn-ed">
-    {% for sec in v.sections %}
-    <li><a href="#editorias" data-tab="{{ sec.id }}" style="--sc:{{ sec.color }}">{{ sec.title }}</a></li>
-    {% endfor %}
-    <li><a href="#editorias" data-tab="all">Todas</a></li>
-  </ul>
-  {% if v.compared_map or v.termometro or v.rationale or v.index_url %}
-  <ul class="sn-x">
-    {% if v.compared_map %}<li><a href="#cobertura">Cobertura comparada</a></li>{% endif %}
-    {% if v.termometro %}<li><a href="#termometro">Termômetro do dia</a></li>{% endif %}
-    {% if v.rationale %}<li><a href="#racional">Racional da edição</a></li>{% endif %}
-    {% if v.index_url %}<li><a href="{{ v.index_url }}">Todas as {{ v.index_total|num }} notícias</a></li>{% endif %}
-  </ul>
   {% endif %}
-  </div>
-</nav>
+  {% if v.clima %}
+  {% set w = v.clima %}
+  <p class="tk-wx" title="Agora: {{ w.now_desc }}. Amanhã: {{ w.tomorrow_desc }}, de {{ w.tomorrow_min }} a {{ w.tomorrow_max }}.">{{ w.city }} <b>{{ w.now_temp }}</b> <span><span aria-hidden="true">↓</span><span class="sr-only">mínima </span>{{ w.today_min }} <span aria-hidden="true">↑</span><span class="sr-only">máxima </span>{{ w.today_max }}</span></p>
+  {% endif %}
+</section>
 {% endif %}
 
-{% if v.lead %}
-{% set L = v.lead %}
-<div class="fp">
-  <div class="fp-main">
-    <section class="fp-box" aria-label="Manchete e principais matérias">
-      {% if v.editorial %}
-      <div class="fp-ed">
-        <p class="fp-ed-k">Editorial do dia</p>
-        <p class="fp-ed-t">{{ v.editorial|md_lite }}</p>
+{% if v.manchete %}
+{% set M = v.manchete %}
+{% set L = M.story %}
+<div class="capa{% if not v.chamadas %} solo{% endif %}">
+  <article class="man {{ M.tamanho }}{% if not L.image %} noimg{% endif %}" style="--sc:{{ L.color }}" aria-label="Manchete">
+    <p class="cat">{{ L.section_title }}</p>
+    <h2{{ m.lang(L) }}><a class="hit" href="#{{ L.anchor }}">{{ L.headline }}</a></h2>
+    <div class="man-c">
+      <div class="man-x">
+        {% if L.dek %}
+        <p class="man-dek"{{ m.lang(L) }}>{{ L.dek }}</p>
+        {% endif %}
+        {{ m.servico(M.servico) }}
       </div>
+      {% if L.image %}
+      {{ m.figure(L, "man-f", lazy=False) }}
       {% endif %}
-      <article class="fp-lead{% if not L.image %} noimg{% endif %}" style="--sc:{{ L.color }}">
-        <div class="fp-lt">
-          <p class="cat">{{ L.section_title }}</p>
-          <h2{{ m.lang(L) }}><a class="hit" href="#{{ L.anchor }}">{{ L.headline }}</a></h2>
-          {% if L.dek %}
-          <p class="fp-dek"{{ m.lang(L) }}>{{ L.dek }}</p>
-          {% endif %}
-          {% if v.lead_excerpt %}
-          <p class="fp-sub fp-sub-t"{{ m.lang(L) }}>{{ v.lead_excerpt|md_lite }}</p>
-          {% endif %}
-          {#- Parágrafos seguintes do corpo: aparecem sem foto e, nas telas largas,
-              quando a coluna de texto precisa crescer para a foto ficar perto de 3:2 -#}
-          {% for paragraph in v.lead_more %}
-          <p class="fp-sub fp-sub-x fp-sub-x{{ loop.index }}"{{ m.lang(L) }}>{{ paragraph|md_lite }}</p>
-          {% endfor %}
-          {{ m.meta(L) }}
-          {% if L.coverage %}
-          {{ m.badge(L.coverage) }}
-          {% endif %}
-          {% if v.related %}
-          {% set s = v.related %}
-          <div class="fp-rel" style="--sc:{{ s.color }}">
-            <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
-            {{ m.meta(s) }}
-          </div>
-          {% endif %}
-        </div>
-        {% if L.image %}
-        <div class="fp-lp">
-          {{ m.figure(L, "fp-li") }}
-          {% if v.lead_excerpt %}
-          <p class="fp-sub fp-sub-p"{{ m.lang(L) }}>{{ v.lead_excerpt|md_lite }}</p>
-          {% endif %}
-        </div>
-        {% endif %}
-      </article>
-      {% if v.more %}
-      <div class="fp-more">
-        <h2 class="fp-lbl">Mais para ler</h2>
-        <ol class="fp-ml">
-          {% for s in v.more %}
-          <li class="fp-mi" style="--sc:{{ s.color }}">
-            <div class="fp-mt">
-              <p class="cat">{{ s.section_title }}</p>
-              <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
-              {% if s.dek %}
-              <p class="fp-mdk"{{ m.lang(s) }}>{{ s.dek }}</p>
-              {% endif %}
-            </div>
-            {% if s.image %}
-            {{ m.figure(s, "fp-th") }}
-            {% endif %}
-          </li>
-          {% endfor %}
-        </ol>
-      </div>
-      {% endif %}
-    </section>
-    {% if v.briefing %}
-    <section class="fp-brief" aria-labelledby="fpb-h">
-      <h2 class="fp-lbl" id="fpb-h">Em 1 minuto</h2>
-      <ul>
-        {% for item in v.briefing %}
-        <li>{{ item|md_lite }}</li>
-        {% endfor %}
-      </ul>
-    </section>
-    {% endif %}
-    {% if v.rationale %}
-    <p class="fp-rat"><span class="fp-rat-s">{{ v.rationale.strip }}</span> <span class="fp-rat-l"><a href="#racional">Como foi compilada</a>{% if v.index_url %} · <a href="{{ v.index_url }}">Todas as {{ v.index_total|num }} notícias</a>{% endif %}</span></p>
-    {% endif %}
-  </div>
-  {% if v.secondary or v.radar %}
-  <aside class="fp-rail" aria-label="Outras chamadas e Radar de notícias">
-    {% if v.secondary %}
-    {% set s = v.secondary[0] %}
-    <article class="fp-r1" style="--sc:{{ s.color }}">
-      {% if s.image %}
-      {{ m.figure(s, "fp-ri") }}
-      {% endif %}
-      <p class="cat">{{ s.section_title }}</p>
-      <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
-      {% if s.dek %}
-      <p class="fp-rdk"{{ m.lang(s) }}>{{ s.dek }}</p>
-      {% endif %}
-      {{ m.meta(s) }}
-      {% if s.coverage %}
-      {{ m.badge(s.coverage) }}
-      {% endif %}
-    </article>
-    {% if v.secondary|length > 1 %}
-    <div class="fp-r2">
-      {% for s in v.secondary[1:] %}
-      <article class="fp-r2i" style="--sc:{{ s.color }}">
-        {% if s.image %}
-        {{ m.figure(s, "fp-ri") }}
-        {% endif %}
-        <p class="cat">{{ s.section_title }}</p>
-        <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
-        {{ m.meta(s) }}
-        {% if s.coverage %}
-        {{ m.badge(s.coverage) }}
-        {% endif %}
-      </article>
-      {% endfor %}
     </div>
+  </article>
+  {% if v.chamadas %}
+  <section class="um" aria-labelledby="um-h">
+    <h2 class="rot" id="um-h">Em 1 minuto</h2>
+    <ol class="um-l">
+      {% for c in v.chamadas %}
+      {% set s = c.story %}
+      <li>
+        <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
+        {% if s.dek %}
+        <p class="um-dk"{{ m.lang(s) }}>{{ s.dek }}</p>
+        {% endif %}
+        {{ m.servico(c.servico) }}
+      </li>
+      {% endfor %}
+    </ol>
+    {% if v.stories|length > v.chamadas|length + 1 %}
+    <p class="mais"><a href="#editorias">Todas as {{ v.stories|length }} matérias</a></p>
     {% endif %}
-    {% endif %}
-    {% if v.radar %}
-    <section class="fp-op" aria-labelledby="fpr-h">
-      <div class="fp-op-in">
-        <h2 class="fp-lbl" id="fpr-h">Radar de notícias <span class="fp-n">{{ v.radar|length }}</span></h2>
-        <ol>
-          {% for r in v.radar %}
-          <li><a href="{{ r.href }}"{% if r.external %} target="_blank" rel="noopener noreferrer"{% endif %}><span class="fp-by">{% if r.time %}<time>{{ r.time }}</time> · {% endif %}{{ r.source }}</span><span class="fp-tt"{% if r.lang %} lang="{{ r.lang }}"{% endif %}>{{ r.title }}</span>{% if r.external %}<span class="sr-only"> (abre a fonte em nova aba)</span>{% endif %}</a></li>
-          {% endfor %}
-        </ol>
-      </div>
-      <button class="fp-op-more" type="button" hidden></button>
-    </section>
-    {% endif %}
-  </aside>
+  </section>
   {% endif %}
 </div>
 {% endif %}
 
-{% if v.editorial %}
-<section class="op-bar" aria-label="Editorial do dia">
-  <p>{{ v.editorial|md_lite }}</p>
-</section>
-{% endif %}
-
-{% if v.briefing %}
-<section class="brief" aria-labelledby="brief-h">
-  <h2 class="kicker" id="brief-h">Em 1 minuto</h2>
-  <ul>
-    {% for item in v.briefing %}
-    <li>{{ item|md_lite }}</li>
+{# AGENDA-DA-SEMANA: o que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso,
+   por dia. Duas colunas no computador: "hoje e amanhã" (larga) e o resto da semana, com o
+   que já foi decidido (estreita); embaixo, as frases e o pé. O bloco só existe quando a edição traz o
+   retrato da agenda (v.agenda, montado em web.py a partir de render/agenda.py). #}
+{% if v.agenda %}
+{% set ag = v.agenda %}
+<section class="bl ag" id="agenda" aria-labelledby="ag-h">
+  <h2 class="rot" id="ag-h">Agenda da semana</h2>
+  <div class="ag-cols{% if not (ag.principais and ag.lateral) %} uma{% endif %}">
+    {% if ag.principais %}
+    <div class="ag-col ag-p">
+      {% for dia in ag.principais %}
+      {{ m.agenda_dia(dia) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if ag.lateral %}
+    <div class="ag-col ag-r">
+      {% for dia in ag.resto %}
+      {{ m.agenda_dia(dia) }}
+      {% endfor %}
+      {% if ag.decidido %}
+      <div class="ag-dec">
+        <h3 class="ag-d">Já decidido esta semana</h3>
+        <ul class="ag-ll">
+          {% for l in ag.decidido %}
+          {{ m.agenda_linha(l, com_dia=True) }}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% if ag.frases %}
+  <ul class="ag-fr">
+    {% for f in ag.frases %}
+    <li>{{ f.texto }}{% if f.link %} <a href="{{ f.link }}" target="_blank" rel="noopener noreferrer">{{ f.link_rotulo }}<span class="sr-only"> (abre em nova aba)</span></a>{% endif %}</li>
     {% endfor %}
   </ul>
+  {% endif %}
+  <p class="ag-pe">{{ ag.pe }}{% for f in ag.pe_fontes %} {{ f }}.{% endfor %}{% if ag.pagina_href %} <a href="{{ ag.pagina_href }}">{{ ag.pagina_rotulo }}</a>{% endif %}{% if ag.congresso_href %}<span class="ag-s"> · </span><a href="{{ ag.congresso_href }}">Raio-X do Congresso</a>{% endif %}{% if ag.tribunais_href %}<span class="ag-s"> · </span><a href="{{ ag.tribunais_href }}">Raio-X dos Tribunais</a>{% endif %}</p>
 </section>
 {% endif %}
 
-{% if v.rationale %}
-<p class="rat-strip"><span>{{ v.rationale.strip }}</span> <a href="#racional">Como foi compilada</a>{% if v.index_url %} · <a href="{{ v.index_url }}">Todas as {{ v.index_total|num }} notícias</a>{% endif %}</p>
-{% endif %}
-
-{% if v.lead %}
-{% set s = v.lead %}
-<section class="hero{% if not v.secondary %} solo{% endif %}" aria-label="Manchete">
-  <article class="hero-l" style="--sc:{{ s.color }}">
-    <p class="cat">{{ s.section_title }}</p>
-    <h2{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h2>
-    {% if s.dek %}
-    <p class="dek"{{ m.lang(s) }}>{{ s.dek }}</p>
-    {% endif %}
-    {% if s.image %}
-    {{ m.figure(s, "hi") }}
-    {% endif %}
-    {% if v.lead_excerpt %}
-    <p class="sub"{{ m.lang(s) }}>{{ v.lead_excerpt|md_lite }}</p>
-    {% endif %}
-    {% for paragraph in v.lead_more %}
-    <p class="sub more"{{ m.lang(s) }}>{{ paragraph|md_lite }}</p>
+{% if v.midia %}
+{% set md = v.midia %}
+<section class="bl md" aria-labelledby="md-h">
+  <h2 class="rot" id="md-h">Como a mídia cobriu</h2>
+  {% if md.vies %}
+  <p class="md-vies">Viés político das notícias de hoje: <b>{{ md.vies.rotulo }}</b>. <a href="{{ v.copia_href }}#termometro">Ver a análise</a></p>
+  {% if md.vies.fora %}
+  <ul class="md-fora" aria-label="Notícias fora da faixa de equilíbrio">
+    {% for t in md.vies.fora %}
+    <li><b>{{ t.veiculo }}</b>, {{ t.rotulo }}: {% if t.url %}<a href="{{ t.url }}" target="_blank" rel="noopener noreferrer">{{ t.titulo }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ t.titulo }}{% endif %}</li>
     {% endfor %}
-    {{ m.meta(s) }}
-    {% if s.coverage %}
-    {{ m.badge(s.coverage) }}
+    {% if md.vies.fora_total > md.vies.fora|length %}
+    <li>E mais {{ md.vies.fora_total - md.vies.fora|length }} fora da faixa de equilíbrio.</li>
     {% endif %}
-    <p class="rd" aria-hidden="true">Ler matéria completa →</p>
-  </article>
-  {% if v.secondary %}
-  <div class="hero-r">
-    {% for s in v.secondary %}
-    <article class="ss" style="--sc:{{ s.color }}">
-      <p class="cat">{{ s.section_title }}</p>
-      <h3{{ m.lang(s) }}><a class="hit" href="#{{ s.anchor }}">{{ s.headline }}</a></h3>
-      {% if s.dek %}
-      <p{{ m.lang(s) }}>{{ s.dek }}</p>
+  </ul>
+  {% endif %}
+  {% endif %}
+  {% if md.colunas %}
+  <div class="md-cols{% if md.colunas == 1 %} uma{% endif %}">
+    {% if md.comparados %}
+    <div class="md-col">
+      <h3 class="sub">Onde os veículos divergiram</h3>
+      {% if md.divergencias %}
+      <ol class="dv">
+        {% for d in md.divergencias %}
+        <li id="{{ d.anchor }}">
+          <h4><a href="{{ d.href }}">{{ d.titulo }}</a></h4>
+          <ul class="dv-l">
+            {% for l in d.lados %}
+            {% if l.texto %}
+            <li><b>{{ l.conta }}:</b> {{ l.texto }}.</li>
+            {% else %}
+            <li class="resto">{{ l.conta }}.</li>
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
+      </ol>
+      {% elif md.comparados == 1 %}
+      <p class="md-nada">Hoje os veículos relataram o único assunto comparado de forma semelhante.</p>
+      {% else %}
+      <p class="md-nada">Hoje os veículos relataram os {{ md.comparados }} assuntos comparados de forma semelhante.</p>
       {% endif %}
-      {{ m.meta(s) }}
-      {% if s.coverage %}
-      {{ m.badge(s.coverage) }}
+      <p class="mais"><a href="{{ v.copia_href }}#cobertura">{{ "Ver o assunto comparado" if md.comparados == 1 else "Ver os " ~ md.comparados ~ " assuntos comparados" }}</a></p>
+    </div>
+    {% endif %}
+    {% if md.recentes %}
+    <div class="md-col">
+      <h3 class="sub">Mais recentes{% if md.ate %} até {{ md.ate }}{% endif %}</h3>
+      <ol class="rc">
+        {% for r in md.recentes %}
+        <li{% if r.so_tela_larga %} class="larga"{% endif %}><a href="{{ r.href }}"{% if r.external %} target="_blank" rel="noopener noreferrer"{% endif %}><time>{{ r.time }}</time><span><b>{{ r.source }}</b><span class="rc-t"{% if r.lang %} lang="{{ r.lang }}"{% endif %}>{{ r.title }}</span></span>{% if r.external %}<span class="sr-only"> (abre a fonte em nova aba)</span>{% endif %}</a></li>
+        {% endfor %}
+      </ol>
+      {% if v.index_url %}
+      <p class="mais"><a href="{{ v.index_url }}">{{ "A notícia do dia" if v.index_total == 1 else "Todas as " ~ v.index_total|num ~ " notícias do dia" }}</a></p>
       {% endif %}
-    </article>
-    {% endfor %}
+    </div>
+    {% endif %}
   </div>
   {% endif %}
 </section>
 {% endif %}
 
-{% if v.highlights %}
-<section class="dst" aria-labelledby="dst-h">
-  <h2 class="kicker" id="dst-h">Destaques</h2>
-  <ol>
-    {% for s in v.highlights %}
-    <li><div><a class="hit" href="#{{ s.anchor }}"{{ m.lang(s) }}>{{ s.headline }}</a><span class="dst-cat">{{ s.section_title }}</span></div></li>
-    {% endfor %}
-  </ol>
-</section>
-{% endif %}
-
 {% if v.sections %}
-<section class="tabs-wrap{% if v.default_all %} all{% endif %}" id="editorias" aria-label="Matérias por seção">
-  {# Digitar filtra as matérias do dia; Enter ou "Todas as edições" leva a busca
-     para a Pesquisa analítica (todas as edições). #}
-  <form class="srch" role="search" action="{{ archive_href }}pesquisa.html" method="get">
-    <label class="srch-label" for="srchInput">Buscar</label>
-    <input class="srch-input" id="srchInput" name="q" type="search" placeholder="Pesquisar nas matérias do dia…" autocomplete="off" spellcheck="false" aria-keyshortcuts="/">
-    <span class="srch-count" id="srchCount" role="status" aria-live="polite"></span>
-    {{ m.search_all() }}
-  </form>
-  <div class="tabs-nav">
-  <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
-  <div class="tabs-bar" role="tablist" aria-label="Seções">
-    {% for sec in v.sections %}
-    {% set on = loop.first and not v.default_all %}
-    <button class="tab-btn" type="button" role="tab" id="tab-{{ sec.id }}" data-tab="{{ sec.id }}" aria-controls="pane-{{ sec.id }}" aria-selected="{{ 'true' if on else 'false' }}" tabindex="{{ '0' if on else '-1' }}" style="--sc:{{ sec.color }}">{{ sec.title }}<span class="n">{{ sec.stories|length }}</span></button>
-    {% endfor %}
-    <button class="tab-btn" type="button" role="tab" id="tab-all" data-tab="all" aria-controls="panes" aria-selected="{{ 'true' if v.default_all else 'false' }}" tabindex="{{ '0' if v.default_all else '-1' }}" style="--sc:{{ brand.colors.primary }}">Todas<span class="n">{{ v.stories|length }}</span></button>
-  </div>
-  <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
-  </div>
-  <div class="tab-layout">
+{#- O único bloco recolhido da home. Aberto: a busca do dia (Enter ou "Todas as edições"
+    leva o termo à Pesquisa analítica), as abas começando em "Todas" e os cartões. O
+    atalho "/" e o link "Todas as N matérias" abrem o bloco (page.js). -#}
+<details class="gav tabs-wrap all" id="editorias">
+  <summary><h2 class="gav-t">{{ "A matéria da edição" if v.stories|length == 1 else "Todas as " ~ v.stories|length ~ " matérias, por editoria" }}</h2></summary>
+  <div class="gav-c">
+    <form class="srch" role="search" action="{{ archive_href }}pesquisa.html" method="get">
+      <label class="srch-label" for="srchInput">Buscar</label>
+      <input class="srch-input" id="srchInput" name="q" type="search" placeholder="Pesquisar nas matérias do dia…" autocomplete="off" spellcheck="false" aria-keyshortcuts="/">
+      <span class="srch-count" id="srchCount" role="status" aria-live="polite"></span>
+      {{ m.search_all() }}
+    </form>
+    <div class="tabs-nav">
+    <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
+    <div class="tabs-bar" role="tablist" aria-label="Editorias">
+      <button class="tab-btn" type="button" role="tab" id="tab-all" data-tab="all" aria-controls="panes" aria-selected="true" tabindex="0" style="--sc:{{ brand.colors.primary }}">Todas<span class="n">{{ v.stories|length }}</span></button>
+      {% for sec in v.sections %}
+      <button class="tab-btn" type="button" role="tab" id="tab-{{ sec.id }}" data-tab="{{ sec.id }}" aria-controls="pane-{{ sec.id }}" aria-selected="false" tabindex="-1" style="--sc:{{ sec.color }}">{{ sec.title }}<span class="n">{{ sec.stories|length }}</span></button>
+      {% endfor %}
+    </div>
+    <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
+    </div>
     <div class="tab-main" id="panes">
       {% for sec in v.sections %}
-      <div class="tab-pane{% if loop.first or v.default_all %} active{% endif %}" id="pane-{{ sec.id }}" role="tabpanel" aria-labelledby="tab-{{ sec.id }}" style="--sc:{{ sec.color }}">
-        <h2 class="pane-hd">{{ sec.title }}</h2>
+      <div class="tab-pane active" id="pane-{{ sec.id }}" role="tabpanel" aria-labelledby="tab-{{ sec.id }}">
         <div class="cards">
           {% for s in sec.stories %}
           {{ m.card(s) }}
@@ -328,189 +263,191 @@
       {% endfor %}
       <p class="no-res" id="noRes" hidden>Nenhuma matéria encontrada para esta busca.</p>
     </div>
-    {% if v.radar %}
-    <aside class="tab-side" aria-labelledby="radar-h">
-      <div class="radar">
-        <h2 class="radar-hd" id="radar-h">Radar de Notícias</h2>
-        <ol class="radar-list">
-          {% for r in v.radar %}
-          <li><a class="radar-item" href="{{ r.href }}"{% if r.external %} target="_blank" rel="noopener noreferrer"{% endif %}><span class="tm">{{ r.time }}</span><span class="src">{{ r.source }}</span><span class="tt"{% if r.lang %} lang="{{ r.lang }}"{% endif %}>{{ r.title }}</span>{% if r.external %}<span class="sr-only"> (abre a fonte em nova aba)</span>{% endif %}</a></li>
-          {% endfor %}
-        </ol>
-      </div>
-    </aside>
-    {% endif %}
   </div>
-</section>
+</details>
 {% endif %}
 
-{% if v.rationale %}
-<section class="rat" id="racional" aria-labelledby="rat-h">
-  <h2 class="kicker" id="rat-h">Racional da edição</h2>
-  <p class="rat-sum">{{ v.rationale.summary }}</p>
-  {% if v.rationale.blocks %}
-  <ol class="rat-blocks">
-    {% for b in v.rationale.blocks %}
-    <li class="{{ 'ok' if b.ok else 'off' }}"><b>{{ b.name }}</b><span>{{ b.articles|num }} notícias{% if b.ok %} · {{ b.stories }} matérias redigidas · {{ b.compared }} outros assuntos comparados{% else %} · bloco sem resposta da IA (notícias na lista completa){% endif %}</span></li>
-    {% endfor %}
-  </ol>
-  {% endif %}
-  {% if v.index_url %}
-  <p class="rat-all"><a href="{{ v.index_url }}">Ver todas as {{ v.index_total|num }} notícias do dia, por editoria e assunto &rarr;</a></p>
-  {% endif %}
-  <p class="rat-note">Na análise de cada assunto, a IA define os dois enfoques do debate, interpreta o foco de cada veículo (o que priorizou, o enquadramento e o que deixou de lado em relação aos outros) e diz para que lado cada um seguiu. A barra cresce para o lado com mais veículos. A análise usa só os títulos e trechos publicados.</p>
-</section>
-{% endif %}
-
-{% if v.compared_map %}{% set cm = v.compared_map %}
-<section class="cmp" id="cobertura" aria-labelledby="cmp-h">
-  <div class="cmp-top">
-    <h2 class="kicker" id="cmp-h">Cobertura comparada</h2>
+{% if v.arquivada %}
+{#- Gavetas de detalhe, só na cópia arquivada: fechadas, com o conteúdo completo por
+    dentro. Os ids ficam na própria gaveta: #cobertura, #termometro e #racional são
+    usados pela home, pelo Analítico, pela Pesquisa e por e-mails já enviados; page.js
+    abre a gaveta que contém o alvo da âncora do endereço. -#}
+{% if v.compared_map %}
+{% set cm = v.compared_map %}
+<details class="gav" id="cobertura">
+  <summary><h2 class="gav-t" id="cmp-h">{{ "Cobertura comparada: o assunto visto por mais de um veículo" if cm.total == 1 else "Cobertura comparada: os " ~ cm.total ~ " assuntos, veículo a veículo" }}</h2></summary>
+  <section class="cmp" aria-labelledby="cmp-h">
     <p class="cmp-note">Todos os assuntos do dia vistos por dois ou mais veículos{% if cm.stories %} — as {{ cm.stories }} matérias da edição com análise e os demais —{% endif %}, separados por editoria. Em cada aba, primeiro <b>onde a mídia divergiu</b> (veículos dos dois lados; antes os assuntos com mais veículos no lado menor), depois o que os veículos relataram <b>de forma semelhante</b>. A barra cresce para o lado com mais veículos; análise feita por IA a partir dos títulos e trechos publicados.</p>
-  </div>
-  <div class="cmp-tabs">
-    <div class="tabs-nav">
-    <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
-    <div class="tabs-bar" role="tablist" aria-label="Cobertura comparada por editoria">
-      {% for cat in cm.categories %}
-      <button class="tab-btn" type="button" role="tab" id="cmp-tab-{{ cat.id }}" data-cmp-tab="{{ cat.id }}" aria-controls="cmp-pane-{{ cat.id }}" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" style="--sc:{{ cat.color }}">{{ cat.title }}<span class="n">{{ cat.total }}</span>{% if cat.divided %}<span class="cmp-dn" title="{{ cat.divided }} {{ 'assunto' if cat.divided == 1 else 'assuntos' }} com veículos dos dois lados">{{ cat.divided }} div.</span>{% endif %}</button>
-      {% endfor %}
-      <button class="tab-btn" type="button" role="tab" id="cmp-tab-all" data-cmp-tab="all" aria-controls="cmp-panes" aria-selected="false" tabindex="-1" style="--sc:{{ brand.colors.primary }}">Todas<span class="n">{{ cm.total }}</span>{% if cm.divided %}<span class="cmp-dn">{{ cm.divided|length }} div.</span>{% endif %}</button>
-    </div>
-    <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
-    </div>
-    <div class="cmp-panes" id="cmp-panes">
-      {% for cat in cm.categories %}
-      <div class="tab-pane cmp-pane{% if loop.first %} active{% endif %}" id="cmp-pane-{{ cat.id }}" role="tabpanel" aria-labelledby="cmp-tab-{{ cat.id }}" style="--sc:{{ cat.color }}">
-        <h3 class="pane-hd">{{ cat.title }}</h3>
-        {% if cat.divergentes %}
-        <h4 class="cmp-gh">Onde a mídia divergiu <span>{{ cat.divergentes|length }} de {{ cat.total }} {{ "assunto" if cat.total == 1 else "assuntos" }}</span></h4>
-        <ol class="cmp-list">
-          {% for it in cat.divergentes %}{% set c = it.c %}
-          <li class="cmp-i" style="--sc:{{ c.color }}">
-            <p class="cat">{{ c.section_title }}{% if c.time %} <span class="cmp-t">· {{ c.time }}</span>{% endif %} <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência {{ it.divergence_pct }}</span>{% if it.story_href %} <span class="cmp-mt">· matéria da edição</span>{% endif %}</p>
-            <h3>{% if it.story_href %}<a href="{{ it.story_href }}">{{ it.story_title }}</a>{% elif c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">{{ c.topic }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ c.topic }}{% endif %}</h3>
-            {{ m.coverage(c) }}
-          </li>
-          {% endfor %}
-        </ol>
-        {% else %}
-        <p class="cmp-vazio">Nenhum assunto de {{ cat.title }} teve veículos dos dois lados hoje.</p>
-        {% endif %}
-        {% if cat.items %}
-        <h4 class="cmp-gh">Relataram de forma semelhante <span>{{ cat.items|length }} {{ "assunto" if cat.items|length == 1 else "assuntos" }} · clique para ver a análise</span></h4>
-        <ol class="cmp-cl">
-          {% for it in cat.items %}{% set c = it.c %}
-          <li>
-            <details>
-              <summary><span class="cmp-ct">{{ it.story_title or c.topic }}</span><span class="cmp-cm">{{ c.total }} {{ "veículo" if c.total == 1 else "veículos" }}{% if c.time %} · {{ c.time }}{% endif %}{% if it.story_href %} · matéria da edição{% endif %}</span></summary>
-              {% if it.story_href %}<p class="cmp-lk"><a href="{{ it.story_href }}">Ler a matéria &rarr;</a></p>{% elif c.url %}<p class="cmp-lk"><a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>{% endif %}
-              {{ m.coverage(c) }}
-            </details>
-          </li>
-          {% endfor %}
-        </ol>
-        {% endif %}
+    <div class="cmp-tabs">
+      <div class="tabs-nav">
+      <button class="tabs-arrow prev" type="button" tabindex="-1" aria-hidden="true" hidden>&#8249;</button>
+      <div class="tabs-bar" role="tablist" aria-label="Cobertura comparada por editoria">
+        {% for cat in cm.categories %}
+        <button class="tab-btn" type="button" role="tab" id="cmp-tab-{{ cat.id }}" data-cmp-tab="{{ cat.id }}" aria-controls="cmp-pane-{{ cat.id }}" aria-selected="{{ 'true' if loop.first else 'false' }}" tabindex="{{ '0' if loop.first else '-1' }}" style="--sc:{{ cat.color }}">{{ cat.title }}<span class="n">{{ cat.total }}</span>{% if cat.divided %}<span class="cmp-dn" title="{{ cat.divided }} {{ 'assunto' if cat.divided == 1 else 'assuntos' }} com veículos dos dois lados">{{ cat.divided }} div.</span>{% endif %}</button>
+        {% endfor %}
+        <button class="tab-btn" type="button" role="tab" id="cmp-tab-all" data-cmp-tab="all" aria-controls="cmp-panes" aria-selected="false" tabindex="-1" style="--sc:{{ brand.colors.primary }}">Todas<span class="n">{{ cm.total }}</span>{% if cm.divided %}<span class="cmp-dn">{{ cm.divided|length }} div.</span>{% endif %}</button>
       </div>
-      {% endfor %}
+      <button class="tabs-arrow next" type="button" tabindex="-1" aria-hidden="true" hidden>&#8250;</button>
+      </div>
+      <div class="cmp-panes" id="cmp-panes">
+        {% for cat in cm.categories %}
+        <div class="tab-pane cmp-pane{% if loop.first %} active{% endif %}" id="cmp-pane-{{ cat.id }}" role="tabpanel" aria-labelledby="cmp-tab-{{ cat.id }}" style="--sc:{{ cat.color }}">
+          <h3 class="pane-hd">{{ cat.title }}</h3>
+          {% if cat.divergentes %}
+          <h4 class="cmp-gh">Onde a mídia divergiu <span>{{ cat.divergentes|length }} de {{ cat.total }} {{ "assunto" if cat.total == 1 else "assuntos" }}</span></h4>
+          <ol class="cmp-list">
+            {% for it in cat.divergentes %}{% set c = it.c %}
+            <li class="cmp-i" style="--sc:{{ c.color }}">
+              <p class="cat">{{ c.section_title }}{% if c.time %} <span class="cmp-t">· {{ c.time }}</span>{% endif %} <span class="cmp-dv" title="Divergência: 2 × o lado menor ÷ (lado A + lado B); 100 = veículos meio a meio">· divergência {{ it.divergence_pct }}</span>{% if it.story_href %} <span class="cmp-mt">· matéria da edição</span>{% endif %}</p>
+              <h3>{% if it.story_href %}<a href="{{ it.story_href }}">{{ it.story_title }}</a>{% elif c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">{{ c.topic }}<span class="sr-only"> (abre a fonte em nova aba)</span></a>{% else %}{{ c.topic }}{% endif %}</h3>
+              {{ m.coverage(c) }}
+            </li>
+            {% endfor %}
+          </ol>
+          {% else %}
+          <p class="cmp-vazio">Nenhum assunto de {{ cat.title }} teve veículos dos dois lados hoje.</p>
+          {% endif %}
+          {% if cat.items %}
+          <h4 class="cmp-gh">Relataram de forma semelhante <span>{{ cat.items|length }} {{ "assunto" if cat.items|length == 1 else "assuntos" }} · clique para ver a análise</span></h4>
+          <ol class="cmp-cl">
+            {% for it in cat.items %}{% set c = it.c %}
+            <li>
+              <details>
+                <summary><span class="cmp-ct">{{ it.story_title or c.topic }}</span><span class="cmp-cm">{{ c.total }} {{ "veículo" if c.total == 1 else "veículos" }}{% if c.time %} · {{ c.time }}{% endif %}{% if it.story_href %} · matéria da edição{% endif %}</span></summary>
+                {% if it.story_href %}<p class="cmp-lk"><a href="{{ it.story_href }}">Ler a matéria &rarr;</a></p>{% elif c.url %}<p class="cmp-lk"><a href="{{ c.url }}" target="_blank" rel="noopener noreferrer">Abrir a fonte<span class="sr-only"> (em nova aba)</span> &#8599;</a></p>{% endif %}
+                {{ m.coverage(c) }}
+              </details>
+            </li>
+            {% endfor %}
+          </ol>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+</details>
 {% endif %}
 
 {% if v.termometro %}
 {% set t = v.termometro %}
-<section class="term" id="termometro" aria-labelledby="term-h">
-  <div class="tm-top">
-    <h2 class="kicker" id="term-h">Termômetro do dia</h2>
-    <p class="tm-links"><a href="#term-metodo">Como ler</a>{% if t.analitico_href %}<a href="{{ t.analitico_href }}">Analítico Político &rarr;</a>{% endif %}</p>
-  </div>
-  {% if t.vazio %}
-  <p class="tm-empty tm-empty-lg">Sem análise nesta edição: {{ t.motivo }}.</p>
-  {% else %}
-  <p class="tm-dek">{{ t.resumo }}. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
-  {% if t.gauge %}{{ tm.placar(t.gauge, "T médio das notícias", t.base) }}{% else %}<p class="tm-empty">{{ t.resumo }}.</p>{% endif %}
-  {{ tm.indicadores(t.indicadores) }}
-  <div class="tm-panels">
-    {% if t.distribuicao %}
-    <section class="tm-panel" aria-labelledby="tmp-dist">
-      <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
-      <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
-      {{ tm.dist(t.distribuicao) }}
-    </section>
-    {% endif %}
-    <section class="tm-panel" aria-labelledby="tmp-sig">
-      <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
-      <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
-      {{ tm.sinais(t.sinais) }}
-    </section>
-    {% if t.checklist %}
-    <section class="tm-panel" aria-labelledby="tmp-q">
-      <h3 class="tm-ph" id="tmp-q">Qualidade da apuração</h3>
-      <p class="tm-pd">Notícias que cumprem cada boa prática, entre as {{ t.checklist.textos }} em que ela se aplica.</p>
-      {{ tm.checklist(t.checklist) }}
-    </section>
-    {% endif %}
-  </div>
-  {% if t.recortes %}
-  <div class="tm-panels tm-panels-2">
-    {% for r in t.recortes %}
-    <section class="tm-panel" aria-labelledby="tmp-r{{ loop.index }}">
-      <h3 class="tm-ph" id="tmp-r{{ loop.index }}">{{ r.titulo }}</h3>
-      <p class="tm-pd">T médio das notícias do dia{% if r.itens|length > 1 %}, do grupo com mais notícias para o com menos{% endif %}; a barra é o intervalo de 95%.</p>
-      {{ tm.recorte(r) }}
-    </section>
-    {% endfor %}
-  </div>
-  {% endif %}
-  <section class="tm-list" aria-labelledby="tml-h">
-    <div class="tm-list-hd">
-      <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">{{ t.analises|length }}</span></h3>
-      <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
+<details class="gav" id="termometro">
+  <summary><h2 class="gav-t" id="term-h">Termômetro do dia: o viés de cada texto analisado</h2></summary>
+  <section class="term" aria-labelledby="term-h">
+    <div class="tm-top">
+      <p class="tm-links"><a href="#term-metodo">Como ler</a>{% if t.analitico_href %}<a href="{{ t.analitico_href }}">Analítico Político &rarr;</a>{% endif %}</p>
     </div>
-    <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
-      <div class="tm-chips" role="group" aria-label="Mostrar">
-        <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>{{ t.analises|length }}</span></button>
-        <button type="button" class="tm-chip" data-f="sig" aria-pressed="false"{% if not t.com_sinais %} disabled{% endif %}>Com sinais <span>{{ t.com_sinais }}</span></button>
-        <button type="button" class="tm-chip" data-f="inc" aria-pressed="false"{% if not t.inclinados %} disabled{% endif %}>Fora do equilíbrio <span>{{ t.inclinados }}</span></button>
-        {% if t.opiniao %}<button type="button" class="tm-chip" data-f="op" aria-pressed="false">Opinião <span>{{ t.opiniao }}</span></button>{% endif %}
+    {% if t.vazio %}
+    <p class="tm-empty tm-empty-lg">Sem análise nesta edição: {{ t.motivo }}.</p>
+    {% else %}
+    <p class="tm-dek">{{ t.resumo }}. Viés editorial medido texto a texto nas notícias compiladas nesta edição, de &minus;100 (esquerda) a +100 (direita).</p>
+    {% if t.gauge %}{{ tm.placar(t.gauge, "T médio das notícias", t.base) }}{% else %}<p class="tm-empty">{{ t.resumo }}.</p>{% endif %}
+    {{ tm.indicadores(t.indicadores) }}
+    <div class="tm-panels">
+      {% if t.distribuicao %}
+      <section class="tm-panel" aria-labelledby="tmp-dist">
+        <h3 class="tm-ph" id="tmp-dist">Distribuição das notícias</h3>
+        <p class="tm-pd">Quantas notícias caíram em cada faixa do termômetro.</p>
+        {{ tm.dist(t.distribuicao) }}
+      </section>
+      {% endif %}
+      <section class="tm-panel" aria-labelledby="tmp-sig">
+        <h3 class="tm-ph" id="tmp-sig">Onde estão os sinais</h3>
+        <p class="tm-pd">Sinais de tratamento desigual confirmados no texto das notícias, por critério e lado favorecido.</p>
+        {{ tm.sinais(t.sinais) }}
+      </section>
+      {% if t.checklist %}
+      <section class="tm-panel" aria-labelledby="tmp-q">
+        <h3 class="tm-ph" id="tmp-q">Qualidade da apuração</h3>
+        <p class="tm-pd">Notícias que cumprem cada boa prática, entre as {{ t.checklist.textos }} em que ela se aplica.</p>
+        {{ tm.checklist(t.checklist) }}
+      </section>
+      {% endif %}
+    </div>
+    {% if t.recortes %}
+    <div class="tm-panels tm-panels-2">
+      {% for r in t.recortes %}
+      <section class="tm-panel" aria-labelledby="tmp-r{{ loop.index }}">
+        <h3 class="tm-ph" id="tmp-r{{ loop.index }}">{{ r.titulo }}</h3>
+        <p class="tm-pd">T médio das notícias do dia{% if r.itens|length > 1 %}, do grupo com mais notícias para o com menos{% endif %}; a barra é o intervalo de 95%.</p>
+        {{ tm.recorte(r) }}
+      </section>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <section class="tm-list" aria-labelledby="tml-h">
+      <div class="tm-list-hd">
+        <h3 class="tm-ph" id="tml-h">Cada texto analisado <span class="tm-cnt">{{ t.analises|length }}</span></h3>
+        <p class="tm-pd">Clique num texto para ver o resumo do cálculo, os sinais com a citação literal, o enquadramento, as fontes e a qualidade item a item.</p>
       </div>
-      <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option>{% for o in t.veiculos %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
-      <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option>{% for o in t.editorias %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
-      <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
-      <p class="tm-shown" role="status" aria-live="polite"></p>
-    </form>
-    <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
-    <ol class="tr-list" id="tmList" data-visiveis="{{ t.visiveis }}">
-      {% for a in t.analises %}
-      {{ tm.analise(a, loop.index) }}
+      <form class="tm-fil" id="tmFil" aria-label="Filtrar e ordenar os textos analisados" hidden>
+        <div class="tm-chips" role="group" aria-label="Mostrar">
+          <button type="button" class="tm-chip" data-f="all" aria-pressed="true">Todos <span>{{ t.analises|length }}</span></button>
+          <button type="button" class="tm-chip" data-f="sig" aria-pressed="false"{% if not t.com_sinais %} disabled{% endif %}>Com sinais <span>{{ t.com_sinais }}</span></button>
+          <button type="button" class="tm-chip" data-f="inc" aria-pressed="false"{% if not t.inclinados %} disabled{% endif %}>Fora do equilíbrio <span>{{ t.inclinados }}</span></button>
+          {% if t.opiniao %}<button type="button" class="tm-chip" data-f="op" aria-pressed="false">Opinião <span>{{ t.opiniao }}</span></button>{% endif %}
+        </div>
+        <label class="tm-sel"><span>Veículo</span><select name="v"><option value="">Todos</option>{% for o in t.veiculos %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
+        <label class="tm-sel"><span>Editoria</span><select name="e"><option value="">Todas</option>{% for o in t.editorias %}<option value="{{ o.valor }}">{{ o.rotulo }} ({{ o.n }})</option>{% endfor %}</select></label>
+        <label class="tm-sel"><span>Ordem</span><select name="o"><option value="inc">Mais inclinados</option><option value="lr">Da esquerda à direita</option><option value="q">Menor qualidade</option><option value="sig">Mais sinais</option><option value="v">Veículo (A–Z)</option></select></label>
+        <p class="tm-shown" role="status" aria-live="polite"></p>
+      </form>
+      <div class="tr-hd" aria-hidden="true"><span>T</span><span>Texto</span><span>Escala</span><span>Rótulo</span><span>Qualidade</span><span></span></div>
+      <ol class="tr-list" id="tmList" data-visiveis="{{ t.visiveis }}">
+        {% for a in t.analises %}
+        {{ tm.analise(a, loop.index) }}
+        {% endfor %}
+      </ol>
+      <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
+      <button class="tm-more" id="tmMore" type="button" hidden></button>
+    </section>
+    {% endif %}
+    <div class="tm-metodo" id="term-metodo">
+      <h3 class="tm-ph">Como ler</h3>
+      <dl>
+        <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
+        <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
+        <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
+      </dl>
+      <p class="tm-foot">Termômetro de Viés Editorial, cálculo v{{ "1.1" }}{% if not t.vazio and t.execucao %} · hoje: {{ t.execucao }}{% endif %}.</p>
+    </div>
+  </section>
+</details>
+{% endif %}
+
+{% if v.rationale %}
+<details class="gav" id="racional">
+  <summary><h2 class="gav-t" id="rat-h">Como a edição foi feita</h2></summary>
+  <section class="rat" aria-labelledby="rat-h">
+    <p class="rat-sum">{{ v.rationale.summary }}</p>
+    {% if v.rationale.blocks %}
+    <ol class="rat-blocks">
+      {% for b in v.rationale.blocks %}
+      <li class="{{ 'ok' if b.ok else 'off' }}"><b>{{ b.name }}</b><span>{{ b.articles|num }} notícias{% if b.ok %} · {{ b.stories }} matérias redigidas · {{ b.compared }} outros assuntos comparados{% else %} · bloco sem resposta da IA (notícias na lista completa){% endif %}</span></li>
       {% endfor %}
     </ol>
-    <p class="tm-none" id="tmNone" hidden>Nenhum texto com esses filtros.</p>
-    <button class="tm-more" id="tmMore" type="button" hidden></button>
+    {% endif %}
+    {% if v.index_url %}
+    <p class="rat-all"><a href="{{ v.index_url }}">Ver todas as {{ v.index_total|num }} notícias do dia, por editoria e assunto &rarr;</a></p>
+    {% endif %}
+    <p class="rat-note">Na análise de cada assunto, a IA define os dois enfoques do debate, interpreta o foco de cada veículo (o que priorizou, o enquadramento e o que deixou de lado em relação aos outros) e diz para que lado cada um seguiu. A barra cresce para o lado com mais veículos. A análise usa só os títulos e trechos publicados.</p>
   </section>
-  {% endif %}
-  <div class="tm-metodo" id="term-metodo">
-    <h3 class="tm-ph">Como ler</h3>
-    <dl>
-      <div><dt>T</dt><dd>De &minus;100 (esquerda) a +100 (direita). A IA aponta, em cada texto, sinais de tratamento desigual com a citação literal; o cálculo confere cada citação no texto, aplica os pesos dos 11 critérios e dá o T. Até &plusmn;10 é equilibrado; &plusmn;25, leve; &plusmn;50, moderado; acima disso, forte.</dd></div>
-      <div><dt>Qualidade</dt><dd>De 0 a 100: práticas visíveis no texto (título sustentado, contraponto, fontes identificadas, números com fonte, documento de origem…). Mede a apuração, não a veracidade dos fatos.</dd></div>
-      <div><dt>Limites</dt><dd>Mede o tratamento dado pelo texto, não a intenção do veículo. Opinião (colunas, editoriais, análises) fica fora da média; um texto sem dimensão política ou curto demais não entra no T. O intervalo de 95% diz quanto a média do dia pode variar com a amostra.</dd></div>
-    </dl>
-    <p class="tm-foot">Termômetro de Viés Editorial, cálculo v{{ "1.1" }}{% if not t.vazio and t.execucao %} · hoje: {{ t.execucao }}{% endif %}.</p>
-  </div>
-</section>
+</details>
+{% endif %}
 {% endif %}
 
 {% endblock %}
 
 {% block footer %}
 <footer class="ft">
-  <p><strong>{{ brand.name }}</strong> · {{ v.sources_total }} fontes consultadas · {{ v.mode_label }} · {{ v.date_label }}</p>
+  {% if v.rationale %}
+  <p>{{ v.rationale.linha }}. <a href="{{ v.copia_href }}#racional">Como foi feita</a></p>
+  {% endif %}
+  <p>{{ v.mode_label }} · {{ v.date_label }}</p>
   <p class="ft-links"><a href="{{ archive_href }}">Edições anteriores</a>{% if v.instagram_url %} · <a href="{{ v.instagram_url }}" rel="noopener">Siga no Instagram</a>{% endif %}{% if v.repo_url %} · <a href="{{ v.repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
   {% if v.source_groups %}
   <details>
-    <summary>Status das fontes · {{ v.sources_ok }} de {{ v.sources_total }} feeds ok</summary>
+    <summary>Estado das fontes · {{ v.sources_ok }} de {{ v.sources_total }} feeds ok</summary>
     <ul class="src-list">
       {% for g in v.source_groups %}
       <li class="st-{{ g.status }}"><span class="dot" aria-hidden="true"></span>{{ g.name }}{% if g.feeds > 1 %} <span class="nf">({{ g.feeds }} feeds)</span>{% endif %}{% if g.failed %}: <em>{{ g.errors|join(", ") }}</em>{% endif %}<span class="sr-only"> — {{ g.status }}</span></li>
@@ -518,6 +455,7 @@
     </ul>
   </details>
   {% endif %}
+  <p class="ft-ass"><strong>{{ brand.name }}</strong>{% if brand.tagline %} · {{ brand.tagline }}{% endif %}</p>
 </footer>
 {% endblock %}
 

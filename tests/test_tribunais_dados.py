@@ -7,6 +7,11 @@ pelo coletor de verdade (robots.txt, pausa por host, recusa do WAF, POST). Confe
 vai para ``data/tribunais/``; o ``meta.json`` fonte a fonte; que o dia bom não é sobrescrito (recusa
 do portal, total fora da faixa, data que volta, teto de tamanho); o fallback das fontes acessórias;
 ``--so``; os achados do tribunal não refeito; e que rodar de novo não regrava nada.
+
+A agenda da semana (``agenda.json``, no fim do arquivo): gravada ao lado dos achados e válida pelo
+contrato; os mesmos dados dão os mesmos bytes; o teto próprio e o da pasta (quem cai é ela); o
+tribunal não refeito fica como estava; rodar na quinta mantém a sessão de quarta; a pauta é lida
+mesmo com o painel recusado; e nenhuma falha dela impede os painéis.
 """
 
 from __future__ import annotations
@@ -22,7 +27,9 @@ from typing import Any
 import pytest
 
 from qijournal import net
+from qijournal.agenda import contrato
 from qijournal.net import FetchError
+from qijournal.tribunais import agenda as agenda_mod
 from qijournal.tribunais import dados, modelo, stj
 from tests.fixtures import tribunais as fx
 from tests.fixtures.tribunais import stf as fx_stf
@@ -154,14 +161,14 @@ def test_carga_grava_paineis_dossies_achados_e_meta(carga: tuple[Path, Portal, d
     tmp, _portal, r = carga
     pasta = _pasta(tmp)
     assert r.refeitos == ["stf", "stj"] and not r.apagados
-    assert {p.name for p in pasta.iterdir()} == {"meta.json", "achados.json", "stj.json", "stf.json", "ministros", "tpu"}
+    assert {p.name for p in pasta.iterdir()} == {"meta.json", "achados.json", "agenda.json", "stj.json", "stf.json", "ministros", "tpu"}
     stj_json = json.loads((pasta / "stj.json").read_text(encoding="utf-8"))
     stf_json = json.loads((pasta / "stf.json").read_text(encoding="utf-8"))
     assert (stj_json["v"], stj_json["trib"], stj_json["data_dados"], stj_json["universo"]["processos"]) == (1, "stj", "2026-11-20", 44)
     assert (stf_json["trib"], stf_json["data_dados"], stf_json["universo"]["processos"]) == ("stf", "2026-11-22", 23)
     dossies = sorted(p.name for p in (pasta / "ministros").glob("*.json"))
     assert dossies and all(n.startswith(("stj-", "stf-")) for n in dossies)
-    assert r.gravados == 4 + len(dossies)  # stj, stf, achados, meta e os dossiês
+    assert r.gravados == 5 + len(dossies)  # stj, stf, achados, agenda, meta e os dossiês
     achados = json.loads((pasta / "achados.json").read_text(encoding="utf-8"))
     assert achados["v"] == 1 and achados["hoje"] == HOJE
     for arquivo in pasta.rglob("*.json"):
@@ -552,3 +559,205 @@ def test_os_citados_do_estado_ignoram_o_que_nao_e_caminho(tmp_path: Path) -> Non
     longo = "Constitucionalidade das contribuições / " + "x" * 400
     dados.Estado(cache).gravar("stf_rg", {"caminho": "arquivos/a.json", "dados": {"temas": [{"titulo": longo}, {"titulo": "Lei 8.870/1994"}]}})
     assert dados.Estado(cache).citados() == {cache / "arquivos" / "a.json"}
+
+
+# ── a agenda da semana (agenda.json) ─────────────────────────────────────────
+
+AMOSTRA_DA_AGENDA = STJ / "pautas_futuras_20261124_agenda.json.gz"  # origem em tests/test_tribunais_agenda.py
+# Hipóteses do teste (o portal do STF não deixou guardar estas duas respostas reais): o calendário
+# de dezembro sem sessão presencial e o dia 26/11, que o calendário marca, ainda sem processos.
+STF_DEZEMBRO = b'{"diasPresenciais": [], "julgamentosVirtuais": []}'
+STF_DIA_SEM_PROCESSOS = b'{"data": "26/11/2026", "tipo": "PRESENCIAL", "colegiados": []}'
+
+
+def _portal_da_agenda(desde: str | None = None) -> Portal:
+    """O portal com a amostra da agenda no lugar das pautas e dos precedentes do STJ (o nome do
+    arquivo continua o da página: a data do dado é 22/11) e com as duas respostas do STF que
+    faltam. ``desde`` (DD/MM/AAAA no arquivo, aqui AAAA-MM-DD): só as sessões dessa data em diante,
+    como a fonte de pautas futuras faz quando o dia passa."""
+    portal = Portal()
+    itens = json.loads(gzip.decompress(AMOSTRA_DA_AGENDA.read_bytes()))
+    if desde:
+        itens = [i for i in itens if "-".join(reversed(i["dataSessão"].split("/"))) >= desde]
+    pautas = gzip.compress(json.dumps(itens, ensure_ascii=False).encode(), mtime=0)
+    for url in portal.arquivos:
+        nome = url.rsplit("/", 1)[-1].lower()
+        if nome.startswith("pautas_futuras_"):
+            portal.arquivos[url] = pautas
+        elif nome in ("temas.csv", "processos.csv"):
+            portal.arquivos[url] = (STJ / nome.replace(".csv", "_agenda.csv")).read_bytes()
+    portal.falhas["dados=calendarios&mes=12&ano=2026"] = STF_DEZEMBRO
+    portal.falhas["dados=sessao-presencial&data=26/11/2026"] = STF_DIA_SEM_PROCESSOS
+    return portal
+
+
+def _agenda(tmp: Path) -> contrato.Agenda:
+    lida = contrato.ler(_pasta(tmp) / "agenda.json", lado=contrato.LADO_TRIBUNAIS)
+    assert lida is not None, "agenda.json ausente ou fora do contrato"
+    return lida
+
+
+def test_agenda_gravada_ao_lado_dos_achados_valida_e_dentro_do_teto(carga: tuple[Path, Portal, dados.Resultado]) -> None:
+    tmp, _portal, r = carga
+    arquivo = _pasta(tmp) / dados.PAUTA_SEMANAL
+    assert arquivo.name == "agenda.json" and arquivo.stat().st_size <= 60_000
+    texto = arquivo.read_text(encoding="utf-8")
+    assert contrato.validar(json.loads(texto)) == [] and texto.endswith("\n") and "\n" not in texto[:-1]
+    a = _agenda(tmp)
+    assert (a.lado, a.hoje, a.gerado_em, a.janela) == ("tribunais", HOJE, "2026-11-23T12:00:00Z", ("2026-11-23", "2026-12-06"))
+    assert [f.chave for f in a.fontes] == ["stf_pauta", "stj_pautas", "stj_precedentes"]
+    stj_pautas = a.fonte("stj_pautas")
+    meta = _meta(tmp)["fontes"]
+    assert stj_pautas is not None and (stj_pautas.ok, stj_pautas.data_dados, stj_pautas.coletado_em, stj_pautas.velho_dias, stj_pautas.url) == (
+        True, "2026-11-22", meta["stj_pautas"]["coletado_em"], meta["stj_pautas"]["velho_dias"], meta["stj_pautas"]["url"])
+    # o STF: o Plenário de 25/11 com os 10 processos e a hora; o dia 26/11 não foi lido (o portal falso não o serve)
+    plenario = next(s for s in a.sessoes if s.id == "stf-plenario-2026-11-25")
+    assert (plenario.hora, plenario.modalidade, len(plenario.itens), plenario.pauta) == ("14:00", "presencial", 10, "publicada")
+    assert next(s for s in a.sessoes if s.id == "stf-plenario-2026-11-26").pauta == "nao_coletada"
+    stf_pauta = a.fonte("stf_pauta")  # o calendário de dezembro falhou: o que foi lido entra, a fonte fica marcada
+    assert stf_pauta is not None and (stf_pauta.ok, stf_pauta.data_dados) == (False, HOJE) and "calendário" in (stf_pauta.aviso or "")
+    assert len(a.estado_de("stf").virtuais) == 3  # type: ignore[union-attr]
+    # o STJ: os 16 itens da amostra, por sessão; só a proposta de relevância entra com nome
+    do_stj = a.sessoes_de("stj")
+    assert sum(s.total_na_fonte for s in do_stj) == 16 and all(s.hora is None and s.modalidade is None for s in do_stj)
+    assert [(i.identificador, i.alcance) for s in do_stj for i in s.itens] == [("AREsp 3296604", "afetacao")]
+    assert "PESSOA FÍSICA" not in texto and "ADVOGADO" not in texto and "mascarado" not in texto
+    assert not any("genda" in aviso for aviso in r.avisos)
+
+
+def test_agenda_mesmos_dados_mesmos_bytes(carga: tuple[Path, Portal, dados.Resultado], tmp_path_factory: pytest.TempPathFactory,
+                                          regras: modelo.Regras) -> None:
+    tmp, portal, _r = carga
+    antes = (_pasta(tmp) / "agenda.json").read_bytes()
+    r = _rodar(tmp, portal, regras, agora=AGORA.replace(hour=15))  # mais tarde no mesmo dia, mesmos dados: só o relógio mudou
+    assert r.gravados == 0 and (_pasta(tmp) / "agenda.json").read_bytes() == antes
+    outra = tmp_path_factory.mktemp("outra-carga")  # outra máquina, do zero, com os mesmos dados
+    shutil.copytree(RAIZ / "data" / "tribunais" / "tpu", _pasta(outra) / "tpu")
+    _rodar(outra, Portal(), regras, completo=True)
+    assert (_pasta(outra) / "agenda.json").read_bytes() == antes
+
+
+def test_agenda_mantem_a_parte_do_tribunal_nao_refeito(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras) -> None:
+    tmp, portal, _r = carga
+    antes = _agenda(tmp)
+    portal.urls.clear()
+    _rodar(tmp, portal, regras, so="stf", agora=datetime(2026, 11, 24, 12, 0, tzinfo=UTC))
+    depois = _agenda(tmp)
+    assert depois.hoje == "2026-11-24" and not any("dadosabertos" in u for u in portal.urls)
+    assert [f for f in depois.fontes if f.instituicao == "stj"] == [f for f in antes.fontes if f.instituicao == "stj"]
+    assert [s.id for s in depois.sessoes_de("stj")] == [s.id for s in antes.sessoes_de("stj")]
+    assert all(s.como_pautado_em == "2026-11-22" for s in depois.sessoes_de("stj"))  # a data do dado em que a fonte as trazia
+    assert [s.itens for s in depois.sessoes_de("stj")] == [s.itens for s in antes.sessoes_de("stj")]
+    assert depois.estado_de("stj") == antes.estado_de("stj")
+    assert depois.fonte("stf_pauta").data_dados == "2026-11-24"  # type: ignore[union-attr]
+    assert len(next(s for s in depois.sessoes if s.id == "stf-plenario-2026-11-25").itens) == 10
+    # e o contrário: só o STJ; a parte do STF fica
+    _rodar(tmp, portal, regras, so="stj", agora=datetime(2026, 11, 25, 12, 0, tzinfo=UTC))
+    final = _agenda(tmp)
+    assert final.hoje == "2026-11-25" and final.fonte("stf_pauta") == depois.fonte("stf_pauta")
+    assert len(next(s for s in final.sessoes if s.id == "stf-plenario-2026-11-25").itens) == 10
+
+
+def test_agenda_rodar_na_quinta_mantem_a_sessao_de_quarta(tmp_path: Path, regras: modelo.Regras) -> None:
+    """As duas fontes só publicam pautas futuras: na quinta, o Plenário e a Corte Especial de quarta
+    já saíram delas e ficam do arquivo anterior, marcados com a data do dado em que constavam."""
+    _rodar(tmp_path, _portal_da_agenda(), regras, agora=datetime(2026, 11, 25, 12, 0, tzinfo=UTC))
+    quarta = _agenda(tmp_path)
+    assert quarta.refeita("stf") and quarta.refeita("stj")
+    assert {"stf-plenario-2026-11-25", "stj-ce-2026-11-25", "stj-t1-2026-11-24"} <= {s.id for s in quarta.sessoes}
+    assert all(s.como_pautado_em is None for s in quarta.sessoes)
+    # quinta-feira, cache novo: o STF só responde de quinta em diante e o STJ não lista mais terça nem quarta
+    r = _rodar(tmp_path, _portal_da_agenda(desde="2026-11-26"), regras, cache="quinta", agora=datetime(2026, 11, 26, 12, 0, tzinfo=UTC))
+    assert r.refeitos == ["stf", "stj"]
+    quinta = _agenda(tmp_path)
+    assert quinta.hoje == "2026-11-26" and quinta.refeita("stf") and quinta.refeita("stj")
+    por_id = {s.id: s for s in quinta.sessoes}
+    plenario, corte = por_id["stf-plenario-2026-11-25"], por_id["stj-ce-2026-11-25"]
+    assert (plenario.como_pautado_em, plenario.hora, len(plenario.itens)) == ("2026-11-25", "14:00", 10)
+    assert corte.como_pautado_em == "2026-11-22" and [i.identificador for i in corte.itens] == ["AREsp 3296604"]
+    assert por_id["stj-t1-2026-11-24"].como_pautado_em == "2026-11-22"
+    assert (por_id["stf-plenario-2026-11-26"].pauta, por_id["stf-plenario-2026-11-26"].como_pautado_em) == ("nao_publicada", None)
+    assert por_id["stj-ce-2026-12-02"].como_pautado_em is None and len(por_id["stj-ce-2026-12-02"].itens) == 4
+    assert all(i.resultado is None for s in quinta.sessoes for i in s.itens)  # sessão passada não é julgamento feito
+    # o repetitivo de 09/12 continua depois da janela (23/11 a 06/12): fica no estado do STJ
+    proximo = quinta.estado_de("stj").proximo  # type: ignore[union-attr]
+    assert proximo is not None and (proximo.id, proximo.itens[0].tema.numero) == ("stj-s2-2026-12-09", 1443)  # type: ignore[union-attr]
+
+
+def test_agenda_nao_depende_do_painel_recusado(tmp_path: Path, regras: modelo.Regras) -> None:
+    """Com o acervo recusado (total fora da faixa no STJ, planilha anterior à em uso no STF), o
+    painel da véspera fica e a pauta do dia é lida do mesmo jeito."""
+    shutil.copytree(RAIZ / "data" / "tribunais" / "tpu", _pasta(tmp_path) / "tpu")
+    _rodar(tmp_path, Portal(), regras, completo=True)
+    antes = _meta(tmp_path)
+    meta = json.loads(json.dumps(antes))
+    meta["fontes"]["stj_acervo"]["registros"] = 60  # 44 de 60: abaixo de 85%, o acervo do STJ é recusado
+    meta["fontes"]["stf_acervo"]["data_dados"] = "2026-11-23"  # a planilha de 22/11 é anterior: recusada
+    (_pasta(tmp_path) / "meta.json").write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+    paineis = {t: (_pasta(tmp_path) / f"{t}.json").read_bytes() for t in ("stj", "stf")}
+    (_pasta(tmp_path) / "agenda.json").unlink()
+    r = _rodar(tmp_path, _portal_da_agenda(), regras, cache="outro", agora=datetime(2026, 11, 24, 12, 0, tzinfo=UTC))
+    assert r.refeitos == [] and {t: (_pasta(tmp_path) / f"{t}.json").read_bytes() for t in ("stj", "stf")} == paineis
+    a = _agenda(tmp_path)
+    assert a.hoje == "2026-11-24" and a.refeita("stj") and a.refeita("stf")
+    assert {"stj-ce-2026-12-02", "stj-s2-2026-12-03", "stf-plenario-2026-11-25", "stf-plenario-2026-11-26"} <= {s.id for s in a.sessoes}
+    assert a.fonte("stj_pautas").coletado_em == "2026-11-24T12:00:00Z"  # type: ignore[union-attr]
+    repetitivos = {i.identificador: i.tema.numero for s in a.sessoes for i in s.itens if i.alcance == "repetitivo" and i.tema}
+    assert repetitivos == {"REsp 2034211": 1254, "REsp 2235680": 1448, "REsp 2226097": 1404}
+    # o meta.json continua descrevendo o painel publicado: as fontes acessórias ficam como estavam
+    depois = _meta(tmp_path)["fontes"]
+    assert all(depois[fid] == antes["fontes"][fid] for fid in ("stj_pautas", "stj_precedentes", "stf_pauta", "stf_rg"))
+
+
+def test_falha_da_agenda_nao_impede_os_paineis(tmp_path: Path, regras: modelo.Regras, monkeypatch: pytest.MonkeyPatch) -> None:
+    def quebrada(*_a: Any, **_k: Any) -> Any:
+        raise RuntimeError("defeito na agenda")
+
+    monkeypatch.setattr(dados.pauta_mod, "montar", quebrada)
+    r = _rodar(tmp_path, Portal(), regras)
+    pasta = _pasta(tmp_path)
+    assert r.refeitos == ["stf", "stj"] and (pasta / "stj.json").is_file() and (pasta / "stf.json").is_file() and (pasta / "achados.json").is_file()
+    assert not (pasta / "agenda.json").exists()
+    assert any("Agenda da semana não gravada" in a and "defeito na agenda" in a for a in r.avisos)
+    assert not any("genda" in a for a in _meta(tmp_path)["avisos"])  # aviso só de operação: o meta.json não muda por causa dela
+
+
+def test_agenda_fora_do_contrato_ou_acima_do_teto_mantem_o_arquivo_anterior(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras,
+                                                                           monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    tmp, portal, _r = carga
+    antes = (_pasta(tmp) / "agenda.json").read_bytes()
+    amanha = datetime(2026, 11, 24, 12, 0, tzinfo=UTC)
+    # 1. o teto próprio (config/agenda.yaml → tetos.arquivos.tribunais_bytes): nem emagrecida cabe
+    pequeno = SimpleNamespace(tetos=SimpleNamespace(arquivos=SimpleNamespace(tribunais_bytes=2_000)))
+    with monkeypatch.context() as m:
+        m.setattr(dados.regras_agenda, "carregar", lambda _root=None: pequeno)
+        r = _rodar(tmp, portal, regras, agora=amanha)
+    assert r.refeitos == ["stf", "stj"] and (_pasta(tmp) / "agenda.json").read_bytes() == antes
+    assert any("Agenda da semana não gravada" in a and "AcimaDoTeto" in a for a in r.avisos)
+    # 2. agenda fora do contrato: o contrato recusa, fica o arquivo anterior e a execução segue
+    original = agenda_mod.texto
+
+    def fora_do_contrato(a: contrato.Agenda, teto: int = 0) -> tuple[str, list[str]]:
+        return original(dataclasses.replace(a, gerado_em="ontem"), 60_000)
+
+    with monkeypatch.context() as m:
+        m.setattr(dados.pauta_mod, "texto", fora_do_contrato)
+        r = _rodar(tmp, portal, regras, agora=amanha.replace(hour=13))
+    assert (_pasta(tmp) / "agenda.json").read_bytes() == antes and any("ErroDeContrato" in a for a in r.avisos)
+    # 3. sem defeito, a mesma execução grava a agenda do dia
+    _rodar(tmp, portal, regras, agora=amanha.replace(hour=14))
+    assert _agenda(tmp).hoje == "2026-11-24"
+
+
+def test_no_teto_da_pasta_quem_cai_e_a_agenda(carga: tuple[Path, Portal, dados.Resultado], regras: modelo.Regras,
+                                               monkeypatch: pytest.MonkeyPatch) -> None:
+    tmp, portal, _r = carga
+    antes = (_pasta(tmp) / "agenda.json").read_bytes()
+    sem_a_agenda = dados._tamanho_atual(_pasta(tmp), {"agenda.json"})
+    monkeypatch.setattr(dados, "TETO_PASTA", sem_a_agenda + 2_000)  # os painéis cabem; com a agenda (9 KB), a pasta passaria
+    r = _rodar(tmp, portal, regras, agora=datetime(2026, 11, 24, 12, 0, tzinfo=UTC))
+    assert r.refeitos == ["stf", "stj"] and (_pasta(tmp) / "agenda.json").read_bytes() == antes
+    assert any("a agenda de hoje não foi gravada" in a for a in r.avisos)
+    assert _meta(tmp)["hoje"] == "2026-11-24" and not any("tamanho máximo" in (f.get("aviso") or "") for f in _meta(tmp)["fontes"].values())

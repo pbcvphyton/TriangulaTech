@@ -1,0 +1,135 @@
+{#- Estilos da Agenda da semana. Entram só onde a agenda aparece: na página da edição que
+    traz o bloco (edition.html.j2, bloco "styles") e na página completa (agenda.html.j2, que
+    passa pagina_completa). As outras páginas, e a edição sem agenda, não carregam nada daqui. -#}
+/* Agenda da semana: o que está pautado, por dia. Uma linha de pauta (.ag-l) tem a cabeça
+   (.ag-c: hora, instituição e órgão por extenso) e o conteúdo (.ag-x: a situação da linha,
+   os itens e o resto). Três desenhos da mesma marcação:
+   - corrida: cabeça e conteúdo num parágrafo só (a coluna estreita .ag-r, com o resto da
+     semana e o que já foi decidido, em qualquer tela; a coluna larga .ag-p, no celular);
+   - pilha: a cabeça numa fileira e os itens embaixo (coluna larga, de 641 a 1023 px);
+   - tabela: hora, cabeça e itens em colunas fixas, um item por fileira (coluna larga, no
+     computador).
+   No celular, as linhas de hoje e amanhã abrem (.ab) com um item e até 3 linhas de texto;
+   as demais ficam numa linha só. HOJE, AMANHÃ e o cinza dos dias passados são postos por
+   page.js pela data de Brasília (.ag-q, .hoje, .passou); o laranja é só do HOJE. */
+.so-cel{display:none}
+.ag-cols{display:grid;grid-template-columns:minmax(0,1fr)}
+.ag-col{min-width:0}
+.ag-dia,.ag-dec{padding:8px 0 9px;border-top:var(--fio)}
+.ag-d{font-family:var(--ss);font-size:var(--f-min);font-weight:700;line-height:1.5;color:var(--ink)}
+.ag-q:not(:empty){display:inline-block;margin-right:6px;padding:0 5px;border:1px solid var(--rule);font-size:var(--f-rot);letter-spacing:.8px;line-height:1.5;color:var(--ink)}
+.ag-dia.hoje .ag-q{border-color:var(--qc);background:var(--qc);color:#1a2332}
+.ag-ll{list-style:none;min-width:0}
+.ag-l{position:relative;min-width:0;font-family:var(--ss);font-size:var(--f-txt);line-height:1.45;color:var(--body)}
+.ag-l+.ag-l{margin-top:7px}
+.ag-c{font-size:var(--f-min);line-height:1.6;color:var(--ink)}
+.ag-c b,.ag-c a{font-weight:700}
+.ag-h{font-weight:400;font-variant-numeric:tabular-nums;color:var(--muted)}
+.ag-h:empty{display:none}
+.ag-i{color:var(--ink)}
+.ag-a{font-weight:700}
+.ag-s{color:var(--muted)}
+.ag-ls{font-weight:700;color:var(--ink)}
+.ag-t{display:block}
+.ag-t,.ag-m{font-size:var(--f-min);line-height:1.5;color:var(--muted)}
+.ag-vz,.ag-fr,.ag-pe{font-family:var(--ss);font-size:var(--f-min);line-height:1.5;color:var(--muted)}
+.ag-dia.sem{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:10px;align-items:baseline}
+.ag-fr{list-style:none;padding-top:9px;border-top:var(--fio);color:var(--body)}
+.ag-fr li{position:relative;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.ag-fr li+li{margin-top:5px}
+.ag-pe{margin-top:10px;padding-top:9px;border-top:var(--fio)}
+.ag-pe a{font-weight:700}
+.ag-k a,.ag-c a,.ag-fr a,.ag-pe a{color:var(--link)}
+.ag a:hover{text-decoration:underline}
+.ag-dia.passou .ag-d,.ag-dia.passou .ag-c,.ag-dia.passou .ag-i,.ag-dia.passou .ag-ls,.ag-dia.passou .ag-l{color:var(--muted)}
+/* corrida (coluna estreita): o rótulo do dia à esquerda e cada linha num parágrafo só */
+.ag-r .ag-dia{display:grid;grid-template-columns:50px minmax(0,1fr);column-gap:8px;align-items:baseline}
+.ag-r .ag-c,.ag-r .ag-x,.ag-r .ag-x>*,.ag-r .ag-t{display:inline}
+.ag-r .ag-c,.ag-r .ag-t,.ag-r .ag-m{font-size:inherit;line-height:inherit}
+.ag-r .ag-c::after,.ag-r .ag-x>*+*::before,.ag-r .ag-t::before{content:" · ";font-weight:400;color:var(--muted)}
+@media (max-width:640px){
+  .so-larga{display:none}
+  .so-cel{display:inline}
+  .ag-dia,.ag-dec{padding:7px 0}
+  .ag-r .ag-dia{padding:5px 0}
+  /* coluna larga em corrida: cabeça, item, situação e "mais N" num parágrafo só */
+  .ag-p .ag-c,.ag-p .ag-x,.ag-p .ag-x>*,.ag-p .ag-t{display:inline}
+  .ag-p .ag-c,.ag-p .ag-t,.ag-p .ag-m{font-size:inherit;line-height:inherit}
+  .ag-p .ag-c::after,.ag-p .ag-x>*+*::before,.ag-p .ag-t::before{content:" · ";font-weight:400;color:var(--muted)}
+  .ag .ag-x>.ag-i.larga{display:none}
+  .ag-p .ag-l{margin-top:3px}
+  /* cada linha em até 3 linhas de texto (numa linha só, o nome da medida provisória ou do
+     projeto sumia nas reticências e a linha não dizia do que se tratava) */
+  .ag-l{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+}
+@media (min-width:1024px){
+  .ag-cols{grid-template-columns:minmax(0,2fr) minmax(0,1fr);column-gap:56px}
+  .ag-cols.uma{grid-template-columns:minmax(0,1fr)}
+  .ag-p .ag-dia{display:grid;grid-template-columns:66px minmax(0,1fr);column-gap:12px;align-items:baseline}
+  .ag-p .ag-q:not(:empty){display:table;margin:0 0 3px}
+  /* tabela: hora, instituição e órgão, itens */
+  .ag-p .ag-l{display:grid;grid-template-columns:176px minmax(0,1fr);column-gap:14px;align-items:baseline}
+  .ag-p .ag-c{display:grid;grid-template-columns:44px minmax(0,1fr)}
+  .ag-p .ag-h:empty{display:block}
+  .ag-p .ag-nk{display:flex;white-space:nowrap}
+  .ag-p .ag-n{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .ag-p .ag-k{flex:none;margin-left:.28em}
+  .ag-fr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:56px}
+  .ag-fr li+li{margin-top:0}
+}
+{% if pagina_completa is defined and pagina_completa %}
+/* Página completa (edicoes/agenda.html): usa as variáveis e as peças do bloco (.ag-a, .ag-h,
+   .ag-s, .ag-q) e acrescenta só o que é dela (agp-…). Uma coluna de leitura; no computador,
+   o dia fica à esquerda das linhas. */
+.agp{margin:0 var(--mg);padding:22px 0 40px;font-family:var(--ss);font-size:var(--f-txt);line-height:1.5;color:var(--body)}
+.agp a{color:var(--link)}
+.agp a:hover{text-decoration:underline}
+.agp-top{max-width:60em;padding-bottom:18px}
+.agp-t{font-family:var(--sf);font-size:28px;font-weight:700;line-height:1.2;color:var(--head)}
+.agp-sub{margin-top:6px;font-family:var(--sf);font-size:var(--f-tit);line-height:1.45;color:var(--ink)}
+.agp-av{margin-top:10px;padding:10px 12px;border-left:3px solid var(--rule);background:var(--soft);color:var(--ink)}
+.agp-nav{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:12px;font-size:var(--f-min);font-weight:700}
+.agp-sem{max-width:60em;margin-bottom:18px;padding:12px 0;border-top:var(--fio);border-bottom:var(--fio);font-family:var(--sf);font-size:var(--f-tit);color:var(--ink)}
+.agp-fr{list-style:none;max-width:60em;margin-bottom:18px;color:var(--ink)}
+.agp-fr li+li{margin-top:6px}
+.agp-s{padding:22px 0 8px;border-top:var(--fio);scroll-margin-top:12px}
+.agp-x{max-width:60em;margin-bottom:6px;color:var(--muted)}
+.agp-dia{padding:12px 0 14px;border-top:var(--fio)}
+.agp-s>.rot+.agp-dia,.agp-x+.agp-dia{border-top:0}
+.agp-d3{font-family:var(--ss);font-size:var(--f-txt);font-weight:700;line-height:1.4;color:var(--ink)}
+.agp-dia.hoje .ag-q{border-color:var(--qc);background:var(--qc);color:#1a2332}
+.agp-dia.passou .agp-d3,.agp-dia.passou .agp-c,.agp-dia.passou .agp-n{color:var(--muted)}
+.agp-vz{color:var(--muted)}
+.agp-ll,.agp-il,.agp-nums,.agp-ft,.agp-lm{list-style:none}
+.agp-l{margin-top:10px;scroll-margin-top:12px}
+.agp-l:target{background:var(--soft)}
+.agp-c{font-size:var(--f-txt);font-weight:700;line-height:1.4;color:var(--ink)}
+.agp-ls{font-weight:400;color:var(--muted)}
+.agp-il{margin-top:2px}
+.agp-i{padding:7px 0 8px;border-top:1px solid var(--rl)}
+.agp-n{color:var(--ink)}
+.agp-d,.agp-pq,.agp-fl{font-size:var(--f-min);line-height:1.5;color:var(--muted)}
+.agp-d span+span::before{content:" · "}
+.agp-d b{color:var(--ink)}
+.agp-fl{margin-top:4px}
+.agp-nums{max-width:60em;columns:2 260px;column-gap:36px;margin:6px 0 12px}
+.agp-nums li{break-inside:avoid;padding:3px 0}
+.agp-s>.agp-d3{margin-top:14px}
+.agp-cl{display:grid;grid-template-columns:minmax(0,1fr);row-gap:16px}
+.agp-cl p{max-width:44em;margin-top:6px}
+.agp-cl code{font-family:var(--mn);font-size:.92em}
+.agp-rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 28px;margin-top:6px}
+.agp-tb{width:100%;border-collapse:collapse;font-size:var(--f-min);line-height:1.4}
+.agp-tb caption{padding-bottom:4px;font-weight:700;text-align:left;color:var(--ink)}
+.agp-tb th{padding:3px 8px 3px 0;border-top:1px solid var(--rl);font-weight:400;text-align:left}
+.agp-tb td{padding:3px 0;border-top:1px solid var(--rl);font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
+.agp-ft,.agp-lm{max-width:60em;margin:6px 0 12px}
+.agp-ft li,.agp-lm li{padding:3px 0}
+.agp-ft .velha{color:var(--ink);font-weight:700}
+@media (min-width:1024px){
+  .agp-dia{display:grid;grid-template-columns:200px minmax(0,1fr);column-gap:24px;align-items:start}
+  .agp-dia .ag-q:not(:empty){display:table;margin:0 0 4px}
+  .agp-ll>.agp-l:first-child,.agp-dia>.agp-il{margin-top:0}
+  .agp-cl{grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:56px}
+}
+{% endif %}

@@ -4,6 +4,14 @@ O modelo ``Edition`` é convertido primeiro numa *view* (:class:`EditionView`)
 com todos os textos já limpos (sem markdown em títulos), URLs validadas e
 horários formatados; os templates só apresentam. A mesma view é usada pelo
 e-mail (``render/email.py``).
+
+A home tem três andares, cada um com teto (as constantes ``TETO_*`` abaixo): o
+que aconteceu (a manchete, sem corpo, e as chamadas de "Em 1 minuto"), o que vem
+aí (a agenda da semana, que entra entre os dois) e como a mídia cobriu (a linha
+do viés, "Onde os veículos divergiram" e "Mais recentes"). O que é detalhe mora
+nas janelas das matérias e nas gavetas da cópia arquivada
+(``edicoes/AAAA-MM-DD.html``: ``#cobertura``, ``#termometro`` e ``#racional``),
+que só essa cópia renderiza; a home aponta para elas (``EditionView.copia_href``).
 """
 
 from __future__ import annotations
@@ -19,9 +27,11 @@ from markupsafe import Markup
 from .. import text
 from ..collect.market import format_change
 from ..config import Config
+from ..agenda.retrato import ler_retrato
 from ..models import Coverage, Edition, Quote, Rationale, Story
+from . import agenda as agenda_tela
 from . import filters
-from .termometro import ANALITICO_PAGINA, TermometroDiaView, termometro_dia_view
+from .termometro import ANALITICO_PAGINA, TermometroDiaView, ViesDoDiaView, termometro_dia_view, vies_do_dia
 
 log = logging.getLogger(__name__)
 
@@ -34,14 +44,18 @@ DEFAULT_COLORS = {
     "ticker_down": "#FF5C9A",
 }
 DEFAULT_ON_MASTHEAD = "#FFFFFF"
-RADAR_SIZE = 8
-RADAR_WIRE_SIZE = 12  # itens do Radar quando a edição traz notícias além das matérias
-FRONT_MORE_SIZE = 8  # itens de "Mais para ler" na primeira página do computador
-LEAD_MORE_PARAGRAPHS = 2  # texto extra da manchete quando não há imagem (ou ela falha)
+# Tetos da home: o gerador corta por eles, a edição nunca passa (tests/test_home_orcamento.py).
+TETO_CHAMADAS = 5  # chamadas de "Em 1 minuto": as secundárias e os primeiros destaques
+TETO_DIVERGENCIAS = 3  # assuntos em "Onde os veículos divergiram"
+TETO_RECENTES = 5  # itens de "Mais recentes"
+RECENTES_NO_CELULAR = 3  # quantos deles aparecem no celular (os demais, só em tela larga)
+CHAMADAS_SECUNDARIAS = 3  # secundárias que abrem "Em 1 minuto"; os destaques completam o teto
+DIVERGENCIA_MIN_VEICULOS = 3  # assunto com os dois lados só entra na home com 3 veículos ou mais
+DIVERGE_MIN_LADO_MENOR = 2  # lado menor com 2 veículos ou mais: "veículos divergem"; com 1, "destoou"
+TITULO_CURTO = 60  # manchete até este comprimento: letra maior
+TITULO_MEDIO = 85  # até este: letra média; acima, a menor (o título nunca é cortado)
 DESCRIPTION_MAX = 200
-EXCERPT_OVERLAP = 0.6  # similaridade a partir da qual um parágrafo repete a linha fina
 ORPHAN_SECTION = ("outras", "Outras notícias")
-DEFAULT_ALL_MIN = 3  # 1ª seção com menos matérias que isso: a aba "Todas" abre por padrão
 
 
 @dataclass(frozen=True)
@@ -104,6 +118,7 @@ class StoryView:
     lang: str | None = None  # idioma do texto quando não é português (atributo lang)
     coverage: CoverageView | None = None
     compiled: str = ""  # "Compilada de 7 notícias de 5 veículos · bloco Economia & Mercados"
+    marca: str = ""  # assunto com veículos dos dois lados: "veículos divergem" ou "1 veículo destoou"
     congresso: list[dict[str, Any]] = field(default_factory=list)  # parlamentares citados (fichas curtas)
 
     @property
@@ -120,8 +135,8 @@ class StoryView:
 
 
 @dataclass
-class RadarItem:
-    """Linha do Radar: notícia do dia (link externo) ou matéria da edição (âncora)."""
+class RecenteView:
+    """Linha de "Mais recentes": notícia do dia (link externo) ou matéria da edição (âncora)."""
 
     time: str
     source: str
@@ -129,6 +144,70 @@ class RadarItem:
     href: str
     external: bool
     lang: str | None = None
+    so_tela_larga: bool = False  # passa de RECENTES_NO_CELULAR: some no celular
+
+
+@dataclass
+class ServicoView:
+    """Um trecho da linha de serviço de uma chamada (a linha pequena sob o título).
+
+    ``tipo`` diz ao modelo como desenhar: "veiculos" é texto simples; "idade" e "hora"
+    viram ``<time>`` (a idade é recalculada no navegador); "diverge" leva a marca de
+    divergência e o link do item em "Onde os veículos divergiram". Qualquer outro tipo
+    sai como texto (ou link, com ``href``): é por onde a agenda da semana acrescenta o
+    seu trecho ("na agenda: qua 25")."""
+
+    texto: str
+    tipo: str = ""
+    href: str = ""
+    quando: str = ""  # instante ISO da publicação (tipos "idade" e "hora")
+
+
+@dataclass
+class ChamadaView:
+    """Uma chamada do andar das notícias: a manchete ou um item de "Em 1 minuto"."""
+
+    story: StoryView
+    servico: list[ServicoView] = field(default_factory=list)
+    tamanho: str = ""  # só na manchete: classe de letra do título ("curto" | "medio" | "longo")
+
+
+@dataclass
+class LadoView:
+    """Uma linha de um assunto em que os veículos divergiram: a conta e o lado em palavras."""
+
+    conta: str  # "3 veículos", "1 veículo destoou", "11 sem lado"
+    texto: str = ""  # o lado, como a análise o escreveu (vazio em "sem lado")
+
+
+@dataclass
+class DivergenciaView:
+    """Um assunto de "Onde os veículos divergiram": o título e os dois lados em palavras."""
+
+    anchor: str  # id do item na home ("dv-1"), alvo de "veículos divergem" da chamada
+    titulo: str
+    href: str  # "#s-<id>" (abre a matéria da edição) ou a cobertura completa da cópia arquivada
+    lados: list[LadoView]
+    marca: str  # "veículos divergem" | "1 veículo destoou" | "1 veículo de cada lado"
+    story_id: str = ""
+
+
+@dataclass
+class MidiaView:
+    """Bloco "Como a mídia cobriu": a linha do viés e as duas colunas.
+
+    Cada parte some sozinha quando a edição não a tem (edição automática, sem
+    cobertura comparada; marca sem termômetro), sem deixar coluna ou título vazio."""
+
+    vies: ViesDoDiaView | None  # só a marca com termômetro, no dia em que ele rodou
+    comparados: int  # assuntos com cobertura comparada (0: a coluna das divergências não aparece)
+    divergencias: list[DivergenciaView]
+    recentes: list[RecenteView]
+    ate: str  # hora da edição no título de "Mais recentes": "09h28"
+
+    @property
+    def colunas(self) -> int:
+        return (1 if self.comparados else 0) + (1 if self.recentes else 0)
 
 
 @dataclass
@@ -155,7 +234,7 @@ class RationaleView:
     """Racional da compilação: resumo, números e blocos por editoria."""
 
     summary: str  # parágrafo em texto puro
-    strip: str  # linha curta do topo da página e do e-mail
+    linha: str  # linha de método do rodapé: "Compilada de 1.146 notícias de 42 veículos"
     articles: int
     outlets: int
     topics: int
@@ -317,15 +396,12 @@ class EditionView:
     editorial: str
     briefing: list[str]
     lead: StoryView | None
-    lead_excerpt: str  # parágrafo do corpo exibido na manchete (pode conter **negrito**)
-    lead_more: list[str]  # parágrafos seguintes, exibidos só se a manchete ficar sem imagem
     secondary: list[StoryView]
     highlights: list[StoryView]
     sections: list[SectionView]
     stories: list[StoryView]
-    radar: list[RadarItem]
     quotes: list[QuoteView]
-    weather: list[WeatherView]
+    clima: WeatherView | None  # a primeira cidade da configuração, último item da linha de indicadores
     sources_total: int
     sources_ok: int
     source_groups: list[SourceGroup]
@@ -335,20 +411,28 @@ class EditionView:
     description: str
     og_image: str | None
     mode: str = "heuristic"  # "ai" | "heuristic"
-    default_all: bool = False  # aba "Todas" aberta por padrão (1ª seção com poucas matérias)
     compared: list[CoverageView] = field(default_factory=list)  # demais assuntos com cobertura comparada
     compared_map: ComparedMapView | None = None  # todos os assuntos comparados (matérias + demais), por categoria
     rationale: RationaleView | None = None  # racional da compilação (vazio em edições antigas)
     index: list[IndexSectionView] = field(default_factory=list)  # todas as notícias do dia, por seção
     instagram_url: str = ""  # perfil do Instagram (config instagram.handle), no rodapé
     index_url: str = ""  # página com todas as notícias do dia (edicoes/AAAA-MM-DD-todas.html)
-    # Termômetro do dia (marca com termômetro, quando ele rodou na edição); o link
-    # da aba "Analítico Político" sai em termometro.analitico_href.
+    # Termômetro do dia (marca com termômetro, quando ele rodou na edição): o painel da
+    # gaveta da cópia arquivada; o link da aba "Analítico Político" sai em
+    # termometro.analitico_href. A home leva só o resumo dele (midia.vies).
     termometro: TermometroDiaView | None = None
-    # Primeira página no computador (layout de jornal): chamada relacionada sob a
-    # manchete e a grade "Mais para ler" (demais destaques e matérias fora da capa).
-    related: StoryView | None = None
-    more: list[StoryView] = field(default_factory=list)
+    # Andar das notícias: a manchete e as chamadas de "Em 1 minuto" (cada matéria uma vez).
+    manchete: ChamadaView | None = None
+    chamadas: list[ChamadaView] = field(default_factory=list)
+    # "Como a mídia cobriu" (None quando a edição não tem nada para o bloco).
+    midia: MidiaView | None = None
+    # "Agenda da semana" (None sem retrato na edição, com a agenda desligada ou com erro).
+    agenda: agenda_tela.AgendaView | None = None
+    # Cópia arquivada (edicoes/AAAA-MM-DD.html): é ela que leva as gavetas de detalhe.
+    arquivada: bool = False
+    # Endereço da cópia arquivada visto da página ("" na própria cópia): os links de
+    # detalhe da home são copia_href + "#cobertura", "#termometro" e "#racional".
+    copia_href: str = ""
 
     @property
     def index_total(self) -> int:
@@ -533,6 +617,7 @@ def _story_view(
     title, color = section
     lang = (story.lang or "pt").strip().lower()
     sources = _source_links(story)
+    coverage = coverage_view(story.coverage)
     return StoryView(
         id=story.id,
         anchor=f"s-{story.id}",
@@ -548,8 +633,9 @@ def _story_view(
         age="" if archive else filters.rel_age(story.published, now_iso),
         published=story.published,
         lang=None if lang.startswith("pt") else lang,
-        coverage=coverage_view(story.coverage),
+        coverage=coverage,
         compiled=_compiled_label(story, sources),
+        marca=_marca_da_materia(coverage),
     )
 
 
@@ -661,9 +747,10 @@ def _quote_view(quote: Quote) -> QuoteView:
 
 
 def _weather_views(edition: Edition, config: Config) -> list[WeatherView]:
-    """A faixa de clima mostra só as cidades da configuração (``weather`` em
-    ``config/site.yaml``): uma cidade que saiu de lá some também das edições refeitas,
-    mesmo que a coleta daquele dia a tenha registrado."""
+    """O clima mostra só as cidades da configuração (``weather`` em ``config/site.yaml``):
+    uma cidade que saiu de lá some também das edições refeitas, mesmo que a coleta
+    daquele dia a tenha registrado. A home usa a primeira (último item da linha de
+    indicadores, só em tela larga)."""
     cidades = {text.normalize(c.name) for c in config.weather}
     views = []
     for w in edition.weather:
@@ -712,39 +799,18 @@ def _source_groups(edition: Edition, config: Config) -> list[SourceGroup]:
     return list(groups.values())
 
 
-def _lead_excerpt(lead: StoryView | None) -> str:
-    """Primeiro parágrafo do corpo que não repete a linha fina (a edição heurística
-    costuma abrir o corpo com a mesma frase do ``dek``)."""
-    if lead is None:
-        return ""
-    dek = text.normalize(lead.dek)
-    for paragraph in lead.body:
-        plain = text.normalize(filters.plain(paragraph))
-        if dek and (plain.startswith(dek[:80]) or text.similarity(dek, plain) >= EXCERPT_OVERLAP):
-            continue
-        return paragraph
-    return ""
-
-
-def _lead_more(lead: StoryView | None, excerpt: str) -> list[str]:
-    """Parágrafos que seguem o trecho da manchete (preenchem o espaço da imagem ausente)."""
-    if lead is None or not excerpt or excerpt not in lead.body:
-        return []
-    start = lead.body.index(excerpt) + 1
-    return lead.body[start : start + LEAD_MORE_PARAGRAPHS]
-
-
-def _radar(edition: Edition, ordered: list[StoryView], tz: str) -> list[RadarItem]:
-    """Radar: notícias do dia que não viraram matéria (``edition.wire``, com link para
-    a fonte); em edições sem esse campo, as matérias mais recentes da edição."""
-    items: list[RadarItem] = []
+def _recentes(edition: Edition, ordered: list[StoryView], na_capa: set[str], tz: str) -> list[RecenteView]:
+    """"Mais recentes": as notícias do dia que não viraram matéria (``edition.wire``, com
+    link para a fonte), até ``TETO_RECENTES``; em edições sem esse campo, as matérias
+    mais recentes da edição que não estão no andar das notícias (``na_capa``)."""
+    items: list[RecenteView] = []
     for entry in edition.wire:
         href = filters.safe_url(entry.get("url"))
         title = filters.plain(str(entry.get("title") or ""))
         if not href or not title:
             continue
         items.append(
-            RadarItem(
+            RecenteView(
                 time=filters.local_time(entry.get("published"), tz, edition.generated_at),
                 source=filters.plain(str(entry.get("source") or "")),
                 title=title,
@@ -752,20 +818,23 @@ def _radar(edition: Edition, ordered: list[StoryView], tz: str) -> list[RadarIte
                 external=True,
             )
         )
-    if items:
-        return items[:RADAR_WIRE_SIZE]
-    recent = sorted((v for v in ordered if v.published), key=_published_ts, reverse=True)[:RADAR_SIZE]
-    return [
-        RadarItem(
-            time=v.time,
-            source=v.sources[0].name if v.sources else v.section_title,
-            title=v.headline,
-            href=f"#{v.anchor}",
-            external=False,
-            lang=v.lang,
-        )
-        for v in recent
-    ]
+    if not items:
+        fora_da_capa = (v for v in ordered if v.published and v.id not in na_capa)
+        items = [
+            RecenteView(
+                time=v.time,
+                source=v.sources[0].name if v.sources else v.section_title,
+                title=v.headline,
+                href=f"#{v.anchor}",
+                external=False,
+                lang=v.lang,
+            )
+            for v in sorted(fora_da_capa, key=_published_ts, reverse=True)
+        ]
+    items = items[:TETO_RECENTES]
+    for item in items[RECENTES_NO_CELULAR:]:
+        item.so_tela_larga = True
+    return items
 
 
 def _compared_pairs(
@@ -855,6 +924,154 @@ def _compared_map(
     )
 
 
+def _marca_da_materia(c: CoverageView | None) -> str:
+    """A marca de divergência de uma matéria, ou "" quando o assunto não teve veículos dos
+    dois lados (ou teve menos de ``DIVERGENCIA_MIN_VEICULOS`` veículos). É o que sobra, na
+    capa e nos cartões, das listas de veículos e das barras, que ficam na janela da matéria."""
+    if c is None or _divergence(c) is None or c.total < DIVERGENCIA_MIN_VEICULOS:
+        return ""
+    return _marca_de_divergencia(c)
+
+
+def _marca_de_divergencia(c: CoverageView) -> str:
+    """Como chamar um assunto com veículos dos dois lados: só é divergência quando o lado
+    menor tem ``DIVERGE_MIN_LADO_MENOR`` veículos ou mais; com um só, ele destoou."""
+    menor, maior = sorted((len(c.a), len(c.b)))
+    if menor >= DIVERGE_MIN_LADO_MENOR:
+        return "veículos divergem"
+    return "1 veículo destoou" if maior > menor else "1 veículo de cada lado"
+
+
+def _lados(c: CoverageView) -> list[LadoView]:
+    """Os dois lados em palavras, com a conta: o lado com mais veículos primeiro, depois o
+    menor ("1 veículo destoou" quando é um só contra vários) e os veículos sem lado."""
+    (n_maior, maior), (n_menor, menor) = sorted(((len(c.a), c.side_a), (len(c.b), c.side_b)), key=lambda lado: -lado[0])
+    destoou = n_menor < DIVERGE_MIN_LADO_MENOR and n_maior > n_menor
+    linhas = [
+        LadoView(conta=_veiculos(n_maior), texto=maior.rstrip(" .")),
+        LadoView(conta="1 veículo destoou" if destoou else _veiculos(n_menor), texto=menor.rstrip(" .")),
+    ]
+    if c.neutral:
+        linhas.append(LadoView(conta=f"{len(c.neutral)} sem lado"))
+    return linhas
+
+
+def _divergencias(mapa: ComparedMapView | None, copia_href: str) -> list[DivergenciaView]:
+    """"Onde os veículos divergiram": até ``TETO_DIVERGENCIAS`` assuntos com veículos dos
+    dois lados e ``DIVERGENCIA_MIN_VEICULOS`` veículos ou mais. Primeiro os de lado menor
+    mais cheio; no empate, o assunto com mais veículos e, depois, o mais equilibrado.
+    O título abre a matéria da edição; assunto que não virou matéria leva à cobertura
+    completa da cópia arquivada (nunca ao texto de um dos lados)."""
+    if mapa is None:
+        return []
+    candidatos = [i for i in mapa.divided if i.c.total >= DIVERGENCIA_MIN_VEICULOS]
+    posicao = {id(item): k for k, item in enumerate(candidatos)}
+    candidatos.sort(key=lambda i: (-min(len(i.c.a), len(i.c.b)), -i.c.total, -(i.divergence or 0), posicao[id(i)]))
+    saida = []
+    for n, item in enumerate(candidatos[:TETO_DIVERGENCIAS], start=1):
+        materia = item.story_href.startswith("#s-")
+        saida.append(
+            DivergenciaView(
+                anchor=f"dv-{n}",
+                titulo=item.story_title or item.c.topic,
+                href=item.story_href or f"{copia_href}#cobertura",
+                lados=_lados(item.c),
+                marca=_marca_de_divergencia(item.c),
+                story_id=item.story_href[3:] if materia else "",
+            )
+        )
+    return saida
+
+
+def _tamanho_do_titulo(headline: str) -> str:
+    """Classe de letra da manchete pelo comprimento do título (calculada aqui, não no
+    navegador): o título nunca é cortado, a letra é que diminui."""
+    if len(headline) <= TITULO_CURTO:
+        return "curto"
+    return "medio" if len(headline) <= TITULO_MEDIO else "longo"
+
+
+def _servico(
+    view: StoryView, *, manchete: bool, divergencias: list[DivergenciaView], copia_href: str
+) -> list[ServicoView]:
+    """Linha de serviço de uma chamada, na ordem em que aparece.
+
+    Manchete: "N veículos", há quanto tempo (na cópia arquivada, a hora) e a marca de
+    divergência. Chamadas de "Em 1 minuto": só a marca de divergência (sem ela, a
+    chamada não tem linha de serviço). A marca só existe quando o assunto teve veículos
+    dos dois lados (e 3 veículos ou mais) e leva ao item da home em "Onde os veículos
+    divergiram"; se o assunto não coube ali, à cobertura completa da cópia arquivada.
+    Nenhuma lista de veículos, nenhuma barra.
+
+    Para acrescentar um trecho (a agenda da semana: "na agenda: qua 25"), junte um
+    ``ServicoView`` ao fim da lista devolvida, aqui ou em ``build_view``; o modelo
+    desenha os trechos na ordem, separados por " · ".
+    """
+    linha: list[ServicoView] = []
+    if manchete:
+        if view.sources:
+            linha.append(ServicoView(texto=_veiculos(len(view.sources)), tipo="veiculos"))
+        if view.age:
+            linha.append(ServicoView(texto=view.age, tipo="idade", quando=view.published or ""))
+        elif view.time:
+            linha.append(ServicoView(texto=view.time, tipo="hora", quando=view.published or ""))
+    if view.marca:
+        item = next((d for d in divergencias if d.story_id == view.id), None)
+        linha.append(
+            ServicoView(texto=view.marca, tipo="diverge", href=f"#{item.anchor}" if item else f"{copia_href}#cobertura")
+        )
+    return linha
+
+
+def _chamadas(
+    lead: StoryView | None, secondary: list[StoryView], highlights: list[StoryView], ordered: list[StoryView]
+) -> list[StoryView]:
+    """As chamadas de "Em 1 minuto": as secundárias (até ``CHAMADAS_SECUNDARIAS``), os
+    primeiros destaques e, se ainda faltar, as próximas matérias na ordem das seções, até
+    ``TETO_CHAMADAS``. Nenhuma repete a manchete nem outra chamada: cada matéria aparece
+    uma vez no andar das notícias. As demais ficam em "Todas as matérias, por editoria"."""
+    if lead is None:
+        return []
+    usadas = {lead.id}
+    saida: list[StoryView] = []
+    for story in [*secondary[:CHAMADAS_SECUNDARIAS], *highlights, *ordered]:
+        if len(saida) >= TETO_CHAMADAS:
+            break
+        if story.id not in usadas:
+            usadas.add(story.id)
+            saida.append(story)
+    return saida
+
+
+def _agenda_da_semana(
+    edition: Edition, config: Config, brand: BrandView, materias: dict[str, StoryView], copia_href: str, pagina: bool
+) -> tuple[agenda_tela.AgendaView | None, dict[str, str]]:
+    """O bloco "Agenda da semana" e o rótulo "na agenda: qua 25" de cada matéria ligada.
+
+    O retrato gravado na edição (``Edition.agenda``) vira aqui objetos validados; o modelo
+    só lê esses objetos. O bloco é adicional: com a agenda desligada para a marca, sem
+    retrato, com retrato em formato inesperado ou com qualquer erro, devolve vazio e a
+    página sai como sairia sem a agenda. ``pagina``: a página completa existe (sem ela, o
+    pé não leva o link).
+    """
+    if not config.agenda_ativo or edition.agenda is None:
+        return None, {}
+    try:
+        retrato = ler_retrato(edition.agenda)
+        # A pasta edicoes/ vista desta página: "edicoes/" na home, "" na cópia arquivada.
+        pasta = f"{copia_href.rsplit('/', 1)[0]}/" if "/" in copia_href else ""
+        bloco = agenda_tela.bloco_da_home(
+            retrato, materias=materias.keys(), pasta=pasta, pagina=pagina, congresso=brand.congresso, tribunais=brand.tribunais
+        )
+        if retrato is None or bloco is None:
+            return None, {}
+        rotulos = {m.materia: " ".join(m.rotulo.split())[:40] for m in retrato.materias if m.materia in materias and m.rotulo.strip()}
+        return bloco, rotulos
+    except Exception as exc:  # noqa: BLE001 — a agenda é adicional: nunca derruba a página da edição
+        log.warning("Agenda da semana fora da página da edição (%s: %s)", type(exc).__name__, exc)
+        return None, {}
+
+
 _METHOD_TEXT = {
     "blocos": "em blocos por editoria",
     "etapas": "em etapas (agrupamento, pauta, redação e cobertura)",
@@ -882,7 +1099,6 @@ def _rationale_view(edition: Edition) -> RationaleView | None:
             f"parecidos em {_count(topics, 'assunto', 'assuntos')}; as {stories} saíram por relevância, "
             "frescor e número de veículos. Nenhuma notícia foi descartada: todas estão na lista completa do dia."
         )
-        strip = f"Compilada de {articles} de {outlets} · {_count(topics, 'assunto', 'assuntos')} · sem IA"
     else:
         topics = rationale.topics or rationale.groups
         how = _METHOD_TEXT.get(rationale.method, "")
@@ -902,15 +1118,9 @@ def _rationale_view(edition: Edition) -> RationaleView | None:
             f" e escolheu as {stories} desta edição. Nenhuma notícia foi descartada: todas estão na lista "
             "completa do dia."
         )
-        strip = f"Compilada de {articles} de {outlets}"
-        if blocks:
-            strip += f" · {_count(len(blocks), 'bloco', 'blocos')} por editoria"
-        strip += f" · {_count(topics, 'assunto', 'assuntos')}"
-        if analysed:
-            strip += f" · {_count(analysed, 'análise', 'análises')} de cobertura"
     return RationaleView(
         summary=summary,
-        strip=strip,
+        linha=f"Compilada de {articles} de {outlets}",
         articles=rationale.articles,
         outlets=rationale.outlets,
         topics=topics,
@@ -959,24 +1169,6 @@ def _index_view(
     return sorted(sections.values(), key=lambda s: order.get(s.id, len(order)))
 
 
-def _front_page(
-    lead: StoryView | None, secondary: list[StoryView], highlights: list[StoryView], ordered: list[StoryView]
-) -> tuple[StoryView | None, list[StoryView]]:
-    """Primeira página do computador: a chamada relacionada à manchete (o primeiro
-    destaque da mesma editoria; senão, o primeiro destaque) e "Mais para ler" (os
-    demais destaques e, até completar ``FRONT_MORE_SIZE``, as matérias que não
-    aparecem em outro ponto da capa), sem repetir nenhuma matéria. As que sobram
-    ficam nas abas por editoria, como todas as outras."""
-    if lead is None:
-        return None, []
-    related = next((s for s in highlights if s.section_title == lead.section_title), None)
-    if related is None and highlights:
-        related = highlights[0]
-    placed = {lead.id, *(s.id for s in secondary), *(s.id for s in highlights)}
-    more = [s for s in highlights if s is not related] + [s for s in ordered if s.id not in placed]
-    return related, more[:FRONT_MORE_SIZE]
-
-
 def _mode_label(edition: Edition) -> str:
     if edition.mode == "ai":
         return f"Edição gerada por IA ({edition.model})" if edition.model else "Edição gerada por IA"
@@ -992,11 +1184,17 @@ def instagram_url(config: Config) -> str:
     return f"https://www.instagram.com/{handle}/" if handle else ""
 
 
-def build_view(edition: Edition, config: Config, *, archive: bool = False) -> EditionView:
+def build_view(
+    edition: Edition, config: Config, *, archive: bool = False, copia_href: str = "", agenda_pagina: bool = True
+) -> EditionView:
     """Converte a edição num modelo de apresentação validado e sem marcação.
 
     ``archive``: cópia do arquivo (``edicoes/AAAA-MM-DD.html``), sem idade
-    relativa ("há 3 h") que ficaria congelada.
+    relativa ("há 3 h") que ficaria congelada; é ela que leva as gavetas de
+    detalhe. ``copia_href``: endereço dessa cópia visto da página que está sendo
+    montada ("" na própria cópia), para os links de detalhe da home.
+    ``agenda_pagina``: a página ``edicoes/agenda.html`` existe (sem ela, o pé do
+    bloco "Agenda da semana" não leva o link "Agenda completa").
     """
     brand = brand_view(config)
     tz = config.site.timezone
@@ -1034,32 +1232,61 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
         used.add(lead.id)
     secondary = _pick(edition.secondary, by_id, used)
     highlights = _pick(edition.highlights, by_id, used)
-    radar = _radar(edition, ordered, tz)
-    related, more = _front_page(lead, secondary, highlights, ordered)
 
     description = filters.plain(edition.editorial) or (lead.dek if lead else "") or brand.tagline
     base_url = config.site.base_url
     pares = _compared_pairs(edition, lookup, default_color, tz)
+    mapa = _compared_map(edition, ordered, pares, lookup, config, default_color)
+    painel = termometro_dia_view(edition.termometro) if config.termometro_ativo else None
+    time_label = filters.local_time(edition.generated_at, tz)
+
+    # Andar das notícias (manchete e "Em 1 minuto") e "Como a mídia cobriu".
+    divergencias = _divergencias(mapa, copia_href)
+    chamadas = _chamadas(lead, secondary, highlights, ordered)
+    na_capa = {s.id for s in ([lead] if lead else []) + chamadas}
+    recentes = _recentes(edition, ordered, na_capa, tz)
+    vies = vies_do_dia(painel)
+    midia = None
+    if vies or mapa or recentes:
+        midia = MidiaView(
+            vies=vies,
+            comparados=mapa.total if mapa else 0,
+            divergencias=divergencias,
+            recentes=recentes,
+            ate=time_label.replace(":", "h") if re.fullmatch(r"\d{2}:\d{2}", time_label) else "",
+        )
+
+    # Agenda da semana: o bloco e o rótulo "na agenda" das chamadas ligadas a um item pautado.
+    agenda, na_agenda = _agenda_da_semana(edition, config, brand, by_id, copia_href, agenda_pagina)
+
+    def chamada(story: StoryView, *, manchete: bool = False) -> ChamadaView:
+        servico = _servico(story, manchete=manchete, divergencias=divergencias, copia_href=copia_href)
+        if story.id in na_agenda:
+            servico.append(ServicoView(texto=na_agenda[story.id], tipo="agenda", href=f"#{agenda_tela.ANCORA}"))
+        return ChamadaView(
+            story=story,
+            servico=servico,
+            tamanho=_tamanho_do_titulo(story.headline) if manchete else "",
+        )
+
+    clima = _weather_views(edition, config)
     return EditionView(
         brand=brand,
         date_label=edition.date_label,
-        time_label=filters.local_time(edition.generated_at, tz),
+        time_label=time_label,
         tz_label=filters.tz_label(tz, edition.generated_at),
         mode_label=_mode_label(edition),
         editorial=edition.editorial.strip() if filters.plain(edition.editorial) else "",
         briefing=[item.strip() for item in edition.briefing if filters.plain(item)],
         lead=lead,
-        lead_excerpt=(excerpt := _lead_excerpt(lead)),
-        lead_more=_lead_more(lead, excerpt),
         secondary=secondary,
         highlights=highlights,
         sections=sections,
         stories=ordered,
-        radar=radar,
         compared=[view for _sec, view in pares],
-        compared_map=_compared_map(edition, ordered, pares, lookup, config, default_color),
+        compared_map=mapa,
         quotes=[_quote_view(q) for q in edition.quotes],
-        weather=_weather_views(edition, config),
+        clima=clima[0] if clima else None,
         sources_total=edition.stats.sources_total,
         sources_ok=edition.stats.sources_ok,
         source_groups=_source_groups(edition, config),
@@ -1070,13 +1297,16 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
         description=text.truncate(description, DESCRIPTION_MAX),
         og_image=lead.image if lead else None,
         mode=edition.mode,
-        default_all=bool(sections) and len(sections[0].stories) < DEFAULT_ALL_MIN,
         rationale=_rationale_view(edition),
         index=_index_view(edition, lookup, default_color, tz, by_id),
         index_url=f"{base_url}edicoes/{index_page_name(edition.date)}" if edition.index else "",
-        termometro=termometro_dia_view(edition.termometro) if config.termometro_ativo else None,
-        related=related,
-        more=more,
+        termometro=painel,
+        manchete=chamada(lead, manchete=True) if lead else None,
+        chamadas=[chamada(s) for s in chamadas],
+        midia=midia,
+        agenda=agenda,
+        arquivada=archive,
+        copia_href=copia_href,
     )
 
 
@@ -1084,23 +1314,51 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False) -> Ed
 
 
 def render_edition_page(
-    edition: Edition, config: Config, *, home_href: str, archive_href: str, is_archive: bool = False
+    edition: Edition,
+    config: Config,
+    *,
+    home_href: str,
+    archive_href: str,
+    is_archive: bool = False,
+    agenda_pagina: bool = True,
 ) -> str:
     """Página única e autocontida da edição (CSS/JS inline).
 
-    ``is_archive``: cópia de ``edicoes/`` (sem idade relativa congelada).
+    A mesma função monta a home (``index.html``) e a cópia arquivada
+    (``edicoes/AAAA-MM-DD.html``, com ``is_archive``). A cópia não leva a idade
+    relativa, que ficaria congelada, e é a única que renderiza as gavetas de
+    detalhe (``#cobertura``, ``#termometro`` e ``#racional``); na home, os links
+    de detalhe apontam para a cópia do dia, que fica em ``archive_href``.
+    ``agenda_pagina``: ``edicoes/agenda.html`` existe (ver :func:`build_view`).
     """
-    view = build_view(edition, config, archive=is_archive)
+    archive = filters.safe_href(archive_href) or "edicoes/"
+    copia = "" if is_archive else filters.safe_href(f"{archive.rstrip('/')}/{edition.date}.html") or ""
+    view = build_view(edition, config, archive=is_archive, copia_href=copia, agenda_pagina=agenda_pagina)
     if view.termometro is not None:  # a aba fica em edicoes/, ao lado das edições anteriores
-        archive = filters.safe_href(archive_href) or "edicoes/"
         view.termometro.analitico_href = filters.safe_href(f"{archive.rstrip('/')}/{ANALITICO_PAGINA}") or ""
     template = filters.environment().get_template("edition.html.j2")
-    html = template.render(
-        v=view,
-        brand=view.brand,
-        home_href=filters.safe_href(home_href) or "./",
-        archive_href=filters.safe_href(archive_href) or "edicoes/",
-    )
+
+    def desenhar(v: EditionView) -> str:
+        return template.render(
+            v=v,
+            brand=v.brand,
+            home_href=filters.safe_href(home_href) or "./",
+            archive_href=archive,
+            agenda_script=v.agenda is not None,  # page.js.j2: HOJE, AMANHÃ e os dias passados
+        )
+
+    try:
+        html = desenhar(view)
+    except Exception as exc:
+        if getattr(edition, "agenda", None) is None:
+            raise
+        # A agenda é adicional: se o bloco (ou a marca "na agenda" de uma chamada) não puder
+        # ser desenhado, a página sai sem nada dela, como numa edição sem retrato.
+        log.warning("Agenda da semana: o bloco não foi desenhado (%s: %s); a página sai sem ele", type(exc).__name__, exc)
+        view = build_view(replace(edition, agenda=None), config, archive=is_archive, copia_href=copia, agenda_pagina=False)
+        if view.termometro is not None:
+            view.termometro.analitico_href = filters.safe_href(f"{archive.rstrip('/')}/{ANALITICO_PAGINA}") or ""
+        html = desenhar(view)
     log.info(
         "Página da edição %s renderizada: %d matérias, %d seções, %.0f KB",
         edition.date,
