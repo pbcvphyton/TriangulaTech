@@ -6,7 +6,7 @@
       1. linha de indicadores (cotações paradas; o clima é o último item);
       2. manchete, sem corpo: editoria, título, linha fina, foto e a linha de serviço;
       3. "Em 1 minuto": a lista numerada das chamadas (cada matéria uma vez neste andar);
-      4. (reservado) agenda da semana;
+      4. "Agenda da semana" (só com o retrato da agenda na edição): o que está pautado, por dia;
       5. "Como a mídia cobriu": a linha do viés, "Onde os veículos divergiram" e
          "Mais recentes";
       6. "Todas as N matérias, por editoria": o único bloco recolhido da home;
@@ -39,6 +39,11 @@
 {#- A página da edição não leva a barra de progresso de leitura nem o botão de voltar ao
     topo (ficam nas outras páginas); a classe "ed" liga o cabeçalho de uma fileira no celular. -#}
 {% block body_attrs %} class="ed"{% endblock %}
+{% block styles %}
+{% if v.agenda %}
+{% include "agenda.css.j2" %}
+{% endif %}
+{% endblock %}
 {% block progresso %}{% endblock %}
 {% block topo %}{% endblock %}
 
@@ -113,7 +118,50 @@
 </div>
 {% endif %}
 
-{# AGENDA-DA-SEMANA: o bloco entra aqui (etapa 5) #}
+{# AGENDA-DA-SEMANA: o que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso,
+   por dia. Duas colunas no computador: "hoje e amanhã" (larga) e o resto da semana, com o
+   que já foi decidido (estreita); embaixo, as frases e o pé. O bloco só existe quando a edição traz o
+   retrato da agenda (v.agenda, montado em web.py a partir de render/agenda.py). #}
+{% if v.agenda %}
+{% set ag = v.agenda %}
+<section class="bl ag" id="agenda" aria-labelledby="ag-h">
+  <h2 class="rot" id="ag-h">Agenda da semana</h2>
+  <div class="ag-cols{% if not (ag.principais and ag.lateral) %} uma{% endif %}">
+    {% if ag.principais %}
+    <div class="ag-col ag-p">
+      {% for dia in ag.principais %}
+      {{ m.agenda_dia(dia) }}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if ag.lateral %}
+    <div class="ag-col ag-r">
+      {% for dia in ag.resto %}
+      {{ m.agenda_dia(dia) }}
+      {% endfor %}
+      {% if ag.decidido %}
+      <div class="ag-dec">
+        <h3 class="ag-d">Já decidido esta semana</h3>
+        <ul class="ag-ll">
+          {% for l in ag.decidido %}
+          {{ m.agenda_linha(l, com_dia=True) }}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% if ag.frases %}
+  <ul class="ag-fr">
+    {% for f in ag.frases %}
+    <li>{{ f.texto }}{% if f.link %} <a href="{{ f.link }}" target="_blank" rel="noopener noreferrer">{{ f.link_rotulo }}<span class="sr-only"> (abre em nova aba)</span></a>{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p class="ag-pe">{{ ag.pe }}{% for f in ag.pe_fontes %} {{ f }}.{% endfor %}{% if ag.pagina_href %} <a href="{{ ag.pagina_href }}">{{ ag.pagina_rotulo }}</a>{% endif %}{% if ag.congresso_href %}<span class="ag-s"> · </span><a href="{{ ag.congresso_href }}">Raio-X do Congresso</a>{% endif %}{% if ag.tribunais_href %}<span class="ag-s"> · </span><a href="{{ ag.tribunais_href }}">Raio-X dos Tribunais</a>{% endif %}</p>
+</section>
+{% endif %}
 
 {% if v.midia %}
 {% set md = v.midia %}

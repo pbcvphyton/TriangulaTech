@@ -636,3 +636,159 @@ def test_oversized_email_html_is_a_warning(
     result = pipeline.run(make_config(), out_dir=tmp_path, bundle_path=write_bundle(tmp_path), send_email=False, env={})
     assert any("email.html com 44 KB passa do limite de 40 KB" in w for w in result.warnings)
     assert latest(tmp_path)["email_html_bytes"] == 45_007
+
+
+# ── Agenda da semana (anexar_agenda) ─────────────────────────────────────────
+
+DIA_DA_AGENDA = "2026-11-24"  # as fixtures da agenda são da coleta de 23/11/2026
+
+
+def _arvore(out: Path) -> dict[str, bytes]:
+    """Tudo o que a execução gravou, menos os arquivos de coleta da agenda (entrada do teste)."""
+    return {
+        str(p.relative_to(out)): p.read_bytes()
+        for p in sorted(out.rglob("*"))
+        if p.is_file() and p.name not in ("agenda.json", "meta.json")
+    }
+
+
+def _rodar_com_agenda(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, nome: str, *, preparar=None, config=None):
+    """Roda a edição de 24/11/2026 numa pasta nova; ``preparar(out)`` põe os arquivos de coleta."""
+    monkeypatch.setattr(pipeline, "make_edition", FakeEditor(date=DIA_DA_AGENDA))
+    out = tmp_path / nome
+    if preparar is not None:
+        preparar(out)
+    result = pipeline.run(config or make_config(), out_dir=out, bundle_path=write_bundle(tmp_path), use_llm=False, env={})
+    edicao = json.loads((out / "data" / f"{DIA_DA_AGENDA}.json").read_text(encoding="utf-8"))
+    return out, result, edicao
+
+
+def _por_agenda(out: Path, *, congresso: str | None = None, tribunais: str | None = None) -> None:
+    from tests.fixtures import agenda as fx
+
+    for lado, conteudo, fixture in (("congresso", congresso, fx.CONGRESSO), ("tribunais", tribunais, fx.TRIBUNAIS)):
+        pasta = out / "data" / lado
+        pasta.mkdir(parents=True, exist_ok=True)
+        (pasta / "agenda.json").write_text(conteudo if conteudo is not None else fixture.read_text(encoding="utf-8"), encoding="utf-8")
+
+
+def test_sem_agenda_json_a_edicao_sai_sem_o_bloco(tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch):
+    out, result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "sem")
+    assert "agenda" not in edicao  # o JSON da edição fica como antes
+    assert set(result.outputs) == {"index", "edition", "data", "busca", "email_html", "email_text", "latest", "archive", "pesquisa"}
+    assert not (out / "data" / "congresso").exists() and not (out / "data" / "tribunais").exists()  # a edição só lê
+
+
+def test_agenda_valida_entra_na_edicao_e_so_acrescenta_a_pagina_completa(tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch):
+    from qijournal.agenda.retrato import ler_retrato
+
+    base_out, base, sem = _rodar_com_agenda(tmp_path, monkeypatch, "base")
+    out, result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "com", preparar=_por_agenda)
+    retrato = ler_retrato(edicao["agenda"])
+    assert retrato is not None and retrato.dia == DIA_DA_AGENDA and retrato.lados == ("congresso", "tribunais")
+    assert {l.instituicao for l in retrato.linhas} >= {"STF", "Senado", "Congresso"}
+    assert retrato.pe.texto == "Conferido em 23/11. A pauta pode mudar."
+    assert {k: v for k, v in edicao.items() if k != "agenda"} == sem  # o resto da edição não muda
+    # Um arquivo a mais, e só ele: a página completa da agenda (edicoes/agenda.html).
+    assert set(result.outputs) == set(base.outputs) | {"agenda"}
+    assert set(_arvore(out)) == set(_arvore(base_out)) | {"edicoes/agenda.html"}
+    # A edição só lê os arquivos de coleta: não regrava nenhum deles.
+    from tests.fixtures import agenda as fx
+
+    assert (out / "data" / "congresso" / "agenda.json").read_text(encoding="utf-8") == fx.CONGRESSO.read_text(encoding="utf-8")
+    assert sorted(p.name for p in (out / "data" / "tribunais").iterdir()) == ["agenda.json"]
+
+
+def test_agenda_com_um_lado_so(tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch):
+    from qijournal.agenda.retrato import ler_retrato
+
+    def so_tribunais(out: Path) -> None:
+        _por_agenda(out, congresso="{ilegível")
+
+    _out, _result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "um-lado", preparar=so_tribunais)
+    retrato = ler_retrato(edicao["agenda"])
+    assert retrato is not None and retrato.lados == ("tribunais",)
+    assert retrato.frases[0].texto == "Câmara, Senado e Congresso: pauta indisponível nesta edição."
+
+
+@pytest.mark.parametrize(
+    "conteudo",
+    ["{isto não é json", "", "[]", '{"versao": 99, "lado": "congresso"}', '{"versao": 1}', "null"],
+    ids=["quebrado", "vazio", "lista", "versao-desconhecida", "incompleto", "nulo"],
+)
+def test_agenda_json_ilegivel_nao_muda_a_edicao(tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch, conteudo: str):
+    base_out, base, sem = _rodar_com_agenda(tmp_path, monkeypatch, "base")
+
+    def estragar(out: Path) -> None:
+        _por_agenda(out, congresso=conteudo, tribunais=conteudo)
+
+    out, result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "estragada", preparar=estragar)
+    assert edicao == sem and "agenda" not in edicao
+    assert set(result.outputs) == set(base.outputs)
+    assert _arvore(out) == _arvore(base_out)  # a mesma lista de arquivos, com o mesmo conteúdo
+
+
+@pytest.mark.parametrize("onde", ["do_dia", "montar", "leitura", "para_dict"])
+def test_excecao_na_agenda_nao_derruba_nem_muda_a_edicao(
+    tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, onde: str
+):
+    from qijournal.agenda import contrato as agenda_contrato
+    from qijournal.agenda import montar as agenda_montar
+    from qijournal.agenda import retrato as agenda_retrato
+
+    base_out, base, sem = _rodar_com_agenda(tmp_path, monkeypatch, "base")
+
+    def explode(*args, **kwargs):
+        raise RuntimeError("falha forçada na agenda")
+
+    if onde == "do_dia":
+        monkeypatch.setattr(pipeline.agenda_montar, "do_dia", explode)
+    elif onde == "montar":
+        monkeypatch.setattr(agenda_montar, "montar", explode)
+    elif onde == "leitura":
+        monkeypatch.setattr(agenda_contrato, "ler_lado", explode)
+    else:
+        monkeypatch.setattr(agenda_retrato.Retrato, "para_dict", explode)
+    with caplog.at_level("WARNING"):
+        out, result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "explodiu", preparar=_por_agenda)
+    assert edicao == sem and "agenda" not in edicao
+    assert set(result.outputs) == set(base.outputs)
+    assert _arvore(out) == _arvore(base_out)
+    assert any("Agenda: retrato indisponível" in r.getMessage() for r in caplog.records)
+
+
+def test_agenda_desligada_nada_muda(tmp_path: Path, render: FakeRender, monkeypatch: pytest.MonkeyPatch):
+    base_out, base, sem = _rodar_com_agenda(tmp_path, monkeypatch, "base")
+    chamadas: list[Any] = []
+    real = pipeline.agenda_montar.do_dia
+    monkeypatch.setattr(pipeline.agenda_montar, "do_dia", lambda *a, **k: chamadas.append(a) or real(*a, **k))
+
+    desligada = make_config()
+    desligada.agenda.enabled = False
+    assert desligada.agenda_ativo is False
+    out, result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "desligada", preparar=_por_agenda, config=desligada)
+    assert chamadas == []  # nem lê os arquivos
+    assert edicao == sem and "agenda" not in edicao
+    assert set(result.outputs) == set(base.outputs)
+    assert _arvore(out) == _arvore(base_out)
+
+    outra_marca = make_config()
+    outra_marca.agenda.marcas = ["outra"]
+    assert outra_marca.agenda_ativo is False
+    _out, _result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "outra-marca", preparar=_por_agenda, config=outra_marca)
+    assert "agenda" not in edicao and chamadas == []
+
+    # Ligada, a mesma pasta de entrada produz o bloco (o teste acima não passa por acaso).
+    _out, _result, edicao = _rodar_com_agenda(tmp_path, monkeypatch, "ligada", preparar=_por_agenda)
+    assert "agenda" in edicao and len(chamadas) == 1
+
+
+def test_anexar_agenda_limpa_o_que_a_edicao_trazia(tmp_path: Path):
+    edition = make_edition(date=DIA_DA_AGENDA)
+    edition.agenda = {"versao": 1, "dia": "2000-01-01"}
+    pipeline.anexar_agenda(edition, make_config(), tmp_path)  # sem arquivos de coleta
+    assert edition.agenda is None
+    assert "agenda" not in edition.to_dict()
+    de_volta = type(edition).from_dict({**edition.to_dict(), "agenda": {"versao": 1, "dia": DIA_DA_AGENDA}})
+    assert de_volta.agenda == {"versao": 1, "dia": DIA_DA_AGENDA} and de_volta.to_dict()["agenda"] == de_volta.agenda
+    assert type(edition).from_dict({**edition.to_dict(), "agenda": "lixo"}).agenda is None

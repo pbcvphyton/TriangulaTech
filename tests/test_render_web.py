@@ -1142,18 +1142,20 @@ def test_edicao_automatica_sem_coluna_vazia(edition, config):
     assert 'class="bl md"' not in render(vazia, config)
 
 
-def test_o_ponto_de_entrada_da_agenda_esta_reservado_e_nao_gera_saida(page, copia):
+def test_o_bloco_da_agenda_fica_entre_os_dois_andares_e_sem_retrato_nao_gera_saida(page, copia):
     from qijournal.render import filters
 
     fonte = (filters.TEMPLATES_DIR / "edition.html.j2").read_text(encoding="utf-8")
-    marca = "{# AGENDA-DA-SEMANA: o bloco entra aqui (etapa 5) #}"
+    marca = "{# AGENDA-DA-SEMANA:"
     assert fonte.count(marca) == 1
     # entre "Em 1 minuto" e "Como a mídia cobriu"
-    assert fonte.index('id="um-h"') < fonte.index(marca) < fonte.index('id="md-h"')
-    for html in (page, copia):
-        assert "AGENDA" not in html and "etapa 5" not in html
+    assert fonte.index('id="um-h"') < fonte.index(marca) < fonte.index('id="ag-h"') < fonte.index('id="md-h"')
+    for html in (page, copia):  # a edição destes testes não traz o retrato da agenda
+        assert "AGENDA-DA-SEMANA" not in html and 'id="agenda"' not in html
         entre = html[html.index("</section>", html.index('id="um-h"')) : html.index('<section class="bl md"')]
         assert re.sub(r"\s+", "", entre) == "</section></div>"  # nada entre os dois andares
+        # nem os estilos nem o script da agenda entram na página que não a mostra
+        assert ".ag-cols" not in html and "setupAgenda" not in html and "data-ag-dia" not in html
 
 
 def test_logo_with_dark_variant_and_height(edition):
@@ -1178,4 +1180,62 @@ def test_explicit_mobile_logo_height(edition):
     assert ".mast h1.logo svg,.mast h1.logo.mono svg{height:40px}" in html
     cfg.brand.logo_height_mobile = 999  # fora da faixa: volta aos 85%
     assert ".mast h1.logo svg,.mast h1.logo.mono svg{height:51px}" in render(edition, cfg)
+
+
+# ── agenda da semana ─────────────────────────────────────────────────────────
+
+
+def _retrato_da_agenda(com_midia: bool = False):
+    """O retrato cheio das fixtures de coleta (``tests/fixtures/agenda``); com mídia, um item
+    ligado a uma matéria desta edição e outro a uma matéria que ela não tem."""
+    from qijournal.agenda import ligar, montar, regras
+    from tests.fixtures import agenda as fx
+
+    ligacoes = {
+        "RE 1326541": ligar.Ligacao(veiculos=("Folha", "G1", "Valor"), materias=(LEAD_ID,)),
+        "PL 6461/2019": ligar.Ligacao(veiculos=("Folha", "G1"), materias=("materia-de-outra-edicao",)),
+    }
+    return montar.montar(fx.camara_encerrada(), fx.tribunais(), "2026-11-24", regras.carregar(), ligacoes=ligacoes if com_midia else {})
+
+
+def test_sem_retrato_da_agenda_a_home_nao_muda(edition, page, copia, config):
+    # Sem o retrato na edição, a home e a cópia arquivada saem byte a byte como sempre saíram.
+    sem = copy.deepcopy(edition)
+    sem.agenda = None
+    assert render(sem, config) == page and arquivada(sem, config) == copia
+    # Com o retrato e a agenda desligada, idem: nem bloco, nem estilos, nem script.
+    com = copy.deepcopy(edition)
+    com.agenda = _retrato_da_agenda().para_dict()
+    desligada = default_config()
+    desligada.agenda.enabled = False
+    assert render(com, desligada) == page and arquivada(com, desligada) == copia
+    # Ligada, o bloco entra entre os dois andares e o resto da página fica como estava.
+    home = render(com, config)
+    assert home != page and home.count('<section class="bl ag" id="agenda"') == 1
+    inicio = home.index('<section class="bl ag" id="agenda"')
+    fim = home.index("</section>", inicio) + len("</section>")
+    corpo_sem_bloco = home[home.index("<body") : inicio] + home[fim:]
+    referencia = page[page.index("<body") :]
+    assert re.sub(r"\s+", "", corpo_sem_bloco[: corpo_sem_bloco.index("<script>")]) == re.sub(r"\s+", "", referencia[: referencia.index("<script>")])
+
+
+def test_com_retrato_os_links_de_materia_da_agenda_apontam_para_materias_reais(edition, config):
+    com = copy.deepcopy(edition)
+    com.agenda = _retrato_da_agenda(com_midia=True).para_dict()
+    for html, pesquisa in ((render(com, config), "edicoes/pesquisa.html"), (arquivada(com, config), "pesquisa.html")):
+        estrutura = parse(html)
+        assert estrutura.errors == [] and [i for i, n in estrutura.ids.items() if n > 1] == []
+        bloco = trecho(html, '<section class="bl ag" id="agenda"', "</section>")
+        # a marca de mídia abre a janela de uma matéria que existe; a que não existe vai para a Pesquisa
+        assert f'href="#s-{LEAD_ID}">na mídia: 3 veículos</a>' in bloco
+        assert f'href="{pesquisa}?q=PL%206461/2019">na mídia: 2 veículos</a>' in bloco
+        assert "materia-de-outra-edicao" not in html
+        internos = re.findall(r'href="#([^"]+)"', bloco)
+        assert internos and all(estrutura.ids[alvo] == 1 for alvo in internos)
+        # a chamada da matéria ligada ganha "na agenda", que leva ao bloco
+        capa = trecho(html, '<div class="capa', '<section class="bl ag"')
+        assert capa.count('<a href="#agenda">na agenda: qua 25</a>') == 1 and estrutura.ids["agenda"] == 1
+    view = build_view(com, config)
+    assert view.manchete.story.id == LEAD_ID and view.manchete.servico[-1].texto == "na agenda: qua 25"
+    assert all(i.tipo != "agenda" for c in view.chamadas for i in c.servico)
 

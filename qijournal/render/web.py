@@ -27,7 +27,9 @@ from markupsafe import Markup
 from .. import text
 from ..collect.market import format_change
 from ..config import Config
+from ..agenda.retrato import ler_retrato
 from ..models import Coverage, Edition, Quote, Rationale, Story
+from . import agenda as agenda_tela
 from . import filters
 from .termometro import ANALITICO_PAGINA, TermometroDiaView, ViesDoDiaView, termometro_dia_view, vies_do_dia
 
@@ -424,6 +426,8 @@ class EditionView:
     chamadas: list[ChamadaView] = field(default_factory=list)
     # "Como a mídia cobriu" (None quando a edição não tem nada para o bloco).
     midia: MidiaView | None = None
+    # "Agenda da semana" (None sem retrato na edição, com a agenda desligada ou com erro).
+    agenda: agenda_tela.AgendaView | None = None
     # Cópia arquivada (edicoes/AAAA-MM-DD.html): é ela que leva as gavetas de detalhe.
     arquivada: bool = False
     # Endereço da cópia arquivada visto da página ("" na própria cópia): os links de
@@ -1039,6 +1043,35 @@ def _chamadas(
     return saida
 
 
+def _agenda_da_semana(
+    edition: Edition, config: Config, brand: BrandView, materias: dict[str, StoryView], copia_href: str, pagina: bool
+) -> tuple[agenda_tela.AgendaView | None, dict[str, str]]:
+    """O bloco "Agenda da semana" e o rótulo "na agenda: qua 25" de cada matéria ligada.
+
+    O retrato gravado na edição (``Edition.agenda``) vira aqui objetos validados; o modelo
+    só lê esses objetos. O bloco é adicional: com a agenda desligada para a marca, sem
+    retrato, com retrato em formato inesperado ou com qualquer erro, devolve vazio e a
+    página sai como sairia sem a agenda. ``pagina``: a página completa existe (sem ela, o
+    pé não leva o link).
+    """
+    if not config.agenda_ativo or edition.agenda is None:
+        return None, {}
+    try:
+        retrato = ler_retrato(edition.agenda)
+        # A pasta edicoes/ vista desta página: "edicoes/" na home, "" na cópia arquivada.
+        pasta = f"{copia_href.rsplit('/', 1)[0]}/" if "/" in copia_href else ""
+        bloco = agenda_tela.bloco_da_home(
+            retrato, materias=materias.keys(), pasta=pasta, pagina=pagina, congresso=brand.congresso, tribunais=brand.tribunais
+        )
+        if retrato is None or bloco is None:
+            return None, {}
+        rotulos = {m.materia: " ".join(m.rotulo.split())[:40] for m in retrato.materias if m.materia in materias and m.rotulo.strip()}
+        return bloco, rotulos
+    except Exception as exc:  # noqa: BLE001 — a agenda é adicional: nunca derruba a página da edição
+        log.warning("Agenda da semana fora da página da edição (%s: %s)", type(exc).__name__, exc)
+        return None, {}
+
+
 _METHOD_TEXT = {
     "blocos": "em blocos por editoria",
     "etapas": "em etapas (agrupamento, pauta, redação e cobertura)",
@@ -1151,13 +1184,17 @@ def instagram_url(config: Config) -> str:
     return f"https://www.instagram.com/{handle}/" if handle else ""
 
 
-def build_view(edition: Edition, config: Config, *, archive: bool = False, copia_href: str = "") -> EditionView:
+def build_view(
+    edition: Edition, config: Config, *, archive: bool = False, copia_href: str = "", agenda_pagina: bool = True
+) -> EditionView:
     """Converte a edição num modelo de apresentação validado e sem marcação.
 
     ``archive``: cópia do arquivo (``edicoes/AAAA-MM-DD.html``), sem idade
     relativa ("há 3 h") que ficaria congelada; é ela que leva as gavetas de
     detalhe. ``copia_href``: endereço dessa cópia visto da página que está sendo
     montada ("" na própria cópia), para os links de detalhe da home.
+    ``agenda_pagina``: a página ``edicoes/agenda.html`` existe (sem ela, o pé do
+    bloco "Agenda da semana" não leva o link "Agenda completa").
     """
     brand = brand_view(config)
     tz = config.site.timezone
@@ -1219,10 +1256,16 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False, copia
             ate=time_label.replace(":", "h") if re.fullmatch(r"\d{2}:\d{2}", time_label) else "",
         )
 
+    # Agenda da semana: o bloco e o rótulo "na agenda" das chamadas ligadas a um item pautado.
+    agenda, na_agenda = _agenda_da_semana(edition, config, brand, by_id, copia_href, agenda_pagina)
+
     def chamada(story: StoryView, *, manchete: bool = False) -> ChamadaView:
+        servico = _servico(story, manchete=manchete, divergencias=divergencias, copia_href=copia_href)
+        if story.id in na_agenda:
+            servico.append(ServicoView(texto=na_agenda[story.id], tipo="agenda", href=f"#{agenda_tela.ANCORA}"))
         return ChamadaView(
             story=story,
-            servico=_servico(story, manchete=manchete, divergencias=divergencias, copia_href=copia_href),
+            servico=servico,
             tamanho=_tamanho_do_titulo(story.headline) if manchete else "",
         )
 
@@ -1261,6 +1304,7 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False, copia
         manchete=chamada(lead, manchete=True) if lead else None,
         chamadas=[chamada(s) for s in chamadas],
         midia=midia,
+        agenda=agenda,
         arquivada=archive,
         copia_href=copia_href,
     )
@@ -1270,7 +1314,13 @@ def build_view(edition: Edition, config: Config, *, archive: bool = False, copia
 
 
 def render_edition_page(
-    edition: Edition, config: Config, *, home_href: str, archive_href: str, is_archive: bool = False
+    edition: Edition,
+    config: Config,
+    *,
+    home_href: str,
+    archive_href: str,
+    is_archive: bool = False,
+    agenda_pagina: bool = True,
 ) -> str:
     """Página única e autocontida da edição (CSS/JS inline).
 
@@ -1279,10 +1329,11 @@ def render_edition_page(
     relativa, que ficaria congelada, e é a única que renderiza as gavetas de
     detalhe (``#cobertura``, ``#termometro`` e ``#racional``); na home, os links
     de detalhe apontam para a cópia do dia, que fica em ``archive_href``.
+    ``agenda_pagina``: ``edicoes/agenda.html`` existe (ver :func:`build_view`).
     """
     archive = filters.safe_href(archive_href) or "edicoes/"
     copia = "" if is_archive else filters.safe_href(f"{archive.rstrip('/')}/{edition.date}.html") or ""
-    view = build_view(edition, config, archive=is_archive, copia_href=copia)
+    view = build_view(edition, config, archive=is_archive, copia_href=copia, agenda_pagina=agenda_pagina)
     if view.termometro is not None:  # a aba fica em edicoes/, ao lado das edições anteriores
         view.termometro.analitico_href = filters.safe_href(f"{archive.rstrip('/')}/{ANALITICO_PAGINA}") or ""
     template = filters.environment().get_template("edition.html.j2")
@@ -1291,6 +1342,7 @@ def render_edition_page(
         brand=view.brand,
         home_href=filters.safe_href(home_href) or "./",
         archive_href=archive,
+        agenda_script=view.agenda is not None,  # page.js.j2: HOJE, AMANHÃ e os dias passados
     )
     log.info(
         "Página da edição %s renderizada: %d matérias, %d seções, %.0f KB",

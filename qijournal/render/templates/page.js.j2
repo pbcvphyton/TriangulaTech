@@ -2,7 +2,8 @@
     cabeçalho em canvas 2D, linha de indicadores, abas, busca, gavetas, janelas das
     matérias, progresso de leitura e voltar ao topo. Cada parte verifica se seus elementos
     existem (a página do arquivo e as abas usam só algumas; a edição não tem a barra de
-    progresso nem o botão de voltar ao topo). Nada se move sozinho na página da edição. -#}
+    progresso nem o botão de voltar ao topo). Nada se move sozinho na página da edição.
+    A parte da agenda da semana só entra nas páginas que a mostram (agenda_script). -#}
 (function () {
   'use strict';
   var d = document, w = window, root = d.documentElement;
@@ -495,6 +496,33 @@
     });
   }
 
+{% if agenda_script is defined and agenda_script %}
+  /* ── Agenda da semana: HOJE, AMANHÃ e os dias que já passaram ───────────
+     A data é a de Brasília na hora da leitura. Sem script (ou sem a data), os dias
+     ficam só com o rótulo ("qua 25"). ─────────────────────────────────── */
+  function setupAgenda() {
+    var dias = d.querySelectorAll('[data-ag-dia]');
+    if (!dias.length || !w.Intl || !w.Intl.DateTimeFormat) return;
+    var hoje = '', amanha = '';
+    try {
+      var partes = {};
+      new w.Intl.DateTimeFormat('en-US', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' })
+        .formatToParts(new Date()).forEach(function (parte) { partes[parte.type] = parte.value; });
+      hoje = partes.year + '-' + partes.month + '-' + partes.day;
+      var seguinte = new Date(hoje + 'T12:00:00Z');
+      seguinte.setUTCDate(seguinte.getUTCDate() + 1);
+      amanha = seguinte.toISOString().slice(0, 10);
+    } catch (e) { return; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(hoje)) return;
+    Array.prototype.forEach.call(dias, function (el) {
+      var dia = el.getAttribute('data-ag-dia'), marca = el.querySelector('.ag-q');
+      if (dia < hoje) el.classList.add('passou');
+      else if (dia === hoje) { el.classList.add('hoje'); if (marca) marca.textContent = 'HOJE'; }
+      else if (dia === amanha && marca) marca.textContent = 'AMANHÃ';
+    });
+  }
+
+{% endif %}
   /* ── Idade relativa ("há 3 h") recalculada na hora da leitura ───────── */
   function setupAges() {
     var now = Date.now();
@@ -613,6 +641,9 @@
   var tabsApi = setupTabs();
   setupSearch(tabsApi);
   setupAges();
+{% if agenda_script is defined and agenda_script %}
+  setupAgenda();
+{% endif %}
   setupCompareTabs();
   setupGavetas();
   setupModals();

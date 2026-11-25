@@ -65,6 +65,49 @@
 <button class="srch-all" type="submit" title="Buscar em todas as edições (Pesquisa analítica)"><span class="sr-only">Buscar em </span>Todas as edições<span aria-hidden="true"> &rarr;</span></button>
 {%- endmacro %}
 
+{#- Agenda da semana (bloco da home). Os objetos vêm de render/agenda.py (AgendaView): os
+    textos chegam prontos e validados; aqui eles só são juntados. As classes "so-larga" e
+    "so-cel" trocam a versão do computador pela do celular (nome curto, "mais N" com um item
+    só), sem repetir o texto que as duas têm em comum; o segundo item de uma linha (classe
+    "larga") some no celular.
+
+    Um item: palavra de área, o ASSUNTO, e só depois o identificador (link oficial), a marca
+    de mídia (quando há ligação) e a situação em português claro. -#}
+{% macro agenda_item(i) -%}
+<p class="ag-i{% if i.so_tela_larga %} larga{% endif %}"><span class="ag-nk"><span class="ag-n"{% if i.nome %} title="{{ i.nome }}"{% endif %}>{% if i.area %}<b class="ag-a">{{ i.area }}</b> {% endif %}{% if i.nome_comum %}{{ i.nome_comum }}<span class="so-larga">{{ i.nome_resto }}</span><span class="so-cel">…</span>{% elif i.nome_curto %}<span class="so-larga">{{ i.nome }}</span><span class="so-cel">{{ i.nome_curto }}</span>{% else %}{{ i.nome }}{% endif %}</span><span class="ag-k">{% if i.nome %}<span class="ag-s"> · </span>{% endif %}{% if i.link %}<a href="{{ i.link }}" target="_blank" rel="noopener noreferrer">{{ i.identificador }}<span class="sr-only"> (abre em nova aba)</span></a>{% else %}{{ i.identificador }}{% endif %}{% if i.midia %}<span class="ag-s"> · </span>{% if i.midia_href %}<a class="ag-md" href="{{ i.midia_href }}">{{ i.midia }}</a>{% else %}{{ i.midia }}{% endif %}{% endif %}</span></span>{% if i.situacao %}<span class="ag-t">{{ i.situacao }}</span>{% endif %}</p>
+{%- endmacro %}
+
+{#- Uma linha de pauta: a hora (ou o dia, na faixa "Já decidido"), a instituição e o órgão
+    por extenso, sempre na mesma posição; depois a situação da linha, os itens e o resto
+    ("mais N"). Linha sem item nomeado leva o link oficial na própria cabeça. -#}
+{% macro agenda_linha(l, com_dia=False) -%}
+<li class="ag-l{% if l.aberta %} ab{% endif %}">
+  <p class="ag-c"><span class="ag-h">{{ l.dia if com_dia else l.hora }}</span> {% if l.link and not l.itens %}<a href="{{ l.link }}" target="_blank" rel="noopener noreferrer">{{ l.cabeca }}<span class="sr-only"> (abre em nova aba)</span></a>{% else %}<b>{{ l.cabeca }}</b>{% endif %}</p>
+  <div class="ag-x">
+    {%- if l.situacao %}<p class="ag-ls">{{ l.situacao }}</p>{% endif -%}
+    {%- for i in l.itens %}{{ agenda_item(i) }}{% endfor -%}
+    {%- if l.situacao_comum or l.mais or l.mais_celular %}{% set sep = " · " if l.situacao_comum else "" %}<p class="ag-m">{{ l.situacao_comum }}{% if l.mais == l.mais_celular %}{{ sep }}{{ l.mais }}{% else %}{% if l.mais %}<span class="so-larga">{{ sep }}{{ l.mais }}</span>{% endif %}{% if l.mais_celular %}<span class="so-cel">{{ sep }}{{ l.mais_celular }}</span>{% endif %}{% endif %}</p>{% endif -%}
+  </div>
+</li>
+{%- endmacro %}
+
+{#- Um dia da agenda. A data vai no atributo data-ag-dia: é por ela que o navegador marca
+    HOJE, AMANHÃ e o que já passou (page.js.j2); sem script, fica só a data. -#}
+{% macro agenda_dia(d) -%}
+<div class="ag-dia{% if not d.linhas %} sem{% endif %}"{% if d.data %} data-ag-dia="{{ d.data }}"{% endif %}>
+  <h3 class="ag-d"><span class="ag-q"></span><span{% if d.rotulo_longo %} title="{{ d.rotulo_longo }}"{% endif %}>{{ d.rotulo }}</span></h3>
+  {% if d.linhas %}
+  <ul class="ag-ll">
+    {% for l in d.linhas %}
+    {{ agenda_linha(l) }}
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="ag-vz">{{ d.vazio }}</p>
+  {% endif %}
+</div>
+{%- endmacro %}
+
 {#- Linha de serviço de uma chamada (itens: lista de ServicoView, montada em web.py): os
     trechos separados por " · ". A idade ("há 3 h") é recalculada no navegador; a marca de
     divergência leva ao item de "Onde os veículos divergiram". -#}

@@ -312,3 +312,63 @@ def test_marca_sem_termometro_cabe_no_mesmo_orcamento():
     assert len(tela.palavras) <= PALAVRAS_MAX and tela.controles <= CONTROLES_MAX and tela.links <= LINKS_MAX
     gavetas = [a.get("id") for t, a in parse(copia).tags if t == "details" and "gav" in (a.get("class") or "").split()]
     assert gavetas == ["editorias", "cobertura", "racional"]
+
+
+# ── agenda da semana ─────────────────────────────────────────────────────────
+
+AGENDA_PALAVRAS_MAX = 380  # o bloco inteiro, contando as duas versões (computador e celular) de cada texto
+AGENDA_LINKS_MAX = 24
+AGENDA_PESO_MAX = 22 * 1024  # o bloco, os estilos e o script da agenda somados
+
+
+def _retrato_da_agenda() -> dict:
+    """O retrato cheio das fixtures de coleta (``tests/fixtures/agenda``), com um item citado
+    por uma matéria da edição e outro por uma matéria que ela não tem."""
+    from qijournal.agenda import ligar, montar, regras
+    from tests.fixtures import agenda as fx
+
+    ligacoes = {
+        "RE 1326541": ligar.Ligacao(veiculos=("Folha", "G1", "Valor"), materias=(_edicao("2026-11-23").lead,)),
+        "PL 6461/2019": ligar.Ligacao(veiculos=("Folha", "G1"), materias=("materia-de-outra-edicao",)),
+    }
+    return montar.montar(fx.camara_encerrada(), fx.tribunais(), "2026-11-24", regras.carregar(), ligacoes=ligacoes).para_dict()
+
+
+def test_tetos_da_agenda_na_home(config):
+    from qijournal.render import agenda as agenda_tela
+
+    edicao = _edicao("2026-11-23")
+    sem = render_edition_page(edicao, config, home_href="./", archive_href="edicoes/")
+    edicao.agenda = _retrato_da_agenda()
+    home = render_edition_page(edicao, config, home_href="./", archive_href="edicoes/")
+    view = build_view(edicao, config).agenda
+    assert view is not None
+    linhas = [linha for dia in view.principais + view.resto for linha in dia.linhas]
+    # até 8 linhas na janela; no celular, até 4 abertas (hoje e amanhã), com 1 item nomeado cada
+    assert 0 < len(linhas) <= agenda_tela.TETO_LINHAS == 8
+    assert sum(1 for linha in linhas if linha.aberta) <= agenda_tela.TETO_ABERTAS_NO_CELULAR == 4
+    assert all(len(linha.itens) <= agenda_tela.TETO_ITENS_POR_LINHA == 2 for linha in linhas)
+    assert all(sum(1 for i in linha.itens if not i.so_tela_larga) <= 1 for linha in linhas)
+    assert len(view.principais) <= 3 and all(len(linha.itens) <= 1 for dia in view.resto for linha in dia.linhas)
+    assert len(view.frases) <= agenda_tela.TETO_FRASES == 2 and len(view.decidido) <= agenda_tela.TETO_DECIDIDO == 2
+    assert all(len(i.nome) <= 90 and len(i.nome_curto) <= 60 for linha in linhas for i in linha.itens)
+
+    bloco = trecho(home, '<section class="bl ag" id="agenda"', "</section>")
+    assert bloco.count('<li class="ag-l') == len(linhas) + len(view.decidido)
+    assert bloco.count('class="rot"') == 1 and bloco.count("<h2") == 1  # um título só
+    assert bloco.count('<p class="ag-pe">') == 1 and bloco.count('<ul class="ag-fr">') == 1
+    assert corpo(home).count('class="rot"') <= TITULOS_DE_BLOCO_MAX
+    # o bloco não traz controle nenhum, e cabe no orçamento da home inteira
+    tela, antes = visivel(home), visivel(sem)
+    assert tela.controles == antes.controles <= CONTROLES_MAX
+    assert len(tela.palavras) <= PALAVRAS_MAX and tela.links <= LINKS_MAX, (len(tela.palavras), tela.links)
+    assert len(tela.palavras) - len(antes.palavras) <= AGENDA_PALAVRAS_MAX, len(tela.palavras) - len(antes.palavras)
+    assert tela.links - antes.links <= AGENDA_LINKS_MAX, tela.links - antes.links
+    assert len(home.encode("utf-8")) <= PESO_MAX
+    assert len(home.encode("utf-8")) - len(sem.encode("utf-8")) <= AGENDA_PESO_MAX, len(home.encode("utf-8")) - len(sem.encode("utf-8"))
+    # nada se move sozinho, nenhum termo de bastidor, nenhuma contagem solta de itens na home
+    assert "animation" not in bloco and "transition" not in bloco
+    texto = " ".join(visivel("<html><head></head><body>" + bloco + "</section></body></html>").palavras)
+    assert "Agenda da semana" in texto and not any(re.search(termo, texto, flags=re.I) for termo in BASTIDOR)
+    assert not re.search(r"\b\d[\d.]* (itens|vetos|processos)\b", texto.replace("itens pautados", ""))
+

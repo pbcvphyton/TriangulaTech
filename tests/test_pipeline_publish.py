@@ -266,3 +266,54 @@ def test_mark_email_sent_updates_only_the_delivery_fields(tmp_path: Path, render
         "email_sent_at": "2026-09-29T08:15:03+00:00",
         "email_channel": "smtp",
     }
+
+
+# ── agenda da semana: a página completa ──────────────────────────────────────
+
+
+def _retrato_da_agenda(dia: str = "2026-11-24") -> dict:
+    from qijournal.agenda import montar, regras
+    from tests.fixtures import agenda as fx
+
+    return montar.montar(fx.camara_encerrada(), fx.tribunais(), dia, regras.carregar()).para_dict()
+
+
+def test_com_agenda_a_pagina_completa_entra_na_lista_de_arquivos(tmp_path: Path, render: FakeRender):
+    sem = publish(make_edition(), tmp_path / "sem")
+    assert "agenda" not in sem and not (tmp_path / "sem" / "edicoes" / "agenda.html").exists()  # sem dado, a lista de sempre
+
+    edition = make_edition()
+    edition.agenda = _retrato_da_agenda()
+    paths = publish(edition, tmp_path / "com")
+    assert set(paths) == set(sem) | {"agenda"}
+    assert paths["agenda"] == tmp_path / "com" / "edicoes" / "agenda.html"
+    html = paths["agenda"].read_text(encoding="utf-8")
+    assert "<title>Triangula · Agenda da semana</title>" in html and "Pautado não é votado nem julgado" in html
+    assert json.loads(paths["data"].read_text(encoding="utf-8"))["agenda"] == edition.agenda
+    assert not list((tmp_path / "com").rglob("*.tmp"))
+
+
+def test_pagina_da_agenda_e_regravada_com_o_estado_do_dia_e_sem_retrato_nao_e_tocada(tmp_path: Path, render: FakeRender):
+    edition = make_edition()
+    edition.agenda = _retrato_da_agenda()
+    pagina = publish(edition, tmp_path)["agenda"]
+    assert "Sem pauta válida" not in pagina.read_text(encoding="utf-8")
+
+    # Fontes velhas demais: a página continua sendo regravada, agora com o estado "sem pauta válida".
+    edition.agenda = _retrato_da_agenda("2026-12-05")
+    assert publish(edition, tmp_path)["agenda"] == pagina
+    sem_pauta = pagina.read_text(encoding="utf-8")
+    assert "Sem pauta válida desde 23/11." in sem_pauta
+
+    # Sem retrato (agenda desligada, arquivos ausentes, erro): a página que existe fica como está.
+    edition.agenda = None
+    assert "agenda" not in publish(edition, tmp_path)
+    assert pagina.read_text(encoding="utf-8") == sem_pauta
+
+    # Marca sem agenda: nada é gravado, mesmo com o retrato na edição.
+    from qijournal.config import load_config
+
+    edition.agenda = _retrato_da_agenda()
+    outra = publish(edition, tmp_path / "pbcv", load_config(env={"QIJ_BRAND": "pbcv"}))
+    assert "agenda" not in outra and not (tmp_path / "pbcv" / "edicoes" / "agenda.html").exists()
+

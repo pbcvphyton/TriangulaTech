@@ -1,0 +1,222 @@
+{#- Página "Agenda da semana" (edicoes/agenda.html): a visão completa do bloco da home.
+    A janela por dia, com as sessões e julgamentos que decidem e os itens que passaram do
+    corte da página; "Já decidido esta semana"; "No radar"; "O que ficou de fora", em
+    números; e "Como ler" (a régua e os pesos, as fontes com a data dos dados, os limites
+    de cada fonte e o aviso de que pautado não é votado nem julgado).
+    Sem botão próprio no cabeçalho: chega-se por "Agenda completa", no pé do bloco da home.
+    Os textos vêm prontos do retrato da agenda; aqui eles só são juntados. HOJE, AMANHÃ e o
+    cinza dos dias passados são postos por page.js (data de Brasília), pelo data-ag-dia.
+    Variáveis: a (PaginaView, de render/agenda.py), brand, home_href, archive_href, base_url,
+    repo_url, analitico, pagina_completa e agenda_script (ligam os estilos da página e o
+    script dos dias). Estilos: agenda.css.j2 (agp-…) sobre as peças do bloco (ag-…). -#}
+{% extends "layout.html.j2" %}
+{% import "macros.html.j2" as m %}
+
+{% block title %}{{ brand.name }} · Agenda da semana{% endblock %}
+{% block description %}O que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso nesta semana, pelas pautas oficiais de cada um.{% endblock %}
+{% block meta %}
+<link rel="canonical" href="{{ base_url }}edicoes/agenda.html">
+{% endblock %}
+{% block home_link %}{{ home_href }}{% endblock %}
+{% block dateline %}Agenda da semana{% if a.conferido %}&nbsp;· <span class="nw">conferido em {{ a.conferido }}</span>{% endif %}{% endblock %}
+
+{% block tools %}
+{{ m.ferramentas(brand, archive_href, analitico=(archive_href ~ "analitico.html") if analitico else "", analitico_titulo="Analítico Político: como a imprensa cobre a política") }}
+{% endblock %}
+
+{% block styles %}
+{% include "agenda.css.j2" %}
+{% endblock %}
+
+{#- Um item da página: o assunto antes do número, o link oficial e, embaixo, o resultado
+    (quando já houve), o termo oficial da situação, a relatoria, a menção na imprensa e a
+    conta da nota ("por que está aqui"). -#}
+{% macro item(i) -%}
+<li class="agp-i">
+  <p class="agp-n">{% if i.area %}<b class="ag-a">{{ i.area }}</b> {% endif %}{{ i.nome }}{% if i.nome %}<span class="ag-s"> · </span>{% endif %}{% if i.link %}<a href="{{ i.link }}" target="_blank" rel="noopener noreferrer">{{ i.identificador }}<span class="sr-only"> (abre em nova aba)</span></a>{% else %}{{ i.identificador }}{% endif %}</p>
+  {% if i.resultado or i.termo or i.relator or i.midia %}
+  <p class="agp-d">
+    {%- if i.resultado %}<span><b>Resultado: {{ i.resultado }}</b></span>{% endif -%}
+    {%- if i.termo %}<span>Situação oficial: {{ i.termo }}</span>{% endif -%}
+    {%- if i.relator %}<span>Relatoria: {{ i.relator }}</span>{% endif -%}
+    {%- if i.midia %}<span>{% if i.midia_href %}<a href="{{ i.midia_href }}">{{ i.midia }}</a>{% else %}{{ i.midia }}{% endif %}</span>{% endif -%}
+  </p>
+  {% endif %}
+  {% if i.conta %}
+  <p class="agp-pq">Por que está aqui: {{ i.conta }}</p>
+  {% endif %}
+</li>
+{%- endmacro %}
+
+{% macro linha(l) -%}
+<li class="agp-l"{% if l.ancora %} id="{{ l.ancora }}"{% endif %}>
+  <h4 class="agp-c">{% if l.hora %}<span class="ag-h">{{ l.hora }}</span> {% endif %}{% if l.link %}<a href="{{ l.link }}" target="_blank" rel="noopener noreferrer">{{ l.cabeca }}<span class="sr-only"> (abre em nova aba)</span></a>{% else %}{{ l.cabeca }}{% endif %}{% if l.situacao %}<span class="agp-ls"> · {{ l.situacao }}</span>{% endif %}</h4>
+  {% if l.itens %}
+  <ul class="agp-il">
+    {% for i in l.itens %}
+    {{ item(i) }}
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% if l.fora or l.abaixo_do_corte %}
+  <p class="agp-fl">Ficou de fora nesta sessão: {% for f in l.fora %}{{ f }}{% if not loop.last or l.abaixo_do_corte %}; {% endif %}{% endfor %}{% if l.abaixo_do_corte %}abaixo da nota {{ a.corte }}: {{ l.abaixo_do_corte }}{% endif %}.</p>
+  {% endif %}
+</li>
+{%- endmacro %}
+
+{% macro dias(lista, marcar=False) -%}
+{% for d in lista %}
+<div class="agp-dia"{% if marcar and d.data %} data-ag-dia="{{ d.data }}"{% endif %}>
+  <h3 class="agp-d3"><span class="ag-q"></span>{{ d.rotulo_longo or d.rotulo }}</h3>
+  {% if d.linhas %}
+  <ul class="agp-ll">
+    {% for l in d.linhas %}
+    {{ linha(l) }}
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="agp-vz">{{ d.vazio }}</p>
+  {% endif %}
+</div>
+{% endfor %}
+{%- endmacro %}
+
+{% block content %}
+<div class="agp">
+  <header class="agp-top">
+    <h2 class="agp-t">Agenda da semana</h2>
+    <p class="agp-sub">O que está pautado no STF, no STJ, na Câmara, no Senado e no Congresso{% if a.periodo %}, {{ a.periodo }}{% endif %}, pelas pautas oficiais de cada um.</p>
+    <p class="agp-av"><b>Pautado não é votado nem julgado.</b> Estar na pauta quer dizer que a sessão está marcada com aquele item; ele pode ser adiado ou retirado até a hora. {{ a.pe }}{% for f in a.pe_fontes %} {{ f }}.{% endfor %}</p>
+    <p class="agp-nav">
+      {%- if a.dias %}<a href="#semana">A semana, por dia</a>{% endif -%}
+      {%- if a.decidido %}<a href="#decidido">Já decidido</a>{% endif -%}
+      {%- if a.radar or a.fila %}<a href="#radar">No radar</a>{% endif -%}
+      {%- if a.tem_fora %}<a href="#fora">O que ficou de fora</a>{% endif -%}
+      <a href="#como-ler">Como ler</a>
+    </p>
+  </header>
+
+  {% if a.sem_pauta %}
+  <p class="agp-sem">{{ a.sem_pauta }} As pautas voltam a aparecer aqui quando as fontes oficiais forem lidas de novo.</p>
+  {% endif %}
+
+  {% if a.frases %}
+  <ul class="agp-fr">
+    {% for f in a.frases %}
+    <li>{{ f.texto }}{% if f.link %} <a href="{{ f.link }}" target="_blank" rel="noopener noreferrer">{{ f.link_rotulo }}<span class="sr-only"> (abre em nova aba)</span></a>{% endif %}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if a.dias %}
+  <section class="agp-s" id="semana" aria-labelledby="semana-h">
+    <h2 class="rot" id="semana-h">A semana, por dia</h2>
+    <p class="agp-x">Sessões e julgamentos que decidem, com os itens de nota {{ a.corte }} ou mais. Na home ficam só os de nota {{ a.corte_home }} ou mais.</p>
+    {{ dias(a.dias, marcar=True) }}
+  </section>
+  {% endif %}
+
+  {% if a.decidido %}
+  <section class="agp-s" id="decidido" aria-labelledby="decidido-h">
+    <h2 class="rot" id="decidido-h">Já decidido esta semana</h2>
+    {{ dias(a.decidido) }}
+  </section>
+  {% endif %}
+
+  {% if a.radar or a.fila %}
+  <section class="agp-s" id="radar" aria-labelledby="radar-h">
+    <h2 class="rot" id="radar-h">No radar</h2>
+    {% if a.radar %}
+    <p class="agp-x">O que já tem data depois desta semana.</p>
+    {{ dias(a.radar) }}
+    {% endif %}
+    {% if a.fila %}
+    <div class="agp-dia">
+      <h3 class="agp-d3">{{ a.fila_texto or "Fila do Plenário da Câmara" }}</h3>
+      <ul class="agp-il">
+        {% for i in a.fila %}
+        {{ item(i) }}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {% if a.tem_fora %}
+  <section class="agp-s" id="fora" aria-labelledby="fora-h">
+    <h2 class="rot" id="fora-h">O que ficou de fora</h2>
+    <p class="agp-x">A agenda só mostra o que tem data e decide. O resto fica aqui, em números.</p>
+    <ul class="agp-nums">
+      {% for f in a.fora %}
+      <li>{{ f }}</li>
+      {% endfor %}
+      {% if a.abaixo_do_corte %}
+      <li>itens com nota abaixo de {{ a.corte }}: {{ a.abaixo_do_corte|num }}</li>
+      {% endif %}
+      {% if a.fora_do_teto %}
+      <li>sessões além do limite desta página: {{ a.fora_do_teto|num }}</li>
+      {% endif %}
+    </ul>
+    {% if a.contagens %}
+    <h3 class="agp-d3">Os números das fontes</h3>
+    <ul class="agp-nums">
+      {% for c in a.contagens %}
+      <li>{{ c }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <section class="agp-s" id="como-ler" aria-labelledby="como-ler-h">
+    <h2 class="rot" id="como-ler-h">Como ler</h2>
+    <div class="agp-cl">
+      <div>
+        <h3 class="agp-d3">O que entra</h3>
+        <p>Só entra o que tem data e decide: sessão de votação do Plenário, julgamento, comissão que decide e prazo da Constituição que vence. <b>Pautado não é votado nem julgado:</b> a agenda diz o que consta da pauta oficial, não o que vai acontecer.</p>
+        <p>Cada item recebe uma nota de 0 a {{ a.nota_maxima }}, soma de três partes. A regra é a mesma para todos os itens e está escrita em <code>config/agenda.yaml</code>. A cobertura da imprensa não entra na nota. Entram na home os itens de nota {{ a.corte_home }} ou mais; nesta página, os de nota {{ a.corte }} ou mais. STF, STJ, Câmara, Senado e Congresso aparecem sempre na home com o item de maior nota de cada um.</p>
+        <p>Os nomes e as situações vêm das fontes oficiais e de um dicionário fixo, escrito por gente. Nenhum texto desta página é escrito por IA.</p>
+      </div>
+      <div>
+        <h3 class="agp-d3">A régua</h3>
+        <div class="agp-rg">
+          {% for parte in a.regua %}
+          <table class="agp-tb">
+            <caption>{{ parte.nome }}: {{ parte.pergunta }} (até {{ parte.teto }})</caption>
+            <tbody>
+              {% for rotulo, pontos in parte.pesos %}
+              <tr><th scope="row">{{ rotulo }}</th><td>{{ pontos }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% if a.fontes %}
+    <h3 class="agp-d3">As fontes e a data dos dados</h3>
+    <ul class="agp-ft">
+      {% for f in a.fontes %}
+      <li{% if f.estado and f.estado != "ok" %} class="velha"{% endif %}>{% if f.url %}<a href="{{ f.url }}" target="_blank" rel="noopener noreferrer">{{ f.nome or f.instituicao }}<span class="sr-only"> (abre em nova aba)</span></a>{% else %}{{ f.nome or f.instituicao }}{% endif %}{% if f.texto %}: {{ f.texto }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if a.limites %}
+    <h3 class="agp-d3">O que cada fonte permite dizer</h3>
+    <ul class="agp-lm">
+      {% for l in a.limites %}
+      <li>{{ l }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="ft">
+  <p><strong>{{ brand.name }}</strong> · Agenda da semana · fontes: dados abertos da Câmara, do Senado e do STJ e portal do STF</p>
+  <p class="ft-links"><a href="{{ home_href }}">Edição mais recente</a> · <a href="{{ archive_href }}">Edições anteriores</a>{% if repo_url %} · <a href="{{ repo_url }}" rel="noopener">Código-fonte</a>{% endif %}</p>
+</footer>
+{% endblock %}
