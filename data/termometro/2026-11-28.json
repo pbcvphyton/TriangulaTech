@@ -1,0 +1,6209 @@
+{
+ "versao_calculo": "1.1.0",
+ "data": "2026-11-28",
+ "analises": [
+  {
+   "id": "baced98ec82c",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/27/bancada-do-pt-na-camara-diz-que-nao-vai-tolerar-tentativas-de-circunscrever-governo-a-interesses-do-mercado.ghtml",
+   "titulo": "Após anúncio de Trabuco, bancada do PT na Câmara diz que não tolerará tentativas de 'circunscrever governo a interesses do mercado'",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-indica-luiz-carlos-trabuco-para-o-ministeri",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a posição da bancada do PT na Câmara sobre a política econômica do governo, a escolha da equipe econômica e o Banco Central."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 55,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 849,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.61,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": -2.61
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A pressão do mercado financeiro sobre a política econômica e os juros altos do Banco Central.",
+    "causa": "A captura do Banco Central por rentistas e a insistência em políticas de ajuste fiscal ortodoxas.",
+    "vitima": "A classe trabalhadora, os mais pobres e a capacidade produtiva do país.",
+    "culpado": "O Banco Central e o setor financeiro.",
+    "solucao": "Ampliar investimentos públicos, taxar os super-ricos e baixar os juros.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "Se o texto tratasse de uma nota da oposição liberal criticando gastos do governo, o tratamento dos verbos de atribuição tenderia a usar termos como 'alegou' ou 'reclamou'.",
+   "atores": [
+    {
+     "nome": "Bancada do PT na Câmara",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Mercado financeiro e rentistas",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "bancada do PT na Câmara dos Deputados",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 327,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 327,
+    "direita": 0
+   },
+   "falas": 11,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Os petistas defendem uma ampliação significativa",
+     "paragrafo": "P9",
+     "direcao": "esquerda",
+     "contribuicao": -2.61,
+     "explicacao": "Usa verbo que valida o pleito do grupo político.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Bancada do PT na Câmara"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9dc249511503",
+   "url": "https://www1.folha.uol.com.br/poder/2026/11/fundacao-fhc-lamenta-fala-de-lula-que-chamou-ex-presidente-de-morto-vivo.shtml",
+   "titulo": "Fundação FHC lamenta fala de Lula que chamou ex-presidente de 'morto-vivo'",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "fundacao-fhc-lamenta-e-desmente-declaracao-de-lu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "costumes"
+    ],
+    "justificativa": "Trata de embate político envolvendo ex-presidentes e o atual mandatário da República."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 462,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Declaração polêmica do presidente Lula sobre a saúde do ex-presidente FHC.",
+    "causa": "Discurso público de Lula em evento no Rio de Janeiro.",
+    "vitima": "Fernando Henrique Cardoso",
+    "culpado": "Luiz Inácio Lula da Silva",
+    "solucao": "Retratação ou esclarecimento por parte do Palácio do Planalto.",
+    "motor_moral": "respeito"
+   },
+   "teste_inversao": "O rigor na apuração e o registro de falta de resposta do Planalto seriam mantidos independentemente de quem estivesse envolvido.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Fundação Fernando Henrique Cardoso",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Aécio Neves",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Fundação Fernando Henrique Cardoso",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 9
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "A entidade contestou o relato de Lula",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 2.94,
+     "explicacao": "Usa verbo assertivo para validar a nota da fundação.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Fundação Fernando Henrique Cardoso",
+     "desfavorece": "Luiz Inácio Lula da Silva"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "a917dc47039e",
+   "url": "https://neofeed.com.br/negocios/a-positivo-ja-pensa-na-proxima-eleicao-mas-nao-esta-atras-de-voto/",
+   "titulo": "A Positivo já pensa na próxima eleição (mas não está atrás de voto)",
+   "veiculo": "NeoFeed",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Aborda contratos públicos de urnas eletrônicas e o desempenho financeiro de uma empresa fornecedora do TSE."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 937,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A necessidade de renovação de parte do parque de urnas eletrônicas para as eleições de 2028.",
+    "causa": "O envelhecimento dos modelos antigos de urnas.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Realização de nova licitação pelo TSE.",
+    "motor_moral": "eficiencia"
+   },
+   "teste_inversao": "A notícia corporativa e de tecnologia seria redigida da mesma forma para qualquer outro fornecedor do Estado.",
+   "atores": [
+    {
+     "nome": "Positivo Tecnologia",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Tribunal Superior Eleitoral (TSE)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Hélio Rotenberg, presidente da Positivo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 136,
+     "ultima": false
+    },
+    {
+     "rotulo": "Justiça Eleitoral",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 53,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 9,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "O índice de falha do modelo UE2022 da Positivo, o mais novo, produzido em 2023, foi de 0,16%.",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Usa dados oficiais e auditados para embasar a eficácia do equipamento.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "favorece": "Positivo Tecnologia"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "84cac3196fdb",
+   "url": "https://www.moneytimes.com.br/sp-corta-perspectiva-da-franca-para-negativa-por-orcamento-e-politica/",
+   "titulo": "S&P corta perspectiva da França para negativa por orçamento e política",
+   "veiculo": "Money Times",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata de rebaixamento de perspectiva de crédito soberano da França e de sua situação orçamentária."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 357,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade da França em controlar seu déficit fiscal e aprovar o orçamento.",
+    "causa": "Fraco crescimento econômico e custos elevados de juros.",
+    "vitima": "População sujeita à agitação social e custo de vida.",
+    "culpado": "Polarização política e instabilidade orçamentária.",
+    "solucao": "Aprovação de um orçamento responsável e consolidação fiscal.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O padrão de cobertura de notas de agências de risco internacionais segue critérios técnicos padronizados.",
+   "atores": [
+    {
+     "nome": "S&P",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo da França",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "S&P",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 30,
+     "ultima": false
+    },
+    {
+     "rotulo": "ministro das Finanças, Roland Lescure",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 46,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 30
+   },
+   "falas": 6,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A S&P revisou a perspectiva do rating de crédito da França",
+     "paragrafo": "P1",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "Dá destaque à agência de classificação de risco e inclui contraponto do governo francês.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "desfavorece": "Governo da França"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "45571c656fc1",
+   "url": "https://www.cnnbrasil.com.br/internacional/eua-repeliram-drones-em-base-aerea-no-reino-unido-este-mes-diz-jornal/",
+   "titulo": "EUA repeliram drones em base aérea no Reino Unido este mês, diz jornal",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "seguranca",
+     "instituicoes"
+    ],
+    "justificativa": "Envolve segurança internacional, bases militares e suspeitas de ações estatais do Irã."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 72,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 332,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Atividade não autorizada de drones em base aérea britânica utilizada pelos EUA.",
+    "causa": "Possível ligação com ações do Irã.",
+    "vitima": "Pessoal e infraestrutura militar dos EUA e Reino Unido.",
+    "culpado": "Supostos operadores de drones ligados a Teerã.",
+    "solucao": "Medidas de segurança e proteção de forças.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "A cobertura de incidentes de segurança militar mantém tom informativo padrão sem juízos de valor da redação.",
+   "atores": [
+    {
+     "nome": "Forças armadas dos EUA e Reino Unido",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo do Irã",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "porta-voz do Ministério da Defesa do Reino Unido",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 63,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 63
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "Teerã rejeitou as acusações de envolvimento",
+     "paragrafo": "P8",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apesar de trazer suspeitas ocidentais, o texto abre espaço para a defesa do lado acusado.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "seguranca",
+     "desfavorece": "Governo do Irã"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5557ef207696",
+   "url": "https://www.infomoney.com.br/brasil/linha-17-ouro-do-metro-de-sp-e-totalmente-paralisada-apos-falha-eletrica/",
+   "titulo": "Linha 17-Ouro do Metrô de SP é totalmente paralisada após falha elétrica",
+   "veiculo": "InfoMoney",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto relata um problema técnico de paralisação em uma linha do metrô de São Paulo, sem debate ideológico ou partidário."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 253 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 253,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Paralisação da Linha 17-Ouro do Metrô devido a falha elétrica.",
+    "causa": "Queda de energia em subestação elétrica.",
+    "vitima": "Passageiros que utilizam o monotrilho.",
+    "culpado": "Não apontado (falha técnica).",
+    "solucao": "Acionamento do Paese com ônibus gratuitos e trabalho para restabelecer a operação.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente utilitário e descritivo sobre um incidente de infraestrutura de transporte, não havendo viés político aplicável.",
+   "atores": [
+    {
+     "nome": "Metrô de São Paulo",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Metrô",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "7ca74f3f13f8",
+   "url": "https://g1.globo.com/tecnologia/noticia/2026/11/27/open-ai-apple-ia-segredo-processo.ghtml",
+   "titulo": "OpenAI processa Apple e acusa empresa de roubar segredos comerciais e bloquear fornecedores",
+   "veiculo": "g1",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "openai-processa-apple-por-apropriacao-de-segredo",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de disputa judicial corporativa entre gigantes de tecnologia (OpenAI e Apple), sem envolvimento direto de governos ou partidos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "9 critérios avaliados",
+    "texto com 286 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 286,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Disputa judicial cruzada envolvendo roubo de segredos comerciais e contratação de funcionários.",
+    "causa": "Acirramento da corrida pelo mercado de inteligência artificial e dispositivos.",
+    "vitima": "As próprias empresas envolvidas na disputa.",
+    "culpado": "Ambas as partes se acusam mutuamente.",
+    "solucao": "Resolução do conflito via Justiça.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto relata um processo mútuo entre duas empresas privadas sem tomar partido de nenhuma delas, mantendo tom estritamente informativo.",
+   "atores": [
+    {
+     "nome": "OpenAI",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Apple",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "93e8248bf31a",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/vendas-do-tesouro-direto-registram-melhor-outubro-da-historia",
+   "titulo": "Vendas do Tesouro Direto registram melhor outubro da história",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Divulgação de dados econômicos oficiais sobre as vendas do Tesouro Direto pelo governo federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 673,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de captação de recursos pelo governo para pagar dívidas e honrar compromissos.",
+    "causa": "Alto nível da Taxa Selic e atratividade de novos títulos públicos.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Emissão de títulos públicos para investimento de pessoas físicas.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta dados estatísticos oficiais de forma detalhada e neutra, sem julgamento de valor sobre a política econômica.",
+   "atores": [
+    {
+     "nome": "Tesouro Nacional",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Tesouro Nacional",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "795cea9cbde9",
+   "url": "https://www.seudinheiro.com/2026/economia/fim-da-escala-6x1-deve-afetar-lojas-de-shopping-de-forma-diferente-do-comercio-de-rua-entenda-sama/",
+   "titulo": "Fim da escala 6×1 deve afetar lojas de shopping de forma diferente do comércio de rua; entenda",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Aborda os impactos comerciais e operacionais de uma potencial mudança na jornada de trabalho (fim da escala 6x1) sobre o comércio e lojistas de shopping centers."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 858,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade de adaptação dos lojistas de shopping à nova jornada de trabalho devido a regras contratuais rígidas.",
+    "causa": "Possível fim da escala 6x1 e obrigatoriedade de funcionamento contínuo dos shoppings.",
+    "vitima": "Pequenos e médios lojistas de shopping.",
+    "culpado": "Falta de flexibilidade das administradoras de shopping.",
+    "solucao": "Negociação de aditivos contratuais, autonomia de horários e flexibilização de abertura.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Se o tema central fosse uma demanda sindical pelo fim da escala sem ouvir o empresariado, o padrão exigiria o mesmo espaço; aqui o jornal buscou a entidade dos shoppings, que recusou.",
+   "atores": [
+    {
+     "nome": "Associação Brasileira dos Lojistas Satélites (Ablos)",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Associação Brasileira de Shopping Centers (Abrasce)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Associação Comercial de São Paulo (ACSP)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Mauro Franco, presidente da Associação Brasileira dos Lojistas Satélites (Ablos)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 100,
+     "ultima": true
+    },
+    {
+     "rotulo": "Alfredo Cotait Neto, presidente da Associação Comercial de São Paulo (ACSP)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 123
+   },
+   "falas": 5,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A Abrasce, porém, não aceitou conceder entrevista nem enviar um posicionamento por escrito.",
+     "paragrafo": "P10",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O veículo relata abertamente que procurou o outro lado (shoppings), que optou por não se posicionar, garantindo o registro da tentativa de contraponto.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "desfavorece": "Associação Brasileira de Shopping Centers (Abrasce)"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "8036f4d031d0",
+   "url": "https://www.suno.com.br/noticias/b3-b3sa3-stablecoin-reais-open-brl-bancos/",
+   "titulo": "B3 (B3SA3) reúne seis gigantes para criar stablecoin em reais",
+   "veiculo": "Suno Notícias",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "b3-e-seis-grandes-bancos-criam-consorcio-para-la",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Anuncia parceria entre grandes instituições financeiras e a B3 para criar uma moeda digital (stablecoin)."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 536,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de modernização e interoperabilidade tecnológica no mercado financeiro brasileiro.",
+    "causa": "Evolução dos ativos digitais e busca por eficiência na liquidação de operações.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Criação da stablecoin Open BRL e infraestrutura tecnológica compartilhada.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de cobertura de mercado financeiro corporativo com tom descritivo padrão, sem juízo político-partidário.",
+   "atores": [
+    {
+     "nome": "B3 e parceiros financeiros",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Luiz Masagão, vice-presidente de Produtos e Clientes da B3",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": true
+    },
+    {
+     "rotulo": "André Portilho, sócio e head de Digital Assets do BTG Pactual",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "77049d5312e6",
+   "url": "https://www.bloomberglinea.com.br/brasil/trabuco-e-totalmente-diferente-de-joaquim-levy-diz-andrea-damico-da-buysidebrazil/",
+   "titulo": "Trabuco é ‘totalmente diferente’ de Joaquim Levy, diz Andréa Damico, da Buysidebrazil",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-indica-luiz-carlos-trabuco-para-o-ministeri",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata da escolha do novo ministro da Fazenda e compara com gestões anteriores."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 334,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "A comparação supostamente inadequada entre a futura gestão de Trabuco na Fazenda e o período de Joaquim Levy.",
+    "causa": "Diferenças de perfil político, autoridade e relação com o presidente.",
+    "vitima": "Luiz Carlos Trabuco",
+    "culpado": "Analistas que fazem comparações 'levianas'",
+    "solucao": "Reconhecer a distinção entre os dois perfis.",
+    "motor_moral": "pragmatismo"
+   },
+   "teste_inversao": "Se os papéis estivessem invertidos e a crítica fosse sobre um nome indesejado pelo mercado, o tom analítico de contraponto a comparações passadas seria mantido, desde que embasado por especialistas.",
+   "atores": [
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro"
+    },
+    {
+     "nome": "Joaquim Levy",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Andréa Damico",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Andréa Bastos Damico, fundadora e CEO da consultoria de pesquisa econômica Buysidebrazil",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 66,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Economista afirmou que comparação com o ex-ministro do governo Dilma é 'leviana'",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Usa verbo de atribuição adequado para relatar a opinião da especialista sem endosso direto da redação.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Luiz Carlos Trabuco",
+     "desfavorece": "Joaquim Levy"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "5cca266c649d",
+   "url": "https://valor.globo.com/politica/noticia/2026/11/27/dino-manda-suspender-imediatamente-emendas-de-flavio-bolsonaro-indicadas-apos-ele-deixar-o-brasil.ghtml",
+   "titulo": "Dino manda suspender R$ 79 milhões em emendas indicadas por Flávio Bolsonaro após ele deixar Brasil",
+   "veiculo": "Valor Econômico",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "flavio-bolsonaro-tem-emendas-de-r-79-milhoes-sus",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Decisão do STF suspendendo emendas parlamentares de parlamentar investigado e fora do país."
+   },
+   "estado": "ok",
+   "T": -5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 457,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.23,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -5.23
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Indicação de emendas orçamentárias por parlamentar que está fora do país.",
+    "causa": "Afastamento prolongado e recusa em cumprir ordens da Justiça.",
+    "vitima": "O devido processo orçamentário",
+    "culpado": "Flávio Bolsonaro",
+    "solucao": "Suspensão imediata das emendas e exigência de esclarecimentos.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se a mesma expressão de deslocamento fora do país fosse aplicada a parlamentares de esquerda sob investigação, termos como 'autoexílio' ou 'viagem' poderiam ser preferidos dependendo da linha editorial.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Alencar Santana",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro Flávio Dino, do Supremo Tribunal Federal (STF)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 132,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 132,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "após ele ter fugido do Brasil rumo aos Estados Unidos",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -5.23,
+     "explicacao": "O texto utiliza o termo 'fugido' na voz da redação para descrever a viagem do parlamentar, adotando jargão político ativo.",
+     "intensidade": 2,
+     "certeza": 0.8,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro",
+     "ressalva": "O termo reflete o contexto de investigações e mandados de entrega de passaporte descritos posteriormente."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3769c5cc5235",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/ataque-israelense-mata-dois-vigias-ligado-ao-medicos-sem-fronteiras-em-gaza.shtml",
+   "titulo": "Ataque israelense mata dois vigias ligado ao Médicos Sem Fronteiras em Gaza",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataque-aereo-de-israel-mata-dois-funcionarios-do",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Conflito geopolítico internacional em Gaza, envolvendo ataques a civis e ONGs."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 93,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 448,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mortes de funcionários humanitários em zona de conflito.",
+    "causa": "Ataques aéreos israelenses e suposta infiltração de combatentes.",
+    "vitima": "Funcionários dos Médicos Sem Fronteiras",
+    "culpado": "Ambas as partes trocam acusações de violações",
+    "solucao": "Nenhuma apontada diretamente.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto mantém padrão estritamente descritivo de agência internacional de notícias, sem viés partidário nacional.",
+   "atores": [
+    {
+     "nome": "Exército de Israel",
+     "campo": "direita"
+    },
+    {
+     "nome": "Hamas",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Médicos Sem Fronteiras (MSF)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Os Médicos Sem Fronteiras",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 5,
+     "ultima": true
+    },
+    {
+     "rotulo": "Exército israelense",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "O Exército de Israel assumiu a autoria da ação na madrugada de sábado",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta a posição e a justificativa de ambas as partes (Exército de Israel e MSF) com espaço equilibrado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "ec0ad8b661da",
+   "url": "https://www.infomoney.com.br/business/lojistas-avaliam-reduzir-expediente-mas-donas-de-shoppings-nao-querem-papo/",
+   "titulo": "Lojistas avaliam reduzir expediente, mas donas de shoppings “não querem papo”",
+   "veiculo": "InfoMoney",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Impacto de mudança nas leis trabalhistas sobre lojistas e shopping centers."
+   },
+   "estado": "ok",
+   "T": -4,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 80,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 620,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -3.53,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": -3.53
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dificuldade de adaptação do comércio às novas regras de jornada de trabalho devido a contratos rígidos com shoppings.",
+    "causa": "Fim da escala 6x1 e inflexibilidade contratual dos centros de compras.",
+    "vitima": "Pequenos e médios lojistas",
+    "culpado": "Donas de shopping centers que recusam negociação",
+    "solucao": "Diálogo e flexibilização contratual dos horários.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "O texto seria escrito da mesma forma caso a recusa viesse da associação de lojistas, priorizando a transparência sobre quem quis ou não falar.",
+   "atores": [
+    {
+     "nome": "Lojistas (Ablos e ACSP)",
+     "campo": "centro"
+    },
+    {
+     "nome": "Administradoras de shoppings (Abrasce)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Mauro Franco, presidente da Associação Brasileira dos Lojistas Satélites (Ablos)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 186,
+     "ultima": true
+    },
+    {
+     "rotulo": "Alfredo Cotait Neto, presidente da Associação Comercial de São Paulo (ACSP)",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 62,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 8,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "A Abrasce foi procurada pela reportagem, mas recusou o pedido de entrevista ou envio de manifestação por escrito.",
+     "paragrafo": "P7",
+     "direcao": "esquerda",
+     "contribuicao": -3.53,
+     "explicacao": "O texto relata claramente que o outro lado foi procurado, expondo a recusa em se manifestar sem viés além do fato.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Lojistas (Ablos e ACSP)",
+     "desfavorece": "Administradoras de shoppings (Abrasce)",
+     "ressalva": "Prática jornalística padrão quando uma fonte declina o convite."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "31428a06e3b1",
+   "url": "https://www.moneytimes.com.br/fundo-imobiliario-vende-agencia-do-banco-do-brasil-bbas3-por-r-14-milhoes-veja-lucro-por-cota-igdl/",
+   "titulo": "Fundo imobiliário vende agência do Banco do Brasil (BBAS3) por R$ 14 milhões; veja lucro por cota",
+   "veiculo": "Money Times",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Transação imobiliária de fundo de investimento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 244 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 244,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Realização de ganho de capital por fundo imobiliário através de venda de ativo.",
+    "causa": "Estratégia de reciclagem de portfólio.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Alocação eficiente de capital.",
+    "motor_moral": "pragmatismo"
+   },
+   "teste_inversao": "O texto é puramente informativo sobre finanças e mercado imobiliário, sem juízo político.",
+   "atores": [
+    {
+     "nome": "Tivio Capital",
+     "campo": "centro"
+    },
+    {
+     "nome": "Banco do Brasil",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Tivio Capital, gestora do FII",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 19,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "7aeda954064e",
+   "url": "https://www.cnnbrasil.com.br/internacional/ataque-israelense-mata-dois-funcionarios-da-medicos-sem-fronteiras-diz-ong/",
+   "titulo": "Ataque israelense mata dois funcionários da Médicos Sem Fronteiras, diz ONG",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "ataque-aereo-de-israel-mata-dois-funcionarios-do",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda um conflito internacional envolvendo ataques militares e mortes de funcionários humanitários em Gaza, com acusações mútuas entre a ONG Médicos Sem Fronteiras e o exército de Israel."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 75,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 313,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ataques israelenses atingem instalações e matam funcionários de organizações humanitárias em Gaza.",
+    "causa": "Conflito militar em andamento e acusações mútuas sobre o uso de instalações médicas e civis por combatentes.",
+    "vitima": "Funcionários da Médicos Sem Fronteiras e civis em Gaza.",
+    "culpado": "Exército de Israel (segundo a ONG) ou combatentes do Hamas disfarçados (segundo Israel).",
+    "solucao": "Responsabilização dos autores dos ataques e respeito ao direito internacional humanitário.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata de forma simétrica as acusações da ONG e a defesa do exército de Israel, mantendo a estrutura padrão de cobertura de conflitos internacionais.",
+   "atores": [
+    {
+     "nome": "Médicos Sem Fronteiras (MSF)",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Exército de Israel",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "organização",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 29,
+     "ultima": false
+    },
+    {
+     "rotulo": "exército de Israel",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 7,
+     "ultima": true
+    },
+    {
+     "rotulo": "grupos de defesa dos direitos humanos",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 7
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "alegou que os dois funcionários da MSF eram \"terroristas disfarçados de trabalhadores humanitários\"",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O uso do verbo 'alegou' atribui um tom de menor certeza à declaração de Israel, o que é contrabalançado pela citação direta da justificativa.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Exército de Israel",
+     "ressalva": "Uso comum de verbos de atribuição para declarações não comprovadas de forma independente."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "80e6429a6d2e",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/contas-do-governo-tem-superavit-de-r-523-bilhoes-em-outubro",
+   "titulo": "Contas do governo têm superávit de R$ 52,3 bilhões em outubro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-central-registra-superavit-primario-de-r",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata dados fiscais oficiais do Governo Central (superávit primário), informando sobre receitas, despesas e o desempenho das contas públicas."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 444,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Necessidade de controle fiscal e acompanhamento do saldo primário das contas do governo.",
+    "causa": "Crescimento de receitas federais, especialmente ligadas à exploração de recursos naturais, combinado à estabilidade de despesas.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Manutenção do controle de despesas discricionárias e gestão fiscal.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre dados oficiais de arrecadação e despesa, aplicável a qualquer gestão governamental.",
+   "atores": [
+    {
+     "nome": "Governo Central / Tesouro Nacional",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Tesouro Nacional",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "superávit primário de R$ 52,3 bilhões em outubro",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados numéricos amparados por fonte oficial (Tesouro Nacional), com base e período claros.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "favorece": "Governo Central / Tesouro Nacional"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "69be41565d98",
+   "url": "https://www.poder360.com.br/poder-brasil/carlos-bolsonaro-usa-foto-de-internacao-anterior-de-jair-em-video-de-ia/",
+   "titulo": "Carlos Bolsonaro usa foto de internação anterior de Jair em vídeo de IA",
+   "veiculo": "Poder360",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto aborda a repercussão política e o estado de saúde do ex-presidente Jair Bolsonaro, a partir de publicações de seu filho e de boletim médico."
+   },
+   "estado": "ok",
+   "T": -3,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 241 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 78,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 241,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HIERARQUIA": -2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Estado de saúde do ex-presidente e uso de inteligência artificial em postagens de familiares.",
+    "causa": "Quadro de saúde decorrente de obstrução intestinal e pneumonia.",
+    "vitima": "Jair Bolsonaro.",
+    "culpado": "O 'sistema' (segundo a narrativa de Carlos Bolsonaro).",
+    "solucao": "Tratamento médico e recuperação clínica.",
+    "motor_moral": "lealdade"
+   },
+   "teste_inversao": "O tratamento de reportar publicações polêmicas de familiares de figuras públicas é aplicado de forma padrão independentemente do espectro político.",
+   "atores": [
+    {
+     "nome": "Carlos Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Jair Bolsonaro",
+     "campo": "direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Carlos Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 49,
+     "ultima": true
+    },
+    {
+     "rotulo": "boletim médico",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 49
+   },
+   "falas": 4,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HIERARQUIA",
+     "citacao": "Carlos Bolsonaro usa foto de internação anterior de Jair em vídeo de IA",
+     "paragrafo": "P0",
+     "direcao": "esquerda",
+     "contribuicao": -2.94,
+     "explicacao": "O título destaca o uso de foto antiga por IA, enfatizando a controvérsia da postagem em detrimento do boletim médico.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Carlos Bolsonaro",
+     "ressalva": "Reflete o fato noticioso principal gerado pela postagem do político."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "53f13587bf4a",
+   "url": "https://www.seudinheiro.com/2026/economia/da-faria-lima-a-wall-street-o-que-os-bancos-esperam-de-trabuco-no-ministerio-da-fazenda-jcav/",
+   "titulo": "Da Faria Lima a Wall Street: o que os bancos esperam de Trabuco no Ministério da Fazenda",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "indicacao-de-trabuco-para-a-fazenda-anima-mercad",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto analisa a repercussão da escolha de Luiz Carlos Trabuco para o Ministério da Fazenda no governo Lula entre agentes do mercado financeiro nacional e internacional."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1100,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Incerteza fiscal e necessidade de credibilidade na política econômica do governo.",
+    "causa": "Déficit fiscal e desconfiança de investidores em relação às contas públicas.",
+    "vitima": "Nenhuma.",
+    "culpado": "Falta de medidas fiscais concretas anteriores.",
+    "solucao": "Indicação de um nome bem avaliado pelo setor privado e implementação de ajuste fiscal.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "Textos de análise econômica sobre reações de mercados a indicações ministeriais seguem o mesmo padrão metodológico independentemente da orientação ideológica do governo.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Mercado financeiro (Bancos e instituições)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Bradesco BBI",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Citi",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "UBS Global Wealth Management (GWM)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "JPMorgan",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "instituições financeiras avaliam os impactos da escolha de Lula",
+     "paragrafo": "P1",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "O texto prioriza a perspectiva de analistas de mercado e bancos de investimento para avaliar as diretrizes econômicas governamentais.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Mercado financeiro (Bancos e instituições)",
+     "desfavorece": "Governo Lula / Luiz Inácio Lula da Silva",
+     "ressalva": "Adequado ao escopo de um veículo focado em finanças e economia."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "bdc126021ec9",
+   "url": "https://www.bloomberglinea.com.br/brasil/trabuco-dependera-de-lula-nas-decisoes-impopulares-para-nao-repetir-levy-diz-ubs/",
+   "titulo": "Trabuco dependerá de Lula nas decisões impopulares para não repetir Levy, diz UBS",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-indica-luiz-carlos-trabuco-para-o-ministeri",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto analisa os desafios políticos e de sustentação para a gestão de Luiz Carlos Trabuco no Ministério da Fazenda, segundo avaliação do banco UBS."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 227 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 67,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 227,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 3.14,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 3.14
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Riscos de insucesso em ajustes Fiscais devido a resistências políticas.",
+    "causa": "Falta de apoio político claro em gestões passadas análogas (caso Joaquim Levy) e resistências partidárias.",
+    "vitima": "Nenhuma.",
+    "culpado": "Resistências políticas internas no partido de governo.",
+    "solucao": "Apoio presidencial decisivo para medidas impopulares.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Análises de risco político e econômico baseadas em relatórios de grandes instituições financeiras são aplicadas de forma uniforme na imprensa especializada.",
+   "atores": [
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Presidente Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "PT",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "UBS Global Wealth Management (GWM)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "segundo o UBS UBS Global Wealth Management (GWM)",
+     "paragrafo": "P2",
+     "direcao": "direita",
+     "contribuicao": 3.14,
+     "explicacao": "A análise econômica e política baseia-se na projeção de uma instituição financeira privada.",
+     "intensidade": 1,
+     "certeza": 0.8,
+     "eixo": "economico",
+     "favorece": "Luiz Carlos Trabuco",
+     "desfavorece": "PT",
+     "ressalva": "Padrão habitual de reportagens de economia baseadas em relatórios de bancos de investimento."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "bcd17f9b6c82",
+   "url": "https://neofeed.com.br/economia/as-armadilhas-fiscais-que-trabuco-tera-de-desativar/",
+   "titulo": "As armadilhas fiscais que Trabuco terá de desativar",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto analisa o cenário fiscal do governo e os desafios do futuro ministro da Fazenda com base em relatório de consultoria."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 71,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1270,
+   "cortado": true,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Expansão de gastos obrigatórios, uso de mecanismos parafiscais e déficit estrutural elevado.",
+    "causa": "Falta de disposição para cortes de gastos e adoção de manobras fiscais.",
+    "vitima": "A sustentabilidade das contas públicas e a dívida pública.",
+    "culpado": "A política fiscal do governo atual e anterior.",
+    "solucao": "Choque fiscal, ajuste rápido e revisão profunda de gastos e despesas obrigatórias.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "Se o governo fosse de direita, o uso de termos críticos como 'alquimia fiscal' e 'atalho para continuar gastando' provavelmente seria mantido caso a consultoria apontasse desequilíbrios análogos.",
+   "atores": [
+    {
+     "nome": "Governo Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Gabriel Barros",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 226,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 226
+   },
+   "falas": 12,
+   "evidencias": [],
+   "descartadas": 1
+  },
+  {
+   "id": "40051d2d42bd",
+   "url": "https://www.suno.com.br/noticias/ibovespa-hoje-27-novembro-trabuco-dolar-queda/",
+   "titulo": "Dólar despenca 4%, Magalu (MGLU3) dispara e Ibovespa tem melhor semana desde o primeiro turno",
+   "veiculo": "Suno Notícias",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Reportagem financeira sobre o comportamento dos mercados, Ibovespa, dólar e a indicação de ministro da Fazenda."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 54,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 653,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Oscilações e prêmios de risco nos mercados financeiros.",
+    "causa": "Expectativas em torno da política fiscal e nomeação de equipe econômica.",
+    "vitima": "Investidores e ativos brasileiros.",
+    "culpado": "Incerteza fiscal prévia.",
+    "solucao": "Indicação de nomes bien aceitos pelo mercado e ajuste fiscal.",
+    "motor_moral": "eficiencia_economica"
+   },
+   "teste_inversao": "O texto descreve dados objetivos de mercado e seria redigido da mesma forma independentemente da orientação política do governo.",
+   "atores": [
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Ibovespa fecha em queda de 0,13%, mas acumula alta semanal de 6,13% após confirmação de Trabuco na Fazenda.",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresenta dados de desempenho de mercado com base e período claros.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "9ecf4b4728c6",
+   "url": "https://valor.globo.com/financas/noticia/2026/11/27/fachin-libera-repasse-de-r-316-milhoes-para-o-brb.ghtml",
+   "titulo": "Fachin libera repasse de R$ 316 milhões para o BRB",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "fachin-libera-repasse-de-r-316-milhoes-para-o-br",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Cobertura de decisão judicial do STF envolvendo repasses financeiros ao Banco de Brasília e desdobramentos de investigações."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 561,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Retenção de recursos de carteiras de crédito cedidas durante investigações.",
+    "causa": "Medidas assecuratórias e sequestro de bens no âmbito do caso Master.",
+    "vitima": "Banco de Brasília (BRB).",
+    "culpado": "Instituições investigadas e massa liquidante.",
+    "solucao": "Liberação judicial de valores incontroversos.",
+    "motor_moral": "legalidade"
+   },
+   "teste_inversao": "A notícia relata uma decisão judicial estritamente com base nos autos e declarações oficiais, mantendo o mesmo tom para qualquer caso semelhante.",
+   "atores": [
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Banco de Brasília (BRB)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Edson Fachin",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 135,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "disse",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Utiliza verbo de atribuição neutro para relatar a manifestação da autoridade judicial.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "7130d9a5974f",
+   "url": "https://www1.folha.uol.com.br/tec/2026/11/inss-do-reino-unido-tem-site-retirado-do-ar-apos-incidente-cibernetico.shtml",
+   "titulo": "'INSS do Reino Unido' tem site retirado do ar após 'incidente cibernético'",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Tecnologia & Negócios",
+   "secao": "tecnologia",
+   "materia": "falha-cibernetica-afeta-previdencia-britanica-e",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre incidente cibernético em órgão governamental do Reino Unido."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 43,
+    "rotulo": "Fraca",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 431,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "FONTES": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Interrupção de serviços online após incidente cibernético.",
+    "causa": "Ataques e ameaças cibernéticas globais.",
+    "vitima": "Usuários dos serviços do departamento britânico.",
+    "culpado": "Atores cibernéticos não especificados.",
+    "solucao": "Investigação conjunta e restabelecimento dos serviços.",
+    "motor_moral": "seguranca_publica"
+   },
+   "teste_inversao": "A abordagem factual de incidentes de segurança cibernética em governos estrangeiros seria idêntica independentemente do veículo.",
+   "atores": [
+    {
+     "nome": "Departamento de Trabalho e Pensões do Reino Unido",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "porta-voz do departamento",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 32,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "FONTES",
+     "citacao": "informou um porta-voz do departamento",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Atribui as informações oficiais a um porta-voz do órgão competente de forma padrão.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "geral"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "448f670c2412",
+   "url": "https://www.infomoney.com.br/onde-investir/fii-vende-imovel-locado-ao-banco-do-brasil-por-r-14-milhoes-veja-lucro/",
+   "titulo": "FII vende imóvel locado ao Banco do Brasil por R$ 14 milhões; veja lucro",
+   "veiculo": "InfoMoney",
+   "editoria": "Imobiliário",
+   "secao": "imobiliario",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Fato relevante de fundo imobiliário sobre venda de imóvel comercial."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 230,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Necessidade de reciclagem de portfólio de fundo imobiliário.",
+    "causa": "Estratégia de gestão de ativos.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum.",
+    "solucao": "Alienação de imóvel e reinvestimento dos recursos.",
+    "motor_moral": "eficiencia_economica"
+   },
+   "teste_inversao": "Reportagens sobre transações de fundos imobiliários seguem padrão puramente informativo e técnico.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "e738606fd73d",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/27/raizen-avalia-venda-de-sua-divisao-de-distribuicao-de-combustiveis.ghtml",
+   "titulo": "Com dívida de R$ 65 bilhões, Raízen avalia vender negócio de distribuição de combustíveis",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda a venda de ativos de uma grande empresa em recuperação judicial e a repercussão positiva da indicação de um ministro da Fazenda."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 347,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Dívida elevada da Raízen exigindo reestruturação e venda de ativos.",
+    "causa": "Investimentos arriscados, safras ruins e queda de commodities.",
+    "vitima": "A própria companhia em recuperação judicial.",
+    "culpado": "Conjuntura de mercado e decisões de investimento anteriores.",
+    "solucao": "Venda de ativos e possível aporte de capital.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "O texto descreve fatos mercadológicos e declarações de um empresário sem viés partidário direto. Seria escrito da mesma forma independentemente do governo.",
+   "atores": [
+    {
+     "nome": "Rubens Ometto",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rubens Ometto",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 21
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Ometto também elogiou a indicação",
+     "paragrafo": "P8",
+     "direcao": "direita",
+     "contribuicao": 2.94,
+     "explicacao": "Usa verbo de endosso para a avaliação positiva do mercado sobre o novo ministro.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Luiz Carlos Trabuco"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "2f03441484a7",
+   "url": "https://www.moneytimes.com.br/mubadala-propoe-opa-para-ampliar-participacao-na-kepler-weber-kepl3-a-ate-45/",
+   "titulo": "Mubadala propõe OPA para ampliar participação na Kepler Weber (KEPL3) a até 45%",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "mubadala-capital-propoe-opa-voluntaria-para-dete",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de oferta pública de aquisição de ações e investimentos do fundo Mubadala, com menções tangenciais ao cenário econômico."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 351,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Cenário desafiador e queda de resultados na Kepler Weber.",
+    "causa": "Crise enfrentada pelos produtores agrícolas.",
+    "vitima": "Kepler Weber",
+    "culpado": "Crise do setor agrícola",
+    "solucao": "Proposta de OPA para ampliar participação acionária.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Notícia estritamente de mercado financeiro, neutra politicamente.",
+   "atores": [
+    {
+     "nome": "Mubadala Capital",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "ad2975f58e86",
+   "url": "https://www.cnnbrasil.com.br/politica/nos-eua-ha-um-mes-flavio-segue-votando-e-recebendo-salario-de-senador/",
+   "titulo": "Nos EUA há um mês, Flávio segue votando e recebendo salário de senador",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico",
+     "seguranca"
+    ],
+    "justificativa": "Discute a atuação remota, votações e manutenção de salário e emendas de um senador da oposição exilado/viajado após eleições."
+   },
+   "estado": "ok",
+   "T": -6,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 613,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.88,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -5.88
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Parlamentar atuando e recebendo recursos do exterior após derrota eleitoral.",
+    "causa": "Regimento interno permitindo sessões semipresenciais.",
+    "vitima": "Zelo com o erário público (segundo ações populares citadas).",
+    "culpado": "Flávio Bolsonaro",
+    "solucao": "Decisões judiciais bloqueando emendas e questionando remuneração.",
+    "motor_moral": "proporcionalidade"
+   },
+   "teste_inversao": "Se um parlamentar aliado do governo viajasse para o exterior e votasse remotamente, o termo 'fugir' dificilmente seria empregado pela redação.",
+   "atores": [
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo Lula",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Flávio Bolsonaro",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 6,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 6
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "Um mês após fugir para os Estados Unidos",
+     "paragrafo": "P2",
+     "direcao": "esquerda",
+     "contribuicao": -5.88,
+     "explicacao": "Usa o termo carregado 'fugir' na voz da redação para descrever a viagem de um parlamentar.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro",
+     "ressalva": "Viagem ocorreu logo após a derrota eleitoral."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "99024f544d46",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/fachin-prorroga-por-60-dias-investigacao-da-pf-sobre-filme-dark-horse",
+   "titulo": "Fachin prorroga por 60 dias investigação da PF sobre filme Dark Horse",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Relata prorrogação de inquéritos policiais envolvendo figuras políticas de diferentes espectros no STF."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "9 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 9 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao_se_aplica",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 418,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0.0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "HIERARQUIA": 0.0
+   },
+   "aplicaveis": 9,
+   "enquadramento": {
+    "problema": "Investigações sobre corrupção, lavagem de dinheiro e desvio de verbas envolvendo políticos e empresários.",
+    "causa": "Uso de recursos ilícitos e fraudes financeiras.",
+    "vitima": "Administração pública",
+    "culpado": "Investigados citados",
+    "solucao": "Prorrogação de inquérito para conclusão pela PF.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto trata de despachos judiciais e investigações oficiais de forma simétrica entre investigados de campos distintos.",
+   "atores": [
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Jacques Wagner",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "HIERARQUIA",
+     "citacao": "Fachin prorroga por 60 dias investigação da PF sobre filme Dark Horse",
+     "paragrafo": "P0",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto menciona investigações tanto de parlamentar da oposição quanto da base governista (Jacques Wagner), mantendo equilíbrio na cobertura policial.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "3a86c72a37f8",
+   "url": "https://www.seudinheiro.com/2026/renda-fixa/trabuco-day-no-tesouro-direto-taxas-dos-titulos-publicos-voltam-aos-niveis-anteriores-as-eleicoes-mlim/",
+   "titulo": "Trabuco Day no Tesouro Direto: taxas dos títulos públicos voltam aos níveis anteriores às eleições",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "indicacao-de-trabuco-para-a-fazenda-anima-mercad",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Analisa o impacto da indicação de Luiz Carlos Trabuco para a Fazenda nos títulos públicos e nos juros da economia."
+   },
+   "estado": "ok",
+   "T": 3,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 55,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 999,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 2.94,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 2.94
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Volatilidade e altas taxas de juros nos títulos públicos motivadas por incerteza fiscal.",
+    "causa": "Incertezas econômicas e políticas em torno da condução fiscal do governo.",
+    "vitima": "Investidores de renda fixa expostos à volatilidade.",
+    "culpado": "Incerteza fiscal",
+    "solucao": "Nomeação de perfil técnico para a Fazenda e ajuste fiscal.",
+    "motor_moral": "responsabilidade_fiscal"
+   },
+   "teste_inversao": "Reportagens sobre reações do mercado financeiro a nomes ministeriais ortodoxos seguem o mesmo padrão descritivo em veículos econômicos.",
+   "atores": [
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "diretor da BlackRock",
+     "campo": "centro",
+     "anonima": true,
+     "vinculo": true,
+     "palavras": 11,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "Trabuco é visto pelo mercado como um nome com forte interlocução",
+     "paragrafo": "P10",
+     "direcao": "direita",
+     "contribuicao": 2.94,
+     "explicacao": "Atribui ao ator uma visão positiva generalizada do mercado econômico.",
+     "intensidade": 1,
+     "certeza": 0.9,
+     "eixo": "economico",
+     "favorece": "Luiz Carlos Trabuco"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c236f4e4487c",
+   "url": "https://www.bloomberglinea.com.br/brasil/ibovespa-corrige-alta-e-encerra-o-dia-em-leve-queda-dolar-recua-mais-de-7-na-semana/",
+   "titulo": "Ibovespa corrige alta e encerra o dia em leve queda; dólar recua 7% na semana",
+   "veiculo": "Bloomberg Línea",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a repercussão econômica e política da escolha de um novo ministro da Fazenda no governo federal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 661,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Desajuste fiscal e estresse nos mercados financeiros.",
+    "causa": "Gastos elevados do governo e atraso na definição da equipe econômica.",
+    "vitima": "Investidores e empresas alavancadas.",
+    "culpado": "Incerteza fiscal anterior.",
+    "solucao": "Nomeação de um perfil técnico comprometido com a austeridade.",
+    "motor_moral": "pragmatismo economico"
+   },
+   "teste_inversao": "O texto relata fatos mercadológicos e nomeações sem emitir juízos de valor ideológicos na voz da redação, mantendo o mesmo padrão independentemente de quem estivesse no poder.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Max Bohm, estrategista de renda variável da Nomos, escritório de investimentos",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 39,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0a99417c86a7",
+   "url": "https://neofeed.com.br/poder/trabuco-tem-o-atual-congresso-a-favor-mas-ha-duvida-sobre-o-proximo-e-a-sua-autonomia/",
+   "titulo": "Trabuco tem o atual Congresso a favor, mas há dúvida sobre o próximo e a sua autonomia",
+   "veiculo": "NeoFeed",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "lula-indica-luiz-carlos-trabuco-para-o-ministeri",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Trata da articulação política em torno do novo ministro da Fazenda e das reações do Congresso e dos partidos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 89,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 900,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Ceticismo e resistências políticas à nomeação de um perfil de mercado para a Fazenda.",
+    "causa": "Diferenças ideológicas na base governista e desconfiança da oposição.",
+    "vitima": "Ajuste fiscal e estabilidade econômica.",
+    "culpado": "Falta de garantias absolutas de autonomia.",
+    "solucao": "Articulação política liderada pelo próprio ministro e apoio do Congresso.",
+    "motor_moral": "governabilidade"
+   },
+   "teste_inversao": "O texto dá espaço simétrico a vozes de sustentação (centro, centro-direita) e de cautela/oposição (PT, esquerda, oposição), sem viés na voz da redação.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro"
+    },
+    {
+     "nome": "Esquerda / PT",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "deputado Arnaldo Jardim (Cidadania-SP)",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 65,
+     "ultima": false
+    },
+    {
+     "rotulo": "senador Camilo Santana (PT-CE)",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 5,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Paulo Pimenta (PT-RS)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 61,
+     "ultima": false
+    },
+    {
+     "rotulo": "senadora de oposição, Tereza Cristina (PP-MS)",
+     "campo": "direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 100,
+     "ultima": false
+    },
+    {
+     "rotulo": "deputado Lindbergh Farias (PT-RJ)",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 37,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 103,
+    "direita": 165
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "857b2dbef4fb",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/27/aneel-mantm-bandeira-verde-e-contas-de-luz-seguem-sem-cobrana-adicional-em-dezembro.ghtml",
+   "titulo": "Aneel mantém bandeira verde e contas de luz seguem sem cobrança adicional em dezembro",
+   "veiculo": "Valor Econômico",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "aneel-mantem-bandeira-tarifaria-verde-e-contas-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre a manutenção da bandeira tarifária de energia elétrica, sem disputa político-partidária central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 230 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 230,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Custos de geração de energia elétrica.",
+    "causa": "Melhoria nos níveis dos reservatórios devido ao período chuvoso.",
+    "vitima": "Consumidores de energia.",
+    "culpado": "Nenhum.",
+    "solucao": "Manutenção da bandeira verde.",
+    "motor_moral": "bem_comum"
+   },
+   "teste_inversao": "Trata-se de uma notícia puramente utilitária e técnica, mantendo o mesmo tom para qualquer governo.",
+   "atores": [
+    {
+     "nome": "Aneel",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "a agência, em nota",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 33,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "02ff13418a24",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/taiwan-realiza-eleicoes-locais-com-disputa-acirrada-pela-prefeitura-da-capital-taipe.shtml",
+   "titulo": "Taiwan realiza eleições locais com disputa acirrada pela prefeitura da capital Taipé",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Aborda eleições locais em Taiwan e a disputa geopolítica com Pequim."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 516,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disputa eleitoral local sob pressão militar externa.",
+    "causa": "Pressão geopolítica da China sobre Taiwan.",
+    "vitima": "Eleitores e estabilidade democrática taiwanesa.",
+    "culpado": "Pequim.",
+    "solucao": "Realização de eleições locais.",
+    "motor_moral": "democracia_soberania"
+   },
+   "teste_inversao": "O texto relata os fatos da eleição e as movimentações militares de forma descritiva e equilibrada entre as partes.",
+   "atores": [
+    {
+     "nome": "Governo de Taiwan (PDP)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "KMT",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Governo da China",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Ministério da Defesa de Taiwan",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "cientista político Liu Jia-wei, da Universidade Nacional de Taipé",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "182008a6f642",
+   "url": "https://www.infomoney.com.br/mundo/argentina-fracassa-ao-tentar-barrar-exploracao-britanica-de-petroleo-nas-malvinas/",
+   "titulo": "Argentina fracassa ao tentar barrar exploração britânica de petróleo nas Malvinas",
+   "veiculo": "InfoMoney",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "tribunal-internacional-rejeita-pedido-da-argenti",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Trata de disputa geopolítica internacional envolvendo soberania territorial e exploração de recursos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 241 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 241,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Disputa territorial e econômica sobre as Ilhas Malvinas.",
+    "causa": "Tentativa argentina de barrar exploração petrolífera britânica por meio de tribunal internacional.",
+    "vitima": "Habitantes das Ilhas Malvinas.",
+    "culpado": "Governo argentino.",
+    "solucao": "Decisão de tribunal internacional rejeitando o pedido argentino.",
+    "motor_moral": "autodeterminacao"
+   },
+   "teste_inversao": "O texto relata a decisão judicial e expõe os argumentos de ambas as partes sem viés na voz do redator.",
+   "atores": [
+    {
+     "nome": "Governo da Argentina",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo do Reino Unido",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "presidente Maurice Kamga",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ministro das Relações Exteriores, Ed Miliband, e a Procuradora-Geral, Ellie Reeves",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 55,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 55,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0857036f260a",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/28/governo-prorroga-subvencao-ao-diesel-por-mais-30-dias.ghtml",
+   "titulo": "Governo prorroga subvenção ao diesel por mais 30 dias",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de prorrogação de subsídio governamental ao diesel e menciona contexto eleitoral."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 217 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 217,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Volatilidade dos preços internacionais do petróleo e combustíveis.",
+    "causa": "Cenário externo desfavorável e flutuação de preços.",
+    "vitima": "Consumidores e motoristas afetados pelo preço do diesel.",
+    "culpado": "Mercado internacional de petróleo.",
+    "solucao": "Prorrogação da subvenção ao diesel por mais 30 dias.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto é eminentemente informativo e focado em atos administrativos, sendo escrito da mesma forma independentemente da coloração político-partidária.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro"
+    },
+    {
+     "nome": "Ministério da Fazenda",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "documento",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O Ministério da Fazenda prorrogou",
+     "paragrafo": "P2",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro de atribuição para descrever a ação do governo.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d3c39a6dad59",
+   "url": "https://www.cnnbrasil.com.br/internacional/avioes-batem-asas-durante-manobra-em-aeroporto-de-washington-nos-eua/",
+   "titulo": "Aviões batem asas durante manobra em aeroporto de Washington, nos EUA",
+   "veiculo": "CNN Brasil",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia de acidente operacional (colisão de asas) entre aeronaves em aeroporto, sem teor político-ideológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 532,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Colisão entre pontas de asas de duas aeronaves durante taxiação.",
+    "causa": "Ultrapassagem da linha de espera pela aeronave.",
+    "vitima": "Nenhuma pessoa ferida.",
+    "culpado": "Não apontado explicitamente, atribuído a incidente operacional.",
+    "solucao": "Retirada das aeronaves para inspeção e reparação de voos.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Por se tratar de um relato factual sobre um acidente de aviação sem feridos, o texto manteria exatamente a mesma estrutura.",
+   "atores": [
+    {
+     "nome": "American Airlines",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "FAA",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 4,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "8cd166eb0944",
+   "url": "https://www.moneytimes.com.br/eua-anunciam-que-dispararam-contra-navio-que-tentava-furar-bloqueio-a-portos-do-ira-jcav/",
+   "titulo": "EUA anunciam que dispararam contra navio que tentava furar bloqueio a portos do Irã",
+   "veiculo": "Money Times",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Envolve conflito geopolítico militar entre os Estados Unidos e o Irã, bloqueio portuário e impactos econômicos."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 227 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 227,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Tentativa de violação de bloqueio comercial imposto aos portos iranianos.",
+    "causa": "Desrespeito ao bloqueio naval estabelecido pelos Estados Unidos.",
+    "vitima": "Tripulação civil do navio comercial.",
+    "culpado": "Embarcação com bandeira de Palau / Irã.",
+    "solucao": "Uso de munições de precisão para desativar o sistema de propulsão do navio.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata um fato militar com base em comunicados oficiais e manteria a mesma estrutura independentemente da preferência geopolítica.",
+   "atores": [
+    {
+     "nome": "Estados Unidos",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Irã",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Comando Central (Centcom)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 23,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "O Centcom afirmou",
+     "paragrafo": "P5",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo de atribuição padrão (afirmou) para relatar a posição oficial militar.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "instituicoes"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "8322e6e2aa5b",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/com-bandeira-tarifaria-verde-energia-nao-tera-custo-extra-em-dezembro",
+   "titulo": "Com bandeira tarifária verde, energia não terá custo extra em dezembro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "aneel-mantem-bandeira-tarifaria-verde-e-contas-d",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Informa sobre a manutenção da bandeira tarifária verde na energia elétrica, sem grande disputa político-partidária explícita."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 228 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 228,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "VERBOS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Custo da energia elétrica para os consumidores.",
+    "causa": "Condições favoráveis de geração e melhoria nos níveis dos reservatórios devido ao período chuvoso.",
+    "vitima": "Consumidores de energia elétrica.",
+    "culpado": "Nenhum.",
+    "solucao": "Manutenção da bandeira tarifária verde.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "A notícia é estritamente de serviço e utilidade pública, sendo redigida da mesma forma independentemente de governos.",
+   "atores": [
+    {
+     "nome": "Aneel",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Aneel",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 33,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "VERBOS",
+     "citacao": "explica a agência",
+     "paragrafo": "P4",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Uso de verbo neutro de esclarecimento para expor a justificativa da agência reguladora.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "343a47f4749f",
+   "url": "https://neofeed.com.br/insiders/opiniao-o-cisne-negro-em-brasilia/",
+   "titulo": "OPINIÃO: O cisne negro em Brasília",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "opiniao",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Artigo de opinião assinado por executivo do mercado financeiro discutindo a nomeação de Luiz Carlos Trabuco para o Ministério da Fazenda e políticas fiscais do governo Lula."
+   },
+   "estado": "ok",
+   "T": 5,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 59,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1322,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 5.23,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ADJETIVOS": 5.23
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Crise de confiança econômica e alta do dólar gerando risco ao legado presidencial.",
+    "causa": "Falta de um ajuste fiscal crível e resistência da ala política tradicional do governo.",
+    "vitima": "A economia brasileira e a popularidade do governo.",
+    "culpado": "Políticas econômicas anteriores e resistência interna do partido governista.",
+    "solucao": "Nomeação de Luiz Carlos Trabuco para a Fazenda e realização de ajuste fiscal estrutural.",
+    "motor_moral": "liberdade"
+   },
+   "teste_inversao": "Sendo um artigo de opinião explicitamente assinado por um ator do mercado financeiro, a perspectiva reflete sua visão liberal/ortodoxa, que mudaria se escrito por um analista alinhado à esquerda.",
+   "atores": [
+    {
+     "nome": "Governo Lula",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Ala petista (Gleisi, Lindbergh, Rui Costa)",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Walter Maciel",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 7,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ADJETIVOS",
+     "citacao": "E este foi um grande acerto",
+     "paragrafo": "P11",
+     "direcao": "direita",
+     "contribuicao": 5.23,
+     "explicacao": "O autor utiliza julgamento de valor direto na voz principal para enaltecer a decisão econômica, o que é próprio do gênero de opinião.",
+     "intensidade": 2,
+     "certeza": 1.0,
+     "eixo": "economico",
+     "favorece": "Luiz Carlos Trabuco",
+     "desfavorece": "Ala petista (Gleisi, Lindbergh, Rui Costa)",
+     "ressalva": "Trata-se de artigo assinado e explicitamente rotulado como opinião."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "010cf0fe90da",
+   "url": "https://www.seudinheiro.com/2026/bolsa-dolar/o-efeito-trabuco-na-bolsa-citi-elege-5-acoes-para-ter-no-radar-com-a-chegada-do-banqueiro-a-fazenda-miql/",
+   "titulo": "O efeito Trabuco na bolsa: Citi elege 5 ações para ter no radar com a chegada do banqueiro à Fazenda",
+   "veiculo": "Seu Dinheiro",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "O texto aborda a repercussão financeira e as expectativas do mercado financeiro em relação à indicação de Luiz Carlos Trabuco para o Ministério da Fazenda no governo Lula."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 69,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 968,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Percepção de risco fiscal e atrito entre o governo e o mercado financeiro.",
+    "causa": "Incerteza sobre a condução fiscal e a disposição ao diálogo da equipe econômica.",
+    "vitima": "Investidores e empresas sensíveis ao risco Brasil.",
+    "culpado": "Incertezas fiscais do governo.",
+    "solucao": "Nomeação de um perfil benquisto pelo mercado, combinada com propostas fiscais concretas.",
+    "motor_moral": "Responsabilidade fiscal e confiança dos mercados."
+   },
+   "teste_inversao": "Se o governo fosse de outro espectro político e a indicação gerasse desconfiança, o foco estaria nos riscos apontados pelo mercado. Como a indicação é vista positivamente, o tom destaca as oportunidades de alta na bolsa.",
+   "atores": [
+    {
+     "nome": "Governo Lula / Palácio do Planalto",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro"
+    },
+    {
+     "nome": "Citi",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Citi",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Na manhã desta sexta-feira (27), o Ibovespa chegou aos 183 mil pontos, enquanto o dólar caiu mais de 4,60%.",
+     "paragrafo": "P9",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O texto apresenta dados de mercado com base temporal clara (sexta-feira, 27).",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "f70a75d62018",
+   "url": "https://c-level.folha.uol.com.br/negocios/2026/11/raizen-considera-vender-negocio-de-distribuicao-de-combustiveis-diz-ometto.shtml",
+   "titulo": "Raízen considera vender negócio de distribuição de combustíveis, diz Ometto",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto aborda a reestruturação financeira de uma grande empresa (Raízen) e traz breves comentários do acionista sobre o cenário político-econômico."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 334,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alto endividamento de empresa privada necessitando de reestruturação.",
+    "causa": "Condições macroeconômicas e alavancagem.",
+    "vitima": "Empresa em processo de reestruturação de dívidas.",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Venda de ativos e busca de novos investidores para equacionar dívidas.",
+    "motor_moral": "Sustentabilidade financeira."
+   },
+   "teste_inversao": "O tratamento dado à notícia de reestruturação empresarial e venda de ativos seria mantido independentemente do tom dos elogios políticos do empresário.",
+   "atores": [
+    {
+     "nome": "Rubens Ometto",
+     "campo": "centro"
+    },
+    {
+     "nome": "Luiz Carlos Trabuco",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rubens Ometto",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 21,
+     "ultima": true
+    },
+    {
+     "rotulo": "porta-voz da Shell",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 2,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Empresa busca alternativas para reestruturar cerca de R$ 65 bilhões em dívidas",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "O valor da dívida é explicitado com base nas informações da empresa e do mercado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "b516a067e2c4",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/27/pix-bc-vai-desenvolver-regras-para-coibir-envio-de-mensagens-intimidatorias.ghtml",
+   "titulo": "PIX: Banco Central vai desenvolver regras para coibir envio de mensagens intimidatórias",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "O texto relata novas regras e funcionalidades anunciadas pelo Banco Central para o sistema PIX."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 394,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Envio de mensagens intimidatórias, violentas ou ofensivas por meio do PIX e riscos de fraude.",
+    "causa": "Uso indevido das ferramentas de transferência com mensagens livres.",
+    "vitima": "Usuários do sistema PIX sujeitos a intimidação ou fraudes.",
+    "culpado": "Fraudadores e usuários que fazem uso inadequado da plataforma.",
+    "solucao": "Desenvolvimento de regras, opções para ocultar mensagens e indicadores antifraude em tempo real pelo Banco Central.",
+    "motor_moral": "Segurança e proteção ao consumidor."
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre medidas regulatórias de um órgão técnico, sem viés político perceptível.",
+   "atores": [
+    {
+     "nome": "Banco Central",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Banco Central",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "No ano passado, a ferramenta de transferências do Banco Central movimentou R$ 35,36 trilhões, um novo recorde, em quase 80 bilhões de transações.",
+     "paragrafo": "P13",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Dados estatísticos oficiais sobre o volume de transações do PIX devidamente contextualizados.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "56f434fc7a97",
+   "url": "https://www.infomoney.com.br/mundo/explosao-em-escola-no-afeganistao-deixa-sete-mortos-e-mais-de-90-feridos/",
+   "titulo": "Explosão em escola no Afeganistão deixa sete mortos e mais de 90 feridos",
+   "veiculo": "InfoMoney",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "seguranca",
+     "geral"
+    ],
+    "justificativa": "O texto relata um acidente fatal decorrente de explosão em uma escola no Afeganistão."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "media",
+   "motivos_confianca": [
+    "11 critérios avaliados",
+    "texto com 172 palavras (alta exige 300)"
+   ],
+   "resumo": "Equilibrado (confiança média): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 172,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Explosão acidental em escola deixando mortos e feridos.",
+    "causa": "Negligência no armazenamento de explosivos pertencentes a empresas de mineração.",
+    "vitima": "Estudantes e cidadãos locais atingidos pela explosão.",
+    "culpado": "Responsáveis pelo armazenamento negligente de explosivos.",
+    "solucao": "Investigação pelas autoridades afegãs e atendimento médico aos feridos.",
+    "motor_moral": "Preservação da vida e segurança pública."
+   },
+   "teste_inversao": "Relato puramente factual de tragédia internacional, sem viés ideológico envolvido.",
+   "atores": [
+    {
+     "nome": "Autoridades locais do Afeganistão",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "diretor provincial de Cultura e Informação, Sami ul Haq Bayan",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "porta-voz do Comando Provincial de Polícia de Kunar, Farid Dehqan",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "uma explosão em uma escola na província de Kunar, no leste do Afeganistão, deixou sete mortos e mais de 90 feridos neste sábado",
+     "paragrafo": "P1",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Apresentação de dados quantitativos de vítimas com base em autoridades locais.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "seguranca"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "c5040b029855",
+   "url": "https://www.moneytimes.com.br/petroleo-registra-primeiro-ganho-semanal-em-novembro-por-temores-sobre-oferta-davs/",
+   "titulo": "Petróleo registra primeiro ganho semanal em novembro em meio aos temores sobre oferta",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto relata a variação nos preços do petróleo no mercado internacional em função de conflitos geopolíticos e interrupções na oferta."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 403,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0.0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "NUMEROS": 0.0
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Flutuação e alta nos preços do petróleo causadas por conflitos geopolíticos.",
+    "causa": "Ataques a petroleiros e infraestrutura energética no Oriente Médio.",
+    "vitima": "Consumidores e mercado global de energia.",
+    "culpado": "Grupos e nações envolvidos nos ataques e bloqueios na região.",
+    "solucao": "Contenção de conflitos e estabilização da oferta energética.",
+    "motor_moral": "Estabilidade econômica e segurança energética."
+   },
+   "teste_inversao": "A cobertura do mercado de commodities e eventos geopolíticos internacionais segue padrões técnicos de apuração de preços e fatos.",
+   "atores": [
+    {
+     "nome": "Governo dos EUA",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Governo do Irã",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Mark Schaefer",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 20,
+     "ultima": true
+    },
+    {
+     "rotulo": "Ministério da Energia da Arábia Saudita",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "NUMEROS",
+     "citacao": "Os contratos futuros do petróleo Brent caíram US$ 1,13, ou 1,2%, fechando a sessão a US$95,44 o barril.",
+     "paragrafo": "P3",
+     "direcao": "equilibrio",
+     "contribuicao": 0.0,
+     "explicacao": "Cotações e variações percentuais detalhadas com fontes claras de mercado.",
+     "intensidade": 1,
+     "certeza": 1.0,
+     "eixo": "economico"
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "d90bcf97ae75",
+   "url": "https://www.cnnbrasil.com.br/agro/mubadala-lanca-oferta-para-ampliar-participacao-na-kepler-weber-ate-45/",
+   "titulo": "Mubadala lança oferta para ampliar participação na Kepler Weber até 45%",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "mubadala-capital-propoe-opa-voluntaria-para-dete",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia sobre operação financeira de aquisição de ações por um fundo de investimento."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 87,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 456,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Nenhum problema de natureza política ou social em disputa.",
+    "causa": "N/A",
+    "vitima": "N/A",
+    "culpado": "N/A",
+    "solucao": "N/A",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo sobre finanças corporativas, sem viés político.",
+   "atores": [
+    {
+     "nome": "Mubadala Capital",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Kepler Weber",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "fundo",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Brazil Galáxia",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kepler Weber",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "1bf32c0cf8aa",
+   "url": "https://agenciabrasil.ebc.com.br/politica/noticia/2026-11/stf-dino-suspende-emendas-parlamentares-de-flavio-bolsonaro",
+   "titulo": "STF: Dino suspende emendas parlamentares de Flávio Bolsonaro",
+   "veiculo": "Agência Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "flavio-bolsonaro-tem-emendas-de-r-79-milhoes-sus",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Trata de decisão do STF suspendendo emendas parlamentares de senador investigado e no exterior."
+   },
+   "estado": "ok",
+   "T": -6,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 70,
+    "rotulo": "Regular",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 388,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": -5.88,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {
+    "ROTULOS": -5.88
+   },
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Emendas parlamentares apresentadas por parlamentar residindo no exterior.",
+    "causa": "Saída do país por investigado após determinação de retenção de passaporte.",
+    "vitima": "Processo orçamentário",
+    "culpado": "Senador Flávio Bolsonaro",
+    "solucao": "Suspensão cautelar das emendas parlamentares.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "Se o ator afetado fosse de outro espectro político, o uso de termos como 'fuga' na linha fina dependeria da linha editorial do veículo.",
+   "atores": [
+    {
+     "nome": "Flávio Dino",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Flávio Bolsonaro",
+     "campo": "direita"
+    },
+    {
+     "nome": "Santana Braga",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "ministro",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 90,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 90,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [
+    {
+     "id": "E1",
+     "criterio": "ROTULOS",
+     "citacao": "após fuga do Brasil",
+     "paragrafo": "P1",
+     "direcao": "esquerda",
+     "contribuicao": -5.88,
+     "explicacao": "Usa o termo 'fuga' na linha fina para caracterizar a viagem do parlamentar, adotando narrativa crítica.",
+     "intensidade": 2,
+     "certeza": 0.9,
+     "eixo": "instituicoes",
+     "desfavorece": "Flávio Bolsonaro",
+     "ressalva": "O texto menciona que o senador saiu do país após ordem de retenção de passaporte."
+    }
+   ],
+   "descartadas": 0
+  },
+  {
+   "id": "6c56fd83dc7a",
+   "url": "https://neofeed.com.br/negocios/com-trabuco-na-fazenda-bancos-reabrem-a-temporada-de-compras-na-bolsa/",
+   "titulo": "Com Trabuco na Fazenda, bancos reabrem a “temporada de compras” na bolsa",
+   "veiculo": "NeoFeed",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "nomeacao-de-trabuco-para-a-fazenda-derruba-dolar",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": "Opinião",
+   "genero": "analise",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "instituicoes"
+    ],
+    "justificativa": "Aborda a repercussão no mercado financeiro e avaliações sobre a escolha ministerial e política fiscal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 1061,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Falta de credibilidade fiscal e riscos na economia.",
+    "causa": "Políticas fiscais anteriores e incertezas quanto ao controle de gastos.",
+    "vitima": "Investidores e ativos brasileiros",
+    "culpado": "Desajuste fiscal",
+    "solucao": "Escolha de um nome de mercado para a Fazenda e reformas fiscais.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O texto relata visões de mercado de diferentes bancos de forma ampla, equilibrando otimismo e cautela.",
+   "atores": [
+    {
+     "nome": "Luiz Carlos Trabuco Cappi",
+     "campo": "centro_direita"
+    },
+    {
+     "nome": "Luiz Inácio Lula da Silva",
+     "campo": "esquerda"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Solange Srour, diretora de macroeconomia para o Brasil do UBS Global Wealth Management",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 62,
+     "ultima": false
+    },
+    {
+     "rotulo": "estrategistas Pedro Grimaldi e Ben Laidler, do Bradesco BBI",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 24,
+     "ultima": false
+    },
+    {
+     "rotulo": "economistas Vinicius Moreira, Laura Karpuska e Gustavo Ribeiro",
+     "campo": "centro",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 56,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 86
+   },
+   "falas": 7,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "0d96f2c310cb",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/27/mercado-de-trabalho-mais-fraco-em-2027-pode-afetar-renda-mdia-mensal-avalia-ibre.ghtml",
+   "titulo": "Mercado de trabalho mais fraco em 2027 pode afetar renda média mensal, avalia Ibre",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "desemprego-fica-em-5-1-no-trimestre-ate-outubro",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Notícia sobre projeções para o mercado de trabalho e renda com base em dados da PNAD."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 94,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 412,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Mercado de trabalho fraco e endividamento das famílias.",
+    "causa": "Fim de ano e sazonalidade, além de pressões macroeconômicas.",
+    "vitima": "Trabalhadores e famílias endividadas",
+    "culpado": "Cenário econômico restritivo",
+    "solucao": "Monitoramento de indicadores de emprego e renda.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto apresenta análises técnicas sobre dados econômicos sem viés político partidário.",
+   "atores": [
+    {
+     "nome": "Rodolpho Tobler",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Rodolpho Tobler, economista do Instituto Brasileiro de Economia da Fundação Getulio Vargas…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 113,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "5cdb5062e3e8",
+   "url": "https://www1.folha.uol.com.br/mercado/2026/11/pix-tera-novas-regras-de-seguranca-e-bc-busca-disponibilizar-devolucao-de-valor-enviado-por-engano.shtml",
+   "titulo": "Pix terá novas regras de segurança e BC busca disponibilizar devolução de valor enviado por engano",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre novas regras de segurança e funcionalidades do Pix planejadas pelo Banco Central."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 86,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 657,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Fraudes e uso indevido de mensagens em transferências via Pix.",
+    "causa": "Vulnerabilidades no sistema de pagamentos instantâneos.",
+    "vitima": "Usuários do sistema financeiro",
+    "culpado": "Golpistas e fraudadores",
+    "solucao": "Novas regras de segurança e aprimoramento tecnológico pelo Banco Central.",
+    "motor_moral": "cuidado_igualdade"
+   },
+   "teste_inversao": "O texto relata medidas técnicas e institucionais de um órgão de Estado sem viés político.",
+   "atores": [
+    {
+     "nome": "Banco Central",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "coordenador do Fórum Pix e chefe-adjunto do Departamento de Competição e de Estrutura do…",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "50aa4959cda9",
+   "url": "https://g1.globo.com/economia/noticia/2026/11/27/expectativa-de-vida-no-brasil-sobe-para-769-anos-em-2025-diz-ibge.ghtml",
+   "titulo": "Expectativa de vida no Brasil sobe para 76,9 anos em 2025, aponta IBGE",
+   "veiculo": "g1",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "O texto apresenta dados estatísticos oficiais do IBGE sobre expectativa de vida, sem envolver debate político ou ideológico."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 296,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Nenhum",
+    "causa": "Nenhuma",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Nenhuma",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente informativo e baseado em dados públicos, logo a inversão não se aplica a debates político-partidários.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "c5f2a257f2e6",
+   "url": "https://www.moneytimes.com.br/herdeiros-da-armani-consideram-comprar-pequena-participacao-na-grife-em-operacao-de-venda-de-acoes-dizem-fontes/",
+   "titulo": "Herdeiros da Armani consideram comprar pequena participação na grife em operação de venda de ações, dizem fontes",
+   "veiculo": "Money Times",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto trata de negócios e movimentações societárias envolvendo herdeiros de uma marca de grife global, sem impacto político direto no Brasil, exceto por uma menção lateral em chamada secundária."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 82,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "nao",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 473,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Reorganização acionária da empresa após o falecimento do fundador.",
+    "causa": "Disposições testamentárias do fundador.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Venda de participações e futura abertura de capital.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Por se tratar de cobertura puramente factual de mercado corporativo internacional com fontes anônimas habituais do setor, o texto seria redigido exatamente da mesma forma para qualquer grupo empresarial.",
+   "atores": [
+    {
+     "nome": "Herdeiros de Giorgio Armani",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "duas pessoas a par do assunto",
+     "campo": "indefinido",
+     "anonima": true,
+     "vinculo": false,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 1,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "28578cb54c0f",
+   "url": "https://www.cnnbrasil.com.br/economia/money/mercado/nova-onda-de-tensao-no-oriente-medio-freia-queda-do-petroleo/",
+   "titulo": "Nova onda de tensão no Oriente Médio freia queda do petróleo",
+   "veiculo": "CNN Brasil",
+   "editoria": "Mercados & Finanças",
+   "secao": "mercados",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico",
+     "geral"
+    ],
+    "justificativa": "Aborda a flutuação dos preços do petróleo em decorrência de conflitos geopolíticos no Oriente Médio e decisões da OPEP+."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 100,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao_se_aplica",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 791,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Alta nos preços do petróleo causada por conflitos e ataques no Oriente Médio.",
+    "causa": "Ataques a refinarias, bases militares e petroleiros na região.",
+    "vitima": "Trabalhadores e civis atingidos pelos ataques na região.",
+    "culpado": "Grupos insurgentes e forças envolvidas nos ataques (rebeldes Houthi, Irã)",
+    "solucao": "Reuniões e possíveis decisões da OPEP+ sobre cotas de produção.",
+    "motor_moral": "ordem_autoridade"
+   },
+   "teste_inversao": "O relato de eventos geopolíticos e cotações de commodities baseia-se em dados de mercado e declarações oficiais de diferentes governos, sem viés partidário doméstico.",
+   "atores": [
+    {
+     "nome": "Donald Trump",
+     "campo": "direita"
+    },
+    {
+     "nome": "Governo do Irã",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Antonio Tajani",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Kathleen Brooks",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 51,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 3,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "cdefed7104d6",
+   "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-11/rendimento-real-do-trabalhador-cresceu-35-em-um-ano",
+   "titulo": "Rendimento real do trabalhador cresceu 3,5% em um ano",
+   "veiculo": "Agência Brasil",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "desemprego-fica-em-5-1-no-trimestre-ate-outubro",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "O texto apresenta indicadores socioeconômicos oficiais de emprego e renda (PNAD Contínua), com repercussão sobre o cenário econômico do país."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 311,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Nenhum",
+    "causa": "Nenhuma",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Nenhuma",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Matérias baseadas na divulgação de dados estatísticos do IBGE seguem padrão puramente descritivo, independente de qual governo esteja no poder.",
+   "atores": [],
+   "fontes": [
+    {
+     "rotulo": "Instituto Brasileiro de Geografia e Estatística (IBGE)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "bcae0af09de6",
+   "url": "https://valor.globo.com/brasil/noticia/2026/11/27/governo-central-tem-superavit-primario-de-r-52-bilhoes-em-outubro.ghtml",
+   "titulo": "Governo central tem o maior superávit primário para outubro desde 2016",
+   "veiculo": "Valor Econômico",
+   "editoria": "Brasil · Economia",
+   "secao": "brasil",
+   "materia": "governo-central-registra-superavit-primario-de-r",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "media",
+    "eixos": [
+     "economico"
+    ],
+    "justificativa": "Trata de dados oficiais das contas públicas do governo federal (superávit primário), tema de forte debate na política fiscal."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 92,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "nao_se_aplica",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "nao_se_aplica",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 413,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Equilíbrio fiscal e cumprimento de metas de resultado primário.",
+    "causa": "Variação na arrecadação de receitas e controle de despesas públicas.",
+    "vitima": "Nenhuma",
+    "culpado": "Nenhum",
+    "solucao": "Gestão das contas públicas para atingir a meta fiscal estabelecida.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "A publicação de relatórios fiscais do Tesouro Nacional é feita de forma técnica, relatando números e variações reais sem juízo de valor da redação.",
+   "atores": [
+    {
+     "nome": "Governo Federal",
+     "campo": "centro"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Tesouro Nacional",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9994e6cd6182",
+   "url": "https://www1.folha.uol.com.br/mundo/2026/11/explosao-perto-de-escola-mata-7-estudantes-e-fere-cerca-de-100-no-afeganistao.shtml",
+   "titulo": "Explosão perto de escola mata 7 estudantes e fere cerca de 100 no Afeganistão",
+   "veiculo": "Folha de S.Paulo",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "baixa",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Trata de um acidente em depósito de explosivos no Afeganistão, sem embate político-ideológico nacional."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 88,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 398,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Explosão acidental perto de escola no Afeganistão mata estudantes e fere civis.",
+    "causa": "Preparação de explosivos em depósito de empresas de mineração.",
+    "vitima": "Estudantes e moradores locais.",
+    "culpado": "Nenhum (tratado como acidente).",
+    "solucao": "Investigação pelas autoridades.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "O texto é estritamente factual e descritivo de um acidente internacional, mantendo-se o mesmo independentemente do contexto ideológico.",
+   "atores": [
+    {
+     "nome": "Abdul Mateen Qani",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "um porta-voz do Ministério do Interior do Talibã",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Sami-ul-Haq Bayan, chefe do Departamento de Informação e Cultura de Kunar",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "fef40e91f33e",
+   "url": "https://g1.globo.com/mundo/noticia/2026/11/27/avioes-comerciais-batem-enquanto-se-preparavam-para-decolar-no-aeroporto-de-washington-nos-eua.ghtml",
+   "titulo": "Aviões comerciais batem enquanto se preparavam para decolar no aeroporto de Washington, nos EUA",
+   "veiculo": "g1",
+   "editoria": "Geopolítica & Mundo",
+   "secao": "mundo",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "nenhuma",
+    "eixos": [
+     "geral"
+    ],
+    "justificativa": "Notícia sobre incidente aéreo sem envolvimento político ou partidário."
+   },
+   "estado": "nao_se_aplica",
+   "T": null,
+   "rotulo": "Não se aplica",
+   "confianca": null,
+   "motivos_confianca": [],
+   "resumo": "Não se aplica: o texto não tem dimensão político-ideológica relevante.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 81,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "nao_se_aplica",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 369,
+   "cortado": false,
+   "decomposicao": null,
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 0,
+   "enquadramento": {
+    "problema": "Colisão leve entre duas aeronaves comerciais durante taxiamento.",
+    "causa": "Aeronave ultrapassou a linha de espera.",
+    "vitima": "Nenhuma.",
+    "culpado": "Nenhum apontado diretamente.",
+    "solucao": "Investigação pela FAA.",
+    "motor_moral": "nenhum"
+   },
+   "teste_inversao": "Trata-se de uma notícia puramente factual sobre aviação civil, sem qualquer viés político aplicável.",
+   "atores": [],
+   "fontes": [],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "9c33d92a59fe",
+   "url": "https://www.infomoney.com.br/politica/fundacao-criada-por-fhc-desmente-relato-de-lula-sobre-saude-do-ex-presidente/",
+   "titulo": "Fundação criada por FHC desmente relato de Lula sobre saúde do ex-presidente",
+   "veiculo": "InfoMoney",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "fundacao-fhc-lamenta-e-desmente-declaracao-de-lu",
+   "origem": "materia",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes"
+    ],
+    "justificativa": "Envolve declarações do presidente da República sobre a saúde de um ex-presidente e a manifestação da fundação correspondente."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 83,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "nao_se_aplica",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 486,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Declarações polêmicas do presidente Lula sobre o estado de saúde do ex-presidente FHC.",
+    "causa": "Declaração pública feita em agenda oficial.",
+    "vitima": "FHC e sua família.",
+    "culpado": "Lula.",
+    "solucao": "Esclarecimento público e desmentido pela Fundação FHC.",
+    "motor_moral": "respeito_dignidade"
+   },
+   "teste_inversao": "O veículo relata de forma direta e balanceada o fato (declaração de Lula) e a resposta imediata da fundação e da defesa, mantendo simetria.",
+   "atores": [
+    {
+     "nome": "Lula",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Fundação FHC",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Fundação FHC",
+     "campo": "centro_direita",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 9,
+     "ultima": false
+    },
+    {
+     "rotulo": "Lula",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 8,
+     "ultima": true
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 8,
+    "direita": 9
+   },
+   "falas": 6,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "3ddb76531bd0",
+   "url": "https://www.cnnbrasil.com.br/internacional/taiwan-vai-as-urnas-em-eleicoes-locais-decisivas-sob-pressao-da-china/",
+   "titulo": "Taiwan vai às urnas em eleições locais decisivas sob pressão da China",
+   "veiculo": "CNN Brasil",
+   "editoria": "Política",
+   "secao": "politica",
+   "materia": "",
+   "origem": "cobertura comparada",
+   "data_publicacao": "2026-11-28",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "geral"
+    ],
+    "justificativa": "Cobertura de eleições locais em Taiwan e repercussão geopolítica envolvendo a China e partidos locais."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 85,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "nao",
+     "incerteza_declarada": "nao",
+     "autoria_data": "sim"
+    }
+   },
+   "palavras": 576,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Eleições locais em Taiwan sob pressão e ameaça geopolítica da China.",
+    "causa": "Reivindicação territorial de Pequim sobre Taiwan.",
+    "vitima": "População e instituições democráticas de Taiwan.",
+    "culpado": "Governo da China.",
+    "solucao": "Resistência democrática por meio do voto e postura de defesa local.",
+    "motor_moral": "democracia_soberania"
+   },
+   "teste_inversao": "A cobertura expõe a posição tanto de Taiwan quanto de Pequim de maneira descritiva, sem favorecimento estrutural evidente.",
+   "atores": [
+    {
+     "nome": "Governo da China",
+     "campo": "esquerda"
+    },
+    {
+     "nome": "Partido Democrático Progressista (PDP)",
+     "campo": "centro_esquerda"
+    },
+    {
+     "nome": "Kuomintang (KMT)",
+     "campo": "centro_direita"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Puma Shen",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ministério da Defesa de Taiwan",
+     "campo": "centro_esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Ministério da Defesa da China",
+     "campo": "esquerda",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 5,
+   "evidencias": [],
+   "descartadas": 0
+  },
+  {
+   "id": "eb7ec35b32fe",
+   "url": "https://agenciabrasil.ebc.com.br/justica/noticia/2026-11/fachin-mantem-prisao-de-paulo-henrique-costa-ex-presidente-do-brb",
+   "titulo": "Fachin mantém prisão de Paulo Henrique Costa, ex-presidente do BRB",
+   "veiculo": "Agência Brasil",
+   "editoria": "Jurídico & Regulação",
+   "secao": "juridico",
+   "materia": "fachin-libera-repasse-de-r-316-milhoes-para-o-br",
+   "origem": "materia",
+   "data_publicacao": "2026-11-27",
+   "analisado_em": "2026-11-28",
+   "versao_calculo": "1.1.0",
+   "selo": null,
+   "genero": "noticia",
+   "triagem": {
+    "relevancia_politica": "alta",
+    "eixos": [
+     "instituicoes",
+     "economico"
+    ],
+    "justificativa": "Aborda decisão judicial do STF mantendo a prisão de ex-dirigente de banco público envolvido em esquema de corrupção."
+   },
+   "estado": "ok",
+   "T": 0,
+   "rotulo": "Equilibrado",
+   "confianca": "alta",
+   "motivos_confianca": [
+    "11 critérios avaliados"
+   ],
+   "resumo": "Equilibrado (confiança alta): sinais fracos ou ausentes nos 11 critérios avaliados.",
+   "motivo_estado": null,
+   "qualidade_apuracao": {
+    "Q": 95,
+    "rotulo": "Boa",
+    "itens": {
+     "titulo_sustentado": "sim",
+     "contraponto": "sim",
+     "fontes_identificadas": "sim",
+     "opiniao_separada": "sim",
+     "numeros_contextualizados": "sim",
+     "documento_primario": "sim",
+     "incerteza_declarada": "sim",
+     "autoria_data": "nao"
+    }
+   },
+   "palavras": 383,
+   "cortado": false,
+   "decomposicao": {
+    "premissas": 0,
+    "atores": 0,
+    "divergente": false
+   },
+   "por_eixo": {},
+   "criterios": {},
+   "aplicaveis": 11,
+   "enquadramento": {
+    "problema": "Corrupção e fraudes bancárias envolvendo dirigente de banco público.",
+    "causa": "Acordos e desvios financeiros na gestão do BRB.",
+    "vitima": "Banco Regional de Brasília (BRB) / sociedade.",
+    "culpado": "Ex-gestores investigados.",
+    "solucao": "Manutenção da prisão preventiva e investigações em curso.",
+    "motor_moral": "lei_e_ordem"
+   },
+   "teste_inversao": "O texto apresenta os argumentos da defesa de forma clara e neutra, além da posição do STF e da PGR, mantendo o padrão informativo.",
+   "atores": [
+    {
+     "nome": "Edson Fachin",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Paulo Henrique Costa",
+     "campo": "indefinido"
+    },
+    {
+     "nome": "Procuradoria-Geral da República (PGR)",
+     "campo": "indefinido"
+    }
+   ],
+   "fontes": [
+    {
+     "rotulo": "Procuradoria-Geral da República (PGR)",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    },
+    {
+     "rotulo": "Os advogados",
+     "campo": "indefinido",
+     "anonima": false,
+     "vinculo": true,
+     "palavras": 0,
+     "ultima": false
+    }
+   ],
+   "saldo_fontes": {
+    "esquerda": 0,
+    "direita": 0
+   },
+   "falas": 0,
+   "evidencias": [],
+   "descartadas": 0
+  }
+ ],
+ "execucoes": [
+  {
+   "gerado_em": "2026-11-28T13:41:55+00:00",
+   "provedor": "gemini_lite",
+   "modelo": "gemini-flash-lite-latest",
+   "candidatos": 120,
+   "textos_curtos": 27,
+   "falhas": 0,
+   "chamadas": 12,
+   "tokens": {
+    "entrada": 81279,
+    "saida": 42901
+   },
+   "analises": [
+    "baced98ec82c",
+    "9dc249511503",
+    "a917dc47039e",
+    "84cac3196fdb",
+    "45571c656fc1",
+    "5557ef207696",
+    "7ca74f3f13f8",
+    "93e8248bf31a",
+    "795cea9cbde9",
+    "8036f4d031d0",
+    "77049d5312e6",
+    "5cca266c649d",
+    "3769c5cc5235",
+    "ec0ad8b661da",
+    "31428a06e3b1",
+    "7aeda954064e",
+    "80e6429a6d2e",
+    "69be41565d98",
+    "53f13587bf4a",
+    "bdc126021ec9",
+    "bcd17f9b6c82",
+    "40051d2d42bd",
+    "9ecf4b4728c6",
+    "7130d9a5974f",
+    "448f670c2412",
+    "e738606fd73d",
+    "2f03441484a7",
+    "ad2975f58e86",
+    "99024f544d46",
+    "3a86c72a37f8",
+    "c236f4e4487c",
+    "0a99417c86a7",
+    "857b2dbef4fb",
+    "02ff13418a24",
+    "182008a6f642",
+    "0857036f260a",
+    "d3c39a6dad59",
+    "8cd166eb0944",
+    "8322e6e2aa5b",
+    "343a47f4749f",
+    "010cf0fe90da",
+    "f70a75d62018",
+    "b516a067e2c4",
+    "56f434fc7a97",
+    "c5040b029855",
+    "d90bcf97ae75",
+    "1bf32c0cf8aa",
+    "6c56fd83dc7a",
+    "0d96f2c310cb",
+    "5cdb5062e3e8",
+    "50aa4959cda9",
+    "c5f2a257f2e6",
+    "28578cb54c0f",
+    "cdefed7104d6",
+    "bcae0af09de6",
+    "9994e6cd6182",
+    "fef40e91f33e",
+    "9c33d92a59fe",
+    "3ddb76531bd0",
+    "eb7ec35b32fe"
+   ]
+  }
+ ]
+}
